@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
@@ -15,6 +16,8 @@ public class Particle implements Pool.Poolable {
     float transparency;
     float rotation;
     float size;
+
+    Color color = new Color();
 
     float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
@@ -54,6 +57,7 @@ public class Particle implements Pool.Poolable {
         transparency = particleModule.getTransparency();
         rotation = particleModule.getRotation();
         size = particleModule.getSize();
+        color.set(particleModule.getColor());
 
         // perform inner operations
         position.x += MathUtils.cosDeg(angle)*velocity;

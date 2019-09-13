@@ -1,7 +1,8 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.graphics.Color;
+import com.rockbite.tools.talos.runtime.values.ColorValue;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
-import com.rockbite.tools.talos.runtime.values.Value;
 
 public class ParticleModule extends Module {
 
@@ -33,6 +34,7 @@ public class ParticleModule extends Module {
         scopePayload = new ScopePayload();
 
         createInputSlots(15);
+        inputValues.put(COLOR, new ColorValue());
     }
 
     @Override
@@ -92,5 +94,13 @@ public class ParticleModule extends Module {
         if(tmp.isEmpty()) return 50; // defaults
 
         return tmp.get();
+    }
+
+    public Color getColor() {
+        getInputValue(inputValues.get(COLOR), COLOR, scopePayload);
+
+        if(inputValues.get(COLOR).isEmpty()) return Color.WHITE; // defaults
+
+        return (Color) inputValues.get(COLOR).get();
     }
 }
