@@ -13,6 +13,10 @@ public class Vector2Value extends Value<Vector2> {
         object.set(value, value);
     }
 
+    public void set(float x, float y) {
+        object.set(x, y);
+    }
+
     @Override
     public void set(Value value) {
         this.object.set((Vector2) value.get());

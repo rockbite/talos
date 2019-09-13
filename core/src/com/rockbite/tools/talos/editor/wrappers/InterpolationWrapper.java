@@ -10,8 +10,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Field;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
-import com.rockbite.tools.talos.runtime.InterpolationModule;
-import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
 
 public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
 

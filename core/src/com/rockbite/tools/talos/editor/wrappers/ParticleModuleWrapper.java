@@ -1,7 +1,6 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
-import com.rockbite.tools.talos.runtime.EmitterModule;
-import com.rockbite.tools.talos.runtime.ParticleModule;
+import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
@@ -14,7 +13,6 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     protected void configureSlots() {
         addInputSlot("drawable",  ParticleModule.DRAWABLE);
         addInputSlot("offset",  ParticleModule.OFFSET);
-        addInputSlot("position",  ParticleModule.POSITION);
         addInputSlot("life",  ParticleModule.LIFE);
 
         addSeparator(true);

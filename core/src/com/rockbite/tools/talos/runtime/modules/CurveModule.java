@@ -1,9 +1,10 @@
-package com.rockbite.tools.talos.runtime;
+package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.tools.talos.runtime.ParticleSystem;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
-import com.rockbite.tools.talos.runtime.values.Value;
 
 import java.util.Comparator;
 
@@ -84,7 +85,7 @@ public class CurveModule extends Module {
         // interpolate alpha in this point space
 
         if(points.get(0).x > 0) {
-            return interpolate(alpha, 0, points.get(0).y, points.get(0).x, points.get(0).y);
+            return points.get(0).y;
         }
 
         for(int i = 0; i < points.size-1; i++) {
@@ -96,14 +97,14 @@ public class CurveModule extends Module {
         }
 
         if(points.get(points.size-1).x < 1f) {
-            return interpolate(alpha, points.get(points.size-1).x, points.get(points.size-1).y, 1, points.get(points.size-1).y);
+            return points.get(points.size-1).y;
         }
 
         return 0;
     }
 
     private float interpolate(float alpha, float x1, float y1, float x2, float y2) {
-
+        if(y1 == y2) return y1;
         if(x1 == x2) return y1;
 
         tmp.set(x2, y2);

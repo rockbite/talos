@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.runtime;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 
 public class ParticleEmitter {
 
@@ -16,8 +17,8 @@ public class ParticleEmitter {
     float rate; // emission rate
 
     // inner vars
-    float alpha;
-    float particlesToEmmit;
+    public float alpha;
+    public float particlesToEmmit;
 
     public Array<Particle> activeParticles = new Array<>();
 

@@ -11,6 +11,11 @@ public class FloatValue extends Value<Float> {
         object = value;
     }
 
+
+    public float getFloat() {
+        return object;
+    }
+
     @Override
     public void set(Value value) {
         this.object = (Float) value.get();

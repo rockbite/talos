@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.reflect.Field;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.runtime.Expression;
-import com.rockbite.tools.talos.runtime.MathModule;
+import com.rockbite.tools.talos.runtime.modules.MathModule;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 

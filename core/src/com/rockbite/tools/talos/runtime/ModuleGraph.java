@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.rockbite.tools.talos.runtime.modules.*;
+import com.rockbite.tools.talos.runtime.values.Vector2Value;
 
 public class ModuleGraph {
 
@@ -34,6 +36,7 @@ public class ModuleGraph {
         registeredModules.add(MixModule.class);
         registeredModules.add(MathModule.class);
         registeredModules.add(CurveModule.class);
+        registeredModules.add(Vector2Module.class);
     }
 
     public Module createModule(Class clazz) {

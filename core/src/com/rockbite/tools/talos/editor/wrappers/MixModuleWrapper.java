@@ -1,6 +1,6 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
-import com.rockbite.tools.talos.runtime.MixModule;
+import com.rockbite.tools.talos.runtime.modules.MixModule;
 
 public class MixModuleWrapper extends ModuleWrapper<MixModule> {
 

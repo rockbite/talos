@@ -1,7 +1,7 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 
-import com.rockbite.tools.talos.runtime.EmitterModule;
+import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 
 public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 

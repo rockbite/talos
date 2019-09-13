@@ -19,7 +19,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
-import com.rockbite.tools.talos.runtime.Module;
+import com.rockbite.tools.talos.runtime.modules.*;
 
 public class ModuleBoardWidget extends WidgetGroup {
 
@@ -156,6 +156,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(MixModule.class, MixModuleWrapper.class);
         WrapperRegistry.reg(MathModule.class, MathModuleWrapper.class);
         WrapperRegistry.reg(CurveModule.class, CurveModuleWrapper.class);
+        WrapperRegistry.reg(Vector2Module.class, Vector2ModuleWrapper.class);
     }
 
     private void showPopup() {

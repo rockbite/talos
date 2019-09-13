@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.editor.ModuleBoardWidget;
-import com.rockbite.tools.talos.runtime.Module;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
@@ -137,7 +137,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
         return addSelectBox(values.toArray());
     }
 
-    private void  configureNodeActions(final Image icon, final int key, final boolean isInput) {
+    protected void  configureNodeActions(final Image icon, final int key, final boolean isInput) {
 
         if(isInput) {
             inputSlotMap.put(key, icon);

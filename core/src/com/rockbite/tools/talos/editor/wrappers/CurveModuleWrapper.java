@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.rockbite.tools.talos.runtime.CurveModule;
-import com.rockbite.tools.talos.runtime.InterpolationModule;
+import com.rockbite.tools.talos.runtime.modules.CurveModule;
+import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
 
 public class CurveModuleWrapper extends ModuleWrapper<CurveModule> {
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class Particle implements Pool.Poolable {
 
@@ -19,7 +20,7 @@ public class Particle implements Pool.Poolable {
 
     Color color = new Color();
 
-    float alpha; // alpha position from 0 to 1 in it's lifetime cycle
+    public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
     public float seed;
 
@@ -35,7 +36,7 @@ public class Particle implements Pool.Poolable {
 
         particleModule.updateScopeData(this);
 
-        position.set(0, 0);
+        position.set(particleModule.getStartPosition());
 
         // inner variable defaults
         alpha = 0f;

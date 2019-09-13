@@ -2,10 +2,8 @@ package com.rockbite.tools.talos.runtime;
 
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
-
-import java.util.HashMap;
+import com.rockbite.tools.talos.runtime.modules.EmitterModule;
+import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class ParticleSystem {
 

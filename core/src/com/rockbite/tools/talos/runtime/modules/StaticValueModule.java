@@ -1,5 +1,7 @@
-package com.rockbite.tools.talos.runtime;
+package com.rockbite.tools.talos.runtime.modules;
 
+import com.rockbite.tools.talos.runtime.ParticleSystem;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
 import com.rockbite.tools.talos.runtime.values.Value;
 import com.rockbite.tools.talos.runtime.values.Vector2Value;

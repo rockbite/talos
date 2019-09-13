@@ -1,6 +1,8 @@
-package com.rockbite.tools.talos.runtime;
+package com.rockbite.tools.talos.runtime.modules;
 
-import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.ParticleEmitter;
+import com.rockbite.tools.talos.runtime.ParticleSystem;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 
 public class EmitterModule extends Module {
 

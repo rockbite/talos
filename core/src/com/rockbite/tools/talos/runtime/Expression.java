@@ -38,14 +38,14 @@ public abstract class Expression {
     static public final Expression cos = new Expression() {
         @Override
         public float apply(float a, float b) {
-            return MathUtils.cosDeg(a);
+            return MathUtils.cosDeg(a) * b;
         }
     };
 
     static public final Expression sin = new Expression() {
         @Override
         public float apply(float a, float b) {
-            return MathUtils.sinDeg(a);
+            return MathUtils.sinDeg(a) * b;
         }
     };
 }

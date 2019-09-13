@@ -4,10 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.IntMap;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
-import com.kotcrab.vis.ui.widget.VisTextField;
-import com.rockbite.tools.talos.runtime.InputModule;
+import com.rockbite.tools.talos.runtime.modules.InputModule;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.StaticValueModule;
 
 public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 
