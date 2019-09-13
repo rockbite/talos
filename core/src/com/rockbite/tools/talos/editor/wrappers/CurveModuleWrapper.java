@@ -175,8 +175,11 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> {
                         // we are dragging a point
                         point.set(vec1);
 
-                        if(point.x < 0) point.x = 0;
-                        if(point.x > 1) point.x = 1;
+                        float leftBound = getLeftBound(draggingPoint);
+                        float rightBound = getRightBound(draggingPoint);
+
+                        if(point.x < leftBound) point.x = leftBound;
+                        if(point.x > rightBound) point.x = rightBound;
                         if(point.y < 0) point.y = 0;
                         if(point.y > 1) point.y = 1;
                     }
@@ -190,6 +193,17 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> {
 
                     draggingPoint = -1;
                 }
+
+                private float getLeftBound(int index) {
+                    if(index == 0) return 0;
+                    return module.getPoints().get(index-1).x;
+                }
+
+                private float getRightBound(int index) {
+                    if(index == module.getPoints().size - 1) return 1;
+                    return module.getPoints().get(index+1).x;
+                }
+
             });
         }
 
