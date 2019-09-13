@@ -1,0 +1,209 @@
+
+character-cadmius.png
+size: 621,531
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+cadmius-back-color
+  rotate: false
+  xy: 548, 115
+  size: 57, 35
+  orig: 57, 35
+  offset: 0, 0
+  index: -1
+cadmius-back-finger
+  rotate: false
+  xy: 601, 172
+  size: 20, 51
+  orig: 20, 51
+  offset: 0, 0
+  index: -1
+cadmius-back-glass-tube
+  rotate: false
+  xy: 371, 25
+  size: 81, 77
+  orig: 81, 77
+  offset: 0, 0
+  index: -1
+cadmius-back-wire
+  rotate: false
+  xy: 307, 38
+  size: 64, 96
+  orig: 64, 96
+  offset: 0, 0
+  index: -1
+cadmius-body
+  rotate: false
+  xy: 0, 186
+  size: 350, 179
+  orig: 350, 179
+  offset: 0, 0
+  index: -1
+cadmius-body-back
+  rotate: false
+  xy: 0, 125
+  size: 201, 61
+  orig: 201, 61
+  offset: 0, 0
+  index: -1
+cadmius-brush-hand
+  rotate: false
+  xy: 449, 404
+  size: 164, 127
+  orig: 164, 127
+  offset: 0, 0
+  index: -1
+cadmius-drop
+  rotate: false
+  xy: 581, 80
+  size: 27, 35
+  orig: 27, 35
+  offset: 0, 0
+  index: -1
+cadmius-front-color
+  rotate: false
+  xy: 452, 9
+  size: 79, 60
+  orig: 79, 60
+  offset: 0, 0
+  index: -1
+cadmius-front-finger
+  rotate: false
+  xy: 535, 66
+  size: 22, 49
+  orig: 22, 49
+  offset: 0, 0
+  index: -1
+cadmius-front-glass-tube
+  rotate: false
+  xy: 460, 305
+  size: 98, 99
+  orig: 98, 99
+  offset: 0, 0
+  index: -1
+cadmius-front-wire
+  rotate: false
+  xy: 548, 150
+  size: 53, 59
+  orig: 53, 59
+  offset: 0, 0
+  index: -1
+cadmius-hands-holder
+  rotate: false
+  xy: 350, 196
+  size: 110, 43
+  orig: 110, 43
+  offset: 0, 0
+  index: -1
+cadmius-left-arm
+  rotate: false
+  xy: 371, 102
+  size: 71, 94
+  orig: 71, 94
+  offset: 0, 0
+  index: -1
+cadmius-left-hand
+  rotate: false
+  xy: 350, 239
+  size: 110, 126
+  orig: 110, 126
+  offset: 0, 0
+  index: -1
+cadmius-left-hand-armor
+  rotate: false
+  xy: 460, 135
+  size: 88, 74
+  orig: 88, 74
+  offset: 0, 0
+  index: -1
+cadmius-left-hand-armor-back
+  rotate: false
+  xy: 319, 143
+  size: 33, 43
+  orig: 33, 43
+  offset: 0, 0
+  index: -1
+cadmius-paint-bucket-back
+  rotate: false
+  xy: 201, 134
+  size: 118, 52
+  orig: 118, 52
+  offset: 0, 0
+  index: -1
+cadmius-paint-bucket-front
+  rotate: false
+  xy: 0, 8
+  size: 128, 117
+  orig: 128, 117
+  offset: 0, 0
+  index: -1
+cadmius-paint-bucket-holder-back
+  rotate: false
+  xy: 557, 76
+  size: 24, 39
+  orig: 24, 39
+  offset: 0, 0
+  index: -1
+cadmius-paint-bucket-holder-front
+  rotate: false
+  xy: 128, 2
+  size: 77, 123
+  orig: 77, 123
+  offset: 0, 0
+  index: -1
+cadmius-paint-left
+  rotate: false
+  xy: 205, 3
+  size: 81, 27
+  orig: 81, 27
+  offset: 0, 0
+  index: -1
+cadmius-paint-right
+  rotate: false
+  xy: 558, 312
+  size: 57, 92
+  orig: 57, 92
+  offset: 0, 0
+  index: -1
+cadmius-right-arm
+  rotate: false
+  xy: 561, 223
+  size: 58, 89
+  orig: 58, 89
+  offset: 0, 0
+  index: -1
+cadmius-right-hand-armor
+  rotate: false
+  xy: 452, 69
+  size: 83, 66
+  orig: 83, 66
+  offset: 0, 0
+  index: -1
+cadmius-right-hand-armor-back
+  rotate: false
+  xy: 286, 0
+  size: 32, 30
+  orig: 32, 30
+  offset: 0, 0
+  index: -1
+smile-left-eye
+  rotate: false
+  xy: 460, 209
+  size: 101, 96
+  orig: 101, 96
+  offset: 0, 0
+  index: -1
+smile-mouth
+  rotate: false
+  xy: 0, 365
+  size: 449, 166
+  orig: 449, 166
+  offset: 0, 0
+  index: -1
+smile-right-eye
+  rotate: false
+  xy: 205, 30
+  size: 102, 104
+  orig: 102, 104
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,90 @@
+
+drifter.png
+size: 173,253
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+drifter-back-left-leg-horizontal-down
+  rotate: false
+  xy: 100, 12
+  size: 27, 38
+  orig: 27, 38
+  offset: 0, 0
+  index: -1
+drifter-back-right-leg-horizontal-down
+  rotate: false
+  xy: 127, 12
+  size: 27, 38
+  orig: 27, 38
+  offset: 0, 0
+  index: -1
+drifter-body-blick
+  rotate: false
+  xy: 91, 134
+  size: 11, 11
+  orig: 11, 11
+  offset: 0, 0
+  index: -1
+drifter-body-jelly-part
+  rotate: false
+  xy: 0, 145
+  size: 107, 108
+  orig: 107, 108
+  offset: 0, 0
+  index: -1
+drifter-body-metallic-part
+  rotate: false
+  xy: 91, 50
+  size: 82, 76
+  orig: 82, 76
+  offset: 0, 0
+  index: -1
+drifter-eye-horizontal-down
+  rotate: false
+  xy: 107, 173
+  size: 57, 80
+  orig: 57, 80
+  offset: 0, 0
+  index: -1
+drifter-eye-horizontal-up
+  rotate: false
+  xy: 0, 0
+  size: 36, 13
+  orig: 36, 13
+  offset: 0, 0
+  index: -1
+drifter-eye-left-side
+  rotate: false
+  xy: 0, 13
+  size: 42, 43
+  orig: 42, 43
+  offset: 0, 0
+  index: -1
+drifter-front-left-leg-horizontal-down
+  rotate: false
+  xy: 42, 10
+  size: 29, 46
+  orig: 29, 46
+  offset: 0, 0
+  index: -1
+drifter-front-right-leg-horizontal-down
+  rotate: false
+  xy: 71, 4
+  size: 29, 46
+  orig: 29, 46
+  offset: 0, 0
+  index: -1
+drifter-shadow
+  rotate: false
+  xy: 0, 56
+  size: 91, 89
+  orig: 91, 89
+  offset: 0, 0
+  index: -1
+drifter-yellow-light-horizontal-down
+  rotate: false
+  xy: 107, 126
+  size: 66, 47
+  orig: 66, 47
+  offset: 0, 0
+  index: -1

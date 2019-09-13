@@ -1,0 +1,9 @@
+<bindings>
+	<vfx>
+		<effect animation="excited" asset="aquaponic-head_ui" bone="aquaponic-left-body-control" offsetX="1.7727356" offsetY="3.4163437" startEvent="" endEvent="" behind="false" scale="0.6"/>
+		<effect animation="excited" asset="aquaponic-head_ui" bone="aquaponic-right-back-hand-finger-3" offsetX="2.2954407" offsetY="1.0975647" startEvent="" endEvent="" behind="false" scale="0.6"/>
+	</vfx>
+	<sfx>
+		<sound asset="sneeze1" extension="ogg" event=""/>
+	</sfx>
+</bindings>
