@@ -1,17 +1,18 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+
 public class EmitterModule extends Module {
 
     public static final int RATE = 0;
 
     private ScopePayload scopePayload;
 
-    Value tmp = new Value();
-
     @Override
     public void init(ParticleSystem system) {
         super.init(system);
         scopePayload = new ScopePayload();
+
         createInputSlots(1);
     }
 
@@ -21,11 +22,11 @@ public class EmitterModule extends Module {
     }
 
     public float getRate() {
-        getInputValue(tmp, RATE, scopePayload);
+        getInputValue(inputValues.get(RATE), RATE, scopePayload);
 
-        if(tmp.isDefault) return 50; // defaults
+        if(inputValues.get(RATE).isEmpty()) return 50; // defaults
 
-        return tmp.floatVars[0];
+        return (float) inputValues.get(RATE).get();
     }
 
     public void updateScopeData(ParticleEmitter particleEmitter) {

@@ -1,5 +1,8 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
+
 public class InputModule extends Module {
 
     private int scopeKey;
@@ -8,7 +11,7 @@ public class InputModule extends Module {
     public void init(ParticleSystem system) {
         super.init(system);
 
-        Value output = new Value();
+        FloatValue output = new FloatValue();
         outputValues.put(0, output);
     }
 

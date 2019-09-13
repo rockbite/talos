@@ -1,12 +1,15 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
+
 public class MathModule extends Module {
 
     public static final int A = 0;
     public static final int B = 1;
 
-    Value valA = new Value();
-    Value valB = new Value();
+    FloatValue valA = new FloatValue();
+    FloatValue valB = new FloatValue();
 
     private Expression currentExpression;
 
@@ -17,7 +20,7 @@ public class MathModule extends Module {
         currentExpression = Expression.sum;
 
         createInputSlots(3);
-        Value output = new Value();
+        FloatValue output = new FloatValue();
         outputValues.put(0, output);
     }
 
@@ -27,10 +30,8 @@ public class MathModule extends Module {
         getInputValue(valB, B, scopePayload);
 
         if(currentExpression != null) {
-            for(int i = 0; i < 3; i++){
-                outputValues.get(0).floatVars[i] = currentExpression.apply(valA.floatVars[i], valB.floatVars[i]);
-                outputValues.put(0, outputValues.get(0));
-            }
+            float res = currentExpression.apply(valA.get(), valB.get()); // change expressions to ValueExpressions
+            outputValues.get(0).set(res);
         }
     }
 

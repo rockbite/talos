@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.utils.IntMap;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 public class ScopePayload {
 
@@ -12,7 +14,7 @@ public class ScopePayload {
 
     public ScopePayload() {
         for(int i = 0; i < 10; i++) {
-            map.put(i, new Value());
+            map.put(i, new FloatValue());
         }
     }
 
@@ -29,6 +31,6 @@ public class ScopePayload {
     }
 
     public float getFloat(int index) {
-        return map.get(index).floatVars[0];
+        return (float) map.get(index).get();
     }
 }

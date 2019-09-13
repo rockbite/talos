@@ -93,6 +93,7 @@ public class ModuleGraph {
         // slotTo is the input of module to
         // slotFrom is the output of slot from
         to.attachModuleToInput(from, slotTo, slotFrom);
+        from.attached(to, slotTo);
     }
 
     public void removeNode(Module module, int slot) {

@@ -2,15 +2,18 @@ package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 import java.util.Comparator;
-import java.util.Vector;
 
 
 public class CurveModule extends Module {
 
     public static final int ALPHA = 0;
-    Value alphaVal = new Value();
+
+    FloatValue alphaVal = new FloatValue();
+    FloatValue result = new FloatValue();
 
     private Array<Vector2> points = new Array();
 
@@ -31,8 +34,7 @@ public class CurveModule extends Module {
         super.init(system);
 
         createInputSlots(1);
-        Value output = new Value();
-        outputValues.put(0, output);
+        outputValues.put(0, result);
 
         resetPoints();
     }
@@ -71,9 +73,9 @@ public class CurveModule extends Module {
     @Override
     public void processValues(ScopePayload scopePayload) {
         getInputValue(alphaVal, ALPHA, scopePayload);
-        float alpha = alphaVal.floatVars[0];
+        float alpha = (float) alphaVal.get();
 
-        alphaVal.floatVars[0] = interpolate(alpha);
+        alphaVal.set(interpolate(alpha));
         outputValues.put(0, alphaVal);
 
     }

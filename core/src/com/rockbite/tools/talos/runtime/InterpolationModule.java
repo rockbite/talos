@@ -1,13 +1,14 @@
 package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.IntMap;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 public class InterpolationModule extends Module {
 
     public static final int ALPHA = 0;
 
-    Value alphaVal = new Value();
+    FloatValue alphaVal = new FloatValue();
 
     private Interpolation currentInterpolation;
 
@@ -18,17 +19,17 @@ public class InterpolationModule extends Module {
         currentInterpolation = Interpolation.linear;
 
         createInputSlots(1);
-        Value output = new Value();
+        FloatValue output = new FloatValue();
         outputValues.put(0, output);
     }
 
     @Override
     public void processValues(ScopePayload scopePayload) {
         getInputValue(alphaVal, ALPHA, scopePayload);
-        float alpha = alphaVal.floatVars[0];
+        float alpha = alphaVal.get();
 
         if(currentInterpolation != null) {
-            alphaVal.floatVars[0] = currentInterpolation.apply(alpha);
+            alphaVal.set(currentInterpolation.apply(alpha));
             outputValues.put(0, alphaVal);
         }
     }

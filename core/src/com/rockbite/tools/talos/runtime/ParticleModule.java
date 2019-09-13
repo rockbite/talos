@@ -1,5 +1,8 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
+
 public class ParticleModule extends Module {
 
 
@@ -22,12 +25,13 @@ public class ParticleModule extends Module {
 
     private ScopePayload scopePayload;
 
-    Value tmp = new Value();
+    FloatValue tmp = new FloatValue();
 
     @Override
     public void init(ParticleSystem system) {
         super.init(system);
         scopePayload = new ScopePayload();
+
         createInputSlots(15);
     }
 
@@ -45,48 +49,48 @@ public class ParticleModule extends Module {
     public float getTransparency() {
         getInputValue(tmp, TRANSPARENCY, scopePayload);
 
-        if(tmp.isDefault) return 1; // defaults
+        if(tmp.isEmpty()) return 1; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 
     public float getLife() {
         getInputValue(tmp, LIFE, scopePayload);
 
-        if(tmp.isDefault) return 2; // defaults
+        if(tmp.isEmpty()) return 2; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 
     public float getAngle() {
         getInputValue(tmp, ANGLE, scopePayload);
 
-        if(tmp.isDefault) return 90; // defaults
+        if(tmp.isEmpty()) return 90; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 
     public float getVelocity() {
         getInputValue(tmp, VELOCITY, scopePayload);
 
-        if(tmp.isDefault) return 1; // defaults
+        if(tmp.isEmpty()) return 1; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 
     public float getRotation() {
         getInputValue(tmp, ROTATION, scopePayload);
 
-        if(tmp.isDefault) return 0; // defaults
+        if(tmp.isEmpty()) return 0; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 
     public float getSize() {
         getInputValue(tmp, SIZE, scopePayload);
 
-        if(tmp.isDefault) return 50; // defaults
+        if(tmp.isEmpty()) return 50; // defaults
 
-        return tmp.floatVars[0];
+        return tmp.get();
     }
 }

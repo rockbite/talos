@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.utils.IntMap;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 public abstract class Module {
 
@@ -8,7 +10,9 @@ public abstract class Module {
 
     protected IntMap<Module> inputModules = new IntMap<>(2);
     protected IntMap<Integer> inputSlots = new IntMap<>(2);
+
     protected IntMap<Value> outputValues = new IntMap<>(2);
+    protected IntMap<Value> inputValues;
 
     protected int index = 1;
 
@@ -23,6 +27,11 @@ public abstract class Module {
     protected void createInputSlots(int slotCount) {
         inputModules = new IntMap<>(slotCount);
         inputSlots = new IntMap<>(slotCount);
+
+        inputValues = new IntMap<>(slotCount);
+        for(int i = 0; i < slotCount; i++) {
+            inputValues.put(i, new FloatValue());
+        }
     }
 
     public void attachModuleToInput(Module module, int inputSlot, int outputSlot) {
@@ -37,6 +46,10 @@ public abstract class Module {
             inputModules.remove(slot);
             inputSlots.remove(slot);
         }
+    }
+
+    public void attached(Module module, int slot) {
+
     }
 
     public void detach(int slot) {
@@ -65,12 +78,12 @@ public abstract class Module {
     public void getInputValue(Value value, int inputSlot, ScopePayload scopePayload) {
         if(!inputSlots.containsKey(inputSlot)) {
             value.set(0);
-            value.setDefault(true);
+            value.setEmpty(true);
             // fetch default variable which is currently 0
             return;
         }
 
-        value.setDefault(false);
+        value.setEmpty(false);
         int connectedSlot = inputSlots.get(inputSlot);
         Module connectedModule = inputModules.get(inputSlot);
 

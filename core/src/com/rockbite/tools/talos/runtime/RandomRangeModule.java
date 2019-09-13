@@ -1,6 +1,7 @@
 package com.rockbite.tools.talos.runtime;
 
-import com.badlogic.gdx.math.Interpolation;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class RandomRangeModule extends Module {
     public void init(ParticleSystem system) {
         super.init(system);
         createInputSlots(1);
-        Value output = new Value();
+        FloatValue output = new FloatValue();
         outputValues.put(0, output);
     }
 
@@ -30,7 +31,7 @@ public class RandomRangeModule extends Module {
 
         float res = min + (max - min) * startPos;
 
-        outputValues.get(ALPHA).floatVars[0] = res;
+        outputValues.get(ALPHA).set(res);
 
         outputValues.put(0, outputValues.get(ALPHA));
     }
