@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.desktop;
+package com.rockbite.talos.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
