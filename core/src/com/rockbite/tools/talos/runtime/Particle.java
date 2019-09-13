@@ -12,7 +12,6 @@ public class Particle implements Pool.Poolable {
     public ParticleEmitter particleEmitter;
 
     Vector2 position = new Vector2();
-
     float life;
     float transparency;
     float rotation;
@@ -52,7 +51,14 @@ public class Particle implements Pool.Poolable {
         particleModule.updateScopeData(this);
 
         //update variable values
-        float angle = particleModule.getAngle();
+        Vector2 target = particleModule.getTarget();
+        float angle = 0;
+        if(target == null) {
+            angle = particleModule.getAngle(); // do we take angle or target
+        } else {
+            angle = target.sub(position).angle();
+        }
+
         float velocity = particleModule.getVelocity();
         life = particleModule.getLife();
         transparency = particleModule.getTransparency();

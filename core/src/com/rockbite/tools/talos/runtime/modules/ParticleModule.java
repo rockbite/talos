@@ -41,6 +41,7 @@ public class ParticleModule extends Module {
         createInputSlots(15);
         inputValues.put(COLOR, new ColorValue());
         inputValues.put(OFFSET, new Vector2Value());
+        inputValues.put(TARGET, new Vector2Value());
     }
 
     @Override
@@ -119,5 +120,15 @@ public class ParticleModule extends Module {
         }
 
         return (Vector2) inputValues.get(OFFSET).get();
+    }
+
+    public Vector2 getTarget() {
+        getInputValue(inputValues.get(TARGET), TARGET, scopePayload);
+
+        if(inputValues.get(TARGET).isEmpty()) {
+            return null; // defaults
+        }
+
+        return (Vector2) inputValues.get(TARGET).get();
     }
 }
