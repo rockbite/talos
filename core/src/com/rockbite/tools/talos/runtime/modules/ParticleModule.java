@@ -107,7 +107,7 @@ public class ParticleModule extends Module {
     public Color getColor() {
         fetchInputSlotValue(COLOR);
         if(color.isEmpty()) return Color.WHITE; // defaults
-        tmpColor.set(color.getElements()[0], color.getElements()[1], color.getElements()[2], 1f);
+        tmpColor.set(color.get(0), color.get(1), color.get(2), 1f);
         return tmpColor;
     }
 

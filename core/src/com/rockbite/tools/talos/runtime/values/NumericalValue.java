@@ -83,10 +83,10 @@ public class NumericalValue extends Value {
 	}
 
 	public void set(NumericalValue val1, NumericalValue val2, NumericalValue val3) {
-		currentElementCount = 2;
+		currentElementCount = 3;
 		elements[0] = val1.getFloat();
 		elements[1] = val2.getFloat();
-		elements[3] = val3.getFloat();
+		elements[2] = val3.getFloat();
 	}
 
 	public void set(float val1, float val2, float val3) {
