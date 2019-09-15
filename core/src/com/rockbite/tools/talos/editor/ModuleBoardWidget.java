@@ -157,6 +157,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(MathModule.class, MathModuleWrapper.class);
         WrapperRegistry.reg(CurveModule.class, CurveModuleWrapper.class);
         WrapperRegistry.reg(Vector2Module.class, Vector2ModuleWrapper.class);
+        WrapperRegistry.reg(ColorModule.class, ColorModuleWrapper.class);
     }
 
     private void showPopup() {

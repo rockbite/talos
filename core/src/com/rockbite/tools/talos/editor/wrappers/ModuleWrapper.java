@@ -279,6 +279,24 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
             outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
         }
     }
+    protected VisTextField addInputSlotWithTextField(String title, int key) {
+        Table slotRow = new Table();
+        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        VisLabel label = new VisLabel(title, "small");
+        slotRow.add(icon).left();
+        slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
+
+        VisTextField textField = new VisTextField();
+        slotRow.add(textField).width(60);
+
+        leftWrapper.add(slotRow).left().expandX().pad(3);
+        leftWrapper.row();
+
+        configureNodeActions(icon, key, true);
+
+        return textField;
+    }
+
 
     protected float floatFromText(VisTextField textField) {
         float value = 0;

@@ -38,22 +38,4 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> {
     protected float reportPrefWidth() {
         return 210;
     }
-
-    protected VisTextField addInputSlotWithTextField(String title, int key) {
-        Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
-        slotRow.add(icon).left();
-        slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
-
-        VisTextField textField = new VisTextField();
-        slotRow.add(textField).width(60);
-
-        leftWrapper.add(slotRow).left().expandX().pad(3);
-        leftWrapper.row();
-
-        configureNodeActions(icon, key, true);
-
-        return textField;
-    }
 }

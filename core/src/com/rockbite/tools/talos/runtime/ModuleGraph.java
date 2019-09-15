@@ -36,6 +36,7 @@ public class ModuleGraph {
         registeredModules.add(MathModule.class);
         registeredModules.add(CurveModule.class);
         registeredModules.add(Vector2Module.class);
+        registeredModules.add(ColorModule.class);
     }
 
     public Module createModule(Class clazz) {
