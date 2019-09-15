@@ -11,9 +11,6 @@ public class InputModule extends Module {
     @Override
     public void init(ParticleSystem system) {
         super.init(system);
-
-        FloatValue output = new FloatValue();
-        outputValues.put(0, output);
     }
 
     @Override

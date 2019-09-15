@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.rockbite.tools.talos.runtime.ParticleEmitter;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.values.FloatValue;
 
 public class EmitterModule extends Module {
 
@@ -14,21 +15,23 @@ public class EmitterModule extends Module {
     public void init(ParticleSystem system) {
         super.init(system);
         scopePayload = new ScopePayload();
-
-        createInputSlots(1);
     }
 
     @Override
-    public void processValues(ScopePayload scopePayload) {
+    protected void defineSlots() {
+        createInputSlot(this, RATE, FloatValue.class);
+    }
+
+    @Override
+    public void processValues() {
         // nothing to process
     }
 
     public float getRate() {
-        getInputValue(inputValues.get(RATE), RATE, scopePayload);
+        FloatValue rate = getValue(RATE);
+        if(rate.isEmpty()) return 50; // defaults
 
-        if(inputValues.get(RATE).isEmpty()) return 50; // defaults
-
-        return (float) inputValues.get(RATE).get();
+        return rate.get();
     }
 
     public void updateScopeData(ParticleEmitter particleEmitter) {

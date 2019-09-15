@@ -3,18 +3,17 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.utils.IntMap;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
 import com.rockbite.tools.talos.runtime.values.Value;
+import com.sun.org.apache.xpath.internal.operations.Variable;
 
 public abstract class Module {
 
     protected ParticleSystem system;
 
-    protected IntMap<Module> inputModules = new IntMap<>(2);
-    protected IntMap<Integer> inputSlots = new IntMap<>(2);
-
-    protected IntMap<Value> outputValues = new IntMap<>(2);
-    protected IntMap<Value> inputValues;
+    protected IntMap<Slot> inputSlots = new IntMap<>();
+    protected IntMap<Slot> outputSlots = new IntMap<>();
 
     protected int index = 1;
 
@@ -24,60 +23,64 @@ public abstract class Module {
 
     public void init(ParticleSystem system) {
         this.system = system;
+        defineSlots();
     }
 
-    protected void createInputSlots(int slotCount) {
-        inputModules = new IntMap<>(slotCount);
-        inputSlots = new IntMap<>(slotCount);
+    protected abstract void defineSlots();
 
-        inputValues = new IntMap<>(slotCount);
-        for(int i = 0; i < slotCount; i++) {
-            inputValues.put(i, new FloatValue());
-        }
+    public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
+        inputSlots.get(mySlot).connect(module, module.outputSlots.get(targetSlot));
     }
 
-    public void attachModuleToInput(Module module, int inputSlot, int outputSlot) {
-        inputModules.put(inputSlot, module);
-        inputSlots.put(inputSlot, outputSlot);
+    public void attachModuleToMyOutput(Module module, int mySlot, int targetSlot) {
+        outputSlots.get(mySlot).connect(module, module.inputSlots.get(targetSlot));
     }
 
     public void detach(Module module) {
-        while(true) {
-            int slot = inputModules.findKey(module, true, -1);
-            if(slot == -1 )break;
-            inputModules.remove(slot);
-            inputSlots.remove(slot);
+        for(Slot slot : inputSlots.values()) {
+            if(slot.getTargetModule() == module) {
+                slot.getTargetSlot().detach();
+                slot.detach();
+            }
         }
     }
 
-    public void attached(Module module, int slot) {
-
-    }
-
     public void detach(int slot) {
-        inputModules.remove(slot);
         inputSlots.remove(slot);
     }
 
     public boolean isConnectedTo(Module module) {
-        if(inputModules.containsValue(module, true)) {
-            return true;
+        for(Slot slot : inputSlots.values()) {
+            if(slot.getTargetModule() == module) {
+                return true;
+            }
         }
 
         return false;
     }
 
+
     /**
      * Need to keep the output values updated
      */
-    public abstract void processValues(ScopePayload scopePayload);
+    public abstract void processValues();
 
-    /**
-     * Fetches value into particular input slot
-     * @param value
-     * @param inputSlot
-     */
-    public void getInputValue(Value value, int inputSlot, ScopePayload scopePayload) {
+
+    public <T extends Value> T getValueFromInputSlot(int slotId, Class<T> clazz) {
+        return inputSlots.get(slotId).fetchValue(clazz);
+    }
+
+
+    public Value getOutputContainer(int slotId) {
+        outputSlots.get(slotId).getValue()
+    }
+
+
+/*
+
+    public void getValue(int outputSlot) {
+        Value value = inputValues.get(inputSlot);
+
         if(!inputSlots.containsKey(inputSlot)) {
             value.set(0);
             value.setEmpty(true);
@@ -89,16 +92,42 @@ public abstract class Module {
         int connectedSlot = inputSlots.get(inputSlot);
         Module connectedModule = inputModules.get(inputSlot);
 
-        connectedModule.getOutputValue(value, connectedSlot, scopePayload);
+        connectedModule.getOutputValue(connectedSlot, scopePayload);
     }
 
-    public void getOutputValue(Value value, int outputSlot, ScopePayload scopePayload) {
+    public void getOutputValue(int outputSlot, ScopePayload scopePayload) {
         if(outputValues.get(outputSlot) == null) return;
         processValues(scopePayload);
-        value.set(outputValues.get(outputSlot));
     }
+
+    public Value getInput(int slot) {
+        return inputValues.get(slot);
+    }*/
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+
+    protected <T extends Value> T createInputSlot(Module module, int index, Class<T> type) {
+        return (T) createInputSlot(module, index, new Class[]{type});
+    }
+
+    protected <T extends Value> T createInputSlot(Module module, int index, Class<T>[] compatibility) {
+        Slot slot = new Slot(module, index, true);
+        slot.setCompatibility(compatibility);
+
+        return (T) slot.getValue();
+    }
+
+    protected <T extends Value> T createOutputSlot(Module module, int index, Class<T> type) {
+        return (T) createInputSlot(module, index, new Class[]{type});
+    }
+
+    protected <T extends Value> T createOutputSlot(Module module, int index, Class<T>[] compatibility) {
+        Slot slot = new Slot(module, index, false);
+        slot.setCompatibility(compatibility);
+
+        return (T) slot.getValue();
     }
 }

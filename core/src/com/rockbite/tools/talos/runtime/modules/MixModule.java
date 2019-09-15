@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.Value;
 
 public class MixModule extends Module {
 
@@ -11,31 +12,33 @@ public class MixModule extends Module {
     public static final int VAL1 = 1;
     public static final int VAL2 = 2;
 
-    FloatValue alphaV = new FloatValue();
-    FloatValue val1V = new FloatValue();
-    FloatValue val2V = new FloatValue();
+    public static final int OUTPUT = 0;
 
     @Override
     public void init(ParticleSystem system) {
         super.init(system);
-
-        createInputSlots(3);
-        FloatValue output = new FloatValue();
-        outputValues.put(0, output);
     }
 
     @Override
-    public void processValues(ScopePayload scopePayload) {
-        getInputValue(alphaV, ALPHA, scopePayload);
-        getInputValue(val1V, VAL1, scopePayload);
-        getInputValue(val2V, VAL2, scopePayload);
+    protected void defineSlots() {
+        createInputSlot(this, ALPHA, Value.FLOAT);
+        createInputSlot(this, VAL1, Value.NUMERIC);
+        createInputSlot(this, VAL2, Value.NUMERIC);
+
+        createOutputSlot(this, OUTPUT, Value.NUMERIC);
+    }
+
+    @Override
+    public void processValues() {
+        FloatValue alphaV = getValueFromInputSlot(ALPHA, FloatValue.class);
+
+        Value val1 = getValueFromInputSlot(VAL1, Value.class);
+        Value val2 = getValueFromInputSlot(VAL2, Value.class);
 
         float alpha = alphaV.get();
-        float val1 = val1V.get();
-        float val2 = val2V.get();
 
-        float result = Interpolation.linear.apply(val1, val2, alpha);
+        Value output = getOutputContainer(OUTPUT);
+        output.set(val2).sub(val1).mul(alpha).add(val1);
 
-        outputValues.get(0).set(result);
     }
 }

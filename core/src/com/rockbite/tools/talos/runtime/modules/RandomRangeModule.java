@@ -9,6 +9,9 @@ import java.util.Random;
 public class RandomRangeModule extends Module {
 
     public static final int ALPHA = 0;
+    public static final int RESULT = 0;
+
+    FloatValue alpha;
 
     private float min = 0, max = 100;
 
@@ -18,8 +21,8 @@ public class RandomRangeModule extends Module {
     public void init(ParticleSystem system) {
         super.init(system);
         createInputSlots(1);
-        FloatValue output = new FloatValue();
-        outputValues.put(0, output);
+        alpha = new FloatValue();
+        inputValues.put(ALPHA, alpha);
     }
 
     @Override
@@ -32,9 +35,7 @@ public class RandomRangeModule extends Module {
 
         float res = min + (max - min) * startPos;
 
-        outputValues.get(ALPHA).set(res);
-
-        outputValues.put(0, outputValues.get(ALPHA));
+        outputValues.get(RESULT).set(res);
     }
 
     public void setMinMax(float min, float max) {

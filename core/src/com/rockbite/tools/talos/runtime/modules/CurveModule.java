@@ -12,9 +12,9 @@ import java.util.Comparator;
 public class CurveModule extends Module {
 
     public static final int ALPHA = 0;
+    public static final int RESULT = 0;
 
-    FloatValue alphaVal = new FloatValue();
-    FloatValue result = new FloatValue();
+    FloatValue alpha;
 
     private Array<Vector2> points = new Array();
 
@@ -35,7 +35,10 @@ public class CurveModule extends Module {
         super.init(system);
 
         createInputSlots(1);
-        outputValues.put(0, result);
+
+        alpha = new FloatValue();
+
+        inputValues.put(ALPHA, alpha);
 
         resetPoints();
     }
@@ -73,18 +76,15 @@ public class CurveModule extends Module {
 
     @Override
     public void processValues(ScopePayload scopePayload) {
-        getInputValue(alphaVal, ALPHA, scopePayload);
-        float alpha = (float) alphaVal.get();
-
-        alphaVal.set(interpolate(alpha));
-        outputValues.put(0, alphaVal);
+        getInputValue(ALPHA, scopePayload);
+        inputValues.get(RESULT).set(interpolate(alpha.get()));
 
     }
 
     private float interpolate(float alpha) {
         // interpolate alpha in this point space
 
-        if(points.get(0).x > 0) {
+        if(points.get(0).x > 0 && alpha < points.get(0).x) {
             return points.get(0).y;
         }
 
@@ -96,7 +96,7 @@ public class CurveModule extends Module {
             }
         }
 
-        if(points.get(points.size-1).x < 1f) {
+        if(points.get(points.size-1).x < 1f && alpha > points.get(points.size-1).x) {
             return points.get(points.size-1).y;
         }
 

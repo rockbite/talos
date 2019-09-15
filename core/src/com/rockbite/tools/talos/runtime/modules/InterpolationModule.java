@@ -8,8 +8,9 @@ import com.rockbite.tools.talos.runtime.values.FloatValue;
 public class InterpolationModule extends Module {
 
     public static final int ALPHA = 0;
+    public static final int RESULT = 0;
 
-    FloatValue alphaVal = new FloatValue();
+    FloatValue alpha;
 
     private Interpolation currentInterpolation;
 
@@ -20,18 +21,16 @@ public class InterpolationModule extends Module {
         currentInterpolation = Interpolation.linear;
 
         createInputSlots(1);
-        FloatValue output = new FloatValue();
-        outputValues.put(0, output);
+        alpha = new FloatValue();
+        inputValues.put(ALPHA, alpha);
     }
 
     @Override
     public void processValues(ScopePayload scopePayload) {
-        getInputValue(alphaVal, ALPHA, scopePayload);
-        float alpha = alphaVal.get();
+        getInputValue(ALPHA, scopePayload);
 
         if(currentInterpolation != null) {
-            alphaVal.set(currentInterpolation.apply(alpha));
-            outputValues.put(0, alphaVal);
+            outputValues.get(RESULT).set(currentInterpolation.apply(alpha.get()));
         }
     }
 

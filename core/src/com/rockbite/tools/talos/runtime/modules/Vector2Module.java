@@ -1,5 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+
+import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
@@ -9,33 +11,34 @@ public class Vector2Module extends Module {
 
     public static final int X = 0;
     public static final int Y = 1;
+    public static final int RESULT = 0;
 
-    FloatValue valX = new FloatValue();
-    FloatValue valY = new FloatValue();
+    Vector2Value output;
 
     float defaultX, defaultY;
-
-    Vector2Value output = new Vector2Value();
 
     @Override
     public void init(ParticleSystem system) {
         super.init(system);
-
-        createInputSlots(2);
-
-        outputValues.put(0, output);
     }
 
+    @Override
+    protected void defineSlots() {
+        createInputSlot(this, X, FloatValue.class);
+        createInputSlot(this, Y, FloatValue.class);
+
+        output = createOutputSlot(this, RESULT, Vector2Value.class);
+    }
 
     @Override
-    public void processValues(ScopePayload scopePayload) {
-        getInputValue(valX, X, scopePayload);
-        getInputValue(valY, Y, scopePayload);
+    public void processValues() {
+        FloatValue valX = getValue(X);
+        FloatValue valY = getValue(Y);
 
         if(valX.isEmpty()) valX.set(defaultX);
         if(valY.isEmpty()) valY.set(defaultY);
 
-        output.set(valX.getFloat(), valY.getFloat());
+        output.set(valX.get(), valY.get());
     }
 
     public void setX(float x) {

@@ -95,8 +95,8 @@ public class ModuleGraph {
     public void connectNode(Module from, Module to, int slotFrom, int slotTo) {
         // slotTo is the input of module to
         // slotFrom is the output of slot from
-        to.attachModuleToInput(from, slotTo, slotFrom);
-        from.attached(to, slotTo);
+        from.attachModuleToMyOutput(to, slotFrom, slotTo);
+        to.attachModuleToMyInput(from, slotTo, slotFrom);
     }
 
     public void removeNode(Module module, int slot) {

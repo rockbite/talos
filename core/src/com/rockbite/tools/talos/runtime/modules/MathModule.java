@@ -10,8 +10,10 @@ public class MathModule extends Module {
     public static final int A = 0;
     public static final int B = 1;
 
-    FloatValue valA = new FloatValue();
-    FloatValue valB = new FloatValue();
+    public static final int RESULT = 0;
+
+    FloatValue valA;
+    FloatValue valB;
 
     private Expression currentExpression;
 
@@ -21,19 +23,23 @@ public class MathModule extends Module {
 
         currentExpression = Expression.sum;
 
-        createInputSlots(3);
-        FloatValue output = new FloatValue();
-        outputValues.put(0, output);
+        createInputSlots(2);
+
+        valA = new FloatValue();
+        valB = new FloatValue();
+
+        inputValues.put(A, valA);
+        inputValues.put(B, valB);
     }
 
     @Override
     public void processValues(ScopePayload scopePayload) {
-        getInputValue(valA, A, scopePayload);
-        getInputValue(valB, B, scopePayload);
+        getInputValue(A, scopePayload);
+        getInputValue(B, scopePayload);
 
         if(currentExpression != null) {
             float res = currentExpression.apply(valA.get(), valB.get()); // change expressions to ValueExpressions
-            outputValues.get(0).set(res);
+            outputValues.get(RESULT).set(res);
         }
     }
 

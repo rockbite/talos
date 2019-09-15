@@ -30,7 +30,6 @@ public class ParticleModule extends Module {
 
     private ScopePayload scopePayload;
 
-    FloatValue tmp = new FloatValue();
     Vector2 vec2 = new Vector2();
 
     @Override
@@ -56,55 +55,55 @@ public class ParticleModule extends Module {
     }
 
     public float getTransparency() {
-        getInputValue(tmp, TRANSPARENCY, scopePayload);
+        getInputValue(TRANSPARENCY, scopePayload);
 
-        if(tmp.isEmpty()) return 1; // defaults
+        if(getInput(TRANSPARENCY).isEmpty()) return 1; // defaults
 
-        return tmp.get();
+        return (float) getInput(TRANSPARENCY).get();
     }
 
     public float getLife() {
-        getInputValue(tmp, LIFE, scopePayload);
+        getInputValue(LIFE, scopePayload);
 
-        if(tmp.isEmpty()) return 2; // defaults
+        if(getInput(LIFE).isEmpty()) return 2; // defaults
 
-        return tmp.get();
+        return (float) getInput(LIFE).get();
     }
 
     public float getAngle() {
-        getInputValue(tmp, ANGLE, scopePayload);
+        getInputValue(ANGLE, scopePayload);
 
-        if(tmp.isEmpty()) return 90; // defaults
+        if(getInput(ANGLE).isEmpty()) return 90; // defaults
 
-        return tmp.get();
+        return (float) getInput(ANGLE).get();
     }
 
     public float getVelocity() {
-        getInputValue(tmp, VELOCITY, scopePayload);
+        getInputValue(VELOCITY, scopePayload);
 
-        if(tmp.isEmpty()) return 1; // defaults
+        if(getInput(VELOCITY).isEmpty()) return 1; // defaults
 
-        return tmp.get();
+        return (float) getInput(VELOCITY).get();
     }
 
     public float getRotation() {
-        getInputValue(tmp, ROTATION, scopePayload);
+        getInputValue(ROTATION, scopePayload);
 
-        if(tmp.isEmpty()) return 0; // defaults
+        if(getInput(ROTATION).isEmpty()) return 0; // defaults
 
-        return tmp.get();
+        return (float) getInput(ROTATION).get();
     }
 
     public float getSize() {
-        getInputValue(tmp, SIZE, scopePayload);
+        getInputValue(SIZE, scopePayload);
 
-        if(tmp.isEmpty()) return 50; // defaults
+        if(getInput(SIZE).isEmpty()) return 50; // defaults
 
-        return tmp.get();
+        return (float) getInput(SIZE).get();
     }
 
     public Color getColor() {
-        getInputValue(inputValues.get(COLOR), COLOR, scopePayload);
+        getInputValue(COLOR, scopePayload);
 
         if(inputValues.get(COLOR).isEmpty()) return Color.WHITE; // defaults
 
@@ -112,7 +111,7 @@ public class ParticleModule extends Module {
     }
 
     public Vector2 getStartPosition() {
-        getInputValue(inputValues.get(OFFSET), OFFSET, scopePayload);
+        getInputValue(OFFSET, scopePayload);
 
         if(inputValues.get(OFFSET).isEmpty()) {
             vec2.set(0, 0);
@@ -123,7 +122,7 @@ public class ParticleModule extends Module {
     }
 
     public Vector2 getTarget() {
-        getInputValue(inputValues.get(TARGET), TARGET, scopePayload);
+        getInputValue(TARGET, scopePayload);
 
         if(inputValues.get(TARGET).isEmpty()) {
             return null; // defaults

@@ -12,6 +12,9 @@ public class Vector2Value extends Value<Vector2> {
     public void set(float value) {
         object.set(value, value);
     }
+    public void set(Float x, Float y) {
+        object.set(x, y);
+    }
 
     public void set(float x, float y) {
         object.set(x, y);
