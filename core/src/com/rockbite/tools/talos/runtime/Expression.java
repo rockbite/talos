@@ -1,15 +1,17 @@
 package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public abstract class Expression {
 
-    abstract public float apply(float a, float b);
+    abstract public void apply(NumericalValue a, NumericalValue b, NumericalValue out);
+
 
     static public final Expression sum = new Expression() {
         @Override
-        public float apply(float a, float b) {
-            return a + b;
+        public void apply (NumericalValue a, NumericalValue b, NumericalValue out) {
+            a.sum(b, out);
         }
     };
 

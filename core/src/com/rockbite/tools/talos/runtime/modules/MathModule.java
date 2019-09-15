@@ -4,6 +4,7 @@ import com.rockbite.tools.talos.runtime.Expression;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MathModule extends Module {
 
@@ -15,7 +16,11 @@ public class MathModule extends Module {
     FloatValue valA;
     FloatValue valB;
 
-    private Expression currentExpression;
+    NumericalValue inputA;
+    NumericalValue inputB;
+    NumericalValue outputValue;
+
+    private Expression<NumbericalValue> currentExpression;
 
     @Override
     public void init(ParticleSystem system) {
@@ -38,6 +43,9 @@ public class MathModule extends Module {
         getInputValue(B, scopePayload);
 
         if(currentExpression != null) {
+
+            currentExpression.apply(inputA, inputB, outputValue); //Input
+
             float res = currentExpression.apply(valA.get(), valB.get()); // change expressions to ValueExpressions
             outputValues.get(RESULT).set(res);
         }
