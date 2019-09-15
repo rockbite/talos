@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.rockbite.tools.talos.runtime.modules.*;
-import com.rockbite.tools.talos.runtime.values.Vector2Value;
 
 public class ModuleGraph {
 

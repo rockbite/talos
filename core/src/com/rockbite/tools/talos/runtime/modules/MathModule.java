@@ -1,9 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.rockbite.tools.talos.runtime.Expression;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.values.FloatValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MathModule extends Module {
@@ -11,43 +9,27 @@ public class MathModule extends Module {
     public static final int A = 0;
     public static final int B = 1;
 
-    public static final int RESULT = 0;
+    public static final int OUTPUT = 0;
 
-    FloatValue valA;
-    FloatValue valB;
+    NumericalValue a;
+    NumericalValue b;
 
-    NumericalValue inputA;
-    NumericalValue inputB;
-    NumericalValue outputValue;
+    NumericalValue output;
 
-    private Expression<NumbericalValue> currentExpression;
+    private Expression currentExpression;
 
     @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
+    protected void defineSlots() {
+        a = createInputSlot(A);
+        b = createInputSlot(B);
 
-        currentExpression = Expression.sum;
-
-        createInputSlots(2);
-
-        valA = new FloatValue();
-        valB = new FloatValue();
-
-        inputValues.put(A, valA);
-        inputValues.put(B, valB);
+        output = createOutputSlot(OUTPUT);
     }
 
     @Override
-    public void processValues(ScopePayload scopePayload) {
-        getInputValue(A, scopePayload);
-        getInputValue(B, scopePayload);
-
+    public void processValues() {
         if(currentExpression != null) {
-
-            currentExpression.apply(inputA, inputB, outputValue); //Input
-
-            float res = currentExpression.apply(valA.get(), valB.get()); // change expressions to ValueExpressions
-            outputValues.get(RESULT).set(res);
+            currentExpression.apply(a, b, output);
         }
     }
 

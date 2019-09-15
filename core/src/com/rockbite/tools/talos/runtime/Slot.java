@@ -17,30 +17,10 @@ public class Slot {
     private Module targetModule;
     private Slot targetSlot;
 
-    private ObjectMap<Class<? extends Value>, Value> valueObjects;
-
-    private Class<? extends Value> resolvedType;
-
-    public Value val(Class<? extends Value> clazz) {
-        return valueObjects.get(clazz);
-    }
+    private Value value;
 
     public Module getTargetModule() {
         return targetModule;
-    }
-
-    public <T extends Value> T getValue(Class<T> clazz) {
-        return (T) valueObjects.get(resolvedType);
-    }
-
-    public <T extends Value> T fetchValue(Class<T> clazz) {
-        if(isInput) {
-            valueObjects.get(resolvedType).set(targetSlot.fetchValue(clazz));
-            return getValue(clazz);
-        } else {
-            currentModule.processValues();
-            return getValue(clazz);
-        }
     }
 
     enum Flavour {
@@ -53,16 +33,12 @@ public class Slot {
         this.isInput = isInput;
     }
 
-    public <T extends Value> void setCompatibility(Class<T>[] arr) {
-        valueObjects = new ObjectMap<>(arr.length);
-        for(int i = 0; i < arr.length; i++) {
-            try {
-                Value value = ClassReflection.newInstance(arr[i]);
-                valueObjects.put(arr[i], value);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-            }
-        }
+    public void setValue(Value value) {
+        this.value = value;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public void connect(Module targetModule, Slot targetSlot) {
@@ -74,6 +50,9 @@ public class Slot {
         return targetSlot;
     }
 
+    public Value getValue() {
+        return value;
+    }
 
     public void detach() {
         this.targetModule = null;

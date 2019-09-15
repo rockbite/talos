@@ -1,44 +1,35 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 
-import com.rockbite.tools.talos.runtime.Slot;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.values.FloatValue;
-import com.rockbite.tools.talos.runtime.values.Vector2Value;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class Vector2Module extends Module {
 
     public static final int X = 0;
     public static final int Y = 1;
-    public static final int RESULT = 0;
+    public static final int OUTPUT = 0;
 
-    Vector2Value output;
+    NumericalValue x;
+    NumericalValue y;
+    NumericalValue output;
 
     float defaultX, defaultY;
 
     @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
-    }
-
-    @Override
     protected void defineSlots() {
-        createInputSlot(this, X, FloatValue.class);
-        createInputSlot(this, Y, FloatValue.class);
+        x = createInputSlot(X);
+        y = createInputSlot(Y);
 
-        output = createOutputSlot(this, RESULT, Vector2Value.class);
+        output = createOutputSlot(OUTPUT);
     }
 
     @Override
     public void processValues() {
-        FloatValue valX = getValue(X);
-        FloatValue valY = getValue(Y);
 
-        if(valX.isEmpty()) valX.set(defaultX);
-        if(valY.isEmpty()) valY.set(defaultY);
+        if(x.isEmpty()) x.set(defaultX);
+        if(y.isEmpty()) y.set(defaultY);
 
-        output.set(valX.get(), valY.get());
+        output.set(x, y);
     }
 
     public void setX(float x) {

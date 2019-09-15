@@ -3,35 +3,28 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.math.Interpolation;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class InterpolationModule extends Module {
 
     public static final int ALPHA = 0;
-    public static final int RESULT = 0;
+    public static final int OUTPUT = 0;
 
-    FloatValue alpha;
+    NumericalValue alpha;
+    NumericalValue output;
 
-    private Interpolation currentInterpolation;
+    private Interpolation currentInterpolation = Interpolation.linear;
 
     @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
+    protected void defineSlots() {
+        alpha = createInputSlot(ALPHA);
 
-        currentInterpolation = Interpolation.linear;
-
-        createInputSlots(1);
-        alpha = new FloatValue();
-        inputValues.put(ALPHA, alpha);
+        output = createOutputSlot(OUTPUT);
     }
 
     @Override
-    public void processValues(ScopePayload scopePayload) {
-        getInputValue(ALPHA, scopePayload);
-
-        if(currentInterpolation != null) {
-            outputValues.get(RESULT).set(currentInterpolation.apply(alpha.get()));
-        }
+    public void processValues() {
+        output.set(currentInterpolation.apply(alpha.getFloat()));
     }
 
     public void setInterpolation(Interpolation interpolation) {

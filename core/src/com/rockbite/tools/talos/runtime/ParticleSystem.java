@@ -11,6 +11,8 @@ public class ParticleSystem {
 
     private ModuleGraph moduleGraph;
 
+    public ScopePayload scopePayload = new ScopePayload(); // temporary locaiton
+
     public ParticleSystem() {
         moduleGraph = new ModuleGraph(this);
 

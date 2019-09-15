@@ -1,23 +1,17 @@
 package com.rockbite.tools.talos.runtime.modules;
 
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.values.FloatValue;
-import com.rockbite.tools.talos.runtime.values.Value;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class StaticValueModule extends Module {
 
-    private FloatValue staticValue = new FloatValue();
-    private FloatValue outputValue;
+    public static final int OUTPUT = 0;
 
-    @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
-    }
+    private NumericalValue staticValue = new NumericalValue();
+    private NumericalValue outputValue;
 
     @Override
     protected void defineSlots() {
-        outputValue = createOutputSlot(this, 0, FloatValue.class);
+        outputValue = createOutputSlot(OUTPUT);
     }
 
     @Override

@@ -4,9 +4,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
-import com.rockbite.tools.talos.runtime.values.FloatValue;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import com.rockbite.tools.talos.runtime.values.Value;
-import com.sun.org.apache.xpath.internal.operations.Variable;
 
 public abstract class Module {
 
@@ -16,6 +15,8 @@ public abstract class Module {
     protected IntMap<Slot> outputSlots = new IntMap<>();
 
     protected int index = 1;
+
+    private float lastRequester;
 
     public Module() {
         // must have empty constructor
@@ -46,7 +47,7 @@ public abstract class Module {
     }
 
     public void detach(int slot) {
-        inputSlots.remove(slot);
+        inputSlots.get(slot).detach();
     }
 
     public boolean isConnectedTo(Module module) {
@@ -66,68 +67,84 @@ public abstract class Module {
     public abstract void processValues();
 
 
-    public <T extends Value> T getValueFromInputSlot(int slotId, Class<T> clazz) {
-        return inputSlots.get(slotId).fetchValue(clazz);
-    }
-
-
-    public Value getOutputContainer(int slotId) {
-        outputSlots.get(slotId).getValue()
-    }
-
-
-/*
-
-    public void getValue(int outputSlot) {
-        Value value = inputValues.get(inputSlot);
-
-        if(!inputSlots.containsKey(inputSlot)) {
-            value.set(0);
-            value.setEmpty(true);
-            // fetch default variable which is currently 0
-            return;
-        }
-
-        value.setEmpty(false);
-        int connectedSlot = inputSlots.get(inputSlot);
-        Module connectedModule = inputModules.get(inputSlot);
-
-        connectedModule.getOutputValue(connectedSlot, scopePayload);
-    }
-
-    public void getOutputValue(int outputSlot, ScopePayload scopePayload) {
-        if(outputValues.get(outputSlot) == null) return;
-        processValues(scopePayload);
-    }
-
-    public Value getInput(int slot) {
-        return inputValues.get(slot);
-    }*/
-
     public void setIndex(int index) {
         this.index = index;
     }
 
 
-    protected <T extends Value> T createInputSlot(Module module, int index, Class<T> type) {
-        return (T) createInputSlot(module, index, new Class[]{type});
+    /**
+     * Fetch value from the input of this module
+     * @param slotId
+     */
+    public void fetchInputSlotValue(int slotId) {
+        //find what it is connected to
+        Slot inputSlot = inputSlots.get(slotId);
+
+        if(inputSlot.getTargetSlot() == null) {
+            inputSlot.getValue().setEmpty(true);
+        } else {
+            //ask it's module give it's output value
+            Value result = inputSlot.getTargetModule().fetchOutputSlotValue(inputSlot.getTargetSlot().getIndex());
+            inputSlot.getValue().set(result);
+            inputSlot.getValue().setEmpty(false);
+        }
     }
 
-    protected <T extends Value> T createInputSlot(Module module, int index, Class<T>[] compatibility) {
-        Slot slot = new Slot(module, index, true);
-        slot.setCompatibility(compatibility);
+    /**
+     * this module is asked to calculate and then give it's output value
+     * @param slotId
+     */
+    public Value fetchOutputSlotValue(int slotId) {
+        float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
 
-        return (T) slot.getValue();
+        if(lastRequester != requester) { // caching mechanism
+            //fetch all local inputs
+            fetchAllInputSlotValues();
+            // process
+            processValues();
+            lastRequester = requester;
+        }
+
+        return outputSlots.get(slotId).getValue();
     }
 
-    protected <T extends Value> T createOutputSlot(Module module, int index, Class<T> type) {
-        return (T) createInputSlot(module, index, new Class[]{type});
+    public void fetchAllInputSlotValues() {
+        for(Slot inputSlot : inputSlots.values()) {
+            fetchInputSlotValue(inputSlot.getIndex());
+        }
     }
 
-    protected <T extends Value> T createOutputSlot(Module module, int index, Class<T>[] compatibility) {
-        Slot slot = new Slot(module, index, false);
-        slot.setCompatibility(compatibility);
+    public Value createInputSlot(int slotId, Value value) {
+        inputSlots.put(slotId, new Slot(this, slotId, true));
+        inputSlots.get(slotId).setValue(value);
 
-        return (T) slot.getValue();
+        return value;
+    }
+
+    public Value createOutputSlot(int slotId, Value value) {
+        outputSlots.put(slotId, new Slot(this, slotId, false));
+        outputSlots.get(slotId).setValue(value);
+
+        return value;
+    }
+
+    public NumericalValue createInputSlot(int slotId) {
+        inputSlots.put(slotId, new Slot(this, slotId, true));
+        NumericalValue value = new NumericalValue();
+        inputSlots.get(slotId).setValue(value);
+
+        return value;
+    }
+
+    public NumericalValue createOutputSlot(int slotId) {
+        outputSlots.put(slotId, new Slot(this, slotId, false));
+        NumericalValue value = new NumericalValue();
+        outputSlots.get(slotId).setValue(value);
+
+        return value;
+    }
+
+    public ScopePayload getScope() {
+        return system.scopePayload;
     }
 }
