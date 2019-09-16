@@ -158,6 +158,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(CurveModule.class, CurveModuleWrapper.class);
         WrapperRegistry.reg(Vector2Module.class, Vector2ModuleWrapper.class);
         WrapperRegistry.reg(ColorModule.class, ColorModuleWrapper.class);
+        WrapperRegistry.reg(DynamicRangeModule.class, DynamicRangeModuleWrapper.class);
     }
 
     private void showPopup() {
@@ -194,12 +195,14 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    private void createModuleWidget(Class clazz, float x, float y) {
+    public ModuleWrapper createModuleWidget(Class clazz, float x, float y) {
         Module module = moduleGraph.createModule(clazz);
-        if(module == null) return;
+        ModuleWrapper moduleWrapper = null;
+
+        if(module == null) return moduleWrapper;
 
         try {
-            ModuleWrapper moduleWrapper = (ModuleWrapper) ClassReflection.newInstance(WrapperRegistry.map.get(clazz));
+            moduleWrapper = (ModuleWrapper) ClassReflection.newInstance(WrapperRegistry.map.get(clazz));
 
 
             moduleWrapper.setModule(module);
@@ -222,6 +225,8 @@ public class ModuleBoardWidget extends WidgetGroup {
                 particleSystem.setEmitterModule((EmitterModule) module);
             }
         }
+
+        return moduleWrapper;
     }
 
     @Override
@@ -364,6 +369,11 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void setParticleSystem(ParticleSystem particleSystem) {
         this.moduleGraph = particleSystem.getModuleGraph();
         this.particleSystem = particleSystem;
+
+        //TODO: move this somewhere else
+        //create defaults
+        createModuleWidget(EmitterModule.class, 500, 400);
+        createModuleWidget(ParticleModule.class, 500, 600);
     }
 
     public Object getModuleGraph() {

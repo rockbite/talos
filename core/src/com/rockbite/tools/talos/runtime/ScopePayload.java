@@ -34,4 +34,10 @@ public class ScopePayload {
     public float getFloat(int index) {
         return map.get(index).getFloat();
     }
+
+    public void reset() {
+        for(int i = 0; i < 10; i++) {
+            map.get(i).set(0);
+        }
+    }
 }

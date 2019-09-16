@@ -38,6 +38,6 @@ public class EmitterModule extends Module {
 
     public void updateScopeData(ParticleEmitter particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
-        getScope().set(ScopePayload.REQUESTER_ID, -1f); // TODO change to something more... unique when emitters are in
+        getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
     }
 }

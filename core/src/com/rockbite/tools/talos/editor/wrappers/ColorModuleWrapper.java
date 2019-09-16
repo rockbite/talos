@@ -14,6 +14,10 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         final VisTextField gField = addInputSlotWithTextField("G: ", 1);
         final VisTextField bField = addInputSlotWithTextField("B: ", 2);
 
+        rField.setText("1");
+        gField.setText("0");
+        bField.setText("0");
+
         rField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

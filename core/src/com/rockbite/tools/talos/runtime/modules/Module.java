@@ -147,4 +147,16 @@ public abstract class Module {
     public ScopePayload getScope() {
         return system.scopePayload;
     }
+
+    public Slot getInputSlot(int slotId) {
+        return inputSlots.get(slotId);
+    }
+
+    public Slot getOutputSlot(int slotId) {
+        return outputSlots.get(slotId);
+    }
+
+    public void resetLastRequester() {
+        lastRequester = -1f;
+    }
 }

@@ -1,16 +1,20 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.editor.ModuleBoardWidget;
+import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
 public abstract class ModuleWrapper<T extends Module> extends VisWindow {
@@ -26,6 +30,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
     private int hoveredSlot = -1;
     private boolean hoveredSlotIsInput = false;
+
+    private Vector2 tmp = new Vector2();
+    private Vector2 tmp2 = new Vector2();
 
     public ModuleWrapper() {
         super("", "panel");
@@ -156,6 +163,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
             private int currentSlot;
 
+            private boolean dragged;
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 currentIsInput = isInput;
@@ -166,6 +175,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
                 icon.localToStageCoordinates(tmp2);
 
                 currentSlot = key;
+
+                dragged = false;
 
                 ModuleBoardWidget.NodeConnection connection = moduleBoardWidget.findConnection(ModuleWrapper.this, isInput, key);
 
@@ -191,12 +202,19 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
                 tmp.set(x, y);
                 icon.localToStageCoordinates(tmp);
                 moduleBoardWidget.updateActiveCurve(tmp.x, tmp.y);
+
+                dragged = true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
                 moduleBoardWidget.connectNodeIfCan(currentWrapper, currentSlot, currentIsInput);
+
+                if(!dragged) {
+                    // clicked
+                    slotClicked(currentSlot, currentIsInput);
+                }
             }
 
             @Override
@@ -213,6 +231,47 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
             }
         });
 
+    }
+
+    public void slotClicked(int slotId, boolean isInput) {
+
+        Slot slot = module.getInputSlot(slotId);
+        if(!isInput) {
+            slot = module.getOutputSlot(slotId);
+        }
+
+        if(slot == null) return;
+
+        if(slot.isInput()) {
+            Class<? extends Module> clazz = getSlotsPreferredModule(slot);
+
+            if (clazz != null) {
+                ModuleWrapper newWrapper = moduleBoardWidget.createModuleWidget(clazz, getX(), getY());
+
+                //connecting
+                //Slot newOutSlot = newWrapper.getModule().getOutputSlot(0);
+                moduleBoardWidget.makeConnection(newWrapper, this, 0, slotId);
+
+                // now tricky positioning
+                float offset = MathUtils.random(100, 300);
+                newWrapper.getOutputSlotPos(0, tmp);
+                getInputSlotPos(slotId, tmp2);
+                tmp2.x -= offset;
+                tmp2.sub(tmp);
+                tmp2.add(newWrapper.getX(), newWrapper.getY()); // new target
+                tmp.set(tmp2).add(offset, 0); // starting position
+                newWrapper.setPosition(tmp.x, tmp.y);
+
+                // now the animation
+                float duration = 0.2f;
+                newWrapper.addAction(Actions.fadeIn(duration));
+                newWrapper.addAction(Actions.moveTo(tmp2.x, tmp2.y, duration, Interpolation.swingOut));
+            }
+        }
+    }
+
+    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+        return null;
     }
 
     @Override

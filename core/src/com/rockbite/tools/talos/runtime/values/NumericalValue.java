@@ -28,6 +28,12 @@ public class NumericalValue extends Value {
 		}
 	}
 
+	public void mul (float val, NumericalValue out) {
+		for (int i = 0; i < currentElementCount; i++) {
+			out.elements[i] = elements[i] * val;
+		}
+	}
+
 	public void mul (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * other.elements[i];

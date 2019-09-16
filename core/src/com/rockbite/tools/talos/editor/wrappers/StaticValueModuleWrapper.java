@@ -14,7 +14,7 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     @Override
     public void setModule(StaticValueModule module) {
         super.setModule(module);
-        module.setStaticValue(0f);
+        module.setStaticValue(1f);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 
     @Override
     protected void configureSlots() {
-        final VisTextField textField = addTextField("0");
+        final VisTextField textField = addTextField("1");
         addOutputSlot("output", 0);
 
 

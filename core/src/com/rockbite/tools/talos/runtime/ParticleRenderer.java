@@ -44,7 +44,7 @@ public class ParticleRenderer {
     private void renderParticle(Batch batch, Particle particle) {
         color.set(particle.color);
         color.a = particle.transparency;
-        float rotation = particle.rotation;
+        float rotation = particle.rotation * 360f;
         float size = particle.size;
         batch.setColor(color);
         batch.draw(textureRegion,

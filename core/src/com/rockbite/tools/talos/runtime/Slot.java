@@ -23,6 +23,10 @@ public class Slot {
         return targetModule;
     }
 
+    public boolean isInput() {
+        return isInput;
+    }
+
     enum Flavour {
         ANGLE
     }

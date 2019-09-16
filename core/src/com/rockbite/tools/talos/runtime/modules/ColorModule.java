@@ -14,7 +14,7 @@ public class ColorModule extends Module {
     NumericalValue b;
     NumericalValue output;
 
-    float defaultR, defaultG, defaultB;
+    float defaultR = 1, defaultG = 0, defaultB = 0;
 
     @Override
     protected void defineSlots() {

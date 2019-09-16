@@ -11,7 +11,7 @@ public class RandomRangeModule extends Module {
 
     NumericalValue output;
 
-    private float min = 0, max = 100;
+    private float min = 0, max = 1;
 
     private Random random = new Random();
 

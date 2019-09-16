@@ -12,6 +12,8 @@ public class StaticValueModule extends Module {
     @Override
     protected void defineSlots() {
         outputValue = createOutputSlot(OUTPUT);
+
+        staticValue.set(1f);
     }
 
     @Override

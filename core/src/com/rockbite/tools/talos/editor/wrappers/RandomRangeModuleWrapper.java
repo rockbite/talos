@@ -30,7 +30,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
         // let's create our fields
         VisLabel label = new VisLabel(" RNG Range");
         minLabel = new VisTextField("0");
-        maxLabel = new VisTextField("100");
+        maxLabel = new VisTextField("1");
 
         table.add(label).left();
         table.row().padTop(4);

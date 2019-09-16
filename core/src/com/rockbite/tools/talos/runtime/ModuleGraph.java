@@ -37,6 +37,7 @@ public class ModuleGraph {
         registeredModules.add(CurveModule.class);
         registeredModules.add(Vector2Module.class);
         registeredModules.add(ColorModule.class);
+        registeredModules.add(DynamicRangeModule.class);
     }
 
     public Module createModule(Class clazz) {
@@ -105,5 +106,11 @@ public class ModuleGraph {
 
     public ParticleModule getParticleModule() {
         return particleModule;
+    }
+
+    public void resetRequesters() {
+        for(Module module: modules) {
+            module.resetLastRequester();
+        }
     }
 }

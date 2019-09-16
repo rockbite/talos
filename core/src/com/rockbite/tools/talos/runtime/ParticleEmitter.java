@@ -95,6 +95,8 @@ public class ParticleEmitter {
             // let's repeat
             alpha = 0;
         }
+
+        particleSystem.getModuleGraph().resetRequesters();
     }
 
 }
