@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.graphics.Color;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class ColorModule extends Module {
@@ -13,6 +14,8 @@ public class ColorModule extends Module {
     NumericalValue g;
     NumericalValue b;
     NumericalValue output;
+
+    Color tmpColor = new Color();
 
     float defaultR = 1, defaultG = 0, defaultB = 0;
 
@@ -45,5 +48,10 @@ public class ColorModule extends Module {
 
     public void setB(float b) {
         defaultB = b;
+    }
+
+    public Color getColor() {
+        tmpColor.set(defaultR, defaultG, defaultB, 1f);
+        return tmpColor;
     }
 }
