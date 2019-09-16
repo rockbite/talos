@@ -20,36 +20,42 @@ public class NumericalValue extends Value {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] + other.elements[i];
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 	public void sub (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] - other.elements[i];
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 	public void mul (float val, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * val;
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 	public void mul (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * other.elements[i];
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 	public void sin (NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = MathUtils.sinDeg(elements[i]);
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 	public void cos (NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = MathUtils.cosDeg(elements[i]);
 		}
+		out.setElementsCount(elementsCount());
 	}
 
 

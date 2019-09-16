@@ -66,6 +66,7 @@ public class ParticleModule extends Module {
         getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
         getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
+        getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
     }
 
     public float getTransparency() {
@@ -88,7 +89,7 @@ public class ParticleModule extends Module {
 
     public float getVelocity() {
         fetchInputSlotValue(VELOCITY);
-        if(velocity.isEmpty()) return 1; // defaults
+        if(velocity.isEmpty()) return 100; // defaults
         return velocity.getFloat();
     }
 

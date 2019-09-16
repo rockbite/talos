@@ -16,7 +16,7 @@ public class MathModule extends Module {
 
     NumericalValue output;
 
-    private Expression currentExpression;
+    private Expression currentExpression = Expression.sum;
 
     @Override
     protected void defineSlots() {
@@ -28,6 +28,9 @@ public class MathModule extends Module {
 
     @Override
     public void processValues() {
+        if(a.isEmpty()) a.set(0);
+        if(b.isEmpty()) b.set(0);
+
         if(currentExpression != null) {
             currentExpression.apply(a, b, output);
         }

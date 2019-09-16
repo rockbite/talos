@@ -23,14 +23,15 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 
     @Override
     protected float reportPrefWidth() {
-        return 250;
+        return 280;
     }
 
     @Override
     protected void configureSlots() {
         map = new IntMap<>();
-        map.put(ScopePayload.EMITTER_ALPHA, "Emitter.alpha");
-        map.put(ScopePayload.PARTICLE_ALPHA, "Particle.alpha");
+        map.put(ScopePayload.EMITTER_ALPHA, "Emitter.alpha - Duration");
+        map.put(ScopePayload.PARTICLE_ALPHA, "Particle.alpha - Lifetime");
+        map.put(ScopePayload.EMITTER_ALPHA_AT_P_INIT, "Duration at particle init");
 
 
         final VisSelectBox<String> selectBox = addSelectBox(map.values());

@@ -23,6 +23,8 @@ public class Particle implements Pool.Poolable {
 
     public float seed;
 
+    public float durationAtInit;
+
     public Particle() {
         // empty constructor
     }
@@ -39,6 +41,8 @@ public class Particle implements Pool.Poolable {
 
         // inner variable defaults
         alpha = 0f;
+
+        durationAtInit = particleEmitter.alpha;
     }
 
     public void update(float delta) {
@@ -67,8 +71,8 @@ public class Particle implements Pool.Poolable {
         color.set(particleModule.getColor());
 
         // perform inner operations
-        position.x += MathUtils.cosDeg(angle)*velocity;
-        position.y += MathUtils.sinDeg(angle)*velocity;
+        position.x += MathUtils.cosDeg(angle)*velocity*delta;
+        position.y += MathUtils.sinDeg(angle)*velocity*delta;
     }
 
     @Override

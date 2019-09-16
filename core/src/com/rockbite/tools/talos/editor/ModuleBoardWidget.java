@@ -373,7 +373,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         //TODO: move this somewhere else
         //create defaults
         createModuleWidget(EmitterModule.class, 500, 400);
-        createModuleWidget(ParticleModule.class, 500, 600);
+        createModuleWidget(ParticleModule.class, 500, 615);
     }
 
     public Object getModuleGraph() {

@@ -111,7 +111,11 @@ public class CurveModule extends Module {
             Vector2 from = points.get(i);
             Vector2 to = points.get(i+1);
             if(alpha > from.x && alpha <= to.x) {
-                return interpolate(alpha, from.x, from.y, to.x, to.y);
+                float localAlpha = 1f;
+                if(from.x != to.x) {
+                    localAlpha = (alpha - from.x) / (to.x - from.x);
+                }
+                return interpolate(localAlpha, from.x, from.y, to.x, to.y);
             }
         }
 
