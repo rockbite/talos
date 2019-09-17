@@ -15,6 +15,9 @@ import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.runtime.ModuleGraph;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
+import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
+import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
+import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 public class MainStage extends Stage {
@@ -32,6 +35,8 @@ public class MainStage extends Stage {
     private Array<EmitterWrapper> emitterWrappers = new Array<>();
 
     private EmitterWrapper currentEmitterWrapper;
+
+    private TimelineWidget timelineWidget;
 
     public MainStage() {
         super(new ScreenViewport(),
@@ -98,12 +103,17 @@ public class MainStage extends Stage {
         Table bottomTable = new Table();
 
         bottomTable.setSkin(skin);
-        bottomTable.add("bbb");
+        Table timelineContainer = new Table();
+        Table libraryContainer = new Table();
+        VisSplitPane bottomPane = new VisSplitPane(timelineContainer, libraryContainer, false);
+        timelineWidget = new TimelineWidget();
+        timelineContainer.add(timelineWidget).grow().expand().fill();
+        bottomTable.add(bottomPane).expand().grow().fill();
 
         VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
         contentTable.add(verticalPane).expand().grow().fill();
-        //verticalPane.setMaxSplitAmount(0.8f);
-        //verticalPane.setMinSplitAmount(0.2f);
+        verticalPane.setMaxSplitAmount(0.8f);
+        verticalPane.setMinSplitAmount(0.2f);
         verticalPane.setSplitAmount(0.7f);
 
         Table leftTable = new Table(); leftTable.setSkin(skin);
@@ -112,8 +122,8 @@ public class MainStage extends Stage {
         rightTable.add(moduleBoardWidget).grow();
         VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
         midTable.add(horizontalPane).expand().grow().fill();
-        //horizontalPane.setMaxSplitAmount(0.8f);
-        //horizontalPane.setMinSplitAmount(0.2f);
+        horizontalPane.setMaxSplitAmount(0.8f);
+        horizontalPane.setMinSplitAmount(0.2f);
         horizontalPane.setSplitAmount(0.3f);
 
         addActor(mainTable);

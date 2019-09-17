@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.kotcrab.vis.ui.widget.*;
-import com.rockbite.tools.talos.editor.ModuleBoardWidget;
+import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.Module;
 

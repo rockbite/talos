@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.editor;
+package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.FocusManager;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.rockbite.tools.talos.editor.Curve;
+import com.rockbite.tools.talos.editor.MainStage;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
