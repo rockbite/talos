@@ -45,11 +45,15 @@ public class ScriptModuleWrapper extends ModuleWrapper<ScriptModule> {
 
     @Override
     public void write(JsonValue value) {
-
+        value.addChild("script", new JsonValue(script.getText()));
     }
 
     @Override
     public void read(JsonValue value) {
-
+        if(value.has("script")) {
+            String text = value.getString("script");
+            script.setText(text);
+            module.setScript(text);
+        }
     }
 }
