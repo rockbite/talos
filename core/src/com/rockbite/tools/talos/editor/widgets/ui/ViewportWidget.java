@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.editor;
+package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
