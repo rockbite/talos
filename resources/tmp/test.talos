@@ -1,0 +1,20 @@
+{
+metadata: {},
+effect: {
+	emitters: [
+		{
+			name: "",
+			groups: [],
+			modules: [
+				{
+					id: 1,
+					ref: "ParticleModule",
+					x: 194.0,
+					y: 71.0
+				}
+			],
+			connections: []
+		}
+	]
+}
+}
