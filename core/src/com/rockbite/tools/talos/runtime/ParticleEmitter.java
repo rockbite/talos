@@ -8,6 +8,9 @@ import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 public class ParticleEmitter {
 
     ParticleSystem particleSystem;
+    ParticleEffectDescriptor descriptor;
+
+    int id;
 
     Vector2 position = new Vector2();
     float duration;
@@ -72,8 +75,8 @@ public class ParticleEmitter {
             int count = (int) particlesToEmmit;
             for (int i = 0; i < count; i++) {
                 Particle particle = particlePool.obtain();
-                if(particleSystem.getParticleModule() != null) {
-                    particle.init(particleSystem.getParticleModule(), this);
+                if(particleSystem.getEmitterModuleFor(descriptor, id) != null) {
+                    particle.init(particleSystem.getParticleModuleFor(descriptor, id), this);
                     activeParticles.add(particle);
                 }
             }
@@ -95,8 +98,6 @@ public class ParticleEmitter {
             // let's repeat
             alpha = 0;
         }
-
-        particleSystem.getModuleGraph().resetRequesters();
     }
 
 }

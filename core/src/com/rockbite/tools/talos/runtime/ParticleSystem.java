@@ -1,43 +1,59 @@
 package com.rockbite.tools.talos.runtime;
 
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class ParticleSystem {
 
-    Array<ParticleEmitter> emitters = new Array();
+    private Array<ParticleEffectDescriptor> particleEffects = new Array<>();
+    private Array<ParticleEffect> particleEffectInstances = new Array<>();
 
-    private ModuleGraph moduleGraph;
-
-    public ScopePayload scopePayload = new ScopePayload(); // temporary locaiton
+    private ScopePayload scopePayload = new ScopePayload(); // temporary location
 
     public ParticleSystem() {
-        moduleGraph = new ModuleGraph(this);
-
-        emitters.add(new ParticleEmitter(this));
-
-    }
-
-    public void setEmitterModule(EmitterModule module) {
-        for(ParticleEmitter emitter: emitters) {
-            emitter.setEmitterModule(module);
-        }
 
     }
 
     public void update(float delta) {
-        for(int i = 0; i < emitters.size; i++) {
-            emitters.get(i).update(delta);
+        for(int i = 0; i < particleEffectInstances.size; i++) {
+            particleEffectInstances.get(i).update(delta);
         }
     }
 
-    public ParticleModule getParticleModule() {
-        return moduleGraph.getParticleModule();
+    public ParticleEffectDescriptor loadEffect(FileHandle file) {
+        ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
+        particleEffectDescriptor.load(file);
+        particleEffects.add(particleEffectDescriptor);
+
+        return particleEffectDescriptor;
     }
 
-    public ModuleGraph getModuleGraph() {
-        return moduleGraph;
+    public void unloadEffect(ParticleEffectDescriptor particleEffectDescriptor) {
+        particleEffects.removeValue(particleEffectDescriptor, true);
+    }
+
+    public void createEffect(ParticleEffectDescriptor descriptor) {
+        ParticleEffect effect = new ParticleEffect(); // make this pooled
+        effect.init(descriptor);
+        addEffect(effect);
+    }
+
+    public void addEffect(ParticleEffect effect) {
+        particleEffectInstances.add(effect);
+    }
+
+    public void removeEffect(ParticleEffect effect) {
+        particleEffectInstances.removeValue(effect, true);
+    }
+
+    public EmitterModule getEmitterModuleFor(ParticleEffectDescriptor descriptor, int emitterId) {
+        return descriptor.getGraph(emitterId).emitterModule;
+    }
+
+    public ParticleModule getParticleModuleFor(ParticleEffectDescriptor descriptor, int emitterId) {
+        return descriptor.getGraph(emitterId).particleModule;
     }
 }
