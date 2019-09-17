@@ -135,4 +135,18 @@ public class NumericalValue extends Value {
 	public float get(int index) {
 		return elements[index];
 	}
+
+	public void pow(NumericalValue b, NumericalValue out) {
+		for (int i = 0; i < currentElementCount; i++) {
+			out.elements[i] = (float) Math.pow(elements[i], b.getFloat());
+		}
+		out.setElementsCount(elementsCount());
+	}
+
+	public void abs(NumericalValue out) {
+		for (int i = 0; i < currentElementCount; i++) {
+			out.elements[i] = Math.abs(elements[i]);
+		}
+		out.setElementsCount(elementsCount());
+	}
 }

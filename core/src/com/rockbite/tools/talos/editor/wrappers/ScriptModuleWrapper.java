@@ -20,7 +20,10 @@ public class ScriptModuleWrapper extends ModuleWrapper<ScriptModule> {
     	addInputSlot("i4", 4);
     	addInputSlot("i5", 5);
 
-        script = addInputSlotWithTextArea("script: ", 0);
+        script = new VisTextArea();
+        contentWrapper.add(script).width(220).height(100);
+
+
         script.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -28,12 +31,12 @@ public class ScriptModuleWrapper extends ModuleWrapper<ScriptModule> {
             }
         });
 
-        addOutputSlot("output", 0);
+        addOutputSlot("out", 0);
     }
 
     @Override
     protected float reportPrefWidth() {
-        return 210;
+        return 320;
     }
 
     @Override

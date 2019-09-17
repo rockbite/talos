@@ -43,4 +43,18 @@ public abstract class Expression {
             out.mul(b, out);
         }
     };
+
+    static public final Expression pow = new Expression() {
+        @Override
+        public void apply(NumericalValue a, NumericalValue b, NumericalValue out) {
+            a.pow(b, out);
+        }
+    };
+
+    static public final Expression abs = new Expression() {
+        @Override
+        public void apply(NumericalValue a, NumericalValue b, NumericalValue out) {
+            a.abs(out);
+        }
+    };
 }

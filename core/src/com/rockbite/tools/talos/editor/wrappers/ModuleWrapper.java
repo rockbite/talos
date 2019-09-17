@@ -357,7 +357,6 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
         slotRow.add(textArea).width(60);
 
         contentWrapper.add(slotRow).left().expandX().pad(3);
-        leftWrapper.row();
 
         configureNodeActions(icon, key, true);
 
