@@ -3,14 +3,15 @@ package com.rockbite.tools.talos.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.widget.Menu;
-import com.kotcrab.vis.ui.widget.MenuBar;
-import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 public class MainStage extends Stage {
@@ -62,6 +63,23 @@ public class MainStage extends Stage {
         MenuBar menuBar = new MenuBar();
         Menu projectMenu = new Menu("File");
         menuBar.addMenu(projectMenu);
+        Menu helpMenu = new Menu("Help");
+        MenuItem about = new MenuItem("About");
+        helpMenu.addItem(about);
+        menuBar.addMenu(helpMenu);
+
+        about.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                VisDialog dialog = Dialogs.showOKDialog (MainStage.this, "About Talos 1.0.0", "Add better dialog system later");
+                dialog.padTop(32);
+                dialog.padLeft(16).setHeight(100);
+                dialog.setWidth(320);
+            }
+        });
+
+
         topTable.add(menuBar.getTable()).left().expand();
 
         Table midTable = new Table();
