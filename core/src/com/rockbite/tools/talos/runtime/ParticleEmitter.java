@@ -75,7 +75,7 @@ public class ParticleEmitter {
             int count = (int) particlesToEmmit;
             for (int i = 0; i < count; i++) {
                 Particle particle = particlePool.obtain();
-                if(moduleGraph.getEmitterModule() != null) {
+                if(moduleGraph.getParticleModule() != null) {
                     particle.init(moduleGraph.getParticleModule(), this);
                     activeParticles.add(particle);
                 }
