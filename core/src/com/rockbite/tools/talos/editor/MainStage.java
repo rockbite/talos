@@ -117,10 +117,10 @@ public class MainStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog (MainStage.this, "About Talos 1.0.1", "Talos Particle Effect Editor 1.0.1");
+                VisDialog dialog = Dialogs.showOKDialog (MainStage.this, "About Talos 1.0.1", "Talos Particle Editor 1.0.1");
                 dialog.padTop(32);
-                dialog.padLeft(16).setHeight(180);
-                dialog.setWidth(480);
+                dialog.padLeft(16).setHeight(160);
+                dialog.setWidth(520);
             }
         });
 

@@ -50,6 +50,7 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     public void read(JsonValue value) {
         float val = value.getFloat("value");
         textField.setText(val+"");
+        module.setStaticValue(val);
     }
 
 }

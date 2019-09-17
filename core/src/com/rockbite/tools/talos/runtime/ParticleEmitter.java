@@ -98,6 +98,8 @@ public class ParticleEmitter {
             // let's repeat
             alpha = 0;
         }
+
+        moduleGraph.resetRequesters();
     }
 
 }

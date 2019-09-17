@@ -56,5 +56,7 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> {
         float y = value.getFloat("y");
         xField.setText(x+"");
         yField.setText(y+"");
+        module.setX(x);
+        module.setY(y);
     }
 }
