@@ -73,4 +73,8 @@ public class ParticleSystem {
 
         return moduleGraph;
     }
+
+    public  Array<ParticleEffect> getEffectInstances() {
+        return particleEffectInstances;
+    }
 }

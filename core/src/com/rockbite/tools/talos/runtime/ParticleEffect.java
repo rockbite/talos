@@ -45,4 +45,8 @@ public class ParticleEffect implements Pool.Poolable {
         ParticleEmitter emitter = new ParticleEmitter(system, moduleGraph);
         emitters.add(emitter);
     }
+
+    public Array<ParticleEmitter> getEmitters() {
+        return emitters;
+    }
 }

@@ -60,6 +60,7 @@ public class ParticleEmitter {
         alpha += delta/duration;
         if(alpha > 1f) alpha = 1f;
 
+        emitterModule = moduleGraph.getEmitterModule();
         if(emitterModule == null) return;
 
         //update variables to their real values

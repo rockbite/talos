@@ -8,7 +8,6 @@ import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class Particle implements Pool.Poolable {
 
-    public ParticleModule particleModule;
     public ParticleEmitter particleEmitter;
 
     Vector2 position = new Vector2();
@@ -31,7 +30,6 @@ public class Particle implements Pool.Poolable {
 
     public void init(ParticleModule particleModule, ParticleEmitter particleEmitter) {
         this.particleEmitter = particleEmitter;
-        this.particleModule = particleModule;
 
         this.seed = MathUtils.random();
 
@@ -52,6 +50,8 @@ public class Particle implements Pool.Poolable {
         if(alpha > 1f) alpha = 1f;
 
         //scope data
+        ParticleModule particleModule = particleEmitter.moduleGraph.getParticleModule();
+        if(particleModule == null) return;
         particleModule.updateScopeData(this);
 
         //update variable values

@@ -97,6 +97,13 @@ public class ModuleGraph {
         }
 
         modules.removeValue(module, true);
+
+        if(module instanceof ParticleModule) {
+            particleModule = null;
+        }
+        if(module instanceof EmitterModule) {
+            emitterModule = null;
+        }
     }
 
     public void connectNode(Module from, Module to, int slotFrom, int slotTo) {
