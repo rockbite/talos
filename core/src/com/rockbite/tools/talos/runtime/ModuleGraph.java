@@ -23,7 +23,7 @@ public class ModuleGraph {
         this.system = system;
     }
 
-    public static ObjectSet<Class> getModules() {
+    public static ObjectSet<Class> getRegisteredModules() {
         registerModules();
         return registeredModules;
     }
@@ -118,5 +118,13 @@ public class ModuleGraph {
         for(Module module: modules) {
             module.resetLastRequester();
         }
+    }
+
+    public EmitterModule getEmitterModule() {
+        return emitterModule;
+    }
+
+    public Array<Module> getModules() {
+        return modules;
     }
 }

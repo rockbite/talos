@@ -25,4 +25,8 @@ public class InputModule extends Module {
     public void setInput(int scopeKey) {
         this.scopeKey = scopeKey;
     }
+
+    public int getInput() {
+        return this.scopeKey;
+    }
 }

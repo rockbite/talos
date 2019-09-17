@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Field;
@@ -16,6 +17,8 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
 
     IntMap<Interpolation> map;
     ObjectMap<String, Integer> names;
+
+    VisSelectBox<String> selectBox;
 
     public InterpolationWrapper() {
         super();
@@ -53,7 +56,7 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
         addOutputSlot("output", 0);
 
 
-        final VisSelectBox<String> selectBox = addSelectBox(namesArr);
+        selectBox = addSelectBox(namesArr);
 
         selectBox.addListener(new ChangeListener() {
             @Override
@@ -64,5 +67,23 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
                 module.setInterpolation(interp);
             }
         });
+    }
+
+
+    @Override
+    public void write(JsonValue value) {
+        Interpolation interpolation = module.getInterpolation();
+        int key = map.findKey(interpolation, true, 0);
+        String name = names.findKey(key, false);
+        value.addChild("scopeKey", new JsonValue(name));
+    }
+
+    @Override
+    public void read(JsonValue value) {
+        String name = value.getString("scopeKey");
+        Interpolation interpolation = map.get(names.get(name));
+        module.setInterpolation(interpolation);
+
+        selectBox.setSelected(name);
     }
 }

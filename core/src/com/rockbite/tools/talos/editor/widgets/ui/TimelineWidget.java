@@ -1,17 +1,16 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.rockbite.tools.talos.editor.MainStage;
 
 public class TimelineWidget extends Table {
 
-    public TimelineWidget() {
-        //TODO: add top bar here.
-
-        for(int i = 0; i < 5; i++) {
-            EmitterRow emitterRow = new EmitterRow();
-            add(emitterRow);
-            row();
-        }
+    public TimelineWidget(Skin skin) {
+        setSkin(skin);
 
     }
 

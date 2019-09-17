@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
 
@@ -43,5 +44,15 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.SIZE) return DynamicRangeModule.class;
 
         return null;
+    }
+
+    @Override
+    public void write(JsonValue value) {
+
+    }
+
+    @Override
+    public void read(JsonValue value) {
+
     }
 }

@@ -1,9 +1,12 @@
 package com.rockbite.tools.talos.editor;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -19,6 +22,9 @@ import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
+
+import java.io.File;
+import java.net.URISyntaxException;
 
 public class MainStage extends Stage {
 
@@ -38,6 +44,8 @@ public class MainStage extends Stage {
 
     private TimelineWidget timelineWidget;
 
+    ProjectSerializer projectSerializer;
+
     public MainStage() {
         super(new ScreenViewport(),
                 new PolygonSpriteBatch());
@@ -50,14 +58,34 @@ public class MainStage extends Stage {
 
         VisUI.load(skin);
 
+        projectSerializer = new ProjectSerializer(this);
+
         initData();
 
         initActors();
+
+        loadDefaultProject();
+
+        initListeners();
+    }
+
+    private void initListeners() {
+        addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    saveProject();
+                }
+
+                return super.keyDown(event, keycode);
+            }
+        });
     }
 
     private void initData() {
         particleSystem = new ParticleSystem();
         particleEffectDescriptor = new ParticleEffectDescriptor();
+        particleSystem.createEffect(particleEffectDescriptor);
     }
 
     private void initActors() {
@@ -89,10 +117,10 @@ public class MainStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog (MainStage.this, "About Talos 1.0.0", "Add better dialog system later");
+                VisDialog dialog = Dialogs.showOKDialog (MainStage.this, "About Talos 1.0.1", "Talos Particle Effect Editor 1.0.1");
                 dialog.padTop(32);
-                dialog.padLeft(16).setHeight(100);
-                dialog.setWidth(320);
+                dialog.padLeft(16).setHeight(180);
+                dialog.setWidth(480);
             }
         });
 
@@ -106,9 +134,9 @@ public class MainStage extends Stage {
         Table timelineContainer = new Table();
         Table libraryContainer = new Table();
         VisSplitPane bottomPane = new VisSplitPane(timelineContainer, libraryContainer, false);
-        timelineWidget = new TimelineWidget();
+        timelineWidget = new TimelineWidget(skin);
         timelineContainer.add(timelineWidget).grow().expand().fill();
-        bottomTable.add(bottomPane).expand().grow().fill();
+        bottomTable.add(bottomPane).expand().grow();
 
         VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
         contentTable.add(verticalPane).expand().grow().fill();
@@ -129,11 +157,51 @@ public class MainStage extends Stage {
         addActor(mainTable);
     }
 
+    private void loadDefaultProject() {
+        String path = getLocalPath() + "\\" + "project.talos";
+        FileHandle fileHandle = Gdx.files.absolute(path);
+        if(fileHandle.exists()) {
+            projectSerializer.read(fileHandle);
+        } else {
+            // empty stuff
+            createNewEmitter("test");
+        }
+    }
+
+    private void saveProject() {
+        String path = getLocalPath() + "\\" + "project.talos";
+        FileHandle fileHandleWrite = Gdx.files.absolute(path);
+        projectSerializer.write(fileHandleWrite);
+    }
+
     public ModuleGraph getCurrentModuleGraph() {
         if(currentEmitterWrapper != null) {
-            return particleEffectDescriptor.getGraph(currentEmitterWrapper.getId());
+            return currentEmitterWrapper.getGraph();
         } else {
             return null;
         }
+    }
+
+    public void createNewEmitter(String emitterName) {
+        EmitterWrapper emitterWrapper = new EmitterWrapper();
+
+        ModuleGraph graph = particleSystem.createEmptyEmitter(particleEffectDescriptor);
+        emitterWrapper.setModuleGraph(graph);
+
+        emitterWrappers.add(emitterWrapper);
+        currentEmitterWrapper = emitterWrapper;
+
+        moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
+    }
+
+    public String getLocalPath() {
+        try {
+            return new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
+                    .toURI()).getParent();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

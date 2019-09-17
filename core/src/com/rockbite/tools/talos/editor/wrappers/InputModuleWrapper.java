@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.runtime.modules.InputModule;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -10,6 +11,8 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 
     IntMap<String> map;
+
+    VisSelectBox<String> selectBox;
 
     public InputModuleWrapper() {
         super();
@@ -34,7 +37,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
         map.put(ScopePayload.EMITTER_ALPHA_AT_P_INIT, "Duration at particle init");
 
 
-        final VisSelectBox<String> selectBox = addSelectBox(map.values());
+        selectBox = addSelectBox(map.values());
         addOutputSlot("output", 0);
 
 
@@ -47,5 +50,16 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
                 module.setInput(key);
             }
         });
+    }
+
+    @Override
+    public void write(JsonValue value) {
+        value.addChild("scopeKey", new JsonValue(module.getInput()+""));
+    }
+
+    @Override
+    public void read(JsonValue value) {
+        int scopeKey = value.getInt("scopeKey");
+        selectBox.setSelected(map.get(scopeKey));
     }
 }

@@ -36,6 +36,13 @@ public class RandomRangeModule extends Module {
     public void setMinMax(float min, float max) {
         this.min = min;
         this.max = max;
+    }
 
+    public float getMin() {
+        return min;
+    }
+
+    public float getMax() {
+        return max;
     }
 }

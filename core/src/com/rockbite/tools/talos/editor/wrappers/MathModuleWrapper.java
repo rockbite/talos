@@ -1,9 +1,11 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Field;
@@ -16,6 +18,8 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
     IntMap<Expression> map;
     ObjectMap<String, Integer> names;
+
+    VisSelectBox<String> selectBox;
 
     public MathModuleWrapper() {
         super();
@@ -54,7 +58,7 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         addOutputSlot("result", 0);
 
 
-        final VisSelectBox<String> selectBox = new VisSelectBox();
+        selectBox = new VisSelectBox();
         selectBox.setItems(namesArr);
 
         contentWrapper.add(selectBox).width(120).padRight(3);
@@ -68,5 +72,22 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
                 module.setExpression(expression);
             }
         });
+    }
+
+    @Override
+    public void write(JsonValue value) {
+        Expression expression = module.getExpression();
+        int key = map.findKey(expression, true, 0);
+        String name = names.findKey(key, false);
+        value.addChild("scopeKey", new JsonValue(name));
+    }
+
+    @Override
+    public void read(JsonValue value) {
+        String name = value.getString("scopeKey");
+        Expression expression = map.get(names.get(name));
+        module.setExpression(expression);
+
+        selectBox.setSelected(name);
     }
 }

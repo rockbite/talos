@@ -39,4 +39,8 @@ public class MathModule extends Module {
     public void setExpression(Expression expression) {
         this.currentExpression = expression;
     }
+
+    public Expression getExpression() {
+        return currentExpression;
+    }
 }

@@ -36,4 +36,13 @@ public class ParticleEffect implements Pool.Poolable {
     public void reset() {
 
     }
+
+    public boolean isTypeOf(ParticleEffectDescriptor particleEffectDescriptor) {
+        return descriptor == particleEffectDescriptor;
+    }
+
+    public void createEmitter(ModuleGraph moduleGraph) {
+        ParticleEmitter emitter = new ParticleEmitter(system, moduleGraph);
+        emitters.add(emitter);
+    }
 }

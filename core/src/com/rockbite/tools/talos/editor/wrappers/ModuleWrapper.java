@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
@@ -33,6 +34,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
+
+    private int id;
 
     public ModuleWrapper() {
         super("", "panel");
@@ -246,7 +249,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
             Class<? extends Module> clazz = getSlotsPreferredModule(slot);
 
             if (clazz != null) {
-                ModuleWrapper newWrapper = moduleBoardWidget.createModuleWidget(clazz, getX(), getY());
+                ModuleWrapper newWrapper = moduleBoardWidget.createModule(clazz, getX(), getY());
 
                 //connecting
                 //Slot newOutSlot = newWrapper.getModule().getOutputSlot(0);
@@ -374,4 +377,17 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
         return value;
     }
+
+    public int getId() {
+        return id;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public abstract void write(JsonValue value);
+
+    public abstract void read(JsonValue value);
 }

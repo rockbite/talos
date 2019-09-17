@@ -30,4 +30,8 @@ public class InterpolationModule extends Module {
     public void setInterpolation(Interpolation interpolation) {
         this.currentInterpolation = interpolation;
     }
+
+    public Interpolation getInterpolation() {
+        return this.currentInterpolation;
+    }
 }

@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.modules.MixModule;
 
 public class MixModuleWrapper extends ModuleWrapper<MixModule> {
@@ -7,6 +8,16 @@ public class MixModuleWrapper extends ModuleWrapper<MixModule> {
     @Override
     protected float reportPrefWidth() {
         return 180;
+    }
+
+    @Override
+    public void write(JsonValue value) {
+
+    }
+
+    @Override
+    public void read(JsonValue value) {
+
     }
 
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
@@ -18,11 +19,17 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
     private ColorPicker picker;
 
+    VisTextField rField;
+    VisTextField gField;
+    VisTextField bField;
+
+    Color tmpClr = new Color();
+
     @Override
     protected void configureSlots() {
-        final VisTextField rField = addInputSlotWithTextField("R: ", 0, 40);
-        final VisTextField gField = addInputSlotWithTextField("G: ", 1, 40);
-        final VisTextField bField = addInputSlotWithTextField("B: ", 2, 40);
+        rField = addInputSlotWithTextField("R: ", 0, 40);
+        gField = addInputSlotWithTextField("G: ", 1, 40);
+        bField = addInputSlotWithTextField("B: ", 2, 40);
 
         rField.setText("255");
         gField.setText("0");
@@ -101,5 +108,30 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
     @Override
     protected float reportPrefWidth() {
         return 230;
+    }
+
+    @Override
+    public void write(JsonValue value) {
+        Color clr = module.getColor();
+        value.addChild("r", new JsonValue( clr.r));
+        value.addChild("g", new JsonValue( clr.g));
+        value.addChild("b", new JsonValue( clr.b));
+    }
+
+    @Override
+    public void read(JsonValue value) {
+        float r = value.getFloat("r");
+        float g = value.getFloat("g");
+        float b = value.getFloat("b");
+        module.setR(r);
+        module.setG(g);
+        module.setB(b);
+
+        tmpClr.set(r, g, b, 1f);
+
+        colorBtn.setColor(tmpClr);
+        rField.setText(""+(int)(r * 255f));
+        gField.setText(""+(int)(g * 255f));
+        bField.setText(""+(int)(b * 255f));
     }
 }

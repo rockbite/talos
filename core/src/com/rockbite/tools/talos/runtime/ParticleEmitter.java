@@ -9,8 +9,7 @@ public class ParticleEmitter {
 
     ParticleSystem particleSystem;
     ParticleEffectDescriptor descriptor;
-
-    int id;
+    ModuleGraph moduleGraph;
 
     Vector2 position = new Vector2();
     float duration;
@@ -38,9 +37,9 @@ public class ParticleEmitter {
         init();
     }
 
-    public ParticleEmitter(ParticleSystem particleSystem, EmitterModule emitterModule) {
+    public ParticleEmitter(ParticleSystem particleSystem, ModuleGraph moduleGraph) {
         this.particleSystem = particleSystem;
-        this.emitterModule = emitterModule;
+        this.moduleGraph = moduleGraph;
         init();
     }
 
@@ -75,8 +74,8 @@ public class ParticleEmitter {
             int count = (int) particlesToEmmit;
             for (int i = 0; i < count; i++) {
                 Particle particle = particlePool.obtain();
-                if(particleSystem.getEmitterModuleFor(descriptor, id) != null) {
-                    particle.init(particleSystem.getParticleModuleFor(descriptor, id), this);
+                if(moduleGraph.getEmitterModule() != null) {
+                    particle.init(moduleGraph.getParticleModule(), this);
                     activeParticles.add(particle);
                 }
             }

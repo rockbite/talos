@@ -60,4 +60,17 @@ public class ParticleSystem {
     public ScopePayload getScope() {
         return scopePayload;
     }
+
+    public ModuleGraph createEmptyEmitter(ParticleEffectDescriptor particleEffectDescriptor) {
+        ModuleGraph moduleGraph = particleEffectDescriptor.createEmitter(this);
+
+        // iterate all the instances and add the emitter there
+        for(ParticleEffect effect: particleEffectInstances) {
+            if(effect.isTypeOf(particleEffectDescriptor)) {
+                effect.createEmitter(moduleGraph);
+            }
+        }
+
+        return moduleGraph;
+    }
 }

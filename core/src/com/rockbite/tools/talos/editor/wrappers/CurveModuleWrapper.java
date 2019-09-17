@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.runtime.modules.CurveModule;
@@ -44,5 +45,26 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> {
     public void setModule(CurveModule module) {
         super.setModule(module);
         curveWidget.setModule(module);
+    }
+
+    @Override
+    public void write(JsonValue value) {
+        Array<Vector2> points = module.getPoints();
+        JsonValue arr = new JsonValue(JsonValue.ValueType.array);
+        value.addChild("points", arr);
+        for(Vector2 point: points) {
+            JsonValue vec = new JsonValue(JsonValue.ValueType.array);
+            vec.addChild(new JsonValue(point.x));
+            vec.addChild(new JsonValue(point.y));
+            arr.addChild(vec);
+        }
+    }
+
+    @Override
+    public void read(JsonValue value) {
+        JsonValue points = value.get("points");
+        for(JsonValue point: points) {
+            module.createPoint(point.get(0).asFloat(), point.get(1).asFloat());
+        }
     }
 }

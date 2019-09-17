@@ -44,4 +44,20 @@ public class DynamicRangeModule extends CurveModule {
         this.lowMin = lowMin;
         this.lowMax = lowMax;
     }
+
+    public float getLowMin() {
+        return lowMin;
+    }
+
+    public float getLowMax() {
+        return lowMax;
+    }
+
+    public float getHightMin() {
+        return highMin;
+    }
+
+    public float getHightMax() {
+        return highMax;
+    }
 }

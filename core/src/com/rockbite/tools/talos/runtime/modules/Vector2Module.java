@@ -39,4 +39,12 @@ public class Vector2Module extends Module {
     public void setY(float y) {
         defaultY = y;
     }
+
+    public float getDefaultX() {
+        return defaultX;
+    }
+
+    public float getDefaultY() {
+        return defaultY;
+    }
 }

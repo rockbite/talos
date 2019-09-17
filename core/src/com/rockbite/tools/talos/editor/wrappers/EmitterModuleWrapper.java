@@ -1,6 +1,7 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.DynamicRangeModule;
 import com.rockbite.tools.talos.runtime.modules.EmitterModule;
@@ -33,5 +34,15 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         }
 
         return null;
+    }
+
+    @Override
+    public void write(JsonValue value) {
+
+    }
+
+    @Override
+    public void read(JsonValue value) {
+
     }
 }

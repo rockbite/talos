@@ -9,7 +9,7 @@ public class ParticleEffectDescriptor {
     /**
      * graph per each emitter
      */
-    private IntMap<ModuleGraph> graphList = new IntMap<>();
+    private Array<ModuleGraph> graphList = new Array<>();
 
     public ParticleEffectDescriptor() {
 
@@ -22,5 +22,12 @@ public class ParticleEffectDescriptor {
     public ModuleGraph getGraph(int emitterId) {
 
         return null;
+    }
+
+    public ModuleGraph createEmitter(ParticleSystem system) {
+        ModuleGraph graph = new ModuleGraph(system);
+        graphList.add(graph);
+
+        return graph;
     }
 }
