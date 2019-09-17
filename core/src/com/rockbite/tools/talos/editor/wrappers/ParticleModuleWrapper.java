@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 

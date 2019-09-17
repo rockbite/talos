@@ -66,7 +66,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
         content.add(stack).grow().fill().width(reportPrefWidth());
 
-        invalidate();
+        invalidateHierarchy();
         pack();
 
         addCaptureListener(new InputListener() {
@@ -344,6 +344,24 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
     protected VisTextField addInputSlotWithTextField(String title, int key) {
         return addInputSlotWithTextField(title, key, 60);
+    }
+
+    protected VisTextArea addInputSlotWithTextArea (String title, int key) {
+        Table slotRow = new Table();
+        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        VisLabel label = new VisLabel(title, "small");
+        slotRow.add(icon).left();
+        slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
+
+        VisTextArea textArea = new VisTextArea();
+        slotRow.add(textArea).width(60);
+
+        contentWrapper.add(slotRow).left().expandX().pad(3);
+        leftWrapper.row();
+
+        configureNodeActions(icon, key, true);
+
+        return textArea;
     }
 
     protected VisTextField addInputSlotWithTextField(String title, int key, float size) {

@@ -24,6 +24,7 @@ import com.rockbite.tools.talos.editor.MainStage;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ModuleBoardWidget extends WidgetGroup {
 
@@ -197,6 +198,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(Vector2Module.class, Vector2ModuleWrapper.class);
         WrapperRegistry.reg(ColorModule.class, ColorModuleWrapper.class);
         WrapperRegistry.reg(DynamicRangeModule.class, DynamicRangeModuleWrapper.class);
+        WrapperRegistry.reg(ScriptModule.class, ScriptModuleWrapper.class);
     }
 
     private void showPopup() {

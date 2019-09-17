@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.rockbite.tools.talos.runtime.modules.*;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ModuleGraph {
 
@@ -43,6 +44,7 @@ public class ModuleGraph {
             registeredModules.add(Vector2Module.class);
             registeredModules.add(ColorModule.class);
             registeredModules.add(DynamicRangeModule.class);
+            registeredModules.add(ScriptModule.class);
         }
     }
 
