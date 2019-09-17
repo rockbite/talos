@@ -31,13 +31,13 @@ public class ParticleRenderer {
         if(particleSystem == null) return;
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
-
+/*
         for(int i = 0; i < particleSystem.emitters.size; i++) {
             for(int j = 0; j < particleSystem.emitters.get(i).activeParticles.size; j++) {
                 renderParticle(batch, particleSystem.emitters.get(i).activeParticles.get(j));
             }
         }
-
+*/
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 

@@ -24,8 +24,6 @@ import com.rockbite.tools.talos.runtime.modules.*;
 public class ModuleBoardWidget extends WidgetGroup {
 
     ShapeRenderer shapeRenderer;
-    private ModuleGraph moduleGraph;
-    private ParticleSystem particleSystem;
 
     Array<ModuleWrapper> moduleWrapperArray = new Array<>();
 
@@ -43,8 +41,11 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     private ModuleWrapper selectedWrapper;
 
-    public ModuleBoardWidget() {
+    private MainStage mainStage;
+
+    public ModuleBoardWidget(MainStage mainStage) {
         super();
+        this.mainStage = mainStage;
 
         curvePoints[0] = new Vector2();
         curvePoints[1] = new Vector2();
@@ -125,7 +126,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         connection.fromModule.setSlotInactive(connection.fromSlot, false);
         connection.toModule.setSlotInactive(connection.toSlot, true);
 
-        moduleGraph.removeNode(connection.toModule.getModule(), connection.toSlot);
+        mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot);
     }
 
     public void selectWrapper(ModuleWrapper selectWrapper) {
@@ -162,8 +163,12 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     private void showPopup() {
+        ModuleGraph moduleGraph = getModuleGraph();
+
+        if(moduleGraph == null) return;
+
         PopupMenu menu = new PopupMenu();
-        for(final Class clazz : moduleGraph.registeredModules) {
+        for(final Class clazz : ModuleGraph.getModules()) {
             String className = clazz.getSimpleName();
             MenuItem menuItem = new MenuItem(className);
             menu.addItem(menuItem);
@@ -190,13 +195,13 @@ public class ModuleBoardWidget extends WidgetGroup {
                     removeConnection(connections.get(i));
                 }
             }
-            moduleGraph.removeModule(selectedWrapper.getModule());
+            mainStage.getCurrentModuleGraph().removeModule(selectedWrapper.getModule());
             moduleContainer.removeActor(selectedWrapper);
         }
     }
 
     public ModuleWrapper createModuleWidget(Class clazz, float x, float y) {
-        Module module = moduleGraph.createModule(clazz);
+        Module module = mainStage.getCurrentModuleGraph().createModule(clazz);
         ModuleWrapper moduleWrapper = null;
 
         if(module == null) return moduleWrapper;
@@ -222,7 +227,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         if(module != null) {
             if(module instanceof EmitterModule) {
-                particleSystem.setEmitterModule((EmitterModule) module);
+                //particleSystem.setEmitterModule((EmitterModule) module);
             }
         }
 
@@ -339,11 +344,12 @@ public class ModuleBoardWidget extends WidgetGroup {
             iter++;
         }
 
-
+/*
+// white cross at center
         shapeRenderer.setColor(1f, 1f, 1f, 1f);
         shapeRenderer.rectLine(tmp.x-10, gridPos.y + getStage().getHeight()/2f, tmp.x+10, gridPos.y+getStage().getHeight()/2f, 2f);
         shapeRenderer.rectLine(gridPos.x+getStage().getWidth()/2f, tmp.y-10, gridPos.x+getStage().getWidth()/2f, tmp.y+10, 2f);
-
+*/
     }
 
     @Override
@@ -366,20 +372,9 @@ public class ModuleBoardWidget extends WidgetGroup {
         super.layout();
     }
 
-    public void setParticleSystem(ParticleSystem particleSystem) {
-        this.moduleGraph = particleSystem.getModuleGraph();
-        this.particleSystem = particleSystem;
-
-        //TODO: move this somewhere else
-        //create defaults
-        createModuleWidget(EmitterModule.class, 500, 400);
-        createModuleWidget(ParticleModule.class, 500, 615);
+    public ModuleGraph getModuleGraph() {
+        return mainStage.getCurrentModuleGraph();
     }
-
-    public Object getModuleGraph() {
-        return moduleGraph;
-    }
-
 
     public void setActiveCurve(float x, float y, float toX, float toY, boolean isInput) {
         activeCurve = new Curve(x, y, toX, toY, isInput);
@@ -400,7 +395,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         connections.add(connection);
 
-        moduleGraph.connectNode(from.getModule(), to.getModule(), slotForm, slotTo);
+        mainStage.getCurrentModuleGraph().connectNode(from.getModule(), to.getModule(), slotForm, slotTo);
 
         from.setSlotActive(slotForm, false);
         to.setSlotActive(slotTo, true);

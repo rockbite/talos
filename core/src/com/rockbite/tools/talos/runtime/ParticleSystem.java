@@ -56,4 +56,8 @@ public class ParticleSystem {
     public ParticleModule getParticleModuleFor(ParticleEffectDescriptor descriptor, int emitterId) {
         return descriptor.getGraph(emitterId).particleModule;
     }
+
+    public ScopePayload getScope() {
+        return scopePayload;
+    }
 }

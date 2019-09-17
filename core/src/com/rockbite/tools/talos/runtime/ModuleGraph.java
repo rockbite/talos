@@ -17,27 +17,33 @@ public class ModuleGraph {
 
     private int moduleIndex = 0;
 
-    public ObjectSet<Class> registeredModules = new ObjectSet<>();
+    public static ObjectSet<Class> registeredModules;
 
     public ModuleGraph(ParticleSystem system) {
         this.system = system;
-
-        registerModules();
     }
 
-    private void registerModules() {
-        registeredModules.add(EmitterModule.class);
-        registeredModules.add(InterpolationModule.class);
-        registeredModules.add(InputModule.class);
-        registeredModules.add(ParticleModule.class);
-        registeredModules.add(StaticValueModule.class);
-        registeredModules.add(RandomRangeModule.class);
-        registeredModules.add(MixModule.class);
-        registeredModules.add(MathModule.class);
-        registeredModules.add(CurveModule.class);
-        registeredModules.add(Vector2Module.class);
-        registeredModules.add(ColorModule.class);
-        registeredModules.add(DynamicRangeModule.class);
+    public static ObjectSet<Class> getModules() {
+        registerModules();
+        return registeredModules;
+    }
+
+    public static void registerModules() {
+        if(registeredModules == null) {
+            registeredModules = new ObjectSet<>();
+            registeredModules.add(EmitterModule.class);
+            registeredModules.add(InterpolationModule.class);
+            registeredModules.add(InputModule.class);
+            registeredModules.add(ParticleModule.class);
+            registeredModules.add(StaticValueModule.class);
+            registeredModules.add(RandomRangeModule.class);
+            registeredModules.add(MixModule.class);
+            registeredModules.add(MathModule.class);
+            registeredModules.add(CurveModule.class);
+            registeredModules.add(Vector2Module.class);
+            registeredModules.add(ColorModule.class);
+            registeredModules.add(DynamicRangeModule.class);
+        }
     }
 
     public Module createModule(Class clazz) {

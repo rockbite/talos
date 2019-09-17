@@ -8,10 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
+import com.rockbite.tools.talos.runtime.ModuleGraph;
+import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 public class MainStage extends Stage {
@@ -25,13 +28,16 @@ public class MainStage extends Stage {
 
     PreviewWidget previewWidget;
 
+    private ParticleEffectDescriptor particleEffectDescriptor;
+    private Array<EmitterWrapper> emitterWrappers = new Array<>();
+
+    private EmitterWrapper currentEmitterWrapper;
+
     public MainStage() {
         super(new ScreenViewport(),
                 new PolygonSpriteBatch());
 
         Gdx.input.setInputProcessor(this);
-
-        particleSystem = new ParticleSystem();
 
         atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
         skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
@@ -39,7 +45,14 @@ public class MainStage extends Stage {
 
         VisUI.load(skin);
 
+        initData();
+
         initActors();
+    }
+
+    private void initData() {
+        particleSystem = new ParticleSystem();
+        particleEffectDescriptor = new ParticleEffectDescriptor();
     }
 
     private void initActors() {
@@ -47,8 +60,7 @@ public class MainStage extends Stage {
         mainTable.setSkin(skin);
         mainTable.setFillParent(true);
 
-        moduleBoardWidget = new ModuleBoardWidget();
-        moduleBoardWidget.setParticleSystem(particleSystem);
+        moduleBoardWidget = new ModuleBoardWidget(this);
 
         previewWidget = new PreviewWidget();
         previewWidget.setParticleSystem(particleSystem);
@@ -105,5 +117,13 @@ public class MainStage extends Stage {
         horizontalPane.setSplitAmount(0.3f);
 
         addActor(mainTable);
+    }
+
+    public ModuleGraph getCurrentModuleGraph() {
+        if(currentEmitterWrapper != null) {
+            return particleEffectDescriptor.getGraph(currentEmitterWrapper.getId());
+        } else {
+            return null;
+        }
     }
 }
