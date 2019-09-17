@@ -63,6 +63,7 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> {
     @Override
     public void read(JsonValue value) {
         JsonValue points = value.get("points");
+        module.getPoints().clear();
         for(JsonValue point: points) {
             module.createPoint(point.get(0).asFloat(), point.get(1).asFloat());
         }
