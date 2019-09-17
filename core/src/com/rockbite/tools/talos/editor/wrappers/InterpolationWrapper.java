@@ -39,7 +39,7 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
         Field[] fields = ClassReflection.getFields(Interpolation.class);
         int iter = 0;
         for(int i = 0; i < fields.length; i++) {
-            if(fields[i].getType().isAssignableFrom(Interpolation.class)) {
+            if(true) {
                 try {
                     Interpolation interp = (Interpolation) fields[i].get(null);
                     names.put(fields[i].getName(), iter);
