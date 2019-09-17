@@ -2,6 +2,8 @@ package com.rockbite.tools.talos.runtime.values;
 
 import com.badlogic.gdx.math.MathUtils;
 
+import java.util.Arrays;
+
 public class NumericalValue extends Value {
 
 	private float[] elements = new float[4];
@@ -148,5 +150,10 @@ public class NumericalValue extends Value {
 			out.elements[i] = Math.abs(elements[i]);
 		}
 		out.setElementsCount(elementsCount());
+	}
+
+	@Override
+	public String toString () {
+		return Arrays.toString(elements);
 	}
 }
