@@ -17,6 +17,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.runtime.ModuleGraph;
+import com.rockbite.tools.talos.runtime.ParticleEffect;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
@@ -40,7 +41,7 @@ public class MainStage extends Stage {
     private ParticleEffectDescriptor particleEffectDescriptor;
     private Array<EmitterWrapper> emitterWrappers = new Array<>();
 
-    private EmitterWrapper currentEmitterWrapper;
+    public EmitterWrapper currentEmitterWrapper;
 
     private TimelineWidget timelineWidget;
 
@@ -166,6 +167,8 @@ public class MainStage extends Stage {
             // empty stuff
             createNewEmitter("test");
         }
+
+        timelineWidget.setEmitters(emitterWrappers);
     }
 
     private void saveProject() {
@@ -182,8 +185,9 @@ public class MainStage extends Stage {
         }
     }
 
-    public void createNewEmitter(String emitterName) {
+    public EmitterWrapper createNewEmitter(String emitterName) {
         EmitterWrapper emitterWrapper = new EmitterWrapper();
+        emitterWrapper.setName(emitterName);
 
         ModuleGraph graph = particleSystem.createEmptyEmitter(particleEffectDescriptor);
         emitterWrapper.setModuleGraph(graph);
@@ -192,6 +196,8 @@ public class MainStage extends Stage {
         currentEmitterWrapper = emitterWrapper;
 
         moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
+
+        return emitterWrapper;
     }
 
     public String getLocalPath() {
@@ -203,5 +209,30 @@ public class MainStage extends Stage {
         }
 
         return "";
+    }
+
+    public Array<EmitterWrapper> getEmitterWrappers() {
+        return emitterWrappers;
+    }
+
+    public void removeEmitter(EmitterWrapper wrapper) {
+        int index = emitterWrappers.indexOf(wrapper, true);
+        index--;
+        if(index < 0) index = 0;
+
+        ParticleEffectDescriptor effect = particleSystem.getEffectDescriptors().get(0);
+        particleSystem.removeEmitter(effect, wrapper.getEmitter());
+
+        moduleBoardWidget.removeEmitter(wrapper);
+
+        emitterWrappers.removeValue(wrapper, true);
+
+        if(emitterWrappers.size > 0) {
+            currentEmitterWrapper = emitterWrappers.get(index);
+        } else {
+            currentEmitterWrapper = null;
+        }
+
+        moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
     }
 }

@@ -49,4 +49,16 @@ public class ParticleEffect implements Pool.Poolable {
     public Array<ParticleEmitter> getEmitters() {
         return emitters;
     }
+
+    public ParticleEffectDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    public void removeEmitter(ModuleGraph emitter) {
+        for(int i = emitters.size - 1; i >= 0; i--) {
+            if(emitters.get(i).moduleGraph == emitter) {
+                emitters.removeIndex(i);
+            }
+        }
+    }
 }

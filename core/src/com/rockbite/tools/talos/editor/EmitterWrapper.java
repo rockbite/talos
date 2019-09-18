@@ -23,4 +23,12 @@ public class EmitterWrapper {
     public String getName() {
         return emitterName;
     }
+
+    public void setName(String emitterName) {
+        this.emitterName = emitterName;
+    }
+
+    public ModuleGraph getEmitter() {
+        return moduleGraph;
+    }
 }

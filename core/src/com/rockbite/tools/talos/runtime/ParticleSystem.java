@@ -38,6 +38,7 @@ public class ParticleSystem {
     public void createEffect(ParticleEffectDescriptor descriptor) {
         ParticleEffect effect = new ParticleEffect(); // make this pooled
         effect.init(descriptor);
+        particleEffects.add(descriptor);
         addEffect(effect);
     }
 
@@ -76,5 +77,20 @@ public class ParticleSystem {
 
     public  Array<ParticleEffect> getEffectInstances() {
         return particleEffectInstances;
+    }
+
+    public  Array<ParticleEffectDescriptor> getEffectDescriptors() {
+        return particleEffects;
+    }
+
+    public void removeEmitter(ParticleEffectDescriptor effect, ModuleGraph emitter) {
+
+        for(ParticleEffect eff: getEffectInstances()) {
+            if(eff.getDescriptor() == effect) {
+                eff.removeEmitter(emitter);
+            }
+        }
+
+        effect.removeEmitter(emitter);
     }
 }

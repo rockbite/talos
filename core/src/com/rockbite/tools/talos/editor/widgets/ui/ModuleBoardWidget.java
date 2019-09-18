@@ -173,9 +173,18 @@ public class ModuleBoardWidget extends WidgetGroup {
         this.currentEmitterWrapper = currentEmitterWrapper;
 
         moduleContainer.clearChildren();
-        for(ModuleWrapper wrapper: getModuleWrappers()) {
-            moduleContainer.addActor(wrapper);
+
+        if(this.currentEmitterWrapper == null) return;
+
+        for (ModuleWrapper wrapper : getModuleWrappers()) {
+                moduleContainer.addActor(wrapper);
         }
+    }
+
+    public void removeEmitter(EmitterWrapper wrapper) {
+        moduleWrappers.remove(wrapper);
+        nodeConnections.remove(wrapper);
+        idMap.remove(wrapper);
     }
 
     public class NodeConnection {
