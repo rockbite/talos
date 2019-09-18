@@ -381,6 +381,18 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
         return textField;
     }
 
+    protected float floatFromText(String text) {
+        float value = 0;
+        try {
+            if (text.length() > 0) {
+                value = Float.parseFloat(text);
+            }
+        } catch (NumberFormatException e) {
+
+        }
+
+        return value;
+    }
 
     protected float floatFromText(VisTextField textField) {
         float value = 0;

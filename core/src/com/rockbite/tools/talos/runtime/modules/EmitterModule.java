@@ -7,8 +7,14 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class EmitterModule extends Module {
 
-    public static final int RATE = 0;
+    public static final int DELAY = 0;
+    public static final int DURATION = 1;
+    public static final int RATE = 2;
+    public static final int CONFIG = 3;
 
+
+    NumericalValue delay;
+    NumericalValue duration;
     NumericalValue rate;
 
     @Override
@@ -18,9 +24,9 @@ public class EmitterModule extends Module {
 
     @Override
     protected void defineSlots() {
-        rate = new NumericalValue();
-
-        createInputSlot(RATE, rate);
+        delay = createInputSlot(DELAY);
+        duration = createInputSlot(DURATION);
+        rate = createInputSlot(RATE);
     }
 
     @Override

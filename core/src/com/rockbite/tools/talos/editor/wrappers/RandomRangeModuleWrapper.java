@@ -80,8 +80,12 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     public void read(JsonValue value) {
         String min = value.getString("min");
         String max = value.getString("max");
-        minLabel.setText(min);
-        maxLabel.setText(max);
+        setData(floatFromText(min), floatFromText(max));
+    }
+
+    public void setData(float min, float max) {
+        minLabel.setText(min+"");
+        maxLabel.setText(max+"");
         updateValues();
     }
 }

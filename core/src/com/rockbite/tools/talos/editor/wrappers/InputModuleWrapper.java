@@ -60,6 +60,11 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
     @Override
     public void read(JsonValue value) {
         int scopeKey = value.getInt("scopeKey");
-        selectBox.setSelected(map.get(scopeKey));
+        setKey(scopeKey);
+    }
+
+    public void setKey(int key) {
+        selectBox.setSelected(map.get(key));
+        module.setInput(key);
     }
 }

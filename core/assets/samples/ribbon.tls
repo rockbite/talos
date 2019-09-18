@@ -30,7 +30,7 @@ effect: {
 					}
 				},
 				{
-					id: 25,
+					id: 4,
 					ref: "Vector2Module",
 					x: -11.0,
 					y: 221.0,
@@ -40,7 +40,7 @@ effect: {
 					}
 				},
 				{
-					id: 27,
+					id: 5,
 					ref: "StaticValueModule",
 					x: -60.0,
 					y: 417.0,
@@ -49,7 +49,7 @@ effect: {
 					}
 				},
 				{
-					id: 28,
+					id: 6,
 					ref: "InputModule",
 					x: -1098.0,
 					y: 594.0,
@@ -58,7 +58,7 @@ effect: {
 					}
 				},
 				{
-					id: 29,
+					id: 7,
 					ref: "MathModule",
 					x: -783.0,
 					y: 517.0,
@@ -67,7 +67,7 @@ effect: {
 					}
 				},
 				{
-					id: 31,
+					id: 8,
 					ref: "StaticValueModule",
 					x: -1096.0,
 					y: 451.0,
@@ -76,7 +76,7 @@ effect: {
 					}
 				},
 				{
-					id: 32,
+					id: 9,
 					ref: "MathModule",
 					x: -519.0,
 					y: 266.0,
@@ -85,7 +85,7 @@ effect: {
 					}
 				},
 				{
-					id: 33,
+					id: 10,
 					ref: "MathModule",
 					x: -524.0,
 					y: 165.0,
@@ -94,7 +94,7 @@ effect: {
 					}
 				},
 				{
-					id: 35,
+					id: 11,
 					ref: "MathModule",
 					x: -542.0,
 					y: 16.0,
@@ -103,7 +103,7 @@ effect: {
 					}
 				},
 				{
-					id: 36,
+					id: 12,
 					ref: "StaticValueModule",
 					x: -546.0,
 					y: -64.0,
@@ -112,7 +112,7 @@ effect: {
 					}
 				},
 				{
-					id: 37,
+					id: 13,
 					ref: "RandomRangeModule",
 					x: 67.0,
 					y: 99.0,
@@ -122,7 +122,7 @@ effect: {
 					}
 				},
 				{
-					id: 38,
+					id: 14,
 					ref: "DynamicRangeModule",
 					x: -119.0,
 					y: -245.0,
@@ -138,7 +138,7 @@ effect: {
 					}
 				},
 				{
-					id: 39,
+					id: 15,
 					ref: "CurveModule",
 					x: 424.0,
 					y: -377.0,
@@ -151,7 +151,7 @@ effect: {
 					}
 				},
 				{
-					id: 40,
+					id: 16,
 					ref: "CurveModule",
 					x: 560.0,
 					y: -211.0,
@@ -163,7 +163,7 @@ effect: {
 					}
 				},
 				{
-					id: 41,
+					id: 17,
 					ref: "ColorModule",
 					x: 113.0,
 					y: -504.0,
@@ -174,7 +174,7 @@ effect: {
 					}
 				},
 				{
-					id: 42,
+					id: 18,
 					ref: "ColorModule",
 					x: 114.0,
 					y: -666.0,
@@ -185,7 +185,7 @@ effect: {
 					}
 				},
 				{
-					id: 43,
+					id: 19,
 					ref: "CurveModule",
 					x: -188.0,
 					y: -575.0,
@@ -197,14 +197,14 @@ effect: {
 					}
 				},
 				{
-					id: 44,
+					id: 20,
 					ref: "MixModule",
 					x: 367.0,
 					y: -566.0,
 					config: {}
 				},
 				{
-					id: 45,
+					id: 21,
 					ref: "MathModule",
 					x: -896.0,
 					y: 59.0,
@@ -213,7 +213,7 @@ effect: {
 					}
 				},
 				{
-					id: 46,
+					id: 22,
 					ref: "StaticValueModule",
 					x: -1076.0,
 					y: -35.0,
@@ -222,7 +222,7 @@ effect: {
 					}
 				},
 				{
-					id: 47,
+					id: 23,
 					ref: "MathModule",
 					x: -1186.0,
 					y: 113.0,
@@ -231,7 +231,7 @@ effect: {
 					}
 				},
 				{
-					id: 48,
+					id: 24,
 					ref: "InputModule",
 					x: -570.0,
 					y: -440.0,
@@ -240,12 +240,21 @@ effect: {
 					}
 				},
 				{
-					id: 49,
+					id: 25,
 					ref: "StaticValueModule",
 					x: 722.0,
 					y: 302.0,
 					config: {
 						value: 1.0
+					}
+				},
+				{
+					id: 26,
+					ref: "StaticValueModule",
+					x: -144.0,
+					y: 675.0,
+					config: {
+						value: 200.0
 					}
 				}
 			],
@@ -257,146 +266,158 @@ effect: {
 					slotTo: 0
 				},
 				{
-					moduleFrom: 27,
+					moduleFrom: 5,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 5
 				},
 				{
-					moduleFrom: 28,
-					moduleTo: 29,
+					moduleFrom: 6,
+					moduleTo: 7,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 31,
-					moduleTo: 29,
+					moduleFrom: 8,
+					moduleTo: 7,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 29,
-					moduleTo: 32,
+					moduleFrom: 7,
+					moduleTo: 9,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 29,
-					moduleTo: 33,
+					moduleFrom: 7,
+					moduleTo: 10,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 32,
-					moduleTo: 25,
+					moduleFrom: 9,
+					moduleTo: 4,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 33,
-					moduleTo: 25,
+					moduleFrom: 10,
+					moduleTo: 4,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 35,
-					moduleTo: 33,
+					moduleFrom: 11,
+					moduleTo: 10,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 35,
-					moduleTo: 32,
+					moduleFrom: 11,
+					moduleTo: 9,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 36,
-					moduleTo: 35,
+					moduleFrom: 12,
+					moduleTo: 11,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 37,
+					moduleFrom: 13,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 11
 				},
 				{
-					moduleFrom: 38,
+					moduleFrom: 14,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 13
 				},
 				{
-					moduleFrom: 39,
+					moduleFrom: 15,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 10
 				},
 				{
-					moduleFrom: 40,
+					moduleFrom: 16,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 7
 				},
 				{
-					moduleFrom: 43,
-					moduleTo: 44,
+					moduleFrom: 19,
+					moduleTo: 20,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 44,
+					moduleFrom: 20,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 9
 				},
 				{
-					moduleFrom: 42,
-					moduleTo: 44,
+					moduleFrom: 18,
+					moduleTo: 20,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 41,
-					moduleTo: 44,
+					moduleFrom: 17,
+					moduleTo: 20,
 					slotFrom: 0,
 					slotTo: 2
 				},
 				{
-					moduleFrom: 46,
-					moduleTo: 45,
+					moduleFrom: 22,
+					moduleTo: 21,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 45,
-					moduleTo: 35,
+					moduleFrom: 21,
+					moduleTo: 11,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 25,
+					moduleFrom: 4,
 					moduleTo: 1,
 					slotFrom: 0,
 					slotTo: 3
 				},
 				{
-					moduleFrom: 29,
-					moduleTo: 47,
+					moduleFrom: 7,
+					moduleTo: 23,
 					slotFrom: 0,
 					slotTo: 0
 				},
 				{
-					moduleFrom: 46,
-					moduleTo: 47,
+					moduleFrom: 22,
+					moduleTo: 23,
 					slotFrom: 0,
 					slotTo: 1
 				},
 				{
-					moduleFrom: 47,
-					moduleTo: 45,
+					moduleFrom: 23,
+					moduleTo: 21,
+					slotFrom: 0,
+					slotTo: 0
+				},
+				{
+					moduleFrom: 4,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 8
+				},
+				{
+					moduleFrom: 24,
+					moduleTo: 19,
 					slotFrom: 0,
 					slotTo: 0
 				},
@@ -404,19 +425,13 @@ effect: {
 					moduleFrom: 25,
 					moduleTo: 1,
 					slotFrom: 0,
-					slotTo: 8
-				},
-				{
-					moduleFrom: 48,
-					moduleTo: 43,
-					slotFrom: 0,
-					slotTo: 0
-				},
-				{
-					moduleFrom: 49,
-					moduleTo: 1,
-					slotFrom: 0,
 					slotTo: 4
+				},
+				{
+					moduleFrom: 26,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 2
 				}
 			]
 		}

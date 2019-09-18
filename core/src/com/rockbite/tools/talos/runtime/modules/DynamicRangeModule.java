@@ -10,6 +10,8 @@ public class DynamicRangeModule extends CurveModule {
     private float lowMin = 0, lowMax = 100;
     private float highMin = 0, highMax = 100;
 
+    public static final int OUTPUT = 0;
+
     private Random random = new Random();
 
     @Override

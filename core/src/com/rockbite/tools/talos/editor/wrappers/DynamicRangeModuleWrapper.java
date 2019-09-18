@@ -149,4 +149,18 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
             module.setMinMaxLow(min, max);
         }
     }
+
+    public void setData(float lowMin, float lowMax, float highMin, float highMax, Array<Vector2> points) {
+        lowMinField.setText(lowMin+"");
+        lowMaxField.setText(lowMax+"");
+        highMinField.setText(highMin+"");
+        highMaxField.setText(highMax+"");
+        updateValues(lowMinField, lowMaxField, false);
+        updateValues(highMinField, highMaxField, true);
+
+        module.getPoints().clear();
+        for(Vector2 point: points) {
+            module.createPoint(point.x, point.y);
+        }
+    }
 }
