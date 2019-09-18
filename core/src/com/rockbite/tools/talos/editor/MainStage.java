@@ -48,11 +48,15 @@ public class MainStage extends Stage {
 
     private TimelineWidget timelineWidget;
 
+    LegacyImporter legacyImporter;
+
     ProjectSerializer projectSerializer;
 
     private String currentProjectPath = null;
 
     FileChooser fileChooser;
+
+    private PopupMenu examplesPopup;
 
     public MainStage() {
         super(new ScreenViewport(),
@@ -67,6 +71,7 @@ public class MainStage extends Stage {
         VisUI.load(skin);
 
         projectSerializer = new ProjectSerializer(this);
+        legacyImporter = new LegacyImporter(this);
 
         initData();
 
@@ -148,14 +153,21 @@ public class MainStage extends Stage {
         MenuItem newProject = new MenuItem("New Project");
         MenuItem openProject = new MenuItem("Open Project");
         MenuItem saveProject = new MenuItem("Save Project");
+        MenuItem examples = new MenuItem("Examples");
+        MenuItem importItem = new MenuItem("Legacy Import");
+        examplesPopup = new PopupMenu();
+        examples.setSubMenu(examplesPopup);
+        initExampleList(examplesPopup);
         MenuItem saveAsProject = new MenuItem("Save As Project");
         MenuItem exitApp = new MenuItem("Exit");
-
 
         projectMenu.addItem(newProject);
         projectMenu.addItem(openProject);
         projectMenu.addItem(saveProject);
         projectMenu.addItem(saveAsProject);
+        projectMenu.addSeparator();
+        projectMenu.addItem(examples);
+        projectMenu.addItem(importItem);
         projectMenu.addSeparator();
         projectMenu.addItem(exitApp);
 
@@ -188,6 +200,14 @@ public class MainStage extends Stage {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 saveAsProjectAction();
+            }
+        });
+
+        importItem.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                legacyImport();
             }
         });
 
@@ -232,8 +252,27 @@ public class MainStage extends Stage {
         addActor(mainTable);
     }
 
+    private void initExampleList(PopupMenu examples) {
+        FileHandle dir = Gdx.files.internal("samples");
+        for(final FileHandle file: dir.list()) {
+            if(file.extension().equals("tls")) {
+                MenuItem item  = new MenuItem(file.name());
+                examples.addItem(item);
+
+                item.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        openProject(file);
+                        currentProjectPath = null;
+                    }
+                });
+            }
+        }
+    }
+
     private void loadDefaultProject() {
-        FileHandle fileHandle = Gdx.files.internal("samples/fire.tls");
+        FileHandle fileHandle = Gdx.files.internal("samples/default.tls");
         if(fileHandle.exists()) {
             projectSerializer.read(fileHandle);
         } else {
@@ -280,6 +319,12 @@ public class MainStage extends Stage {
     private void saveAsProjectAction() {
         fileChooser.setMode(FileChooser.Mode.SAVE);
         fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+            }
+        });
         fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
 
         fileChooser.setListener(new FileChooserAdapter() {
@@ -299,10 +344,29 @@ public class MainStage extends Stage {
         addActor(fileChooser.fadeIn());
     }
 
-    private void newProject() {
+    public void newProject() {
         cleanData();
         createNewEmitter("emitter1");
         timelineWidget.setEmitters(emitterWrappers);
+    }
+
+    public void legacyImport() {
+        fileChooser.setMode(FileChooser.Mode.OPEN);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileFilter(new FileChooser.DefaultFileFilter(fileChooser));
+        fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+        fileChooser.setListener(new FileChooserAdapter() {
+            @Override
+            public void selected (Array<FileHandle> file) {
+                cleanData();
+                legacyImporter.read(file.get(0));
+                currentProjectPath = file.get(0).path();
+                timelineWidget.setEmitters(emitterWrappers);
+            }
+        });
+
+        addActor(fileChooser.fadeIn());
     }
 
     public void cleanData() {
@@ -314,12 +378,14 @@ public class MainStage extends Stage {
 
     private void openProject(String path) {
         FileHandle fileHandle = Gdx.files.internal(path);
+        openProject(fileHandle);
+    }
+
+    private void openProject(FileHandle fileHandle) {
         if(fileHandle.exists()) {
-
             cleanData();
-
             projectSerializer.read(fileHandle);
-            currentProjectPath = path;
+            currentProjectPath = fileHandle.path();
             timelineWidget.setEmitters(emitterWrappers);
         }
     }

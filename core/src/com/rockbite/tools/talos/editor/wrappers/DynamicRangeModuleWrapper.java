@@ -128,6 +128,7 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         updateValues(highMinField, highMaxField, true);
 
         JsonValue points = value.get("points");
+        module.getPoints().clear();
         for(JsonValue point: points) {
             module.createPoint(point.get(0).asFloat(), point.get(1).asFloat());
         }
