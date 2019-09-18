@@ -187,6 +187,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         idMap.remove(wrapper);
     }
 
+    public void clearAll() {
+        moduleWrappers.clear();
+        nodeConnections.clear();
+        idMap.clear();
+    }
+
     public class NodeConnection {
         public ModuleWrapper fromModule;
         public ModuleWrapper toModule;

@@ -93,4 +93,13 @@ public class ParticleSystem {
 
         effect.removeEmitter(emitter);
     }
+
+    public void clearEffect(ParticleEffectDescriptor effect) {
+        for(ParticleEffect eff: getEffectInstances()) {
+            if(eff.getDescriptor() == effect) {
+                eff.removeEmitters();
+            }
+        }
+        effect.removeEmitters();
+    }
 }

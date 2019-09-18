@@ -34,4 +34,8 @@ public class ParticleEffectDescriptor {
     public void removeEmitter(ModuleGraph emitter) {
         graphList.removeValue(emitter, true);
     }
+
+    public void removeEmitters() {
+        graphList.clear();
+    }
 }

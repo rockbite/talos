@@ -83,10 +83,10 @@
 		default-horizontal: {handle: splitpane }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
-		default: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window}
+		default: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder}
 		resizable: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-resizable}
 		noborder: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder}
-		dialog: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window},
+		dialog: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder},
 		panel: {titleFont: default-font, titleFontColor: white, background: window},
 		panel-blue: {titleFont: default-font, titleFontColor: white, background: window-blue},
 		panel-orange: {titleFont: default-font, titleFontColor: white, background: window-orange}

@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
+import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.tools.talos.runtime.ModuleGraph;
 import com.rockbite.tools.talos.runtime.ParticleEffect;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -25,6 +27,7 @@ import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.net.URISyntaxException;
 
 public class MainStage extends Stage {
@@ -47,6 +50,10 @@ public class MainStage extends Stage {
 
     ProjectSerializer projectSerializer;
 
+    private String currentProjectPath = null;
+
+    FileChooser fileChooser;
+
     public MainStage() {
         super(new ScreenViewport(),
                 new PolygonSpriteBatch());
@@ -65,17 +72,30 @@ public class MainStage extends Stage {
 
         initActors();
 
+        initFileChoosers();
+
         loadDefaultProject();
 
         initListeners();
+    }
+
+    private void initFileChoosers() {
+        fileChooser = new FileChooser(FileChooser.Mode.SAVE);
+        fileChooser.setBackground(skin.getDrawable("window-noborder"));
     }
 
     private void initListeners() {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    newProjectAction();
+                }
+                if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    openProjectAction();
+                }
                 if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    saveProject();
+                    saveProjectAction();
                 }
 
                 return super.keyDown(event, keycode);
@@ -125,6 +145,60 @@ public class MainStage extends Stage {
             }
         });
 
+        MenuItem newProject = new MenuItem("New Project");
+        MenuItem openProject = new MenuItem("Open Project");
+        MenuItem saveProject = new MenuItem("Save Project");
+        MenuItem saveAsProject = new MenuItem("Save As Project");
+        MenuItem exitApp = new MenuItem("Exit");
+
+
+        projectMenu.addItem(newProject);
+        projectMenu.addItem(openProject);
+        projectMenu.addItem(saveProject);
+        projectMenu.addItem(saveAsProject);
+        projectMenu.addSeparator();
+        projectMenu.addItem(exitApp);
+
+        newProject.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                newProjectAction();
+            }
+        });
+
+        openProject.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                openProjectAction();
+            }
+        });
+
+        saveProject.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                saveProjectAction();
+            }
+        });
+
+        saveAsProject.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                saveAsProjectAction();
+            }
+        });
+
+        exitApp.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                System.exit(0);
+            }
+        });
+
 
         topTable.add(menuBar.getTable()).left().expand();
 
@@ -159,22 +233,105 @@ public class MainStage extends Stage {
     }
 
     private void loadDefaultProject() {
-        String path = getLocalPath() + "\\" + "project.talos";
-        FileHandle fileHandle = Gdx.files.absolute(path);
+        FileHandle fileHandle = Gdx.files.internal("samples/fire.tls");
         if(fileHandle.exists()) {
             projectSerializer.read(fileHandle);
         } else {
             // empty stuff
-            createNewEmitter("test");
+            createNewEmitter("emitter1");
         }
 
         timelineWidget.setEmitters(emitterWrappers);
     }
 
-    private void saveProject() {
-        String path = getLocalPath() + "\\" + "project.talos";
+    private void newProjectAction() {
+        newProject();
+    }
+
+    private void openProjectAction() {
+        fileChooser.setMode(FileChooser.Mode.OPEN);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+            }
+        });
+        fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+        fileChooser.setListener(new FileChooserAdapter() {
+            @Override
+            public void selected (Array<FileHandle> file) {
+                openProject(file.first().file().getAbsolutePath());
+            }
+        });
+
+        addActor(fileChooser.fadeIn());
+    }
+
+    private void saveProjectAction() {
+        if(currentProjectPath == null) {
+            saveAsProjectAction();
+        } else {
+            saveProject(currentProjectPath);
+        }
+    }
+
+    private void saveAsProjectAction() {
+        fileChooser.setMode(FileChooser.Mode.SAVE);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+        fileChooser.setListener(new FileChooserAdapter() {
+            @Override
+            public void selected(Array<FileHandle> file) {
+                String path = file.first().file().getAbsolutePath();
+                if(!path.endsWith(".tls")) {
+                    if(path.indexOf(".") > 0) {
+                        path = path.substring(0, path.indexOf("."));
+                    }
+                    path += ".tls";
+                }
+                saveProject(path);
+            }
+        });
+
+        addActor(fileChooser.fadeIn());
+    }
+
+    private void newProject() {
+        cleanData();
+        createNewEmitter("emitter1");
+        timelineWidget.setEmitters(emitterWrappers);
+    }
+
+    public void cleanData() {
+        particleSystem.clearEffect(particleSystem.getEffectDescriptors().get(0));
+        currentEmitterWrapper = null;
+        moduleBoardWidget.clearAll();
+        emitterWrappers.clear();
+    }
+
+    private void openProject(String path) {
+        FileHandle fileHandle = Gdx.files.internal(path);
+        if(fileHandle.exists()) {
+
+            cleanData();
+
+            projectSerializer.read(fileHandle);
+            currentProjectPath = path;
+            timelineWidget.setEmitters(emitterWrappers);
+        }
+    }
+
+    private void saveProject(String path) {
         FileHandle fileHandleWrite = Gdx.files.absolute(path);
-        projectSerializer.write(fileHandleWrite);
+        try {
+            projectSerializer.write(fileHandleWrite);
+            currentProjectPath = path;
+        } catch (Exception e) {
+            Dialogs.showErrorDialog(this, "Access Denied");
+        }
     }
 
     public ModuleGraph getCurrentModuleGraph() {

@@ -61,4 +61,8 @@ public class ParticleEffect implements Pool.Poolable {
             }
         }
     }
+
+    public void removeEmitters() {
+        emitters.clear();
+    }
 }
