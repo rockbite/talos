@@ -21,10 +21,6 @@ allprojects {
     ext {
         appName = "talos"
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.7'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
         visuiVersion = '1.4.2'
     }
 
@@ -38,29 +34,16 @@ allprojects {
     }
 }
 
-project(":desktop") {
+project(":editor") {
     apply plugin: "java-library"
 
 
     dependencies {
-        implementation project(":core")
+        implementation project(":runtimes:talos-libgdx")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        
+
     }
 }
 
-project(":core") {
-    apply plugin: "java-library"
-
-
-    dependencies {
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
-        
-    }
-}
