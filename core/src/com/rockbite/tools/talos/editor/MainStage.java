@@ -455,4 +455,8 @@ public class MainStage extends Stage {
 
         moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
     }
+
+    public void fileDrop(String[] paths, float x, float y) {
+        moduleBoardWidget.fileDrop(paths, x, y);
+    }
 }

@@ -419,4 +419,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
     public abstract void write(JsonValue value);
 
     public abstract void read(JsonValue value);
+
+    public void fileDrop(String[] paths, float x, float y) {
+        // do nothing
+    }
 }

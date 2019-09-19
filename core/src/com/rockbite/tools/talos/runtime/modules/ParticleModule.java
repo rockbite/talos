@@ -1,10 +1,16 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.rockbite.tools.talos.runtime.Particle;
+import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
+import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class ParticleModule extends Module {
@@ -26,6 +32,7 @@ public class ParticleModule extends Module {
     public static final int SIZE = 13;
 
 
+    DrawableValue drawable;
     NumericalValue offset;
     NumericalValue life;
     NumericalValue velocity;
@@ -40,9 +47,11 @@ public class ParticleModule extends Module {
 
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
+    private ParticleDrawable defaultDrawable;
 
     @Override
     protected void defineSlots() {
+        drawable = (DrawableValue) createInputSlot(DRAWABLE, new DrawableValue());
         offset = createInputSlot(OFFSET);
         life = createInputSlot(LIFE);
         velocity = createInputSlot(VELOCITY);
@@ -67,6 +76,15 @@ public class ParticleModule extends Module {
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
         getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
         getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
+    }
+
+    public ParticleDrawable getDrawable() {
+        fetchInputSlotValue(DRAWABLE);
+        if(drawable.isEmpty()) {
+            return defaultDrawable;
+        }
+
+        return drawable.getDrawable();
     }
 
     public float getTransparency() {
@@ -131,5 +149,9 @@ public class ParticleModule extends Module {
         tmpVec.set(target.get(0), target.get(1));
 
         return tmpVec;
+    }
+
+    public void setDefaultDrawable(ParticleDrawable defaultDrawable) {
+        this.defaultDrawable = defaultDrawable;
     }
 }

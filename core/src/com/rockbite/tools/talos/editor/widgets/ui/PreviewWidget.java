@@ -2,7 +2,7 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import com.rockbite.tools.talos.runtime.ParticleRenderer;
+import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 public class PreviewWidget extends ViewportWidget {

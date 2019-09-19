@@ -1,11 +1,28 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
+
+    ParticleDrawable defaultDrawable;
+
+    public ParticleModuleWrapper() {
+        super();
+        defaultDrawable = new TextureRegionDrawable(new TextureRegion(new Texture("fire.png")));
+    }
+
+    @Override
+    public void setModule(ParticleModule module) {
+        super.setModule(module);
+        module.setDefaultDrawable(defaultDrawable);
+    }
 
     @Override
     protected float reportPrefWidth() {
@@ -34,6 +51,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     @Override
     public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
 
+        if(slot.getIndex() == ParticleModule.DRAWABLE) return TextureModule.class;
         if(slot.getIndex() == ParticleModule.OFFSET) return Vector2Module.class;
         if(slot.getIndex() == ParticleModule.TARGET) return Vector2Module.class;
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;

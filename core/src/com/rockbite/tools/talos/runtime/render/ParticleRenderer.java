@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.runtime;
+package com.rockbite.tools.talos.runtime.render;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,24 +8,24 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.tools.talos.runtime.Particle;
+import com.rockbite.tools.talos.runtime.ParticleEmitter;
+import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 public class ParticleRenderer {
 
     ParticleSystem particleSystem;
-
-    TextureRegion textureRegion;
 
     Color color = new Color(Color.WHITE);
 
     private Vector2 position = new Vector2();
 
     public ParticleRenderer() {
-        textureRegion = new TextureRegion(new Texture("fire.png"));
+
     }
 
     public ParticleRenderer(ParticleSystem particleSystem) {
         this.particleSystem = particleSystem;
-        textureRegion = new TextureRegion(new Texture("fire.png"));
     }
 
     public void render(Batch batch) {
@@ -53,16 +53,17 @@ public class ParticleRenderer {
         float rotation = particle.rotation * 360f;
         float size = particle.size;
         batch.setColor(color);
-        batch.draw(textureRegion,
-                position.x + particle.position.x-size/2f,
-                position.y + particle.position.y-size/2f,
-                size/2f,
-                size/2f,
-                size,
-                size,
-                1f,
-                1f,
-                rotation);
+
+        if(particle.drawable != null) {
+            particle.drawable.draw(batch,
+                    position.x + particle.position.x-size/2f,
+                    position.y + particle.position.y-size/2f,
+                    size/2f,
+                    size/2f,
+                    size,
+                    size,
+                    rotation);
+        }
     }
 
     public void dispose() {

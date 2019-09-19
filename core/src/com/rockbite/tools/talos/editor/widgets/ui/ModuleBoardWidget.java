@@ -40,6 +40,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     Vector2 gridPos = new Vector2();
     Vector2 tmp = new Vector2();
+    Vector2 tmp2 = new Vector2();
     Vector2 prev = new Vector2();
 
 
@@ -72,6 +73,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             Vector2 tmp = new Vector2();
 
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println(x);
                 prev.set(x, y);
                 return true;
             }
@@ -193,6 +195,20 @@ public class ModuleBoardWidget extends WidgetGroup {
         idMap.clear();
     }
 
+    public void fileDrop(String[] paths, float x, float y) {
+        tmp.set(x, Gdx.graphics.getHeight() - y);
+        (getStage().getViewport()).unproject(tmp);
+
+        for(ModuleWrapper wrapper: getModuleWrappers()) {
+            tmp2.set(tmp);
+            wrapper.screenToLocalCoordinates(tmp2);
+
+            if(wrapper.hit(tmp2.x, tmp2.y, false) != null) {
+                wrapper.fileDrop(paths, tmp2.x, tmp2.y);
+            }
+        }
+    }
+
     public class NodeConnection {
         public ModuleWrapper fromModule;
         public ModuleWrapper toModule;
@@ -215,6 +231,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(DynamicRangeModule.class, DynamicRangeModuleWrapper.class);
         WrapperRegistry.reg(ScriptModule.class, ScriptModuleWrapper.class);
         WrapperRegistry.reg(GradientColorModule.class, GradientColorModuleWrapper.class);
+        WrapperRegistry.reg(TextureModule.class, TextureModuleWrapper.class);
     }
 
     private void showPopup() {

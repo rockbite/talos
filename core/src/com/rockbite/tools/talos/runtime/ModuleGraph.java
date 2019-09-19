@@ -46,6 +46,7 @@ public class ModuleGraph {
             registeredModules.add(DynamicRangeModule.class);
             registeredModules.add(ScriptModule.class);
             registeredModules.add(GradientColorModule.class);
+            registeredModules.add(TextureModule.class);
         }
     }
 
