@@ -94,9 +94,11 @@ public class GradientWidget extends Actor {
             private void doubleClick(float x, float y) {
                 int hitIndex = hit(x, y);
                 if(hitIndex >= 0) {
-                    module.removePoint(hitIndex);
-                    updateGradientData();
-                    justRemoved = true;
+                    if(module.getPoints().size > 1) {
+                        module.removePoint(hitIndex);
+                        updateGradientData();
+                        justRemoved = true;
+                    }
                 }
             }
 

@@ -85,7 +85,7 @@ public class GradientColorModule extends Module {
         points.clear();
         ColorPoint colorPoint = new ColorPoint();
         colorPoint.pos = 0;
-        colorPoint.color.set(Color.RED);
+        colorPoint.color.set(255/255f, 68/255f, 26/255f, 1f);
         points.add(colorPoint);
     }
 
@@ -102,6 +102,7 @@ public class GradientColorModule extends Module {
     }
 
     public void removePoint(int hitIndex) {
+        if(points.size <= 1) return;
         points.removeIndex(hitIndex);
     }
 
@@ -132,5 +133,13 @@ public class GradientColorModule extends Module {
         }
 
         return tmpColor;
+    }
+
+    public void setPoints(Array<ColorPoint> from) {
+        points.clear();
+        for(ColorPoint fromPoint: from) {
+            ColorPoint point = new ColorPoint(fromPoint.color, fromPoint.pos);
+            points.add(point);
+        }
     }
 }

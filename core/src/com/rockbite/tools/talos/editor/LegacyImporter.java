@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.StreamUtils;
+import com.rockbite.tools.talos.editor.tools.ColorPoint;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.modules.*;
@@ -151,6 +152,21 @@ public class LegacyImporter {
                 float[] timeline = new float[readInt(reader, "timelineCount")];
                 for (int i = 0; i < timeline.length; i++)
                     timeline[i] = readFloat(reader, "timeline" + i);
+
+
+                // now normal code...
+                Array<ColorPoint> points = new Array<>();
+                for(int i = 0; i < timeline.length; i++) {
+                    ColorPoint point = new ColorPoint();
+                    point.pos = timeline[i];
+                    point.color.set(colors[i*3], colors[i*3+1], colors[i*3+2], 1f);
+                    points.add(point);
+                }
+
+                GradientColorModuleWrapper wrapper = (GradientColorModuleWrapper) stage.moduleBoardWidget.createModule(GradientColorModule.class, leftX, getNextY());
+                wrapper.setData(points);
+                stage.moduleBoardWidget.makeConnection(wrapper, toModule, RandomRangeModule.OUTPUT, toSlot);
+
             }
         } catch (IOException e) {
             e.printStackTrace();

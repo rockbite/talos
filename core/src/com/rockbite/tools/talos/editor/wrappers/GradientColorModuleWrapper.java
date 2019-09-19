@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
@@ -77,5 +78,9 @@ public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModul
     @Override
     protected float reportPrefWidth() {
         return 350;
+    }
+
+    public void setData(Array<ColorPoint> points) {
+        module.setPoints(points);
     }
 }
