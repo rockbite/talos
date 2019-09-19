@@ -73,7 +73,6 @@ public class ModuleBoardWidget extends WidgetGroup {
             Vector2 tmp = new Vector2();
 
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println(x);
                 prev.set(x, y);
                 return true;
             }
@@ -232,6 +231,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(ScriptModule.class, ScriptModuleWrapper.class);
         WrapperRegistry.reg(GradientColorModule.class, GradientColorModuleWrapper.class);
         WrapperRegistry.reg(TextureModule.class, TextureModuleWrapper.class);
+        WrapperRegistry.reg(EmConfigModule.class, EmConfigModuleWrapper.class);
     }
 
     private void showPopup() {
@@ -338,9 +338,11 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         // draw active curve
         if(activeCurve != null) {
+            shapeRenderer.setColor(0, 203/255f, 124/255f, 1f);
             drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
         }
 
+        shapeRenderer.setColor(1, 1, 1, 0.4f);
         // draw nodes
         for(NodeConnection connection: getCurrentConnections()) {
             connection.fromModule.getOutputSlotPos(connection.fromSlot, tmp);
@@ -372,7 +374,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         curvePoints[3].set(toX + 20f, toY);
 
         bezier.set(curvePoints, 0, curvePoints.length);
-        shapeRenderer.setColor(1, 1, 1, 1f);
 
         float resolution = 1f/20f;
 

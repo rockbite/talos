@@ -67,12 +67,29 @@ public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModul
 
     @Override
     public void write(JsonValue value) {
-
+        Array<ColorPoint> points = module.getPoints();
+        JsonValue arr = new JsonValue(JsonValue.ValueType.array);
+        value.addChild("points", arr);
+        for(ColorPoint point: points) {
+            JsonValue vec = new JsonValue(JsonValue.ValueType.array);
+            vec.addChild(new JsonValue(point.color.r));
+            vec.addChild(new JsonValue(point.color.g));
+            vec.addChild(new JsonValue(point.color.b));
+            vec.addChild(new JsonValue(point.pos));
+            arr.addChild(vec);
+        }
     }
 
     @Override
     public void read(JsonValue value) {
-
+        JsonValue points = value.get("points");
+        module.getPoints().clear();
+        for(JsonValue point: points) {
+            Color color = new Color();
+            color.set(point.get(0).asFloat(), point.get(1).asFloat(), point.get(2).asFloat(), 1f);
+            module.createPoint(color, point.get(3).asFloat());
+        }
+        gradientWidget.updateGradientData();
     }
 
     @Override

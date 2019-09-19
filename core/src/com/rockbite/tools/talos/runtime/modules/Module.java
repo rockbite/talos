@@ -30,10 +30,12 @@ public abstract class Module {
     protected abstract void defineSlots();
 
     public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
+        if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
         inputSlots.get(mySlot).connect(module, module.outputSlots.get(targetSlot));
     }
 
     public void attachModuleToMyOutput(Module module, int mySlot, int targetSlot) {
+        if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
         outputSlots.get(mySlot).connect(module, module.inputSlots.get(targetSlot));
     }
 

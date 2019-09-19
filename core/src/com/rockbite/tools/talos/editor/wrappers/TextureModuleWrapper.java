@@ -66,9 +66,11 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
     public void read(JsonValue value) {
         fileName = value.getString("fileName");
         filePath = value.getString("filePath");
-        FileHandle fileHandle = Gdx.files.absolute(filePath);
-        TextureRegion region = new TextureRegion(new Texture(fileHandle));
-        module.setRegion(region);
-        image.setDrawable(new TextureRegionDrawable(region));
+        if(filePath != null) {
+            FileHandle fileHandle = Gdx.files.absolute(filePath);
+            TextureRegion region = new TextureRegion(new Texture(fileHandle));
+            module.setRegion(region);
+            image.setDrawable(new TextureRegionDrawable(region));
+        }
     }
 }

@@ -71,7 +71,13 @@ public class Particle implements Pool.Poolable {
         float velocity = particleModule.getVelocity();
         life = particleModule.getLife();
         transparency = particleModule.getTransparency();
-        rotation = particleModule.getRotation();
+
+        if(particleEmitter.moduleGraph.emitterModule.isAligned()) {
+            rotation = angle/360f;
+        } else {
+            rotation = particleModule.getRotation();
+        }
+
         size = particleModule.getSize();
         color.set(particleModule.getColor());
         drawable = particleModule.getDrawable();
