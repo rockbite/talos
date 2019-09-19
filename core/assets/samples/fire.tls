@@ -1,0 +1,374 @@
+{
+metadata: {},
+effect: {
+	emitters: [
+		{
+			name: "particles",
+			groups: [],
+			modules: [
+				{
+					id: 1,
+					ref: "EmitterModule",
+					x: -77.0,
+					y: -67.0,
+					config: {}
+				},
+				{
+					id: 2,
+					ref: "ParticleModule",
+					x: -75.0,
+					y: -361.0,
+					config: {}
+				},
+				{
+					id: 3,
+					ref: "DynamicRangeModule",
+					x: -527.0,
+					y: -586.0,
+					config: {
+						lowMin: 2.0,
+						lowMax: 5.0,
+						highMin: 0.0,
+						highMax: 0.0,
+						points: [
+							[ 0.002553511643782258, 0.0 ],
+							[ 1.0, 0.2031218260526657 ]
+						]
+					}
+				},
+				{
+					id: 4,
+					ref: "CurveModule",
+					x: -821.0,
+					y: -591.0,
+					config: {
+						points: [
+							[ 0.0, 0.0 ],
+							[ 0.2366257607936859, 0.14062118530273438 ],
+							[ 0.5329217910766602, 1.0 ],
+							[ 1.0, 0.0 ]
+						]
+					}
+				},
+				{
+					id: 6,
+					ref: "DynamicRangeModule",
+					x: -813.0,
+					y: -407.0,
+					config: {
+						lowMin: 20.0,
+						lowMax: 180.0,
+						highMin: 90.0,
+						highMax: 90.0,
+						points: [
+							[ 0.002552888821810484, 0.20312118530273438 ],
+							[ 0.16071459650993347, 0.005203565116971731 ],
+							[ 0.24234724044799805, 1.0 ],
+							[ 0.50765460729599, 0.0 ],
+							[ 0.5178586840629578, 0.6614551544189453 ],
+							[ 0.6198998093605042, 1.0 ],
+							[ 0.7831647992134094, 0.2135384976863861 ],
+							[ 1.0, 1.0 ]
+						]
+					}
+				},
+				{
+					id: 7,
+					ref: "GradientColorModule",
+					x: -125.0,
+					y: -590.0,
+					config: {
+						points: [
+							[ 1.0, 1.0, 1.0, 0.0 ],
+							[ 1.0, 0.9725490212440491, 0.8313725590705872, 0.42966434359550476 ],
+							[ 1.0, 0.21568627655506134, 0.0, 1.0015298128128052 ]
+						]
+					}
+				},
+				{
+					id: 8,
+					ref: "DynamicRangeModule",
+					x: -549.0,
+					y: -242.0,
+					config: {
+						lowMin: 0.0,
+						lowMax: 0.0,
+						highMin: 40.0,
+						highMax: 160.0,
+						points: [
+							[ 0.0, 1.0 ],
+							[ 0.49745145440101624, 1.0 ],
+							[ 1.0, 0.3489551544189453 ]
+						]
+					}
+				},
+				{
+					id: 9,
+					ref: "StaticValueModule",
+					x: -426.0,
+					y: -64.0,
+					config: {
+						value: 1.899999976158142
+					}
+				},
+				{
+					id: 10,
+					ref: "StaticValueModule",
+					x: -447.0,
+					y: 31.0,
+					config: {
+						value: 170.0
+					}
+				}
+			],
+			connections: [
+				{
+					moduleFrom: 3,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 13
+				},
+				{
+					moduleFrom: 4,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 10
+				},
+				{
+					moduleFrom: 6,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 11
+				},
+				{
+					moduleFrom: 7,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 9
+				},
+				{
+					moduleFrom: 8,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 5
+				},
+				{
+					moduleFrom: 9,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 4
+				},
+				{
+					moduleFrom: 10,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 2
+				}
+			]
+		},
+		{
+			name: "main-fire",
+			groups: [],
+			modules: [
+				{
+					id: 1,
+					ref: "ParticleModule",
+					x: 261.0,
+					y: -101.0,
+					config: {}
+				},
+				{
+					id: 2,
+					ref: "EmitterModule",
+					x: 261.0,
+					y: 184.0,
+					config: {}
+				},
+				{
+					id: 4,
+					ref: "DynamicRangeModule",
+					x: -203.0,
+					y: -98.0,
+					config: {
+						lowMin: 20.0,
+						lowMax: 160.0,
+						highMin: 90.0,
+						highMax: 90.0,
+						points: [
+							[ 0.0, 0.0 ],
+							[ 0.18112245202064514, 0.26562055945396423 ],
+							[ 0.4005126953125, 0.9010385274887085 ],
+							[ 1.0, 1.0 ]
+						]
+					}
+				},
+				{
+					id: 5,
+					ref: "CurveModule",
+					x: -105.0,
+					y: -308.0,
+					config: {
+						points: [
+							[ 0.0, 0.0 ],
+							[ 0.12139967828989029, 0.3593711853027344 ],
+							[ 0.7263374328613281, 0.21353785693645477 ],
+							[ 1.0, 0.0 ]
+						]
+					}
+				},
+				{
+					id: 6,
+					ref: "GradientColorModule",
+					x: -537.0,
+					y: -275.0,
+					config: {
+						points: [
+							[ 0.7490196228027344, 0.2862745225429535, 0.18039216101169586, -0.0015290520386770368 ],
+							[ 0.929411768913269, 0.3490196168422699, 0.10196078568696976, 0.23088853061199188 ],
+							[ 0.3019607961177826, 0.20000000298023224, 0.16862745583057404, 0.7262998819351196 ],
+							[ 0.34117648005485535, 0.33725491166114807, 0.33725491166114807, 1.0 ]
+						]
+					}
+				},
+				{
+					id: 7,
+					ref: "StaticValueModule",
+					x: -139.0,
+					y: 282.0,
+					config: {
+						value: 100.0
+					}
+				},
+				{
+					id: 9,
+					ref: "DynamicRangeModule",
+					x: -194.0,
+					y: 111.0,
+					config: {
+						lowMin: 0.0,
+						lowMax: 0.0,
+						highMin: 3.0,
+						highMax: 4.0,
+						points: [
+							[ 0.0, 1.0 ],
+							[ 0.6913280487060547, 1.0 ],
+							[ 1.0, 0.6406234502792358 ]
+						]
+					}
+				},
+				{
+					id: 10,
+					ref: "InputModule",
+					x: -483.0,
+					y: 290.0,
+					config: {
+						scopeKey: "0"
+					}
+				},
+				{
+					id: 11,
+					ref: "DynamicRangeModule",
+					x: -559.0,
+					y: 107.0,
+					config: {
+						lowMin: 0.0,
+						lowMax: 0.0,
+						highMin: 60.0,
+						highMax: 190.0,
+						points: [
+							[ 0.0, 0.3489561080932617 ],
+							[ 0.201532781124115, 0.7968724966049194 ],
+							[ 0.5382659435272217, 0.713537871837616 ],
+							[ 1.0, 0.16145452857017517 ]
+						]
+					}
+				},
+				{
+					id: 12,
+					ref: "CurveModule",
+					x: -543.0,
+					y: -102.0,
+					config: {
+						points: [
+							[ 0.0, 1.0 ],
+							[ 1.0, 0.0 ]
+						]
+					}
+				},
+				{
+					id: 13,
+					ref: "DynamicRangeModule",
+					x: -212.0,
+					y: -510.0,
+					config: {
+						lowMin: 50.0,
+						lowMax: 70.0,
+						highMin: 0.0,
+						highMax: 100.0,
+						points: [
+							[ 0.0, 0.0 ],
+							[ 1.0, 1.0 ]
+						]
+					}
+				}
+			],
+			connections: [
+				{
+					moduleFrom: 4,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 11
+				},
+				{
+					moduleFrom: 5,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 10
+				},
+				{
+					moduleFrom: 6,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 9
+				},
+				{
+					moduleFrom: 7,
+					moduleTo: 2,
+					slotFrom: 0,
+					slotTo: 2
+				},
+				{
+					moduleFrom: 9,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 4
+				},
+				{
+					moduleFrom: 10,
+					moduleTo: 9,
+					slotFrom: 0,
+					slotTo: 0
+				},
+				{
+					moduleFrom: 11,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 5
+				},
+				{
+					moduleFrom: 12,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 7
+				},
+				{
+					moduleFrom: 13,
+					moduleTo: 1,
+					slotFrom: 0,
+					slotTo: 13
+				}
+			]
+		}
+	]
+}
+}
