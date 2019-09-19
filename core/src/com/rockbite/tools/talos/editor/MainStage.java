@@ -269,7 +269,7 @@ public class MainStage extends Stage {
     }
 
     private void loadDefaultProject() {
-        FileHandle fileHandle = Gdx.files.internal("samples/empty.tls");
+        FileHandle fileHandle = Gdx.files.internal("samples/fire.tls");
         if(fileHandle.exists()) {
             projectSerializer.read(fileHandle);
         } else {
