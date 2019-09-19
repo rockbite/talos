@@ -100,7 +100,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                     }
                 }
 
-                if(button == 1) {
+                if(button == 1 && !event.isHandled()) {
                     showPopup();
                 }
             }
@@ -214,6 +214,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(ColorModule.class, ColorModuleWrapper.class);
         WrapperRegistry.reg(DynamicRangeModule.class, DynamicRangeModuleWrapper.class);
         WrapperRegistry.reg(ScriptModule.class, ScriptModuleWrapper.class);
+        WrapperRegistry.reg(GradientColorModule.class, GradientColorModuleWrapper.class);
     }
 
     private void showPopup() {
