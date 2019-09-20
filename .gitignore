@@ -63,7 +63,7 @@ com_crashlytics_export_strings.xml
 
 /editor/build
 /editor/out
-/runtime/talos-libgdx-build/
+/runtimes/talos-libgdx/build/
 
 
 nbactions.xml

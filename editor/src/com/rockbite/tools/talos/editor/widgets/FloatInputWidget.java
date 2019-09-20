@@ -132,7 +132,11 @@ public class FloatInputWidget extends Table {
         if(flavour == NumericalValue.Flavour.REGULAR) {
             String text = regularCarrier.getText();
             if (text.length() > 0) {
-                val = Float.parseFloat(text);
+                try {
+                    val = Float.parseFloat(text);
+                } catch (NumberFormatException e) {
+                    val = 0;
+                }
             }
         } else if(flavour == NumericalValue.Flavour.ANGLE) {
             val = angleCarrier.getValue();
