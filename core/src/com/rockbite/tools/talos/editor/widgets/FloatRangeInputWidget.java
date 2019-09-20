@@ -56,7 +56,9 @@ public class FloatRangeInputWidget extends Table {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(mirrorButton.isChecked()) {
-                    maxInput.setValue(180f - minInput.getValue());
+                    float angle = 180f - minInput.getValue();
+                    if(angle < 0) angle = 360 + angle;
+                    maxInput.setValue(angle);
                 } else if(equalsButton.isChecked()) {
                     maxInput.setValue(minInput.getValue());
                 }
@@ -71,7 +73,9 @@ public class FloatRangeInputWidget extends Table {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(mirrorButton.isChecked()) {
-                    minInput.setValue(180f - maxInput.getValue());
+                    float angle = 180f - maxInput.getValue();
+                    if(angle < 0) angle = 360 + angle;
+                    minInput.setValue(angle);
                 } else if(equalsButton.isChecked()) {
                     minInput.setValue(maxInput.getValue());
                 }
