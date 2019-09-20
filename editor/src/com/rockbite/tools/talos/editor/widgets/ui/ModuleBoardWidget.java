@@ -322,6 +322,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
         shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         drawCurves();
         shapeRenderer.end();
