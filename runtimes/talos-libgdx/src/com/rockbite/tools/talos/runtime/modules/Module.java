@@ -48,8 +48,10 @@ public abstract class Module {
         }
     }
 
-    public void detach(int slot) {
-        inputSlots.get(slot).detach();
+    public void detach(int slot, boolean isInput) {
+        if(isInput) {
+            inputSlots.get(slot).detach();
+        }
     }
 
     public boolean isConnectedTo(Module module) {

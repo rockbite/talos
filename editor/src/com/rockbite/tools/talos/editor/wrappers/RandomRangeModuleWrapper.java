@@ -8,12 +8,30 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.rockbite.tools.talos.editor.widgets.FloatInputWidget;
+import com.rockbite.tools.talos.editor.widgets.FloatRangeInputWidget;
 import com.rockbite.tools.talos.runtime.modules.RandomRangeModule;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
-    VisTextField minLabel;
-    VisTextField maxLabel;
+    FloatRangeInputWidget inputRange;
+
+    @Override
+    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+        super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
+
+        inputRange.setFlavour(module.getOutputValue().getFlavour());
+    }
+
+    @Override
+    public void setSlotInactive(int slotTo, boolean isInput) {
+        super.setSlotInactive(slotTo, isInput);
+        if(!isInput) {
+            inputRange.setFlavour(NumericalValue.Flavour.REGULAR);
+            inputRange.setText("Min", "Max");
+        }
+    }
 
     @Override
     protected float reportPrefWidth() {
@@ -25,45 +43,24 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
         addOutputSlot("result", 0);
 
-        VisTable table = new VisTable();
-
-        // let's create our fields
-        VisLabel label = new VisLabel(" RNG Range");
-        minLabel = new VisTextField("0");
-        maxLabel = new VisTextField("1");
-
-        table.add(label).left();
-        table.row().padTop(4);
-
-        Table eWrap = new Table();
-        eWrap.add(minLabel).width(120).padRight(10);
-        eWrap.add(maxLabel).width(120);
-        table.add(eWrap).expandX().left();
-
-        table.row();
-
-        contentWrapper.add(table).left().padTop(0).expandX();
+        inputRange = new FloatRangeInputWidget("Min", "Max", getSkin());
+        contentWrapper.add(inputRange).left().padTop(0).padLeft(4).expandX();
 
         leftWrapper.add(new Table()).expandY();
         rightWrapper.add(new Table()).expandY();
 
-        minLabel.addListener(new ChangeListener() {
+        inputRange.setListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 updateValues();
             }
         });
-        maxLabel.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                updateValues();
-            }
-        });
+
     }
 
     private void updateValues() {
-        float min = floatFromText(minLabel);
-        float max = floatFromText(maxLabel);
+        float min = inputRange.getMinValue();
+        float max = inputRange.getMaxValue();
 
         module.setMinMax(min, max);
     }
@@ -84,8 +81,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     }
 
     public void setData(float min, float max) {
-        minLabel.setText(min+"");
-        maxLabel.setText(max+"");
+        inputRange.setValue(min, max);
         updateValues();
     }
 }

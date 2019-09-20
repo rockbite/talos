@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.runtime.Expression;
 import com.rockbite.tools.talos.runtime.modules.MathModule;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
@@ -29,6 +30,24 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
     protected float reportPrefWidth() {
         return 250;
     }
+
+    @Override
+    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+        super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
+
+        module.a.setFlavour(module.output.getFlavour());
+        module.b.setFlavour(module.output.getFlavour());
+    }
+
+    @Override
+    public void setSlotInactive(int slotTo, boolean isInput) {
+        super.setSlotInactive(slotTo, isInput);
+        if(!isInput) {
+            module.a.setFlavour(NumericalValue.Flavour.REGULAR);
+            module.b.setFlavour(NumericalValue.Flavour.REGULAR);
+        }
+    }
+
 
     @Override
     protected void configureSlots() {

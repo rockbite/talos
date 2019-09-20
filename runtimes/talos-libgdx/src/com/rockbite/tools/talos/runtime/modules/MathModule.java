@@ -11,10 +11,10 @@ public class MathModule extends Module {
 
     public static final int OUTPUT = 0;
 
-    NumericalValue a;
-    NumericalValue b;
+    public NumericalValue a;
+    public NumericalValue b;
 
-    NumericalValue output;
+    public NumericalValue output;
 
     private Expression currentExpression = Expression.sum;
 
@@ -42,5 +42,9 @@ public class MathModule extends Module {
 
     public Expression getExpression() {
         return currentExpression;
+    }
+
+    public NumericalValue getOutputValue() {
+        return output;
     }
 }

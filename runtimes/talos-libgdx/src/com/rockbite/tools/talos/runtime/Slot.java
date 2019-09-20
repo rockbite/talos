@@ -19,12 +19,18 @@ public class Slot {
 
     private Value value;
 
+    private String text = "";
+
     public Module getTargetModule() {
         return targetModule;
     }
 
     public boolean isInput() {
         return isInput;
+    }
+
+    public String getText() {
+        return text;
     }
 
     enum Flavour {

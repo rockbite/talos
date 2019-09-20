@@ -29,4 +29,8 @@ public class StaticValueModule extends Module {
     public float getStaticValue() {
         return staticValue.getFloat();
     }
+
+    public NumericalValue getOutputValue() {
+        return outputValue;
+    }
 }

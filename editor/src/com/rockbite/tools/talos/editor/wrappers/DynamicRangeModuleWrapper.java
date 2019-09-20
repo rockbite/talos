@@ -10,17 +10,34 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
+import com.rockbite.tools.talos.editor.widgets.FloatRangeInputWidget;
 import com.rockbite.tools.talos.runtime.modules.DynamicRangeModule;
 import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule> {
 
     private CurveWidget curveWidget;
 
-    private VisTextField lowMinField;
-    private VisTextField lowMaxField;
-    private VisTextField highMinField;
-    private VisTextField highMaxField;
+    private FloatRangeInputWidget lowInput;
+    private FloatRangeInputWidget highInput;
+
+    @Override
+    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+        super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
+
+        lowInput.setFlavour(module.getOutputValue().getFlavour());
+        highInput.setFlavour(module.getOutputValue().getFlavour());
+    }
+
+    @Override
+    public void setSlotInactive(int slotTo, boolean isInput) {
+        super.setSlotInactive(slotTo, isInput);
+        if(!isInput) {
+            lowInput.setFlavour(NumericalValue.Flavour.REGULAR);
+            highInput.setFlavour(NumericalValue.Flavour.REGULAR);
+        }
+    }
 
     @Override
     protected void configureSlots() {
@@ -30,57 +47,31 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
 
         Table container = new Table();
 
-        createMinMax(container, "High", true);
-        createMinMax(container, "Low", false);
+        highInput = new FloatRangeInputWidget("HMin", "HMax", getSkin());
+        lowInput = new FloatRangeInputWidget("LMin", "LMax", getSkin());
 
-        contentWrapper.add(container).left().padTop(20).expandX();
+        container.add(highInput).row();
+        container.add().height(3).row();
+        container.add(lowInput);
+
+        contentWrapper.add(container).left().padTop(20).expandX().padLeft(4);
 
         curveWidget = new CurveWidget(getSkin());
-        contentWrapper.add(curveWidget).left().height(100).width(200).padTop(23).padRight(3).padBottom(3);
+        contentWrapper.add(curveWidget).left().height(119).width(200).padTop(23).padRight(3).padBottom(3);
 
         leftWrapper.add(new Table()).expandY();
         rightWrapper.add(new Table()).expandY();
-    }
 
-    public void createMinMax(Table container, String text, final boolean isHigh) {
-        VisTable table = new VisTable();
-
-        // let's create our fields
-        VisLabel label = new VisLabel(text);
-        final VisTextField minLabel = new VisTextField("0");
-        final VisTextField maxLabel = new VisTextField("100");
-
-        if(isHigh) {
-            highMinField = minLabel;
-            highMaxField = maxLabel;
-        } else {
-            lowMinField = minLabel;
-            lowMaxField = maxLabel;
-        }
-
-        table.add(label).left();
-        table.row().padTop(4);
-
-        Table eWrap = new Table();
-        eWrap.add(minLabel).width(60).padRight(5);
-        eWrap.add(maxLabel).width(60);
-        table.add(eWrap).expandX().left();
-
-        table.row();
-
-        container.add(table).left().padTop(0).expandX().padLeft(5);
-        container.row();
-
-        minLabel.addListener(new ChangeListener() {
+        highInput.setListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                updateValues(minLabel, maxLabel, isHigh);
+                updateValues();
             }
         });
-        maxLabel.addListener(new ChangeListener() {
+        lowInput.setListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                updateValues(minLabel, maxLabel, isHigh);
+                updateValues();
             }
         });
     }
@@ -120,12 +111,11 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         String lowMax = value.getString("lowMax");
         String highMin = value.getString("highMin");
         String highMax = value.getString("highMax");
-        lowMinField.setText(lowMin);
-        lowMaxField.setText(lowMax);
-        highMinField.setText(highMin);
-        highMaxField.setText(highMax);
-        updateValues(lowMinField, lowMaxField, false);
-        updateValues(highMinField, highMaxField, true);
+
+        lowInput.setValue(floatFromText(lowMin), floatFromText(lowMax));
+        highInput.setValue(floatFromText(highMin), floatFromText(highMax));
+
+        updateValues();
 
         JsonValue points = value.get("points");
         module.getPoints().clear();
@@ -136,27 +126,17 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
 
     @Override
     protected float reportPrefWidth() {
-        return 350;
+        return 390;
     }
 
-    private void updateValues(VisTextField minLabel, VisTextField maxLabel, boolean isHigh) {
-        float min = floatFromText(minLabel);
-        float max = floatFromText(maxLabel);
-
-        if(isHigh) {
-            module.setMinMaxHigh(min, max);
-        } else {
-            module.setMinMaxLow(min, max);
-        }
+    private void updateValues() {
+        module.setMinMaxLow(lowInput.getMinValue(), lowInput.getMaxValue());
+        module.setMinMaxHigh(highInput.getMinValue(), highInput.getMaxValue());
     }
 
     public void setData(float lowMin, float lowMax, float highMin, float highMax, Array<Vector2> points) {
-        lowMinField.setText(lowMin+"");
-        lowMaxField.setText(lowMax+"");
-        highMinField.setText(highMin+"");
-        highMaxField.setText(highMax+"");
-        updateValues(lowMinField, lowMaxField, false);
-        updateValues(highMinField, highMaxField, true);
+        lowInput.setValue(lowMin, lowMax);
+        highInput.setValue(highMin, highMax);
 
         module.getPoints().clear();
         for(Vector2 point: points) {

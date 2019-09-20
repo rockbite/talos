@@ -2,13 +2,14 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 import java.util.Random;
 
 public class DynamicRangeModule extends CurveModule {
 
-    private float lowMin = 0, lowMax = 100;
-    private float highMin = 0, highMax = 100;
+    private float lowMin = 0, lowMax = 0;
+    private float highMin = 360, highMax = 360;
 
     public static final int OUTPUT = 0;
 
@@ -61,5 +62,9 @@ public class DynamicRangeModule extends CurveModule {
 
     public float getHightMax() {
         return highMax;
+    }
+
+    public NumericalValue getOutputValue() {
+        return output;
     }
 }

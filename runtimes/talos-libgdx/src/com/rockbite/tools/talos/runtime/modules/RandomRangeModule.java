@@ -45,4 +45,8 @@ public class RandomRangeModule extends Module {
     public float getMax() {
         return max;
     }
+
+    public NumericalValue getOutputValue() {
+        return output;
+    }
 }

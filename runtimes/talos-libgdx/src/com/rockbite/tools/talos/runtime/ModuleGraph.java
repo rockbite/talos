@@ -118,8 +118,8 @@ public class ModuleGraph {
         to.attachModuleToMyInput(from, slotTo, slotFrom);
     }
 
-    public void removeNode(Module module, int slot) {
-        module.detach(slot);
+    public void removeNode(Module module, int slot,boolean isInput) {
+        module.detach(slot, isInput);
     }
 
     public ParticleModule getParticleModule() {
