@@ -26,6 +26,8 @@ import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
+import java.util.Comparator;
+
 public class ModuleBoardWidget extends WidgetGroup {
 
     ShapeRenderer shapeRenderer;
@@ -235,13 +237,23 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(EmConfigModule.class, EmConfigModuleWrapper.class);
     }
 
-    private void showPopup() {
+    public void showPopup() {
         ModuleGraph moduleGraph = getModuleGraph();
 
         if(moduleGraph == null) return;
 
         PopupMenu menu = new PopupMenu();
-        for(final Class clazz : ModuleGraph.getRegisteredModules()) {
+        Array<Class> temp = new Array<>();
+        for (Class registeredModule : ModuleGraph.getRegisteredModules()) {
+            temp.add(registeredModule);
+        }
+        temp.sort(new Comparator<Class>() {
+            @Override
+            public int compare (Class o1, Class o2) {
+                return o1.getSimpleName().compareTo(o2.getSimpleName());
+            }
+        });
+        for(final Class clazz : temp) {
             String className = clazz.getSimpleName();
             MenuItem menuItem = new MenuItem(className);
             menu.addItem(menuItem);
