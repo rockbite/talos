@@ -156,7 +156,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         connection.fromModule.setSlotInactive(connection.fromSlot, false);
         connection.toModule.setSlotInactive(connection.toSlot, true);
 
-        mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot);
+        mainStage.getCurrentModuleGraph().removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
+        mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot, true);
     }
 
     public void selectWrapper(ModuleWrapper selectWrapper) {
@@ -484,9 +485,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         to.setSlotActive(slotTo, true);
     }
 
-    public void makeConnection(ModuleWrapper from, ModuleWrapper to, int slotForm, int slotTo) {
-        mainStage.getCurrentModuleGraph().connectNode(from.getModule(), to.getModule(), slotForm, slotTo);
-        addConnectionCurve(from, to, slotForm, slotTo);
+    public void makeConnection(ModuleWrapper from, ModuleWrapper to, int slotFrom, int slotTo) {
+        mainStage.getCurrentModuleGraph().connectNode(from.getModule(), to.getModule(), slotFrom, slotTo);
+        addConnectionCurve(from, to, slotFrom, slotTo);
+
+        from.attachModuleToMyOutput(to, slotFrom, slotTo);
+        to.attachModuleToMyInput(from, slotTo, slotFrom);
     }
 
     public void connectNodeIfCan(ModuleWrapper currentWrapper, int currentSlot, boolean currentIsInput) {

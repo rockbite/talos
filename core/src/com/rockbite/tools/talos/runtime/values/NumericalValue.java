@@ -10,6 +10,22 @@ public class NumericalValue extends Value {
 
 	private int currentElementCount;
 
+	public enum Flavour {
+		REGULAR,
+		ANGLE,
+		NORMALIZED
+	}
+
+	private Flavour flavour = Flavour.REGULAR;
+
+	public void setFlavour(Flavour flavour) {
+		this.flavour = flavour;
+	}
+
+	public Flavour getFlavour() {
+		return flavour;
+	}
+
 	public void configure (int elementCount) {
 		//Depeneding on the values
 

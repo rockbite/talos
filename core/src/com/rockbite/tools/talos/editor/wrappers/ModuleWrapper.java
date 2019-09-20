@@ -17,6 +17,7 @@ import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
@@ -422,5 +423,22 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
 
     public void fileDrop(String[] paths, float x, float y) {
         // do nothing
+    }
+
+    public void attachModuleToMyInput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+
+    }
+
+    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+        // find the flavour
+        Slot mySlotObject = getModule().getOutputSlot(mySlot);
+        Slot toSlotObject = moduleWrapper.getModule().getInputSlot(targetSlot);
+        if(mySlotObject == null || toSlotObject == null) return;
+        if(mySlotObject.getValue() instanceof NumericalValue && toSlotObject.getValue() instanceof NumericalValue) {
+            NumericalValue myValue = (NumericalValue) mySlotObject.getValue();
+            NumericalValue toValue = (NumericalValue) toSlotObject.getValue();
+
+            myValue.setFlavour(toValue.getFlavour());
+        }
     }
 }

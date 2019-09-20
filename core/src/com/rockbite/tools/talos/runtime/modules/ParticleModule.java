@@ -63,6 +63,8 @@ public class ParticleModule extends Module {
         angle = createInputSlot(ANGLE);
         mass = createInputSlot(MASS);
         size = createInputSlot(SIZE);
+
+        angle.setFlavour(NumericalValue.Flavour.ANGLE);
     }
 
     @Override
