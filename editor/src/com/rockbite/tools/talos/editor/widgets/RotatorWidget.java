@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -23,9 +24,15 @@ public class RotatorWidget extends Actor {
 
     private boolean normalize = false;
 
+    private Label label;
+
+    private boolean isActive = false;
+
     public RotatorWidget(Skin skin) {
         this.skin = skin;
         image = new Image(skin.getDrawable("rotator"));
+
+        label = new Label("", skin, "small");
 
         addListener(new ClickListener() {
 
@@ -36,18 +43,25 @@ public class RotatorWidget extends Actor {
                 float newAngle = tmp.set(x - image.getOriginX(), y - image.getOriginY()).angle();
                 if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     float step = 15f;
-                    float offfset = newAngle % step;
-                    if(offfset < step/2f) {
-                        newAngle -= offfset;
+                    float offset = newAngle % step;
+                    if(offset < step/2f) {
+                        newAngle -= offset;
                     } else {
-                        newAngle += (step - offfset);
+                        newAngle += (step - offset);
                     }
+
+                    if(prevAngle == 360 && newAngle == 0) newAngle = 360;
+                    if(prevAngle == 0 && newAngle == 360) newAngle = 0;
                 }
 
-                if(prevAngle > 0 && prevAngle <= 180 && (newAngle == 0 || newAngle == 360)) newAngle = 0;
-                if(prevAngle < 360 && prevAngle > 180 && (newAngle == 0 || newAngle == 360)) newAngle = 360;
+                if(prevAngle >= 0 && prevAngle <= 90 && newAngle > 270 && newAngle <= 360) {
+                    newAngle = 0;
+                }
+                if(prevAngle <= 360 && prevAngle >= 270 && newAngle > 0 && newAngle <= 90) {
+                    newAngle = 360;
+                }
 
-                value = newAngle;
+                value = (int)newAngle;
 
                 if(listener != null) {
                     listener.changed(new ChangeListener.ChangeEvent(), RotatorWidget.this);
@@ -58,6 +72,7 @@ public class RotatorWidget extends Actor {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 prevAngle = value;
                 applyAngle(x, y);
+                isActive = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
 
@@ -71,6 +86,7 @@ public class RotatorWidget extends Actor {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
+                isActive = false;
             }
         });
     }
@@ -78,6 +94,17 @@ public class RotatorWidget extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
+        getSkin().getDrawable("rotator-bg").draw(batch, getX(), getY(), getWidth(), getHeight());
+
+        label.setText((int)value + "");
+        label.setPosition(getX() + getWidth()/2f - label.getPrefWidth()/2f, getY() + getHeight()/2f + 20 - label.getPrefHeight()/2f);
+        label.draw(batch, parentAlpha);
+
+
+        image.setDrawable(skin.getDrawable("rotator"));
+        if(isActive) {
+            image.setDrawable(skin.getDrawable("rotator-active"));
+        }
         image.setPosition(getX(), getY());
         image.setSize(getWidth(), getHeight());
         image.setOrigin(getWidth()/2f, getHeight()/2f);

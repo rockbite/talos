@@ -87,7 +87,7 @@ public class FloatRangeInputWidget extends Table {
         });
 
         midTable.add(mirrorButton).row();
-        midTable.add().height(7).row();
+        midTable.add().height(8).row();
         midTable.add(equalsButton);
 
         add(minInput);

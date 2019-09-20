@@ -57,7 +57,7 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         contentWrapper.add(container).left().padTop(20).expandX().padLeft(4);
 
         curveWidget = new CurveWidget(getSkin());
-        contentWrapper.add(curveWidget).left().height(119).width(200).padTop(23).padRight(3).padBottom(3);
+        contentWrapper.add(curveWidget).left().growY().width(200).padTop(23).padRight(3).padLeft(4).padBottom(3);
 
         leftWrapper.add(new Table()).expandY();
         rightWrapper.add(new Table()).expandY();
