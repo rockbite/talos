@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.Menu;
@@ -200,21 +201,24 @@ public class UIStage {
 
 
 	private void initExampleList (PopupMenu examples) {
-		FileHandle dir = Gdx.files.internal("samples");
-		for (final FileHandle file : dir.list()) {
-			if (file.extension().equals("tls")) {
-				MenuItem item = new MenuItem(file.name());
-				examples.addItem(item);
+		FileHandle list = Gdx.files.internal("samples/list.xml");
+		XmlReader xmlReader = new XmlReader();
+		XmlReader.Element root = xmlReader.parse(list);
+		Array<XmlReader.Element> samples = root.getChildrenByName("sample");
+		for (XmlReader.Element sample : samples) {
+			String name = sample.getAttribute("name");
+			String fileName = sample.getAttribute("file");
+			MenuItem item = new MenuItem(name);
+			examples.addItem(item);
 
-				item.addListener(new ClickListener() {
-					@Override
-					public void clicked (InputEvent event, float x, float y) {
-						super.clicked(event, x, y);
-						//openProject(file);
-						//currentProjectPath = null;
-					}
-				});
-			}
+			item.addListener(new ClickListener() {
+				@Override
+				public void clicked (InputEvent event, float x, float y) {
+					super.clicked(event, x, y);
+					//openProject(fileName);
+					//currentProjectPath = null;
+				}
+			});
 		}
 	}
 
