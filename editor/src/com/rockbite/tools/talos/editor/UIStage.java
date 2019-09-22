@@ -335,6 +335,10 @@ public class UIStage {
 		}
 	}
 
+	public TimelineWidget Timeline() {
+		return timelineWidget;
+	}
+
 	public void resize (int width, int height) {
 		stage.getViewport().update(width, height, true);
 	}

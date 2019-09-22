@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -21,6 +22,8 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.rockbite.tools.talos.editor.Curve;
 import com.rockbite.tools.talos.editor.EmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
+import com.rockbite.tools.talos.editor.serialization.ConnectionData;
+import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
@@ -208,6 +211,24 @@ public class ModuleBoardWidget extends WidgetGroup {
             if(wrapper.hit(tmp2.x, tmp2.y, false) != null) {
                 wrapper.fileDrop(paths, tmp2.x, tmp2.y);
             }
+        }
+    }
+
+
+    public void loadEmitterToBoard(EmitterWrapper emitterWrapper, EmitterData emitterData) {
+        IntMap<ModuleWrapper> map = new IntMap<>();
+        if(!moduleWrappers.containsKey(emitterWrapper)) {
+            moduleWrappers.put(emitterWrapper, new Array<ModuleWrapper>());
+        }
+
+        for(ModuleWrapper wrapper: emitterData.modules) {
+            moduleWrappers.get(emitterWrapper).add(wrapper);
+            wrapper.setBoard(this);
+            map.put(wrapper.getId(), wrapper);
+        }
+        for(ConnectionData connectionData: emitterData.connections) {
+            // make connections based on ids
+            makeConnection(map.get(connectionData.moduleFrom), map.get(connectionData.moduleTo), connectionData.slotFrom, connectionData.slotTo);
         }
     }
 

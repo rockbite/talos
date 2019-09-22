@@ -2,10 +2,10 @@ package com.rockbite.tools.talos.editor.serialization;
 
 public class ConnectionData {
 
-	private int moduleFrom;
-	private int moduleTo;
-	private int slotFrom;
-	private int slotTo;
+	public int moduleFrom;
+	public int moduleTo;
+	public int slotFrom;
+	public int slotTo;
 
 	public ConnectionData () {
 

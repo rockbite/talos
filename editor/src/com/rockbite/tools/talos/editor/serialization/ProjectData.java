@@ -38,6 +38,9 @@ public class ProjectData {
 
 			emitters.add(emitterData);
 		}
+	}
 
+	public Array<EmitterData> getEmitters() {
+		return emitters;
 	}
 }

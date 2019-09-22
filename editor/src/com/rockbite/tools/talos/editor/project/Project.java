@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.EmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
+import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.serialization.ProjectData;
 import com.rockbite.tools.talos.editor.serialization.ProjectSerializer;
 import com.rockbite.tools.talos.runtime.ModuleGraph;
@@ -47,6 +48,25 @@ public class Project {
 		if (projectFileHandle.exists()) {
 			projectData = projectSerializer.read(projectFileHandle);
 			currentProjectPath = projectFileHandle.path();
+
+			cleanData();
+
+			EmitterWrapper firstEmitter = null;
+
+			for(EmitterData emitterData: projectData.getEmitters()) {
+				EmitterWrapper emitterWrapper = createNewEmitter(emitterData.name);
+				TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
+
+				if(firstEmitter == null) {
+					firstEmitter = emitterWrapper;
+				}
+			}
+
+			if(firstEmitter != null) {
+				TalosMain.Instance().Project().setCurrentEmitterWrapper(firstEmitter);
+				TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(firstEmitter);
+			}
+
 		} else {
 			//Error handle
 		}
@@ -71,15 +91,20 @@ public class Project {
 		if (fileHandle.exists()) {
 			TalosMain.Instance().Project().loadProject(fileHandle);
 		} else {
-			// empty stuff
-			TalosMain.Instance().Project().createNewEmitter("emitter1");
+			newProject();
 		}
 	}
 
 	public void newProject () {
-		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
+		cleanData();
 		projectData = new ProjectData();
 		createNewEmitter("default_emitter");
+	}
+
+	private void cleanData() {
+		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
+		activeWrappers.clear();
+		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 	}
 
 	public ParticleSystem getParticleSystem () {

@@ -111,6 +111,11 @@ public class TimelineWidget extends Table {
         return selectedRow;
     }
 
+    public void clearEmitters() {
+        rows.clear();
+        selectedRow = null;
+    }
+
     private class EmitterRow extends Table {
 
         private Label label;
