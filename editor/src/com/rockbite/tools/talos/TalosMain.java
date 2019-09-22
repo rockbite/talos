@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
+import com.rockbite.tools.talos.editor.project.Project;
 import com.rockbite.tools.talos.editor.utils.CameraController;
 import com.rockbite.tools.talos.editor.utils.DropTargetListenerAdapter;
 
@@ -27,6 +28,8 @@ public class TalosMain extends ApplicationAdapter {
 	private UIStage uiStage;
 	private NodeStage nodeStage;
 	private CameraController cameraController;
+
+	private Project project;
 
 	private Skin skin;
 
@@ -46,6 +49,10 @@ public class TalosMain extends ApplicationAdapter {
 		return nodeStage;
 	}
 
+	public Project Project () {
+		return project;
+	}
+
 	public DropTargetListener getDropTargetListener () {
 		return dropTargetListener;
 	}
@@ -57,6 +64,7 @@ public class TalosMain extends ApplicationAdapter {
 				nodeStage.fileDrop(finalPaths, x, y);
 			}
 		};
+		project = new Project();
 	}
 
 	@Override
@@ -68,7 +76,6 @@ public class TalosMain extends ApplicationAdapter {
 		skin.addRegions(atlas);
 
 		VisUI.load(skin);
-		System.out.println("Created");
 
 		uiStage = new UIStage(skin);
 		nodeStage = new NodeStage(skin);

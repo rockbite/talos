@@ -65,13 +65,5 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         return null;
     }
 
-    @Override
-    public void write(JsonValue value) {
 
-    }
-
-    @Override
-    public void read(JsonValue value) {
-
-    }
 }

@@ -1,5 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleEmitter;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -66,5 +68,13 @@ public class EmitterModule extends Module {
         getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
     }
 
+    @Override
+    public void write (Json json) {
+        
+    }
 
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+
+    }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StreamUtils;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.runtime.values.ColorPoint;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -254,7 +255,7 @@ public class LegacyImporter {
 
         try {
             String emitterName = readString(reader, "name");
-            stage.createNewEmitter(emitterName);
+            TalosMain.Instance().Project().createNewEmitter(emitterName);
             ParticleModuleWrapper particleModuleWrapper = (ParticleModuleWrapper) stage.moduleBoardWidget.createModule(ParticleModule.class, rightX, yStart);
             EmitterModuleWrapper emitterModuleWrapper = (EmitterModuleWrapper) stage.moduleBoardWidget.createModule(EmitterModule.class, rightX, yStart+200);
 

@@ -4,6 +4,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -66,18 +67,9 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     }
 
     @Override
-    public void write(JsonValue value) {
-        float min = module.getMin();
-        float max = module.getMax();
-        value.addChild("min", new JsonValue(min));
-        value.addChild("max", new JsonValue(max));
-    }
-
-    @Override
-    public void read(JsonValue value) {
-        String min = value.getString("min");
-        String max = value.getString("max");
-        setData(floatFromText(min), floatFromText(max));
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        setData(module.getMin(), module.getMax());
     }
 
     public void setData(float min, float max) {

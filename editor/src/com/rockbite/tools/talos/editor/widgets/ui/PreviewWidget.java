@@ -30,8 +30,8 @@ public class PreviewWidget extends ViewportWidget {
     public void act(float delta) {
         super.act(delta);
 
-        particleRenderer.setParticleSystem(TalosMain.Instance().NodeStage().getParticleSystem());
-        TalosMain.Instance().NodeStage().getParticleSystem().update(delta);
+        TalosMain.Instance().Project().getParticleSystem().update(delta);
+        particleRenderer.setParticleSystem(TalosMain.Instance().Project().getParticleSystem());
     }
 
     @Override

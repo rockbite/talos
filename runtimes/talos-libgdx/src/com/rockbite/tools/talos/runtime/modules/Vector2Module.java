@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class Vector2Module extends Module {
@@ -47,4 +49,17 @@ public class Vector2Module extends Module {
     public float getDefaultY() {
         return defaultY;
     }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("x", getDefaultX());
+        json.writeValue("x", getDefaultY());
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        defaultX = jsonData.getFloat("x");
+        defaultY = jsonData.getFloat("y");
+    }
+
 }

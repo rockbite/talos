@@ -1,13 +1,15 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import com.rockbite.tools.talos.runtime.values.Value;
 
-public abstract class Module {
+public abstract class Module implements Json.Serializable {
 
     protected ParticleSystem system;
 
@@ -162,5 +164,14 @@ public abstract class Module {
 
     public void resetLastRequester() {
         lastRequester = -1f;
+    }
+
+    @Override
+    public void write (Json json) {
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+
     }
 }

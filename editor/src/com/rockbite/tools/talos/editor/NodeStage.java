@@ -9,24 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.widget.*;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.serialization.ProjectSerializer;
 import com.rockbite.tools.talos.editor.utils.GridRenderer;
 import com.rockbite.tools.talos.runtime.ModuleGraph;
-import com.rockbite.tools.talos.runtime.ParticleEffect;
-import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
-import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
-import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -41,17 +33,8 @@ public class NodeStage {
 
     public ModuleBoardWidget moduleBoardWidget;
 
-    public ParticleSystem particleSystem;
-
-
-    private ParticleEffectDescriptor particleEffectDescriptor;
-    private Array<EmitterWrapper> emitterWrappers = new Array<>();
-
-    public EmitterWrapper currentEmitterWrapper;
-
     LegacyImporter legacyImporter;
 
-    ProjectSerializer projectSerializer;
 
     private String currentProjectPath = null;
 
@@ -64,16 +47,14 @@ public class NodeStage {
     }
 
     public void init () {
-        projectSerializer = new ProjectSerializer(this);
         legacyImporter = new LegacyImporter(this);
-
-        initData();
 
         initActors();
 
         initFileChoosers();
 
-        loadDefaultProject();
+//        loadDefaultProject();
+        TalosMain.Instance().Project().newProject();
 
         initListeners();
     }
@@ -97,7 +78,7 @@ public class NodeStage {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    newProjectAction();
+                    TalosMain.Instance().Project().newProject();
                 }
                 if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     openProjectAction();
@@ -124,11 +105,6 @@ public class NodeStage {
         });
     }
 
-    private void initData() {
-        particleSystem = new ParticleSystem();
-        particleEffectDescriptor = new ParticleEffectDescriptor();
-        particleSystem.createEffect(particleEffectDescriptor);
-    }
 
     private void initActors() {
         GridRenderer gridRenderer = new GridRenderer(stage);
@@ -142,18 +118,12 @@ public class NodeStage {
 
     private void loadDefaultProject() {
         FileHandle fileHandle = Gdx.files.internal("samples/fire.tls");
-        if(fileHandle.exists()) {
-            projectSerializer.read(fileHandle);
+        if (fileHandle.exists()) {
+            TalosMain.Instance().Project().loadProject(fileHandle);
         } else {
             // empty stuff
-            createNewEmitter("emitter1");
+            TalosMain.Instance().Project().createNewEmitter("emitter1");
         }
-
-        TalosMain.Instance().UIStage().setEmitters(emitterWrappers);
-    }
-
-    private void newProjectAction() {
-        newProject();
     }
 
     private void openProjectAction() {
@@ -170,7 +140,7 @@ public class NodeStage {
         fileChooser.setListener(new FileChooserAdapter() {
             @Override
             public void selected (Array<FileHandle> file) {
-                openProject(file.first().file().getAbsolutePath());
+                TalosMain.Instance().Project().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
             }
         });
 
@@ -213,11 +183,6 @@ public class NodeStage {
         stage.addActor(fileChooser.fadeIn());
     }
 
-    public void newProject() {
-        cleanData();
-        createNewEmitter("emitter1");
-        TalosMain.Instance().UIStage().setEmitters(emitterWrappers);
-    }
 
     public void legacyImport() {
         fileChooser.setMode(FileChooser.Mode.OPEN);
@@ -230,7 +195,6 @@ public class NodeStage {
             public void selected (Array<FileHandle> file) {
                 cleanData();
                 legacyImporter.read(file.get(0));
-                TalosMain.Instance().UIStage().setEmitters(emitterWrappers);
                 currentProjectPath = null;
             }
         });
@@ -239,10 +203,7 @@ public class NodeStage {
     }
 
     public void cleanData() {
-        particleSystem.clearEffect(particleSystem.getEffectDescriptors().get(0));
-        currentEmitterWrapper = null;
         moduleBoardWidget.clearAll();
-        emitterWrappers.clear();
     }
 
     private void openProject(String path) {
@@ -253,16 +214,15 @@ public class NodeStage {
     private void openProject(FileHandle fileHandle) {
         if(fileHandle.exists()) {
             cleanData();
-            projectSerializer.read(fileHandle);
+            TalosMain.Instance().Project().loadProject(fileHandle);
             currentProjectPath = fileHandle.path();
-            TalosMain.Instance().UIStage().setEmitters(emitterWrappers);
         }
     }
 
     private void saveProject(String path) {
         FileHandle fileHandleWrite = Gdx.files.absolute(path);
         try {
-            projectSerializer.write(fileHandleWrite);
+            TalosMain.Instance().Project().saveProject(fileHandleWrite);
             currentProjectPath = path;
         } catch (Exception e) {
             Dialogs.showErrorDialog(stage, "Access Denied");
@@ -270,26 +230,7 @@ public class NodeStage {
     }
 
     public ModuleGraph getCurrentModuleGraph() {
-        if(currentEmitterWrapper != null) {
-            return currentEmitterWrapper.getGraph();
-        } else {
-            return null;
-        }
-    }
-
-    public EmitterWrapper createNewEmitter(String emitterName) {
-        EmitterWrapper emitterWrapper = new EmitterWrapper();
-        emitterWrapper.setName(emitterName);
-
-        ModuleGraph graph = particleSystem.createEmptyEmitter(particleEffectDescriptor);
-        emitterWrapper.setModuleGraph(graph);
-
-        emitterWrappers.add(emitterWrapper);
-        currentEmitterWrapper = emitterWrapper;
-
-        moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
-
-        return emitterWrapper;
+        return TalosMain.Instance().Project().getCurrentModuleGraph();
     }
 
     public String getLocalPath() {
@@ -303,36 +244,15 @@ public class NodeStage {
         return "";
     }
 
-    public Array<EmitterWrapper> getEmitterWrappers() {
-        return emitterWrappers;
-    }
 
-    public void removeEmitter(EmitterWrapper wrapper) {
-        int index = emitterWrappers.indexOf(wrapper, true);
-        index--;
-        if(index < 0) index = 0;
-
-        ParticleEffectDescriptor effect = particleSystem.getEffectDescriptors().get(0);
-        particleSystem.removeEmitter(effect, wrapper.getEmitter());
-
+    public void onEmitterRemoved (EmitterWrapper wrapper) {
         moduleBoardWidget.removeEmitter(wrapper);
-
-        emitterWrappers.removeValue(wrapper, true);
-
-        if(emitterWrappers.size > 0) {
-            currentEmitterWrapper = emitterWrappers.get(index);
-        } else {
-            currentEmitterWrapper = null;
-        }
-
-        moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
+        moduleBoardWidget.setCurrentEmitter(TalosMain.Instance().Project().getCurrentEmitterWrapper());
     }
 
     public void fileDrop(String[] paths, float x, float y) {
         moduleBoardWidget.fileDrop(paths, x, y);
     }
 
-    public ParticleSystem getParticleSystem () {
-        return particleSystem;
-    }
+
 }

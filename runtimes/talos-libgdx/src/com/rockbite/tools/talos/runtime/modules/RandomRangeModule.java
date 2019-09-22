@@ -1,5 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -49,4 +51,17 @@ public class RandomRangeModule extends Module {
     public NumericalValue getOutputValue() {
         return output;
     }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("min", min);
+        json.writeValue("max", max);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        min = jsonData.getFloat("min");
+        max = jsonData.getFloat("max");
+    }
+
 }

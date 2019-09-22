@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.rockbite.tools.talos.editor.widgets.FloatInputWidget;
@@ -64,15 +65,8 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     }
 
     @Override
-    public void write(JsonValue value) {
-        value.addChild("value", new JsonValue(module.getStaticValue()));
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        floatInput.setValue(module.getStaticValue());
     }
-
-    @Override
-    public void read(JsonValue value) {
-        float val = value.getFloat("value");
-        floatInput.setValue(val);
-        module.setStaticValue(val);
-    }
-
 }

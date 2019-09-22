@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextArea;
 import com.kotcrab.vis.ui.widget.VisTextField;
@@ -43,17 +44,14 @@ public class ScriptModuleWrapper extends ModuleWrapper<ScriptModule> {
         return 320;
     }
 
-    @Override
-    public void write(JsonValue value) {
-        value.addChild("script", new JsonValue(script.getText()));
-    }
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
+		if (module.getScript() != null) {
+			script.setText(module.getScript());
+			module.setScript(module.getScript());
+		}
+	}
 
-    @Override
-    public void read(JsonValue value) {
-        if(value.has("script")) {
-            String text = value.getString("script");
-            script.setText(text);
-            module.setScript(text);
-        }
-    }
+
 }

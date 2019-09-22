@@ -12,14 +12,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.ColorModule;
 import com.rockbite.tools.talos.runtime.modules.Module;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public abstract class ModuleWrapper<T extends Module> extends VisWindow {
+public abstract class ModuleWrapper<T extends Module> extends VisWindow implements Json.Serializable {
 
     protected T module;
     protected VisTable leftWrapper, rightWrapper, contentWrapper;
@@ -37,6 +41,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
     private Vector2 tmp2 = new Vector2();
 
     private int id;
+
+
 
     public ModuleWrapper() {
         super("", "panel");
@@ -417,9 +423,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
         this.id = id;
     }
 
-    public abstract void write(JsonValue value);
 
-    public abstract void read(JsonValue value);
 
     public void fileDrop(String[] paths, float x, float y) {
         // do nothing
@@ -441,4 +445,26 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow {
             myValue.setFlavour(toValue.getFlavour());
         }
     }
+
+    @Override
+    public void write (Json json) {
+		json.writeValue("id", getId());
+		json.writeValue("x", getX());
+		json.writeValue("y", getY());
+
+		json.writeObjectStart("module", module.getClass(), module.getClass());
+		json.writeValue("data", module, null);
+		json.writeObjectEnd();
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+		setId(jsonData.getInt("id"));
+		setX(jsonData.getFloat("x"));
+ 		setY(jsonData.getFloat("y"));
+
+        module = (T)json.readValue(Module.class, jsonData.get("module").get("data"));
+    }
 }
+
+

@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.rockbite.tools.talos.runtime.modules.EmConfigModule;
@@ -90,20 +91,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     }
 
     @Override
-    public void write(JsonValue value) {
-        value.addChild("additive", new JsonValue(module.getUserValue().additive));
-        value.addChild("attached", new JsonValue(module.getUserValue().attached));
-        value.addChild("continuous", new JsonValue(module.getUserValue().continuous));
-        value.addChild("aligned", new JsonValue(module.getUserValue().aligned));
-    }
-
-    @Override
-    public void read(JsonValue value) {
-        module.getUserValue().additive = value.getBoolean("additive");
-        module.getUserValue().attached = value.getBoolean("attached");
-        module.getUserValue().continuous = value.getBoolean("continuous");
-        module.getUserValue().aligned = value.getBoolean("aligned");
-
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         fromDataToUI();
     }
 

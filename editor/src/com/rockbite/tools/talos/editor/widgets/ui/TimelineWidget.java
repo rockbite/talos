@@ -56,9 +56,9 @@ public class TimelineWidget extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                EmitterWrapper wrapper = TalosMain.Instance().NodeStage().createNewEmitter("emitter");
-                setEmitters(TalosMain.Instance().NodeStage().getEmitterWrappers());
-                selectRow(wrapper);
+
+                final EmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter");
+                selectRow(emitter);
             }
         });
 
@@ -69,16 +69,13 @@ public class TimelineWidget extends Table {
 
                 EmitterWrapper wrapper = getSelectedRow().wrapper;
 
-                TalosMain.Instance().NodeStage().removeEmitter(wrapper);
-                setEmitters(TalosMain.Instance().NodeStage().getEmitterWrappers());
-                selectRow(TalosMain.Instance().NodeStage().currentEmitterWrapper);
+                TalosMain.Instance().Project().removeEmitter(wrapper);
             }
         });
     }
 
     public void setEmitters(Array<EmitterWrapper> emitterWrappers) {
         listContent.clearChildren();
-
 
         for(EmitterWrapper emitter: emitterWrappers) {
             EmitterRow row = new EmitterRow(this, getSkin());
@@ -93,7 +90,7 @@ public class TimelineWidget extends Table {
         listContent.row();
         listContent.add().expandY();
 
-        selectRow((TalosMain.Instance().NodeStage()).currentEmitterWrapper);
+        selectRow(TalosMain.Instance().Project().getCurrentEmitterWrapper());
     }
 
     public void selectRow(EmitterWrapper emitterWrapper) {
@@ -106,8 +103,8 @@ public class TimelineWidget extends Table {
             }
         }
 
-        TalosMain.Instance().NodeStage().currentEmitterWrapper = emitterWrapper;
-        TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(TalosMain.Instance().NodeStage().currentEmitterWrapper);
+        TalosMain.Instance().Project().setCurrentEmitterWrapper(emitterWrapper);
+        TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrapper);
     }
 
     public EmitterRow getSelectedRow() {

@@ -1,7 +1,9 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Expression;
-import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.utils.MathExpressionMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MathModule extends Module {
@@ -47,4 +49,15 @@ public class MathModule extends Module {
     public NumericalValue getOutputValue() {
         return output;
     }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("mathExpression", MathExpressionMappings.getNameForMathExpression(getExpression()));
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        currentExpression = MathExpressionMappings.getMathExpressionForName(jsonData.getString("mathExpression"));
+    }
+
 }

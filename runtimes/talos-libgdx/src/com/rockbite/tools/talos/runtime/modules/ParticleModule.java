@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
@@ -155,5 +157,15 @@ public class ParticleModule extends Module {
 
     public void setDefaultDrawable(ParticleDrawable defaultDrawable) {
         this.defaultDrawable = defaultDrawable;
+    }
+
+    @Override
+    public void write (Json json) {
+
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+
     }
 }

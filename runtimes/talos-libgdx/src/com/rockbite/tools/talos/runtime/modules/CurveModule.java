@@ -2,6 +2,8 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -141,6 +143,27 @@ public class CurveModule extends Module {
     public void removePoint(int i) {
         if(points.size > 1) {
             points.removeIndex(i);
+        }
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeArrayStart("points");
+        for (Vector2 point : getPoints()) {
+            json.writeObjectStart();
+            json.writeValue("x", point.x);
+            json.writeValue("y", point.y);
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        points.clear();
+        final JsonValue points = jsonData.getChild("points");
+        for (JsonValue point : points) {
+            createPoint(point.get(0).asFloat(), point.get(1).asFloat());
         }
     }
 }

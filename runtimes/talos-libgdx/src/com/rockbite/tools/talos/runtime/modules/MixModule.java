@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MixModule extends Module {
@@ -32,5 +34,15 @@ public class MixModule extends Module {
             output.getElements()[i] = Interpolation.linear.apply(val1.getElements()[i], val2.getElements()[i], alpha.getFloat());
         }
         output.setElementsCount(count);
+    }
+
+    @Override
+    public void write (Json json) {
+
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+
     }
 }
