@@ -100,7 +100,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				//newProjectAction();
+				newProjectAction();
 			}
 		});
 
@@ -108,7 +108,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				//openProjectAction();
+				openProjectAction();
 			}
 		});
 
@@ -116,7 +116,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				//saveProjectAction();
+				saveProjectAction();
 			}
 		});
 
@@ -124,7 +124,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				//saveAsProjectAction();
+				saveAsProjectAction();
 			}
 		});
 
@@ -132,7 +132,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				//legacyImport();
+				legacyImportAction();
 			}
 		});
 

@@ -10,7 +10,6 @@ import com.rockbite.tools.talos.runtime.ModuleGraph;
 import com.rockbite.tools.talos.runtime.ParticleEffect;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.sun.org.apache.xpath.internal.domapi.XPathStylesheetDOM3Exception;
 
 public class Project {
 

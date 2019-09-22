@@ -28,11 +28,4 @@ public class ProjectSerializer {
         String data = json.prettyPrint(projectData);
         fileHandle.writeString(data, false);
     }
-
-    public static void main (String[] args) {
-        Gdx.files = new LwjglFiles();
-
-        final ProjectData read = new ProjectSerializer().read(Gdx.files.internal("samples/newformat.tls"));
-        System.out.println();
-    }
 }
