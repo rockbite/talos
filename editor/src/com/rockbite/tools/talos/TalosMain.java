@@ -86,6 +86,10 @@ public class TalosMain extends ApplicationAdapter {
 		nodeStage.init();
 
 		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage.getStage(), nodeStage.getStage(), cameraController));
+
+		// final init after all is done
+		//TalosMain.Instance().Project().loadDefaultProject();
+		TalosMain.Instance().Project().newProject();
 	}
 
 	@Override

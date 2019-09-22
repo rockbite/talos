@@ -1,8 +1,10 @@
 package com.rockbite.tools.talos.editor;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,9 +19,14 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
+import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
+
+import java.io.File;
+import java.io.FileFilter;
 
 public class UIStage {
 
@@ -30,6 +37,9 @@ public class UIStage {
 
 	private TimelineWidget timelineWidget;
 	private PreviewWidget previewWidget;
+
+	FileChooser fileChooser;
+
 
 	public UIStage (Skin skin) {
 		stage = new Stage(new ScreenViewport());
@@ -45,6 +55,8 @@ public class UIStage {
 		defaults();
 		constructMenu();
 		constructSplitPanes();
+
+		initFileChoosers();
 	}
 
 	public Stage getStage () {
@@ -147,6 +159,111 @@ public class UIStage {
 		topTable.add(menuBar.getTable()).left().grow();
 
 		fullScreenTable.add(topTable).growX();
+
+		// adding key listeners for menu items
+		stage.addListener(new InputListener() {
+			@Override
+			public boolean keyDown(InputEvent event, int keycode) {
+				if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+					TalosMain.Instance().Project().newProject();
+				}
+				if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+					openProjectAction();
+				}
+				if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+					saveProjectAction();
+				}
+
+				return super.keyDown(event, keycode);
+			}
+
+		});
+	}
+
+	private void initFileChoosers() {
+		fileChooser = new FileChooser(FileChooser.Mode.SAVE);
+		fileChooser.setBackground(skin.getDrawable("window-noborder"));
+	}
+
+
+	private void newProjectAction() {
+		TalosMain.Instance().Project().newProject();
+	}
+
+
+	private void openProjectAction() {
+		fileChooser.setMode(FileChooser.Mode.OPEN);
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+			}
+		});
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(new FileChooserAdapter() {
+			@Override
+			public void selected (Array<FileHandle> file) {
+				TalosMain.Instance().Project().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
+			}
+		});
+
+		stage.addActor(fileChooser.fadeIn());
+	}
+
+	private void saveProjectAction() {
+		if(!TalosMain.Instance().Project().isBoundToFile()) {
+			saveAsProjectAction();
+		} else {
+			TalosMain.Instance().Project().saveProject();
+		}
+	}
+
+	private void saveAsProjectAction() {
+		fileChooser.setMode(FileChooser.Mode.SAVE);
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+			}
+		});
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(new FileChooserAdapter() {
+			@Override
+			public void selected(Array<FileHandle> file) {
+				String path = file.first().file().getAbsolutePath();
+				if(!path.endsWith(".tls")) {
+					if(path.indexOf(".") > 0) {
+						path = path.substring(0, path.indexOf("."));
+					}
+					path += ".tls";
+				}
+				FileHandle handle = Gdx.files.absolute(path);
+				TalosMain.Instance().Project().saveProject(handle);
+			}
+		});
+
+		stage.addActor(fileChooser.fadeIn());
+	}
+
+
+	public void legacyImportAction() {
+		fileChooser.setMode(FileChooser.Mode.OPEN);
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileFilter(new FileChooser.DefaultFileFilter(fileChooser));
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(new FileChooserAdapter() {
+			@Override
+			public void selected (Array<FileHandle> file) {
+				TalosMain.Instance().Project().importFromLegacyFormat(file.get(0));
+			}
+		});
+
+		stage.addActor(fileChooser.fadeIn());
 	}
 
 
