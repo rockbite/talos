@@ -464,6 +464,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
  		setY(jsonData.getFloat("y"));
 
         module = (T)json.readValue(Module.class, jsonData.get("module").get("data"));
+        //TODO: this has to be create through module graph to go with properr creation channels
+
+        setModule(module);
     }
 }
 

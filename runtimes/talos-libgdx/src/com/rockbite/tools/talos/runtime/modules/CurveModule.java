@@ -161,7 +161,7 @@ public class CurveModule extends Module {
     @Override
     public void read (Json json, JsonValue jsonData) {
         points.clear();
-        final JsonValue points = jsonData.getChild("points");
+        final JsonValue points = jsonData.get("points");
         for (JsonValue point : points) {
             createPoint(point.get(0).asFloat(), point.get(1).asFloat());
         }

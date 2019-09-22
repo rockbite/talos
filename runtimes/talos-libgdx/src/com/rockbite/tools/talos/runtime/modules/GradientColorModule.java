@@ -164,7 +164,7 @@ public class GradientColorModule extends Module {
 	@Override
 	public void read (Json json, JsonValue jsonData) {
         points.clear();
-        final JsonValue jsonPpoints = jsonData.getChild("points");
+        final JsonValue jsonPpoints = jsonData.get("points");
         for (JsonValue point : jsonPpoints) {
             createPoint(new Color(point.getFloat("r"), point.getFloat("g"), point.getFloat("b"), 1f), point.getFloat("pos"));
         }

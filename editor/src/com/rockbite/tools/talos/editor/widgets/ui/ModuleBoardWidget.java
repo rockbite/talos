@@ -223,6 +223,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         for(ModuleWrapper wrapper: emitterData.modules) {
             moduleWrappers.get(emitterWrapper).add(wrapper);
+            wrapper.setModule(wrapper.getModule());
             wrapper.setBoard(this);
             map.put(wrapper.getId(), wrapper);
         }
