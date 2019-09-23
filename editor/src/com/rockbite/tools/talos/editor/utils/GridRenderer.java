@@ -15,7 +15,6 @@ public class GridRenderer extends Actor {
 	private final OrthographicCamera camera;
 
 	private Vector2 tmp = new Vector2();
-	private Vector2 gridPos = new Vector2();
 
 	private ShapeRenderer shapeRenderer;
 
@@ -40,7 +39,7 @@ public class GridRenderer extends Actor {
 		float x = position.x - worldWidth / 2f;
 		float y = position.y - worldHeight / 2f;
 
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		drawGrid(x, y, worldWidth, worldHeight);
 		shapeRenderer.end();
 
@@ -49,10 +48,7 @@ public class GridRenderer extends Actor {
 
 	private void drawGrid (float x, float y, float worldWidth, float worldHeight) {
 		OrthographicCamera camera = (OrthographicCamera) getStage().getCamera();
-		gridPos.set(camera.position.x, camera.position.y);
-
-		tmp.x = 0 + worldWidth/2f;
-		tmp.y = 0 + worldHeight/2f;
+		tmp.set(camera.position.x, camera.position.y);
 
 		float tileSize = 15f;
 
@@ -66,28 +62,24 @@ public class GridRenderer extends Actor {
 
 		for (int i = -lineCount / 2 - 1; i < lineCount / 2 + 1; i++) {
 			float spacing = width / lineCount;
-			float offsetX = (int)(gridPos.x / spacing);
-			float offsetY = (int)(gridPos.y / spacing);
 			shapeRenderer.setColor(0.17f, 0.17f, 0.17f, 1f);
-			thickness = 2f;
-			float posX = tmp.x + (i - offsetX) * spacing;
-			float posY = tmp.y + (i - offsetY) * spacing;
-			shapeRenderer.rectLine(posX, 0, posX, worldHeight, thickness);
-			shapeRenderer.rectLine(0, posY, worldWidth, posY, thickness);
+			thickness = 2f * camera.zoom;
+			float posX = tmp.x - i * spacing - tmp.x % spacing;
+			float posY = tmp.y + i * spacing - tmp.y % spacing;
+			shapeRenderer.rectLine(posX, tmp.y - worldHeight/2f, posX, tmp.y + worldHeight/2f, thickness); // vertical
+			shapeRenderer.rectLine(tmp.x - worldWidth/2f, posY, tmp.x + worldWidth/2f, posY, thickness); // horizontal
 			iter++;
 		}
 
 		iter = 0;
 		for (int i = -blackLineCount / 2 - 1; i < blackLineCount / 2 + 1; i++) {
 			float spacing = width / blackLineCount;
-			float offsetX = (int)(gridPos.x / spacing);
-			float offsetY = (int)(gridPos.y / spacing);
 			shapeRenderer.setColor(0.12f, 0.12f, 0.12f, 1f);
-			thickness = 3f;
-			float posX = tmp.x + (i - offsetX) * spacing;
-			float posY = tmp.y + (i - offsetY) * spacing;
-			shapeRenderer.rectLine(posX, 0, posX, worldHeight, thickness);
-			shapeRenderer.rectLine(0, posY, worldWidth, posY, thickness);
+			thickness = 3f * camera.zoom;
+			float posX = tmp.x - i * spacing - tmp.x % spacing;
+			float posY = tmp.y + i * spacing - tmp.y % spacing;
+			shapeRenderer.rectLine(posX, tmp.y - worldHeight/2f, posX, tmp.y + worldHeight/2f, thickness); // vertical
+			shapeRenderer.rectLine(tmp.x - worldWidth/2f, posY, tmp.x + worldWidth/2f, posY, thickness); // horizontal
 			iter++;
 		}
 
