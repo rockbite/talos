@@ -23,8 +23,7 @@ public class PreviewWidget extends ViewportWidget {
 
     private ShapeRenderer shapeRenderer;
 
-    private Color green = new Color(Color.GREEN);
-    private Color red = new Color(Color.RED);
+    private Color tmpColor = new Color();
 
     public PreviewWidget() {
         super();
@@ -46,15 +45,15 @@ public class PreviewWidget extends ViewportWidget {
 
         batch.end();
 
-        green.a = 0.2f;
-        red.a = 0.2f;
+        tmpColor.set(Color.WHITE);
+        tmpColor.a = 0.2f;
         Gdx.gl.glLineWidth(1f);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(green);
+        shapeRenderer.setColor(tmpColor);
         shapeRenderer.line(-100, 0, 100, 0);
-        shapeRenderer.setColor(red);
+        shapeRenderer.setColor(tmpColor);
         shapeRenderer.line(0, -100, 0, 100);
         shapeRenderer.end();
 

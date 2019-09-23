@@ -48,8 +48,8 @@ public class GridRenderer extends Actor {
 	}
 
 	private void drawGrid (float x, float y, float worldWidth, float worldHeight) {
-
-		gridPos.set(0, 0);
+		OrthographicCamera camera = (OrthographicCamera) getStage().getCamera();
+		gridPos.set(camera.position.x, camera.position.y);
 
 		tmp.x = 0 + worldWidth/2f;
 		tmp.y = 0 + worldHeight/2f;
