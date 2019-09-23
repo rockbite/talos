@@ -45,6 +45,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
         addOutputSlot("result", 0);
 
         inputRange = new FloatRangeInputWidget("Min", "Max", getSkin());
+        inputRange.setValue(1, 1);
         contentWrapper.add(inputRange).left().padTop(0).padLeft(4).expandX();
 
         leftWrapper.add(new Table()).expandY();
