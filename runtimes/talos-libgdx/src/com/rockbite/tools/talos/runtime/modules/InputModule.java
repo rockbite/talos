@@ -1,7 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class InputModule extends Module {
@@ -28,5 +28,15 @@ public class InputModule extends Module {
 
     public int getInput() {
         return this.scopeKey;
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("scopeKey", getInput(), int.class);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        setInput(jsonData.getInt("scopeKey"));
     }
 }

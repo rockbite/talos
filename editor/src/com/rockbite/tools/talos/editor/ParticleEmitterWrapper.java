@@ -1,22 +1,21 @@
 package com.rockbite.tools.talos.editor;
 
-import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ModuleGraph;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 
-public class EmitterWrapper {
+public class ParticleEmitterWrapper {
 
     private String emitterName = "";
     private boolean isMuted;
     private boolean isSolo;
     private int position;
 
-    private ModuleGraph moduleGraph;
+    private ParticleEmitterDescriptor moduleGraph;
 
-    public ModuleGraph getGraph() {
+    public ParticleEmitterDescriptor getGraph() {
         return moduleGraph;
     }
 
-    public void setModuleGraph(ModuleGraph graph) {
+    public void setModuleGraph(ParticleEmitterDescriptor graph) {
         this.moduleGraph = graph;
     }
 
@@ -28,7 +27,7 @@ public class EmitterWrapper {
         this.emitterName = emitterName;
     }
 
-    public ModuleGraph getEmitter() {
+    public ParticleEmitterDescriptor getEmitter() {
         return moduleGraph;
     }
 }

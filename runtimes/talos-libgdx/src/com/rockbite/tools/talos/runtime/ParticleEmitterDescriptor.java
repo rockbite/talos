@@ -2,14 +2,14 @@ package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
-public class ModuleGraph {
+public class ParticleEmitterDescriptor {
 
-    private ParticleSystem system;
+    private final ParticleEffectDescriptor particleEffectResourceDescriptor;
+
+    ScopePayload scopePayload;
 
     Array<Module> modules = new Array<>();
 
@@ -20,8 +20,8 @@ public class ModuleGraph {
 
     public static ObjectSet<Class> registeredModules;
 
-    public ModuleGraph(ParticleSystem system) {
-        this.system = system;
+    public ParticleEmitterDescriptor (ParticleEffectDescriptor descriptor) {
+        this.particleEffectResourceDescriptor = descriptor;
     }
 
     public static ObjectSet<Class> getRegisteredModules() {
@@ -51,47 +51,30 @@ public class ModuleGraph {
         }
     }
 
-    public Module createModule(Class clazz) {
-        Module module = null;
-
-        if(Module.class.isAssignableFrom(clazz)) {
-            try {
-                module = (Module) ClassReflection.newInstance(clazz);
-                module.init(system);
-                module.setIndex(moduleIndex++);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        boolean cancel = false;
-
-        if(module != null) {
-            if(module instanceof ParticleModule) {
-                if(particleModule == null) {
-                    particleModule = (ParticleModule) module;
-                } else {
-                    cancel = true;
-                }
-            }
-            if(module instanceof EmitterModule) {
-                if(emitterModule == null) {
-                    emitterModule = (EmitterModule) module;
-                } else {
-                    cancel = true;
-                }
-            }
-
-            if(!cancel) {
-                modules.add(module);
+    public boolean addModule (Module module) {
+        boolean added = true;
+        if (module instanceof ParticleModule) {
+            if (particleModule == null) {
+                particleModule = (ParticleModule)module;
             } else {
-                module = null;
+                added = false;
+            }
+        }
+        if (module instanceof EmitterModule) {
+            if (emitterModule == null) {
+                emitterModule = (EmitterModule)module;
+            } else {
+                added = false;
             }
         }
 
-        return module;
-    }
+        if (added) {
+            modules.add(module);
+        }
 
+        return added;
+
+    }
 
     public void removeModule(Module module) {
         // was this module connected to someone?
@@ -138,5 +121,13 @@ public class ModuleGraph {
 
     public Array<Module> getModules() {
         return modules;
+    }
+
+    public void setScope (ScopePayload scope) {
+        this.scopePayload = scope;
+    }
+
+    public ScopePayload getScope () {
+        return scopePayload;
     }
 }

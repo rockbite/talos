@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.modules.TextureModule;
 public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
@@ -57,20 +58,23 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
     }
 
     @Override
-    public void write(JsonValue value) {
-        value.addChild("fileName", new JsonValue(fileName));
-        value.addChild("filePath", new JsonValue(filePath));
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("fileName", fileName);
+        json.writeValue("filePath", filePath);
     }
 
     @Override
-    public void read(JsonValue value) {
-        fileName = value.getString("fileName");
-        filePath = value.getString("filePath");
-        if(filePath != null) {
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        fileName = jsonData.getString("fileName");
+        filePath = jsonData.getString("filePath");
+        if (filePath != null) {
             FileHandle fileHandle = Gdx.files.absolute(filePath);
             TextureRegion region = new TextureRegion(new Texture(fileHandle));
             module.setRegion(region);
             image.setDrawable(new TextureRegionDrawable(region));
         }
     }
+
 }

@@ -1,12 +1,20 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
@@ -24,6 +32,10 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
     VisTextField bField;
 
     Color tmpClr = new Color();
+
+    public ColorModuleWrapper () {
+
+    }
 
     @Override
     protected void configureSlots() {
@@ -110,28 +122,60 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         return 230;
     }
 
-    @Override
-    public void write(JsonValue value) {
-        Color clr = module.getColor();
-        value.addChild("r", new JsonValue( clr.r));
-        value.addChild("g", new JsonValue( clr.g));
-        value.addChild("b", new JsonValue( clr.b));
-    }
 
     @Override
-    public void read(JsonValue value) {
-        float r = value.getFloat("r");
-        float g = value.getFloat("g");
-        float b = value.getFloat("b");
-        module.setR(r);
-        module.setG(g);
-        module.setB(b);
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
 
-        tmpClr.set(r, g, b, 1f);
+        final Color color = module.getColor();
+        tmpClr.set(color);
 
         colorBtn.setColor(tmpClr);
-        rField.setText(""+(int)(r * 255f));
-        gField.setText(""+(int)(g * 255f));
-        bField.setText(""+(int)(b * 255f));
+        rField.setText(""+(int)(color.r * 255f));
+        gField.setText(""+(int)(color.g * 255f));
+        bField.setText(""+(int)(color.b * 255f));
+    }
+
+    public static void main (String[] args) {
+
+        ApplicationAdapter ad = new ApplicationAdapter() {
+            @Override
+            public void create () {
+                TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
+                Skin skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+                skin.addRegions(atlas);
+
+                VisUI.load(skin);
+
+                Array<ModuleWrapper> wrappers = new Array<>();
+
+                ColorModuleWrapper wrapper = new ColorModuleWrapper();
+                wrapper.setModule(new ColorModule());
+
+                wrapper.getModule().setR(0.5f);
+                wrapper.getModule().setG(0.75f);
+                wrapper.getModule().setB(0.25f);
+                wrapper.setX(500);
+                wrapper.setY(800);
+
+                Json json = new Json();
+
+                wrappers.add(wrapper);
+
+                final String s = json.prettyPrint(wrappers);
+
+                System.out.println(s);
+
+                final Object o = json.fromJson(Array.class, s);
+
+                System.out.println(o);
+
+            }
+        };
+
+        new LwjglApplication(ad);
+
+
+
     }
 }

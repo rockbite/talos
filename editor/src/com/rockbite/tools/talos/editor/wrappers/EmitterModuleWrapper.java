@@ -34,13 +34,4 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         return null;
     }
 
-    @Override
-    public void write(JsonValue value) {
-
-    }
-
-    @Override
-    public void read(JsonValue value) {
-
-    }
 }

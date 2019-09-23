@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.runtime.modules.InputModule;
@@ -53,14 +54,9 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
     }
 
     @Override
-    public void write(JsonValue value) {
-        value.addChild("scopeKey", new JsonValue(module.getInput()+""));
-    }
-
-    @Override
-    public void read(JsonValue value) {
-        int scopeKey = value.getInt("scopeKey");
-        setKey(scopeKey);
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        setKey(module.getInput());
     }
 
     public void setKey(int key) {

@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class ColorModule extends Module {
@@ -18,6 +20,10 @@ public class ColorModule extends Module {
     Color tmpColor = new Color();
 
     float defaultR = 1, defaultG = 0, defaultB = 0;
+
+    public ColorModule () {
+
+    }
 
     @Override
     protected void defineSlots() {
@@ -53,5 +59,21 @@ public class ColorModule extends Module {
     public Color getColor() {
         tmpColor.set(defaultR, defaultG, defaultB, 1f);
         return tmpColor;
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("r", defaultR);
+        json.writeValue("g", defaultG);
+        json.writeValue("b", defaultB);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        defaultR = jsonData.getFloat("r");
+        defaultG = jsonData.getFloat("g");
+        defaultB = jsonData.getFloat("b");
     }
 }

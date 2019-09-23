@@ -1,15 +1,12 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -109,7 +106,7 @@ public class ParticleModule extends Module {
 
     public float getVelocity() {
         fetchInputSlotValue(VELOCITY);
-        if(velocity.isEmpty()) return 100; // defaults
+        if(velocity.isEmpty()) return 1; // defaults
         return velocity.getFloat();
     }
 
@@ -121,7 +118,7 @@ public class ParticleModule extends Module {
 
     public float getSize() {
         fetchInputSlotValue(SIZE);
-        if(size.isEmpty()) return 50; // defaults
+        if(size.isEmpty()) return 1; // defaults
         return size.getFloat();
     }
 
@@ -155,5 +152,15 @@ public class ParticleModule extends Module {
 
     public void setDefaultDrawable(ParticleDrawable defaultDrawable) {
         this.defaultDrawable = defaultDrawable;
+    }
+
+    @Override
+    public void write (Json json) {
+
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+
     }
 }

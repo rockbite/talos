@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.script.ScriptCompiler;
 import com.rockbite.tools.talos.runtime.scripts.SimpleReturnScript;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -87,5 +89,19 @@ public class ScriptModule extends Module {
         + "%SCRIPT%"
         + "}"
         + "}";
+
+    public String getScript () {
+        return script;
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("script", script);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        this.script = jsonData.getString("script");
+    }
 
 }

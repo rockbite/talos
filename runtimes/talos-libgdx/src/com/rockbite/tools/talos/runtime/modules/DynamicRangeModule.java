@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -9,7 +11,7 @@ import java.util.Random;
 public class DynamicRangeModule extends CurveModule {
 
     private float lowMin = 0, lowMax = 0;
-    private float highMin = 360, highMax = 360;
+    private float highMin = 1, highMax = 1;
 
     public static final int OUTPUT = 0;
 
@@ -66,5 +68,23 @@ public class DynamicRangeModule extends CurveModule {
 
     public NumericalValue getOutputValue() {
         return output;
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("lowMin", lowMin, float.class);
+        json.writeValue("lowMax", lowMax, float.class);
+        json.writeValue("highMin", highMin, float.class);
+        json.writeValue("highMax", highMax, float.class);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        lowMin = jsonData.getFloat("lowMin");
+        lowMax = jsonData.getFloat("lowMax");
+        highMin = jsonData.getFloat("highMin");
+        highMax = jsonData.getFloat("highMax");
     }
 }

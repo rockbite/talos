@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -33,4 +34,15 @@ public class StaticValueModule extends Module {
     public NumericalValue getOutputValue() {
         return outputValue;
     }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("value", getStaticValue());
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        setStaticValue(jsonData.getFloat("value"));
+    }
+
 }

@@ -1,8 +1,9 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.utils.InterpolationMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class InterpolationModule extends Module {
@@ -34,4 +35,15 @@ public class InterpolationModule extends Module {
     public Interpolation getInterpolation() {
         return this.currentInterpolation;
     }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("interp", InterpolationMappings.getNameForInterpolation(getInterpolation()));
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        currentInterpolation = InterpolationMappings.getInterpolationForName(jsonData.getString("interp"));
+    }
+
 }

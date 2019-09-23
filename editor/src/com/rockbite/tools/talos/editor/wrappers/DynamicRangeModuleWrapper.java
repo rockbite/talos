@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -50,6 +51,9 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         highInput = new FloatRangeInputWidget("HMin", "HMax", getSkin());
         lowInput = new FloatRangeInputWidget("LMin", "LMax", getSkin());
 
+        lowInput.setValue(0, 0);
+        highInput.setValue(1, 1);
+
         container.add(highInput).row();
         container.add().height(3).row();
         container.add(lowInput);
@@ -82,47 +86,17 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         curveWidget.setModule(module);
     }
 
-    @Override
-    public void write(JsonValue value) {
-        float lowMin = module.getLowMin();
-        float lowMax = module.getLowMax();
-        float highMin = module.getHightMin();
-        float highMax = module.getHightMax();
-        value.addChild("lowMin", new JsonValue(lowMin));
-        value.addChild("lowMax", new JsonValue(lowMax));
-        value.addChild("highMin", new JsonValue(highMin));
-        value.addChild("highMax", new JsonValue(highMax));
 
-        // now points
-        Array<Vector2> points = module.getPoints();
-        JsonValue arr = new JsonValue(JsonValue.ValueType.array);
-        value.addChild("points", arr);
-        for(Vector2 point: points) {
-            JsonValue vec = new JsonValue(JsonValue.ValueType.array);
-            vec.addChild(new JsonValue(point.x));
-            vec.addChild(new JsonValue(point.y));
-            arr.addChild(vec);
-        }
-    }
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
 
-    @Override
-    public void read(JsonValue value) {
-        String lowMin = value.getString("lowMin");
-        String lowMax = value.getString("lowMax");
-        String highMin = value.getString("highMin");
-        String highMax = value.getString("highMax");
+		lowInput.setValue(module.getLowMin(), module.getLowMax());
+		highInput.setValue(module.getHightMin(), module.getHightMax());
 
-        lowInput.setValue(floatFromText(lowMin), floatFromText(lowMax));
-        highInput.setValue(floatFromText(highMin), floatFromText(highMax));
+		updateValues();
+	}
 
-        updateValues();
-
-        JsonValue points = value.get("points");
-        module.getPoints().clear();
-        for(JsonValue point: points) {
-            module.createPoint(point.get(0).asFloat(), point.get(1).asFloat());
-        }
-    }
 
     @Override
     protected float reportPrefWidth() {

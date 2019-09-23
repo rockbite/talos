@@ -12,15 +12,20 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.FocusManager;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
-import com.rockbite.tools.talos.editor.EmitterWrapper;
+import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
+import com.rockbite.tools.talos.editor.serialization.ConnectionData;
+import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
@@ -32,10 +37,10 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     ShapeRenderer shapeRenderer;
 
-    public ObjectMap<EmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
-    public ObjectMap<EmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
-    public ObjectMap<EmitterWrapper, Integer> idMap = new ObjectMap<>();
-    private EmitterWrapper currentEmitterWrapper;
+    public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
+    public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
+    public ObjectMap<ParticleEmitterWrapper, Integer> idMap = new ObjectMap<>();
+    private ParticleEmitterWrapper currentEmitterWrapper;
     private ModuleWrapper selectedWrapper;
 
     Group moduleContainer = new Group();
@@ -173,7 +178,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public void setCurrentEmitter(EmitterWrapper currentEmitterWrapper) {
+    public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
         this.currentEmitterWrapper = currentEmitterWrapper;
 
         moduleContainer.clearChildren();
@@ -185,7 +190,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public void removeEmitter(EmitterWrapper wrapper) {
+    public void removeEmitter(ParticleEmitterWrapper wrapper) {
         moduleWrappers.remove(wrapper);
         nodeConnections.remove(wrapper);
         idMap.remove(wrapper);
@@ -208,6 +213,25 @@ public class ModuleBoardWidget extends WidgetGroup {
             if(wrapper.hit(tmp2.x, tmp2.y, false) != null) {
                 wrapper.fileDrop(paths, tmp2.x, tmp2.y);
             }
+        }
+    }
+
+
+    public void loadEmitterToBoard(ParticleEmitterWrapper emitterWrapper, EmitterData emitterData) {
+        IntMap<ModuleWrapper> map = new IntMap<>();
+        if(!moduleWrappers.containsKey(emitterWrapper)) {
+            moduleWrappers.put(emitterWrapper, new Array<ModuleWrapper>());
+        }
+
+        for(ModuleWrapper wrapper: emitterData.modules) {
+            moduleWrappers.get(emitterWrapper).add(wrapper);
+            wrapper.setModule(wrapper.getModule());
+            wrapper.setBoard(this);
+            map.put(wrapper.getId(), wrapper);
+        }
+        for(ConnectionData connectionData: emitterData.connections) {
+            // make connections based on ids
+            makeConnection(map.get(connectionData.moduleFrom), map.get(connectionData.moduleTo), connectionData.slotFrom, connectionData.slotTo);
         }
     }
 
@@ -238,13 +262,13 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void showPopup() {
-        ModuleGraph moduleGraph = getModuleGraph();
+        ParticleEmitterDescriptor moduleGraph = getModuleGraph();
 
         if(moduleGraph == null) return;
 
         PopupMenu menu = new PopupMenu();
         Array<Class> temp = new Array<>();
-        for (Class registeredModule : ModuleGraph.getRegisteredModules()) {
+        for (Class registeredModule : ParticleEmitterDescriptor.getRegisteredModules()) {
             temp.add(registeredModule);
         }
         temp.sort(new Comparator<Class>() {
@@ -285,29 +309,32 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public ModuleWrapper createModule(String className, float x, float y) {
+    public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
+        final Module module;
         try {
-            Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + className);
-            return createModule(clazz, x, y);
+            module = ClassReflection.newInstance(clazz);
+            module.setModuleGraph(TalosMain.Instance().Project().getCurrentModuleGraph());
+
+            if (TalosMain.Instance().Project().getCurrentModuleGraph().addModule(module)) {
+                return createModuleWrapper(module, x, y);
+            } else {
+                System.out.println("Did not create module: " + clazz.getSimpleName());
+                return null;
+            }
         } catch (ReflectionException e) {
-            e.printStackTrace();
+            throw new GdxRuntimeException(e);
         }
-
-        return null;
     }
 
-    public ModuleWrapper createModule(Class clazz, float x, float y) {
-        Module module = mainStage.getCurrentModuleGraph().createModule(clazz);
-        return createModuleWrapper(module, x, y);
-    }
+    public <T extends Module> ModuleWrapper createModuleWrapper (T module, float x, float y) {
+        ModuleWrapper<T> moduleWrapper = null;
 
-    public ModuleWrapper createModuleWrapper(Module module, float x, float y) {
-        ModuleWrapper moduleWrapper = null;
+        if (module == null) return null;
 
-        if(module == null) return moduleWrapper;
+        Class<T> moduleClazz = (Class<T>)module.getClass();
 
         try {
-            moduleWrapper = (ModuleWrapper) ClassReflection.newInstance(WrapperRegistry.map.get(module.getClass()));
+            moduleWrapper = ClassReflection.newInstance(WrapperRegistry.get(moduleClazz));
             int id = getUniqueIdForModuleWrapper();
             moduleWrapper.setId(id);
 
@@ -416,7 +443,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         super.layout();
     }
 
-    public ModuleGraph getModuleGraph() {
+    public ParticleEmitterDescriptor getModuleGraph() {
         return mainStage.getCurrentModuleGraph();
     }
 
