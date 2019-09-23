@@ -8,13 +8,14 @@ public class StaticValueModule extends Module {
 
     public static final int OUTPUT = 0;
 
-    private NumericalValue staticValue = new NumericalValue();
+    private NumericalValue staticValue;
     private NumericalValue outputValue;
 
     @Override
     protected void defineSlots() {
         outputValue = createOutputSlot(OUTPUT);
 
+        staticValue = new NumericalValue();
         staticValue.set(1f);
     }
 

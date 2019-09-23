@@ -18,20 +18,20 @@ public class ProjectData {
 
 	public void setFrom (ModuleBoardWidget moduleBoardWidget) {
 		final ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = moduleBoardWidget.moduleWrappers;
-		final ObjectMap<ParticleEmitterWrapper, Integer> idMap = moduleBoardWidget.idMap;
 		final ObjectMap<ParticleEmitterWrapper, Array<ModuleBoardWidget.NodeConnection>> nodeConnections = moduleBoardWidget.nodeConnections;
 
 		emitters.clear();
 
-		for (ObjectMap.Entry<ParticleEmitterWrapper, Integer> emitterWrapperIntegerEntry : idMap) {
-			final ParticleEmitterWrapper key = emitterWrapperIntegerEntry.key;
+		for (ParticleEmitterWrapper key : moduleWrappers.keys()) {
 			final EmitterData emitterData = new EmitterData();
 			emitterData.name = key.getName();
 			emitterData.modules.addAll(moduleWrappers.get(key));
 
 			final Array<ModuleBoardWidget.NodeConnection> nodeConns = nodeConnections.get(key);
-			for (ModuleBoardWidget.NodeConnection nodeConn : nodeConns) {
-				emitterData.connections.add(new ConnectionData(nodeConn.fromModule.getId(), nodeConn.toModule.getId(), nodeConn.fromSlot, nodeConn.toSlot));
+			if(nodeConns != null) {
+				for (ModuleBoardWidget.NodeConnection nodeConn : nodeConns) {
+					emitterData.connections.add(new ConnectionData(nodeConn.fromModule.getId(), nodeConn.toModule.getId(), nodeConn.fromSlot, nodeConn.toSlot));
+				}
 			}
 
 			emitters.add(emitterData);

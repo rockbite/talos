@@ -142,4 +142,12 @@ public class FloatRangeInputWidget extends Table {
     public float getMaxValue() {
         return maxInput.getValue();
     }
+
+    public ImageButton getEqualsButton() {
+        return equalsButton;
+    }
+
+    public ImageButton getMirrorButton() {
+        return mirrorButton;
+    }
 }

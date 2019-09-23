@@ -20,7 +20,7 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     @Override
     public void setModule(StaticValueModule module) {
         super.setModule(module);
-        module.setStaticValue(1f);
+        floatInput.setValue(module.getStaticValue());
     }
 
     @Override

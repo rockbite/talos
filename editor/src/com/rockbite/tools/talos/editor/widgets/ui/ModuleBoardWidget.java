@@ -39,7 +39,6 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
     public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
-    public ObjectMap<ParticleEmitterWrapper, Integer> idMap = new ObjectMap<>();
     private ParticleEmitterWrapper currentEmitterWrapper;
     private ModuleWrapper selectedWrapper;
 
@@ -193,13 +192,11 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void removeEmitter(ParticleEmitterWrapper wrapper) {
         moduleWrappers.remove(wrapper);
         nodeConnections.remove(wrapper);
-        idMap.remove(wrapper);
     }
 
     public void clearAll() {
         moduleWrappers.clear();
         nodeConnections.clear();
-        idMap.clear();
     }
 
     public void fileDrop(String[] paths, float x, float y) {
@@ -533,13 +530,14 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public int getUniqueIdForModuleWrapper() {
-        if(idMap.get(currentEmitterWrapper) == null) {
-            idMap.put(currentEmitterWrapper, 0);
+        int maxId = -1;
+        for (ModuleWrapper wrapper: moduleWrappers.get(currentEmitterWrapper)) {
+            if(wrapper.getId() > maxId) {
+                maxId = wrapper.getId();
+            }
         }
 
-        idMap.put(currentEmitterWrapper, idMap.get(currentEmitterWrapper) + 1);
-
-        return idMap.get(currentEmitterWrapper);
+        return maxId + 1;
     }
 
 

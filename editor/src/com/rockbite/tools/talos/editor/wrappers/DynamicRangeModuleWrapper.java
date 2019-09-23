@@ -86,10 +86,25 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         curveWidget.setModule(module);
     }
 
+    @Override
+    public void write(Json json) {
+        super.write(json);
 
-	@Override
+        json.writeValue("lowEquals", lowInput.getEqualsButton().isChecked());
+        json.writeValue("lowMirror", lowInput.getMirrorButton().isChecked());
+
+        json.writeValue("highEquals", highInput.getEqualsButton().isChecked());
+        json.writeValue("highMirror", highInput.getMirrorButton().isChecked());
+    }
+
+    @Override
 	public void read (Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
+
+        lowInput.getEqualsButton().setChecked(jsonData.getBoolean("lowEquals"));
+        lowInput.getMirrorButton().setChecked(jsonData.getBoolean("lowMirror"));
+        highInput.getEqualsButton().setChecked(jsonData.getBoolean("highEquals"));
+        highInput.getMirrorButton().setChecked(jsonData.getBoolean("highMirror"));
 
 		lowInput.setValue(module.getLowMin(), module.getLowMax());
 		highInput.setValue(module.getHightMin(), module.getHightMax());

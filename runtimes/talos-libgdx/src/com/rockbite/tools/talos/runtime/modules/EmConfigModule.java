@@ -8,12 +8,14 @@ public class EmConfigModule extends Module {
 
     public static final int OUTPUT = 0;
 
-    private EmConfigValue userValue = new EmConfigValue();
+    private EmConfigValue userValue;
     private EmConfigValue outputValue;
 
     @Override
     public void init () {
         super.init();
+
+        userValue = new EmConfigValue();
 
         userValue.attached = false;
         userValue.continuous = true;
