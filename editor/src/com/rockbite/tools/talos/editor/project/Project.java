@@ -108,6 +108,7 @@ public class Project {
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 	}
 

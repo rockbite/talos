@@ -89,7 +89,9 @@ public class TimelineWidget extends Table {
         listContent.row();
         listContent.add().expandY();
 
-        selectRow(TalosMain.Instance().Project().getCurrentEmitterWrapper());
+        if(emitterWrappers.size > 0) {
+            selectRow(TalosMain.Instance().Project().getCurrentEmitterWrapper());
+        }
     }
 
     public void selectRow(ParticleEmitterWrapper emitterWrapper) {
