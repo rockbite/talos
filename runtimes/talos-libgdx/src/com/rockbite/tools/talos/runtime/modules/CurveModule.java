@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -19,7 +18,7 @@ public class CurveModule extends Module {
     NumericalValue alpha;
     NumericalValue output;
 
-    private Array<Vector2> points = new Array();
+    private Array<Vector2> points;
 
     private Vector2 tmp = new Vector2();
 
@@ -34,8 +33,8 @@ public class CurveModule extends Module {
     };
 
     @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
+    public void init () {
+        super.init();
         resetPoints();
     }
 
@@ -48,7 +47,7 @@ public class CurveModule extends Module {
 
     private void resetPoints() {
         // need to guarantee at least one point
-        points.clear();
+        points = new Array<>();
         Vector2 point = new Vector2(0, 0.5f);
         points.add(point);
     }

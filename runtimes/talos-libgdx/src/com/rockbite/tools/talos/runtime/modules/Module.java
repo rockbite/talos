@@ -3,7 +3,7 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
+import com.rockbite.tools.talos.runtime.ModuleGraph;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -11,22 +11,26 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public abstract class Module implements Json.Serializable {
 
-    protected ParticleSystem system;
+    private ModuleGraph graph;
 
     protected IntMap<Slot> inputSlots = new IntMap<>();
     protected IntMap<Slot> outputSlots = new IntMap<>();
 
-    protected int index = 1;
+    static int indexCounter = 0;
+    protected int index = indexCounter++;
 
     private float lastRequester;
 
-    public Module() {
-        // must have empty constructor
+    public Module () {
+        init();
     }
 
-    public void init(ParticleSystem system) {
-        this.system = system;
+    protected void init () {
         defineSlots();
+    }
+
+    public void setModuleGraph (ModuleGraph graph) {
+        this.graph = graph;
     }
 
     protected abstract void defineSlots();
@@ -151,7 +155,7 @@ public abstract class Module implements Json.Serializable {
     }
 
     public ScopePayload getScope() {
-        return system.getScope();
+        return graph.getScope();
     }
 
     public Slot getInputSlot(int slotId) {

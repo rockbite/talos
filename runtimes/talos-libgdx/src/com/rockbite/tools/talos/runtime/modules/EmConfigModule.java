@@ -2,7 +2,6 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.values.EmConfigValue;
 
 public class EmConfigModule extends Module {
@@ -13,8 +12,8 @@ public class EmConfigModule extends Module {
     private EmConfigValue outputValue;
 
     @Override
-    public void init(ParticleSystem system) {
-        super.init(system);
+    public void init () {
+        super.init();
 
         userValue.attached = false;
         userValue.continuous = true;

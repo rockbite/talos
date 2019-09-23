@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.FocusManager;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
 import com.rockbite.tools.talos.editor.EmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
@@ -307,29 +309,32 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public ModuleWrapper createModule(String className, float x, float y) {
+    public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
+        final Module module;
         try {
-            Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + className);
-            return createModule(clazz, x, y);
+            module = ClassReflection.newInstance(clazz);
+            module.setModuleGraph(TalosMain.Instance().Project().getCurrentModuleGraph());
+
+            if (TalosMain.Instance().Project().getCurrentModuleGraph().addModule(module)) {
+                return createModuleWrapper(module, x, y);
+            } else {
+                System.out.println("Did not create module: " + clazz.getSimpleName());
+                return null;
+            }
         } catch (ReflectionException e) {
-            e.printStackTrace();
+            throw new GdxRuntimeException(e);
         }
-
-        return null;
     }
 
-    public ModuleWrapper createModule(Class clazz, float x, float y) {
-        Module module = mainStage.getCurrentModuleGraph().createModule(clazz);
-        return createModuleWrapper(module, x, y);
-    }
+    public <T extends Module> ModuleWrapper createModuleWrapper (T module, float x, float y) {
+        ModuleWrapper<T> moduleWrapper = null;
 
-    public ModuleWrapper createModuleWrapper(Module module, float x, float y) {
-        ModuleWrapper moduleWrapper = null;
+        if (module == null) return null;
 
-        if(module == null) return moduleWrapper;
+        Class<T> moduleClazz = (Class<T>)module.getClass();
 
         try {
-            moduleWrapper = (ModuleWrapper) ClassReflection.newInstance(WrapperRegistry.map.get(module.getClass()));
+            moduleWrapper = ClassReflection.newInstance(WrapperRegistry.get(moduleClazz));
             int id = getUniqueIdForModuleWrapper();
             moduleWrapper.setId(id);
 

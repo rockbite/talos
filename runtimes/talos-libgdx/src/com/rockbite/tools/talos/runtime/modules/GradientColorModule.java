@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.ColorPoint;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -20,7 +19,7 @@ public class GradientColorModule extends Module {
 	NumericalValue alpha;
 	NumericalValue output;
 
-	private Array<ColorPoint> points = new Array<>();
+	private Array<ColorPoint> points;
 
 	private Color tmpColor = new Color();
 
@@ -37,8 +36,8 @@ public class GradientColorModule extends Module {
 	};
 
 	@Override
-	public void init (ParticleSystem system) {
-		super.init(system);
+	public void init () {
+		super.init();
 		resetPoints();
 	}
 
@@ -85,7 +84,7 @@ public class GradientColorModule extends Module {
 
 	private void resetPoints () {
 		// need to guarantee at least one point
-		points.clear();
+		points = new Array<>();
 		ColorPoint colorPoint = new ColorPoint();
 		colorPoint.pos = 0;
 		colorPoint.color.set(255 / 255f, 68 / 255f, 26 / 255f, 1f);

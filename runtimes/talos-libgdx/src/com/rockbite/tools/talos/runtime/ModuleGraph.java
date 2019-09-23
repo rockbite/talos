@@ -9,6 +9,8 @@ import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ModuleGraph {
 
+    private ScopePayload scopePayload = new ScopePayload();
+
     private ParticleSystem system;
 
     Array<Module> modules = new Array<>();
@@ -51,47 +53,30 @@ public class ModuleGraph {
         }
     }
 
-    public Module createModule(Class clazz) {
-        Module module = null;
-
-        if(Module.class.isAssignableFrom(clazz)) {
-            try {
-                module = (Module) ClassReflection.newInstance(clazz);
-                module.init(system);
-                module.setIndex(moduleIndex++);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        boolean cancel = false;
-
-        if(module != null) {
-            if(module instanceof ParticleModule) {
-                if(particleModule == null) {
-                    particleModule = (ParticleModule) module;
-                } else {
-                    cancel = true;
-                }
-            }
-            if(module instanceof EmitterModule) {
-                if(emitterModule == null) {
-                    emitterModule = (EmitterModule) module;
-                } else {
-                    cancel = true;
-                }
-            }
-
-            if(!cancel) {
-                modules.add(module);
+    public boolean addModule (Module module) {
+        boolean added = true;
+        if (module instanceof ParticleModule) {
+            if (particleModule == null) {
+                particleModule = (ParticleModule)module;
             } else {
-                module = null;
+                added = false;
+            }
+        }
+        if (module instanceof EmitterModule) {
+            if (emitterModule == null) {
+                emitterModule = (EmitterModule)module;
+            } else {
+                added = false;
             }
         }
 
-        return module;
-    }
+        if (added) {
+            modules.add(module);
+        }
 
+        return added;
+
+    }
 
     public void removeModule(Module module) {
         // was this module connected to someone?
@@ -138,5 +123,13 @@ public class ModuleGraph {
 
     public Array<Module> getModules() {
         return modules;
+    }
+
+    public void setScope (ScopePayload scopePayload) {
+        this.scopePayload = scopePayload;
+    }
+
+    public ScopePayload getScope () {
+        return scopePayload;
     }
 }
