@@ -111,7 +111,7 @@ public class ParticleModule extends Module {
 
     public float getVelocity() {
         fetchInputSlotValue(VELOCITY);
-        if(velocity.isEmpty()) return 100; // defaults
+        if(velocity.isEmpty()) return 1; // defaults
         return velocity.getFloat();
     }
 
@@ -123,7 +123,7 @@ public class ParticleModule extends Module {
 
     public float getSize() {
         fetchInputSlotValue(SIZE);
-        if(size.isEmpty()) return 50; // defaults
+        if(size.isEmpty()) return 1; // defaults
         return size.getFloat();
     }
 

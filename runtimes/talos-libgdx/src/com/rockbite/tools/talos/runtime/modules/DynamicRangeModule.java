@@ -11,7 +11,7 @@ import java.util.Random;
 public class DynamicRangeModule extends CurveModule {
 
     private float lowMin = 0, lowMax = 0;
-    private float highMin = 360, highMax = 360;
+    private float highMin = 1, highMax = 1;
 
     public static final int OUTPUT = 0;
 

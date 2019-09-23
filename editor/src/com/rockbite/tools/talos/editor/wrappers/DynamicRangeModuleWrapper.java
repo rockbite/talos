@@ -51,6 +51,9 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         highInput = new FloatRangeInputWidget("HMin", "HMax", getSkin());
         lowInput = new FloatRangeInputWidget("LMin", "LMax", getSkin());
 
+        lowInput.setValue(0, 0);
+        highInput.setValue(1, 1);
+
         container.add(highInput).row();
         container.add().height(3).row();
         container.add(lowInput);
