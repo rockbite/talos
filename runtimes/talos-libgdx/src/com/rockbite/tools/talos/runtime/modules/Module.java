@@ -3,7 +3,7 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ModuleGraph;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -11,7 +11,7 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public abstract class Module implements Json.Serializable {
 
-    private ModuleGraph graph;
+    private ParticleEmitterDescriptor graph;
 
     protected IntMap<Slot> inputSlots = new IntMap<>();
     protected IntMap<Slot> outputSlots = new IntMap<>();
@@ -29,7 +29,7 @@ public abstract class Module implements Json.Serializable {
         defineSlots();
     }
 
-    public void setModuleGraph (ModuleGraph graph) {
+    public void setModuleGraph (ParticleEmitterDescriptor graph) {
         this.graph = graph;
     }
 

@@ -9,8 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.EmitterWrapper;
-import com.rockbite.tools.talos.editor.NodeStage;
+import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 
 public class TimelineWidget extends Table {
 
@@ -57,7 +56,7 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                final EmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter");
+                final ParticleEmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter");
                 selectRow(emitter);
             }
         });
@@ -67,17 +66,17 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                EmitterWrapper wrapper = getSelectedRow().wrapper;
+                ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
 
                 TalosMain.Instance().Project().removeEmitter(wrapper);
             }
         });
     }
 
-    public void setEmitters(Array<EmitterWrapper> emitterWrappers) {
+    public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
         listContent.clearChildren();
 
-        for(EmitterWrapper emitter: emitterWrappers) {
+        for(ParticleEmitterWrapper emitter: emitterWrappers) {
             EmitterRow row = new EmitterRow(this, getSkin());
             row.set(emitter);
             listContent.add(row).growX();
@@ -93,7 +92,7 @@ public class TimelineWidget extends Table {
         selectRow(TalosMain.Instance().Project().getCurrentEmitterWrapper());
     }
 
-    public void selectRow(EmitterWrapper emitterWrapper) {
+    public void selectRow(ParticleEmitterWrapper emitterWrapper) {
         for(EmitterRow row: rows) {
             if(row.wrapper == emitterWrapper) {
                 row.select();
@@ -126,7 +125,7 @@ public class TimelineWidget extends Table {
 
         private boolean selecteed = true;
 
-        private EmitterWrapper wrapper;
+        private ParticleEmitterWrapper wrapper;
         private TimelineWidget timeline;
 
         public EmitterRow(final TimelineWidget timeline, Skin skin) {
@@ -221,7 +220,7 @@ public class TimelineWidget extends Table {
             }
         }
 
-        public void set(EmitterWrapper emitter) {
+        public void set(ParticleEmitterWrapper emitter) {
             label.setText(emitter.getName());
             textField.setText(emitter.getName());
             wrapper = emitter;

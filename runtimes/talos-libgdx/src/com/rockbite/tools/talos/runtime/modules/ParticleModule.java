@@ -1,17 +1,12 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 

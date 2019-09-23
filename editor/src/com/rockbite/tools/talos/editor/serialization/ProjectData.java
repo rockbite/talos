@@ -2,11 +2,9 @@ package com.rockbite.tools.talos.editor.serialization;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.rockbite.tools.talos.editor.EmitterWrapper;
-import com.rockbite.tools.talos.editor.project.Project;
+import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
-import com.rockbite.tools.talos.runtime.ParticleEffect;
 
 public class ProjectData {
 
@@ -19,14 +17,14 @@ public class ProjectData {
 	}
 
 	public void setFrom (ModuleBoardWidget moduleBoardWidget) {
-		final ObjectMap<EmitterWrapper, Array<ModuleWrapper>> moduleWrappers = moduleBoardWidget.moduleWrappers;
-		final ObjectMap<EmitterWrapper, Integer> idMap = moduleBoardWidget.idMap;
-		final ObjectMap<EmitterWrapper, Array<ModuleBoardWidget.NodeConnection>> nodeConnections = moduleBoardWidget.nodeConnections;
+		final ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = moduleBoardWidget.moduleWrappers;
+		final ObjectMap<ParticleEmitterWrapper, Integer> idMap = moduleBoardWidget.idMap;
+		final ObjectMap<ParticleEmitterWrapper, Array<ModuleBoardWidget.NodeConnection>> nodeConnections = moduleBoardWidget.nodeConnections;
 
 		emitters.clear();
 
-		for (ObjectMap.Entry<EmitterWrapper, Integer> emitterWrapperIntegerEntry : idMap) {
-			final EmitterWrapper key = emitterWrapperIntegerEntry.key;
+		for (ObjectMap.Entry<ParticleEmitterWrapper, Integer> emitterWrapperIntegerEntry : idMap) {
+			final ParticleEmitterWrapper key = emitterWrapperIntegerEntry.key;
 			final EmitterData emitterData = new EmitterData();
 			emitterData.name = key.getName();
 			emitterData.modules.addAll(moduleWrappers.get(key));

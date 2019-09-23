@@ -2,16 +2,14 @@ package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
-public class ModuleGraph {
+public class ParticleEmitterDescriptor {
 
-    private ScopePayload scopePayload = new ScopePayload();
+    private final ParticleEffectDescriptor particleEffectResourceDescriptor;
 
-    private ParticleSystem system;
+    ScopePayload scopePayload;
 
     Array<Module> modules = new Array<>();
 
@@ -22,8 +20,8 @@ public class ModuleGraph {
 
     public static ObjectSet<Class> registeredModules;
 
-    public ModuleGraph(ParticleSystem system) {
-        this.system = system;
+    public ParticleEmitterDescriptor (ParticleEffectDescriptor descriptor) {
+        this.particleEffectResourceDescriptor = descriptor;
     }
 
     public static ObjectSet<Class> getRegisteredModules() {
@@ -125,8 +123,8 @@ public class ModuleGraph {
         return modules;
     }
 
-    public void setScope (ScopePayload scopePayload) {
-        this.scopePayload = scopePayload;
+    public void setScope (ScopePayload scope) {
+        this.scopePayload = scope;
     }
 
     public ScopePayload getScope () {

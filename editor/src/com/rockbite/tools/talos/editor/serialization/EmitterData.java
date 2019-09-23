@@ -1,9 +1,7 @@
 package com.rockbite.tools.talos.editor.serialization;
 
 import com.badlogic.gdx.utils.Array;
-import com.rockbite.tools.talos.editor.EmitterWrapper;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
-import com.rockbite.tools.talos.runtime.ModuleGraph;
 
 public class EmitterData {
 

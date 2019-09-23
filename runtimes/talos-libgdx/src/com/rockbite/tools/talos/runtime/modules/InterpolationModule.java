@@ -3,8 +3,6 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.utils.InterpolationMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 

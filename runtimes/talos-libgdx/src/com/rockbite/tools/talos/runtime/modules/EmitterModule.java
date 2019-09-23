@@ -2,7 +2,7 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleEmitter;
+import com.rockbite.tools.talos.runtime.ParticleEmitterInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.EmConfigValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
@@ -57,7 +57,7 @@ public class EmitterModule extends Module {
         return config.aligned;
     }
 
-    public void updateScopeData(ParticleEmitter particleEmitter) {
+    public void updateScopeData(ParticleEmitterInstance particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
         getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
     }

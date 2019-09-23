@@ -4,16 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
+import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public class PreviewWidget extends ViewportWidget {
 
     Vector2 mid = new Vector2();
 
     private ParticleRenderer particleRenderer;
+
+    private SpriteBatchParticleRenderer spriteBatchParticleRenderer;
 
     private ShapeRenderer shapeRenderer;
 
@@ -22,7 +28,8 @@ public class PreviewWidget extends ViewportWidget {
 
     public PreviewWidget() {
         super();
-        particleRenderer = new ParticleRenderer();
+        spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
+        particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
     }
 
@@ -30,8 +37,8 @@ public class PreviewWidget extends ViewportWidget {
     public void act(float delta) {
         super.act(delta);
 
-        TalosMain.Instance().Project().getParticleSystem().update(delta);
-        particleRenderer.setParticleSystem(TalosMain.Instance().Project().getParticleSystem());
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
+        particleEffect.update(Gdx.graphics.getDeltaTime());
     }
 
     @Override
@@ -56,8 +63,11 @@ public class PreviewWidget extends ViewportWidget {
 
         mid.set(0, 0);
 
-        particleRenderer.render(batch);
-        particleRenderer.setPosition(mid.x, mid.y);
+
+        spriteBatchParticleRenderer.setBatch(batch);
+
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
+        particleEffect.render(particleRenderer);
     }
 
 }

@@ -22,7 +22,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
-import com.rockbite.tools.talos.editor.EmitterWrapper;
+import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.serialization.ConnectionData;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
@@ -37,10 +37,10 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     ShapeRenderer shapeRenderer;
 
-    public ObjectMap<EmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
-    public ObjectMap<EmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
-    public ObjectMap<EmitterWrapper, Integer> idMap = new ObjectMap<>();
-    private EmitterWrapper currentEmitterWrapper;
+    public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
+    public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
+    public ObjectMap<ParticleEmitterWrapper, Integer> idMap = new ObjectMap<>();
+    private ParticleEmitterWrapper currentEmitterWrapper;
     private ModuleWrapper selectedWrapper;
 
     Group moduleContainer = new Group();
@@ -178,7 +178,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public void setCurrentEmitter(EmitterWrapper currentEmitterWrapper) {
+    public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
         this.currentEmitterWrapper = currentEmitterWrapper;
 
         moduleContainer.clearChildren();
@@ -190,7 +190,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public void removeEmitter(EmitterWrapper wrapper) {
+    public void removeEmitter(ParticleEmitterWrapper wrapper) {
         moduleWrappers.remove(wrapper);
         nodeConnections.remove(wrapper);
         idMap.remove(wrapper);
@@ -217,7 +217,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
 
-    public void loadEmitterToBoard(EmitterWrapper emitterWrapper, EmitterData emitterData) {
+    public void loadEmitterToBoard(ParticleEmitterWrapper emitterWrapper, EmitterData emitterData) {
         IntMap<ModuleWrapper> map = new IntMap<>();
         if(!moduleWrappers.containsKey(emitterWrapper)) {
             moduleWrappers.put(emitterWrapper, new Array<ModuleWrapper>());
@@ -262,13 +262,13 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void showPopup() {
-        ModuleGraph moduleGraph = getModuleGraph();
+        ParticleEmitterDescriptor moduleGraph = getModuleGraph();
 
         if(moduleGraph == null) return;
 
         PopupMenu menu = new PopupMenu();
         Array<Class> temp = new Array<>();
-        for (Class registeredModule : ModuleGraph.getRegisteredModules()) {
+        for (Class registeredModule : ParticleEmitterDescriptor.getRegisteredModules()) {
             temp.add(registeredModule);
         }
         temp.sort(new Comparator<Class>() {
@@ -443,7 +443,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         super.layout();
     }
 
-    public ModuleGraph getModuleGraph() {
+    public ParticleEmitterDescriptor getModuleGraph() {
         return mainStage.getCurrentModuleGraph();
     }
 

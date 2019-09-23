@@ -2,8 +2,6 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.runtime.ParticleSystem;
-import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class InputModule extends Module {

@@ -343,7 +343,7 @@ public class UIStage {
 		stage.getViewport().update(width, height, true);
 	}
 
-	public void setEmitters (Array<EmitterWrapper> emitterWrappers) {
+	public void setEmitters (Array<ParticleEmitterWrapper> emitterWrappers) {
 		timelineWidget.setEmitters(emitterWrappers);
 	}
 }

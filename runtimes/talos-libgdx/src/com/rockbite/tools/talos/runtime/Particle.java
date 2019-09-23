@@ -1,17 +1,14 @@
 package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Pool;
 import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 
 public class Particle implements Pool.Poolable {
 
-    public ParticleEmitter particleEmitter;
+    public ParticleEmitterInstance particleEmitter;
 
     public Vector2 position = new Vector2();
     public float life;
@@ -33,7 +30,7 @@ public class Particle implements Pool.Poolable {
         // empty constructor
     }
 
-    public void init(ParticleModule particleModule, ParticleEmitter particleEmitter) {
+    public void init(ParticleModule particleModule, ParticleEmitterInstance particleEmitter) {
         this.particleEmitter = particleEmitter;
 
         this.seed = MathUtils.random();
@@ -55,7 +52,7 @@ public class Particle implements Pool.Poolable {
         if(alpha > 1f) alpha = 1f;
 
         //scope data
-        ParticleModule particleModule = particleEmitter.moduleGraph.getParticleModule();
+        ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
         if(particleModule == null) return;
         particleModule.updateScopeData(this);
 
@@ -72,7 +69,7 @@ public class Particle implements Pool.Poolable {
         life = particleModule.getLife();
         transparency = particleModule.getTransparency();
 
-        if(particleEmitter.moduleGraph.emitterModule.isAligned()) {
+        if(particleEmitter.emitterGraph.emitterModule.isAligned()) {
             rotation = angle/360f;
         } else {
             rotation = particleModule.getRotation();
