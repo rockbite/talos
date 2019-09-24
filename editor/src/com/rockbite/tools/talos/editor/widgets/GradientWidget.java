@@ -117,6 +117,7 @@ public class GradientWidget extends Actor {
                 Array<ColorPoint> points = module.getPoints();
 
                 if(button == Input.Buttons.RIGHT) {
+                    event.handle();
                     return true;
                 }
 
@@ -162,7 +163,6 @@ public class GradientWidget extends Actor {
 
                 if(button == Input.Buttons.RIGHT) {
                     rightClick(event, x, y);
-                    event.handle();
 
                     return;
                 }

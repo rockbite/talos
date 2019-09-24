@@ -18,6 +18,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.runtime.modules.ColorModule;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
@@ -102,7 +103,7 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                getStage().addActor(picker.fadeIn());
+                TalosMain.Instance().UIStage().getStage().addActor(picker.fadeIn());
             }
         });
 

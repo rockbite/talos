@@ -324,7 +324,7 @@ public class UIStage {
 		Array<XmlReader.Element> samples = root.getChildrenByName("sample");
 		for (XmlReader.Element sample : samples) {
 			String name = sample.getAttribute("name");
-			String fileName = sample.getAttribute("file");
+			final String fileName = sample.getAttribute("file");
 			MenuItem item = new MenuItem(name);
 			examples.addItem(item);
 
@@ -333,7 +333,8 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
-					//currentProjectPath = null;
+					TalosMain.Instance().Project().loadProject(Gdx.files.internal("samples/" + fileName));
+					TalosMain.Instance().Project().resetCurrentProjectPath();
 				}
 			});
 		}

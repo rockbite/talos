@@ -187,4 +187,7 @@ public class Project {
 		currentProjectPath = null;
 	}
 
+	public void resetCurrentProjectPath() {
+		currentProjectPath = null;
+	}
 }
