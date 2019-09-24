@@ -46,6 +46,7 @@ public class NodeStage {
         stage.addListener(new InputListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                TalosMain.Instance().UIStage().getStage().unfocusAll();
                 if (button == 1)
                     moduleBoardWidget.showPopup();
 

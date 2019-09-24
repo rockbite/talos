@@ -208,6 +208,7 @@ public class TimelineWidget extends Table {
             textField.setText(label.getText().toString());
             textField.selectAll();
             getStage().setKeyboardFocus(textField);
+            TalosMain.Instance().NodeStage().getStage().unfocusAll();
         }
 
         public void setStaticMode() {

@@ -280,9 +280,9 @@ public class ModuleBoardWidget extends WidgetGroup {
             menu.addItem(menuItem);
 
             final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-            (getStage().getViewport()).unproject(vec);
+            (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
 
-            menu.showMenu(getStage(), vec.x, vec.y);
+            menu.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
 
             menuItem.addListener(new ClickListener() {
                 @Override

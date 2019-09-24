@@ -162,6 +162,7 @@ public class GradientWidget extends Actor {
 
                 if(button == Input.Buttons.RIGHT) {
                     rightClick(event, x, y);
+                    event.handle();
 
                     return;
                 }

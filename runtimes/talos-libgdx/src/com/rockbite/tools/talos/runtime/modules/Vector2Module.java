@@ -53,7 +53,7 @@ public class Vector2Module extends Module {
     @Override
     public void write (Json json) {
         json.writeValue("x", getDefaultX());
-        json.writeValue("x", getDefaultY());
+        json.writeValue("y", getDefaultY());
     }
 
     @Override
