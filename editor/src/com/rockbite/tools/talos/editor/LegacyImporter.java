@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -27,6 +28,8 @@ public class LegacyImporter {
     float yStart = 400;
     int iter = 0;
 
+    private String path;
+
     public LegacyImporter(NodeStage stage) {
         this.stage = stage;
 
@@ -36,6 +39,8 @@ public class LegacyImporter {
     public void read(FileHandle effectFile) {
         nextY = 700;
         InputStream input = effectFile.read();
+
+        path = effectFile.parent().path();
 
         BufferedReader reader = null;
         try {
@@ -332,6 +337,21 @@ public class LegacyImporter {
             Array<String> imagePaths = new Array<String>();
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 imagePaths.add(line);
+            }
+
+            if(imagePaths.size == 1) {
+                // then it's just drawable
+                TextureModuleWrapper textureModule = (TextureModuleWrapper) stage.moduleBoardWidget.createModule(TextureModule.class, leftX, getNextY());
+                String filePath = imagePaths.get(0);
+                if(filePath.contains("/")) {
+                    if(!Gdx.files.absolute(filePath).exists()) {
+                        filePath = path + "\\" + filePath.substring(filePath.lastIndexOf("/"));
+                    }
+                } else {
+                    filePath = path + "\\" + filePath;
+                }
+                textureModule.setTexture(filePath);
+                stage.moduleBoardWidget.makeConnection(textureModule, particleModuleWrapper, TextureModule.OUTPUT, ParticleModule.DRAWABLE);
             }
 
 

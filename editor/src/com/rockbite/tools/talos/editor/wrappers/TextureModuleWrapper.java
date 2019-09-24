@@ -77,4 +77,12 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
         }
     }
 
+    public void setTexture(String path) {
+        FileHandle fileHandle = Gdx.files.absolute(path);
+        TextureRegion region = new TextureRegion(new Texture(fileHandle));
+        module.setRegion(region);
+        image.setDrawable(new TextureRegionDrawable(region));
+        filePath = path+"";
+        fileName = fileHandle.name();
+    }
 }

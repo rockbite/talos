@@ -10,12 +10,13 @@ public class TextureModule extends Module {
 
     public static final int OUTPUT = 0;
 
-    private DrawableValue userDrawable = new DrawableValue();
+    private DrawableValue userDrawable;
     private DrawableValue outputValue;
 
     @Override
     protected void defineSlots() {
         outputValue = (DrawableValue) createOutputSlot(OUTPUT, new DrawableValue());
+        userDrawable = new DrawableValue();
         userDrawable.setEmpty(true);
     }
 

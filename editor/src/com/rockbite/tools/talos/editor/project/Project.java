@@ -37,6 +37,8 @@ public class Project {
 		projectSerializer = new ProjectSerializer();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+
+		importer = new LegacyImporter(TalosMain.Instance().NodeStage());
 	}
 
 	public void loadProject (FileHandle projectFileHandle) {

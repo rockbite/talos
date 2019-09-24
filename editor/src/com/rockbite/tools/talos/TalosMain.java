@@ -64,7 +64,6 @@ public class TalosMain extends ApplicationAdapter {
 				nodeStage.fileDrop(finalPaths, x, y);
 			}
 		};
-		project = new Project();
 	}
 
 	@Override
@@ -79,6 +78,8 @@ public class TalosMain extends ApplicationAdapter {
 
 		uiStage = new UIStage(skin);
 		nodeStage = new NodeStage(skin);
+
+		project = new Project();
 
 		cameraController = new CameraController((OrthographicCamera)nodeStage.getStage().getCamera());
 
