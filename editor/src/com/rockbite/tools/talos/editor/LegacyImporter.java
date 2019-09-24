@@ -103,6 +103,14 @@ public class LegacyImporter {
                     highMax /= 1000f;
                 }
 
+                if(varName.equals("emission")) {
+                    //1 value hack
+                    if(lowMin == 1) lowMin = 2;
+                    if(lowMax == 1) lowMax = 2;
+                    if(highMin == 1) highMin = 2;
+                    if(highMax == 1) highMax = 2;
+                }
+
                 boolean relative = readBoolean(reader, "relative");
                 float[] scaling = new float[readInt(reader, "scalingCount")];
                 for (int i = 0; i < scaling.length; i++) {
@@ -122,12 +130,16 @@ public class LegacyImporter {
                     if(varName.equals("xOffset") || varName.equals("yOffset")) { // special shitty case
                         randomRange = (RandomRangeModuleWrapper) stage.moduleBoardWidget.createModule(RandomRangeModule.class, leftX, getNextY());
                         randomRange.setData(lowMin, lowMax);
-                        stage.moduleBoardWidget.makeConnection(randomRange, toModule, RandomRangeModule.OUTPUT, toSlot);
+                        if(toModule != null) {
+                            stage.moduleBoardWidget.makeConnection(randomRange, toModule, RandomRangeModule.OUTPUT, toSlot);
+                        }
                         wrapper = randomRange;
                     } else {
                         dynamic = (DynamicRangeModuleWrapper) stage.moduleBoardWidget.createModule(DynamicRangeModule.class, leftX, getNextY());
                         dynamic.setData(lowMin, lowMax, highMin, highMax, points);
-                        stage.moduleBoardWidget.makeConnection(dynamic, toModule, DynamicRangeModule.OUTPUT, toSlot);
+                        if(toModule != null) {
+                            stage.moduleBoardWidget.makeConnection(dynamic, toModule, DynamicRangeModule.OUTPUT, toSlot);
+                        }
                         wrapper = dynamic;
                     }
                 }
@@ -297,14 +309,18 @@ public class LegacyImporter {
                 readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.SIZE,"xScaleValue", false, false);
                 reader.readLine();
             } else {
-                Vector2ModuleWrapper vectorWrapper = (Vector2ModuleWrapper) stage.moduleBoardWidget.createModule(Vector2Module.class, leftX, getNextY());
-                stage.moduleBoardWidget.makeConnection(vectorWrapper, particleModuleWrapper, Vector2Module.OUTPUT, ParticleModule.SIZE);
-
-                ModuleWrapper xval = readScaledNumbericalValue(reader, vectorWrapper, Vector2Module.X,"xScaleValue", false, false);
+                ModuleWrapper xval = readScaledNumbericalValue(reader, null, Vector2Module.X,"xScaleValue", false, false);
                 reader.readLine();
-                ModuleWrapper wrp = readScaledNumbericalValue(reader, vectorWrapper, Vector2Module.Y,"yScaleValue", false, false);
-                if(wrp == null) {
-                    stage.moduleBoardWidget.makeConnection(xval, vectorWrapper, DynamicRangeModule.OUTPUT, Vector2Module.Y);
+                ModuleWrapper yval = readScaledNumbericalValue(reader, null, Vector2Module.Y,"yScaleValue", false, false);
+
+                if(yval == null) {
+                    stage.moduleBoardWidget.makeConnection(xval, particleModuleWrapper, DynamicRangeModule.OUTPUT, ParticleModule.SIZE);
+                } else {
+                    Vector2ModuleWrapper vectorWrapper = (Vector2ModuleWrapper) stage.moduleBoardWidget.createModule(Vector2Module.class, leftX, getNextY());
+                    stage.moduleBoardWidget.makeConnection(vectorWrapper, particleModuleWrapper, Vector2Module.OUTPUT, ParticleModule.SIZE);
+
+                    stage.moduleBoardWidget.makeConnection(xval, vectorWrapper, DynamicRangeModule.OUTPUT, Vector2Module.X);
+                    stage.moduleBoardWidget.makeConnection(yval, vectorWrapper, DynamicRangeModule.OUTPUT, Vector2Module.Y);
                 }
             }
             reader.readLine();

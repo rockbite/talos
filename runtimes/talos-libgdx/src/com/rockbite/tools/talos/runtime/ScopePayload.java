@@ -11,6 +11,7 @@ public class ScopePayload {
     public static final int PARTICLE_SEED = 2;
     public static final int REQUESTER_ID = 3;
     public static final int EMITTER_ALPHA_AT_P_INIT = 4;
+    public static final int DRAWABLE_ASPECT_RATIO = 5;
 
     private IntMap<NumericalValue> map = new IntMap<>();
 

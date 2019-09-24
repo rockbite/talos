@@ -18,6 +18,8 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
     String filePath;
     String fileName;
 
+    boolean isDefaultSet = false; //TODO: this is a hack for loading
+
     public TextureModuleWrapper() {
         super();
     }
@@ -30,7 +32,10 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
     @Override
     public void setModule(TextureModule module) {
         super.setModule(module);
-        module.setRegion(defaultRegion);
+        if(!isDefaultSet) {
+            module.setRegion(defaultRegion);
+            isDefaultSet = true;
+        }
     }
 
     @Override

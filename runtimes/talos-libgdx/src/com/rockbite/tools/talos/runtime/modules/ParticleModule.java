@@ -83,6 +83,8 @@ public class ParticleModule extends Module {
             return defaultDrawable;
         }
 
+        getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getDrawable().getAspectRatio());
+
         return drawable.getDrawable();
     }
 
@@ -119,13 +121,13 @@ public class ParticleModule extends Module {
     public Vector2 getSize() {
         fetchInputSlotValue(SIZE);
         if(size.isEmpty()) {
-            tmpVec.set(1f, 1f);
+            tmpVec.set(1f, 1f/getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
         }  else if(size.elementsCount() == 1) {
-            tmpVec.set(size.getFloat(), size.getFloat());
+            tmpVec.set(size.getFloat(), size.getFloat() / getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
         } else if (size.elementsCount() == 2) {
             tmpVec.set(size.get(0), size.get(1));
         } else {
-            tmpVec.set(1f, 1f);
+            tmpVec.set(1f, 1f/getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
         }
 
         return tmpVec;

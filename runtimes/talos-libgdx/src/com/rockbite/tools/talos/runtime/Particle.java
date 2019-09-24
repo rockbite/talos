@@ -75,9 +75,10 @@ public class Particle implements Pool.Poolable {
             rotation = particleModule.getRotation();
         }
 
+
+        drawable = particleModule.getDrawable(); // important to get drawable before sze
         size.set(particleModule.getSize());
         color.set(particleModule.getColor());
-        drawable = particleModule.getDrawable();
 
         // perform inner operations
         position.x += MathUtils.cosDeg(angle)*velocity*delta;
