@@ -106,7 +106,7 @@ public class ParticleModule extends Module {
 
     public float getVelocity() {
         fetchInputSlotValue(VELOCITY);
-        if(velocity.isEmpty()) return 1; // defaults
+        if(velocity.isEmpty()) return 0; // defaults
         return velocity.getFloat();
     }
 
@@ -116,10 +116,19 @@ public class ParticleModule extends Module {
         return rotation.getFloat();
     }
 
-    public float getSize() {
+    public Vector2 getSize() {
         fetchInputSlotValue(SIZE);
-        if(size.isEmpty()) return 1; // defaults
-        return size.getFloat();
+        if(size.isEmpty()) {
+            tmpVec.set(1f, 1f);
+        }  else if(size.elementsCount() == 1) {
+            tmpVec.set(size.getFloat(), size.getFloat());
+        } else if (size.elementsCount() == 2) {
+            tmpVec.set(size.get(0), size.get(1));
+        } else {
+            tmpVec.set(1f, 1f);
+        }
+
+        return tmpVec;
     }
 
     public Color getColor() {

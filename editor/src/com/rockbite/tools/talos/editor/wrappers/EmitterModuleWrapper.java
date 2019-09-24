@@ -17,6 +17,7 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 
     @Override
     protected void configureSlots() {
+        addInputSlot("delay", EmitterModule.DELAY);
         addInputSlot("duration", EmitterModule.DURATION);
         addInputSlot("emission", EmitterModule.RATE);
         addInputSlot("config", EmitterModule.CONFIG);

@@ -12,6 +12,10 @@ public class ParticleEmitterInstance {
 
 	Vector2 position = new Vector2();
 	float duration;
+	float delay;
+	float delayTimer;
+
+	boolean isContinuous = false;
 
 	private EmitterModule emitterModule;
 
@@ -20,6 +24,8 @@ public class ParticleEmitterInstance {
 	// inner vars
 	public float alpha;
 	public float particlesToEmmit;
+
+	public boolean initialized = false;
 
 	public Array<Particle> activeParticles = new Array<>();
 
@@ -37,34 +43,66 @@ public class ParticleEmitterInstance {
         init();
 	}
 
-	public void setEmitterModule (EmitterModule emitterModule) {
-		this.emitterModule = emitterModule;
-	}
-
 	public void init () {
 		position.set(0, 0);
-		duration = 2f;
-
-		// inner variable defaults
-		alpha = 0f;
-		particlesToEmmit = 0f;
-	}
-
-	public void update (float delta) {
-		alpha += delta / duration;
-		if (alpha > 1f)
-			alpha = 1f;
 
 		emitterModule = emitterGraph.getEmitterModule();
 		if (emitterModule == null)
 			return;
 
+		delay = emitterModule.getDelay();
+		duration = emitterModule.getDuration();
+		isContinuous = emitterModule.isContinnuous();
+
+		delayTimer = delay;
+
+
+		// inner variable defaults
+		alpha = 0f;
+		particlesToEmmit = 0f;
+
+		initialized = true;
+	}
+
+	public void update (float delta) {
+		emitterModule = emitterGraph.getEmitterModule();
+		if (emitterModule == null)
+			return;
+
+		if(!initialized) {
+			init();
+		}
+
 		//update variables to their real values
 		emitterModule.updateScopeData(this);
+
+		delay = emitterModule.getDelay();
+		duration = emitterModule.getDuration();
+		isContinuous = emitterModule.isContinnuous();
 		rate = emitterModule.getRate();
 
+		if(delayTimer > 0) {
+			delayTimer -= delta;
+			if(delayTimer < 0) delayTimer = 0;
+			if(delayTimer > 0) {
+
+				updateParticles(delta); // process existing particles at least
+
+				emitterGraph.resetRequesters();
+				return;
+			}
+		}
+
+		alpha += delta / duration;
+		if (alpha > 1f) {
+			alpha = 1f;
+		}
+
+		//update variables to their real values
+		emitterModule.updateScopeData(this);
+
 		//
-		if (alpha < 1f) {
+		if (alpha < 1f) { // emission only here
 			// let's emmit
 			particlesToEmmit += rate * delta;
 
@@ -80,6 +118,19 @@ public class ParticleEmitterInstance {
 		}
 
 		// process existing particles.
+		updateParticles(delta);
+
+		if (alpha == 1f) {
+			if (isContinuous) {
+				// let's repeat
+				restart();
+			}
+		}
+
+		emitterGraph.resetRequesters();
+	}
+
+	private void updateParticles(float delta) {
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
 			Particle particle = activeParticles.get(i);
 			particle.update(delta);
@@ -88,13 +139,11 @@ public class ParticleEmitterInstance {
 				activeParticles.removeIndex(i);
 			}
 		}
+	}
 
-		if (alpha == 1f) {
-			// let's repeat
-			alpha = 0;
-		}
-
-		emitterGraph.resetRequesters();
+	public void restart() {
+    	delayTimer = delay;
+    	alpha = 0;
 	}
 
     public void setScope (ScopePayload scope) {

@@ -185,6 +185,7 @@ public class Project {
 	}
 
 	public void importFromLegacyFormat(FileHandle fileHandle) {
+		cleanData();
 		importer.read(fileHandle);
 		currentProjectPath = null;
 	}

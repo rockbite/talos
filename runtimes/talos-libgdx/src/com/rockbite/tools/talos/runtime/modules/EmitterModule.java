@@ -22,6 +22,7 @@ public class EmitterModule extends Module {
 
     @Override
     protected void defineSlots() {
+        delay = createInputSlot(DELAY);
         duration = createInputSlot(DURATION);
         rate = createInputSlot(RATE);
 
@@ -33,12 +34,38 @@ public class EmitterModule extends Module {
         // nothing to process
     }
 
+
+
+    public float getDelay() {
+        fetchInputSlotValue(DELAY);
+
+        if(delay.isEmpty()) return 0f; // defaults
+
+        return delay.getFloat();
+    }
+
+    public float getDuration() {
+        fetchInputSlotValue(DURATION);
+
+        if(duration.isEmpty()) return 2f; // defaults
+
+        return duration.getFloat();
+    }
+
     public float getRate() {
         fetchInputSlotValue(RATE);
 
         if(rate.isEmpty()) return 50; // defaults
 
         return rate.getFloat();
+    }
+
+    public boolean isContinnuous() {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return false;
+
+        return config.continuous;
     }
 
     public boolean isAttached() {

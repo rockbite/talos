@@ -33,7 +33,7 @@ public class LegacyImporter {
     public LegacyImporter(NodeStage stage) {
         this.stage = stage;
 
-        scaleTimes.addAll("duration", "life", "lifeOffset");
+        scaleTimes.addAll("delay", "duration", "life", "lifeOffset");
     }
 
     public void read(FileHandle effectFile) {
@@ -294,12 +294,18 @@ public class LegacyImporter {
             readScaledNumbericalValue(reader, null, 0,"spawnHeight", true, false);
             String line = reader.readLine();
             if (line.trim().equals("- Scale -")) {
-                readScaledNumbericalValue(reader, null, 0,"xScaleValue", true, false);
+                readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.SIZE,"xScaleValue", false, false);
                 reader.readLine();
             } else {
-                readScaledNumbericalValue(reader, null, 0,"xScaleValue", true, false);
+                Vector2ModuleWrapper vectorWrapper = (Vector2ModuleWrapper) stage.moduleBoardWidget.createModule(Vector2Module.class, leftX, getNextY());
+                stage.moduleBoardWidget.makeConnection(vectorWrapper, particleModuleWrapper, Vector2Module.OUTPUT, ParticleModule.SIZE);
+
+                ModuleWrapper xval = readScaledNumbericalValue(reader, vectorWrapper, Vector2Module.X,"xScaleValue", false, false);
                 reader.readLine();
-                readScaledNumbericalValue(reader, null, 0,"yScaleValue", true, false);
+                ModuleWrapper wrp = readScaledNumbericalValue(reader, vectorWrapper, Vector2Module.Y,"yScaleValue", false, false);
+                if(wrp == null) {
+                    stage.moduleBoardWidget.makeConnection(xval, vectorWrapper, DynamicRangeModule.OUTPUT, Vector2Module.Y);
+                }
             }
             reader.readLine();
             readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.VELOCITY,"velocity", false, false);

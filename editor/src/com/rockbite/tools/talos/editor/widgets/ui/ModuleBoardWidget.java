@@ -200,12 +200,12 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void fileDrop(String[] paths, float x, float y) {
-        tmp.set(x, Gdx.graphics.getHeight() - y);
+        tmp.set(x, y);
         (getStage().getViewport()).unproject(tmp);
 
         for(ModuleWrapper wrapper: getModuleWrappers()) {
             tmp2.set(tmp);
-            wrapper.screenToLocalCoordinates(tmp2);
+            wrapper.stageToLocalCoordinates(tmp2);
 
             if(wrapper.hit(tmp2.x, tmp2.y, false) != null) {
                 wrapper.fileDrop(paths, tmp2.x, tmp2.y);

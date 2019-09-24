@@ -78,5 +78,6 @@ public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModul
 
     public void setData(Array<ColorPoint> points) {
         module.setPoints(points);
+        gradientWidget.updateGradientData();
     }
 }

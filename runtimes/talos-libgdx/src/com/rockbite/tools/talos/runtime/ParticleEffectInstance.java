@@ -23,8 +23,18 @@ public class ParticleEffectInstance {
 	}
 
 	public void update (float delta) {
+		int particleCount = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
+			particleCount += emitters.get(i).activeParticles.size;
+		}
+
+		if(particleCount == 0) {
+			for (int i = 0; i < emitters.size; i++) {
+				if(!emitters.get(i).isContinuous) {
+					emitters.get(i).restart();
+				}
+			}
 		}
 	}
 

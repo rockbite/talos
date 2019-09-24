@@ -17,7 +17,9 @@ public class TextureRegionDrawable implements ParticleDrawable {
     }
 
     @Override
-    public void draw(Batch batch, float x, float y, float originX, float originY, float width, float height, float rotation) {
-        batch.draw(region, x, y, originX, originY, width, height,1f,1f, rotation);
+    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
+        float aspect = region.getRegionWidth()/(float)region.getRegionHeight();
+        height = height / aspect;
+        batch.draw(region, x - width/2f, y - height/2f, width/2f, height/2f, width, height,1f,1f, rotation);
     }
 }

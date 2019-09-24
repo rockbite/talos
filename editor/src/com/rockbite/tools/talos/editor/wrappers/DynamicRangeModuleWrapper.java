@@ -131,5 +131,7 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         for(Vector2 point: points) {
             module.createPoint(point.x, point.y);
         }
+
+        updateValues();
     }
 }

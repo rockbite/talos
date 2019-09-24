@@ -14,7 +14,7 @@ public class Particle implements Pool.Poolable {
     public float life;
     public float transparency;
     public float rotation;
-    public float size;
+    public Vector2 size = new Vector2();
 
     public Color color = new Color();
 
@@ -75,7 +75,7 @@ public class Particle implements Pool.Poolable {
             rotation = particleModule.getRotation();
         }
 
-        size = particleModule.getSize();
+        size.set(particleModule.getSize());
         color.set(particleModule.getColor());
         drawable = particleModule.getDrawable();
 

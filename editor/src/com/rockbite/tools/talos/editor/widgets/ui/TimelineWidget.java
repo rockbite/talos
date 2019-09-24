@@ -33,7 +33,8 @@ public class TimelineWidget extends Table {
         row();
 
         listContent = new Table();
-        add(listContent).grow();
+        ScrollPane scrollPane = new ScrollPane(listContent, getSkin());
+        add(scrollPane).grow();
 
         addListener(new ClickListener() {
             @Override
