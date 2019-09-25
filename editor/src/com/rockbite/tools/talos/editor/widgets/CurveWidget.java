@@ -13,9 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.rockbite.tools.talos.runtime.modules.CurveModule;
 
-public class CurveWidget extends Actor {
+import java.util.Comparator;
+
+public class CurveWidget extends Actor implements CurveDataProvider {
 
     private Color bgColor = new Color(0.82f, 0.82f, 0.82f, 1f);
     private Color lineColor = new Color(154/255f, 23/255f, 48/255f, 0.7f);
@@ -30,11 +31,24 @@ public class CurveWidget extends Actor {
 
     float pointSize = 7f;
 
-    private CurveModule module;
+    private CurveDataProvider curveDataProvider;
+    private Array<Vector2> points = new Array<>();
+    Comparator<Vector2> comparator = new Comparator<Vector2>() {
+        @Override
+        public int compare(Vector2 o1, Vector2 o2) {
+            if(o1.x < o2.x) return -1;
+            if(o1.x > o2.x) return 1;
+
+            return 0;
+        }
+    };
 
     private Skin skin;
 
     public CurveWidget(Skin skin) {
+
+        curveDataProvider = this;
+        resetPoints();
 
         this.skin = skin;
 
@@ -78,13 +92,13 @@ public class CurveWidget extends Actor {
                 norm(vec1);
 
                 // we need to create a new point if the space is empty
-                Array<Vector2> points = module.getPoints();
+                Array<Vector2> points = curveDataProvider.getPoints();
 
                 for(int i = 0; i < points.size; i++) {
                     Vector2 point = points.get(i);
                     if(hit(point, vec1) && !justCreated) {
                         // then let's delete this point
-                        module.removePoint(i);
+                        curveDataProvider.removePoint(i);
                         justRemoved = true;
                         break;
                     }
@@ -113,7 +127,7 @@ public class CurveWidget extends Actor {
 
                 if(button == 1) return true;
 
-                Array<Vector2> points = module.getPoints();
+                Array<Vector2> points = curveDataProvider.getPoints();
 
                 boolean wasHit = false;
 
@@ -130,7 +144,7 @@ public class CurveWidget extends Actor {
                 justCreated = false;
                 if(!wasHit && !justRemoved) {
                     // great we can create new point here
-                    draggingPoint = module.createPoint(vec1.x, vec1.y);
+                    draggingPoint = curveDataProvider.createPoint(vec1.x, vec1.y);
                     justCreated = true;
                 }
 
@@ -145,7 +159,7 @@ public class CurveWidget extends Actor {
                 norm(vec1);
 
                 if(draggingPoint>= 0) {
-                    Vector2 point = module.getPoints().get(draggingPoint);
+                    Vector2 point = curveDataProvider.getPoints().get(draggingPoint);
                     // we are dragging a point
                     point.set(vec1);
 
@@ -170,19 +184,26 @@ public class CurveWidget extends Actor {
 
             private float getLeftBound(int index) {
                 if(index == 0) return 0;
-                return module.getPoints().get(index-1).x;
+                return curveDataProvider.getPoints().get(index-1).x;
             }
 
             private float getRightBound(int index) {
-                if(index == module.getPoints().size - 1) return 1;
-                return module.getPoints().get(index+1).x;
+                if(index == curveDataProvider.getPoints().size - 1) return 1;
+                return curveDataProvider.getPoints().get(index+1).x;
             }
 
         });
     }
 
-    public void setModule(CurveModule module) {
-        this.module = module;
+    private void resetPoints() {
+        // need to guarantee at least one point
+        points = new Array<>();
+        Vector2 point = new Vector2(0, 0.5f);
+        points.add(point);
+    }
+
+    public void setDataProvider(CurveDataProvider dataProvider) {
+        this.curveDataProvider = dataProvider;
     }
 
     @Override
@@ -228,7 +249,11 @@ public class CurveWidget extends Actor {
 
         shapeRenderer.setColor(lineColor);
 
-        Array<Vector2> points = module.getPoints();
+        if(curveDataProvider == null) return;
+
+        Array<Vector2> points = curveDataProvider.getPoints();
+
+        if(points == null) return;
 
         if(points.get(0).x > 0) {
             // draw a line from (0, v) to that point (u, v)
@@ -271,5 +296,34 @@ public class CurveWidget extends Actor {
 
     public Skin getSkin() {
         return skin;
+    }
+
+
+    public void removePoint(int i) {
+        if(points.size > 1) {
+            points.removeIndex(i);
+        }
+    }
+
+    public Array<Vector2> getPoints() {
+        return points;
+    }
+
+
+    public int createPoint(float x, float y) {
+
+        if(x < 0) x = 0;
+        if(x > 1) x = 1;
+        if(y < 0) y = 0;
+        if(y > 1) y = 1;
+
+        Vector2 point = new Vector2(x, y);
+        points.add(point);
+        sortPoints();
+        return points.indexOf(point, true);
+    }
+
+    private void sortPoints() {
+        points.sort(comparator);
     }
 }

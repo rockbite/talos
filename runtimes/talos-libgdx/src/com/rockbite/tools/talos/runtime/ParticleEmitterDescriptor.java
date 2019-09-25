@@ -48,6 +48,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(GradientColorModule.class);
             registeredModules.add(TextureModule.class);
             registeredModules.add(EmConfigModule.class);
+            registeredModules.add(OffsetModule.class);
         }
     }
 

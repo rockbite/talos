@@ -10,13 +10,14 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.editor.widgets.FloatRangeInputWidget;
 import com.rockbite.tools.talos.runtime.modules.DynamicRangeModule;
 import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule> {
+public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule> implements CurveDataProvider {
 
     private CurveWidget curveWidget;
 
@@ -61,6 +62,7 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         contentWrapper.add(container).left().padTop(20).expandX().padLeft(4);
 
         curveWidget = new CurveWidget(getSkin());
+        curveWidget.setDataProvider(this);
         contentWrapper.add(curveWidget).left().growY().width(200).padTop(23).padRight(3).padLeft(4).padBottom(3);
 
         leftWrapper.add(new Table()).expandY();
@@ -78,12 +80,6 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
                 updateValues();
             }
         });
-    }
-
-    @Override
-    public void setModule(DynamicRangeModule module) {
-        super.setModule(module);
-        curveWidget.setModule(module);
     }
 
     @Override
@@ -133,5 +129,24 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
         }
 
         updateValues();
+    }
+
+    @Override
+    public Array<Vector2> getPoints() {
+        if(module == null) return null;
+
+        return module.getPoints();
+    }
+
+    @Override
+    public void removePoint(int index) {
+        if(module == null) return;
+        module.removePoint(index);
+    }
+
+    @Override
+    public int createPoint(float x, float y) {
+        if(module == null) return 0;
+        return module.createPoint(x, y);
     }
 }
