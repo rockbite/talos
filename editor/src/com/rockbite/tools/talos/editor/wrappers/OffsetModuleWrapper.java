@@ -74,10 +74,12 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 lowShape.getShapePos(pos);
-                if(equalsButton.isChecked()) highShape.setPos(pos);
-
                 lowShape.getShapeSize(size);
-                if(equalsButton.isChecked()) highShape.setShapeSize(size);
+                if(equalsButton.isChecked()) {
+                    highShape.setScaleVal(lowShape.getScale());
+                    highShape.setPos(pos);
+                    highShape.setShapeSize(size);
+                }
             }
         });
 
@@ -85,10 +87,12 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 lowShape.getShapePos(pos);
-                if(equalsButton.isChecked()) highShape.setPos(pos);
-
                 lowShape.getShapeSize(size);
-                if(equalsButton.isChecked()) highShape.setShapeSize(size);
+                if(equalsButton.isChecked()) {
+                    highShape.setScaleVal(lowShape.getScale());
+                    highShape.setPos(pos);
+                    highShape.setShapeSize(size);
+                }
 
                 updateModuleDataFromWidgets();
             }
@@ -98,10 +102,12 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 highShape.getShapePos(pos);
-                if(equalsButton.isChecked()) lowShape.setPos(pos);
-
                 highShape.getShapeSize(size);
-                if(equalsButton.isChecked()) lowShape.setShapeSize(size);
+                if(equalsButton.isChecked()) {
+                    lowShape.setScaleVal(highShape.getScale());
+                    lowShape.setPos(pos);
+                    lowShape.setShapeSize(size);
+                }
 
                 updateModuleDataFromWidgets();
             }
@@ -195,5 +201,10 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
         json.writeValue("lowScale", lowShape.getScale());
         json.writeValue("highScale", highShape.getScale());
         json.writeValue("equals", equalsButton.isChecked());
+    }
+
+    public void setScaleValues(float lowScl, float highScl) {
+        lowShape.setScaleVal(lowScl);
+        highShape.setScaleVal(highScl);
     }
 }

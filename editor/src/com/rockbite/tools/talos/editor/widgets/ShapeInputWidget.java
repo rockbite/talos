@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.widgets;
 
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -21,6 +22,10 @@ public class ShapeInputWidget extends Table {
 
     ChangeListener changeListener;
 
+    float prevScale;
+
+    boolean lockListeners = false;
+
     public ShapeInputWidget(Skin skin) {
         setSkin(skin);
 
@@ -29,6 +34,7 @@ public class ShapeInputWidget extends Table {
         shapeTypes.add("LINE");
 
         scaleField = new TextField("7", skin);
+        prevScale = 7;
         shapeWidget = new ShapeWidget(skin);
         shapeType = new SelectBox<>(skin);
         sideBox = new SelectBox<>(skin);
@@ -54,35 +60,36 @@ public class ShapeInputWidget extends Table {
             public void changed(ChangeEvent event, Actor actor) {
                 shapeWidget.setType(getShape());
 
-                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+                if(changeListener != null &&!lockListeners) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
             }
         });
 
         shapeWidget.setListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+                if(changeListener != null &&!lockListeners) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
             }
         });
 
         scaleField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+                updateScale();
+                if(changeListener != null &&!lockListeners) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
             }
         });
 
         edgeBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+                if(changeListener != null &&!lockListeners) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
             }
         });
 
         sideBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+                if(changeListener != null &&!lockListeners) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
             }
         });
     }
@@ -111,21 +118,35 @@ public class ShapeInputWidget extends Table {
     }
 
     public void setPos(Vector2 tmp) {
+        lockListeners = true;
         try {
             float scl = Float.parseFloat(scaleField.getText());
             shapeWidget.setPos(tmp.x / scl, tmp.y / scl);
         } catch (Exception e) {
 
         }
+        lockListeners = false;
+    }
+
+    private void updateScale() {
+        try {
+            float scl = Float.parseFloat(scaleField.getText());
+            prevScale = scl;
+
+        } catch (Exception e) {
+
+        }
     }
 
     public void setShapeSize(Vector2 size) {
+        lockListeners = true;
         try {
             float scl = Float.parseFloat(scaleField.getText());
             shapeWidget.setShapeSize(size.x / scl, size.y / scl);
         } catch (Exception e) {
 
         }
+        lockListeners = false;
     }
 
     public int getShape() {

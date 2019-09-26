@@ -238,6 +238,9 @@ public class LegacyImporter {
         String side = "both";
         String shape = "point";
         OffsetModuleWrapper offsetModuleWrapper = null;
+
+        Vector2 minBound = new Vector2();
+        Vector2 maxBound = new Vector2();
         try {
             if(true) {
                 shape = readString(reader, "shape");
@@ -261,6 +264,11 @@ public class LegacyImporter {
 
                         stage.moduleBoardWidget.deleteWrapper(yOffsetWrapper);
                     }
+
+                    if(offsetXMin < minBound.x) minBound.x = offsetXMin;
+                    if(offsetYMin < minBound.y) minBound.y = offsetYMin;
+                    if(offsetXMax >  maxBound.x) maxBound.x = offsetXMax;
+                    if(offsetYMax > maxBound.y) maxBound.y = offsetYMax;
 
                     // remove this both wrappers here, and move on to shape
                     stage.moduleBoardWidget.deleteWrapper(vector2ModuleWrapper);
@@ -298,6 +306,9 @@ public class LegacyImporter {
             float heightHighMin = spawnHeightWrapper.getModule().getHightMin();
             float heightHighMax = spawnHeightWrapper.getModule().getHightMax();
 
+            float lowScl = Math.max((maxBound.x - minBound.x) + widthLowMax, (maxBound.y - minBound.y) + heightLowMax) * 2f;
+            float highScl = Math.max((maxBound.x - minBound.x) + widthHighMax, (maxBound.y - minBound.y) + heightHighMax) * 2f;
+
             Array<Vector2> points = spawnWidthWrapper.getPoints();
 
             // ditch this modules.
@@ -306,6 +317,8 @@ public class LegacyImporter {
 
             // use values
             if(offsetModuleWrapper != null) {
+
+                offsetModuleWrapper.setScaleValues(lowScl, highScl);
 
                 offsetModuleWrapper.setPoints(points);
 

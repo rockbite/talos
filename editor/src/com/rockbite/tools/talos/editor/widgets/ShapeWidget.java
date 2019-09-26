@@ -312,4 +312,9 @@ public class ShapeWidget extends Actor {
     public void setShapeSize(float x, float y) {
         shapeSize.set(x * getWidth(), y * getHeight());
     }
+
+    public void resize(float resize) {
+        shapeSize.scl(resize);
+        shapePos.scl(resize);
+    }
 }
