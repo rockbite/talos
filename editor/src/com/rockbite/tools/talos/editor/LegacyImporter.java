@@ -496,7 +496,7 @@ public class LegacyImporter {
                 imagePaths.add(line);
             }
 
-            if(imagePaths.size == 1) {
+            if(imagePaths.size > 0) {
                 // then it's just drawable
                 TextureModuleWrapper textureModule = (TextureModuleWrapper) stage.moduleBoardWidget.createModule(TextureModule.class, leftX, getNextY());
                 String filePath = imagePaths.get(0);

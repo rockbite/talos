@@ -167,4 +167,24 @@ public class ShapeInputWidget extends Table {
     public void setSide(int side) {
         sideBox.setSelected(sideTypes.get(side));
     }
+
+    public float getScale() {
+        float scl = 0f;
+        try {
+            scl = Float.parseFloat(scaleField.getText());
+        } catch (Exception e) {
+
+        }
+
+        return scl;
+    }
+
+    public void setScaleVal(float scale) {
+        ChangeListener tmp = changeListener;
+        changeListener = null;
+
+        scaleField.setText(scale+"");
+
+        changeListener = tmp;
+    }
 }

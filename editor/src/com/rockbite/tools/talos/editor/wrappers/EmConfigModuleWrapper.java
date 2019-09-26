@@ -15,6 +15,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     VisCheckBox continuousBox;
     VisCheckBox alignedBox;
 
+    boolean lockListeners = false;
+
     @Override
     protected void configureSlots() {
         addOutputSlot("config", EmConfigModule.OUTPUT);
@@ -72,17 +74,21 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     }
 
     public void fromUIToData() {
-        module.getUserValue().additive = additiveBox.isChecked();
-        module.getUserValue().attached = attachedBox.isChecked();
-        module.getUserValue().continuous = continuousBox.isChecked();
-        module.getUserValue().aligned = alignedBox.isChecked();
+        if(!lockListeners) {
+            module.getUserValue().additive = additiveBox.isChecked();
+            module.getUserValue().attached = attachedBox.isChecked();
+            module.getUserValue().continuous = continuousBox.isChecked();
+            module.getUserValue().aligned = alignedBox.isChecked();
+        }
     }
 
     public void fromDataToUI() {
+        lockListeners = true;
         additiveBox.setChecked(module.getUserValue().additive);
         attachedBox.setChecked(module.getUserValue().attached);
         continuousBox.setChecked(module.getUserValue().continuous);
         alignedBox.setChecked(module.getUserValue().aligned);
+        lockListeners = false;
     }
 
     @Override

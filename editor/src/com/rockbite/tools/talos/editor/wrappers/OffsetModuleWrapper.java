@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.editor.widgets.ShapeInputWidget;
@@ -171,5 +173,27 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
 
     public void setPoints(Array<Vector2> points) {
         module.setPoints(points);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        lockUpdate = true;
+        super.read(json, jsonData);
+
+        equalsButton.setChecked(jsonData.getBoolean("equals"));
+        lowShape.setScaleVal(jsonData.getFloat("lowScale"));
+        highShape.setScaleVal(jsonData.getFloat("highScale"));
+
+        updateWidgetsFromModuleData();
+        lockUpdate = false;
+    }
+
+    @Override
+    public void write(Json json) {
+        super.write(json);
+
+        json.writeValue("lowScale", lowShape.getScale());
+        json.writeValue("highScale", highShape.getScale());
+        json.writeValue("equals", equalsButton.isChecked());
     }
 }

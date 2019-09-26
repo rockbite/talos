@@ -8,7 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.runtime.modules.TextureModule;
+
+import java.io.File;
+
 public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
 
     Image image;
@@ -75,18 +80,37 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
         fileName = jsonData.getString("fileName");
         filePath = jsonData.getString("filePath");
         if (filePath != null) {
-            FileHandle fileHandle = Gdx.files.absolute(filePath);
+            FileHandle fileHandle = tryAndFineTexture(filePath);
             TextureRegion region = new TextureRegion(new Texture(fileHandle));
             module.setRegion(region);
             image.setDrawable(new TextureRegionDrawable(region));
         }
     }
 
-    public void setTexture(String path) {
+    private FileHandle tryAndFineTexture(String path) {
         FileHandle fileHandle = Gdx.files.absolute(path);
-        TextureRegion region = new TextureRegion(new Texture(fileHandle));
-        module.setRegion(region);
-        image.setDrawable(new TextureRegionDrawable(region));
+        String fileName = fileHandle.name();
+        if(!fileHandle.exists()) {
+            if(TalosMain.Instance().Project().getPath() != null) {
+                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().Project().getPath()).parent();
+                fileHandle = Gdx.files.absolute(parent.path() + "/" + fileName);
+            }
+
+            if(!fileHandle.exists()) {
+                fileHandle = Gdx.files.absolute(TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH) + File.separator + fileName);
+            }
+        }
+
+        return fileHandle;
+    }
+
+    public void setTexture(String path) {
+        FileHandle fileHandle = tryAndFineTexture(path);
+        if(fileHandle.exists()) {
+            TextureRegion region = new TextureRegion(new Texture(fileHandle));
+            module.setRegion(region);
+            image.setDrawable(new TextureRegionDrawable(region));
+        }
         filePath = path+"";
         fileName = fileHandle.name();
     }

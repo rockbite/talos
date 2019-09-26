@@ -23,6 +23,8 @@ import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
+import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
 
@@ -40,7 +42,8 @@ public class UIStage {
 	private PreviewWidget previewWidget;
 
 	FileChooser fileChooser;
-
+	BatchConvertDialog batchConvertDialog;
+	SettingsDialog settingsDialog;
 
 	public UIStage (Skin skin) {
 		stage = new Stage(new ScreenViewport());
@@ -58,6 +61,9 @@ public class UIStage {
 		constructSplitPanes();
 
 		initFileChoosers();
+
+		batchConvertDialog = new BatchConvertDialog();
+		settingsDialog = new SettingsDialog();
 	}
 
 	public Stage getStage () {
@@ -84,7 +90,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.2", "Talos Particle Editor 1.0.2");
+				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.3", "Talos 1.0.3");
 			}
 		});
 
@@ -92,7 +98,17 @@ public class UIStage {
 		MenuItem openProject = new MenuItem("Open Project");
 		MenuItem saveProject = new MenuItem("Save Project");
 		MenuItem examples = new MenuItem("Examples");
-		MenuItem importItem = new MenuItem("Legacy Import");
+
+		MenuItem legacy = new MenuItem("Legacy");
+		PopupMenu legacyPopup = new PopupMenu();
+		MenuItem legacyImportItem = new MenuItem("Import");
+		MenuItem legacyBatchImportItem = new MenuItem("Batch Convert");
+		legacyPopup.addItem(legacyImportItem);
+		legacyPopup.addItem(legacyBatchImportItem);
+		legacy.setSubMenu(legacyPopup);
+
+		MenuItem settings = new MenuItem("Preferences");
+
 		PopupMenu examplesPopup = new PopupMenu();
 		examples.setSubMenu(examplesPopup);
 		initExampleList(examplesPopup);
@@ -105,7 +121,9 @@ public class UIStage {
 		projectMenu.addItem(saveAsProject);
 		projectMenu.addSeparator();
 		projectMenu.addItem(examples);
-		projectMenu.addItem(importItem);
+		projectMenu.addItem(legacy);
+		projectMenu.addSeparator();
+		projectMenu.addItem(settings);
 		projectMenu.addSeparator();
 		projectMenu.addItem(exitApp);
 
@@ -141,11 +159,19 @@ public class UIStage {
 			}
 		});
 
-		importItem.addListener(new ClickListener() {
+		legacyImportItem.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				legacyImportAction();
+			}
+		});
+
+		legacyBatchImportItem.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				legacyBatchConvertAction();
 			}
 		});
 
@@ -154,6 +180,13 @@ public class UIStage {
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				System.exit(0);
+			}
+		});
+		settings.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				stage.addActor(settingsDialog.fadeIn());
 			}
 		});
 
@@ -265,6 +298,11 @@ public class UIStage {
 		});
 
 		stage.addActor(fileChooser.fadeIn());
+	}
+
+	public void legacyBatchConvertAction() {
+		// show dialog for batch convert
+		stage.addActor((batchConvertDialog.fadeIn()));
 	}
 
 

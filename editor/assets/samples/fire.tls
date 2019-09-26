@@ -1,317 +1,24 @@
 {
 "emitters": [
 	{
-		"name": "main fire",
-		"modules": [
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.ParticleModuleWrapper",
-				"id": 0,
-				"x": -35,
-				"y": -171,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.ParticleModule"
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.EmitterModuleWrapper",
-				"id": 1,
-				"x": -40,
-				"y": 153,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.EmitterModule"
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
-				"id": 2,
-				"x": -518,
-				"y": -355,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 0.58914536
-							},
-							{
-								"x": 1,
-								"y": 0
-							}
-						],
-						"lowMin": 0.5,
-						"lowMax": 1,
-						"highMin": 1,
-						"highMax": 2
-					}
-				},
-				"lowEquals": false,
-				"lowMirror": false,
-				"highEquals": false,
-				"highMirror": false
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
-				"id": 3,
-				"x": -929,
-				"y": -358,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 0.32143074,
-								"y": 0.55038995
-							},
-							{
-								"x": 1,
-								"y": 0.8604638
-							}
-						],
-						"lowMin": 165,
-						"lowMax": 15,
-						"highMin": 90,
-						"highMax": 90
-					}
-				},
-				"lowEquals": false,
-				"lowMirror": true,
-				"highEquals": false,
-				"highMirror": true
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.CurveModuleWrapper",
-				"id": 4,
-				"x": -377,
-				"y": -160,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.CurveModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 0.48971093,
-								"y": 0.38541445
-							},
-							{
-								"x": 1,
-								"y": 0
-							}
-						]
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.GradientColorModuleWrapper",
-				"id": 5,
-				"x": -748,
-				"y": -157,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.GradientColorModule",
-						"points": [
-							{
-								"r": 0.87058824,
-								"g": 0.47058824,
-								"b": 0.28627452,
-								"pos": 0
-							},
-							{
-								"r": 0.70980394,
-								"g": 0.41960785,
-								"b": 0.28235295,
-								"pos": 0.33944955
-							},
-							{
-								"r": 1,
-								"g": 0.26666668,
-								"b": 0.101960786,
-								"pos": 0.74923575
-							},
-							{
-								"r": 0.7607843,
-								"g": 0.6431373,
-								"b": 0.6156863,
-								"pos": 1
-							}
-						]
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
-				"id": 6,
-				"x": -1336,
-				"y": -358,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 0.42346877,
-								"y": 0.44185904
-							}
-						],
-						"lowMin": 1,
-						"lowMax": 1,
-						"highMin": 1.5,
-						"highMax": 4
-					}
-				},
-				"lowEquals": true,
-				"lowMirror": false,
-				"highEquals": false,
-				"highMirror": false
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.StaticValueModuleWrapper",
-				"id": 7,
-				"x": -301,
-				"y": 235,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.StaticValueModule",
-						"value": 100
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.CurveModuleWrapper",
-				"id": 8,
-				"x": -1014,
-				"y": -164,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.CurveModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 0.5
-							},
-							{
-								"x": 1,
-								"y": 0.70832986
-							}
-						]
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
-				"id": 9,
-				"x": -540,
-				"y": 38,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
-						"points": [
-							{
-								"x": 0,
-								"y": 1
-							},
-							{
-								"x": 0.61224455,
-								"y": 1
-							},
-							{
-								"x": 1,
-								"y": 0.705424
-							}
-						],
-						"lowMin": 0,
-						"lowMax": 0,
-						"highMin": 2,
-						"highMax": 2
-					}
-				},
-				"lowEquals": true,
-				"lowMirror": false,
-				"highEquals": true,
-				"highMirror": false
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.InputModuleWrapper",
-				"id": 10,
-				"x": -854,
-				"y": 176,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.InputModule",
-						"scopeKey": 0
-					}
-				}
-			}
-		],
-		"connections": [
-			{
-				"moduleFrom": 2,
-				"slotTo": 13
-			},
-			{
-				"moduleFrom": 3,
-				"slotTo": 11
-			},
-			{
-				"moduleFrom": 4,
-				"slotTo": 10
-			},
-			{
-				"moduleFrom": 5,
-				"slotTo": 9
-			},
-			{
-				"moduleFrom": 6,
-				"slotTo": 5
-			},
-			{
-				"moduleFrom": 7,
-				"moduleTo": 1,
-				"slotTo": 2
-			},
-			{
-				"moduleFrom": 8,
-				"slotTo": 7
-			},
-			{
-				"moduleFrom": 9,
-				"slotTo": 4
-			},
-			{
-				"moduleFrom": 10,
-				"moduleTo": 9
-			}
-		]
-	},
-	{
 		"name": "sparks",
 		"modules": [
 			{
 				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
 				"id": 0,
 				"x": -816,
-				"y": -520,
+				"y": -555,
 				"module": {
 					"data": {
 						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
 						"points": [
 							{
 								"x": 0,
-								"y": 0.41085544
+								"y": 0.8201507
+							},
+							{
+								"x": 0.16836672,
+								"y": 0.4558096
 							}
 						],
 						"lowMin": 0,
@@ -344,19 +51,6 @@
 				"module": {
 					"data": {
 						"class": "com.rockbite.tools.talos.runtime.modules.EmitterModule"
-					}
-				}
-			},
-			{
-				"class": "com.rockbite.tools.talos.editor.wrappers.Vector2ModuleWrapper",
-				"id": 4,
-				"x": -566,
-				"y": -195,
-				"module": {
-					"data": {
-						"class": "com.rockbite.tools.talos.runtime.modules.Vector2Module",
-						"x": 0,
-						"y": 0
 					}
 				}
 			},
@@ -449,8 +143,8 @@
 								"y": 0.73643696
 							}
 						],
-						"lowMin": 165,
-						"lowMax": 15,
+						"lowMin": 180,
+						"lowMax": 0,
 						"highMin": 90,
 						"highMax": 90
 					}
@@ -463,8 +157,8 @@
 			{
 				"class": "com.rockbite.tools.talos.editor.wrappers.CurveModuleWrapper",
 				"id": 9,
-				"x": -408,
-				"y": -519,
+				"x": -353,
+				"y": -562,
 				"module": {
 					"data": {
 						"class": "com.rockbite.tools.talos.runtime.modules.CurveModule",
@@ -488,26 +182,59 @@
 						]
 					}
 				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.TextureModuleWrapper",
+				"id": 10,
+				"x": -736,
+				"y": -50,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.TextureModule"
+					}
+				},
+				"fileName": null,
+				"filePath": null
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.EmConfigModuleWrapper",
+				"id": 12,
+				"x": -475,
+				"y": 96,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.EmConfigModule",
+						"additive": true,
+						"attached": false,
+						"continuous": true,
+						"aligned": false
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.GradientColorModuleWrapper",
+				"id": 13,
+				"x": -776,
+				"y": -335,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.GradientColorModule",
+						"points": [
+							{
+								"r": 0.8392157,
+								"g": 0.5019608,
+								"b": 0.42745098,
+								"pos": 0
+							}
+						]
+					}
+				}
 			}
 		],
 		"connections": [
 			{
 				"moduleTo": 1,
 				"slotTo": 13
-			},
-			{
-				"moduleFrom": 5,
-				"moduleTo": 4
-			},
-			{
-				"moduleFrom": 4,
-				"moduleTo": 1,
-				"slotTo": 3
-			},
-			{
-				"moduleFrom": 6,
-				"moduleTo": 4,
-				"slotTo": 1
 			},
 			{
 				"moduleFrom": 7,
@@ -523,6 +250,355 @@
 				"moduleFrom": 9,
 				"moduleTo": 1,
 				"slotTo": 10
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 1,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 2,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 13,
+				"moduleTo": 1,
+				"slotTo": 9
+			}
+		]
+	},
+	{
+		"name": "main fire",
+		"modules": [
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.ParticleModuleWrapper",
+				"id": 0,
+				"x": -35,
+				"y": -171,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.ParticleModule"
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.EmitterModuleWrapper",
+				"id": 1,
+				"x": -40,
+				"y": 153,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.EmitterModule"
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
+				"id": 2,
+				"x": -514,
+				"y": -373,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 0.58914536
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"lowMin": 0.5,
+						"lowMax": 1,
+						"highMin": 1,
+						"highMax": 2
+					}
+				},
+				"lowEquals": false,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
+				"id": 3,
+				"x": -929,
+				"y": -358,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.32143074,
+								"y": 0.55038995
+							},
+							{
+								"x": 1,
+								"y": 0.8604638
+							}
+						],
+						"lowMin": 165,
+						"lowMax": 15,
+						"highMin": 90,
+						"highMax": 90
+					}
+				},
+				"lowEquals": false,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.CurveModuleWrapper",
+				"id": 4,
+				"x": -358,
+				"y": -160,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.CurveModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.48971093,
+								"y": 0.38541445
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.GradientColorModuleWrapper",
+				"id": 5,
+				"x": -748,
+				"y": -157,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.GradientColorModule",
+						"points": [
+							{
+								"r": 0.87058824,
+								"g": 0.47058824,
+								"b": 0.28627452,
+								"pos": 0
+							},
+							{
+								"r": 0.70980394,
+								"g": 0.41960785,
+								"b": 0.28235295,
+								"pos": 0.33944955
+							},
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 0.74923575
+							},
+							{
+								"r": 0.7607843,
+								"g": 0.6431373,
+								"b": 0.6156863,
+								"pos": 1
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
+				"id": 6,
+				"x": -1336,
+				"y": -358,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.42346877,
+								"y": 0.44185904
+							}
+						],
+						"lowMin": 1,
+						"lowMax": 1,
+						"highMin": 1.5,
+						"highMax": 4
+					}
+				},
+				"lowEquals": true,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.StaticValueModuleWrapper",
+				"id": 7,
+				"x": -348,
+				"y": 283,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.StaticValueModule",
+						"value": 100
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.CurveModuleWrapper",
+				"id": 8,
+				"x": -1014,
+				"y": -164,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.CurveModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 0.5
+							},
+							{
+								"x": 1,
+								"y": 0.70832986
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.DynamicRangeModuleWrapper",
+				"id": 9,
+				"x": -540,
+				"y": 38,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.DynamicRangeModule",
+						"points": [
+							{
+								"x": 0,
+								"y": 1
+							},
+							{
+								"x": 0.61224455,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 0.705424
+							}
+						],
+						"lowMin": 0,
+						"lowMax": 0,
+						"highMin": 2,
+						"highMax": 2
+					}
+				},
+				"lowEquals": true,
+				"lowMirror": false,
+				"highEquals": true,
+				"highMirror": false
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.InputModuleWrapper",
+				"id": 10,
+				"x": -854,
+				"y": 176,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.InputModule",
+						"scopeKey": 0
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.EmConfigModuleWrapper",
+				"id": 11,
+				"x": -224,
+				"y": 365,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.EmConfigModule",
+						"additive": true,
+						"attached": false,
+						"continuous": true,
+						"aligned": false
+					}
+				}
+			},
+			{
+				"class": "com.rockbite.tools.talos.editor.wrappers.TextureModuleWrapper",
+				"id": 12,
+				"x": -566,
+				"y": 296,
+				"module": {
+					"data": {
+						"class": "com.rockbite.tools.talos.runtime.modules.TextureModule"
+					}
+				},
+				"fileName": null,
+				"filePath": null
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 2,
+				"slotTo": 13
+			},
+			{
+				"moduleFrom": 4,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 5,
+				"slotTo": 9
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 1,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 8,
+				"slotTo": 7
+			},
+			{
+				"moduleFrom": 9,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 9
+			},
+			{
+				"moduleFrom": 6,
+				"slotTo": 5
+			},
+			{
+				"moduleFrom": 11,
+				"moduleTo": 1,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 3,
+				"slotTo": 11
+			},
+			{
+				"moduleFrom": 12,
+				"slotTo": 2
 			}
 		]
 	}

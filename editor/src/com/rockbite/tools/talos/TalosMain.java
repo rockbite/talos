@@ -3,6 +3,7 @@ package com.rockbite.tools.talos;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -49,8 +50,14 @@ public class TalosMain extends ApplicationAdapter {
 		return nodeStage;
 	}
 
+	private Preferences preferences;
+
 	public Project Project () {
 		return project;
+	}
+
+	public Preferences Prefs() {
+		return preferences;
 	}
 
 	public DropTargetListener getDropTargetListener () {
@@ -69,6 +76,8 @@ public class TalosMain extends ApplicationAdapter {
 	@Override
 	public void create () {
 		TalosMain.instance = this;
+
+		preferences = Gdx.app.getPreferences("talos-preferences");
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
 		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));

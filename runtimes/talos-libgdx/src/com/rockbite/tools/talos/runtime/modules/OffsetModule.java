@@ -2,6 +2,8 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -353,5 +355,75 @@ public class OffsetModule extends Module {
 
     public int getHighSide() {
         return highSide;
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+
+        points.clear();
+        final JsonValue points = jsonData.get("points");
+        for (JsonValue point : points) {
+            createPoint(point.get(0).asFloat(), point.get(1).asFloat());
+        }
+
+        final JsonValue low = jsonData.get("low");
+        final JsonValue high = jsonData.get("high");
+
+        lowEdge = low.getBoolean("edge");
+        highEdge = high.getBoolean("edge");
+
+        lowShape = low.getInt("shape");
+        highShape = high.getInt("shape");
+
+        lowSide = low.getInt("side");
+        highSide = high.getInt("side");
+
+        final JsonValue lowRect = low.get("rect");
+        final JsonValue highRect = high.get("rect");
+
+        lowPos.set(lowRect.getFloat("x"), lowRect.getFloat("y"));
+        lowSize.set(lowRect.getFloat("width"), lowRect.getFloat("height"));
+
+        highPos.set(highRect.getFloat("x"), highRect.getFloat("y"));
+        highSize.set(highRect.getFloat("width"), highRect.getFloat("height"));
+    }
+
+    @Override
+    public void write(Json json) {
+        super.write(json);
+
+        json.writeArrayStart("points");
+        for (Vector2 point : getPoints()) {
+            json.writeObjectStart();
+            json.writeValue("x", point.x);
+            json.writeValue("y", point.y);
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
+
+        json.writeObjectStart("low");
+        json.writeValue("edge", lowEdge);
+        json.writeValue("shape", lowShape);
+        json.writeValue("side", lowSide);
+        json.writeObjectStart("rect");
+        json.writeValue("x", lowPos.get(0));
+        json.writeValue("y", lowPos.get(1));
+        json.writeValue("width", lowSize.get(0));
+        json.writeValue("height", lowSize.get(1));
+        json.writeObjectEnd();
+        json.writeObjectEnd();
+
+        json.writeObjectStart("high");
+        json.writeValue("edge", highEdge);
+        json.writeValue("shape", highShape);
+        json.writeValue("side", highSide);
+        json.writeObjectStart("rect");
+        json.writeValue("x", highPos.get(0));
+        json.writeValue("y", highPos.get(1));
+        json.writeValue("width", highSize.get(0));
+        json.writeValue("height", highSize.get(1));
+        json.writeObjectEnd();
+        json.writeObjectEnd();
     }
 }

@@ -43,8 +43,8 @@ public class Project {
 
 	public void loadProject (FileHandle projectFileHandle) {
 		if (projectFileHandle.exists()) {
-			projectData = projectSerializer.read(projectFileHandle);
 			currentProjectPath = projectFileHandle.path();
+			projectData = projectSerializer.read(projectFileHandle);
 
 			cleanData();
 
@@ -192,5 +192,13 @@ public class Project {
 
 	public void resetCurrentProjectPath() {
 		currentProjectPath = null;
+	}
+
+	public String getPath() {
+		return currentProjectPath;
+	}
+
+	public void exportProject(FileHandle fileHandle) {
+
 	}
 }
