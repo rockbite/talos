@@ -11,6 +11,7 @@ import static com.rockbite.tools.talos.runtime.modules.OffsetModule.*;
 public class ShapeInputWidget extends Table {
 
     Array<String> shapeTypes = new Array<>();
+    Array<String> sideTypes = new Array<>();
 
     TextField scaleField;
     CheckBox edgeBox;
@@ -32,7 +33,9 @@ public class ShapeInputWidget extends Table {
         shapeType = new SelectBox<>(skin);
         sideBox = new SelectBox<>(skin);
 
-        sideBox.setItems("ALL", "TOP", "BOTTOM", "LEFT", "RIGHT");
+        sideTypes.addAll("ALL", "TOP", "BOTTOM", "LEFT", "RIGHT");
+
+        sideBox.setItems(sideTypes);
 
         edgeBox = new CheckBox("", skin);
         edgeBox.setChecked(true);
@@ -151,5 +154,17 @@ public class ShapeInputWidget extends Table {
 
     public boolean isEdge() {
         return edgeBox.isChecked();
+    }
+
+    public void setShape(int shape) {
+        shapeType.setSelected(shapeTypes.get(shape));
+    }
+
+    public void setEdge(boolean edge) {
+        edgeBox.setChecked(edge);
+    }
+
+    public void setSide(int side) {
+        sideBox.setSelected(sideTypes.get(side));
     }
 }

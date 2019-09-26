@@ -96,4 +96,19 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         fromDataToUI();
     }
 
+    public void setAttached(boolean attached) {
+        attachedBox.setChecked(attached);
+    }
+
+    public void setContinuous(boolean attached) {
+        continuousBox.setChecked(attached);
+    }
+
+    public void setAdditive(boolean attached) {
+        additiveBox.setChecked(attached);
+    }
+
+    public void setAligned(boolean attached) {
+        alignedBox.setChecked(attached);
+    }
 }

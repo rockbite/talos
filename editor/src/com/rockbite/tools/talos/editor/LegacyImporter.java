@@ -23,10 +23,10 @@ public class LegacyImporter {
     private Array<String> scaleTimes = new Array<>();
 
     private float nextY;
-    float leftX = 200;
-    float rightX =500;
-    float yStart = 400;
-    int iter = 0;
+    float leftX;
+    float rightX;
+    float yStart;
+    int iter;
 
     private String path;
 
@@ -37,7 +37,13 @@ public class LegacyImporter {
     }
 
     public void read(FileHandle effectFile) {
+
+        leftX = 200;
+        rightX =500;
+        yStart = 400;
+        iter = 0;
         nextY = 700;
+
         InputStream input = effectFile.read();
 
         path = effectFile.parent().path();
@@ -109,6 +115,14 @@ public class LegacyImporter {
                     if(lowMax == 1) lowMax = 2;
                     if(highMin == 1) highMin = 2;
                     if(highMax == 1) highMax = 2;
+                }
+
+                if(varName.equals("rotation")) {
+                    //1 value hack
+                    lowMin /= 360f;
+                    lowMax /= 360f;
+                    highMin /= 360f;
+                    highMax /= 360f;
                 }
 
                 boolean relative = readBoolean(reader, "relative");
@@ -219,14 +233,124 @@ public class LegacyImporter {
         readRangedNumericValue(reader, toModule, toSlot, varName, "lowMin", "lowMax", false);
     }
 
-    void readSpawnShapeValue(BufferedReader reader, String varName) {
+    void readSpawnShapeValue(BufferedReader reader, String varName, RandomRangeModuleWrapper xOffsetWrapper, RandomRangeModuleWrapper yOffsetWrapper, ParticleModuleWrapper particleModuleWrapper, InputModuleWrapper durationWrapper, Vector2ModuleWrapper vector2ModuleWrapper) {
+        boolean edges = false;
+        String side = "both";
+        String shape = "point";
+        OffsetModuleWrapper offsetModuleWrapper = null;
         try {
             if(true) {
-                String shape = readString(reader, "shape");
-                if(shape.equals("ellipse")) {
-                    readBoolean(reader, "edges");
-                    readString(reader, "side");
+                shape = readString(reader, "shape");
+                if(shape.equals("point")) {
+                    // keep the old vector stuff, but in other cases we invoke the offset module
+                } else {
+                    float offsetXMin = 0;
+                    float offsetXMax = 0;
+                    float offsetYMin = 0;
+                    float offsetYMax = 0;
+                    if(xOffsetWrapper != null) {
+                        offsetXMin = xOffsetWrapper.getModule().getMin();
+                        offsetXMax = xOffsetWrapper.getModule().getMax();
+
+                        stage.moduleBoardWidget.deleteWrapper(xOffsetWrapper);
+
+                    }
+                    if(yOffsetWrapper != null) {
+                        offsetYMin = yOffsetWrapper.getModule().getMin();
+                        offsetYMax = yOffsetWrapper.getModule().getMax();
+
+                        stage.moduleBoardWidget.deleteWrapper(yOffsetWrapper);
+                    }
+
+                    // remove this both wrappers here, and move on to shape
+                    stage.moduleBoardWidget.deleteWrapper(vector2ModuleWrapper);
+
+                    // shape stuff
+                    offsetModuleWrapper = (OffsetModuleWrapper) stage.moduleBoardWidget.createModule(OffsetModule.class, leftX, getNextY());
+                    offsetModuleWrapper.getModule().setLowPos(new Vector2(offsetXMin, offsetYMin));
+                    offsetModuleWrapper.getModule().setHighPos(new Vector2(offsetXMax, offsetYMax));
+
+                    if(shape.equals("ellipse")) {
+                        edges = readBoolean(reader, "edges");
+                        side = readString(reader, "side");
+                    }
                 }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            reader.readLine();
+            DynamicRangeModuleWrapper spawnWidthWrapper = (DynamicRangeModuleWrapper) readScaledNumbericalValue(reader, null, 0,"spawnWidth", false, false);
+            reader.readLine();
+            DynamicRangeModuleWrapper spawnHeightWrapper = (DynamicRangeModuleWrapper) readScaledNumbericalValue(reader, null, 0,"spawnHeight", false, false);
+
+            // now time to get the values and ditch this modules
+            float widthLowMin = spawnWidthWrapper.getModule().getLowMin();
+            float widthLowMax = spawnWidthWrapper.getModule().getLowMax();
+            float widthHighMin = spawnWidthWrapper.getModule().getHightMin();
+            float widthHighMax = spawnWidthWrapper.getModule().getHightMax();
+
+            float heightLowMin = spawnHeightWrapper.getModule().getLowMin();
+            float heightLowMax = spawnHeightWrapper.getModule().getLowMax();
+            float heightHighMin = spawnHeightWrapper.getModule().getHightMin();
+            float heightHighMax = spawnHeightWrapper.getModule().getHightMax();
+
+            Array<Vector2> points = spawnWidthWrapper.getPoints();
+
+            // ditch this modules.
+            stage.moduleBoardWidget.deleteWrapper(spawnWidthWrapper);
+            stage.moduleBoardWidget.deleteWrapper(spawnHeightWrapper);
+
+            // use values
+            if(offsetModuleWrapper != null) {
+
+                offsetModuleWrapper.setPoints(points);
+
+                offsetModuleWrapper.getModule().setLowSize(new Vector2((widthLowMin + widthLowMax)/2f, (heightLowMin + heightLowMax)/2f)); // best we can do
+                offsetModuleWrapper.getModule().setHighSize(new Vector2((widthHighMin + widthHighMax)/2f, (heightHighMin + heightHighMax)/2f)); // best we can do
+
+                offsetModuleWrapper.getModule().setLowEdge(edges);
+                offsetModuleWrapper.getModule().setHighEdge(edges);
+                if(side.equals("both")) {
+                    offsetModuleWrapper.getModule().setLowSide(OffsetModule.SIDE_ALL);
+                    offsetModuleWrapper.getModule().setHighSide(OffsetModule.SIDE_ALL);
+                }
+                if(side.equals("top")) {
+                    offsetModuleWrapper.getModule().setLowSide(OffsetModule.SIDE_TOP);
+                    offsetModuleWrapper.getModule().setHighSide(OffsetModule.SIDE_TOP);
+                }
+                if(side.equals("bottom")) {
+                    offsetModuleWrapper.getModule().setLowSide(OffsetModule.SIDE_BOTTOM);
+                    offsetModuleWrapper.getModule().setHighSide(OffsetModule.SIDE_BOTTOM);
+                }
+
+                if(shape.equals("square")) {
+                    offsetModuleWrapper.getModule().setLowShape(OffsetModule.TYPE_SQUARE);
+                    offsetModuleWrapper.getModule().setHighShape(OffsetModule.TYPE_SQUARE);
+                }
+                if(shape.equals("ellipse")) {
+                    offsetModuleWrapper.getModule().setLowShape(OffsetModule.TYPE_ELLIPSE);
+                    offsetModuleWrapper.getModule().setHighShape(OffsetModule.TYPE_ELLIPSE);
+                }
+                if(shape.equals("line")) {
+                    offsetModuleWrapper.getModule().setLowShape(OffsetModule.TYPE_LINE);
+                    offsetModuleWrapper.getModule().setHighShape(OffsetModule.TYPE_LINE);
+                }
+
+
+                // finally make the connections
+                stage.moduleBoardWidget.makeConnection(offsetModuleWrapper, particleModuleWrapper, OffsetModule.OUTPUT, ParticleModule.OFFSET);
+
+                //connect to duration alpha
+                stage.moduleBoardWidget.makeConnection(durationWrapper, offsetModuleWrapper, InputModule.OUTPUT, OffsetModule.ALPHA);
+
+                // update visual data
+                offsetModuleWrapper.setEquals(false);
+                offsetModuleWrapper.updateWidgetsFromModuleData();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -295,15 +419,11 @@ public class LegacyImporter {
             reader.readLine();
             readScaledNumbericalValue(reader, null, 0,"lifeOffset", true, true);
             reader.readLine();
-            readScaledNumbericalValue(reader, offsetVector, Vector2Module.X, "xOffset", false, false);
+            RandomRangeModuleWrapper xOffsetWrapper = (RandomRangeModuleWrapper) readScaledNumbericalValue(reader, offsetVector, Vector2Module.X, "xOffset", false, false);
             reader.readLine();
-            readScaledNumbericalValue(reader, offsetVector, Vector2Module.Y, "yOffset", false, false);
+            RandomRangeModuleWrapper yOffsetWrapper = (RandomRangeModuleWrapper) readScaledNumbericalValue(reader, offsetVector, Vector2Module.Y, "yOffset", false, false);
             reader.readLine();
-            readSpawnShapeValue(reader, "spawnShape");
-            reader.readLine();
-            readScaledNumbericalValue(reader, null, 0,"spawnWidth", true, false);
-            reader.readLine();
-            readScaledNumbericalValue(reader, null, 0,"spawnHeight", true, false);
+            readSpawnShapeValue(reader, "spawnShape", xOffsetWrapper, yOffsetWrapper, particleModuleWrapper, durationInput, offsetVector);
             String line = reader.readLine();
             if (line.trim().equals("- Scale -")) {
                 readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.SIZE,"xScaleValue", false, false);
@@ -326,7 +446,7 @@ public class LegacyImporter {
             reader.readLine();
             readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.VELOCITY,"velocity", false, false);
             reader.readLine();
-            readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.ANGLE,"angle", false, false);
+            ModuleWrapper angleWrapper = readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.ANGLE,"angle", false, false);
             reader.readLine();
             readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.ROTATION,"rotation", false, false);
             reader.readLine();
@@ -339,11 +459,26 @@ public class LegacyImporter {
             readScaledNumbericalValue(reader, particleModuleWrapper, ParticleModule.TRANSPARENCY,"transparency", false, false);
             reader.readLine();
 
+            if(angleWrapper == null) {
+                StaticValueModuleWrapper angleVal = (StaticValueModuleWrapper) stage.moduleBoardWidget.createModule(StaticValueModule.class, leftX, getNextY());
+                angleVal.setValue(0);
+                stage.moduleBoardWidget.makeConnection(angleVal, particleModuleWrapper, 0, ParticleModule.ANGLE);
+            }
+
             boolean attached = readBoolean(reader, "attached");
             boolean continuous = readBoolean(reader, "continuous");
             boolean aligned = readBoolean(reader, "aligned");
             boolean additive = readBoolean(reader, "additive");
             boolean behind = readBoolean(reader, "behind");
+
+
+            EmConfigModuleWrapper config = (EmConfigModuleWrapper) stage.moduleBoardWidget.createModule(EmConfigModule.class, leftX, getNextY());
+            stage.moduleBoardWidget.makeConnection(config, emitterModuleWrapper, EmConfigModule.OUTPUT, EmitterModule.CONFIG);
+
+            config.setAttached(attached);
+            config.setContinuous(continuous);
+            config.setAligned(aligned);
+            config.setAdditive(additive);
 
             // Backwards compatibility
             line = reader.readLine();

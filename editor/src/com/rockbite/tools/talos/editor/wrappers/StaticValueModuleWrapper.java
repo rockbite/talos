@@ -69,4 +69,9 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
         super.read(json, jsonData);
         floatInput.setValue(module.getStaticValue());
     }
+
+    public void setValue(int val) {
+        floatInput.setValue(val);
+        module.setStaticValue(val);
+    }
 }

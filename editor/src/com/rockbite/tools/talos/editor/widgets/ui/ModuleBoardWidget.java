@@ -307,6 +307,17 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
+    public void deleteWrapper(ModuleWrapper wrapper) {
+        getModuleWrappers().removeValue(wrapper, true);
+        for(int i = getCurrentConnections().size-1; i >= 0; i--) {
+            if(getCurrentConnections().get(i).toModule == wrapper || getCurrentConnections().get(i).fromModule == wrapper) {
+                removeConnection(getCurrentConnections().get(i));
+            }
+        }
+        mainStage.getCurrentModuleGraph().removeModule(wrapper.getModule());
+        moduleContainer.removeActor(wrapper);
+    }
+
     public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
         final Module module;
         try {

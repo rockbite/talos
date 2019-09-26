@@ -237,6 +237,19 @@ public class OffsetModule extends Module {
         lowPos.set(pos.x, pos.y);
     }
 
+    public void getLowPos(Vector2 result) {
+        result.set(lowPos.get(0), lowPos.get(1));
+    }
+    public void getHighPos(Vector2 result) {
+        result.set(highPos.get(0), highPos.get(1));
+    }
+    public void getLowSize(Vector2 result) {
+        result.set(lowSize.get(0), lowSize.get(1));
+    }
+    public void getHighSize(Vector2 result) {
+        result.set(highSize.get(0), highSize.get(1));
+    }
+
     public void setLowSize(Vector2 size) {
         lowSize.set(size.x, size.y);
     }
@@ -316,5 +329,29 @@ public class OffsetModule extends Module {
 
     public void setHighSide(int side) {
         highSide = side;
+    }
+
+    public int getLowShape() {
+        return lowShape;
+    }
+
+    public int getHighShape() {
+        return highShape;
+    }
+
+    public boolean getLowEdge() {
+        return lowEdge;
+    }
+
+    public boolean getHighEdge() {
+        return highEdge;
+    }
+
+    public int getLowSide() {
+        return lowSide;
+    }
+
+    public int getHighSide() {
+        return highSide;
     }
 }

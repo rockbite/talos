@@ -24,6 +24,8 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
     private Vector2 pos = new Vector2();
     private Vector2 size = new Vector2();
 
+    private boolean lockUpdate = false;
+
     @Override
     protected float reportPrefWidth() {
         return 250;
@@ -105,23 +107,47 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
     }
 
     private void updateModuleDataFromWidgets() {
-        lowShape.getShapePos(pos);
-        module.setLowPos(pos);
-        lowShape.getShapeSize(size);
-        module.setLowSize(size);
-        highShape.getShapePos(pos);
-        module.setHighPos(pos);
-        highShape.getShapeSize(size);
-        module.setHighSize(size);
+        if(!lockUpdate) {
+            lowShape.getShapePos(pos);
+            module.setLowPos(pos);
+            lowShape.getShapeSize(size);
+            module.setLowSize(size);
+            highShape.getShapePos(pos);
+            module.setHighPos(pos);
+            highShape.getShapeSize(size);
+            module.setHighSize(size);
 
-        module.setLowShape(lowShape.getShape());
-        module.setHighShape(highShape.getShape());
+            module.setLowShape(lowShape.getShape());
+            module.setHighShape(highShape.getShape());
 
-        module.setLowEdge(lowShape.isEdge());
-        module.setHighEdge(highShape.isEdge());
+            module.setLowEdge(lowShape.isEdge());
+            module.setHighEdge(highShape.isEdge());
 
-        module.setLowSide(lowShape.getSide());
-        module.setHighSide(highShape.getSide());
+            module.setLowSide(lowShape.getSide());
+            module.setHighSide(highShape.getSide());
+        }
+    }
+
+    public void updateWidgetsFromModuleData() {
+        lockUpdate = true;
+        module.getLowPos(pos);
+        lowShape.setPos(pos);
+        module.getHighPos(pos);
+        highShape.setPos(pos);
+
+        module.getLowSize(size);
+        lowShape.setShapeSize(size);
+        module.getHighSize(size);
+        highShape.setShapeSize(size);
+
+        // shape edge and side
+        lowShape.setShape(module.getLowShape());
+        highShape.setShape(module.getHighShape());
+        lowShape.setEdge(module.getLowEdge());
+        highShape.setEdge(module.getLowEdge());
+        highShape.setSide(module.getLowSide());
+        highShape.setSide(module.getHighSide());
+        lockUpdate = false;
     }
 
     @Override
@@ -137,5 +163,13 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
     @Override
     public int createPoint(float x, float y) {
         return module.createPoint(x, y);
+    }
+
+    public void setEquals(boolean eequals) {
+        equalsButton.setChecked(eequals);
+    }
+
+    public void setPoints(Array<Vector2> points) {
+        module.setPoints(points);
     }
 }
