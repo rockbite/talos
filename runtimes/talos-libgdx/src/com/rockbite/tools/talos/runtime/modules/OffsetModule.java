@@ -28,12 +28,20 @@ public class OffsetModule extends Module {
     private boolean lowEdge = true;
     private boolean highEdge = true;
 
-    private int side = 0;
     private float tolerance = 0;
 
     public static final int TYPE_SQUARE = 0;
     public static final int TYPE_ELLIPSE = 1;
     public static final int TYPE_LINE = 2;
+
+    public static final int SIDE_ALL = 0;
+    public static final int SIDE_TOP = 1;
+    public static final int SIDE_BOTTOM = 2;
+    public static final int SIDE_LEFT = 3;
+    public static final int SIDE_RIGHT = 4;
+
+    private int lowSide = SIDE_BOTTOM;
+    private int highSide = SIDE_RIGHT;
 
     private Vector2 randLow = new Vector2();
     private Vector2 randHigh = new Vector2();
@@ -81,8 +89,8 @@ public class OffsetModule extends Module {
         alpha = interpolate(alpha); // apply the curve
 
         // let's find pos by shape
-        getRandomPosOn(lowEdge, lowShape, lowPos, lowSize, randLow);
-        getRandomPosOn(highEdge, highShape, highPos, highSize, randHigh);
+        getRandomPosOn(lowSide, lowEdge, lowShape, lowPos, lowSize, randLow);
+        getRandomPosOn(highSide, highEdge, highShape, highPos, highSize, randHigh);
 
         float x = Interpolation.linear.apply(randLow.x, randHigh.x, alpha);
         float y = Interpolation.linear.apply(randLow.y, randHigh.y, alpha);
@@ -90,9 +98,15 @@ public class OffsetModule extends Module {
         output.set(x, y);
     }
 
-    private void getRandomPosOn(boolean edge, int shape, NumericalValue pos, NumericalValue size, Vector2 result) {
+    private void getRandomPosOn(int side, boolean edge, int shape, NumericalValue pos, NumericalValue size, Vector2 result) {
         random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * index * 1000)));
         float angle = random.nextFloat();
+
+        if(side == SIDE_TOP) angle = angle/2f;
+        if(side == SIDE_BOTTOM) angle = angle/2f + 0.5f;
+        if(side == SIDE_LEFT) angle = angle/2f + 0.25f;
+        if(side == SIDE_RIGHT) angle = angle/2f - 0.25f;
+
         if(shape == TYPE_SQUARE) {
             findRandomSquarePos(angle, pos, size, result);
         } else if (shape == TYPE_ELLIPSE) {
@@ -119,8 +133,8 @@ public class OffsetModule extends Module {
     private void findRandomEllipsePos(float angle, NumericalValue pos, NumericalValue size, Vector2 result) {
         angle = angle * 360;
 
-        float x = MathUtils.cosDeg(angle) * size.get(0) + pos.get(0);
-        float y = MathUtils.sinDeg(angle) * size.get(1) + pos.get(1);
+        float x = MathUtils.cosDeg(angle) * size.get(0)/2f + pos.get(0);
+        float y = MathUtils.sinDeg(angle) * size.get(1)/2f + pos.get(1);
 
         result.set(x, y);
     }
@@ -132,7 +146,17 @@ public class OffsetModule extends Module {
     }
 
     private void findRandomLinePos(float angle, NumericalValue pos, NumericalValue size, Vector2 result) {
+        angle = angle * 360;
+        rect.set(pos.get(0) - size.get(0)/2f, pos.get(1) - size.get(1)/2f, size.get(0), size.get(1));
+        tmp.set(rect.width, rect.height); // initial segment vector; for alpha
+        float alpha = tmp.angle();
+        float beta = angle - alpha;
+        float r3 = tmp.set(MathUtils.cosDeg(angle) * rect.width/2f, MathUtils.sinDeg(angle) * rect.height/2f).len();
+        float r4 = MathUtils.cosDeg(beta) * r3;
+        float posX = r4 * MathUtils.cosDeg(alpha) + pos.get(0);
+        float posY = r4 * MathUtils.sinDeg(alpha) + pos.get(1);
 
+        result.set(posX, posY);
     }
 
     protected void processAlphaDefaults() {
@@ -284,5 +308,13 @@ public class OffsetModule extends Module {
 
     public void setHighEdge(boolean edge) {
         highEdge = edge;
+    }
+
+    public void setLowSide(int side) {
+        lowSide = side;
+    }
+
+    public void setHighSide(int side) {
+        highSide = side;
     }
 }

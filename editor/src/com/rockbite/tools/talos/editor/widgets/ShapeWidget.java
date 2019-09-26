@@ -111,7 +111,7 @@ public class ShapeWidget extends Actor {
                 if(selectedSide == TOP) {
                     float diff = y - prevPos.y;
                     shapeSize.add(0, diff * 2f);
-                    if(shapeSize.y < 0) shapeSize.y = 0;
+                    //if(shapeSize.y < 0) shapeSize.y = 0;
                     if(shapeSize.y > getHeight()) shapeSize.y = getHeight();
                     if(y > getHeight()) shapeSize.y = getHeight();
                     if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) shapeSize.x = shapeSize.y;
@@ -120,7 +120,7 @@ public class ShapeWidget extends Actor {
                 if(selectedSide == BOTTOM) {
                     float diff = prevPos.y - y;
                     shapeSize.add(0, diff * 2f);
-                    if(shapeSize.y < 0) shapeSize.y = 0;
+                    //if(shapeSize.y < 0) shapeSize.y = 0;
                     if(shapeSize.y > getHeight()) shapeSize.y = getHeight();
                     if(y > getHeight()) shapeSize.y = getHeight();
                     if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) shapeSize.x = shapeSize.y;
@@ -129,7 +129,7 @@ public class ShapeWidget extends Actor {
                 if(selectedSide == LEFT) {
                     float diff = prevPos.x - x;
                     shapeSize.add(diff * 2f, 0f);
-                    if(shapeSize.x < 0) shapeSize.x = 0;
+                    //if(shapeSize.x < 0) shapeSize.x = 0;
                     if(shapeSize.x > getWidth()) shapeSize.x = getWidth();
                     if(x > getWidth()) shapeSize.x = getWidth();
                     if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) shapeSize.y = shapeSize.x;
@@ -138,7 +138,7 @@ public class ShapeWidget extends Actor {
                 if(selectedSide == RIGHT) {
                     float diff = x - prevPos.x;
                     shapeSize.add(diff * 2f, 0f);
-                    if(shapeSize.x < 0) shapeSize.x = 0;
+                    //if(shapeSize.x < 0) shapeSize.x = 0;
                     if(shapeSize.x > getWidth()) shapeSize.x = getWidth();
                     if(x > getWidth()) shapeSize.x = getWidth();
                     if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) shapeSize.y = shapeSize.x;
@@ -170,20 +170,20 @@ public class ShapeWidget extends Actor {
             private void fitSize() {
                 if(shapePos.x + shapeSize.x/2f > getWidth()/2f) {
                     shapeSize.x = (getWidth()/2f - shapePos.x) * 2f;
-                    if( shapeSize.x < 0)  shapeSize.x = 0;
+                    //if( shapeSize.x < 0)  shapeSize.x = 0;
                 }
                 if(shapePos.x - shapeSize.x/2f < -getWidth()/2f) {
                     shapeSize.x = (getWidth()/2f + shapePos.x) * 2f;
                 }
                 if(shapePos.y + shapeSize.y/2f > getHeight()/2f) {
                     shapeSize.y = (getHeight()/2f - shapePos.y) * 2f;
-                    if( shapeSize.y < 0)  shapeSize.y = 0;
+                    //if( shapeSize.y < 0)  shapeSize.y = 0;
                 }
                 if(shapePos.y - shapeSize.y/2f < -getHeight()/2f) {
                     shapeSize.y = (getHeight()/2f + shapePos.y) * 2f;
                 }
-                if( shapeSize.x < 0)  shapeSize.x = 0;
-                if( shapeSize.y < 0)  shapeSize.y = 0;
+                //if( shapeSize.x < 0)  shapeSize.x = 0;
+                //if( shapeSize.y < 0)  shapeSize.y = 0;
             }
 
             @Override

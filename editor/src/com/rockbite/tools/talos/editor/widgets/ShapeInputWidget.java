@@ -16,6 +16,7 @@ public class ShapeInputWidget extends Table {
     CheckBox edgeBox;
     ShapeWidget shapeWidget;
     SelectBox<String> shapeType;
+    SelectBox<String> sideBox;
 
     ChangeListener changeListener;
 
@@ -26,19 +27,23 @@ public class ShapeInputWidget extends Table {
         shapeTypes.add("ELLIPSE");
         shapeTypes.add("LINE");
 
-        scaleField = new TextField("5", skin);
+        scaleField = new TextField("7", skin);
         shapeWidget = new ShapeWidget(skin);
         shapeType = new SelectBox<>(skin);
+        sideBox = new SelectBox<>(skin);
+
+        sideBox.setItems("ALL", "TOP", "BOTTOM", "LEFT", "RIGHT");
 
         edgeBox = new CheckBox("", skin);
         edgeBox.setChecked(true);
 
         shapeType.setItems(shapeTypes);
 
-        add(edgeBox).width(50);
-        add(scaleField).width(45).padLeft(5).row();
+        add(edgeBox).width(30);
+        add(scaleField).width(65).padLeft(5).row();
         add(shapeWidget).size(100).colspan(2).row();
-        add(shapeType).width(100).colspan(2);
+        add(shapeType).width(100).colspan(2).row();
+        add(sideBox).width(100).colspan(2);
 
 
         shapeType.addListener(new ChangeListener() {
@@ -65,6 +70,13 @@ public class ShapeInputWidget extends Table {
         });
 
         edgeBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
+            }
+        });
+
+        sideBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(changeListener != null) changeListener.changed(new ChangeListener.ChangeEvent(), ShapeInputWidget.this);
@@ -117,9 +129,22 @@ public class ShapeInputWidget extends Table {
         int res = 0;
         String type = shapeType.getSelected();
 
-        if(type.equals("SQUARE")) res = TYPE_SQUARE;
-        if(type.equals("ELLIPSE")) res =TYPE_ELLIPSE;
-        if(type.equals("LINE")) res =TYPE_LINE;
+        if(type.equals("SQUARE")) res =  TYPE_SQUARE;
+        if(type.equals("ELLIPSE")) res = TYPE_ELLIPSE;
+        if(type.equals("LINE")) res = TYPE_LINE;
+
+        return res;
+    }
+
+    public int getSide() {
+        int res = 0;
+        String type = sideBox.getSelected();
+
+        if(type.equals("ALL")) res = SIDE_ALL;
+        if(type.equals("TOP")) res = SIDE_TOP;
+        if(type.equals("BOTTOM")) res = SIDE_BOTTOM;
+        if(type.equals("LEFT")) res = SIDE_LEFT;
+        if(type.equals("RIGHT")) res = SIDE_RIGHT;
 
         return res;
     }
