@@ -96,11 +96,13 @@ public class ScriptModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("script", script);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         this.script = jsonData.getString("script");
     }
 

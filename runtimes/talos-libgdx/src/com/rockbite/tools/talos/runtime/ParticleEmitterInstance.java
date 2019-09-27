@@ -149,4 +149,8 @@ public class ParticleEmitterInstance {
     public void setScope (ScopePayload scope) {
         emitterGraph.setScope(scope);
     }
+
+    public ParticleEffectInstance getEffect() {
+    	return parentParticleInstance;
+	}
 }

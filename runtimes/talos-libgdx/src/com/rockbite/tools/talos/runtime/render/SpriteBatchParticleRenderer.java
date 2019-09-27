@@ -13,7 +13,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	private Batch batch;
 
 	Color color = new Color(Color.WHITE);
-	private Vector2 position = new Vector2();
 
 	public SpriteBatchParticleRenderer (Batch batch) {
 		this.batch = batch;
@@ -42,6 +41,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		color.a = particle.transparency;
 		float rotation = particle.rotation * 360f;
 		batch.setColor(color);
+
+		Vector2 position = particle.particleEmitter.getEffect().getPosition();
 
 		if (particle.drawable != null) {
 			particle.drawable.draw(batch, position.x + particle.position.x, position.y + particle.position.y, particle.size.x, particle.size.y, rotation);

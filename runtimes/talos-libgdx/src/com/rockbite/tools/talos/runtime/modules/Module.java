@@ -11,7 +11,7 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public abstract class Module implements Json.Serializable {
 
-    private ParticleEmitterDescriptor graph;
+    protected ParticleEmitterDescriptor graph;
 
     protected IntMap<Slot> inputSlots = new IntMap<>();
     protected IntMap<Slot> outputSlots = new IntMap<>();
@@ -172,10 +172,17 @@ public abstract class Module implements Json.Serializable {
 
     @Override
     public void write (Json json) {
+        json.writeValue("index", index);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        if(jsonData.has("index")) {
+            index = jsonData.getInt("index");
+        }
+    }
 
+    public int getIndex() {
+        return index;
     }
 }

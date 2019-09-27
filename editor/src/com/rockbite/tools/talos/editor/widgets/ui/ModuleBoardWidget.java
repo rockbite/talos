@@ -345,9 +345,9 @@ public class ModuleBoardWidget extends WidgetGroup {
         try {
             moduleWrapper = ClassReflection.newInstance(WrapperRegistry.get(moduleClazz));
             int id = getUniqueIdForModuleWrapper();
-            moduleWrapper.setId(id);
-
             moduleWrapper.setModule(module);
+            moduleWrapper.setId(id);
+            module.setIndex(id);
             moduleWrapper.setBoard(this);
 
             tmp.set(x, Gdx.graphics.getHeight() - y);

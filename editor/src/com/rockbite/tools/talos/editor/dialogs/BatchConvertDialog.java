@@ -163,7 +163,7 @@ public class BatchConvertDialog extends VisWindow {
         String runtimePath = outputPath + File.separator + "runtime" +  File.separator + subPath + File.separator + fileHandle.nameWithoutExtension() + ".p";
 
         FileHandle projectDestination = Gdx.files.absolute(projectPath);
-        FileHandle exportDestination = Gdx.files.absolute(projectPath);
+        FileHandle exportDestination = Gdx.files.absolute(runtimePath);
 
         String result = "ok";
         try {

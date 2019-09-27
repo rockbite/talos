@@ -47,7 +47,7 @@ public class ProjectSerializer {
         }
 
         json.setOutputType(JsonWriter.OutputType.json);
-        String data = json.prettyPrint(exportData);
+        String data = json.toJson(exportData);
         fileHandle.writeString(data, false);
     }
 }

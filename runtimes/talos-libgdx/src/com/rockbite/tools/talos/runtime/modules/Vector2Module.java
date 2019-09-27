@@ -52,12 +52,14 @@ public class Vector2Module extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("x", getDefaultX());
         json.writeValue("y", getDefaultY());
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         defaultX = jsonData.getFloat("x");
         defaultY = jsonData.getFloat("y");
     }

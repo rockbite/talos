@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 
@@ -8,6 +9,8 @@ public class ParticleEffectInstance {
     private final ParticleEffectDescriptor descriptor;
 
     private Array<ParticleEmitterInstance> emitters = new Array<>();
+
+    Vector2 position = new Vector2();
 
     ScopePayload scopePayload = new ScopePayload();
 
@@ -60,4 +63,11 @@ public class ParticleEffectInstance {
     }
 
 
+	public void setPosition(float x, float y) {
+		position.set(x, y);
+	}
+
+	public Vector2 getPosition() {
+		return position;
+	}
 }

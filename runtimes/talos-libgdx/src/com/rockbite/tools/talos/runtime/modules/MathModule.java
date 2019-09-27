@@ -52,11 +52,13 @@ public class MathModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("mathExpression", MathExpressionMappings.getNameForMathExpression(getExpression()));
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         currentExpression = MathExpressionMappings.getMathExpressionForName(jsonData.getString("mathExpression"));
     }
 

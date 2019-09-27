@@ -33,5 +33,14 @@ task dist(type: Jar) {
     with jar
 }
 
+task distLegacyTest(type: Jar) {
+    manifest {
+        attributes 'Main-Class': "com.rockbite.tools.talos.test.LegacyCompareTest"
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
 
 dist.dependsOn classes

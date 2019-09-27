@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 
@@ -12,6 +13,8 @@ public class TextureModule extends Module {
 
     private DrawableValue userDrawable;
     private DrawableValue outputValue;
+
+    public String fileName;
 
     @Override
     protected void defineSlots() {
@@ -30,13 +33,24 @@ public class TextureModule extends Module {
     }
 
     @Override
+    public void setModuleGraph(ParticleEmitterDescriptor graph) {
+        super.setModuleGraph(graph);
+        setRegion(graph.getEffectDescriptor().getTextureRegion(fileName));
+    }
+
+    @Override
     public void write (Json json) {
-        //todo texture serialization
+        super.write(json);
+        json.writeValue("fileName", fileName);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        //todo texture serialization
+        super.read(json, jsonData);
+
+        if(jsonData.has("fileName")) {
+            fileName = jsonData.getString("fileName");
+        }
     }
 
 

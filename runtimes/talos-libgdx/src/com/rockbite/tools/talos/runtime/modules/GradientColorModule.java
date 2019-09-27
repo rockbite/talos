@@ -147,6 +147,7 @@ public class GradientColorModule extends Module {
 
 	@Override
 	public void write (Json json) {
+		super.write(json);
 		Array<ColorPoint> points = getPoints();
 		json.writeArrayStart("points");
 		for (ColorPoint point : points) {
@@ -162,6 +163,7 @@ public class GradientColorModule extends Module {
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
         points.clear();
         final JsonValue jsonPpoints = jsonData.get("points");
         for (JsonValue point : jsonPpoints) {

@@ -40,6 +40,7 @@ public class EmConfigModule extends Module {
 
     @Override
     public void write(Json json) {
+        super.write(json);
         json.writeValue("additive", getUserValue().additive);
         json.writeValue("attached", getUserValue().attached);
         json.writeValue("continuous", getUserValue().continuous);
@@ -48,6 +49,7 @@ public class EmConfigModule extends Module {
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         getUserValue().additive = jsonData.getBoolean("additive");
         getUserValue().attached = jsonData.getBoolean("attached");
         getUserValue().continuous = jsonData.getBoolean("continuous");

@@ -32,11 +32,13 @@ public class InputModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("scopeKey", getInput(), int.class);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         setInput(jsonData.getInt("scopeKey"));
     }
 }

@@ -167,11 +167,11 @@ public class ParticleModule extends Module {
 
     @Override
     public void write (Json json) {
-
+        super.write(json);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-
+        super.read(json, jsonData);
     }
 }

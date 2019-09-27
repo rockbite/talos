@@ -54,12 +54,14 @@ public class RandomRangeModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("min", min);
         json.writeValue("max", max);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         min = jsonData.getFloat("min");
         max = jsonData.getFloat("max");
     }

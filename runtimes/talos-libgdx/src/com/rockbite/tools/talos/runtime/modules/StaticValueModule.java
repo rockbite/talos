@@ -38,11 +38,13 @@ public class StaticValueModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeValue("value", getStaticValue());
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         setStaticValue(jsonData.getFloat("value"));
     }
 

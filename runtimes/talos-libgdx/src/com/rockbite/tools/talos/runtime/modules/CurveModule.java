@@ -147,6 +147,7 @@ public class CurveModule extends Module {
 
     @Override
     public void write (Json json) {
+        super.write(json);
         json.writeArrayStart("points");
         for (Vector2 point : getPoints()) {
             json.writeObjectStart();
@@ -159,6 +160,7 @@ public class CurveModule extends Module {
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         points.clear();
         final JsonValue points = jsonData.get("points");
         for (JsonValue point : points) {

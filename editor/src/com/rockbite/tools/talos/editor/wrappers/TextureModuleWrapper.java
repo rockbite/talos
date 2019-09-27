@@ -39,6 +39,7 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
         super.setModule(module);
         if(!isDefaultSet) {
             module.setRegion(defaultRegion);
+            module.fileName = fileName;
             isDefaultSet = true;
         }
     }
@@ -113,5 +114,8 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
         }
         filePath = path+"";
         fileName = fileHandle.name();
+        if(module != null) {
+            module.fileName = fileName;
+        }
     }
 }
