@@ -97,6 +97,7 @@ public class UIStage {
 		MenuItem newProject = new MenuItem("New Project");
 		MenuItem openProject = new MenuItem("Open Project");
 		MenuItem saveProject = new MenuItem("Save Project");
+		MenuItem export = new MenuItem("Export");
 		MenuItem examples = new MenuItem("Examples");
 
 		MenuItem legacy = new MenuItem("Legacy");
@@ -119,6 +120,7 @@ public class UIStage {
 		projectMenu.addItem(openProject);
 		projectMenu.addItem(saveProject);
 		projectMenu.addItem(saveAsProject);
+		projectMenu.addItem(export);
 		projectMenu.addSeparator();
 		projectMenu.addItem(examples);
 		projectMenu.addItem(legacy);
@@ -148,6 +150,14 @@ public class UIStage {
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				saveProjectAction();
+			}
+		});
+
+		export.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				exportAction();
 			}
 		});
 
@@ -252,6 +262,35 @@ public class UIStage {
 		} else {
 			TalosMain.Instance().Project().saveProject();
 		}
+	}
+
+	private void exportAction() {
+		fileChooser.setMode(FileChooser.Mode.SAVE);
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".p");
+			}
+		});
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(new FileChooserAdapter() {
+			@Override
+			public void selected(Array<FileHandle> file) {
+				String path = file.first().file().getAbsolutePath();
+				if(!path.endsWith(".p")) {
+					if(path.indexOf(".") > 0) {
+						path = path.substring(0, path.indexOf("."));
+					}
+					path += ".p";
+				}
+				FileHandle handle = Gdx.files.absolute(path);
+				TalosMain.Instance().Project().exportProject(handle);
+			}
+		});
+
+		stage.addActor(fileChooser.fadeIn());
 	}
 
 	private void saveAsProjectAction() {

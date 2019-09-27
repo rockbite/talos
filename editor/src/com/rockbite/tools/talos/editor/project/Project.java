@@ -7,6 +7,7 @@ import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
+import com.rockbite.tools.talos.editor.serialization.ExportData;
 import com.rockbite.tools.talos.editor.serialization.ProjectData;
 import com.rockbite.tools.talos.editor.serialization.ProjectSerializer;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
@@ -199,6 +200,8 @@ public class Project {
 	}
 
 	public void exportProject(FileHandle fileHandle) {
-
+		ExportData exportData = new ExportData();
+		exportData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
+		projectSerializer.writeExport(fileHandle, exportData);
 	}
 }
