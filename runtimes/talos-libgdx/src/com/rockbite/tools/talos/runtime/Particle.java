@@ -76,7 +76,7 @@ public class Particle implements Pool.Poolable {
         }
 
 
-        drawable = particleModule.getDrawable(); // important to get drawable before sze
+        drawable = particleModule.getDrawable(); // important to get drawable before size
         size.set(particleModule.getSize());
         color.set(particleModule.getColor());
 

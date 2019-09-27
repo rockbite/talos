@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -27,6 +29,7 @@ import java.net.URISyntaxException;
 public class LegacyCompareTest extends ApplicationAdapter {
 
     Stage stage;
+    Stage uiStage;
 
     SpriteBatchParticleRenderer talosRenderer;
 
@@ -37,6 +40,8 @@ public class LegacyCompareTest extends ApplicationAdapter {
     Array<String> legacyList;
     Array<String> talosList;
     TextureAtlas atlas;
+
+    Skin skin;
 
     public LegacyCompareTest() {
 
@@ -101,6 +106,12 @@ public class LegacyCompareTest extends ApplicationAdapter {
     public void create() {
         super.create();
 
+        TextureAtlas skinAtlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
+        skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+        skin.addRegions(skinAtlas);
+
+        uiStage = new Stage();
+
         stage = new Stage();
         ((OrthographicCamera)stage.getViewport().getCamera()).zoom = 1f/64;
 
@@ -108,7 +119,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         String mainPath = "C:\\Users\\User\\Desktop\\convert\\";
 
-        mainPath = getLocalPath() + "\\";
+        //mainPath = getLocalPath() + "\\";
 
         String assetPath =   mainPath + "Particles-Assets";
         String legacyPath =  mainPath + "RefactoredProduction";
@@ -136,6 +147,14 @@ public class LegacyCompareTest extends ApplicationAdapter {
         TalosActor talosActor = new TalosActor(Gdx.files.absolute(talosList.get(index)), atlas, talosRenderer);
         talosActor.setPosition(stage.getWidth()/2f + 3f, stage.getHeight()/2f);
         stage.addActor(talosActor);
+
+        String leftName = legacyList.get(index).substring(legacyList.get(index).lastIndexOf("/")+1);
+
+        uiStage.clear();
+        Label mainLbl = new Label(leftName, skin);
+        mainLbl.setPosition(uiStage.getWidth()/2f - mainLbl.getPrefWidth()/2f, 100);
+        uiStage.addActor(mainLbl);
+
         index++;
     }
 
@@ -146,6 +165,9 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         stage.act();
         stage.draw();
+
+        uiStage.act();
+        uiStage.draw();
 
         if(Gdx.input.justTouched()) {
             addNextEffect();

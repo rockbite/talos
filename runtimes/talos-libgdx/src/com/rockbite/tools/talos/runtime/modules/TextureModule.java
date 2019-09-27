@@ -35,7 +35,9 @@ public class TextureModule extends Module {
     @Override
     public void setModuleGraph(ParticleEmitterDescriptor graph) {
         super.setModuleGraph(graph);
-        setRegion(graph.getEffectDescriptor().getTextureRegion(fileName));
+        if(fileName != null) {
+            setRegion(graph.getEffectDescriptor().getTextureRegion(fileName));
+        }
     }
 
     @Override
