@@ -78,7 +78,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
         addCaptureListener(new InputListener() {
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                moduleBoardWidget.selectWrapper(ModuleWrapper.this);
+                moduleBoardWidget.wrapperClicked(ModuleWrapper.this);
                 return false;
             }
         });

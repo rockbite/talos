@@ -11,10 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.FocusManager;
@@ -24,6 +22,7 @@ import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
+import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
 import com.rockbite.tools.talos.editor.serialization.ConnectionData;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
@@ -40,11 +39,13 @@ public class ModuleBoardWidget extends WidgetGroup {
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
     public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
     private ParticleEmitterWrapper currentEmitterWrapper;
-    private ModuleWrapper selectedWrapper;
+    private ObjectSet<ModuleWrapper> selectedWrappers = new ObjectSet<>();
+
+    private Array<ModuleWrapperGroup> groups = new Array<>();
 
     Group moduleContainer = new Group();
 
-    Vector2 gridPos = new Vector2();
+    public Vector2 gridPos = new Vector2();
     Vector2 tmp = new Vector2();
     Vector2 tmp2 = new Vector2();
     Vector2 prev = new Vector2();
@@ -75,48 +76,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         shapeRenderer = new ShapeRenderer();
 
         addListener(new ClickListener() {
-            Vector2 prev = new Vector2();
-            Vector2 tmp = new Vector2();
-
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                prev.set(x, y);
-                return true;
-            }
-            public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if(event.isHandled()) return;
-                tmp.set(x, y);
-                tmp.sub(prev);
-
-                //setX(getX() - tmp.x);
-                //setY(getY() - tmp.y);
-                gridPos.x += tmp.x;
-                gridPos.y += tmp.y;
-
-                prev.set(x, y);
-                super.touchDragged(event, x, y, pointer);
-            }
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button);
-
-                if(!event.isHandled() && button == 0) {
-                    FocusManager.resetFocus(getStage());
-
-                    if(selectedWrapper != null) {
-                        selectedWrapper.setBackground("window");
-                        selectedWrapper = null;
-                    }
-                }
-
-                if(button == 1 && !event.isHandled()) {
-                    showPopup();
-                }
-            }
 
             @Override
             public boolean keyUp(InputEvent event, int keycode) {
                 if(event.isHandled()) return super.keyUp(event, keycode);
                 if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    deleteSelectedWrapper();
+                    deleteSelectedWrappers();
                 }
                 return super.keyUp(event, keycode);
             }
@@ -164,17 +129,6 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         mainStage.getCurrentModuleGraph().removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
         mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot, true);
-    }
-
-    public void selectWrapper(ModuleWrapper selectWrapper) {
-        for(ModuleWrapper wrapper : getModuleWrappers()) {
-            if(selectWrapper == wrapper) {
-                wrapper.setBackground("window-blue");
-                selectedWrapper = wrapper;
-            } else {
-                wrapper.setBackground("window");
-            }
-        }
     }
 
     public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
@@ -294,17 +248,11 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    private void deleteSelectedWrapper() {
-        if(selectedWrapper != null) {
-            getModuleWrappers().removeValue(selectedWrapper, true);
-            for(int i = getCurrentConnections().size-1; i >= 0; i--) {
-                if(getCurrentConnections().get(i).toModule == selectedWrapper || getCurrentConnections().get(i).fromModule == selectedWrapper) {
-                    removeConnection(getCurrentConnections().get(i));
-                }
-            }
-            mainStage.getCurrentModuleGraph().removeModule(selectedWrapper.getModule());
-            moduleContainer.removeActor(selectedWrapper);
-        }
+    private void deleteSelectedWrappers() {
+       for(ModuleWrapper wrapper : getSelectedWrappers()) {
+           deleteWrapper(wrapper);
+       }
+       clearSelection();
     }
 
     public void deleteWrapper(ModuleWrapper wrapper) {
@@ -357,7 +305,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             getModuleWrappers().add(moduleWrapper);
             moduleContainer.addActor(moduleWrapper);
 
-            selectWrapper(moduleWrapper);
+            addWrapperToSelection(moduleWrapper);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
@@ -375,8 +323,17 @@ public class ModuleBoardWidget extends WidgetGroup {
         drawCurves();
         shapeRenderer.end();
         batch.begin();
+        drawGroups(batch);
 
         super.draw(batch, parentAlpha);
+    }
+
+    private void drawGroups(Batch batch) {
+        for(ModuleWrapperGroup group: groups) {
+            // need to find positions
+            group.setPosition(moduleContainer.getX(), moduleContainer.getY());
+            group.draw(batch, 1f);
+        }
     }
 
     private void drawCurves() {
@@ -550,6 +507,67 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
 
         return maxId + 1;
+    }
+
+    public void selectWrapper(ModuleWrapper wrapper) {
+        clearSelection();
+        addWrapperToSelection(wrapper);
+    }
+
+    public void addWrapperToSelection(ModuleWrapper wrapper) {
+        selectedWrappers.add(wrapper);
+        updateSelectionBackgrounds();
+    }
+
+    public void removeWrapperFromSelection(ModuleWrapper wrapper) {
+        selectedWrappers.remove(wrapper);
+        updateSelectionBackgrounds();
+    }
+
+    public ObjectSet<ModuleWrapper> getSelectedWrappers() {
+        return selectedWrappers;
+    }
+
+    public void setSelectedWrappers(ObjectSet<ModuleWrapper> wrappers) {
+        selectedWrappers.clear();
+        selectedWrappers.addAll(wrappers);
+        updateSelectionBackgrounds();
+    }
+
+    public void clearSelection() {
+        selectedWrappers.clear();
+        updateSelectionBackgrounds();
+    }
+
+    public void updateSelectionBackgrounds() {
+        for(ModuleWrapper wrapper : getModuleWrappers()) {
+            if(getSelectedWrappers().contains(wrapper)) {
+                wrapper.setBackground("window-blue");
+            } else {
+                wrapper.setBackground("window");
+            }
+        }
+    }
+
+    public void wrapperClicked(ModuleWrapper wrapper) {
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            if(selectedWrappers.contains(wrapper)) {
+                removeWrapperFromSelection(wrapper);
+            } else {
+                addWrapperToSelection(wrapper);
+            }
+        } else {
+            selectWrapper(wrapper);
+        }
+    }
+
+
+    public void createGroupFromSelectedWidgets() {
+        ModuleWrapperGroup group = new ModuleWrapperGroup(mainStage.getSkin());
+        group.setWrappers(getSelectedWrappers());
+        groups.add(group);
+
+        clearSelection();
     }
 
 
