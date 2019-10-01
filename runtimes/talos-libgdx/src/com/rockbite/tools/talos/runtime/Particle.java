@@ -78,11 +78,16 @@ public class Particle implements Pool.Poolable {
 
         drawable = particleModule.getDrawable(); // important to get drawable before size
         size.set(particleModule.getSize());
+        Vector2 positionOverride = particleModule.getPosition();
         color.set(particleModule.getColor());
 
         // perform inner operations
-        position.x += MathUtils.cosDeg(angle)*velocity*delta;
-        position.y += MathUtils.sinDeg(angle)*velocity*delta;
+        if(positionOverride != null) {
+            position.set(positionOverride);
+        } else {
+            position.x += MathUtils.cosDeg(angle) * velocity * delta;
+            position.y += MathUtils.sinDeg(angle) * velocity * delta;
+        }
     }
 
     @Override

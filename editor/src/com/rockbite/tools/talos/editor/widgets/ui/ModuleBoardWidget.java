@@ -43,6 +43,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     private Array<ModuleWrapperGroup> groups = new Array<>();
 
+    Group groupContainer = new Group();
     Group moduleContainer = new Group();
 
     public Vector2 gridPos = new Vector2();
@@ -71,6 +72,8 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         registerWrappers();
 
+
+        addActor(groupContainer);
         addActor(moduleContainer);
 
         shapeRenderer = new ShapeRenderer();
@@ -134,6 +137,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
         this.currentEmitterWrapper = currentEmitterWrapper;
 
+        groupContainer.clearChildren();
         moduleContainer.clearChildren();
 
         if(this.currentEmitterWrapper == null) return;
@@ -323,17 +327,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         drawCurves();
         shapeRenderer.end();
         batch.begin();
-        drawGroups(batch);
 
         super.draw(batch, parentAlpha);
-    }
-
-    private void drawGroups(Batch batch) {
-        for(ModuleWrapperGroup group: groups) {
-            // need to find positions
-            group.setPosition(moduleContainer.getX(), moduleContainer.getY());
-            group.draw(batch, 1f);
-        }
     }
 
     private void drawCurves() {
@@ -399,6 +394,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         // now we need to figure out how to project that pos from stage to this widget
         this.stageToLocalCoordinates(tmp);
 
+        groupContainer.setPosition(tmp.x, tmp.y);
         moduleContainer.setPosition(tmp.x, tmp.y);
 
         super.act(delta);
@@ -566,6 +562,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         ModuleWrapperGroup group = new ModuleWrapperGroup(mainStage.getSkin());
         group.setWrappers(getSelectedWrappers());
         groups.add(group);
+
+        groupContainer.addActor(group);
 
         clearSelection();
     }

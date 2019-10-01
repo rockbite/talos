@@ -39,7 +39,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	private void renderParticle (Batch batch, Particle particle) {
 		color.set(particle.color);
 		color.a = particle.transparency;
-		float rotation = particle.rotation * 360f;
+		float rotation = particle.rotation;
 		batch.setColor(color);
 
 		Vector2 position = particle.particleEmitter.getEffect().getPosition();

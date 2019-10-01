@@ -27,6 +27,7 @@ public class ParticleModule extends Module {
     public static final int ANGLE = 11;
     public static final int MASS = 12;
     public static final int SIZE = 13;
+    public static final int POSITION = 14;
 
 
     DrawableValue drawable;
@@ -41,6 +42,7 @@ public class ParticleModule extends Module {
     NumericalValue angle;
     NumericalValue mass;
     NumericalValue size;
+    NumericalValue position;
 
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
@@ -60,7 +62,9 @@ public class ParticleModule extends Module {
         angle = createInputSlot(ANGLE);
         mass = createInputSlot(MASS);
         size = createInputSlot(SIZE);
+        position = createInputSlot(POSITION);
 
+        rotation.setFlavour(NumericalValue.Flavour.ANGLE);
         angle.setFlavour(NumericalValue.Flavour.ANGLE);
     }
 
@@ -157,6 +161,16 @@ public class ParticleModule extends Module {
             return null;
         }
         tmpVec.set(target.get(0), target.get(1));
+
+        return tmpVec;
+    }
+
+    public Vector2 getPosition() {
+        fetchInputSlotValue(POSITION);
+        if(position.isEmpty()) {
+            return null;
+        }
+        tmpVec.set(position.get(0), position.get(1));
 
         return tmpVec;
     }

@@ -46,6 +46,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         addInputSlot("angle",  ParticleModule.ANGLE);
         addInputSlot("mass",  ParticleModule.MASS);
         addInputSlot("size",  ParticleModule.SIZE);
+        addInputSlot("position",  ParticleModule.POSITION);
     }
 
     @Override
@@ -61,6 +62,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
         if(slot.getIndex() == ParticleModule.ANGLE) return DynamicRangeModule.class;
         if(slot.getIndex() == ParticleModule.SIZE) return DynamicRangeModule.class;
+        if(slot.getIndex() == ParticleModule.POSITION) return Vector2Module.class;
 
         return null;
     }
