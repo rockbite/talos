@@ -229,9 +229,14 @@ public class ModuleBoardWidget extends WidgetGroup {
         try {
             ObjectSet<ModuleWrapper> wrappers = json.fromJson(ObjectSet.class, clipboard);
             for(ModuleWrapper wrapper: wrappers) {
+                if(wrapper instanceof ParticleModuleWrapper || wrapper instanceof EmitterModuleWrapper) {
+                    continue;
+                }
                 getModuleWrappers().add(wrapper);
                 wrapper.moveBy(20, 20);
                 wrapper.setModule(wrapper.getModule());
+                int id = getUniqueIdForModuleWrapper();
+                wrapper.setId(id);
                 wrapper.setBoard(this);
                 currentEmitterWrapper.getGraph().addModule(wrapper.getModule());
                 wrapper.getModule().setModuleGraph(currentEmitterWrapper.getGraph());
