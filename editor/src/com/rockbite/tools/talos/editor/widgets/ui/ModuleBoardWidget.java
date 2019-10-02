@@ -216,6 +216,33 @@ public class ModuleBoardWidget extends WidgetGroup {
         moduleWrapperGroup.remove();
     }
 
+    public void copySelectedModules() {
+        Json json = new Json();
+        String clipboard = json.toJson(getSelectedWrappers());
+        Gdx.app.getClipboard().setContents(clipboard);
+    }
+
+    public void pasteFromClipboard() {
+        String clipboard = Gdx.app.getClipboard().getContents();
+
+        Json json = new Json();
+        try {
+            ObjectSet<ModuleWrapper> wrappers = json.fromJson(ObjectSet.class, clipboard);
+            for(ModuleWrapper wrapper: wrappers) {
+                getModuleWrappers().add(wrapper);
+                wrapper.moveBy(20, 20);
+                wrapper.setModule(wrapper.getModule());
+                wrapper.setBoard(this);
+                currentEmitterWrapper.getGraph().addModule(wrapper.getModule());
+                wrapper.getModule().setModuleGraph(currentEmitterWrapper.getGraph());
+                moduleContainer.addActor(wrapper);
+            }
+            setSelectedWrappers(wrappers);
+        } catch (Exception e) {
+
+        }
+    }
+
 
     public class NodeConnection {
         public ModuleWrapper fromModule;
@@ -618,6 +645,8 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         return group;
     }
+
+
 
 
     public void createGroupFromSelectedWrappers() {

@@ -94,6 +94,15 @@ public class NodeStage {
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     moduleBoardWidget.createGroupFromSelectedWrappers();
                 }
+
+                if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    moduleBoardWidget.copySelectedModules();
+                }
+
+                if(keycode == Input.Keys.V && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    moduleBoardWidget.pasteFromClipboard();
+                }
+
                 return super.keyDown(event, keycode);
             }
         });
