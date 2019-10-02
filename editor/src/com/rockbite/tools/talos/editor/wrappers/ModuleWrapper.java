@@ -40,6 +40,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
 
+    private IntMap<String> leftSlotNames = new IntMap<>();
+    private IntMap<String> rightSlotNames = new IntMap<>();
+
     private int id;
 
 
@@ -77,9 +80,31 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         pack();
 
         addCaptureListener(new InputListener() {
+
+            Vector2 tmp = new Vector2();
+            Vector2 prev = new Vector2();
+
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                prev.set(x, y);
+                ModuleWrapper.this.localToStageCoordinates(prev);
                 moduleBoardWidget.wrapperClicked(ModuleWrapper.this);
-                return false;
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                tmp.set(x, y);
+                ModuleWrapper.this.localToStageCoordinates(tmp);
+                super.touchDragged(event, x, y, pointer);
+                moduleBoardWidget.wrapperMovedBy(ModuleWrapper.this, tmp.x - prev.x, tmp.y - prev.y);
+
+                prev.set(tmp);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                super.touchUp(event, x, y, pointer, button);
+                moduleBoardWidget.wrapperClickedUp(ModuleWrapper.this);
             }
         });
 
@@ -109,6 +134,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         leftWrapper.add(slotRow).left().expandX();
         leftWrapper.row();
 
+        leftSlotNames.put(key, title);
+
         configureNodeActions(icon, key, true);
     }
 
@@ -121,6 +148,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
         rightWrapper.add(slotRow).right().expandX();
         rightWrapper.row();
+
+        rightSlotNames.put(key, title);
 
         configureNodeActions(icon, key, false);
     }
@@ -444,6 +473,13 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
             myValue.setFlavour(toValue.getFlavour());
         }
+
+        // change the name
+        getTitleLabel().setText(moduleWrapper.getLeftSlotName(targetSlot) + " (" + module.getClass().getSimpleName() + ")");
+    }
+
+    private String getLeftSlotName(int targetSlot) {
+        return leftSlotNames.get(targetSlot);
     }
 
     @Override

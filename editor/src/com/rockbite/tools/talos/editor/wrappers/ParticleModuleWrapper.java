@@ -57,7 +57,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.TARGET) return Vector2Module.class;
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
         if(slot.getIndex() == ParticleModule.VELOCITY) return DynamicRangeModule.class;
-        if(slot.getIndex() == ParticleModule.ROTATION) return CurveModule.class;
+        if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
         if(slot.getIndex() == ParticleModule.ANGLE) return DynamicRangeModule.class;

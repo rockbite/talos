@@ -2,14 +2,15 @@ package com.rockbite.tools.talos.editor.project;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
-import com.rockbite.tools.talos.editor.serialization.EmitterData;
-import com.rockbite.tools.talos.editor.serialization.ExportData;
-import com.rockbite.tools.talos.editor.serialization.ProjectData;
-import com.rockbite.tools.talos.editor.serialization.ProjectSerializer;
+import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
+import com.rockbite.tools.talos.editor.serialization.*;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
@@ -52,11 +53,15 @@ public class Project {
 			ParticleEmitterWrapper firstEmitter = null;
 
 			for(EmitterData emitterData: projectData.getEmitters()) {
+				IntMap<ModuleWrapper> map = new IntMap<>();
+
 				ParticleEmitterWrapper emitterWrapper = createNewEmitter(emitterData.name);
 				TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
 
 				final ParticleEmitterDescriptor graph = emitterWrapper.getGraph();
 				for (ModuleWrapper module : emitterData.modules) {
+					map.put(module.getId(), module);
+
 					graph.addModule(module.getModule());
 					module.getModule().setModuleGraph(graph);
 				}
@@ -64,6 +69,20 @@ public class Project {
 
 				if(firstEmitter == null) {
 					firstEmitter = emitterWrapper;
+				}
+
+				// time to load groups here
+				for(GroupData group: emitterData.groups) {
+					ObjectSet<ModuleWrapper> childWrappers = new ObjectSet<>();
+					for(Integer id: group.modules) {
+						if(map.get(id) != null) {
+							childWrappers.add(map.get(id));
+						}
+					}
+					ModuleWrapperGroup moduleWrapperGroup = TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupForWrappers(childWrappers);
+					Color clr = new Color();
+					Color.abgr8888ToColor(clr, group.color);
+					moduleWrapperGroup.setData(group.text, clr);
 				}
 			}
 

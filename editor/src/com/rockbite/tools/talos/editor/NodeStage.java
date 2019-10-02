@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,7 +23,6 @@ public class NodeStage {
     public Skin skin;
 
     public ModuleBoardWidget moduleBoardWidget;
-
 
     public NodeStage (Skin skin) {
         this.skin = skin;
@@ -63,7 +61,9 @@ public class NodeStage {
                 }
                 wasDragged = false;
 
-                return super.touchDown(event, x, y, pointer, button);
+                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+
+                return true;
             }
 
             @Override
@@ -73,23 +73,26 @@ public class NodeStage {
                 wasDragged = true;
 
                 super.touchDragged(event, x, y, pointer);
+
+                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
             }
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
-                if(!event.isHandled() && button == 0 && !wasDragged) {
+                if(!event.isHandled() && button == 0) {
                     FocusManager.resetFocus(getStage());
-
                     moduleBoardWidget.clearSelection();
                 }
+
+                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
             }
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    moduleBoardWidget.createGroupFromSelectedWidgets();
+                    moduleBoardWidget.createGroupFromSelectedWrappers();
                 }
                 return super.keyDown(event, keycode);
             }

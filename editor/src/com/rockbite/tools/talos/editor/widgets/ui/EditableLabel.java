@@ -1,10 +1,12 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
 
@@ -34,7 +36,7 @@ public class EditableLabel extends Table {
         labelTabel.add().expandX();
 
 
-        textField = new TextField("", getSkin(), "no-bg");
+        textField = new TextField(text, getSkin(), "no-bg");
         inputTable.add(textField);
         inputTable.add().expandX();
 
@@ -67,16 +69,29 @@ public class EditableLabel extends Table {
             }
         });
 
+        textField.addListener(new FocusListener() {
+            @Override
+            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
+                super.keyboardFocusChanged(event, actor, focused);
+                if(!focused) {
+                    setStaticMode();
+                }
+            }
+        });
+
         pack();
+
+        setStaticMode();
     }
 
     public void setEditMode() {
         labelTabel.setVisible(false);
         inputTable.setVisible(true);
+        textField.setWidth(label.getPrefWidth());
         textField.setText(label.getText().toString());
-        textField.selectAll();
-        getStage().setKeyboardFocus(textField);
         TalosMain.Instance().NodeStage().getStage().unfocusAll();
+        getStage().setKeyboardFocus(textField);
+        textField.selectAll();
     }
 
     public void setStaticMode() {
@@ -85,5 +100,13 @@ public class EditableLabel extends Table {
 
         label.setText(textField.getText());
         textField.clearSelection();
+    }
+
+    public String getText() {
+        return label.getText().toString();
+    }
+
+    public void setText(String text) {
+        label.setText(text);
     }
 }

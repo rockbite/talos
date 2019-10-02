@@ -31,6 +31,12 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         if(slot.getIndex() == EmitterModule.CONFIG) {
             return EmConfigModule.class;
         }
+        if(slot.getIndex() == EmitterModule.DURATION) {
+            return StaticValueModule.class;
+        }
+        if(slot.getIndex() == EmitterModule.DELAY) {
+            return StaticValueModule.class;
+        }
 
         return null;
     }

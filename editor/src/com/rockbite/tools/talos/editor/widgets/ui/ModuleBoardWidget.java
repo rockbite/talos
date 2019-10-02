@@ -41,7 +41,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     private ParticleEmitterWrapper currentEmitterWrapper;
     private ObjectSet<ModuleWrapper> selectedWrappers = new ObjectSet<>();
 
-    private Array<ModuleWrapperGroup> groups = new Array<>();
+    private ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapperGroup>> groups = new ObjectMap<>();
 
     Group groupContainer = new Group();
     Group moduleContainer = new Group();
@@ -57,6 +57,8 @@ public class ModuleBoardWidget extends WidgetGroup {
     private Bezier<Vector2> bezier = new Bezier<>();
     private Vector2[] curvePoints = new Vector2[4];
 
+    private ModuleWrapper wasWrapperSelectedOnDown = null;
+    private ModuleWrapper wasWrapperDragged = null;
 
 
     private NodeStage mainStage;
@@ -145,6 +147,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         for (ModuleWrapper wrapper : getModuleWrappers()) {
                 moduleContainer.addActor(wrapper);
         }
+
+        for (ModuleWrapperGroup group : getGroups()) {
+            groupContainer.addActor(group);
+        }
     }
 
     public void removeEmitter(ParticleEmitterWrapper wrapper) {
@@ -155,6 +161,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void clearAll() {
         moduleWrappers.clear();
         nodeConnections.clear();
+        groups.clear();
     }
 
     public void fileDrop(String[] paths, float x, float y) {
@@ -190,6 +197,26 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
+    public Array<ModuleWrapperGroup> getGroups(ParticleEmitterWrapper emitterModuleWrapper) {
+        return groups.get(emitterModuleWrapper);
+    }
+
+    public Array<ModuleWrapperGroup> getGroups() {
+        Array<ModuleWrapperGroup> arr = groups.get(currentEmitterWrapper);
+        if(arr == null) {
+            arr = new Array<>();
+            groups.put(currentEmitterWrapper, arr);
+        }
+
+        return arr;
+    }
+
+    public void removeGroup(ModuleWrapperGroup moduleWrapperGroup) {
+        getGroups().removeValue(moduleWrapperGroup, true);
+        moduleWrapperGroup.remove();
+    }
+
+
     public class NodeConnection {
         public ModuleWrapper fromModule;
         public ModuleWrapper toModule;
@@ -222,37 +249,17 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         if(moduleGraph == null) return;
 
-        PopupMenu menu = new PopupMenu();
-        Array<Class> temp = new Array<>();
-        for (Class registeredModule : ParticleEmitterDescriptor.getRegisteredModules()) {
-            temp.add(registeredModule);
-        }
-        temp.sort(new Comparator<Class>() {
-            @Override
-            public int compare (Class o1, Class o2) {
-                return o1.getSimpleName().compareTo(o2.getSimpleName());
-            }
-        });
-        for(final Class clazz : temp) {
-            String className = clazz.getSimpleName();
-            MenuItem menuItem = new MenuItem(className);
-            menu.addItem(menuItem);
 
-            final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-            (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
 
-            menu.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
+        final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
 
-            menuItem.addListener(new ClickListener() {
-                @Override
-                public void clicked (InputEvent event, float x, float y) {
-                    createModule(clazz, vec.x, vec.y);
-                }
-            });
-        }
+
+        PopupMenu menu = TalosMain.Instance().UIStage().createModuleListPopup(vec);
+        menu.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
     }
 
-    private void deleteSelectedWrappers() {
+    public void deleteSelectedWrappers() {
        for(ModuleWrapper wrapper : getSelectedWrappers()) {
            deleteWrapper(wrapper);
        }
@@ -268,6 +275,9 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
         mainStage.getCurrentModuleGraph().removeModule(wrapper.getModule());
         moduleContainer.removeActor(wrapper);
+        for(ModuleWrapperGroup group: getGroups()) {
+            group.removeWrapper(wrapper);
+        }
     }
 
     public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
@@ -309,7 +319,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             getModuleWrappers().add(moduleWrapper);
             moduleContainer.addActor(moduleWrapper);
 
-            addWrapperToSelection(moduleWrapper);
+            selectWrapper(moduleWrapper);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
@@ -546,26 +556,72 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void wrapperClicked(ModuleWrapper wrapper) {
-        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-            if(selectedWrappers.contains(wrapper)) {
-                removeWrapperFromSelection(wrapper);
-            } else {
-                addWrapperToSelection(wrapper);
-            }
+        wasWrapperDragged = null;
+        if(selectedWrappers.contains(wrapper)) {
+            wasWrapperSelectedOnDown = wrapper;
         } else {
-            selectWrapper(wrapper);
+            wasWrapperSelectedOnDown = null;
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            addWrapperToSelection(wrapper);
+        } else {
+            if(!selectedWrappers.contains(wrapper)) {
+                selectWrapper(wrapper);
+            }
         }
     }
 
+    public void wrapperMovedBy(ModuleWrapper wrapper, float x, float y) {
+        wasWrapperDragged = wrapper;
+        if(selectedWrappers.size > 1) {
+            for(ModuleWrapper other: selectedWrappers) {
+                if(other != wrapper) {
+                    other.moveBy(x, y);
+                }
+            }
+        }
+    }
 
-    public void createGroupFromSelectedWidgets() {
+    public void wrapperClickedUp(ModuleWrapper wrapper) {
+
+        if(wasWrapperDragged != null) {
+
+        } else {
+            // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
+            if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                selectWrapper(wrapper);
+            } else {
+                if(wasWrapperSelectedOnDown == wrapper) {
+                    removeWrapperFromSelection(wrapper);
+                } else {
+                    addWrapperToSelection(wrapper);
+                }
+            }
+        }
+    }
+
+    public ModuleWrapperGroup createGroupForWrappers(ObjectSet<ModuleWrapper> wrappers) {
+        if(wrappers == null || wrappers.size == 0) return null;
+
+        for(ModuleWrapperGroup other: getGroups()) {
+            other.removeWrappers(wrappers);
+        }
+
         ModuleWrapperGroup group = new ModuleWrapperGroup(mainStage.getSkin());
-        group.setWrappers(getSelectedWrappers());
-        groups.add(group);
+        group.setWrappers(wrappers);
+        getGroups().add(group);
 
         groupContainer.addActor(group);
 
         clearSelection();
+
+        return group;
+    }
+
+
+    public void createGroupFromSelectedWrappers() {
+        createGroupForWrappers(getSelectedWrappers());
     }
 
 

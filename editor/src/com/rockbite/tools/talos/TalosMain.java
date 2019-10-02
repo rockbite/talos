@@ -125,4 +125,8 @@ public class TalosMain extends ApplicationAdapter {
 		uiStage.getStage().dispose();
 	}
 
+	public CameraController getCameraController() {
+		return cameraController;
+	}
+
 }

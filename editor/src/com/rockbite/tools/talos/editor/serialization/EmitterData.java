@@ -8,7 +8,7 @@ public class EmitterData {
 	public String name;
 	public Array<ModuleWrapper> modules = new Array<>();
 	public Array<ConnectionData> connections = new Array<>();
-	public Array groups = new Array();
+	public Array<GroupData> groups = new Array();
 
 	public EmitterData () {
 

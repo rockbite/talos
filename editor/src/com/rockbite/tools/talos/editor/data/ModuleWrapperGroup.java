@@ -1,16 +1,27 @@
 package com.rockbite.tools.talos.editor.data;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.EditableLabel;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 
-public class ModuleWrapperGroup extends Group {
-
-    private String text = "";
+public class ModuleWrapperGroup extends Group{
 
     private ObjectSet<ModuleWrapper> wrappers = new ObjectSet();
 
@@ -29,6 +40,9 @@ public class ModuleWrapperGroup extends Group {
     Image frameImage;
     EditableLabel title;
     ImageButton settings;
+    Actor topHit;
+
+    PopupMenu settingsPopup;
 
     public ModuleWrapperGroup(Skin skin) {
         this.skin = skin;
@@ -37,12 +51,82 @@ public class ModuleWrapperGroup extends Group {
         frameImage.setColor(44/255f, 140/255f, 209/255f, 1f);
         addActor(frameImage);
 
-        title = new EditableLabel("VELOCITY & TRANSFORM", skin);
+        topHit = new Actor();
+        topHit.setTouchable(Touchable.enabled);
+        addActor(topHit);
+
+        title = new EditableLabel("GROUP NAME", skin);
         addActor(title);
 
         settings = new ImageButton(skin, "settings");
         settings.setSize(25, 25);
         addActor(settings);
+
+        settings.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+                (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+                settingsPopup.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
+            }
+        });
+
+        settingsPopup = new PopupMenu();
+        MenuItem changeColorMenuItem = new MenuItem("Change Color");
+        MenuItem ungroupMenuItem = new MenuItem("Ungroup");
+        settingsPopup.addItem(changeColorMenuItem);
+        settingsPopup.addItem(ungroupMenuItem);
+        changeColorMenuItem.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                    @Override
+                    public void changed(Color newColor) {
+                        super.changed(newColor);
+                        frameImage.setColor(newColor);
+                    }
+                });
+            }
+        });
+        ungroupMenuItem.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(ModuleWrapperGroup.this);
+            }
+        });
+
+        topHit.addListener(new ClickListener() {
+
+            Vector2 tmp = new Vector2();
+            Vector2 pos = new Vector2();
+            Vector2 diff = new Vector2();
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                pos.set(x, y);
+                topHit.localToStageCoordinates(pos);
+                TalosMain.Instance().NodeStage().moduleBoardWidget.setSelectedWrappers(wrappers);
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                tmp.set(x, y);
+                topHit.localToStageCoordinates(tmp);
+
+                diff.set(tmp).sub(pos);
+
+                moveGroupBy(diff.x, diff.y);
+
+                pos.set(tmp);
+
+                super.touchDragged(event, x, y, pointer);
+            }
+        });
+
+        setTouchable(Touchable.childrenOnly);
+        frameImage.setTouchable(Touchable.disabled);
     }
 
     public void setWrappers(ObjectSet<ModuleWrapper> wrappers) {
@@ -80,10 +164,55 @@ public class ModuleWrapperGroup extends Group {
 
         title.setPosition(7, getHeight() - title.getPrefHeight() + TOP_BAR - 5);
         settings.setPosition(getWidth() - settings.getWidth() - 3, getHeight() - settings.getHeight() + TOP_BAR - 3);
+
+        topHit.setPosition(0, getHeight());
+        topHit.setSize(getWidth(), TOP_BAR);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
+    }
+
+    private void moveGroupBy(float x, float y) {
+        for(ModuleWrapper wrapper: wrappers) {
+            wrapper.moveBy(x, y);
+        }
+    }
+
+    public void removeWrappers(ObjectSet<ModuleWrapper> wrappersToRemove) {
+        for(ModuleWrapper wrapper: wrappersToRemove) {
+            if(wrappers.contains(wrapper)) {
+                wrappers.remove(wrapper);
+            }
+        }
+
+        if(wrappers.size == 0) {
+            TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(this);
+        }
+    }
+
+    public String getText() {
+        return title.getText();
+    }
+
+    public ObjectSet<ModuleWrapper> getModuleWrappers() {
+        return wrappers;
+    }
+
+    public Color getFrameColor() {
+        return frameImage.getColor();
+    }
+
+    public void setData(String text, Color color) {
+        title.setText(text);
+        frameImage.setColor(color);
+    }
+
+    public void removeWrapper(ModuleWrapper wrapper) {
+        wrappers.remove(wrapper);
+        if(wrappers.size == 0) {
+            TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(this);
+        }
     }
 }
