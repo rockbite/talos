@@ -13,8 +13,8 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.editor.widgets.FloatRangeInputWidget;
-import com.rockbite.tools.talos.runtime.modules.DynamicRangeModule;
-import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule> implements CurveDataProvider {
@@ -39,6 +39,13 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
             lowInput.setFlavour(NumericalValue.Flavour.REGULAR);
             highInput.setFlavour(NumericalValue.Flavour.REGULAR);
         }
+    }
+
+    @Override
+    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+        if(slot.getIndex() == DynamicRangeModule.ALPHA) return InputModule.class;
+
+        return null;
     }
 
     @Override

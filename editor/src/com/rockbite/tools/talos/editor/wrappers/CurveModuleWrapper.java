@@ -3,12 +3,10 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
-import com.rockbite.tools.talos.runtime.modules.CurveModule;
-import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 
 public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements CurveDataProvider {
 
@@ -32,6 +30,13 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements Cu
 
         leftWrapper.add(new Table()).expandY();
         rightWrapper.add(new Table()).expandY();
+    }
+
+    @Override
+    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+        if(slot.getIndex() == CurveModule.ALPHA) return InputModule.class;
+
+        return null;
     }
 
     @Override

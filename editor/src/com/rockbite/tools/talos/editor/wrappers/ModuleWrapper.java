@@ -375,6 +375,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
             inputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
         } else {
             outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
+
+            getTitleLabel().setText(module.getClass().getSimpleName());
         }
     }
 
@@ -475,7 +477,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         }
 
         // change the name
-        getTitleLabel().setText(moduleWrapper.getLeftSlotName(targetSlot) + " (" + module.getClass().getSimpleName() + ")");
+        getTitleLabel().setText(moduleWrapper.getLeftSlotName(targetSlot));
     }
 
     private String getLeftSlotName(int targetSlot) {
