@@ -9,15 +9,15 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public class Slot {
 
-    private int index;
+    public int index;
     private boolean isInput;
     private Flavour flavour;
 
     private Module currentModule;
-    private Module targetModule;
-    private Slot targetSlot;
+    public Module targetModule;
+    public Slot targetSlot;
 
-    private Value value;
+    public Value value;
 
     private String text = "";
 

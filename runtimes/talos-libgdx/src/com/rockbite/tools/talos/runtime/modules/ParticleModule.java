@@ -74,64 +74,64 @@ public class ParticleModule extends Module {
     }
 
     public void updateScopeData(Particle particle) {
-        getScope().set(ScopePayload.EMITTER_ALPHA, particle.particleEmitter.alpha);
-        getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
-        getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
-        getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
-        getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
+        graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].set(particle.particleEmitter.alpha);
+        graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].set(particle.alpha);
+        graph.scopePayload.internalMap[ScopePayload.PARTICLE_SEED].set(particle.seed);
+        graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].set(particle.seed);
+        graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA_AT_P_INIT].set(particle.durationAtInit);
     }
 
     public ParticleDrawable getDrawable() {
         fetchInputSlotValue(DRAWABLE);
-        if(drawable.isEmpty()) {
+        if(drawable.isEmpty) {
             return defaultDrawable;
         }
 
-        getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getDrawable().getAspectRatio());
+        graph.scopePayload.internalMap[ScopePayload.DRAWABLE_ASPECT_RATIO].set(drawable.getDrawable().getAspectRatio());
 
         return drawable.getDrawable();
     }
 
     public float getTransparency() {
         fetchInputSlotValue(TRANSPARENCY);
-        if(transparency.isEmpty()) return 1; // defaults
-        return transparency.getFloat();
+        if(transparency.isEmpty) return 1; // defaults
+        return transparency.elements[0];
     }
 
     public float getLife() {
         fetchInputSlotValue(LIFE);
-        if(life.isEmpty()) return 2; // defaults
-        return life.getFloat();
+        if(life.isEmpty) return 2; // defaults
+        return life.elements[0];
     }
 
     public float getAngle() {
         fetchInputSlotValue(ANGLE);
-        if(angle.isEmpty()) return 90; // defaults
-        return angle.getFloat();
+        if(angle.isEmpty) return 90; // defaults
+        return angle.elements[0];
     }
 
     public float getVelocity() {
         fetchInputSlotValue(VELOCITY);
-        if(velocity.isEmpty()) return 0; // defaults
-        return velocity.getFloat();
+        if(velocity.isEmpty) return 0; // defaults
+        return velocity.elements[0];
     }
 
     public float getRotation() {
         fetchInputSlotValue(ROTATION);
-        if(rotation.isEmpty()) return 0; // defaults
-        return rotation.getFloat();
+        if(rotation.isEmpty) return 0; // defaults
+        return rotation.elements[0];
     }
 
     public Vector2 getSize() {
         fetchInputSlotValue(SIZE);
-        if(size.isEmpty()) {
-            tmpVec.set(1f, 1f/getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
-        }  else if(size.elementsCount() == 1) {
-            tmpVec.set(size.getFloat(), size.getFloat() / getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
-        } else if (size.elementsCount() == 2) {
+        if(size.isEmpty) {
+            tmpVec.set(1f, 1f/graph.scopePayload.internalMap[ScopePayload.DRAWABLE_ASPECT_RATIO].elements[0]);
+        }  else if(size.currentElementCount == 1) {
+            tmpVec.set(size.elements[0], size.elements[0] / graph.scopePayload.internalMap[ScopePayload.DRAWABLE_ASPECT_RATIO].elements[0]);
+        } else if (size.currentElementCount == 2) {
             tmpVec.set(size.get(0), size.get(1));
         } else {
-            tmpVec.set(1f, 1f/getScope().getFloat(ScopePayload.DRAWABLE_ASPECT_RATIO));
+            tmpVec.set(1f, 1f/graph.scopePayload.internalMap[ScopePayload.DRAWABLE_ASPECT_RATIO].elements[0]);
         }
 
         return tmpVec;
@@ -139,14 +139,14 @@ public class ParticleModule extends Module {
 
     public Color getColor() {
         fetchInputSlotValue(COLOR);
-        if(color.isEmpty()) return Color.WHITE; // defaults
+        if(color.isEmpty) return Color.WHITE; // defaults
         tmpColor.set(color.get(0), color.get(1), color.get(2), 1f);
         return tmpColor;
     }
 
     public Vector2 getStartPosition() {
         fetchInputSlotValue(OFFSET);
-        if(offset.isEmpty()) {
+        if(offset.isEmpty) {
             tmpVec.set(0, 0);
             return tmpVec;
         }
@@ -157,7 +157,7 @@ public class ParticleModule extends Module {
 
     public Vector2 getTarget() {
         fetchInputSlotValue(TARGET);
-        if(target.isEmpty()) {
+        if(target.isEmpty) {
             return null;
         }
         tmpVec.set(target.get(0), target.get(1));
@@ -167,7 +167,7 @@ public class ParticleModule extends Module {
 
     public Vector2 getPosition() {
         fetchInputSlotValue(POSITION);
-        if(position.isEmpty()) {
+        if(position.isEmpty) {
             return null;
         }
         tmpVec.set(position.get(0), position.get(1));

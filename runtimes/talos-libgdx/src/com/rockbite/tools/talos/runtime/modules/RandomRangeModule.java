@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -24,13 +25,12 @@ public class RandomRangeModule extends Module {
 
     @Override
     public void processValues() {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * index * 1000)));
-        // what's worse, keeping thousands of long values, or keeping floats but casting 1000 times to long?
-        // I'll leave the answer to the reader
+        float a = 23.14069263277926f;
+        final float particleSeed = graph.scopePayload.internalMap[ScopePayload.PARTICLE_SEED].elements[0];
+        float value = MathUtils.cos(particleSeed * a * index);
+        float fraction = value - (int)value;
 
-        float startPos = random.nextFloat();
-
-        float res = min + (max - min) * startPos;
+        float res = min + (max - min) * fraction;
 
         output.set(res);
     }

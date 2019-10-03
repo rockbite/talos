@@ -101,8 +101,11 @@ public class OffsetModule extends Module {
     }
 
     private void getRandomPosOn(int side, boolean edge, int shape, NumericalValue pos, NumericalValue size, Vector2 result) {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * index * 1000)));
-        float angle = random.nextFloat();
+        float a = 23.14069263277926f;
+        final float particleSeed = graph.scopePayload.internalMap[ScopePayload.PARTICLE_SEED].elements[0];
+        float value = MathUtils.cos(particleSeed * a * index);
+        float angle = value - (int)value;
+
 
         if(side == SIDE_TOP) angle = angle/2f;
         if(side == SIDE_BOTTOM) angle = angle/2f + 0.5f;
@@ -162,17 +165,17 @@ public class OffsetModule extends Module {
     }
 
     protected void processAlphaDefaults() {
-        if(alpha.isEmpty()) {
+        if(alpha.isEmpty) {
             // as default we are going to fetch the lifetime or duration depending on context
-            float requester = getScope().getFloat(ScopePayload.REQUESTER_ID);
+            float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0];
             if(requester < 1) {
                 // particle
-                alpha.set(getScope().get(ScopePayload.PARTICLE_ALPHA));
-                alpha.setEmpty(false);
+                alpha.set(graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
+                alpha.isEmpty = false;
             } else if(requester > 1) {
                 // emitter
-                alpha.set(getScope().get(ScopePayload.EMITTER_ALPHA));
-                alpha.setEmpty(false);
+                alpha.set(graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
+                alpha.isEmpty = false;
             } else {
                 // whaat?
                 alpha.set(0);

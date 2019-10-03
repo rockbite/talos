@@ -28,8 +28,8 @@ public class Vector2Module extends Module {
     @Override
     public void processValues() {
 
-        if(x.isEmpty()) x.set(defaultX);
-        if(y.isEmpty()) y.set(defaultY);
+        if(x.isEmpty) x.set(defaultX);
+        if(y.isEmpty) y.set(defaultY);
 
         output.set(x, y);
     }

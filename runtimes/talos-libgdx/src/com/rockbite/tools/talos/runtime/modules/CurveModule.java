@@ -47,7 +47,7 @@ public class CurveModule extends Module {
 
     private void resetPoints() {
         // need to guarantee at least one point
-        points = new Array<>();
+        points = new Array<>(Vector2.class);
         Vector2 point = new Vector2(0, 0.5f);
         points.add(point);
     }
@@ -77,17 +77,17 @@ public class CurveModule extends Module {
     }
 
     protected void processAlphaDefaults() {
-        if(alpha.isEmpty()) {
+        if(alpha.isEmpty) {
             // as default we are going to fetch the lifetime or duration depending on context
-            float requester = getScope().getFloat(ScopePayload.REQUESTER_ID);
+            float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0];
             if(requester < 1) {
                 // particle
-                alpha.set(getScope().get(ScopePayload.PARTICLE_ALPHA));
-                alpha.setEmpty(false);
+                alpha.set(graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
+                alpha.isEmpty = false;
             } else if(requester > 1) {
                 // emitter
-                alpha.set(getScope().get(ScopePayload.EMITTER_ALPHA));
-                alpha.setEmpty(false);
+                alpha.set(graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
+                alpha.isEmpty = false;
             } else {
                 // whaat?
                 alpha.set(0);
@@ -98,19 +98,20 @@ public class CurveModule extends Module {
     @Override
     public void processValues() {
         processAlphaDefaults();
-        output.set(interpolate(alpha.getFloat()));
+        output.set(interpolate(alpha.elements[0]));
     }
 
     private float interpolate(float alpha) {
         // interpolate alpha in this point space
 
-        if(points.get(0).x >= 0 && alpha <= points.get(0).x) {
-            return points.get(0).y;
+        final Vector2 firstPoint = points.items[0];
+        if(firstPoint.x >= 0 && alpha <= firstPoint.x) {
+            return firstPoint.y;
         }
 
         for(int i = 0; i < points.size-1; i++) {
-            Vector2 from = points.get(i);
-            Vector2 to = points.get(i+1);
+            Vector2 from = points.items[i];
+            Vector2 to = points.items[i+1];
             if(alpha > from.x && alpha <= to.x) {
                 float localAlpha = 1f;
                 if(from.x != to.x) {
@@ -120,8 +121,9 @@ public class CurveModule extends Module {
             }
         }
 
-        if(points.get(points.size-1).x <= 1f && alpha >= points.get(points.size-1).x) {
-            return points.get(points.size-1).y;
+        final Vector2 lastPoint = points.items[points.size - 1];
+        if(lastPoint.x <= 1f && alpha >= lastPoint.x) {
+            return lastPoint.y;
         }
 
         return 0;

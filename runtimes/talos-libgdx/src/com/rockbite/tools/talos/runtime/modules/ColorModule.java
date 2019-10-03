@@ -37,9 +37,9 @@ public class ColorModule extends Module {
     @Override
     public void processValues() {
 
-        if(r.isEmpty()) r.set(defaultR);
-        if(g.isEmpty()) g.set(defaultG);
-        if(b.isEmpty()) b.set(defaultB);
+        if(r.isEmpty) r.set(defaultR);
+        if(g.isEmpty) g.set(defaultG);
+        if(b.isEmpty) b.set(defaultB);
 
         output.set(r, g, b);
     }

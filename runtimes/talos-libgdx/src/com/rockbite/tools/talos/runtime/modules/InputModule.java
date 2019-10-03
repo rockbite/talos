@@ -18,7 +18,7 @@ public class InputModule extends Module {
 
     @Override
     public void processValues() {
-        NumericalValue value = getScope().get(scopeKey);
+        NumericalValue value = graph.scopePayload.internalMap[scopeKey];
         outputValue.set(value);
     }
 

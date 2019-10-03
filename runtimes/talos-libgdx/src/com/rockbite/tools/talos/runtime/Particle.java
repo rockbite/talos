@@ -27,8 +27,13 @@ public class Particle implements Pool.Poolable {
 
     public ParticleDrawable drawable;
 
+    private static int uniqueIDCounter = 0;
+
+    public final int uniqueID;
+
     public Particle() {
         // empty constructor
+        uniqueID = uniqueIDCounter++;
     }
 
     public void init(ParticleModule particleModule, ParticleEmitterInstance particleEmitter) {

@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 public class NumericalValue extends Value {
 
-	private float[] elements = new float[4];
+	public float[] elements = new float[4];
 
-	private int currentElementCount;
+	public int currentElementCount;
 
 	public enum Flavour {
 		REGULAR,

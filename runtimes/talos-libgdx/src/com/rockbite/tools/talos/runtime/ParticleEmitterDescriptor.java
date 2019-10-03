@@ -8,9 +8,9 @@ public class ParticleEmitterDescriptor {
 
     private final ParticleEffectDescriptor particleEffectResourceDescriptor;
 
-    ScopePayload scopePayload;
+    public ScopePayload scopePayload;
 
-    Array<Module> modules = new Array<>();
+    Array<Module> modules = new Array<>(Module.class);
 
     ParticleModule particleModule;
     EmitterModule emitterModule;
@@ -109,9 +109,8 @@ public class ParticleEmitterDescriptor {
     }
 
     public void resetRequesters() {
-        for(Module module: modules) {
-            module.resetLastRequester();
-        }
+        for (int i = 0, n = modules.size; i < n; i++)
+            modules.items[i].lastRequester = -1f;
     }
 
     public EmitterModule getEmitterModule() {
@@ -134,6 +133,9 @@ public class ParticleEmitterDescriptor {
         JsonValue modulesArr = emitter.get("modules");
         JsonValue connections = emitter.get("connections");
         modules = json.readValue(Array.class, modulesArr);
+        Array<Module> mod = new Array<>(Module.class);
+        mod.addAll(modules);
+        modules = mod;
         IntMap<Module> idMap = new IntMap<>();
         for(Module module: modules) {
             module.setModuleGraph(this);

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.LongMap;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ParticleEmitterInstance;
@@ -28,9 +29,13 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
-			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
-				renderParticle(batch, particleEmitter.activeParticles.get(j));
+			for (int j = 0; j < particleEmitter.activeParticles.length; j++) {
+				if (particleEmitter.activeParticles[j] != null) {
+					renderParticle(batch, particleEmitter.activeParticles[j]);
+				}
 			}
+
+
 		}
 
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

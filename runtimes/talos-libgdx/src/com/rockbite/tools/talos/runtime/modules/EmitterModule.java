@@ -39,31 +39,31 @@ public class EmitterModule extends Module {
     public float getDelay() {
         fetchInputSlotValue(DELAY);
 
-        if(delay.isEmpty()) return 0f; // defaults
+        if(delay.isEmpty) return 0f; // defaults
 
-        return delay.getFloat();
+        return delay.elements[0];
     }
 
     public float getDuration() {
         fetchInputSlotValue(DURATION);
 
-        if(duration.isEmpty()) return 2f; // defaults
+        if(duration.isEmpty) return 2f; // defaults
 
-        return duration.getFloat();
+        return duration.elements[0];
     }
 
     public float getRate() {
         fetchInputSlotValue(RATE);
 
-        if(rate.isEmpty()) return 50; // defaults
+        if(rate.isEmpty) return 50; // defaults
 
-        return rate.getFloat();
+        return rate.elements[0];
     }
 
     public boolean isContinnuous() {
         fetchInputSlotValue(CONFIG);
 
-        if(config.isEmpty()) return false;
+        if(config.isEmpty) return false;
 
         return config.continuous;
     }
@@ -71,7 +71,7 @@ public class EmitterModule extends Module {
     public boolean isAttached() {
         fetchInputSlotValue(CONFIG);
 
-        if(config.isEmpty()) return false;
+        if(config.isEmpty) return false;
 
         return config.attached;
     }
@@ -79,14 +79,14 @@ public class EmitterModule extends Module {
     public boolean isAligned() {
         fetchInputSlotValue(CONFIG);
 
-        if(config.isEmpty()) return false;
+        if(config.isEmpty) return false;
 
         return config.aligned;
     }
 
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {
-        getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
-        getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
+        graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].set(particleEmitter.alpha);
+        graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].set(1.1f); // TODO change to something more... unique when emitters are in
     }
 
     @Override

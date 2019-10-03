@@ -21,13 +21,16 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.modules.Module;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.lwjgl.Sys;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
-public class LegacyCompareTest extends ApplicationAdapter {
+public class LegacyCompareTest extends ApplicationAdapter implements Runnable {
 
     Stage stage;
     Stage uiStage;
@@ -44,14 +47,29 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
     Skin skin;
 
-    Label leftTime, rightTime;
+    Label leftTime, rightTime, comparedTime;
 
     Array<Long> leftTimes = new Array<>();
     Array<Long> rightTimes = new Array<>();
+    private float talosAverageTimeMS;
+    private float legacyAverageTimeMS;
 
+    private ParticleEffectInstance particleEffect;
 
     public LegacyCompareTest() {
 
+    }
+
+    @Override
+    public void run () {
+        while (true) {
+            try {
+                particleEffect.update(1/60f);
+                Thread.sleep(16);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private class LegacyActor extends Actor {
@@ -83,7 +101,8 @@ public class LegacyCompareTest extends ApplicationAdapter {
                 sum += leftTimes.get(i);
             }
             long avg = sum/leftTimes.size;
-            leftTime.setText(avg/1000 + "ns");
+            legacyAverageTimeMS = avg / 1000000f;
+            leftTime.setText(legacyAverageTimeMS + "ms");
         }
 
         @Override
@@ -95,7 +114,6 @@ public class LegacyCompareTest extends ApplicationAdapter {
     private class TalosActor extends Actor {
 
         ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
-        ParticleEffectInstance particleEffect;
         ParticleRenderer renderer;
 
         public TalosActor(FileHandle effect, TextureAtlas atlas, ParticleRenderer renderer) {
@@ -104,16 +122,20 @@ public class LegacyCompareTest extends ApplicationAdapter {
             particleEffectDescriptor.load(effect);
             particleEffect = particleEffectDescriptor.createEffectInstance();
             particleEffect.setScope(scope);
+
         }
 
         @Override
         public void act(float delta) {
-            long nano = TimeUtils.nanoTime();
             super.act(delta);
-            particleEffect.setPosition(getX(), getY());
-            particleEffect.update(Gdx.graphics.getDeltaTime());
 
-            long diff = TimeUtils.nanoTime() - nano;
+            float x = getX();
+            float y = getY();
+            long nano = System.nanoTime();
+            particleEffect.setPosition(x, y);
+            particleEffect.update(Gdx.graphics.getDeltaTime());
+            long diff = System.nanoTime() - nano;
+
             rightTimes.add(diff);
             if(rightTimes.size > 60) rightTimes.removeIndex(0);
             long sum = 0;
@@ -121,7 +143,12 @@ public class LegacyCompareTest extends ApplicationAdapter {
                 sum += rightTimes.get(i);
             }
             long avg = sum/rightTimes.size;
-            rightTime.setText(avg/1000 + "ns");
+            talosAverageTimeMS = avg / 1000000f;
+            rightTime.setText(talosAverageTimeMS + "ms");
+
+            comparedTime.setText((int)(talosAverageTimeMS/legacyAverageTimeMS  * 100) + "%");
+
+            Module.inputSlotMethodCall = 0;
         }
 
         @Override
@@ -146,7 +173,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         talosRenderer = new SpriteBatchParticleRenderer(stage.getBatch());
 
-        String mainPath = "C:\\Users\\User\\Desktop\\convert\\";
+        String mainPath = "C:\\Users\\Tom\\Desktop\\vfx\\";
 
         //mainPath = getLocalPath() + "\\";
 
@@ -165,6 +192,9 @@ public class LegacyCompareTest extends ApplicationAdapter {
         addNextEffect();
 
         Gdx.input.setInputProcessor(stage);
+
+//        Thread thread = new Thread(this);
+//        thread.start();
     }
 
     private void addNextEffect() {
@@ -186,12 +216,15 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         leftTime = new Label("", skin);
         rightTime = new Label("", skin);
+        comparedTime = new Label("", skin);
 
         leftTime.setPosition(uiStage.getWidth()/2f - 200,  200);
         rightTime.setPosition(uiStage.getWidth()/2f + 200, 200);
+        comparedTime.setPosition(uiStage.getWidth()/2f, 200);
 
         uiStage.addActor(leftTime);
         uiStage.addActor(rightTime);
+        uiStage.addActor(comparedTime);
 
 
         index++;

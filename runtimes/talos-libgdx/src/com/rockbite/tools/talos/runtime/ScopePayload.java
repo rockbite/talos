@@ -15,30 +15,17 @@ public class ScopePayload {
 
     private IntMap<NumericalValue> map = new IntMap<>();
 
+    public NumericalValue[] internalMap = new NumericalValue[10];
+
     public ScopePayload() {
-        for(int i = 0; i < 10; i++) {
-            map.put(i, new NumericalValue());
+        for(int i = 0; i < internalMap.length; i++) {
+            internalMap[i] = new NumericalValue();
         }
     }
 
-    public void set(int index, float value) {
-        map.get(index).set(value);
-    }
-
-    public void set(int index, NumericalValue value) {
-        map.get(index).set(value);
-    }
-
-    public NumericalValue get(int index) {
-        return map.get(index);
-    }
-
-    public float getFloat(int index) {
-        return map.get(index).getFloat();
-    }
 
     public void reset() {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < internalMap.length; i++) {
             map.get(i).set(0);
         }
     }

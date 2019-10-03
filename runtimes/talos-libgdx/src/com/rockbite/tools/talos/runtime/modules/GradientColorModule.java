@@ -49,17 +49,17 @@ public class GradientColorModule extends Module {
 	}
 
 	protected void processAlphaDefaults () {
-		if (alpha.isEmpty()) {
+		if (alpha.isEmpty) {
 			// as default we are going to fetch the lifetime or duration depending on context
-			float requester = getScope().getFloat(ScopePayload.REQUESTER_ID);
+			float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0];
 			if (requester < 1) {
 				// particle
-				alpha.set(getScope().get(ScopePayload.PARTICLE_ALPHA));
-				alpha.setEmpty(false);
+				alpha.set(graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
+				alpha.isEmpty = false;
 			} else if (requester > 1) {
 				// emitter
-				alpha.set(getScope().get(ScopePayload.EMITTER_ALPHA));
-				alpha.setEmpty(false);
+				alpha.set(graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
+				alpha.isEmpty = false;
 			} else {
 				// whaat?
 				alpha.set(0);
@@ -110,25 +110,29 @@ public class GradientColorModule extends Module {
 
 	public Color getPosColor (float pos) {
 
-		if (pos <= points.get(0).pos) {
-			tmpColor.set(points.get(0).color);
+		final ColorPoint firstPoint = points.get(0);
+		if (pos <= firstPoint.pos) {
+			tmpColor.set(firstPoint.color);
 		}
 
-		if (pos >= points.get(points.size - 1).pos) {
-			tmpColor.set(points.get(points.size - 1).color);
+		final ColorPoint lastPoint = points.get(points.size - 1);
+		if (pos >= lastPoint.pos) {
+			tmpColor.set(lastPoint.color);
 		}
 
 		for (int i = 0; i < points.size - 1; i++) {
-			if (points.get(i).pos < pos && points.get(i + 1).pos > pos) {
+			final ColorPoint currentPoint = points.get(i);
+			final ColorPoint nextPoint = points.get(i + 1);
+			if (currentPoint.pos < pos && nextPoint.pos > pos) {
 				// found it
 
-				if (points.get(i + 1).pos == points.get(i).pos) {
-					tmpColor.set(points.get(i).color);
+				if (nextPoint.pos == currentPoint.pos) {
+					tmpColor.set(currentPoint.color);
 				} else {
-					float localAlpha = (pos - points.get(i).pos) / (points.get(i + 1).pos - points.get(i).pos);
-					tmpColor.r = Interpolation.linear.apply(points.get(i).color.r, points.get(i + 1).color.r, localAlpha);
-					tmpColor.g = Interpolation.linear.apply(points.get(i).color.g, points.get(i + 1).color.g, localAlpha);
-					tmpColor.b = Interpolation.linear.apply(points.get(i).color.b, points.get(i + 1).color.b, localAlpha);
+					float localAlpha = (pos - currentPoint.pos) / (nextPoint.pos - currentPoint.pos);
+					tmpColor.r = Interpolation.linear.apply(currentPoint.color.r, nextPoint.color.r, localAlpha);
+					tmpColor.g = Interpolation.linear.apply(currentPoint.color.g, nextPoint.color.g, localAlpha);
+					tmpColor.b = Interpolation.linear.apply(currentPoint.color.b, nextPoint.color.b, localAlpha);
 				}
 				break;
 			}

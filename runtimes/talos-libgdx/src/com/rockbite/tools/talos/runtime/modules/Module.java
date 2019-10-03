@@ -11,15 +11,18 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public abstract class Module implements Json.Serializable {
 
-    protected ParticleEmitterDescriptor graph;
+    public static int inputSlotMethodCall;
+    ParticleEmitterDescriptor graph;
 
-    protected IntMap<Slot> inputSlots = new IntMap<>();
-    protected IntMap<Slot> outputSlots = new IntMap<>();
+    public Slot[] inputSlots = new Slot[20];
+    public Slot[] outputSlots = new Slot[20];
 
     static int indexCounter = 0;
     protected int index = indexCounter++;
 
-    private float lastRequester;
+    public float lastRequester;
+
+    public static int totalModuleProcessCount = 0;
 
     public Module () {
         init();
@@ -36,17 +39,19 @@ public abstract class Module implements Json.Serializable {
     protected abstract void defineSlots();
 
     public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
-        if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
-        inputSlots.get(mySlot).connect(module, module.outputSlots.get(targetSlot));
+        if(inputSlots[mySlot] == null || module.outputSlots[targetSlot] == null) return;
+        inputSlots[mySlot].connect(module, module.outputSlots[targetSlot]);
     }
 
     public void attachModuleToMyOutput(Module module, int mySlot, int targetSlot) {
-        if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
-        outputSlots.get(mySlot).connect(module, module.inputSlots.get(targetSlot));
+        if(inputSlots[mySlot] == null || module.outputSlots[targetSlot] == null) return;
+        outputSlots[mySlot].connect(module, module.inputSlots[targetSlot]);
     }
 
     public void detach(Module module) {
-        for(Slot slot : inputSlots.values()) {
+        for (int i = 0; i < inputSlots.length; i++) {
+            if (inputSlots[i] == null) continue;
+            Slot slot = inputSlots[i];
             if(slot.getTargetModule() == module) {
                 slot.getTargetSlot().detach();
                 slot.detach();
@@ -56,17 +61,18 @@ public abstract class Module implements Json.Serializable {
 
     public void detach(int slot, boolean isInput) {
         if(isInput) {
-            inputSlots.get(slot).detach();
+            inputSlots[slot].detach();
         }
     }
 
     public boolean isConnectedTo(Module module) {
-        for(Slot slot : inputSlots.values()) {
+        for (int i = 0; i < inputSlots.length; i++) {
+            if (inputSlots[i] == null) continue;
+            Slot slot = inputSlots[i];
             if(slot.getTargetModule() == module) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -87,16 +93,20 @@ public abstract class Module implements Json.Serializable {
      * @param slotId
      */
     public void fetchInputSlotValue(int slotId) {
-        //find what it is connected to
-        Slot inputSlot = inputSlots.get(slotId);
+        Module.inputSlotMethodCall++;
 
-        if(inputSlot.getTargetSlot() == null) {
-            inputSlot.getValue().setEmpty(true);
+        //find what it is connected to
+        Slot inputSlot = inputSlots[slotId];
+
+        final Value value = inputSlot.value;
+        final Slot targetSlot = inputSlot.targetSlot;
+        if(targetSlot == null) {
+            value.isEmpty = true;
         } else {
             //ask it's module give it's output value
-            Value result = inputSlot.getTargetModule().fetchOutputSlotValue(inputSlot.getTargetSlot().getIndex());
-            inputSlot.getValue().set(result);
-            inputSlot.getValue().setEmpty(false);
+            Value result = inputSlot.targetModule.fetchOutputSlotValue(inputSlot.targetSlot.index);
+            value.set(result);
+            value.isEmpty = false;
         }
     }
 
@@ -105,9 +115,13 @@ public abstract class Module implements Json.Serializable {
      * @param slotId
      */
     public Value fetchOutputSlotValue(int slotId) {
-        float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
+        Module.inputSlotMethodCall++;
+
+        float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0]; //get float
 
         if(lastRequester != requester) { // caching mechanism
+            totalModuleProcessCount++;
+
             //fetch all local inputs
             fetchAllInputSlotValues();
             // process
@@ -115,55 +129,53 @@ public abstract class Module implements Json.Serializable {
             lastRequester = requester;
         }
 
-        return outputSlots.get(slotId).getValue();
+        return outputSlots[slotId].value;
     }
 
     public void fetchAllInputSlotValues() {
-        for(Slot inputSlot : inputSlots.values()) {
-            fetchInputSlotValue(inputSlot.getIndex());
+        for (int i = 0; i < inputSlots.length; i++) {
+            if (inputSlots[i] == null) continue;
+
+            fetchInputSlotValue(inputSlots[i].index);
         }
     }
 
     public Value createInputSlot(int slotId, Value value) {
-        inputSlots.put(slotId, new Slot(this, slotId, true));
-        inputSlots.get(slotId).setValue(value);
+        inputSlots[slotId] = new Slot(this, slotId, true);
+        inputSlots[slotId].setValue(value);
 
         return value;
     }
 
     public Value createOutputSlot(int slotId, Value value) {
-        outputSlots.put(slotId, new Slot(this, slotId, false));
-        outputSlots.get(slotId).setValue(value);
+        outputSlots[slotId] = new Slot(this, slotId, false);
+        outputSlots[slotId].setValue(value);
 
         return value;
     }
 
     public NumericalValue createInputSlot(int slotId) {
-        inputSlots.put(slotId, new Slot(this, slotId, true));
+        inputSlots[slotId] = new Slot(this, slotId, true);
         NumericalValue value = new NumericalValue();
-        inputSlots.get(slotId).setValue(value);
+        inputSlots[slotId].setValue(value);
 
         return value;
     }
 
     public NumericalValue createOutputSlot(int slotId) {
-        outputSlots.put(slotId, new Slot(this, slotId, false));
+        outputSlots[slotId] = new Slot(this, slotId, false);
         NumericalValue value = new NumericalValue();
-        outputSlots.get(slotId).setValue(value);
+        outputSlots[slotId].setValue(value);
 
         return value;
     }
 
-    public ScopePayload getScope() {
-        return graph.getScope();
-    }
-
     public Slot getInputSlot(int slotId) {
-        return inputSlots.get(slotId);
+        return inputSlots[slotId];
     }
 
     public Slot getOutputSlot(int slotId) {
-        return outputSlots.get(slotId);
+        return outputSlots[slotId];
     }
 
     public void resetLastRequester() {

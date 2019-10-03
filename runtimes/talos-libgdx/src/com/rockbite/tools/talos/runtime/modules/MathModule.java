@@ -30,8 +30,8 @@ public class MathModule extends Module {
 
     @Override
     public void processValues() {
-        if(a.isEmpty()) a.set(0);
-        if(b.isEmpty()) b.set(0);
+        if(a.isEmpty) a.set(0);
+        if(b.isEmpty) b.set(0);
 
         if(currentExpression != null) {
             currentExpression.apply(a, b, output);

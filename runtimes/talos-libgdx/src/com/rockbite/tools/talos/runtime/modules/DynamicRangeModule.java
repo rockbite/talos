@@ -1,6 +1,7 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -33,9 +34,13 @@ public class DynamicRangeModule extends CurveModule {
     }
 
     private float calcRandomRange(float min, float max, int randomOffset) {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index + randomOffset) * 1000)));
-        float startPos = random.nextFloat();
-        float res = min + (max - min) * startPos;
+
+        float a = 23.14069263277926f;
+        final float particleSeed = graph.scopePayload.internalMap[ScopePayload.PARTICLE_SEED].elements[0];
+        float value = MathUtils.cos(particleSeed * randomOffset * a * index + randomOffset );
+        float fraction = value - (int)value;
+
+        float res = min + (max - min) * fraction;
 
         return res;
     }

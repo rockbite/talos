@@ -29,7 +29,7 @@ public class ParticleEffectInstance {
 		int particleCount = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
-			particleCount += emitters.get(i).activeParticles.size;
+			particleCount += emitters.get(i).activeParticleCount;
 		}
 
 		if(particleCount == 0) {

@@ -20,7 +20,7 @@ public class TextureModule extends Module {
     protected void defineSlots() {
         outputValue = (DrawableValue) createOutputSlot(OUTPUT, new DrawableValue());
         userDrawable = new DrawableValue();
-        userDrawable.setEmpty(true);
+        userDrawable.isEmpty = true;
     }
 
     @Override

@@ -2,13 +2,17 @@ package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.Pool;
 import com.rockbite.tools.talos.runtime.modules.EmitterModule;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ParticleEmitterInstance {
 
     private final ParticleEffectInstance parentParticleInstance;
-    ParticleEmitterDescriptor emitterGraph;
+	ParticleEmitterDescriptor emitterGraph;
 
 	Vector2 position = new Vector2();
 	float duration;
@@ -28,9 +32,11 @@ public class ParticleEmitterInstance {
 
 	public boolean initialized = false;
 
-	public Array<Particle> activeParticles = new Array<>();
 
-	private final Pool<Particle> particlePool = new Pool<Particle>() {
+	public Particle[] activeParticles = new Particle[1000];
+	public int activeParticleCount;
+
+	public final Pool<Particle> particlePool = new Pool<Particle>() {
 		@Override
 		protected Particle newObject () {
 			return new Particle();
@@ -113,7 +119,8 @@ public class ParticleEmitterInstance {
 				Particle particle = particlePool.obtain();
 				if (emitterGraph.getParticleModule() != null) {
 					particle.init(emitterGraph.getParticleModule(), this);
-					activeParticles.add(particle);
+					activeParticles[particle.uniqueID] = particle;
+					activeParticleCount++;
 				}
 			}
 			particlesToEmmit -= count;
@@ -133,12 +140,15 @@ public class ParticleEmitterInstance {
 	}
 
 	private void updateParticles(float delta) {
-		for (int i = activeParticles.size - 1; i >= 0; i--) {
-			Particle particle = activeParticles.get(i);
-			particle.update(delta);
-			if (particle.alpha >= 1f) {
-				particlePool.free(particle);
-				activeParticles.removeIndex(i);
+    	for (int i = 0; i < activeParticles.length; i++) {
+    		if (activeParticles[i] != null) {
+				Particle particle = activeParticles[i];
+				particle.update(delta);
+				if (particle.alpha >= 1f) {
+					particlePool.free(particle);
+					activeParticles[i] = null;
+					activeParticleCount--;
+				}
 			}
 		}
 	}
