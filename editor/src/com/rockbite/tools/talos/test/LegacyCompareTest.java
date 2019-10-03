@@ -44,10 +44,12 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
     Skin skin;
 
-    Label leftTime, rightTime;
+    Label leftTime, rightTime, comparedTime;
 
     Array<Long> leftTimes = new Array<>();
     Array<Long> rightTimes = new Array<>();
+    private float talosAverageTimeMS;
+    private float legacyAverageTimeMS;
 
 
     public LegacyCompareTest() {
@@ -83,7 +85,8 @@ public class LegacyCompareTest extends ApplicationAdapter {
                 sum += leftTimes.get(i);
             }
             long avg = sum/leftTimes.size;
-            leftTime.setText(avg/1000 + "ns");
+            legacyAverageTimeMS = avg / 1000000f;
+            leftTime.setText(legacyAverageTimeMS + "ms");
         }
 
         @Override
@@ -121,7 +124,10 @@ public class LegacyCompareTest extends ApplicationAdapter {
                 sum += rightTimes.get(i);
             }
             long avg = sum/rightTimes.size;
-            rightTime.setText(avg/1000 + "ns");
+            talosAverageTimeMS = avg / 1000000f;
+            rightTime.setText(talosAverageTimeMS + "ms");
+
+            comparedTime.setText((int)(talosAverageTimeMS/legacyAverageTimeMS  * 100) + "%");
         }
 
         @Override
@@ -146,7 +152,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         talosRenderer = new SpriteBatchParticleRenderer(stage.getBatch());
 
-        String mainPath = "C:\\Users\\User\\Desktop\\convert\\";
+        String mainPath = "C:\\Users\\Tom\\Desktop\\vfx\\";
 
         //mainPath = getLocalPath() + "\\";
 
@@ -186,12 +192,15 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         leftTime = new Label("", skin);
         rightTime = new Label("", skin);
+        comparedTime = new Label("", skin);
 
         leftTime.setPosition(uiStage.getWidth()/2f - 200,  200);
         rightTime.setPosition(uiStage.getWidth()/2f + 200, 200);
+        comparedTime.setPosition(uiStage.getWidth()/2f, 200);
 
         uiStage.addActor(leftTime);
         uiStage.addActor(rightTime);
+        uiStage.addActor(comparedTime);
 
 
         index++;
