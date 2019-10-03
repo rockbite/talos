@@ -29,7 +29,7 @@ public class MixModule extends Module {
 
     @Override
     public void processValues() {
-        int count = Math.max(val1.elementsCount(), val2.elementsCount());
+        int count = Math.max(val1.currentElementCount, val2.currentElementCount);
         for(int i = 0; i < count; i++) {
             output.getElements()[i] = Interpolation.linear.apply(val1.getElements()[i], val2.getElements()[i], alpha.getFloat());
         }

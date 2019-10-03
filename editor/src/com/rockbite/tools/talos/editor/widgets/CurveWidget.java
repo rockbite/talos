@@ -95,7 +95,7 @@ public class CurveWidget extends Actor implements CurveDataProvider {
                 Array<Vector2> points = curveDataProvider.getPoints();
 
                 for(int i = 0; i < points.size; i++) {
-                    Vector2 point = points.get(i);
+                    Vector2 point = points.items[i];
                     if(hit(point, vec1) && !justCreated) {
                         // then let's delete this point
                         curveDataProvider.removePoint(i);

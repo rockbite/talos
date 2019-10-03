@@ -38,42 +38,42 @@ public class NumericalValue extends Value {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] + other.elements[i];
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void sub (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] - other.elements[i];
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void mul (float val, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * val;
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void mul (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * other.elements[i];
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void sin (NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = MathUtils.sinDeg(elements[i]);
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void cos (NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = MathUtils.cosDeg(elements[i]);
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 
@@ -83,8 +83,8 @@ public class NumericalValue extends Value {
 	}
 
 	public void set (NumericalValue other) {
-		if(other.elementsCount() > currentElementCount) {
-			currentElementCount = other.elementsCount();
+		if(other.currentElementCount > currentElementCount) {
+			currentElementCount = other.currentElementCount;
 		}
 		for (int i = 0; i < 4; i++) {
 			if (i < currentElementCount) {
@@ -138,10 +138,6 @@ public class NumericalValue extends Value {
 		return elements[0];
 	}
 
-	public int elementsCount() {
-		return currentElementCount;
-	}
-
 	public void setElementsCount(int elementsCount) {
 		currentElementCount = elementsCount;
 	}
@@ -158,14 +154,14 @@ public class NumericalValue extends Value {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = (float) Math.pow(elements[i], b.getFloat());
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	public void abs(NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = Math.abs(elements[i]);
 		}
-		out.setElementsCount(elementsCount());
+		out.setElementsCount(currentElementCount);
 	}
 
 	@Override

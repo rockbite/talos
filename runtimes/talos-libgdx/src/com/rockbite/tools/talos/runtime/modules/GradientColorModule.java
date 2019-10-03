@@ -84,7 +84,7 @@ public class GradientColorModule extends Module {
 
 	private void resetPoints () {
 		// need to guarantee at least one point
-		points = new Array<>();
+		points = new Array<>(ColorPoint.class);
 		ColorPoint colorPoint = new ColorPoint();
 		colorPoint.pos = 0;
 		colorPoint.color.set(255 / 255f, 68 / 255f, 26 / 255f, 1f);
@@ -110,19 +110,19 @@ public class GradientColorModule extends Module {
 
 	public Color getPosColor (float pos) {
 
-		final ColorPoint firstPoint = points.get(0);
+		final ColorPoint firstPoint = points.items[0];
 		if (pos <= firstPoint.pos) {
 			tmpColor.set(firstPoint.color);
 		}
 
-		final ColorPoint lastPoint = points.get(points.size - 1);
+		final ColorPoint lastPoint = points.items[points.size - 1];
 		if (pos >= lastPoint.pos) {
 			tmpColor.set(lastPoint.color);
 		}
 
 		for (int i = 0; i < points.size - 1; i++) {
-			final ColorPoint currentPoint = points.get(i);
-			final ColorPoint nextPoint = points.get(i + 1);
+			final ColorPoint currentPoint = points.items[i];
+			final ColorPoint nextPoint = points.items[i + 1];
 			if (currentPoint.pos < pos && nextPoint.pos > pos) {
 				// found it
 
