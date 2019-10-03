@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -43,6 +44,12 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
     Skin skin;
 
+    Label leftTime, rightTime;
+
+    Array<Long> leftTimes = new Array<>();
+    Array<Long> rightTimes = new Array<>();
+
+
     public LegacyCompareTest() {
 
     }
@@ -60,12 +67,23 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         @Override
         public void act(float delta) {
+            long nano = TimeUtils.nanoTime();
             particleEffect.setPosition(getX(), getY());
             particleEffect.update(delta);
 
             if(particleEffect.isComplete()) {
                 particleEffect.start();
             }
+
+            long diff = TimeUtils.nanoTime() - nano;
+            leftTimes.add(diff);
+            if(leftTimes.size > 60) leftTimes.removeIndex(0);
+            long sum = 0;
+            for(int i = 0; i < leftTimes.size; i++) {
+                sum += leftTimes.get(i);
+            }
+            long avg = sum/leftTimes.size;
+            leftTime.setText(avg/1000 + "ns");
         }
 
         @Override
@@ -90,9 +108,20 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
         @Override
         public void act(float delta) {
+            long nano = TimeUtils.nanoTime();
             super.act(delta);
             particleEffect.setPosition(getX(), getY());
             particleEffect.update(Gdx.graphics.getDeltaTime());
+
+            long diff = TimeUtils.nanoTime() - nano;
+            rightTimes.add(diff);
+            if(rightTimes.size > 60) rightTimes.removeIndex(0);
+            long sum = 0;
+            for(int i = 0; i < rightTimes.size; i++) {
+                sum += rightTimes.get(i);
+            }
+            long avg = sum/rightTimes.size;
+            rightTime.setText(avg/1000 + "ns");
         }
 
         @Override
@@ -154,6 +183,16 @@ public class LegacyCompareTest extends ApplicationAdapter {
         Label mainLbl = new Label(leftName, skin);
         mainLbl.setPosition(uiStage.getWidth()/2f - mainLbl.getPrefWidth()/2f, 100);
         uiStage.addActor(mainLbl);
+
+        leftTime = new Label("", skin);
+        rightTime = new Label("", skin);
+
+        leftTime.setPosition(uiStage.getWidth()/2f - 200,  200);
+        rightTime.setPosition(uiStage.getWidth()/2f + 200, 200);
+
+        uiStage.addActor(leftTime);
+        uiStage.addActor(rightTime);
+
 
         index++;
     }
