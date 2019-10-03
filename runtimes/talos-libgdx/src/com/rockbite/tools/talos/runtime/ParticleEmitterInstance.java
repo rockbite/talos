@@ -16,6 +16,7 @@ public class ParticleEmitterInstance {
 	float delayTimer;
 
 	boolean isContinuous = false;
+	boolean isAttached = false;
 
 	private EmitterModule emitterModule;
 
@@ -80,6 +81,7 @@ public class ParticleEmitterInstance {
 		duration = emitterModule.getDuration();
 		isContinuous = emitterModule.isContinnuous();
 		rate = emitterModule.getRate();
+		isAttached = emitterModule.isAttached();
 
 		if(delayTimer > 0) {
 			delayTimer -= delta;
@@ -152,5 +154,9 @@ public class ParticleEmitterInstance {
 
     public ParticleEffectInstance getEffect() {
     	return parentParticleInstance;
+	}
+
+	public boolean isAttached() {
+		return isAttached;
 	}
 }

@@ -42,10 +42,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		float rotation = particle.rotation;
 		batch.setColor(color);
 
-		Vector2 position = particle.particleEmitter.getEffect().getPosition();
-
 		if (particle.drawable != null) {
-			particle.drawable.draw(batch, position.x + particle.position.x, position.y + particle.position.y, particle.size.x, particle.size.y, rotation);
+			particle.drawable.draw(batch, particle.getX(), particle.getY(), particle.size.x, particle.size.y, rotation);
 		}
 	}
 }

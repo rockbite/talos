@@ -136,8 +136,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 9,
-				"x": -472,
-				"y": -147.89987,
+				"x": -470,
+				"y": -150.89987,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -197,8 +197,8 @@
 			{
 				"class": "GradientColorModuleWrapper",
 				"id": 13,
-				"x": -476.69983,
-				"y": 21.200104,
+				"x": -474.69983,
+				"y": 18.200104,
 				"module": {
 					"data": {
 						"class": "GradientColorModule",
@@ -259,12 +259,12 @@
 			},
 			{
 				"text": "MOVEMENT",
-				"modules": [ 0, 7, 8 ],
+				"modules": [ 7, 8, 0 ],
 				"color": -1.5988972E38
 			},
 			{
 				"text": "SETUP",
-				"modules": [ 12, 10 ],
+				"modules": [ 10, 12 ],
 				"color": -7.338595E37
 			},
 			{
@@ -562,13 +562,17 @@
 						"points": [
 							{
 								"x": 0,
-								"y": 0.5
+								"y": 0.24031055
+							},
+							{
+								"x": 1,
+								"y": 0.6046521
 							}
 						],
 						"lowMin": 0,
 						"lowMax": 0,
-						"highMin": 1,
-						"highMax": 1
+						"highMin": 360,
+						"highMax": 360
 					}
 				},
 				"lowEquals": true,
@@ -628,22 +632,22 @@
 		"groups": [
 			{
 				"text": "COLOR",
-				"modules": [ 4, 5 ],
+				"modules": [ 5, 4 ],
 				"color": -6.188278E37
 			},
 			{
 				"text": "MOVEMENT",
-				"modules": [ 13, 6, 2, 3 ],
+				"modules": [ 2, 6, 3, 13 ],
 				"color": -1.3926823E38
 			},
 			{
 				"text": "SETUP",
-				"modules": [ 7, 10, 11, 12, 9 ],
+				"modules": [ 7, 11, 10, 9, 12 ],
 				"color": -6.7344547E37
 			},
 			{
 				"text": "COLLECTORS",
-				"modules": [ 1, 0 ],
+				"modules": [ 0, 1 ],
 				"color": -4.775874E37
 			}
 		]

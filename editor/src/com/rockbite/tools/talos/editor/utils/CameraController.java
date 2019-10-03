@@ -15,6 +15,8 @@ public class CameraController extends InputAdapter {
 
 	private boolean inverted = false;
 
+	private boolean movingCamera = false;
+
 	public CameraController (OrthographicCamera camera) {
 		this.camera = camera;
 	}
@@ -34,17 +36,22 @@ public class CameraController extends InputAdapter {
 
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+		movingCamera = false;
+		if(button != 0) return false;
+		movingCamera = true;
 		last.set(-1, -1, -1);
 		return super.touchDown(screenX, screenY, pointer, button);
 	}
 
 	@Override
 	public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+		if(button != 0) return false;
 		return super.touchUp(screenX, screenY, pointer, button);
 	}
 
 	@Override
 	public boolean touchDragged (int screenX, int screenY, int pointer) {
+		if(!movingCamera) return false;
 		camera.unproject(current.set(screenX, screenY, 0));
 		if (!(last.x == -1 && last.y == -1 && last.z == -1)) {
 			camera.unproject(delta.set(last.x, last.y, 0));

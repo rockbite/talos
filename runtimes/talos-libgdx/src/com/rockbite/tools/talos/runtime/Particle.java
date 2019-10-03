@@ -10,6 +10,7 @@ public class Particle implements Pool.Poolable {
 
     public ParticleEmitterInstance particleEmitter;
 
+    public Vector2 spawnPosition = new Vector2();
     public Vector2 position = new Vector2();
     public float life;
     public float transparency;
@@ -37,7 +38,8 @@ public class Particle implements Pool.Poolable {
 
         particleModule.updateScopeData(this);
 
-        position.set(particleModule.getStartPosition());
+        position.set(particleModule.getStartPosition()); // offset
+        spawnPosition.set(particleEmitter.getEffect().position);
 
         // inner variable defaults
         alpha = 0f;
@@ -75,7 +77,6 @@ public class Particle implements Pool.Poolable {
             rotation = particleModule.getRotation();
         }
 
-
         drawable = particleModule.getDrawable(); // important to get drawable before size
         size.set(particleModule.getSize());
         Vector2 positionOverride = particleModule.getPosition();
@@ -87,6 +88,22 @@ public class Particle implements Pool.Poolable {
         } else {
             position.x += MathUtils.cosDeg(angle) * velocity * delta;
             position.y += MathUtils.sinDeg(angle) * velocity * delta;
+        }
+    }
+
+    public float getX() {
+        if(particleEmitter.isAttached()) {
+            return particleEmitter.getEffect().position.x + position.x;
+        } else {
+            return spawnPosition.x + position.x;
+        }
+    }
+
+    public float getY() {
+        if(particleEmitter.isAttached()) {
+            return particleEmitter.getEffect().position.y + position.y;
+        } else {
+            return spawnPosition.y + position.y;
         }
     }
 

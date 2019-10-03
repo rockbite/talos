@@ -117,14 +117,6 @@ public class LegacyImporter {
                     if(highMax == 1) highMax = 2;
                 }
 
-                if(varName.equals("rotation")) {
-                    //1 value hack
-                    lowMin /= 360f;
-                    lowMax /= 360f;
-                    highMin /= 360f;
-                    highMax /= 360f;
-                }
-
                 boolean relative = readBoolean(reader, "relative");
                 float[] scaling = new float[readInt(reader, "scalingCount")];
                 for (int i = 0; i < scaling.length; i++) {
