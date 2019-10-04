@@ -16,6 +16,7 @@ public class ParticleEmitterInstance {
 	float delay;
 	float delayTimer;
 
+	public boolean isVisible = true;
 	boolean paused = false;
 	boolean isContinuous = false;
 	boolean isAttached = false;
@@ -182,5 +183,9 @@ public class ParticleEmitterInstance {
 
 	public void resume() {
 		paused = false;
+	}
+
+	public void setVisible(boolean isVisible) {
+		this.isVisible = isVisible;
 	}
 }

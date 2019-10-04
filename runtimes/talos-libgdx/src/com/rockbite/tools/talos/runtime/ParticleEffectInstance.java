@@ -106,6 +106,16 @@ public class ParticleEffectInstance {
         return emitters;
     }
 
+    public ParticleEmitterInstance getEmitter(ParticleEmitterDescriptor descriptor) {
+    	for(ParticleEmitterInstance instance: emitters) {
+    		if(instance.emitterGraph == descriptor) {
+    			return instance;
+			}
+		}
+
+    	return null;
+	}
+
 
 	public void setPosition(float x, float y) {
 		position.set(x, y);

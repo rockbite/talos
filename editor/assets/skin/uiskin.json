@@ -63,7 +63,8 @@
 		toggle: {checked: button-down, down: button-down, up: button },
 		chain: {checked: icon-chain-on, down: icon-chain-on, up: icon-chain-off },
 		mirror: {checked: icon-mirror-on, down: icon-mirror-on, up: icon-mirror-off },
-		settings: {down: settings-normal, up: settings-normal, over: settings-over }
+		settings: {down: settings-normal, up: settings-normal, over: settings-over },
+		eye: {checked: eye, down: eye, up: no-eye }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		default: {down: button-down, up: button, over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey }

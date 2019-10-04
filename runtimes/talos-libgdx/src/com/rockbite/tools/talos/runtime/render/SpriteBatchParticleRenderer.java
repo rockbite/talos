@@ -28,6 +28,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
+			if(!particleEmitter.isVisible) continue;
 			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
 				renderParticle(batch, particleEmitter.activeParticles.get(j));
 			}

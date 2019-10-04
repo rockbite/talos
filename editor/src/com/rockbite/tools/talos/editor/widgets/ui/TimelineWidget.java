@@ -1,10 +1,12 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -126,6 +128,8 @@ public class TimelineWidget extends Table {
         private Table labelTabel;
         private Table inputTable;
 
+        ImageButton eye;
+
         private boolean selecteed = true;
 
         private ParticleEmitterWrapper wrapper;
@@ -136,6 +140,9 @@ public class TimelineWidget extends Table {
             setSkin(skin);
             setBackground(getSkin().getDrawable("red_row"));
 
+            eye = new ImageButton(getSkin(), "eye");
+            eye.setChecked(true);
+
             Stack stack = new Stack();
 
             labelTabel = new Table();
@@ -144,6 +151,7 @@ public class TimelineWidget extends Table {
             stack.add(labelTabel);
             stack.add(inputTable);
 
+            add(eye).padLeft(5);
             add(stack).grow();
 
             label = new Label("", getSkin());
@@ -175,6 +183,13 @@ public class TimelineWidget extends Table {
 
 
                     super.clicked(event, x, y);
+                }
+            });
+
+            eye.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    TalosMain.Instance().Project().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(!isMuted());
                 }
             });
 
@@ -222,6 +237,14 @@ public class TimelineWidget extends Table {
             if(wrapper != null) {
                 wrapper.setName(textField.getText());
             }
+        }
+
+        public void setMuted(boolean muted) {
+            eye.setChecked(!muted);
+        }
+
+        public boolean isMuted() {
+            return !eye.isChecked();
         }
 
         public void set(ParticleEmitterWrapper emitter) {
