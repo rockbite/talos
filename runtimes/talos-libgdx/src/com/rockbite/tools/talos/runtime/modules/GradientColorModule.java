@@ -51,14 +51,15 @@ public class GradientColorModule extends Module {
 	protected void processAlphaDefaults () {
 		if (alpha.isEmpty) {
 			// as default we are going to fetch the lifetime or duration depending on context
-			float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0];
+			final NumericalValue[] internalMap = graph.scopePayload.internalMap;
+			float requester = internalMap[ScopePayload.REQUESTER_ID].elements[0];
 			if (requester < 1) {
 				// particle
-				alpha.set(graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
+				alpha.set(internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
 				alpha.isEmpty = false;
 			} else if (requester > 1) {
 				// emitter
-				alpha.set(graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
+				alpha.set(internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
 				alpha.isEmpty = false;
 			} else {
 				// whaat?

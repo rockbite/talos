@@ -20,7 +20,7 @@ public class CurveModule extends Module {
 
     private Array<Vector2> points;
 
-    private Vector2 tmp = new Vector2();
+    Vector2 tmp = new Vector2();
 
     Comparator<Vector2> comparator = new Comparator<Vector2>() {
         @Override
@@ -79,14 +79,15 @@ public class CurveModule extends Module {
     protected void processAlphaDefaults() {
         if(alpha.isEmpty) {
             // as default we are going to fetch the lifetime or duration depending on context
-            float requester = graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].elements[0];
+            final NumericalValue[] internalMap = graph.scopePayload.internalMap;
+            float requester = internalMap[ScopePayload.REQUESTER_ID].elements[0];
             if(requester < 1) {
                 // particle
-                alpha.set(graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
+                alpha.set(internalMap[ScopePayload.PARTICLE_ALPHA].elements[0]);
                 alpha.isEmpty = false;
             } else if(requester > 1) {
                 // emitter
-                alpha.set(graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
+                alpha.set(internalMap[ScopePayload.EMITTER_ALPHA].elements[0]);
                 alpha.isEmpty = false;
             } else {
                 // whaat?
@@ -104,24 +105,35 @@ public class CurveModule extends Module {
     private float interpolate(float alpha) {
         // interpolate alpha in this point space
 
-        final Vector2 firstPoint = points.items[0];
+        final Vector2[] items = points.items;
+
+        final Vector2 firstPoint = items[0];
         if(firstPoint.x >= 0 && alpha <= firstPoint.x) {
             return firstPoint.y;
         }
 
         for(int i = 0; i < points.size-1; i++) {
-            Vector2 from = points.items[i];
-            Vector2 to = points.items[i+1];
+            Vector2 from = items[i];
+            Vector2 to = items[i+1];
             if(alpha > from.x && alpha <= to.x) {
                 float localAlpha = 1f;
                 if(from.x != to.x) {
                     localAlpha = (alpha - from.x) / (to.x - from.x);
                 }
-                return interpolate(localAlpha, from.x, from.y, to.x, to.y);
+
+                if(from.y == to.y) return from.y;
+                if(from.x == to.x) return from.y;
+
+                tmp.set(to.x, to.y);
+                tmp.sub(from.x, from.y);
+                tmp.scl(localAlpha);
+                tmp.add(from.x, from.y);
+
+                return tmp.y;
             }
         }
 
-        final Vector2 lastPoint = points.items[points.size - 1];
+        final Vector2 lastPoint = items[points.size - 1];
         if(lastPoint.x <= 1f && alpha >= lastPoint.x) {
             return lastPoint.y;
         }

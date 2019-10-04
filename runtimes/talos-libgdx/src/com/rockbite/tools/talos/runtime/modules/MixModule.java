@@ -31,7 +31,7 @@ public class MixModule extends Module {
     public void processValues() {
         int count = Math.max(val1.currentElementCount, val2.currentElementCount);
         for(int i = 0; i < count; i++) {
-            output.getElements()[i] = Interpolation.linear.apply(val1.getElements()[i], val2.getElements()[i], alpha.getFloat());
+            output.elements[i] = Interpolation.linear.apply(val1.elements[i], val2.elements[i], alpha.elements[0]);
         }
         output.setElementsCount(count);
     }

@@ -59,7 +59,8 @@ public class Particle implements Pool.Poolable {
         if(alpha > 1f) alpha = 1f;
 
         //scope data
-        ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
+        final ParticleEmitterDescriptor emitterGraph = particleEmitter.emitterGraph;
+        ParticleModule particleModule = emitterGraph.getParticleModule();
         if(particleModule == null) return;
         particleModule.updateScopeData(this);
 
@@ -76,7 +77,7 @@ public class Particle implements Pool.Poolable {
         life = particleModule.getLife();
         transparency = particleModule.getTransparency();
 
-        if(particleEmitter.emitterGraph.emitterModule.isAligned()) {
+        if(emitterGraph.emitterModule.isAligned()) {
             rotation = angle/360f + particleModule.getRotation();
         } else {
             rotation = particleModule.getRotation();

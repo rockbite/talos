@@ -140,7 +140,8 @@ public class ParticleEmitterInstance {
 	}
 
 	private void updateParticles(float delta) {
-    	for (int i = 0; i < activeParticles.length; i++) {
+		final Particle[] activeParticles = this.activeParticles;
+		for (int i = 0; i < activeParticles.length; i++) {
     		if (activeParticles[i] != null) {
 				Particle particle = activeParticles[i];
 				particle.update(delta);

@@ -24,8 +24,6 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.modules.Module;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import org.lwjgl.Sys;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -95,7 +93,7 @@ public class LegacyCompareTest extends ApplicationAdapter implements Runnable {
 
             long diff = TimeUtils.nanoTime() - nano;
             leftTimes.add(diff);
-            if(leftTimes.size > 60) leftTimes.removeIndex(0);
+            if(leftTimes.size > 1000) leftTimes.removeIndex(0);
             long sum = 0;
             for(int i = 0; i < leftTimes.size; i++) {
                 sum += leftTimes.get(i);
@@ -137,7 +135,7 @@ public class LegacyCompareTest extends ApplicationAdapter implements Runnable {
             long diff = System.nanoTime() - nano;
 
             rightTimes.add(diff);
-            if(rightTimes.size > 60) rightTimes.removeIndex(0);
+            if(rightTimes.size > 1000) rightTimes.removeIndex(0);
             long sum = 0;
             for(int i = 0; i < rightTimes.size; i++) {
                 sum += rightTimes.get(i);
@@ -273,6 +271,7 @@ public class LegacyCompareTest extends ApplicationAdapter implements Runnable {
         config.width = 800;
         config.height = 600;
         config.title = "Talos";
+        config.foregroundFPS = 0;
         LwjglFrame frame = new LwjglFrame(new LegacyCompareTest(), config);
     }
 }

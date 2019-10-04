@@ -95,7 +95,9 @@ public abstract class Module implements Json.Serializable {
     public void fetchInputSlotValue(int slotId) {
         Module.inputSlotMethodCall++;
 
-        //find what it is connected to
+		final Slot[] inputSlots = this.inputSlots;
+
+		//find what it is connected to
         Slot inputSlot = inputSlots[slotId];
 
         final Value value = inputSlot.value;
@@ -133,7 +135,8 @@ public abstract class Module implements Json.Serializable {
     }
 
     public void fetchAllInputSlotValues() {
-        for (int i = 0; i < inputSlots.length; i++) {
+		final Slot[] inputSlots = this.inputSlots;
+		for (int i = 0; i < inputSlots.length; i++) {
             if (inputSlots[i] == null) continue;
 
             fetchInputSlotValue(inputSlots[i].index);

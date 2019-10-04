@@ -203,13 +203,16 @@ public class OffsetModule extends Module {
     private float interpolate(float alpha) {
         // interpolate alpha in this point space
 
-        if(points.get(0).x >= 0 && alpha <= points.get(0).x) {
-            return points.get(0).y;
+        final Array<Vector2> points = this.points;
+
+        final Vector2 first = points.items[0];
+        if(first.x >= 0 && alpha <= first.x) {
+            return first.y;
         }
 
         for(int i = 0; i < points.size-1; i++) {
-            Vector2 from = points.get(i);
-            Vector2 to = points.get(i+1);
+            Vector2 from = points.items[i];
+            Vector2 to = points.items[i+1];
             if(alpha > from.x && alpha <= to.x) {
                 float localAlpha = 1f;
                 if(from.x != to.x) {
@@ -219,8 +222,9 @@ public class OffsetModule extends Module {
             }
         }
 
-        if(points.get(points.size-1).x <= 1f && alpha >= points.get(points.size-1).x) {
-            return points.get(points.size-1).y;
+        final Vector2 last = points.items[points.size - 1];
+        if(last.x <= 1f && alpha >= last.x) {
+            return last.y;
         }
 
         return 0;
@@ -277,7 +281,7 @@ public class OffsetModule extends Module {
 
     private void resetPoints() {
         // need to guarantee at least one point
-        points = new Array<>();
+        points = new Array<>(Vector2.class);
         Vector2 point = new Vector2(0, 0.5f);
         points.add(point);
     }

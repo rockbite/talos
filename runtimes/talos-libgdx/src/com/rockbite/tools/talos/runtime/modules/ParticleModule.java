@@ -74,11 +74,12 @@ public class ParticleModule extends Module {
     }
 
     public void updateScopeData(Particle particle) {
-        graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA].set(particle.particleEmitter.alpha);
-        graph.scopePayload.internalMap[ScopePayload.PARTICLE_ALPHA].set(particle.alpha);
-        graph.scopePayload.internalMap[ScopePayload.PARTICLE_SEED].set(particle.seed);
-        graph.scopePayload.internalMap[ScopePayload.REQUESTER_ID].set(particle.seed);
-        graph.scopePayload.internalMap[ScopePayload.EMITTER_ALPHA_AT_P_INIT].set(particle.durationAtInit);
+        final NumericalValue[] internalMap = graph.scopePayload.internalMap;
+        internalMap[ScopePayload.EMITTER_ALPHA].set(particle.particleEmitter.alpha);
+        internalMap[ScopePayload.PARTICLE_ALPHA].set(particle.alpha);
+        internalMap[ScopePayload.PARTICLE_SEED].set(particle.seed);
+        internalMap[ScopePayload.REQUESTER_ID].set(particle.seed);
+        internalMap[ScopePayload.EMITTER_ALPHA_AT_P_INIT].set(particle.durationAtInit);
     }
 
     public ParticleDrawable getDrawable() {
