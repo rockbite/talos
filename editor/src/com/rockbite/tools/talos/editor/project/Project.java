@@ -39,6 +39,7 @@ public class Project {
 		projectSerializer = new ProjectSerializer();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.loopable = true;
 
 		importer = new LegacyImporter(TalosMain.Instance().NodeStage());
 	}
@@ -130,6 +131,7 @@ public class Project {
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.loopable = true;
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 	}
