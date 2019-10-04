@@ -89,6 +89,18 @@ public class ParticleEffectInstance {
 		}
 	}
 
+	public void pause() {
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).pause();
+		}
+	}
+
+	public void resume() {
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).resume();
+		}
+	}
+
 
 	public Array<ParticleEmitterInstance> getEmitters () {
         return emitters;

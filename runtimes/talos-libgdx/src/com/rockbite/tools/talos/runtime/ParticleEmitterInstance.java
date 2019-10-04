@@ -16,6 +16,7 @@ public class ParticleEmitterInstance {
 	float delay;
 	float delayTimer;
 
+	boolean paused = false;
 	boolean isContinuous = false;
 	boolean isAttached = false;
 
@@ -75,6 +76,8 @@ public class ParticleEmitterInstance {
 		if(!initialized) {
 			init();
 		}
+
+		if(paused) return;
 
 		//update variables to their real values
 		emitterModule.updateScopeData(this);
@@ -171,5 +174,13 @@ public class ParticleEmitterInstance {
 
 	public void stop() {
 		alpha = 1f;
+	}
+
+	public void pause() {
+		paused = true;
+	}
+
+	public void resume() {
+		paused = false;
 	}
 }
