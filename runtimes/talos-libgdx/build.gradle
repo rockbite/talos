@@ -1,20 +1,20 @@
-apply plugin: "java-library"
+apply plugin: "maven"
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    jcenter()
-    google()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-}
 
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    compile "com.kotcrab.vis:vis-ui:$visuiVersion"
-
+    api "com.kotcrab.vis:vis-ui:$visuiVersion"
+    implementation 'com.github.jitpack:gradle-simple:1.0'
 }
 
 sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = [ "src/" ]
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = 'talos-libgdx'
+        }
+    }
+}

@@ -79,5 +79,6 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 
-
+build/
 editor/build
+runtimes/build/
