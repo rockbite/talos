@@ -8,7 +8,8 @@ import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 public class ParticleEmitterInstance {
 
     private final ParticleEffectInstance parentParticleInstance;
-    ParticleEmitterDescriptor emitterGraph;
+	public boolean isComplete = false;
+	ParticleEmitterDescriptor emitterGraph;
 
 	Vector2 position = new Vector2();
 	float duration;
@@ -60,6 +61,7 @@ public class ParticleEmitterInstance {
 
 		// inner variable defaults
 		alpha = 0f;
+		isComplete = false;
 		particlesToEmmit = 0f;
 
 		initialized = true;
@@ -129,6 +131,12 @@ public class ParticleEmitterInstance {
 			}
 		}
 
+		if(activeParticles.size == 0) {
+			isComplete = true;
+		} else {
+			isComplete = false;
+		}
+
 		emitterGraph.resetRequesters();
 	}
 
@@ -146,6 +154,7 @@ public class ParticleEmitterInstance {
 	public void restart() {
     	delayTimer = delay;
     	alpha = 0;
+    	isComplete = false;
 	}
 
     public void setScope (ScopePayload scope) {
@@ -158,5 +167,9 @@ public class ParticleEmitterInstance {
 
 	public boolean isAttached() {
 		return isAttached;
+	}
+
+	public void stop() {
+		alpha = 1f;
 	}
 }

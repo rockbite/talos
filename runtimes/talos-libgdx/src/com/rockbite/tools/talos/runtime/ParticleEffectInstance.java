@@ -14,6 +14,8 @@ public class ParticleEffectInstance {
 
     ScopePayload scopePayload = new ScopePayload();
 
+    public boolean loopable = false;
+
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
     }
@@ -32,7 +34,7 @@ public class ParticleEffectInstance {
 			particleCount += emitters.get(i).activeParticles.size;
 		}
 
-		if(particleCount == 0) {
+		if(particleCount == 0 && loopable) {
 			for (int i = 0; i < emitters.size; i++) {
 				if(!emitters.get(i).isContinuous) {
 					emitters.get(i).restart();
@@ -58,7 +60,37 @@ public class ParticleEffectInstance {
 		}
 	}
 
-    public Array<ParticleEmitterInstance> getEmitters () {
+
+	public boolean isContinuous() {
+		for (ParticleEmitterDescriptor emitterDescriptor: descriptor.emitterModuleGraphs) {
+			if (emitterDescriptor.isContinuous()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean isComplete() {
+    	if(loopable) return false;
+
+		for (int i = 0; i < emitters.size; i++) {
+			if (!emitters.get(i).isComplete) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public void allowCompletion() {
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).stop();
+		}
+	}
+
+
+	public Array<ParticleEmitterInstance> getEmitters () {
         return emitters;
     }
 

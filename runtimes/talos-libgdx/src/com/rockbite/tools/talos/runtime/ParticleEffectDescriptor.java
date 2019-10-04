@@ -14,7 +14,7 @@ public class ParticleEffectDescriptor {
 	/**
 	 * graph per each emitter
 	 */
-	private Array<ParticleEmitterDescriptor> emitterModuleGraphs = new Array<>();
+	public Array<ParticleEmitterDescriptor> emitterModuleGraphs = new Array<>();
 
 	private TextureAtlas atlas;
 
@@ -67,6 +67,16 @@ public class ParticleEffectDescriptor {
 			name = name.substring(0, name.indexOf("."));
 		}
 		return atlas.findRegion(name);
+	}
+
+	public boolean isContinuous() {
+		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
+			if(emitterDescriptor.isContinuous()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void setTextureAtlas(TextureAtlas atlas) {

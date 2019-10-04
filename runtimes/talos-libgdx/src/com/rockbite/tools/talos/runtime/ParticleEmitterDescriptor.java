@@ -160,4 +160,8 @@ public class ParticleEmitterDescriptor {
     public ParticleEffectDescriptor getEffectDescriptor() {
         return particleEffectResourceDescriptor;
     }
+
+    public boolean isContinuous() {
+        return getEmitterModule().isContinnuous();
+    }
 }
