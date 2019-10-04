@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
@@ -26,11 +28,21 @@ public class PreviewWidget extends ViewportWidget {
 
     private Color tmpColor = new Color();
 
+    private Label countLbl;
+
+    private String countStr = "count: ";
+    private StringBuilder stringBuilder = new StringBuilder();
+
     public PreviewWidget() {
         super();
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
+
+        countLbl = new Label(countStr, TalosMain.Instance().getSkin());
+        add(countLbl).left().top().padLeft(5);
+        row();
+        add().expand();
 
         addListener(new InputListener() {
 
@@ -75,6 +87,11 @@ public class PreviewWidget extends ViewportWidget {
 
         final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
         particleEffect.update(Gdx.graphics.getDeltaTime());
+
+        int count = particleEffect.getParticleCount();
+        stringBuilder.clear();
+        stringBuilder.append(countStr).append(count);
+        countLbl.setText(stringBuilder.toString());
     }
 
     @Override

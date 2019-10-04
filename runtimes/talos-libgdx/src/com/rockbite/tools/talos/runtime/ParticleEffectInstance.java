@@ -16,6 +16,8 @@ public class ParticleEffectInstance {
 
     public boolean loopable = false;
 
+    int particleCount = 0;
+
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
     }
@@ -28,7 +30,7 @@ public class ParticleEffectInstance {
 	}
 
 	public void update (float delta) {
-		int particleCount = 0;
+		particleCount = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
 			particleCount += emitters.get(i).activeParticles.size;
@@ -123,5 +125,9 @@ public class ParticleEffectInstance {
 
 	public Vector2 getPosition() {
 		return position;
+	}
+
+	public int getParticleCount() {
+		return particleCount;
 	}
 }

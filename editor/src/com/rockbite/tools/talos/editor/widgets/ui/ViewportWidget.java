@@ -124,6 +124,8 @@ public abstract class ViewportWidget extends Table {
         batch.setProjectionMatrix(prevProjection);
         batch.setTransformMatrix(prevTransform);
         batch.begin();
+
+        super.draw(batch, parentAlpha);
     }
 
     protected void drawGroup(Batch batch, float parentAlpha) {
