@@ -652,11 +652,20 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
 
-
-
     public void createGroupFromSelectedWrappers() {
         createGroupForWrappers(getSelectedWrappers());
     }
 
+    public void ungroupWrappers(ObjectSet<ModuleWrapper> wrappers) {
+        if(wrappers == null || wrappers.size == 0) return;
+
+        for(ModuleWrapperGroup other: getGroups()) {
+            other.removeWrappers(wrappers);
+        }
+    }
+
+    public void ungroupSelectedWrappers() {
+        ungroupWrappers(getSelectedWrappers());
+    }
 
 }

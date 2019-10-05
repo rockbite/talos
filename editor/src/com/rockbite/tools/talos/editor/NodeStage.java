@@ -95,6 +95,10 @@ public class NodeStage {
                     moduleBoardWidget.createGroupFromSelectedWrappers();
                 }
 
+                if(keycode == Input.Keys.U && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    moduleBoardWidget.ungroupSelectedWrappers();
+                }
+
                 if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     moduleBoardWidget.copySelectedModules();
                 }

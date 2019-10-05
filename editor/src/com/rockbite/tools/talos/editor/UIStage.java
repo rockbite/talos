@@ -117,6 +117,7 @@ public class UIStage {
 		createModule.setSubMenu(createPopup);
 		MenuItem removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
 		MenuItem groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
+		MenuItem ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
 		modulesMenu.addItem(createModule);
 		modulesMenu.addItem(removeSelectedModules);
 		modulesMenu.addItem(groupSelectedModules);
@@ -169,6 +170,14 @@ public class UIStage {
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupFromSelectedWrappers();
+			}
+		});
+
+		ungroupSelectedModules.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+				TalosMain.Instance().NodeStage().moduleBoardWidget.ungroupSelectedWrappers();
 			}
 		});
 
