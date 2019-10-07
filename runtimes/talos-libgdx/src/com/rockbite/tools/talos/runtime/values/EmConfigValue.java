@@ -2,10 +2,10 @@ package com.rockbite.tools.talos.runtime.values;
 
 public class EmConfigValue extends Value {
 
-    public boolean attached;
-    public boolean continuous;
-    public boolean aligned;
-    public boolean additive;
+    public boolean attached = false;
+    public boolean continuous = true;
+    public boolean aligned = false;
+    public boolean additive = true;
 
     @Override
     public void set(Value value) {

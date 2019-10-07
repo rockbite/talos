@@ -65,6 +65,7 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
             image.setDrawable(new TextureRegionDrawable(region));
             filePath = paths[0]+"";
             fileName = fileHandle.name();
+            module.fileName = fileName;
         }
     }
 
@@ -84,6 +85,7 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
             FileHandle fileHandle = tryAndFineTexture(filePath);
             TextureRegion region = new TextureRegion(new Texture(fileHandle));
             module.setRegion(region);
+            module.fileName = fileName;
             image.setDrawable(new TextureRegionDrawable(region));
         }
     }

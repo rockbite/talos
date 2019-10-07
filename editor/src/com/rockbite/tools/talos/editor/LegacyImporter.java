@@ -30,6 +30,8 @@ public class LegacyImporter {
 
     private String path;
 
+    private boolean globalContinuous = false;
+
     public LegacyImporter(NodeStage stage) {
         this.stage = stage;
 
@@ -37,7 +39,7 @@ public class LegacyImporter {
     }
 
     public void read(FileHandle effectFile) {
-
+        globalContinuous = false;
         leftX = 200;
         rightX =500;
         yStart = 400;
@@ -476,6 +478,12 @@ public class LegacyImporter {
             boolean additive = readBoolean(reader, "additive");
             boolean behind = readBoolean(reader, "behind");
 
+            if(continuous) globalContinuous = true;
+
+            if(globalContinuous) {
+                continuous = true; // if at least one effect is continuous then all of them will be imported as true.
+                // it's long to explain why, but it's because legacy editor and legacy runtime do ont agree on each other on this.
+            }
 
             EmConfigModuleWrapper config = (EmConfigModuleWrapper) stage.moduleBoardWidget.createModule(EmConfigModule.class, leftX, getNextY());
             stage.moduleBoardWidget.makeConnection(config, emitterModuleWrapper, EmConfigModule.OUTPUT, EmitterModule.CONFIG);
