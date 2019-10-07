@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -20,6 +21,8 @@ public class ParticleEmitterInstance {
 	boolean paused = false;
 	boolean isContinuous = false;
 	boolean isAttached = false;
+
+	public Color tint = new Color(Color.WHITE);
 
 	private EmitterModule emitterModule;
 
@@ -187,5 +190,13 @@ public class ParticleEmitterInstance {
 
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
+	}
+
+	public void setTint(float r, float g, float b, float a) {
+		tint.set(r, g, b, a);
+	}
+
+	public void setTint(Color color) {
+    	tint.set(color);
 	}
 }
