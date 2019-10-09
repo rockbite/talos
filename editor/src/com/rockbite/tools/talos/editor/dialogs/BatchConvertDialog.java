@@ -158,9 +158,15 @@ public class BatchConvertDialog extends VisWindow {
     }
 
     private void convertOne(FileHandle fileHandle) {
-        String subPath = fileHandle.parent().path().substring(inputPathField.getText().length() + 1);
-        String projectPath = outputPath + File.separator + "projects" +  File.separator + subPath + File.separator + fileHandle.nameWithoutExtension() + ".tls";
-        String runtimePath = outputPath + File.separator + "runtime" +  File.separator + subPath + File.separator + fileHandle.nameWithoutExtension() + ".p";
+        String subPath;
+
+        if (inputPathField.getText().length() == fileHandle.parent().path().length()) {
+            subPath = File.separator;
+        } else {
+             subPath = fileHandle.parent().path().substring(inputPathField.getText().length() + 1) + File.separator;
+        }
+        String projectPath = outputPath + File.separator + "projects" +  File.separator + subPath + fileHandle.nameWithoutExtension() + ".tls";
+        String runtimePath = outputPath + File.separator + "runtime" +  File.separator + subPath + fileHandle.nameWithoutExtension() + ".p";
 
         FileHandle projectDestination = Gdx.files.absolute(projectPath);
         FileHandle exportDestination = Gdx.files.absolute(runtimePath);

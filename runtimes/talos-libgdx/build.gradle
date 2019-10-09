@@ -6,10 +6,15 @@ dependencies {
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.kotcrab.vis:vis-ui:$visuiVersion"
     implementation 'com.github.jitpack:gradle-simple:1.0'
+
+    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    testImplementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
 
 sourceCompatibility = 1.7
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
+sourceSets.test.java.srcDirs = ["test/"]
 
 uploadArchives {
     repositories {
