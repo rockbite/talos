@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.rockbite.talos.runtime.test.utils.CameraController;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -47,9 +49,10 @@ public class ParticleControlTest extends ApplicationAdapter {
 
 		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("particleAssets.atlas"));
+		TextureAtlas atlas = new TextureAtlas();
+		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
 		descriptor.setTextureAtlas(atlas);
-		descriptor.load(Gdx.files.internal("test.p"));
+		descriptor.load(Gdx.files.internal("testfire.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();
 	}
