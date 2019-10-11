@@ -2,21 +2,27 @@ package com.rockbite.talos.runtime.test;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.rockbite.talos.runtime.test.utils.CameraController;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
+import com.rockbite.tools.talos.runtime.assets.TextureAtlasAssetProvider;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -30,6 +36,8 @@ public class ParticleControlTest extends ApplicationAdapter {
 	private CameraController cameraController;
 
 	private ParticleEffectInstance particleEffectInstance;
+
+	Stage stage;
 
 	@Override
 	public void create () {
@@ -45,16 +53,75 @@ public class ParticleControlTest extends ApplicationAdapter {
 		particleRenderer = new SpriteBatchParticleRenderer(batch);
 
 		cameraController = new CameraController(orthographicCamera);
-		Gdx.input.setInputProcessor(cameraController);
 
 		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
 
 		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
-		descriptor.setTextureAtlas(atlas);
+		descriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
 		descriptor.load(Gdx.files.internal("testfire.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();
+
+		particleEffectInstance.loopable = true;
+
+
+		stage = new Stage();
+
+		VisUI.load();
+
+		VisTextButton start = new VisTextButton("Start/Resume");
+		VisTextButton pause = new VisTextButton("Pause");
+		VisTextButton restart = new VisTextButton("Restart");
+		VisTextButton allowCompletion = new VisTextButton("Allow Completion");
+
+		start.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				particleEffectInstance.resume();
+			}
+		});
+
+		pause.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				particleEffectInstance.pause();
+			}
+		});
+
+		restart.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				particleEffectInstance.restart();
+			}
+		});
+
+
+		allowCompletion.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				particleEffectInstance.allowCompletion();
+			}
+		});
+
+
+		Table table = new Table();
+		table.setFillParent(true);
+		table.defaults().pad(10).top().left();
+
+		table.top().left();
+
+		table.add(start);
+		table.row();
+		table.add(pause);
+		table.row();
+		table.add(restart);
+		table.row();
+		table.add(allowCompletion);
+
+		stage.addActor(table);
+
+		Gdx.input.setInputProcessor(new InputMultiplexer(stage, cameraController));
 	}
 
 	@Override
@@ -77,13 +144,15 @@ public class ParticleControlTest extends ApplicationAdapter {
 		batch.setProjectionMatrix(orthographicCamera.combined);
 		batch.begin();
 
-		particleEffectInstance.resume();
-
 		particleEffectInstance.update(Gdx.graphics.getDeltaTime());
 		particleRenderer.render(particleEffectInstance);
 
 		batch.end();
+
+		stage.act();
+		stage.draw();
 	}
+
 
 	public static void main (String[] args) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

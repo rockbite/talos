@@ -86,6 +86,7 @@ public class ParticleEffectInstance {
 	}
 
 	public void allowCompletion() {
+    	loopable = false;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).stop();
 		}
@@ -102,6 +103,15 @@ public class ParticleEffectInstance {
 			emitters.get(i).resume();
 		}
 	}
+
+
+	public void restart () {
+    	loopable = true;
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).restart();
+		}
+	}
+
 
 
 	public Array<ParticleEmitterInstance> getEmitters () {

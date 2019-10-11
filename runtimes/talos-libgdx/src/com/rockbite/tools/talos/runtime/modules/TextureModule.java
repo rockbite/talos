@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 
@@ -14,7 +15,7 @@ public class TextureModule extends Module {
     private DrawableValue userDrawable;
     private DrawableValue outputValue;
 
-    public String fileName;
+    public String regionName;
 
     @Override
     protected void defineSlots() {
@@ -28,31 +29,28 @@ public class TextureModule extends Module {
         outputValue.set(userDrawable);
     }
 
-    public void setRegion(TextureRegion region) {
+    public void setRegion (String regionName, TextureRegion region) {
+        this.regionName = regionName;
         userDrawable.setDrawable(new TextureRegionDrawable(region));
     }
 
     @Override
     public void setModuleGraph(ParticleEmitterDescriptor graph) {
         super.setModuleGraph(graph);
-        if(fileName != null) {
-            setRegion(graph.getEffectDescriptor().getTextureRegion(fileName));
-        }
+        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+        setRegion(regionName, assetProvider.findRegion(regionName));
     }
 
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("fileName", fileName);
+        json.writeValue("regionName", regionName);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-
-        if(jsonData.has("fileName")) {
-            fileName = jsonData.getString("fileName");
-        }
+        regionName = jsonData.getString("regionName");
     }
 
 

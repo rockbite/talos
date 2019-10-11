@@ -16,8 +16,7 @@ public abstract class Module implements Json.Serializable {
     protected IntMap<Slot> inputSlots = new IntMap<>();
     protected IntMap<Slot> outputSlots = new IntMap<>();
 
-    static int indexCounter = 0;
-    protected int index = indexCounter++;
+    protected int index = -1;
 
     private float lastRequester;
 
@@ -177,9 +176,7 @@ public abstract class Module implements Json.Serializable {
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        if(jsonData.has("index")) {
-            index = jsonData.getInt("index");
-        }
+        index = jsonData.getInt("index");
     }
 
     public int getIndex() {

@@ -11,26 +11,21 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.kotcrab.vis.ui.FocusManager;
-import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
-import com.rockbite.tools.talos.editor.serialization.ConnectionData;
+import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
-
-import java.util.Comparator;
 
 public class ModuleBoardWidget extends WidgetGroup {
 

@@ -5,16 +5,24 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
+import com.rockbite.tools.talos.editor.assets.ProjectAssetProvider;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
 import com.rockbite.tools.talos.editor.serialization.*;
+import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
+import com.rockbite.tools.talos.runtime.modules.TextureModule;
+import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
+import com.rockbite.tools.talos.runtime.serialization.ExportData;
+import com.sun.org.apache.xpath.internal.domapi.XPathStylesheetDOM3Exception;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -35,9 +43,14 @@ public class Project {
 
 	private LegacyImporter importer;
 
+	private ProjectAssetProvider projectAssetProvider;
+
 	public Project () {
+		projectAssetProvider = new ProjectAssetProvider();
+
 		projectSerializer = new ProjectSerializer();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
+		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
 		particleEffect.loopable = true;
 
@@ -130,6 +143,7 @@ public class Project {
 		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
+		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
 		particleEffect.loopable = true;
 
@@ -191,6 +205,10 @@ public class Project {
 		return currentEmitterWrapper.getGraph();
 	}
 
+	public ProjectAssetProvider getProjectAssetProvider () {
+		return projectAssetProvider;
+	}
+
 	public String getLocalPath() {
 		try {
 			return new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
@@ -222,7 +240,44 @@ public class Project {
 
 	public void exportProject(FileHandle fileHandle) {
 		ExportData exportData = new ExportData();
-		exportData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
+		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
 		projectSerializer.writeExport(fileHandle, exportData);
 	}
+
+	private void setToExportData (ExportData data, ModuleBoardWidget moduleBoardWidget) {
+		final ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = moduleBoardWidget.moduleWrappers;
+		final ObjectMap<ParticleEmitterWrapper, Array<ModuleBoardWidget.NodeConnection>> nodeConnections = moduleBoardWidget.nodeConnections;
+
+		for (ParticleEmitterWrapper key : moduleWrappers.keys()) {
+			final ExportData.EmitterExportData emitterData = new ExportData.EmitterExportData();
+			emitterData.name = key.getName();
+			for (ModuleWrapper wrapper : moduleWrappers.get(key)) {
+				emitterData.modules.add(wrapper.getModule());
+
+				if (wrapper.getModule() instanceof TextureModule) {
+					TextureModule textureModule = (TextureModule)wrapper.getModule();
+					String name = textureModule.regionName;
+					if (name == null)
+						name = "fire";
+					if (name.contains(".")) {
+						name = name.substring(0, name.lastIndexOf("."));
+					}
+					if (!data.metadata.resources.contains(name, false)) {
+						data.metadata.resources.add(name);
+					}
+				}
+			}
+
+			final Array<ModuleBoardWidget.NodeConnection> nodeConns = nodeConnections.get(key);
+			if (nodeConns != null) {
+				for (ModuleBoardWidget.NodeConnection nodeConn : nodeConns) {
+					emitterData.connections.add(new ConnectionData(nodeConn.fromModule.getModule().getIndex(), nodeConn.toModule.getModule().getIndex(), nodeConn.fromSlot, nodeConn.toSlot));
+				}
+			}
+
+			data.emitters.add(emitterData);
+		}
+
+	}
+
 }

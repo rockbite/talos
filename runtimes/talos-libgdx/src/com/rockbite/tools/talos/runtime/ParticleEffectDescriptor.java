@@ -5,9 +5,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
+import com.rockbite.tools.talos.runtime.modules.EmitterModule;
+import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.ParticleModule;
+import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
+import com.rockbite.tools.talos.runtime.serialization.ExportData;
 
 public class ParticleEffectDescriptor {
 
@@ -16,7 +24,7 @@ public class ParticleEffectDescriptor {
 	 */
 	public Array<ParticleEmitterDescriptor> emitterModuleGraphs = new Array<>();
 
-	private TextureAtlas atlas;
+	private AssetProvider assetProvider;
 
 	public ParticleEffectDescriptor () {
 
@@ -36,17 +44,48 @@ public class ParticleEffectDescriptor {
 
 	public void load(FileHandle fileHandle) {
 		Json json = new Json();
-		JsonValue root = new JsonReader().parse(fileHandle.readString());
-
 		ParticleEmitterDescriptor.registerModules();
 		for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
 			json.addClassTag(clazz.getSimpleName(), clazz);
 		}
 
-		JsonValue emitters = root.get("emitters");
-		for(JsonValue emitter: emitters) {
+		final ExportData exportData = json.fromJson(ExportData.class, fileHandle.readString());
+
+		for (ExportData.EmitterExportData emitter : exportData.emitters) {
 			ParticleEmitterDescriptor emitterDescriptor = new ParticleEmitterDescriptor(this);
-			emitterDescriptor.read(json, emitter);
+
+			IntMap<Module> idMap = new IntMap<>();
+
+			for (Module module: emitter.modules) {
+				module.setModuleGraph(emitterDescriptor);
+				if (module instanceof ParticleModule) {
+					emitterDescriptor.particleModule = (ParticleModule)module;
+				}
+				if (module instanceof EmitterModule) {
+					emitterDescriptor.emitterModule = (EmitterModule)module;
+				}
+				idMap.put(module.getIndex(), module);
+			}
+
+			for (ConnectionData connection : emitter.connections) {
+				final int moduleFromId = connection.moduleFrom;
+				final int moduleToId = connection.moduleTo;
+				final int slotFrom = connection.slotFrom;
+				final int slotTo = connection.slotTo;
+
+				Module moduleFrom = idMap.get(moduleFromId);
+				Module moduleTo = idMap.get(moduleToId);
+
+				if (moduleFrom == null) {
+					throw new GdxRuntimeException("No module from found for id: " + moduleFromId);
+				}
+				if (moduleTo == null) {
+					throw new GdxRuntimeException("No module to found for id: " + moduleToId);
+				}
+
+				emitterDescriptor.connectNode(moduleFrom, moduleTo, slotFrom, slotTo);
+			}
+
 			emitterModuleGraphs.add(emitterDescriptor);
 		}
 	}
@@ -61,14 +100,6 @@ public class ParticleEffectDescriptor {
 		return particleEffectInstance;
 	}
 
-	public TextureRegion getTextureRegion(String name) {
-		//remove extension
-		if(name.contains(".")) {
-			name = name.substring(0, name.indexOf("."));
-		}
-		return atlas.findRegion(name);
-	}
-
 	public boolean isContinuous() {
 		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
 			if(emitterDescriptor.isContinuous()) {
@@ -79,7 +110,11 @@ public class ParticleEffectDescriptor {
 		return false;
 	}
 
-	public void setTextureAtlas(TextureAtlas atlas) {
-		this.atlas = atlas;
+	public AssetProvider getAssetProvider () {
+		return assetProvider;
+	}
+
+	public void setAssetProvider (AssetProvider assetProvider) {
+		this.assetProvider = assetProvider;
 	}
 }

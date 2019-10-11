@@ -11,16 +11,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.assets.TextureAtlasAssetProvider;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -103,7 +102,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
 		public TalosActor (FileHandle effect, TextureAtlas atlas, ParticleRenderer renderer) {
 			this.renderer = renderer;
-			particleEffectDescriptor.setTextureAtlas(atlas);
+			particleEffectDescriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
 			particleEffectDescriptor.load(effect);
 			particleEffect = particleEffectDescriptor.createEffectInstance();
 			particleEffect.setScope(scope);

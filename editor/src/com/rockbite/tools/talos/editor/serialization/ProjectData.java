@@ -6,6 +6,7 @@ import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
+import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 
 public class ProjectData {
 

@@ -130,33 +130,6 @@ public class ParticleEmitterDescriptor {
         return scopePayload;
     }
 
-    public void read(Json json, JsonValue emitter) {
-        JsonValue modulesArr = emitter.get("modules");
-        JsonValue connections = emitter.get("connections");
-        modules = json.readValue(Array.class, modulesArr);
-        IntMap<Module> idMap = new IntMap<>();
-        for(Module module: modules) {
-            module.setModuleGraph(this);
-            if (module instanceof ParticleModule) {
-                particleModule = (ParticleModule) module;
-            }
-            if (module instanceof EmitterModule) {
-                emitterModule = (EmitterModule) module;
-            }
-            idMap.put(module.getIndex(), module);
-        }
-        for(JsonValue connection: connections) {
-            int moduleFromId = connection.getInt("moduleFrom", 0);
-            int moduleToId = connection.getInt("moduleTo", 0);
-            int slotFrom = connection.getInt("slotFrom", 0);
-            int slotTo = connection.getInt("slotTo", 0);
-
-            Module moduleFrom = idMap.get(moduleFromId);
-            Module moduleTo = idMap.get(moduleToId);
-            connectNode(moduleFrom, moduleTo, slotFrom, slotTo);
-        }
-    }
-
     public ParticleEffectDescriptor getEffectDescriptor() {
         return particleEffectResourceDescriptor;
     }

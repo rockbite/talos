@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.editor.serialization;
+package com.rockbite.tools.talos.runtime.serialization;
 
 public class ConnectionData {
 
@@ -18,4 +18,8 @@ public class ConnectionData {
 		this.slotTo = slotTo;
 	}
 
+	@Override
+	public String toString () {
+		return moduleFrom + " -> " + moduleTo + " : " + slotFrom + " -> " + slotTo;
+	}
 }
