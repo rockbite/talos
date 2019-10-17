@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.*;
+import com.rockbite.tools.talos.editor.widgets.ui.DynamicTable;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.ColorModule;
@@ -26,7 +27,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 public abstract class ModuleWrapper<T extends Module> extends VisWindow implements Json.Serializable {
 
     protected T module;
-    protected VisTable leftWrapper, rightWrapper, contentWrapper;
+    protected DynamicTable leftWrapper, rightWrapper, contentWrapper;
     protected Table content;
 
     protected IntMap<Image> inputSlotMap = new IntMap<>();
@@ -45,7 +46,15 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
     private int id;
 
+    class SlotRowData {
+        String title;
+        int key;
 
+        public SlotRowData(String title, int key) {
+            this.title = title;
+            this.key = key;
+        }
+    }
 
     public ModuleWrapper() {
         super("", "panel");
@@ -64,9 +73,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
         Stack stack = new Stack();
 
-        leftWrapper = new VisTable();
-        rightWrapper = new VisTable();
-        contentWrapper = new VisTable();
+        leftWrapper = new DynamicTable();
+        rightWrapper = new DynamicTable();
+        contentWrapper = new DynamicTable();
 
         stack.add(leftWrapper);
         stack.add(rightWrapper);
@@ -131,8 +140,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
-        leftWrapper.add(slotRow).left().expandX();
-        leftWrapper.row();
+        leftWrapper.addRow(slotRow, true);
 
         leftSlotNames.put(key, title);
 
@@ -146,13 +154,13 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
         slotRow.add(icon).right();
 
-        rightWrapper.add(slotRow).right().expandX();
-        rightWrapper.row();
+        rightWrapper.addRow(slotRow, false);
 
         rightSlotNames.put(key, title);
 
         configureNodeActions(icon, key, false);
     }
+
 
     protected VisTextField addTextField(String title) {
         Table slotRow = new Table();

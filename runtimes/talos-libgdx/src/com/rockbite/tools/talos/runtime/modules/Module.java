@@ -89,13 +89,21 @@ public abstract class Module implements Json.Serializable {
         //find what it is connected to
         Slot inputSlot = inputSlots.get(slotId);
 
+        if(inputSlot == null) {
+            return;
+        }
+
         if(inputSlot.getTargetSlot() == null) {
+            if(inputSlot.getValue() == null) return;
+
             inputSlot.getValue().setEmpty(true);
         } else {
             //ask it's module give it's output value
             Value result = inputSlot.getTargetModule().fetchOutputSlotValue(inputSlot.getTargetSlot().getIndex());
-            inputSlot.getValue().set(result);
-            inputSlot.getValue().setEmpty(false);
+            if(result != null) {
+                inputSlot.getValue().set(result);
+                inputSlot.getValue().setEmpty(false);
+            }
         }
     }
 
@@ -181,5 +189,13 @@ public abstract class Module implements Json.Serializable {
 
     public int getIndex() {
         return index;
+    }
+
+    public IntMap<Slot> getInputSlots() {
+        return inputSlots;
+    }
+
+    public IntMap<Slot> getOutputSlots() {
+        return outputSlots;
     }
 }

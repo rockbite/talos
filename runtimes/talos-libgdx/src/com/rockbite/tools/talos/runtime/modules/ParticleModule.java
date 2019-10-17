@@ -83,7 +83,7 @@ public class ParticleModule extends Module {
 
     public ParticleDrawable getDrawable() {
         fetchInputSlotValue(DRAWABLE);
-        if(drawable.isEmpty()) {
+        if(drawable.isEmpty() || drawable.getDrawable() == null) {
             return defaultDrawable;
         }
 

@@ -23,6 +23,9 @@ public class TextureRegionDrawable implements ParticleDrawable {
 
     @Override
     public float getAspectRatio() {
+        if(region == null) {
+            return 1;
+        }
         return region.getRegionWidth()/ (float)region.getRegionHeight();
     }
 }

@@ -7,9 +7,20 @@ public class DrawableValue extends Value {
 
     ParticleDrawable drawable;
 
+    public DrawableValue() {
+        setEmpty(true);
+    }
+
     @Override
     public void set(Value value) {
+        if(value.isEmpty()) {
+            setEmpty(true);
+            drawable = null;
+            return;
+        }
         drawable = ((DrawableValue)value).getDrawable();
+
+        setEmpty(drawable == null);
     }
 
     public ParticleDrawable getDrawable() {
@@ -18,5 +29,6 @@ public class DrawableValue extends Value {
 
     public void setDrawable(ParticleDrawable drawable) {
         this.drawable = drawable;
+        setEmpty(drawable == null);
     }
 }

@@ -47,6 +47,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(TextureModule.class);
             registeredModules.add(EmConfigModule.class);
             registeredModules.add(OffsetModule.class);
+            registeredModules.add(RandomInputModule.class);
         }
     }
 

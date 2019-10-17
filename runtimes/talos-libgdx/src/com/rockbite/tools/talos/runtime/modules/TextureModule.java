@@ -31,7 +31,9 @@ public class TextureModule extends Module {
 
     public void setRegion (String regionName, TextureRegion region) {
         this.regionName = regionName;
-        userDrawable.setDrawable(new TextureRegionDrawable(region));
+        if(region != null) {
+            userDrawable.setDrawable(new TextureRegionDrawable(region));
+        }
     }
 
     @Override

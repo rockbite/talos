@@ -44,6 +44,8 @@ public class Particle implements Pool.Poolable {
         // inner variable defaults
         alpha = 0f;
 
+        drawable = particleModule.getDrawable(); // important to get drawable before size, and in general during init
+
         durationAtInit = particleEmitter.alpha;
     }
 
@@ -77,7 +79,6 @@ public class Particle implements Pool.Poolable {
             rotation = particleModule.getRotation();
         }
 
-        drawable = particleModule.getDrawable(); // important to get drawable before size
         size.set(particleModule.getSize());
         Vector2 positionOverride = particleModule.getPosition();
         color.set(particleModule.getColor());

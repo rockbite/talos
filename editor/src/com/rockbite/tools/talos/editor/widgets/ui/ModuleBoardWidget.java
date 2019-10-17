@@ -269,6 +269,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(TextureModule.class, TextureModuleWrapper.class);
         WrapperRegistry.reg(EmConfigModule.class, EmConfigModuleWrapper.class);
         WrapperRegistry.reg(OffsetModule.class, OffsetModuleWrapper.class);
+        WrapperRegistry.reg(RandomInputModule.class, RandomInputModuleWrapper.class);
     }
 
     public void showPopup() {
