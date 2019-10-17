@@ -106,7 +106,6 @@ public class ParticleEffectInstance {
 
 
 	public void restart () {
-    	loopable = true;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).restart();
 		}

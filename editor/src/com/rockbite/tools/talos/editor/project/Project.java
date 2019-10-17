@@ -22,7 +22,6 @@ import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.modules.TextureModule;
 import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.runtime.serialization.ExportData;
-import com.sun.org.apache.xpath.internal.domapi.XPathStylesheetDOM3Exception;
 
 import java.io.File;
 import java.net.URISyntaxException;
