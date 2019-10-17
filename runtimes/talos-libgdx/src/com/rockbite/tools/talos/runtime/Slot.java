@@ -33,6 +33,10 @@ public class Slot {
         return text;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     enum Flavour {
         ANGLE
     }

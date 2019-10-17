@@ -54,7 +54,7 @@ public abstract class Module implements Json.Serializable {
     }
 
     public void detach(int slot, boolean isInput) {
-        if(isInput) {
+        if(isInput && inputSlots.get(slot) != null) {
             inputSlots.get(slot).detach();
         }
     }

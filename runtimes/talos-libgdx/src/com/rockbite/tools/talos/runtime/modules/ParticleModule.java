@@ -87,8 +87,6 @@ public class ParticleModule extends Module {
             return defaultDrawable;
         }
 
-        getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getDrawable().getAspectRatio());
-
         return drawable.getDrawable();
     }
 

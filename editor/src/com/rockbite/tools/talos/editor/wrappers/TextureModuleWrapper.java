@@ -103,7 +103,7 @@ public class TextureModuleWrapper extends ModuleWrapper<TextureModule> {
                 module.setRegion(fileHandle.nameWithoutExtension(), textureRegion);
                 image.setDrawable(new TextureRegionDrawable(textureRegion));
 
-                filePath = fileHandle.nameWithoutExtension();
+                filePath = fileHandle.path();
                 fileName = fileHandle.name();
             }
         }

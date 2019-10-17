@@ -27,7 +27,7 @@ public class RandomInputModule extends Module {
 
         Value output = outputSlots.get(0).getValue();
         if(output != null) {
-            random.setSeed((long) ((getScope().getFloat(ScopePayload.EMITTER_ALPHA) * 10000 * index * 1000)));
+            random.setSeed((long) ((getScope().getFloat(ScopePayload.EMITTER_ALPHA) * 10000 * (index+1) * 1000)));
             int index = MathUtils.floor(random.nextFloat() * (inputSlots.size - 1));
 
             Value input = inputSlots.get(index).getValue();

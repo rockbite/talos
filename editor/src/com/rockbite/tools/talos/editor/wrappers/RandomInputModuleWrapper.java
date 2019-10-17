@@ -85,6 +85,7 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
                 break;
             }
             list.put(i,list.get(i+1));
+            list.get(i).setIndex(i);
         }
         slotCount--;
 
