@@ -7,6 +7,7 @@ import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements CurveDataProvider {
 
