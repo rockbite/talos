@@ -136,6 +136,7 @@ public class Project {
 		cleanData();
 		projectData = new ProjectData();
 		createNewEmitter("default_emitter");
+		currentProjectPath = null;
 	}
 
 	private void cleanData() {

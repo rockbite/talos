@@ -72,7 +72,7 @@ public class Particle implements Pool.Poolable {
         transparency = particleModule.getTransparency();
 
         if(particleEmitter.emitterGraph.emitterModule.isAligned()) {
-            rotation = angle/360f + particleModule.getRotation();
+            rotation = angle + particleModule.getRotation();
         } else {
             rotation = particleModule.getRotation();
         }
