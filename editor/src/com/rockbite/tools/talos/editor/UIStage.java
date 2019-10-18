@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -42,6 +42,7 @@ public class UIStage {
 
 	private final Stage stage;
 	private final Skin skin;
+	private final DragAndDrop dragAndDrop;
 
 	Table fullScreenTable;
 
@@ -55,8 +56,9 @@ public class UIStage {
 	ColorPicker colorPicker;
 
 	public UIStage (Skin skin) {
-		stage = new Stage(new ScreenViewport());
+		this.stage = new Stage(new ScreenViewport());
 		this.skin = skin;
+		this.dragAndDrop = new DragAndDrop();
 	}
 
 	public void init () {
@@ -88,6 +90,10 @@ public class UIStage {
 
 	private void defaults () {
 		fullScreenTable.top().left();
+	}
+
+	public void fileDrop (String[] paths, float x, float y) {
+		previewWidget.fileDrop(x, y, paths);
 	}
 
 	private void constructMenu () {
@@ -477,7 +483,6 @@ public class UIStage {
 		fullScreenTable.row();
 		fullScreenTable.add(verticalPane).grow();
 	}
-
 
 	private void initExampleList (PopupMenu examples) {
 		FileHandle list = Gdx.files.internal("samples/list.xml");
