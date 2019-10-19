@@ -1,17 +1,23 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -19,6 +25,8 @@ import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 public class PreviewWidget extends ViewportWidget {
 
     Vector2 mid = new Vector2();
+
+    Vector2 temp = new Vector2();
 
     private ParticleRenderer particleRenderer;
 
@@ -30,6 +38,10 @@ public class PreviewWidget extends ViewportWidget {
 
     private Label countLbl;
 
+    private PreviewImageControllerWidget previewController;
+
+    private Image previewImage = new Image();
+
     private String countStr = "count: ";
     private StringBuilder stringBuilder = new StringBuilder();
 
@@ -38,11 +50,20 @@ public class PreviewWidget extends ViewportWidget {
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
+        previewController = new PreviewImageControllerWidget(TalosMain.Instance().getSkin()) {
+            @Override
+            public void removeImage () {
+                super.removeImage();
+                previewImage.setDrawable(null);
+            }
+        };
 
         countLbl = new Label(countStr, TalosMain.Instance().getSkin());
         add(countLbl).left().top().padLeft(5);
         row();
         add().expand();
+        row();
+        add(previewController).bottom().left().growX();
 
         addListener(new InputListener() {
 
@@ -82,6 +103,39 @@ public class PreviewWidget extends ViewportWidget {
     }
 
     @Override
+    protected void cameraScrolledWithAmount (int amount) {
+        super.cameraScrolledWithAmount(amount);
+        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
+    }
+
+    public void fileDrop (float x, float y, String[] paths) {
+        temp.set(x, y);
+        (getStage().getViewport()).unproject(temp);
+        stageToLocalCoordinates(temp);
+        if(this.hit(temp.x, temp.y, false) != null) {
+           addPreviewImage(paths);
+        }
+    }
+
+    public void addPreviewImage (String[] paths) {
+        if(paths.length == 1) {
+
+            String resourcePath = paths[0];
+            FileHandle fileHandle = Gdx.files.absolute(resourcePath);
+
+            final String extension = fileHandle.extension();
+
+            if (extension.endsWith("png") || extension.endsWith("jpg")) {
+                final Texture texture = new Texture(fileHandle);
+                TalosMain.Instance().Project().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
+                final TextureRegion textureRegion = new TextureRegion(texture);
+                previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
+                previewController.setImageWidth(10);
+            }
+        }
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
 
@@ -99,6 +153,8 @@ public class PreviewWidget extends ViewportWidget {
 
         batch.end();
 
+        camera.zoom = previewController.getPreviewBoxWidth() / camera.viewportWidth;
+
         tmpColor.set(Color.WHITE);
         tmpColor.a = 0.2f;
         Gdx.gl.glLineWidth(1f);
@@ -115,10 +171,30 @@ public class PreviewWidget extends ViewportWidget {
 
         mid.set(0, 0);
 
+
+        float imagePrefWidth = previewImage.getPrefWidth();
+        float imagePrefHeight = previewImage.getPrefHeight();
+        float scale = imagePrefHeight / imagePrefWidth;
+
+
+        float imageWidth = previewController.getImageWidth();
+        float imageHeight = imageWidth * scale;
+        previewController.getPreviewBoxWidth();
+
+        previewImage.setPosition(mid.x - imageWidth / 2, mid.y - imageHeight / 2);
+        previewImage.setSize(imageWidth, imageHeight);
+        if (previewController.isBackground()) {
+            previewImage.draw(batch, parentAlpha);
+        }
+
         spriteBatchParticleRenderer.setBatch(batch);
 
         final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
         particleEffect.render(particleRenderer);
+
+        if (!previewController.isBackground()) {
+            previewImage.draw(batch, parentAlpha);
+        }
     }
 
 }

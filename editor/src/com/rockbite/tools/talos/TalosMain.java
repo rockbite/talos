@@ -69,6 +69,7 @@ public class TalosMain extends ApplicationAdapter {
 			@Override
 			protected void doDrop (String[] finalPaths, float x, float y) {
 				nodeStage.fileDrop(finalPaths, x, y);
+				uiStage.fileDrop(finalPaths, x, y);
 			}
 		};
 	}
