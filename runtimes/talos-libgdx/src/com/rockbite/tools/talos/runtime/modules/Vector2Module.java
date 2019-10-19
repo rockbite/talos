@@ -60,8 +60,8 @@ public class Vector2Module extends Module {
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        defaultX = jsonData.getFloat("x");
-        defaultY = jsonData.getFloat("y");
+        defaultX = jsonData.getFloat("x", 0);
+        defaultY = jsonData.getFloat("y", 0);
     }
 
 }

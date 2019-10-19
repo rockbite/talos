@@ -133,18 +133,20 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         }
     }
 
-    protected void addInputSlot(String title, int key) {
+    protected Cell addInputSlot(String title, int key) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
         VisLabel label = new VisLabel(title, "small");
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
-        leftWrapper.addRow(slotRow, true);
+        Cell cell = leftWrapper.addRow(slotRow, true);
 
         leftSlotNames.put(key, title);
 
         configureNodeActions(icon, key, true);
+
+        return cell;
     }
 
     protected void addOutputSlot(String title, int key) {
@@ -389,7 +391,11 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
     }
 
     protected VisTextField addInputSlotWithTextField(String title, int key) {
-        return addInputSlotWithTextField(title, key, 60);
+        return addInputSlotWithTextField(title, key, 60, false);
+    }
+
+    protected VisTextField addInputSlotWithTextField(String title, int key, float size) {
+        return addInputSlotWithTextField(title, key, size, false);
     }
 
     protected VisTextArea addInputSlotWithTextArea (String title, int key) {
@@ -409,18 +415,34 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         return textArea;
     }
 
-    protected VisTextField addInputSlotWithTextField(String title, int key, float size) {
+    protected VisTextField addInputSlotWithTextField(String title, int key, float size, boolean grow) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
         VisLabel label = new VisLabel(title, "small");
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
-        VisTextField textField = new VisTextField();
-        slotRow.add(textField).width(size);
+        final VisTextField textField = new VisTextField();
+        slotRow.add().fillX().expandX().growX();
+        slotRow.add(textField).right().width(size);
 
-        leftWrapper.add(slotRow).left().expandX().pad(3);
+        Cell cell = leftWrapper.add(slotRow).pad(3).expandX().left();
+        if(grow) {
+            cell.growX();
+        }
+
         leftWrapper.row();
+
+        textField.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                if(textField.getSelection().length() == 0) {
+                    textField.selectAll();
+                }
+            }
+        });
 
         configureNodeActions(icon, key, true);
 

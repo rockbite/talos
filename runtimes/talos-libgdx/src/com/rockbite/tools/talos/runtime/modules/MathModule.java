@@ -16,6 +16,8 @@ public class MathModule extends Module {
     public NumericalValue a;
     public NumericalValue b;
 
+    float defaultA = 0, defaultB = 0;
+
     public NumericalValue output;
 
     private Expression currentExpression = Expression.sum;
@@ -30,8 +32,8 @@ public class MathModule extends Module {
 
     @Override
     public void processValues() {
-        if(a.isEmpty()) a.set(0);
-        if(b.isEmpty()) b.set(0);
+        if(a.isEmpty()) a.set(defaultA);
+        if(b.isEmpty()) b.set(defaultB);
 
         if(currentExpression != null) {
             currentExpression.apply(a, b, output);
@@ -53,13 +55,32 @@ public class MathModule extends Module {
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeValue("a", getDefaultA());
+        json.writeValue("b", getDefaultB());
         json.writeValue("mathExpression", MathExpressionMappings.getNameForMathExpression(getExpression()));
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
+        defaultA = jsonData.getFloat("a", 0);
+        defaultB = jsonData.getFloat("b", 0);
         currentExpression = MathExpressionMappings.getMathExpressionForName(jsonData.getString("mathExpression"));
     }
 
+    public void setA(float a) {
+        defaultA = a;
+    }
+
+    public void setB(float b) {
+        defaultB = b;
+    }
+
+    public float getDefaultA() {
+        return defaultA;
+    }
+
+    public float getDefaultB() {
+        return defaultB;
+    }
 }

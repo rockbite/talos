@@ -20,6 +20,10 @@ public class EmitterModule extends Module {
     NumericalValue rate;
     EmConfigValue config;
 
+    public float defaultDelay = 0;
+    public float defaultDuration = 2f;
+    public float defaultRate = 50f;
+
     @Override
     protected void defineSlots() {
         delay = createInputSlot(DELAY);
@@ -39,7 +43,7 @@ public class EmitterModule extends Module {
     public float getDelay() {
         fetchInputSlotValue(DELAY);
 
-        if(delay.isEmpty()) return 0f; // defaults
+        if(delay.isEmpty()) return defaultDelay; // defaults
 
         return delay.getFloat();
     }
@@ -47,7 +51,7 @@ public class EmitterModule extends Module {
     public float getDuration() {
         fetchInputSlotValue(DURATION);
 
-        if(duration.isEmpty()) return 2f; // defaults
+        if(duration.isEmpty()) return defaultDuration; // defaults
 
         return duration.getFloat();
     }
@@ -55,7 +59,7 @@ public class EmitterModule extends Module {
     public float getRate() {
         fetchInputSlotValue(RATE);
 
-        if(rate.isEmpty()) return 50; // defaults
+        if(rate.isEmpty()) return defaultRate; // defaults
 
         return rate.getFloat();
     }
@@ -92,10 +96,16 @@ public class EmitterModule extends Module {
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeValue("delay", defaultDelay);
+        json.writeValue("duration", defaultDuration);
+        json.writeValue("rate", defaultRate);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
+        defaultDelay = jsonData.getFloat("delay", 0);
+        defaultDuration = jsonData.getFloat("duration", 2);
+        defaultRate = jsonData.getFloat("rate", 50);
     }
 }

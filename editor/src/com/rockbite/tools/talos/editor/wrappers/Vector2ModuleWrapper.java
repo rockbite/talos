@@ -16,6 +16,13 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> {
 	private VisTextField yField;
 
 	@Override
+	public void setModule(Vector2Module module) {
+		super.setModule(module);
+		xField.setText(module.getDefaultX() + "");
+		yField.setText(module.getDefaultY() + "");
+	}
+
+	@Override
 	protected void configureSlots () {
 
 		xField = addInputSlotWithTextField("X: ", 0);
@@ -36,6 +43,7 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> {
 				module.setY(y);
 			}
 		});
+
 
 		addOutputSlot("position", 0);
 	}
