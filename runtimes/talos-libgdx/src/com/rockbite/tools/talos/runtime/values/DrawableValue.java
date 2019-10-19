@@ -1,7 +1,6 @@
 package com.rockbite.tools.talos.runtime.values;
 
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
 
 public class DrawableValue extends Value {
 

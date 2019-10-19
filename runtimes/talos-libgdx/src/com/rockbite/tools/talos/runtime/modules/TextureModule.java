@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.assets.AssetProvider;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
+import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 
 public class TextureModule extends Module {

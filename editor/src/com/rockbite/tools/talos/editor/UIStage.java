@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -55,7 +56,7 @@ public class UIStage {
 	ColorPicker colorPicker;
 
 	public UIStage (Skin skin) {
-		stage = new Stage(new ScreenViewport());
+		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
 		this.skin = skin;
 	}
 

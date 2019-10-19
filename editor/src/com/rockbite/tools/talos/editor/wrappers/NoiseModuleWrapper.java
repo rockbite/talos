@@ -49,7 +49,7 @@ public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
     @Override
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        slider.setValue(module.getFrequency());
+        slider.setValue(20f - module.getFrequency() + 0.5f);
 
     }
 }

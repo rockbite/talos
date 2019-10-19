@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.utils.SimplexNoise;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -33,6 +34,10 @@ public class NoiseModule extends Module {
     }
 
     private float noiseFunction(float x, float y) {
+        float particleSeed = getScope().getFloat(ScopePayload.PARTICLE_SEED);
+        y = y * particleSeed;
+        y = y - (int)y;
+
         float result = noise.query(x, y, frequency);
 
         //result = result * 0.5f + 0.5f; // bring to 0-1 range (actually no not needed)

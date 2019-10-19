@@ -2,12 +2,11 @@ package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
+import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 

@@ -75,7 +75,7 @@ public class GradientColorModule extends Module {
 
 	private void interpolate (float alpha, NumericalValue output) {
 		Color color = getPosColor(alpha);
-		output.set(color.r, color.g, color.b);
+		output.set(color.r, color.g, color.b, 1f);
 	}
 
 	public Array<ColorPoint> getPoints () {

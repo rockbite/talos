@@ -271,6 +271,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(OffsetModule.class, OffsetModuleWrapper.class);
         WrapperRegistry.reg(RandomInputModule.class, RandomInputModuleWrapper.class);
         WrapperRegistry.reg(NoiseModule.class, NoiseModuleWrapper.class);
+        WrapperRegistry.reg(PolylineModule.class, PolylineModuleWrapper.class);
     }
 
     public void showPopup() {

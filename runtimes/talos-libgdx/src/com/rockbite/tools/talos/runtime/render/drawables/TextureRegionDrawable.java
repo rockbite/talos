@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.runtime.render;
+package com.rockbite.tools.talos.runtime.render.drawables;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -27,5 +27,10 @@ public class TextureRegionDrawable implements ParticleDrawable {
             return 1;
         }
         return region.getRegionWidth()/ (float)region.getRegionHeight();
+    }
+
+    @Override
+    public void setSeed(float seed) {
+
     }
 }
