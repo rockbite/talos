@@ -41,10 +41,10 @@ public abstract class ViewportWidget extends Table {
         addListener(new InputListener() {
             @Override
             public boolean scrolled (InputEvent event, float x, float y, int amount) {
-
                 camera.zoom += amount * 0.5f;
                 camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 100f);
                 camera.update();
+                cameraScrolledWithAmount(amount);
 
                 return true;
             }
@@ -82,6 +82,10 @@ public abstract class ViewportWidget extends Table {
     }
 
     Vector2 temp = new Vector2();
+
+    protected void cameraScrolledWithAmount (int amount) {
+
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
