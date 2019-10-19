@@ -149,18 +149,20 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         return cell;
     }
 
-    protected void addOutputSlot(String title, int key) {
+    protected Cell addOutputSlot(String title, int key) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
         VisLabel label = new VisLabel(title, "small");
         slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
         slotRow.add(icon).right();
 
-        rightWrapper.addRow(slotRow, false);
+        Cell cell = rightWrapper.addRow(slotRow, false);
 
         rightSlotNames.put(key, title);
 
         configureNodeActions(icon, key, false);
+
+        return cell;
     }
 
 
