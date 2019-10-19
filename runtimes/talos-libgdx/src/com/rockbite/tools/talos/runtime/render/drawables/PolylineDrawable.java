@@ -45,6 +45,10 @@ public class PolylineDrawable implements ParticleDrawable {
         innerPointCount = count;
     }
 
+    public void setRegion(TextureRegion region) {
+        this.region = region;
+    }
+
     public class PolyPoint {
         Vector2 position = new Vector2();
         private Vector2 offset = new Vector2();
@@ -70,7 +74,11 @@ public class PolylineDrawable implements ParticleDrawable {
     }
 
     public PolylineDrawable() {
-        region = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
+
+    }
+
+    public PolylineDrawable(TextureRegion region) {
+       this.region = region;
     }
 
     @Override

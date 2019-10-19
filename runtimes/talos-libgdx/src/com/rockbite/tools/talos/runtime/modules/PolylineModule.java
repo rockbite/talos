@@ -1,11 +1,15 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.render.drawables.PolylineDrawable;
+import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -24,6 +28,8 @@ public class PolylineModule extends Module {
     NumericalValue transparency;
 
     Color tmpColor = new Color();
+
+    public String regionName;
 
     private DrawableValue outputValue;
 
@@ -95,6 +101,7 @@ public class PolylineModule extends Module {
     public void write (Json json) {
         super.write(json);
         json.writeValue("points", pointCount - 2);
+        json.writeValue("regionName", regionName);
     }
 
     @Override
@@ -102,5 +109,21 @@ public class PolylineModule extends Module {
         super.read(json, jsonData);
         pointCount = jsonData.getInt("points", 0) + 2;
         polylineDrawable.setCount(pointCount - 2);
+        regionName = jsonData.getString("regionName", "fire");
+    }
+
+
+    public void setRegion (String regionName, TextureRegion region) {
+        this.regionName = regionName;
+        if(region != null) {
+            polylineDrawable.setRegion(region);
+        }
+    }
+
+    @Override
+    public void setModuleGraph(ParticleEmitterDescriptor graph) {
+        super.setModuleGraph(graph);
+        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+        setRegion(regionName, assetProvider.findRegion(regionName));
     }
 }
