@@ -67,9 +67,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         curvePoints[2] = new Vector2();
         curvePoints[3] = new Vector2();
 
-        registerWrappers();
-
-
         addActor(groupContainer);
         addActor(moduleContainer);
 
@@ -251,42 +248,18 @@ public class ModuleBoardWidget extends WidgetGroup {
         public int toSlot;
     }
 
-    private void registerWrappers() {
-        WrapperRegistry.reg(EmitterModule.class, EmitterModuleWrapper.class);
-        WrapperRegistry.reg(InterpolationModule.class, InterpolationWrapper.class);
-        WrapperRegistry.reg(InputModule.class, InputModuleWrapper.class);
-        WrapperRegistry.reg(ParticleModule.class, ParticleModuleWrapper.class);
-        WrapperRegistry.reg(StaticValueModule.class, StaticValueModuleWrapper.class);
-        WrapperRegistry.reg(RandomRangeModule.class, RandomRangeModuleWrapper.class);
-        WrapperRegistry.reg(MixModule.class, MixModuleWrapper.class);
-        WrapperRegistry.reg(MathModule.class, MathModuleWrapper.class);
-        WrapperRegistry.reg(CurveModule.class, CurveModuleWrapper.class);
-        WrapperRegistry.reg(Vector2Module.class, Vector2ModuleWrapper.class);
-        WrapperRegistry.reg(ColorModule.class, ColorModuleWrapper.class);
-        WrapperRegistry.reg(DynamicRangeModule.class, DynamicRangeModuleWrapper.class);
-        WrapperRegistry.reg(ScriptModule.class, ScriptModuleWrapper.class);
-        WrapperRegistry.reg(GradientColorModule.class, GradientColorModuleWrapper.class);
-        WrapperRegistry.reg(TextureModule.class, TextureModuleWrapper.class);
-        WrapperRegistry.reg(EmConfigModule.class, EmConfigModuleWrapper.class);
-        WrapperRegistry.reg(OffsetModule.class, OffsetModuleWrapper.class);
-        WrapperRegistry.reg(RandomInputModule.class, RandomInputModuleWrapper.class);
-        WrapperRegistry.reg(NoiseModule.class, NoiseModuleWrapper.class);
-        WrapperRegistry.reg(PolylineModule.class, PolylineModuleWrapper.class);
-    }
-
     public void showPopup() {
         ParticleEmitterDescriptor moduleGraph = getModuleGraph();
 
         if(moduleGraph == null) return;
 
 
-
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
 
-
-        PopupMenu menu = TalosMain.Instance().UIStage().createModuleListPopup(vec);
-        menu.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
+        TalosMain.Instance().UIStage().createModuleListAdvancedPopup(vec);
+        //PopupMenu menu = TalosMain.Instance().UIStage().createModuleListAdvancedPopup(vec);
+        //menu.showMenu(TalosMain.Instance().UIStage().getStage(), vec.x, vec.y);
     }
 
     public void deleteSelectedWrappers() {

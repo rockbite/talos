@@ -4,7 +4,9 @@
         <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>
     </category>
     <category name = "General Use">
-
+        <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
+        <module name = "Mix Values" wrapper = "MixModuleWrapper">MixModule</module>
+        <module name = "Position Offset" wrapper = "OffsetModuleWrapper">OffsetModule</module>
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
@@ -16,15 +18,22 @@
         <module name = "Gradient" wrapper = "GradientColorModuleWrapper">GradientColorModule</module>
     </category>
     <category name = "Rendering">
-
+        <module name = "Beam Particle" wrapper = "PolylineModuleWrapper">PolylineModule</module>
+        <module name = "Sprite Particle" wrapper = "TextureModuleWrapper">TextureModule</module>
     </category>
     <category name = "Randomness">
-
+        <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>
+        <module name = "Dynamic Random Range" wrapper = "DynamicRangeModuleWrapper">DynamicRangeModule</module>
+        <module name = "Noise" wrapper = "NoiseModuleWrapper">NoiseModule</module>
+        <module name = "Multi Input" wrapper = "RandomInputModuleWrapper">RandomInputModule</module>
     </category>
-    <category name = "Curves">
-
+    <category name = "Curves and Math">
+        <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
+        <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
+        <module name = "Math Operations" wrapper = "MathModuleWrapper">MathModule</module>
     </category>
     <category name = "Advanced">
-
+        <module name = "Emitter Config" wrapper = "EmConfigModuleWrapper">EmConfigModule</module>
+        <module name = "Script (Java)" wrapper = "ScriptModuleWrapper">ScriptModule</module>
     </category>
 </modules>
