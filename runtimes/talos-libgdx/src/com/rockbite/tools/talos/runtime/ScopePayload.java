@@ -13,8 +13,11 @@ public class ScopePayload {
     public static final int EMITTER_ALPHA_AT_P_INIT = 4;
     public static final int DRAWABLE_ASPECT_RATIO = 5;
     public static final int SECONDARY_SEED = 6;
+    public static final int TOTAL_TIME = 7;
 
     private IntMap<NumericalValue> map = new IntMap<>();
+
+    private IntMap<NumericalValue> dynamicValues = new IntMap<>();
 
     public ScopePayload() {
         for(int i = 0; i < 10; i++) {

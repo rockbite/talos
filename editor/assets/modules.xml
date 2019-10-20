@@ -1,0 +1,30 @@
+<modules>
+    <category name = "Main Modules">
+        <module name = "Particle" wrapper = "ParticleModuleWrapper">ParticleModule</module>
+        <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>
+    </category>
+    <category name = "General Use">
+
+    </category>
+    <category name = "Static Values">
+        <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
+        <module name = "Position" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
+    </category>
+    <category name = "Color">
+        <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
+        <module name = "Gradient" wrapper = "GradientColorModuleWrapper">GradientColorModule</module>
+    </category>
+    <category name = "Rendering">
+
+    </category>
+    <category name = "Randomness">
+
+    </category>
+    <category name = "Curves">
+
+    </category>
+    <category name = "Advanced">
+
+    </category>
+</modules>

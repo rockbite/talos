@@ -1,6 +1,7 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -139,6 +140,11 @@ public class PreviewWidget extends ViewportWidget {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
             }
+
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                return super.keyUp(event, keycode);
+            }
         });
     }
 
@@ -179,6 +185,11 @@ public class PreviewWidget extends ViewportWidget {
     public void act(float delta) {
         super.act(delta);
 
+        //stupid hack, plz do it normal way
+        if(PreviewWidget.this.hasScrollFocus() && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            camera.position.set(0, 0, 0);
+        }
+
         long timeBefore = TimeUtils.nanoTime();
         final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
         particleEffect.update(Gdx.graphics.getDeltaTime());
@@ -217,6 +228,7 @@ public class PreviewWidget extends ViewportWidget {
         batch.end();
 
         camera.zoom = previewController.getPreviewBoxWidth() / camera.viewportWidth;
+        float height =  previewController.getPreviewBoxWidth() * camera.viewportHeight / camera.viewportWidth;
 
         tmpColor.set(Color.WHITE);
         tmpColor.a = 0.2f;
@@ -225,9 +237,9 @@ public class PreviewWidget extends ViewportWidget {
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(-100, 0, 100, 0);
+        shapeRenderer.line(- previewController.getPreviewBoxWidth()/2f+camera.position.x, 0,  previewController.getPreviewBoxWidth()/2f+camera.position.x, 0);
         shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(0, -100, 0, 100);
+        shapeRenderer.line(0, -height/2f+camera.position.y, 0, height/2f + camera.position.y);
         shapeRenderer.end();
 
         batch.begin();

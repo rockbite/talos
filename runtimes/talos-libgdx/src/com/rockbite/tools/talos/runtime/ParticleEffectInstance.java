@@ -19,6 +19,8 @@ public class ParticleEffectInstance {
     int particleCount = 0;
     public int nodeCalls = 0;
 
+    private float totalTime = 0;
+
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
     }
@@ -32,6 +34,13 @@ public class ParticleEffectInstance {
 
 	public void update (float delta) {
     	descriptor.setEffectReference(this);
+
+		if(totalTime > 3600) totalTime = 0;
+		totalTime += delta;
+
+		if(scopePayload != null) {
+			scopePayload.set(ScopePayload.TOTAL_TIME, totalTime);
+		}
 
 		particleCount = 0;
 		nodeCalls = 0;
