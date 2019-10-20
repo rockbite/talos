@@ -272,6 +272,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         WrapperRegistry.reg(RandomInputModule.class, RandomInputModuleWrapper.class);
         WrapperRegistry.reg(NoiseModule.class, NoiseModuleWrapper.class);
         WrapperRegistry.reg(PolylineModule.class, PolylineModuleWrapper.class);
+        WrapperRegistry.reg(FromToModule.class, FromToModuleWrapper.class);
     }
 
     public void showPopup() {
@@ -579,8 +580,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         for(ModuleWrapper wrapper : getModuleWrappers()) {
             if(getSelectedWrappers().contains(wrapper)) {
                 wrapper.setBackground("window-blue");
+                wrapper.setSelectionState(true);
             } else {
                 wrapper.setBackground("window");
+                wrapper.setSelectionState(false);
             }
         }
     }

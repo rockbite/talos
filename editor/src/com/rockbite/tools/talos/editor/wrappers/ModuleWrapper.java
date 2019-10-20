@@ -46,6 +46,27 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
     private int id;
 
+    private boolean isSelected = false;
+
+    public void setSelectionState(boolean selected) {
+        if(isSelected != selected) {
+            if(selected) {
+                wrapperSelected();
+            } else {
+                wrapperDeselected();
+            }
+        }
+        isSelected = selected;
+    }
+
+    protected void wrapperSelected() {
+
+    }
+
+    protected void wrapperDeselected() {
+
+    }
+
     class SlotRowData {
         String title;
         int key;

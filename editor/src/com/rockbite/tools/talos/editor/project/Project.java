@@ -142,6 +142,7 @@ public class Project {
 	}
 
 	private void cleanData() {
+		TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
 		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
