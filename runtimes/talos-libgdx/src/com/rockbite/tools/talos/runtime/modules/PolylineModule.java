@@ -80,9 +80,7 @@ public class PolylineModule extends Module {
                 thicknessVal = thickness.getFloat();
             }
 
-            if(i != 0 && i != pointCount - 1) {
-                polylineDrawable.setPointData(i, 0, offset.getFloat(), thicknessVal, tmpColor);
-            }
+            polylineDrawable.setPointData(i, 0, offset.getFloat(), thicknessVal, tmpColor);
         }
         getScope().set(ScopePayload.REQUESTER_ID, requester);
     }

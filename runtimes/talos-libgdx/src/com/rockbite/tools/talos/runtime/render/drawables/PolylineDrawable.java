@@ -41,6 +41,8 @@ public class PolylineDrawable implements ParticleDrawable {
 
     Color tmpColor = new Color(Color.WHITE);
 
+    Batch batch;
+
     public void setCount(int count) {
         innerPointCount = count;
     }
@@ -85,13 +87,11 @@ public class PolylineDrawable implements ParticleDrawable {
     public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
         if(batch instanceof PolygonSpriteBatch) {
             PolygonSpriteBatch polygonSpriteBatch = (PolygonSpriteBatch) batch;
+            this.batch = polygonSpriteBatch;
 
             updateTranslation(x, y, width, rotation);
 
             for(int i = 0; i < innerPointCount + 2 - 1; i++) {
-                tmpColor.set(batch.getColor());
-                tmpColor.mul(getPoint(particle, i).color);
-
                 // extrude each point
                 extrudePoint(i, 0);
                 extrudePoint(i, 1);
@@ -144,11 +144,11 @@ public class PolylineDrawable implements ParticleDrawable {
 
         int i = index + pos;
         float v = pos;
-        float u = (float)index/(innerPointCount+2-1);
-        float u1 = (float)(index+1)/(innerPointCount+2-1);
+        //float u = (float)index/(innerPointCount+2-1);
+        //float v1 = (float)(index+1)/(innerPointCount+2-1);
 
         //u = 0;
-        //u1 = 1;
+        v = (float)(i)/(innerPointCount+2-1);
 
         float thickness = getPoint(particle, i).thickness;
 
@@ -165,8 +165,8 @@ public class PolylineDrawable implements ParticleDrawable {
             tmp3.scl(-1f);
             tmp2.set(tmp3).add(point2);
 
-            packVertex(region, vertices, index * 4 + 1 + pos * 2, tmp.x, tmp.y, tmpColor, u, v); // left extension vertex
-            packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, tmpColor, u1, v); // right extension vertex
+            packVertex(region, vertices, index * 4 + 1 + pos * 2, tmp.x, tmp.y, getPointColor(i), 0, v); // left extension vertex
+            packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, getPointColor(i + 1), 1, v); // right extension vertex
         } else {
             if(i == 0) {
                 point1.set(getPoint(particle, i).position);
@@ -180,8 +180,8 @@ public class PolylineDrawable implements ParticleDrawable {
                 tmp.set(tmp2).add(point1);
                 tmp2.set(tmp3).add(point1);
 
-                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, tmpColor, 0, v); // left extension vertex
-                packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, tmpColor, u1, v); // right extension vertex
+                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, getPointColor(i ), 0, v); // left extension vertex
+                packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, getPointColor(i + 1), 1, v); // right extension vertex
             }
             if(i == innerPointCount + 2 - 1) {
                 point1.set(getPoint(particle, i - 1).position);
@@ -195,10 +195,17 @@ public class PolylineDrawable implements ParticleDrawable {
                 tmp.set(tmp2).add(point2);
                 tmp2.set(tmp3).add(point2);
 
-                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, tmpColor, u, v); // left extension vertex
-                packVertex(region, vertices, index * 4 + pos * 2 , tmp2.x, tmp2.y, tmpColor, 1, v); // right extension vertex
+                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, getPointColor(i - 1), 0, v); // left extension vertex
+                packVertex(region, vertices, index * 4 + pos * 2 , tmp2.x, tmp2.y, getPointColor(i), 1, v); // right extension vertex
             }
         }
+    }
+
+    private Color getPointColor(int index) {
+        tmpColor.set(batch.getColor());
+        tmpColor.mul(getPoint(particle, index).color);
+
+        return tmpColor;
     }
 
     private void packVertex(TextureRegion region, float[] vertices, int index, float x, float y, Color color, float u, float v) {
