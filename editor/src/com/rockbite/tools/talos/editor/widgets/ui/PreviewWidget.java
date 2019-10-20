@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -50,8 +51,8 @@ public class PreviewWidget extends ViewportWidget {
     private String countStr = "Particles: ";
     private String trisCountStr = "Triangles: ";
     private String nodeCallsStr = "Node Calls: ";
-    private String gpuTimeStr = "GPU Time: ";
-    private String cpuTimeStr = "CPU Time: ";
+    private String gpuTimeStr = "GPU: ";
+    private String cpuTimeStr = "CPU: ";
     private String msStr = "ms";
 
     private Label countLbl;
@@ -66,8 +67,8 @@ public class PreviewWidget extends ViewportWidget {
 
     private StringBuilder stringBuilder = new StringBuilder();
     private int trisCount = 0;
-    private FloatCounter renderTime = new FloatCounter(1);
-    private FloatCounter cpuTime = new FloatCounter(1);
+    private FloatCounter renderTime = new FloatCounter(100);
+    private FloatCounter cpuTime = new FloatCounter(100);
     private float fps = 0;
 
     public PreviewWidget() {
@@ -96,10 +97,10 @@ public class PreviewWidget extends ViewportWidget {
         cpuTimeLbl.setColor(Color.GRAY);
 
         add(countLbl).left().top().padLeft(5).row();
-        add(nodeCallsLbl).left().top().padLeft(5).row();
         add(trisCountLbl).left().top().padLeft(5).row();
-        add(gpuTimeLbl).left().top().padLeft(5).row();
+        add(nodeCallsLbl).left().top().padLeft(5).row();
         add(cpuTimeLbl).left().top().padLeft(5).row();
+        add(gpuTimeLbl).left().top().padLeft(5).row();
         add().expand();
         row();
         add(previewController).bottom().left().growX();
@@ -268,5 +269,9 @@ public class PreviewWidget extends ViewportWidget {
         if (!previewController.isBackground()) {
             previewImage.draw(batch, parentAlpha);
         }
+    }
+
+    public GLProfiler getGLProfiler() {
+        return glProfiler;
     }
 }

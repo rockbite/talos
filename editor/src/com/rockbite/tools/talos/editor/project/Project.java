@@ -57,6 +57,8 @@ public class Project {
 	}
 
 	public void loadProject (FileHandle projectFileHandle) {
+		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
+
 		if (projectFileHandle.exists()) {
 			currentProjectPath = projectFileHandle.path();
 			projectData = projectSerializer.read(projectFileHandle);
