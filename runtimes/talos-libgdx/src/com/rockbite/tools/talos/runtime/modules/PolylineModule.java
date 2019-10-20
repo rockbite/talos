@@ -71,6 +71,7 @@ public class PolylineModule extends Module {
 
             if(color.isEmpty()) {
                 tmpColor.set(Color.WHITE);
+                tmpColor.a = transparencyVal;
             } else {
                 tmpColor.set(color.get(0), color.get(1), color.get(2), transparencyVal);
             }
@@ -78,6 +79,10 @@ public class PolylineModule extends Module {
             float thicknessVal = 0.1f;
             if(!thickness.isEmpty()) {
                 thicknessVal = thickness.getFloat();
+            }
+
+            if(offset.isEmpty()) {
+                offset.set(0);
             }
 
             polylineDrawable.setPointData(i, 0, offset.getFloat(), thicknessVal, tmpColor);
