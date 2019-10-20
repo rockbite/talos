@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.runtime.render;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
@@ -13,6 +14,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	private Batch batch;
 
 	Color color = new Color(Color.WHITE);
+
+
 
 	public SpriteBatchParticleRenderer (Batch batch) {
 		this.batch = batch;

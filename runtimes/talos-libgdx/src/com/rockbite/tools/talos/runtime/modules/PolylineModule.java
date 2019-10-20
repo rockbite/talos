@@ -9,7 +9,6 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.render.drawables.PolylineDrawable;
-import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 

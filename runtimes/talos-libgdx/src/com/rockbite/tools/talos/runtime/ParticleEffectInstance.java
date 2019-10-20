@@ -17,6 +17,7 @@ public class ParticleEffectInstance {
     public boolean loopable = false;
 
     int particleCount = 0;
+    public int nodeCalls = 0;
 
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
@@ -30,7 +31,10 @@ public class ParticleEffectInstance {
 	}
 
 	public void update (float delta) {
+    	descriptor.setEffectReference(this);
+
 		particleCount = 0;
+		nodeCalls = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
 			particleCount += emitters.get(i).activeParticles.size;
@@ -138,5 +142,13 @@ public class ParticleEffectInstance {
 
 	public int getParticleCount() {
 		return particleCount;
+	}
+
+	public int getNodeCalls() {
+		return nodeCalls;
+	}
+
+	public void reportNodeCall() {
+		nodeCalls++;
 	}
 }

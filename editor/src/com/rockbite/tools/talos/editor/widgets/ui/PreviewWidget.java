@@ -2,12 +2,14 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.IndexData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
+import com.badlogic.gdx.math.FloatCounter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,12 +17,17 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
+
+import java.lang.reflect.Field;
+import java.util.Hashtable;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -36,14 +43,32 @@ public class PreviewWidget extends ViewportWidget {
 
     private Color tmpColor = new Color();
 
-    private Label countLbl;
-
     private PreviewImageControllerWidget previewController;
 
     private Image previewImage = new Image();
 
-    private String countStr = "count: ";
+    private String countStr = "Particles: ";
+    private String trisCountStr = "Triangles: ";
+    private String nodeCallsStr = "Node Calls: ";
+    private String gpuTimeStr = "GPU Time: ";
+    private String cpuTimeStr = "CPU Time: ";
+    private String msStr = "ms";
+
+    private Label countLbl;
+    private Label trisCountLbl;
+    private Label nodeCallsLbl;
+    private Label gpuTimeLbl;
+    private Label cpuTimeLbl;
+
+    private GLProfiler glProfiler = new GLProfiler(Gdx.graphics);
+    private FPSLogger fpsLogger = new FPSLogger();
+    private PerformanceCounter performanceCounter = new PerformanceCounter("talos");
+
     private StringBuilder stringBuilder = new StringBuilder();
+    private int trisCount = 0;
+    private FloatCounter renderTime = new FloatCounter(1);
+    private FloatCounter cpuTime = new FloatCounter(1);
+    private float fps = 0;
 
     public PreviewWidget() {
         super();
@@ -59,8 +84,22 @@ public class PreviewWidget extends ViewportWidget {
         };
 
         countLbl = new Label(countStr, TalosMain.Instance().getSkin());
-        add(countLbl).left().top().padLeft(5);
-        row();
+        trisCountLbl = new Label(trisCountStr, TalosMain.Instance().getSkin());
+        nodeCallsLbl = new Label(nodeCallsStr, TalosMain.Instance().getSkin());
+        gpuTimeLbl = new Label(gpuTimeStr, TalosMain.Instance().getSkin());
+        cpuTimeLbl = new Label(cpuTimeStr, TalosMain.Instance().getSkin());
+
+        countLbl.setColor(Color.GRAY);
+        trisCountLbl.setColor(Color.GRAY);
+        nodeCallsLbl.setColor(Color.GRAY);
+        gpuTimeLbl.setColor(Color.GRAY);
+        cpuTimeLbl.setColor(Color.GRAY);
+
+        add(countLbl).left().top().padLeft(5).row();
+        add(nodeCallsLbl).left().top().padLeft(5).row();
+        add(trisCountLbl).left().top().padLeft(5).row();
+        add(gpuTimeLbl).left().top().padLeft(5).row();
+        add(cpuTimeLbl).left().top().padLeft(5).row();
         add().expand();
         row();
         add(previewController).bottom().left().growX();
@@ -139,13 +178,36 @@ public class PreviewWidget extends ViewportWidget {
     public void act(float delta) {
         super.act(delta);
 
+        long timeBefore = TimeUtils.nanoTime();
         final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
         particleEffect.update(Gdx.graphics.getDeltaTime());
+        cpuTime.put( TimeUtils.timeSinceNanos(timeBefore));
 
-        int count = particleEffect.getParticleCount();
         stringBuilder.clear();
-        stringBuilder.append(countStr).append(count);
+        stringBuilder.append(countStr).append(particleEffect.getParticleCount());
         countLbl.setText(stringBuilder.toString());
+
+        stringBuilder.clear();
+        stringBuilder.append(trisCountStr).append(trisCount);
+        trisCountLbl.setText(stringBuilder.toString());
+
+        stringBuilder.clear();
+        stringBuilder.append(nodeCallsStr).append(particleEffect.getNodeCalls());
+        nodeCallsLbl.setText(stringBuilder.toString());
+
+        float rt = renderTime.average/1000000f;
+        float cp = cpuTime.average/1000000f;
+
+        rt = (float)Math.round(rt * 10000f) / 10000f;
+        cp = (float)Math.round(cp * 10000f) / 10000f;
+
+        stringBuilder.clear();
+        stringBuilder.append(gpuTimeStr).append(rt).append(msStr);
+        gpuTimeLbl.setText(stringBuilder.toString());
+
+        stringBuilder.clear();
+        stringBuilder.append(cpuTimeStr).append(cp).append(msStr);
+        cpuTimeLbl.setText(stringBuilder.toString());
     }
 
     @Override
@@ -189,12 +251,22 @@ public class PreviewWidget extends ViewportWidget {
 
         spriteBatchParticleRenderer.setBatch(batch);
 
+        batch.flush();
+        glProfiler.enable();
+
+        long timeBefore = TimeUtils.nanoTime();
+
         final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
         particleEffect.render(particleRenderer);
+
+        batch.flush();
+        renderTime.put(TimeUtils.timeSinceNanos(timeBefore));
+        trisCount = (int) (glProfiler.getVertexCount().average / 3f);
+        glProfiler.disable();
+
 
         if (!previewController.isBackground()) {
             previewImage.draw(batch, parentAlpha);
         }
     }
-
 }
