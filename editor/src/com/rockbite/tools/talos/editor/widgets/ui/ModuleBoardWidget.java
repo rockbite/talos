@@ -552,8 +552,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         for(ModuleWrapper wrapper : getModuleWrappers()) {
             if(getSelectedWrappers().contains(wrapper)) {
                 wrapper.setBackground("window-blue");
+                wrapper.setSelectionState(true);
             } else {
                 wrapper.setBackground("window");
+                wrapper.setSelectionState(false);
             }
         }
     }

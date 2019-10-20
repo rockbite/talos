@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.IndexData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,10 +19,13 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.wrappers.FromToModuleWrapper;
+import com.rockbite.tools.talos.editor.wrappers.IDragPointProvider;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -72,6 +76,9 @@ public class PreviewWidget extends ViewportWidget {
     private FloatCounter cpuTime = new FloatCounter(100);
     private float fps = 0;
 
+    private Array<Vector2> dragPoints = new Array<>();
+    private IDragPointProvider dragPointProvider = null;
+
     public PreviewWidget() {
         super();
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
@@ -106,39 +113,72 @@ public class PreviewWidget extends ViewportWidget {
         row();
         add(previewController).bottom().left().growX();
 
+        cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
         addListener(new InputListener() {
 
             boolean moving = false;
-            Vector2 vec2 = new Vector2();
-            Vector3 vec3 = new Vector3();
+            private Vector3 tmp = new Vector3();
+            private Vector3 tmp2 = new Vector3();
+            private Vector2 prevPos = new Vector2();
+            private Vector2 pos = new Vector2();
+
+            private Vector2 currentlyDragging = null;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 moving = false;
+                getWorldFromLocal(tmp.set(x, y, 0));
+                pos.set(tmp.x, tmp.y);
+                prevPos.set(x, y);
+
+                //detect drag points
+                for(Vector2 point: dragPoints) {
+                    if(pos.dst(point) < 0.2f * camera.zoom) {
+                        // dragging a point
+                        currentlyDragging = point;
+                        return true;
+                    }
+                }
+
                 if(button == 1) {
                     moving = true;
                     return true;
                 }
-                return super.touchDown(event, x, y, pointer, button);
+                return true;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
-                if(moving) {
-                    vec2.set(x, y);
-                    localToScreenCoordinates(vec2); // oh shit... not this again
-                    vec3.set(vec2.x, vec2.y, 0);
-                    camera.unproject(vec3);
 
+                getWorldFromLocal(tmp.set(x, y, 0)); // I can't really explain
+                pos.set(tmp.x, tmp.y);
+
+                if(moving) {
                     final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
-                    particleEffect.setPosition(vec3.x, vec3.y);
+                    particleEffect.setPosition(tmp.x, tmp.y);
+                } else {
+                    getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
+                    getWorldFromLocal(tmp2.set(x, y, 0));
+
+                    if(currentlyDragging == null) {
+                        // panning
+
+                        camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
+                    } else {
+                        // dragging a point
+                        currentlyDragging.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
+                        dragPointProvider.dragPointChanged(currentlyDragging);
+                    }
                 }
+
+                prevPos.set(x, y);
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
+                currentlyDragging = null;
             }
 
             @Override
@@ -146,6 +186,26 @@ public class PreviewWidget extends ViewportWidget {
                 return super.keyUp(event, keycode);
             }
         });
+    }
+
+    /**
+     * I really dunno how this works rather then it does
+     * @param vec
+     * @return
+     */
+    private Vector3 getWorldFromLocal(Vector3 vec) {
+
+        float xA = (getWidth() - vec.x)/getWidth();
+        float yA = (getHeight() - vec.y)/getHeight();
+
+        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
+
+        camera.unproject(vec);
+
+        vec.x *= -1f; // I don't even know why
+        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
+
+        return vec;
     }
 
     @Override
@@ -207,8 +267,8 @@ public class PreviewWidget extends ViewportWidget {
         stringBuilder.append(nodeCallsStr).append(particleEffect.getNodeCalls());
         nodeCallsLbl.setText(stringBuilder.toString());
 
-        float rt = renderTime.average/1000000f;
-        float cp = cpuTime.average/1000000f;
+        float rt = renderTime.value/1000000f;
+        float cp = cpuTime.value/1000000f;
 
         rt = (float)Math.round(rt * 10000f) / 10000f;
         cp = (float)Math.round(cp * 10000f) / 10000f;
@@ -274,16 +334,56 @@ public class PreviewWidget extends ViewportWidget {
 
         batch.flush();
         renderTime.put(TimeUtils.timeSinceNanos(timeBefore));
-        trisCount = (int) (glProfiler.getVertexCount().average / 3f);
+        trisCount = (int) (glProfiler.getVertexCount().value / 3f);
         glProfiler.disable();
 
 
         if (!previewController.isBackground()) {
             previewImage.draw(batch, parentAlpha);
         }
+
+        // now for the drag points
+        if(dragPoints.size > 0) {
+            batch.end();
+            tmpColor.set(Color.ORANGE);
+            tmpColor.a = 0.8f;
+            Gdx.gl.glLineWidth(1f);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(tmpColor);
+
+            for (Vector2 point : dragPoints) {
+                shapeRenderer.circle(point.x, point.y, 0.1f * camera.zoom, 15);
+            }
+
+            shapeRenderer.end();
+            batch.begin();
+        }
     }
 
     public GLProfiler getGLProfiler() {
         return glProfiler;
+    }
+
+    public void registerForDragPoints(IDragPointProvider dragPointProvider) {
+        this.dragPointProvider = dragPointProvider;
+        Vector2[] arr = dragPointProvider.fetchDragPoints();
+        dragPoints.clear();
+        for(int i = 0; i < arr.length; i++) {
+            dragPoints.add(arr[i]);
+        }
+    }
+
+    public void unregisterDragPoints() {
+        this.dragPointProvider = null;
+        dragPoints.clear();
+    }
+
+    public void unregisterDragPoints(IDragPointProvider dragPointProvider) {
+        if(this.dragPointProvider == dragPointProvider) {
+            this.dragPointProvider = null;
+            dragPoints.clear();
+        }
     }
 }

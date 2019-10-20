@@ -27,6 +27,8 @@ public abstract class ViewportWidget extends Table {
     private Matrix4 prevTransform  = new Matrix4();
     private Matrix4 prevProjection = new Matrix4();
 
+    public CameraController cameraController;
+
     public ViewportWidget() {
         camera = new OrthographicCamera();
         camera.viewportWidth = 7;
@@ -35,7 +37,7 @@ public abstract class ViewportWidget extends Table {
         setTouchable(Touchable.enabled);
 
 
-        final CameraController cameraController = new CameraController(camera);
+        cameraController = new CameraController(camera);
         cameraController.setInvert(true);
 
         addListener(new InputListener() {
