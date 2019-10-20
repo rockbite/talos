@@ -254,6 +254,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
                 if(isInput && connection!= null) {
                     moduleBoardWidget.removeConnection(connection);
+                    moduleBoardWidget.ccCurrentlyRemoving = true;
 
                     connection.fromModule.getOutputSlotPos(connection.fromSlot, tmp2);
                     currentIsInput = false;
@@ -282,6 +283,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
                 moduleBoardWidget.connectNodeIfCan(currentWrapper, currentSlot, currentIsInput);
+                moduleBoardWidget.ccCurrentlyRemoving = false;
 
                 if(!dragged) {
                     // clicked

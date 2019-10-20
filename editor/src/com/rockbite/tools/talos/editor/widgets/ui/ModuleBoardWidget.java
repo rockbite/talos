@@ -28,7 +28,6 @@ import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ModuleBoardWidget extends WidgetGroup {
-
     ShapeRenderer shapeRenderer;
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
@@ -60,6 +59,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     private ModuleWrapper ccFromWrapper = null;
     private int ccFromSlot = 0;
     private boolean ccCurrentIsInput = false;
+    public boolean ccCurrentlyRemoving = false;
 
     public ModuleBoardWidget(NodeStage mainStage) {
         super();
@@ -533,7 +533,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         if(targetWrapper == null || currentIsInput == targetIsInput) {
             // removing
             // show popup (but maybe not in case of removing of existing curve)
-            if(activeCurve.getFrom().dst(activeCurve.getTo()) > 20) {
+            if(activeCurve.getFrom().dst(activeCurve.getTo()) > 20 && !ccCurrentlyRemoving) {
                 final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
                 (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
                 ccFromWrapper = currentWrapper;
