@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -27,6 +28,8 @@ public class ModuleListPopup extends VisWindow {
     SearchFilteredTree<String> searchFilteredTree;
 
     Vector2 createLocation = new Vector2();
+
+    private ObjectMap<String, String> nameToModuleClass = new ObjectMap<>();
 
     public ModuleListPopup(XmlReader.Element root) {
         super("Add Module", "default-nodim");
@@ -77,7 +80,7 @@ public class ModuleListPopup extends VisWindow {
                 Selection<FilteredTree.Node<String>> selection = tree.getSelection();
                 if(selection.items().size > 0 && selection.first().children.size == 0) {
                     try {
-                        Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + selection.first().name);
+                        Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + nameToModuleClass.get(selection.first().name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
                             TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
@@ -104,7 +107,8 @@ public class ModuleListPopup extends VisWindow {
         // get modules
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
-            FilteredTree.Node node = new FilteredTree.Node(module.getText(), new Label(module.getAttribute("name"), getSkin()));
+            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("name"), new Label(module.getAttribute("name"), getSkin()));
+            nameToModuleClass.put(module.getAttribute("name"), module.getText());
 
             registerModule(module);
 
@@ -141,6 +145,7 @@ public class ModuleListPopup extends VisWindow {
 
     @Override
     public boolean remove () {
+        TalosMain.Instance().NodeStage().moduleBoardWidget.clearCC();
         if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
     }

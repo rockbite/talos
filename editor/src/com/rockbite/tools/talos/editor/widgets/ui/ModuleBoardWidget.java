@@ -57,6 +57,9 @@ public class ModuleBoardWidget extends WidgetGroup {
 
 
     private NodeStage mainStage;
+    private ModuleWrapper ccFromWrapper = null;
+    private int ccFromSlot = 0;
+    private boolean ccCurrentIsInput = false;
 
     public ModuleBoardWidget(NodeStage mainStage) {
         super();
@@ -240,6 +243,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
+    public void clearCC() {
+        ccFromWrapper = null;
+    }
+
 
     public class NodeConnection {
         public ModuleWrapper fromModule;
@@ -328,7 +335,53 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
 
 
+        // check if there was connect request
+        tryAndConnectLasCC(moduleWrapper);
+
+
         return moduleWrapper;
+    }
+
+    private <T extends Module> void tryAndConnectLasCC(ModuleWrapper<T> moduleWrapper) {
+        if(ccFromWrapper != null) {
+            Class fromClass;
+            IntMap<Slot> toSlots;
+            ModuleWrapper fromModule;
+            ModuleWrapper toModule;
+            int fromSlot = 0;
+            int toSlot = 0;
+            if(ccCurrentIsInput) {
+                fromClass = ccFromWrapper.getModule().getInputSlot(ccFromSlot).getValue().getClass();
+                toSlots = moduleWrapper.getModule().getOutputSlots();
+
+                fromModule = moduleWrapper;
+                toModule = ccFromWrapper;
+                toSlot = ccFromSlot;
+            } else {
+                fromClass = ccFromWrapper.getModule().getOutputSlot(ccFromSlot).getValue().getClass();
+                toSlots = moduleWrapper.getModule().getInputSlots();
+
+                fromModule = ccFromWrapper;
+                toModule = moduleWrapper;
+                fromSlot = ccFromSlot;
+            }
+
+            for(Slot slot: toSlots.values()) {
+                if(slot.getValue().getClass() == fromClass) {
+                    // we can connect
+                    if(ccCurrentIsInput) {
+                        fromSlot = slot.getIndex();
+                    } else {
+                        toSlot = slot.getIndex();
+                    }
+
+                    makeConnection(fromModule, toModule, fromSlot, toSlot);
+                    break;
+                }
+            }
+
+            ccFromWrapper = null;
+        }
     }
 
     @Override
@@ -475,8 +528,19 @@ public class ModuleBoardWidget extends WidgetGroup {
             }
         }
 
+        ccFromWrapper = null;
+
         if(targetWrapper == null || currentIsInput == targetIsInput) {
             // removing
+            // show popup (but maybe not in case of removing of existing curve)
+            if(activeCurve.getFrom().dst(activeCurve.getTo()) > 20) {
+                final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+                (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+                ccFromWrapper = currentWrapper;
+                ccFromSlot = currentSlot;
+                ccCurrentIsInput = currentIsInput;
+                TalosMain.Instance().UIStage().createModuleListAdvancedPopup(vec);
+            }
         } else {
             // yay we are connecting
             ModuleWrapper fromWrapper, toWrapper;
@@ -499,7 +563,6 @@ public class ModuleBoardWidget extends WidgetGroup {
                 makeConnection(fromWrapper, toWrapper, fromSlot, toSlot);
             }
         }
-
         removeActiveCurve();
     }
 
