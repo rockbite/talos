@@ -67,7 +67,7 @@ public class ParticleEmitterInstance {
 		// inner variable defaults
 		alpha = 0f;
 		isComplete = false;
-		particlesToEmmit = 0f;
+		particlesToEmmit = 1f; // always emmit one first
 
 		initialized = true;
 	}
@@ -104,18 +104,24 @@ public class ParticleEmitterInstance {
 			}
 		}
 
-		alpha += delta / duration;
-		if (alpha > 1f) {
+		float normDelta = delta/duration;
+
+		float deltaLeftover = 0;
+		if(alpha + normDelta > 1f) {
+			deltaLeftover = (1f - alpha) * duration;
 			alpha = 1f;
+		} else {
+			alpha += normDelta;
+			deltaLeftover = delta;
 		}
 
 		//update variables to their real values
 		emitterModule.updateScopeData(this);
 
 		//
-		if (alpha < 1f) { // emission only here
+		if (alpha < 1f || (alpha == 1f && deltaLeftover > 0)) { // emission only here
 			// let's emmit
-			particlesToEmmit += rate * delta;
+			particlesToEmmit += rate * deltaLeftover;
 
 			int count = (int)particlesToEmmit;
 			for (int i = 0; i < count; i++) {
@@ -162,6 +168,7 @@ public class ParticleEmitterInstance {
     	delayTimer = delay;
     	alpha = 0;
     	isComplete = false;
+		particlesToEmmit = 1f;
 	}
 
     public void setScope (ScopePayload scope) {
