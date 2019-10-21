@@ -30,6 +30,7 @@ import java.util.Comparator;
  * {@link ChangeEvent} is fired when the selected node changes.
  *
  * @author Nathan Sweet
+ * @author Tom Wojciechowski
  */
 public class FilteredTree<T> extends WidgetGroup {
 
