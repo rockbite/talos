@@ -42,6 +42,7 @@ public class ParticleEmitterInstance {
 			return new Particle();
 		}
 	};
+    private boolean isStopped = false;
 
     public ParticleEmitterInstance (ParticleEmitterDescriptor moduleGraph, ParticleEffectInstance particleEffectInstance) {
 		this.emitterGraph = moduleGraph;
@@ -138,7 +139,7 @@ public class ParticleEmitterInstance {
 		updateParticles(delta);
 
 		if (alpha == 1f) {
-			if (isContinuous) {
+			if (isContinuous && !isStopped) {
 				// let's repeat
 				restart();
 			}
@@ -169,6 +170,7 @@ public class ParticleEmitterInstance {
     	alpha = 0;
     	isComplete = false;
 		particlesToEmmit = 1f;
+        isStopped = false;
 	}
 
     public void setScope (ScopePayload scope) {
@@ -185,6 +187,7 @@ public class ParticleEmitterInstance {
 
 	public void stop() {
 		alpha = 1f;
+        isStopped = true;
 	}
 
 	public void pause() {
