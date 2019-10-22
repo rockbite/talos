@@ -351,14 +351,12 @@ public class ModuleBoardWidget extends WidgetGroup {
             int fromSlot = 0;
             int toSlot = 0;
             if(ccCurrentIsInput) {
-                fromClass = ccFromWrapper.getModule().getInputSlot(ccFromSlot).getValue().getClass();
                 toSlots = moduleWrapper.getModule().getOutputSlots();
 
                 fromModule = moduleWrapper;
                 toModule = ccFromWrapper;
                 toSlot = ccFromSlot;
             } else {
-                fromClass = ccFromWrapper.getModule().getOutputSlot(ccFromSlot).getValue().getClass();
                 toSlots = moduleWrapper.getModule().getInputSlots();
 
                 fromModule = ccFromWrapper;
@@ -367,7 +365,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             }
 
             for(Slot slot: toSlots.values()) {
-                if(slot.getValue().getClass() == fromClass) {
+                if(slot.isCompatable(ccFromWrapper.getModule().getInputSlot(ccFromSlot))) {
                     // we can connect
                     if(ccCurrentIsInput) {
                         fromSlot = slot.getIndex();

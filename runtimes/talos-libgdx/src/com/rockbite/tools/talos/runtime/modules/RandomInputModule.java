@@ -11,6 +11,8 @@ public class RandomInputModule extends Module {
 
     private Random random = new Random();
 
+    public int slotCount = 0;
+
     @Override
     protected void defineSlots() {
         addInputSlot(0);
@@ -20,6 +22,12 @@ public class RandomInputModule extends Module {
     public void addInputSlot(int key) {
         Slot slot = new Slot(this, key, true);
         inputSlots.put(key, slot);
+    }
+
+    @Override
+    public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
+        super.attachModuleToMyInput(module, mySlot, targetSlot);
+        addInputSlot(slotCount++);
     }
 
     @Override

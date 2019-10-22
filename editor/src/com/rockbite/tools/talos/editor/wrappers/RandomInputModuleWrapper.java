@@ -9,7 +9,6 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
 
-    private int slotCount = 0;
     Class valueType = null;
 
     @Override
@@ -21,7 +20,6 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
     public void attachModuleToMyInput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
         super.attachModuleToMyInput(moduleWrapper, mySlot, targetSlot);
 
-        module.addInputSlot(slotCount);
         addNewInputSlot();
 
         invalidateHierarchy();
@@ -54,8 +52,9 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
             leftWrapper.clearChildren();
             IntMap<Slot> list = module.getInputSlots();
             int tmpCount = list.size;
-            slotCount = 0;
+            module.slotCount = 0;
             for (int i = 0; i < tmpCount; i++) {
+                module.slotCount++;
                 addNewInputSlot();
             }
 
@@ -87,27 +86,25 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
             list.put(i,list.get(i+1));
             list.get(i).setIndex(i);
         }
-        slotCount--;
+        module.slotCount--;
 
         loadSlots();
     }
 
     private void addNewInputSlot() {
-        addInputSlot((slotCount+1) + ": ", slotCount);
-        slotCount++;
+        addInputSlot((module.slotCount) + ": ", module.slotCount-1);
     }
 
 
     @Override
     public void setModule(RandomInputModule module) {
         super.setModule(module);
-
         loadSlots();
     }
 
     @Override
     protected void configureSlots() {
-        loadSlots();
         addOutputSlot("output", 0);
+        loadSlots();
     }
 }
