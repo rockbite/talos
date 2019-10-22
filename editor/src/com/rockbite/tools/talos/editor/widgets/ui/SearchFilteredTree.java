@@ -2,9 +2,12 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class SearchFilteredTree<T> extends Table {
 
@@ -12,7 +15,7 @@ public class SearchFilteredTree<T> extends Table {
     private FilteredTree<T> filteredTree;
     public ScrollPane scrollPane;
 
-    public SearchFilteredTree (Skin skin, final FilteredTree<T> tree, TextField.TextFieldFilter filter) {
+    public SearchFilteredTree (Skin skin, final FilteredTree<T> tree, final TextField.TextFieldFilter filter) {
 
         Table searchTable = new Table();
         Image image = new Image(skin.newDrawable("search"));
@@ -40,6 +43,25 @@ public class SearchFilteredTree<T> extends Table {
                 tree.invalidate();
                 tree.layout();
             }
+        });
+
+        textField.addListener(new ClickListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode)  {
+                if(keycode == Input.Keys.UP) {
+                    filteredTree.selectPrevFilteredNode();
+                }
+                if(keycode == Input.Keys.DOWN) {
+                    filteredTree.selectNextFilteredNode();
+                }
+
+                if(keycode == Input.Keys.ENTER) {
+                    filteredTree.reportUserEnter();
+                }
+                return super.keyDown(event, keycode);
+            }
+
+
         });
 
     }

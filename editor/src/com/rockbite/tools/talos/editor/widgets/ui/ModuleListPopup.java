@@ -72,23 +72,24 @@ public class ModuleListPopup extends VisWindow {
             }
         };
 
-
-        tree.addListener(new ClickListener() {
+        tree.setItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                Selection<FilteredTree.Node<String>> selection = tree.getSelection();
-                if(selection.items().size > 0 && selection.first().children.size == 0) {
+            public void chosen(FilteredTree.Node node) {
+                if(node.children.size == 0) {
                     try {
-                        Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + nameToModuleClass.get(selection.first().name));
+                        Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + nameToModuleClass.get(node.name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
                             TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
                     }
-                    selection.clear();
                 }
+            }
+
+            @Override
+            public void selected(FilteredTree.Node node) {
+
             }
         });
     }

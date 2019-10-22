@@ -49,10 +49,22 @@ public class FilteredTree<T> extends WidgetGroup {
     private Skin skin;
 
     private boolean draggable;
+    private int autoSelectionIndex = 0;
 
     public FilteredTree (Skin skin) {
         this(skin.get(TreeStyle.class));
         this.skin = skin;
+    }
+
+    private ItemListener itemListener;
+
+    public interface ItemListener {
+        void chosen(Node node);
+        void selected(Node node);
+    }
+
+    public void setItemListener(ItemListener itemListener) {
+        this.itemListener = itemListener;
     }
 
     public FilteredTree (Skin skin, String styleName) {
@@ -77,6 +89,17 @@ public class FilteredTree<T> extends WidgetGroup {
         selection.setToggle(true);
         setStyle(style);
         initialize();
+    }
+
+    public void reportUserEnter() {
+        Array<Node<T>> result = new Array<>();
+        collectFilteredNodes(rootNodes, result);
+
+        if(result.size == 0) return;
+
+        if(itemListener != null) {
+            itemListener.chosen(result.get(autoSelectionIndex));
+        }
     }
 
     private void initialize () {
@@ -119,6 +142,9 @@ public class FilteredTree<T> extends WidgetGroup {
                 if (!node.isSelectable())
                     return;
                 selection.choose(node);
+                if(itemListener != null) {
+                    itemListener.chosen(node);
+                }
                 if (!selection.isEmpty())
                     rangeStart = node;
             }
@@ -441,8 +467,55 @@ public class FilteredTree<T> extends WidgetGroup {
 
     public void filter (String filter) {
         filter(rootNodes, filter.toLowerCase());
-
         expandAll();
+
+        autoSelectionIndex = 0;
+        selectFilteredNodeByIndex();
+    }
+
+    public void selectNextFilteredNode() {
+        autoSelectionIndex++;
+        selectFilteredNodeByIndex();
+    }
+
+    public void selectPrevFilteredNode() {
+        autoSelectionIndex--;
+        selectFilteredNodeByIndex();
+    }
+
+    public void selectFilteredNodeByIndex() {
+        Array<Node<T>> result = new Array<>();
+        collectFilteredNodes(rootNodes, result);
+
+        if(result.size == 0) return;
+
+        if(autoSelectionIndex < 0) autoSelectionIndex = result.size - 1;
+        if(autoSelectionIndex > result.size - 1) autoSelectionIndex = 0;
+
+        selection.clear();
+        Node node = result.get(autoSelectionIndex);
+        selection.add(node);
+        if(node.parent != null) node.parent.setExpanded(true);
+
+        if(itemListener != null) {
+            itemListener.selected(node);
+        }
+    }
+
+    public void collectFilteredNodes(Array<Node<T>> nodes, Array<Node<T>> result) {
+        for (int i = 0; i < nodes.size; i++) {
+            Node node = nodes.get(i);
+            if(node.children.size == 0) {
+                if(node.parent != null) {
+                    if (!node.filtered) {
+                        // select it!
+                        result.add(node);
+                    }
+                }
+            } else {
+                collectFilteredNodes(node.children, result);
+            }
+        }
     }
 
     public void filter (Array<Node<T>> nodes, String filter) {
