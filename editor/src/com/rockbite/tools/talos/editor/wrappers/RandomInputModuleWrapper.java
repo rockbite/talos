@@ -9,8 +9,6 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
 
-    Class valueType = null;
-
     @Override
     protected float reportPrefWidth() {
         return 180;
@@ -24,27 +22,6 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
 
         invalidateHierarchy();
         pack();
-
-        // let's figure out the type
-        if(valueType == null) {
-            valueType = moduleWrapper.getModule().getOutputSlot(targetSlot).getValue().getClass();
-        } else {
-            Class newValueType = moduleWrapper.getModule().getOutputSlot(targetSlot).getValue().getClass();
-            if(valueType != newValueType) {
-                // changing value detaching all previous values
-                // detach code goes here
-                valueType = newValueType;
-            }
-        }
-        // re init all previous values
-        try {
-            for(Slot slot : module.getInputSlots().values()) {
-                    slot.setValue((Value) ClassReflection.newInstance(valueType));
-            }
-            module.getOutputSlot(0).setValue((Value) ClassReflection.newInstance(valueType));
-        } catch (ReflectionException e) {
-            e.printStackTrace();
-        }
     }
 
     private void loadSlots() {

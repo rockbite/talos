@@ -1,0 +1,1 @@
+{"emitters":[{"name":"default_emitter","modules":[{"class":"ParticleModule","index":0},{"class":"EmitterModule","index":1,"delay":0,"duration":2,"rate":50},{"class":"TextureModule","index":2,"regionName":"fire"}],"connections":[{"moduleFrom":2,"slotTo":2}]}],"metadata":{"resources":["fire"]}}
