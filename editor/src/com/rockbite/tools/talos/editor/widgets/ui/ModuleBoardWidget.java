@@ -345,6 +345,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     private <T extends Module> void tryAndConnectLasCC(ModuleWrapper<T> moduleWrapper) {
         if(ccFromWrapper != null) {
             Class fromClass;
+            Slot fromSlotObject;
             IntMap<Slot> toSlots;
             ModuleWrapper fromModule;
             ModuleWrapper toModule;
@@ -356,16 +357,18 @@ public class ModuleBoardWidget extends WidgetGroup {
                 fromModule = moduleWrapper;
                 toModule = ccFromWrapper;
                 toSlot = ccFromSlot;
+                fromSlotObject = ccFromWrapper.getModule().getInputSlot(ccFromSlot);
             } else {
                 toSlots = moduleWrapper.getModule().getInputSlots();
 
                 fromModule = ccFromWrapper;
                 toModule = moduleWrapper;
                 fromSlot = ccFromSlot;
+                fromSlotObject = ccFromWrapper.getModule().getOutputSlot(ccFromSlot);
             }
 
             for(Slot slot: toSlots.values()) {
-                if(slot.isCompatable(ccFromWrapper.getModule().getInputSlot(ccFromSlot))) {
+                if(slot.isCompatable(fromSlotObject)) {
                     // we can connect
                     if(ccCurrentIsInput) {
                         fromSlot = slot.getIndex();

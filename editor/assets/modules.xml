@@ -10,7 +10,7 @@
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
-        <module name = "Position" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Position (Vector)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
     </category>
     <category name = "Color">
@@ -18,8 +18,8 @@
         <module name = "Gradient" wrapper = "GradientColorModuleWrapper">GradientColorModule</module>
     </category>
     <category name = "Rendering">
-        <module name = "Beam Particle" wrapper = "PolylineModuleWrapper">PolylineModule</module>
-        <module name = "Sprite Particle" wrapper = "TextureModuleWrapper">TextureModule</module>
+        <module name = "Beam Renderer" wrapper = "PolylineModuleWrapper">PolylineModule</module>
+        <module name = "Sprite Renderer" wrapper = "TextureModuleWrapper">TextureModule</module>
     </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>
