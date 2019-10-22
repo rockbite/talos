@@ -5,8 +5,9 @@
     </category>
     <category name = "General Use">
         <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
+        <module name = "Global Values" wrapper = "GlobalScopeModuleWrapper">GlobalScopeModule</module>
         <module name = "Mix Values" wrapper = "MixModuleWrapper">MixModule</module>
-        <module name = "Position Offset" wrapper = "OffsetModuleWrapper">OffsetModule</module>
+        <module name = "Shape Range" wrapper = "OffsetModuleWrapper">OffsetModule</module>
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>

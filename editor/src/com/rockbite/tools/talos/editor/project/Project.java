@@ -51,6 +51,7 @@ public class Project {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.setScope(TalosMain.Instance().globalScope);
 		particleEffect.loopable = true;
 
 		importer = new LegacyImporter(TalosMain.Instance().NodeStage());
@@ -148,6 +149,7 @@ public class Project {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.setScope(TalosMain.Instance().globalScope);
 		particleEffect.loopable = true;
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);

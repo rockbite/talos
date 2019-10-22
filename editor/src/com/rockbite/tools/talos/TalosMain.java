@@ -17,6 +17,7 @@ import com.rockbite.tools.talos.editor.UIStage;
 import com.rockbite.tools.talos.editor.project.Project;
 import com.rockbite.tools.talos.editor.utils.CameraController;
 import com.rockbite.tools.talos.editor.utils.DropTargetListenerAdapter;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -41,6 +42,8 @@ public class TalosMain extends ApplicationAdapter {
 	public static TalosMain Instance () {
 		return instance;
 	}
+
+	public ScopePayload globalScope = new ScopePayload();
 
 	public UIStage UIStage () {
 		return uiStage;

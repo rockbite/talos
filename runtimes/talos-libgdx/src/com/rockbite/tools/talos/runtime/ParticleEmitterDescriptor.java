@@ -51,6 +51,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(NoiseModule.class);
             registeredModules.add(PolylineModule.class);
             registeredModules.add(FromToModule.class);
+            registeredModules.add(GlobalScopeModule.class);
         }
     }
 

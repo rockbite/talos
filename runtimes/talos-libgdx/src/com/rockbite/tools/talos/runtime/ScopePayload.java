@@ -1,8 +1,12 @@
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntMap;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import com.rockbite.tools.talos.runtime.values.Value;
+
+import java.awt.*;
 
 public class ScopePayload {
 
@@ -22,6 +26,9 @@ public class ScopePayload {
     public ScopePayload() {
         for(int i = 0; i < 10; i++) {
             map.put(i, new NumericalValue());
+        }
+        for(int i = 0; i < 10; i++) {
+            dynamicValues.put(i, new NumericalValue());
         }
     }
 
@@ -45,5 +52,29 @@ public class ScopePayload {
         for(int i = 0; i < 10; i++) {
             map.get(i).set(0);
         }
+    }
+
+    public NumericalValue getDynamicValue(int key) {
+        return dynamicValues.get(key);
+    }
+
+    public void setDynamicValue(int key, float val) {
+        dynamicValues.get(key).set(val);
+    }
+
+    public void setDynamicValue(int key, Vector2 val) {
+        dynamicValues.get(key).set(val.x, val.y);
+    }
+
+    public void setDynamicValue(int key, Color val) {
+        dynamicValues.get(key).set(val.getRed(), val.getGreen(), val.getBlue());
+    }
+
+    public void setDynamicValue(int key, Vector3 val) {
+        dynamicValues.get(key).set(val.x, val.y, val.z);
+    }
+
+    public void setDynamicValue(int key, NumericalValue val) {
+        dynamicValues.get(key).set(val);
     }
 }
