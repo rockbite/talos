@@ -26,7 +26,7 @@ public class SearchFilteredTree<T> extends Table {
         }
 
         searchTable.add(image);
-        searchTable.add(textField).growX();
+        searchTable.add(textField).growX().padLeft(5);
 
         filteredTree = tree;
 

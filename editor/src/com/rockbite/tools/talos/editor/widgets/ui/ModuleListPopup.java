@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
@@ -32,11 +33,16 @@ public class ModuleListPopup extends VisWindow {
     private ObjectMap<String, String> nameToModuleClass = new ObjectMap<>();
 
     public ModuleListPopup(XmlReader.Element root) {
-        super("Add Module", "default-nodim");
+        super("Add Module", "module-list");
         setModal(false);
         setMovable(false);
         setKeepWithinParent(false);
         setKeepWithinStage(false);
+
+        padTop(42);
+        padBottom(16);
+        padLeft(16);
+        padRight(16);
 
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
