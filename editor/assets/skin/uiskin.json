@@ -91,10 +91,12 @@
 		resizable: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-resizable}
 		noborder: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder}
 		dialog: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder},
+		default-nodim: {titleFont: default-font, titleFontColor: white, background: window-noborder},
+		module-list: {titleFont: default-font, titleFontColor: white, background: window_dark},
 		panel: {titleFont: default-font, titleFontColor: white, background: window},
 		panel-blue: {titleFont: default-font, titleFontColor: white, background: window-blue},
 		panel-orange: {titleFont: default-font, titleFontColor: white, background: window-orange}
-	}
+	},
 	com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
 		default-horizontal: {background: progressbar, knob: progressbar-filled, knobBefore: progressbar-filled }
 		default-vertical: {background: progressbar-vertical, knob: progressbar-filled-vertical, knobBefore: progressbar-filled-vertical }
@@ -139,7 +141,10 @@
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle: {
 		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
-	}
+	},
+	com.rockbite.tools.talos.editor.widgets.ui.FilteredTree$TreeStyle: {
+		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
+	},
 	com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 		default: {background: tooltip-pane, label: {font: default-font, fontColor: white} }
 	}

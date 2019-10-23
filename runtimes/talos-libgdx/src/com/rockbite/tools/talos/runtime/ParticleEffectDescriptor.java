@@ -26,6 +26,8 @@ public class ParticleEffectDescriptor {
 
 	private AssetProvider assetProvider;
 
+	private ParticleEffectInstance processsingEffectReference;
+
 	public ParticleEffectDescriptor () {
 
 	}
@@ -97,6 +99,8 @@ public class ParticleEffectDescriptor {
 			particleEffectInstance.addEmitter(emitterDescriptor);
 		}
 
+		particleEffectInstance.sortEmitters();
+
 		return particleEffectInstance;
 	}
 
@@ -116,5 +120,13 @@ public class ParticleEffectDescriptor {
 
 	public void setAssetProvider (AssetProvider assetProvider) {
 		this.assetProvider = assetProvider;
+	}
+
+	public void setEffectReference(ParticleEffectInstance particleEffectInstance) {
+		processsingEffectReference = particleEffectInstance;
+	}
+
+	public ParticleEffectInstance getInstanceReference() {
+		return processsingEffectReference;
 	}
 }

@@ -11,12 +11,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
 import com.rockbite.tools.talos.editor.project.Project;
 import com.rockbite.tools.talos.editor.utils.CameraController;
 import com.rockbite.tools.talos.editor.utils.DropTargetListenerAdapter;
+import com.rockbite.tools.talos.runtime.ScopePayload;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -38,9 +40,13 @@ public class TalosMain extends ApplicationAdapter {
 
 	private static TalosMain instance;
 
+	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
+
 	public static TalosMain Instance () {
 		return instance;
 	}
+
+	public ScopePayload globalScope = new ScopePayload();
 
 	public UIStage UIStage () {
 		return uiStage;

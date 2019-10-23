@@ -68,6 +68,12 @@ public class Slot {
         return value;
     }
 
+    public boolean isCompatable(Slot slot) {
+        if(value == null || slot.value == null) return true;
+
+        return value.getClass() == slot.value.getClass();
+    }
+
     public void detach() {
         this.targetModule = null;
         this.targetSlot = null;

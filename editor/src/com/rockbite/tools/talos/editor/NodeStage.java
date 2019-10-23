@@ -56,9 +56,7 @@ public class NodeStage {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 TalosMain.Instance().UIStage().getStage().unfocusAll();
-                if (button == 1 && !event.isHandled()) {
-                    moduleBoardWidget.showPopup();
-                }
+
                 wasDragged = false;
 
                 TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
@@ -84,6 +82,10 @@ public class NodeStage {
                 if(!event.isHandled() && button == 0) {
                     FocusManager.resetFocus(getStage());
                     moduleBoardWidget.clearSelection();
+                }
+
+                if (button == 1 && !event.isHandled()) {
+                    moduleBoardWidget.showPopup();
                 }
 
                 TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);

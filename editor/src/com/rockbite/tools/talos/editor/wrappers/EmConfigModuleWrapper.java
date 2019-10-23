@@ -41,7 +41,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
         rightWrapper.add().expandY();
 
-        attachedBox.addListener(new ChangeListener() {
+        additiveBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 fromUIToData();

@@ -119,6 +119,8 @@ public abstract class Module implements Json.Serializable {
             fetchAllInputSlotValues();
             // process
             processValues();
+            graph.getEffectDescriptor().getInstanceReference().reportNodeCall();
+
             lastRequester = requester;
         }
 

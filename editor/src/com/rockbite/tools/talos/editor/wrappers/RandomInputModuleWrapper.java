@@ -9,9 +9,6 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
 
-    private int slotCount = 0;
-    Class valueType = null;
-
     @Override
     protected float reportPrefWidth() {
         return 180;
@@ -21,32 +18,10 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
     public void attachModuleToMyInput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
         super.attachModuleToMyInput(moduleWrapper, mySlot, targetSlot);
 
-        module.addInputSlot(slotCount);
         addNewInputSlot();
 
         invalidateHierarchy();
         pack();
-
-        // let's figure out the type
-        if(valueType == null) {
-            valueType = moduleWrapper.getModule().getOutputSlot(targetSlot).getValue().getClass();
-        } else {
-            Class newValueType = moduleWrapper.getModule().getOutputSlot(targetSlot).getValue().getClass();
-            if(valueType != newValueType) {
-                // changing value detaching all previous values
-                // detach code goes here
-                valueType = newValueType;
-            }
-        }
-        // re init all previous values
-        try {
-            for(Slot slot : module.getInputSlots().values()) {
-                    slot.setValue((Value) ClassReflection.newInstance(valueType));
-            }
-            module.getOutputSlot(0).setValue((Value) ClassReflection.newInstance(valueType));
-        } catch (ReflectionException e) {
-            e.printStackTrace();
-        }
     }
 
     private void loadSlots() {
@@ -54,8 +29,9 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
             leftWrapper.clearChildren();
             IntMap<Slot> list = module.getInputSlots();
             int tmpCount = list.size;
-            slotCount = 0;
+            module.slotCount = 0;
             for (int i = 0; i < tmpCount; i++) {
+                module.slotCount++;
                 addNewInputSlot();
             }
 
@@ -87,27 +63,25 @@ public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
             list.put(i,list.get(i+1));
             list.get(i).setIndex(i);
         }
-        slotCount--;
+        module.slotCount--;
 
         loadSlots();
     }
 
     private void addNewInputSlot() {
-        addInputSlot((slotCount+1) + ": ", slotCount);
-        slotCount++;
+        addInputSlot((module.slotCount) + ": ", module.slotCount-1);
     }
 
 
     @Override
     public void setModule(RandomInputModule module) {
         super.setModule(module);
-
         loadSlots();
     }
 
     @Override
     protected void configureSlots() {
-        loadSlots();
         addOutputSlot("output", 0);
+        loadSlots();
     }
 }

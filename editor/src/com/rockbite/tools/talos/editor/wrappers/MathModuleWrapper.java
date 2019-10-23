@@ -1,17 +1,22 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
+import com.kotcrab.vis.ui.widget.VisTextField;
 import com.rockbite.tools.talos.runtime.Expression;
 import com.rockbite.tools.talos.runtime.modules.MathModule;
 import com.rockbite.tools.talos.runtime.utils.MathExpressionMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
+
+    private VisTextField aField;
+    private VisTextField bField;
 
     VisSelectBox<String> selectBox;
 
@@ -21,7 +26,7 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
     @Override
     protected float reportPrefWidth() {
-        return 250;
+        return 180;
     }
 
     @Override
@@ -41,22 +46,43 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         }
     }
 
+    @Override
+    public void setModule(MathModule module) {
+        super.setModule(module);
+        aField.setText(module.getDefaultA() + "");
+        bField.setText(module.getDefaultB() + "");
+    }
 
     @Override
     protected void configureSlots() {
         Array<String> mathsExpressions = new Array<>();
         MathExpressionMappings.getAvailableMathExpressions(mathsExpressions);
 
-        addInputSlot("A", MathModule.A);
-        addInputSlot("B", MathModule.B);
-
-        addOutputSlot("result", 0);
-
-
         selectBox = new VisSelectBox();
         selectBox.setItems(mathsExpressions);
 
-        contentWrapper.add(selectBox).width(120).padRight(3);
+        aField = addInputSlotWithTextField("A: ", MathModule.A);
+        leftWrapper.add(selectBox).left().expandX().pad(5).padLeft(17).row();
+        bField = addInputSlotWithTextField("B: ", MathModule.B);
+
+        aField.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                float a = floatFromText(aField);
+                module.setA(a);
+            }
+        });
+
+        bField.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                float b = floatFromText(bField);
+                module.setB(b);
+            }
+        });
+
+
+        addOutputSlot("result", 0);
 
         selectBox.addListener(new ChangeListener() {
             @Override
@@ -73,5 +99,8 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         selectBox.setSelected(MathExpressionMappings.getNameForMathExpression(module.getExpression()));
+
+        aField.setText(module.getDefaultA() + "");
+        bField.setText(module.getDefaultB() + "");
     }
 }

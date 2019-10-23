@@ -22,7 +22,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
     @Override
     public void setModule(InputModule module) {
         super.setModule(module);
-        module.setInput(ScopePayload.EMITTER_ALPHA);
+        //module.setInput(ScopePayload.EMITTER_ALPHA);
     }
 
     @Override
@@ -36,6 +36,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
         map.put(ScopePayload.EMITTER_ALPHA, "Emitter.alpha - Duration");
         map.put(ScopePayload.PARTICLE_ALPHA, "Particle.alpha - Lifetime");
         map.put(ScopePayload.EMITTER_ALPHA_AT_P_INIT, "Duration at particle init");
+        map.put(ScopePayload.SECONDARY_SEED, "Secondary Seed");
 
 
         selectBox = addSelectBox(map.values());

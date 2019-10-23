@@ -20,6 +20,10 @@ public class EmitterModule extends Module {
     NumericalValue rate;
     EmConfigValue config;
 
+    public float defaultDelay = 0;
+    public float defaultDuration = 2f;
+    public float defaultRate = 50f;
+
     @Override
     protected void defineSlots() {
         delay = createInputSlot(DELAY);
@@ -39,7 +43,7 @@ public class EmitterModule extends Module {
     public float getDelay() {
         fetchInputSlotValue(DELAY);
 
-        if(delay.isEmpty()) return 0f; // defaults
+        if(delay.isEmpty()) return defaultDelay; // defaults
 
         return delay.getFloat();
     }
@@ -47,7 +51,7 @@ public class EmitterModule extends Module {
     public float getDuration() {
         fetchInputSlotValue(DURATION);
 
-        if(duration.isEmpty()) return 2f; // defaults
+        if(duration.isEmpty()) return defaultDuration; // defaults
 
         return duration.getFloat();
     }
@@ -55,12 +59,12 @@ public class EmitterModule extends Module {
     public float getRate() {
         fetchInputSlotValue(RATE);
 
-        if(rate.isEmpty()) return 50; // defaults
+        if(rate.isEmpty()) return defaultRate; // defaults
 
         return rate.getFloat();
     }
 
-    public boolean isContinnuous() {
+    public boolean isContinuous() {
         fetchInputSlotValue(CONFIG);
 
         if(config.isEmpty()) return false;
@@ -84,6 +88,14 @@ public class EmitterModule extends Module {
         return config.aligned;
     }
 
+    public boolean isAdditive() {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return true;
+
+        return config.additive;
+    }
+
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
         getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
@@ -92,10 +104,16 @@ public class EmitterModule extends Module {
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeValue("delay", defaultDelay);
+        json.writeValue("duration", defaultDuration);
+        json.writeValue("rate", defaultRate);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
+        defaultDelay = jsonData.getFloat("delay", 0);
+        defaultDuration = jsonData.getFloat("duration", 2);
+        defaultRate = jsonData.getFloat("rate", 50);
     }
 }

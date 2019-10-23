@@ -10,7 +10,7 @@ import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 
 public class ProjectData {
 
-	private MetaData metaData;
+	private MetaData metaData = new MetaData();
 
 	private Array<EmitterData> emitters = new Array<>();
 
@@ -27,6 +27,7 @@ public class ProjectData {
 		for (ParticleEmitterWrapper key : moduleWrappers.keys()) {
 			final EmitterData emitterData = new EmitterData();
 			emitterData.name = key.getName();
+			emitterData.sortPosition = key.getEmitter().getSortPosition();
 			emitterData.modules.addAll(moduleWrappers.get(key));
 
 			final Array<ModuleBoardWidget.NodeConnection> nodeConns = nodeConnections.get(key);

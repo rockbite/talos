@@ -8,10 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
+import com.rockbite.tools.talos.editor.project.Project;
+import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
+import com.rockbite.tools.talos.runtime.ParticleEmitterInstance;
+
+import java.util.Comparator;
 
 public class TimelineWidget extends Table {
 
@@ -28,8 +34,14 @@ public class TimelineWidget extends Table {
         topBar.setBackground(getSkin().getDrawable("seekbar-background"));
         TextButton buttonAdd = new TextButton("+", skin);
         TextButton buttonDel = new TextButton("-", skin);
+        TextButton buttonUp = new TextButton("up", skin);
+        TextButton buttonDown = new TextButton("down", skin);
+
         topBar.add(buttonAdd).left().width(30).pad(3);
         topBar.add(buttonDel).left().width(30).pad(3);
+        topBar.add(buttonUp).left().width(30).pad(3);
+        topBar.add(buttonDown).left().width(45).pad(3);
+
         topBar.add().growX();
         add(topBar).growX();
         row();
@@ -59,7 +71,7 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                final ParticleEmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter");
+                final ParticleEmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter", -1);
                 selectRow(emitter);
             }
         });
@@ -74,6 +86,48 @@ public class TimelineWidget extends Table {
                 TalosMain.Instance().Project().removeEmitter(wrapper);
             }
         });
+
+        buttonUp.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
+                moveWrapperSortingPosition(wrapper, -1);
+            }
+        });
+
+        buttonDown.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
+                moveWrapperSortingPosition(wrapper, 1);
+
+            }
+        });
+    }
+
+    public void moveWrapperSortingPosition(ParticleEmitterWrapper wrapper, int changeBy) { // -1 or 1
+        if(changeBy < -1) changeBy = -1;
+        if(changeBy > 1) changeBy = 1;
+
+        int pos = wrapper.getEmitter().getSortPosition();
+        int newPos = pos + changeBy;
+
+        Array<ParticleEmitterInstance> emitters = TalosMain.Instance().Project().getParticleEffect().getEmitters();
+
+        if(newPos < 0 || newPos > emitters.size-1) return;
+
+        // let's swap
+        ParticleEmitterInstance emOne = emitters.get(pos);
+        ParticleEmitterInstance emTwo = emitters.get(newPos);
+        int tmp = emOne.emitterGraph.getSortPosition();
+        emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
+        emTwo.emitterGraph.setSortPosition(tmp);
+
+        TalosMain.Instance().Project().sortEmitters();
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
@@ -201,6 +255,16 @@ public class TimelineWidget extends Table {
                     }
 
                     return super.keyDown(event, keycode);
+                }
+            });
+
+            textField.addListener(new FocusListener() {
+                @Override
+                public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
+                    super.keyboardFocusChanged(event, actor, focused);
+                    if(!focused) {
+                        setStaticMode();
+                    }
                 }
             });
 

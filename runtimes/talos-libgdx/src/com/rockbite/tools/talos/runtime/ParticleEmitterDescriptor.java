@@ -15,6 +15,8 @@ public class ParticleEmitterDescriptor {
     ParticleModule particleModule;
     EmitterModule emitterModule;
 
+    private int sortPosition;
+
     public static ObjectSet<Class> registeredModules;
 
     public ParticleEmitterDescriptor (ParticleEffectDescriptor descriptor) {
@@ -48,6 +50,10 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(EmConfigModule.class);
             registeredModules.add(OffsetModule.class);
             registeredModules.add(RandomInputModule.class);
+            registeredModules.add(NoiseModule.class);
+            registeredModules.add(PolylineModule.class);
+            registeredModules.add(FromToModule.class);
+            registeredModules.add(GlobalScopeModule.class);
         }
     }
 
@@ -136,6 +142,15 @@ public class ParticleEmitterDescriptor {
     }
 
     public boolean isContinuous() {
-        return getEmitterModule().isContinnuous();
+        return getEmitterModule().isContinuous();
     }
+
+    public int getSortPosition() {
+        return sortPosition;
+    }
+
+    public void setSortPosition(int sortPosition) {
+        this.sortPosition = sortPosition;
+    }
+
 }

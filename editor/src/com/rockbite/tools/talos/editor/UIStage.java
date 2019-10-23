@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -30,8 +31,11 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
+import com.rockbite.tools.talos.editor.widgets.ui.ModuleListPopup;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
+import com.rockbite.tools.talos.editor.widgets.ui.SearchFilteredTree;
 import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
+import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 
 import java.io.File;
@@ -55,8 +59,10 @@ public class UIStage {
 
 	ColorPicker colorPicker;
 
+	ModuleListPopup moduleListPopup;
+
 	public UIStage (Skin skin) {
-		this.stage = new Stage(new ScreenViewport());
+		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
 		this.skin = skin;
 		this.dragAndDrop = new DragAndDrop();
 	}
@@ -75,6 +81,12 @@ public class UIStage {
 
 		batchConvertDialog = new BatchConvertDialog();
 		settingsDialog = new SettingsDialog();
+
+		FileHandle list = Gdx.files.internal("modules.xml");
+		XmlReader xmlReader = new XmlReader();
+		XmlReader.Element root = xmlReader.parse(list);
+		WrapperRegistry.map.clear();
+		moduleListPopup = new ModuleListPopup(root);
 
 		colorPicker = new ColorPicker();
 		colorPicker.padTop(32);
@@ -119,7 +131,7 @@ public class UIStage {
 		});
 
 		MenuItem createModule = new MenuItem("Create Module");
-		PopupMenu createPopup = createModuleListPopup(null);
+		PopupMenu createPopup = createModuleListPopup();
 		createModule.setSubMenu(createPopup);
 		MenuItem removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
 		MenuItem groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
@@ -282,11 +294,10 @@ public class UIStage {
 		});
 	}
 
-	public PopupMenu createModuleListPopup(Vector2 location) {
-		if(location == null) {
-			OrthographicCamera cam = (OrthographicCamera) TalosMain.Instance().NodeStage().getStage().getCamera();
-			location = new Vector2(cam.position.x, cam.position.y);
-		}
+	public PopupMenu createModuleListPopup() {
+		OrthographicCamera cam = (OrthographicCamera) TalosMain.Instance().NodeStage().getStage().getCamera();
+		Vector2 location = new Vector2(cam.position.x, cam.position.y);
+
 		PopupMenu menu = new PopupMenu();
 		Array<Class> temp = new Array<>();
 		for (Class registeredModule : ParticleEmitterDescriptor.getRegisteredModules()) {
@@ -313,6 +324,10 @@ public class UIStage {
 		}
 
 		return menu;
+	}
+
+	public void createModuleListAdvancedPopup(Vector2 location) {
+		moduleListPopup.showPopup(stage, location);
 	}
 
 	private void initFileChoosers() {
@@ -484,6 +499,7 @@ public class UIStage {
 		fullScreenTable.add(verticalPane).grow();
 	}
 
+
 	private void initExampleList (PopupMenu examples) {
 		FileHandle list = Gdx.files.internal("samples/list.xml");
 		XmlReader xmlReader = new XmlReader();
@@ -522,5 +538,9 @@ public class UIStage {
 	public void showColorPicker(ColorPickerListener listener) {
 		colorPicker.setListener(listener);
 		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
+	}
+
+	public PreviewWidget PreviewWidget() {
+		return previewWidget;
 	}
 }

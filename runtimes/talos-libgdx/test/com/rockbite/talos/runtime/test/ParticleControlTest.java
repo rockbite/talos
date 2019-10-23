@@ -59,7 +59,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
 		descriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
-		descriptor.load(Gdx.files.internal("testfire.p"));
+		descriptor.load(Gdx.files.internal("runtime.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();
 

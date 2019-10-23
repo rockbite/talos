@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.runtime.render;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
@@ -29,7 +30,12 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
 			if(!particleEmitter.isVisible) continue;
-			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
+			if(particleEmitter.isAdditive) {
+				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+			} else {
+				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			}
+ 			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
 				renderParticle(batch, particleEmitter.activeParticles.get(j));
 			}
 		}
@@ -45,6 +51,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		batch.setColor(color);
 
 		if (particle.drawable != null) {
+			particle.drawable.setSeed(particle.seed);
 			particle.drawable.draw(batch, particle.getX(), particle.getY(), particle.size.x, particle.size.y, rotation);
 		}
 	}

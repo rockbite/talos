@@ -2,12 +2,11 @@ package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
-import com.rockbite.tools.talos.runtime.render.TextureRegionDrawable;
+import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
@@ -39,12 +38,13 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         addInputSlot("velocity",  ParticleModule.VELOCITY);
         addInputSlot("gravity",  ParticleModule.GRAVITY);
-        addInputSlot("rotation",  ParticleModule.ROTATION);
         addInputSlot("target",  ParticleModule.TARGET);
         addInputSlot("color",  ParticleModule.COLOR);
         addInputSlot("transparency",  ParticleModule.TRANSPARENCY);
         addInputSlot("angle",  ParticleModule.ANGLE);
         addInputSlot("mass",  ParticleModule.MASS);
+
+        addInputSlot("rotation",  ParticleModule.ROTATION);
         addInputSlot("size",  ParticleModule.SIZE);
         addInputSlot("position",  ParticleModule.POSITION);
     }

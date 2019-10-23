@@ -403,7 +403,7 @@ public class LegacyImporter {
 
         try {
             String emitterName = readString(reader, "name");
-            TalosMain.Instance().Project().createNewEmitter(emitterName);
+            TalosMain.Instance().Project().createNewEmitter(emitterName, -1);
             ParticleModuleWrapper particleModuleWrapper = (ParticleModuleWrapper) stage.moduleBoardWidget.createModule(ParticleModule.class, rightX, yStart);
             EmitterModuleWrapper emitterModuleWrapper = (EmitterModuleWrapper) stage.moduleBoardWidget.createModule(EmitterModule.class, rightX, yStart+200);
 

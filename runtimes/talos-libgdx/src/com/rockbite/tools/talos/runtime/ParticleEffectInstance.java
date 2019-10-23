@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 
+import java.util.Comparator;
+
 public class ParticleEffectInstance {
 
     private final ParticleEffectDescriptor descriptor;
@@ -17,6 +19,19 @@ public class ParticleEffectInstance {
     public boolean loopable = false;
 
     int particleCount = 0;
+    public int nodeCalls = 0;
+
+    private float totalTime = 0;
+
+    private EmitterComparator emitterComparator = new EmitterComparator();
+
+    public class EmitterComparator implements Comparator<ParticleEmitterInstance> {
+
+		@Override
+		public int compare(ParticleEmitterInstance o1, ParticleEmitterInstance o2) {
+			return o1.emitterGraph.getSortPosition() - o2.emitterGraph.getSortPosition();
+		}
+	}
 
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
@@ -30,7 +45,17 @@ public class ParticleEffectInstance {
 	}
 
 	public void update (float delta) {
+    	descriptor.setEffectReference(this);
+
+		if(totalTime > 3600) totalTime = 0;
+		totalTime += delta;
+
+		if(scopePayload != null) {
+			scopePayload.set(ScopePayload.TOTAL_TIME, totalTime);
+		}
+
 		particleCount = 0;
+		nodeCalls = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
 			particleCount += emitters.get(i).activeParticles.size;
@@ -138,5 +163,20 @@ public class ParticleEffectInstance {
 
 	public int getParticleCount() {
 		return particleCount;
+	}
+
+	public int getNodeCalls() {
+		return nodeCalls;
+	}
+
+	public void reportNodeCall() {
+		nodeCalls++;
+	}
+
+	public void sortEmitters() {
+		emitters.sort(emitterComparator);
+		for(int i = 0; i < emitters.size; i++) {
+			emitters.get(i).emitterGraph.setSortPosition(i);
+		}
 	}
 }

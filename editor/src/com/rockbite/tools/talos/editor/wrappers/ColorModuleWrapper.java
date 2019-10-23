@@ -136,47 +136,4 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         gField.setText(""+(int)(color.g * 255f));
         bField.setText(""+(int)(color.b * 255f));
     }
-
-    public static void main (String[] args) {
-
-        ApplicationAdapter ad = new ApplicationAdapter() {
-            @Override
-            public void create () {
-                TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
-                Skin skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
-                skin.addRegions(atlas);
-
-                VisUI.load(skin);
-
-                Array<ModuleWrapper> wrappers = new Array<>();
-
-                ColorModuleWrapper wrapper = new ColorModuleWrapper();
-                wrapper.setModule(new ColorModule());
-
-                wrapper.getModule().setR(0.5f);
-                wrapper.getModule().setG(0.75f);
-                wrapper.getModule().setB(0.25f);
-                wrapper.setX(500);
-                wrapper.setY(800);
-
-                Json json = new Json();
-
-                wrappers.add(wrapper);
-
-                final String s = json.prettyPrint(wrappers);
-
-                System.out.println(s);
-
-                final Object o = json.fromJson(Array.class, s);
-
-                System.out.println(o);
-
-            }
-        };
-
-        new LwjglApplication(ad);
-
-
-
-    }
 }

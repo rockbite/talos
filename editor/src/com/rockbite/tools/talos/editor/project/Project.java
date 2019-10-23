@@ -25,6 +25,7 @@ import com.rockbite.tools.talos.runtime.serialization.ExportData;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Comparator;
 
 public class Project {
 
@@ -51,12 +52,15 @@ public class Project {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.setScope(TalosMain.Instance().globalScope);
 		particleEffect.loopable = true;
 
 		importer = new LegacyImporter(TalosMain.Instance().NodeStage());
 	}
 
 	public void loadProject (FileHandle projectFileHandle) {
+		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
+
 		if (projectFileHandle.exists()) {
 			currentProjectPath = projectFileHandle.path();
 			projectData = projectSerializer.read(projectFileHandle);
@@ -68,7 +72,8 @@ public class Project {
 			for(EmitterData emitterData: projectData.getEmitters()) {
 				IntMap<ModuleWrapper> map = new IntMap<>();
 
-				ParticleEmitterWrapper emitterWrapper = createNewEmitter(emitterData.name);
+				ParticleEmitterWrapper emitterWrapper = createNewEmitter(emitterData.name, emitterData.sortPosition);
+
 				TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
 
 				final ParticleEmitterDescriptor graph = emitterWrapper.getGraph();
@@ -79,10 +84,6 @@ public class Project {
 					module.getModule().setModuleGraph(graph);
 				}
 
-
-				if(firstEmitter == null) {
-					firstEmitter = emitterWrapper;
-				}
 
 				// time to load groups here
 				for(GroupData group: emitterData.groups) {
@@ -99,14 +100,34 @@ public class Project {
 				}
 			}
 
+			sortEmitters();
+
+			if(activeWrappers.size > 0) {
+				firstEmitter = activeWrappers.first();
+			}
+
 			if(firstEmitter != null) {
 				TalosMain.Instance().Project().setCurrentEmitterWrapper(firstEmitter);
 				TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(firstEmitter);
 			}
 
+			TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+
 		} else {
 			//Error handle
 		}
+	}
+
+	public void sortEmitters() {
+		particleEffect.sortEmitters();
+		Comparator comparator = new Comparator<ParticleEmitterWrapper>() {
+			@Override
+			public int compare(ParticleEmitterWrapper o1, ParticleEmitterWrapper o2) {
+				return o1.getEmitter().getSortPosition() - o2.getEmitter().getSortPosition();
+			}
+		};
+		activeWrappers.sort(comparator);
+		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 	}
 
 	public void saveProject() {
@@ -135,16 +156,18 @@ public class Project {
 	public void newProject () {
 		cleanData();
 		projectData = new ProjectData();
-		createNewEmitter("default_emitter");
+		createNewEmitter("default_emitter", 0);
 		currentProjectPath = null;
 	}
 
 	private void cleanData() {
+		TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
 		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffectDescriptor.setAssetProvider(projectAssetProvider);
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
+		particleEffect.setScope(TalosMain.Instance().globalScope);
 		particleEffect.loopable = true;
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
@@ -154,7 +177,7 @@ public class Project {
 		return particleEffect;
 	}
 
-	public ParticleEmitterWrapper createNewEmitter (String emitterName) {
+	public ParticleEmitterWrapper createNewEmitter (String emitterName, int sortPosition) {
 		ParticleEmitterWrapper emitterWrapper = new ParticleEmitterWrapper();
 		emitterWrapper.setName(emitterName);
 
@@ -163,11 +186,22 @@ public class Project {
 
 		activeWrappers.add(emitterWrapper);
 		currentEmitterWrapper = emitterWrapper;
+		if(sortPosition == -1) {
+			moduleGraph.setSortPosition(particleEffect.getEmitters().size);
+		} else {
+			moduleGraph.setSortPosition(sortPosition);
+		}
 
 		particleEffect.addEmitter(moduleGraph);
+		if(sortPosition == -1) {
+			sortEmitters();
+		} else {
+			TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+		}
+
 
 		TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
-		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+
 
 		return emitterWrapper;
 	}
@@ -280,4 +314,7 @@ public class Project {
 
 	}
 
+	public Array<ParticleEmitterWrapper> getActiveWrappers() {
+		return activeWrappers;
+	}
 }

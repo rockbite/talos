@@ -23,7 +23,7 @@ public class GradientImage extends Actor {
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
         this.skin = skin;
         shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/ui/gradient.vert"), Gdx.files.internal("shaders/ui/gradient.frag"));
-        System.out.println(shaderProgram.getLog());
+        //System.out.println(shaderProgram.getLog());
     }
 
     public void setPoints(Array<ColorPoint> points) {
@@ -59,7 +59,7 @@ public class GradientImage extends Actor {
         }
 
         // do the rendering
-       batch.draw(white, getX(), getY(), getWidth(), getHeight());
+        batch.draw(white, getX(), getY(), getWidth(), getHeight());
 
         batch.setShader(prevShader);
     }

@@ -1,0 +1,109 @@
+{
+"metaData": {
+	"scopeDefaults": [
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	]
+},
+"emitters": [
+	{
+		"name": "emitter",
+		"modules": [
+			{
+				"class": "ParticleModuleWrapper",
+				"id": 0,
+				"x": 52,
+				"y": -186,
+				"module": {
+					"data": {
+						"class": "ParticleModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "EmitterModuleWrapper",
+				"id": 1,
+				"x": 22,
+				"y": 109,
+				"module": {
+					"data": {
+						"class": "EmitterModule",
+						"index": 1,
+						"delay": 0,
+						"duration": 2,
+						"rate": 50
+					}
+				}
+			},
+			{
+				"class": "StaticValueModuleWrapper",
+				"id": 2,
+				"x": 218,
+				"y": 1,
+				"module": {
+					"data": {
+						"class": "StaticValueModule",
+						"index": 2,
+						"value": 1
+					}
+				}
+			},
+			{
+				"class": "TextureModuleWrapper",
+				"id": 3,
+				"x": -146,
+				"y": 174,
+				"module": {
+					"data": {
+						"class": "TextureModule",
+						"index": 3,
+						"regionName": "fire"
+					}
+				},
+				"fileName": null,
+				"filePath": null
+			},
+			{
+				"class": "EmConfigModuleWrapper",
+				"id": 4,
+				"x": 221,
+				"y": 144,
+				"module": {
+					"data": {
+						"class": "EmConfigModule",
+						"index": 4,
+						"additive": true,
+						"attached": false,
+						"continuous": true,
+						"aligned": false
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 2,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 3,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 4,
+				"moduleTo": 1,
+				"slotTo": 3
+			}
+		]
+	}
+]
+}
