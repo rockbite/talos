@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
@@ -176,6 +177,27 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         } else {
             leftWrapper.addSeparator();
         }
+    }
+
+    protected Label getLabelFromCell(Cell cell) {
+        for(Actor actor: ((Table)cell.getActor()).getChildren()) {
+            if(actor instanceof Label) {
+                return (Label) actor;
+            }
+        }
+
+        return null;
+    }
+
+    protected void markLabelAsHilighted(final Label label) {
+        label.clearActions();
+        label.setColor(Color.ORANGE);
+        label.addAction(Actions.sequence(Actions.delay(1f), Actions.run(new Runnable() {
+            @Override
+            public void run() {
+                label.setColor(Color.WHITE);
+            }
+        })));
     }
 
     protected Cell addInputSlot(String title, int key) {

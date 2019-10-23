@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
@@ -96,5 +98,11 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
     @Override
     public void dragPointChanged(Vector2 point) {
         TalosMain.Instance().globalScope.setDynamicValue(module.getKey(), dragPoint);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        selectBox.setSelected(module.getKey()+"");
     }
 }

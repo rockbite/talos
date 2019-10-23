@@ -1,6 +1,8 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
@@ -12,6 +14,9 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
 
     private Vector2 dragFrom;
     private Vector2 dragTo;
+
+    private Label fromLabel;
+    private Label toLabel;
 
     @Override
     protected void wrapperSelected() {
@@ -27,8 +32,10 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
 
     @Override
     protected void configureSlots() {
-        addInputSlot("from", FromToModule.FROM);
-        addInputSlot("to", FromToModule.TO);
+        Cell fromCell = addInputSlot("from", FromToModule.FROM);
+        Cell toCell = addInputSlot("to", FromToModule.TO);
+        fromLabel = getLabelFromCell(fromCell);
+        toLabel = getLabelFromCell(toCell);
 
         addOutputSlot("rotation", FromToModule.ROTATION);
         addOutputSlot("size", FromToModule.LENGTH);
@@ -67,10 +74,12 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     public void dragPointChanged(Vector2 point) {
         if(point == dragFrom) {
             module.setDefaults(dragFrom, dragTo);
+            markLabelAsHilighted(fromLabel);
         }
 
         if(point == dragTo) {
             module.setDefaults(dragFrom, dragTo);
+            markLabelAsHilighted(toLabel);
         }
     }
 
