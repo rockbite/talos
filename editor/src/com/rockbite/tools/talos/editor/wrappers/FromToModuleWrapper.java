@@ -30,9 +30,9 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
         addInputSlot("from", FromToModule.FROM);
         addInputSlot("to", FromToModule.TO);
 
-        addOutputSlot("position", FromToModule.POSITION);
         addOutputSlot("rotation", FromToModule.ROTATION);
         addOutputSlot("size", FromToModule.LENGTH);
+        addOutputSlot("position", FromToModule.POSITION);
 
         dragFrom = new Vector2(-1, 0);
         dragTo = new Vector2(1, 0);

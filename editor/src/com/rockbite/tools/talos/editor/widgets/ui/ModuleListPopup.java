@@ -71,10 +71,11 @@ public class ModuleListPopup extends VisWindow {
         stageListener = new InputListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                if (!ModuleListPopup.this.contains(x, y)) {
+                if (!ModuleListPopup.this.contains(x, y) && button == 0) {
                     remove();
+                    return false;
                 }
-                return true;
+                return false;
             }
         };
 

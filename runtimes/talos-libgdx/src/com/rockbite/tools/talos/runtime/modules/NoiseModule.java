@@ -34,6 +34,10 @@ public class NoiseModule extends Module {
     }
 
     private float noiseFunction(float x, float y) {
+        // normalize
+        x = x - (int)x;
+        y = y - (int)y;
+
         float particleSeed = getScope().getFloat(ScopePayload.PARTICLE_SEED);
         y = y * particleSeed;
         y = y - (int)y;

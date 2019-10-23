@@ -45,6 +45,7 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
     protected void wrapperSelected() {
         PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
         previewWidget.registerForDragPoints(this);
+        updateFromSelectBox();
     }
 
     @Override
@@ -62,11 +63,7 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         selectBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String selected = (String) selectBox.getSelected();
-                int key = Integer.parseInt(selected);
-                module.setKey(key);
-                NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(key);
-                dragPoint.set(value.get(0), value.get(1));
+                updateFromSelectBox();
             }
         });
 
@@ -76,6 +73,14 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         leftWrapper.row();
 
         return selectBox;
+    }
+
+    private void updateFromSelectBox() {
+        String selected = selectBox.getSelected();
+        int key = Integer.parseInt(selected);
+        module.setKey(key);
+        NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(key);
+        dragPoint.set(value.get(0), value.get(1));
     }
 
     @Override
