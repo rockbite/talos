@@ -47,6 +47,8 @@ public class ModuleListPopup extends VisWindow {
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
 
+        TalosMain.Instance().moduleNames.clear();
+
         parseCategory(tree, null, root);
 
         add(searchFilteredTree).width(300).row();
@@ -130,6 +132,7 @@ public class ModuleListPopup extends VisWindow {
             Class moduleClazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + module.getText());
             Class wrapperClazz =ClassReflection.forName("com.rockbite.tools.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
+            TalosMain.Instance().moduleNames.put(wrapperClazz, module.getAttribute("name"));
         } catch (ReflectionException e) {
             e.printStackTrace();
         }

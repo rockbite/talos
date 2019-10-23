@@ -18,6 +18,12 @@ public class EditableLabel extends Table {
     Label label;
     TextField textField;
 
+    EditableLabelChangeListener listener;
+
+    public interface EditableLabelChangeListener {
+        public void changed(String newText);
+    }
+
     public EditableLabel(String text, Skin skin) {
         super(skin);
 
@@ -63,6 +69,9 @@ public class EditableLabel extends Table {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.ENTER) {
                     setStaticMode();
+                    if(listener != null) {
+                        listener.changed(label.getText().toString());
+                    }
                 }
 
                 return super.keyDown(event, keycode);
@@ -75,6 +84,9 @@ public class EditableLabel extends Table {
                 super.keyboardFocusChanged(event, actor, focused);
                 if(!focused) {
                     setStaticMode();
+                    if(listener != null) {
+                        listener.changed(label.getText().toString());
+                    }
                 }
             }
         });
@@ -82,6 +94,10 @@ public class EditableLabel extends Table {
         pack();
 
         setStaticMode();
+    }
+
+    public void setListener(EditableLabelChangeListener listener) {
+        this.listener = listener;
     }
 
     public void setEditMode() {

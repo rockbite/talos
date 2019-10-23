@@ -17,7 +17,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.*;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.DynamicTable;
+import com.rockbite.tools.talos.editor.widgets.ui.EditableLabel;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.ColorModule;
@@ -48,6 +50,12 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
     private boolean isSelected = false;
 
+    private int lastAttachedTargetSlot;
+    private ModuleWrapper lastAttachedWrapper;
+
+    private EditableLabel titleLabel;
+    private String titleOverride = "";
+
     public void setSelectionState(boolean selected) {
         if(isSelected != selected) {
             if(selected) {
@@ -77,8 +85,24 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         }
     }
 
+    public void setTitleText(String text) {
+        titleLabel.setText(text);
+    }
+
     public ModuleWrapper() {
         super("", "panel");
+
+        // change title label
+        Cell cell = ((Table)getTitleLabel().getParent()).getCell(getTitleLabel());
+        titleLabel = new EditableLabel(getTitleLabel().getText().toString(), getSkin());
+        cell.setActor(titleLabel);
+
+        titleLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+            @Override
+            public void changed(String newText) {
+                titleOverride = newText;
+            }
+        });
 
         setModal(false);
         setMovable(true);
@@ -355,7 +379,24 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
     public void setModule(T module) {
         this.module = module;
-        getTitleLabel().setText(module.getClass().getSimpleName());
+        setTitleText(constructTitle());
+    }
+
+    public String constructTitle() {
+
+        if(!titleOverride.equals("")) {
+            return titleOverride;
+        }
+
+        String name = TalosMain.Instance().moduleNames.get(this.getClass());
+
+        String title = name;
+
+        if(lastAttachedWrapper != null) {
+            title = lastAttachedWrapper.getLeftSlotName(lastAttachedTargetSlot);
+        }
+
+        return title;
     }
 
     public T getModule() {
@@ -411,7 +452,8 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         } else {
             outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
 
-            getTitleLabel().setText(module.getClass().getSimpleName());
+            lastAttachedWrapper = null;
+            setTitleText(constructTitle());
         }
     }
 
@@ -532,7 +574,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         }
 
         // change the name
-        getTitleLabel().setText(moduleWrapper.getLeftSlotName(targetSlot));
+        lastAttachedTargetSlot = targetSlot;
+        lastAttachedWrapper = moduleWrapper;
+        setTitleText(constructTitle());
     }
 
     private String getLeftSlotName(int targetSlot) {
@@ -542,6 +586,9 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
     @Override
     public void write (Json json) {
 		json.writeValue("id", getId());
+		if(!titleOverride.equals("")) {
+            json.writeValue("titleOverride", titleOverride);
+        }
 		json.writeValue("x", getX());
 		json.writeValue("y", getY());
 
@@ -555,6 +602,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 		setId(jsonData.getInt("id"));
 		setX(jsonData.getFloat("x"));
  		setY(jsonData.getFloat("y"));
+ 		titleOverride = jsonData.getString("titleOverride", "");
 
         module = (T)json.readValue(Module.class, jsonData.get("module").get("data"));
         //TODO: this has to be create through module graph to go with properr creation channels

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
@@ -38,6 +39,8 @@ public class TalosMain extends ApplicationAdapter {
 	private DropTargetListener dropTargetListener;
 
 	private static TalosMain instance;
+
+	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
 	public static TalosMain Instance () {
 		return instance;
