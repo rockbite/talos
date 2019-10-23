@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
 
@@ -518,9 +519,84 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
+    private class MatchingNode<C> {
+        public Node<C> node;
+        public double score;
+        public boolean contained;
+        public MatchingNode(Node<C> node, double score, boolean contained) {
+            this.node = node;
+            this.score = score;
+            this.contained = contained;
+        }
+
+        @Override
+        public int hashCode() {
+            return node.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return super.equals(obj);
+        }
+
+        public boolean filterPositive() {
+            if(contained) return true;
+
+            if(score > 0.7f) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    private double getSimilarityScore(String s1, String s2) {
+        JaroWinkler jaroWinkler = new JaroWinkler();
+        double value = jaroWinkler.similarity(s1, s2);
+
+        return value;
+    }
+
+
+    public void gatherMatchingScores (Array<Node<T>> nodes, String filter, Array<MatchingNode<T>> results) {
+        for (int i = 0; i < nodes.size; i++) {
+            MatchingNode<T> mNode = new MatchingNode<>(nodes.get(i),
+                    getSimilarityScore(nodes.get(i).getName().toLowerCase(), filter.toLowerCase()),
+                    nodes.get(i).getName().toLowerCase().contains(filter.toLowerCase()));
+            if(!results.contains(mNode, false)) {
+                results.add(mNode);
+            }
+            gatherMatchingScores(nodes.get(i).children, filter, results);
+        }
+    }
+
+    public void smartFilter(String filter) {
+        Array<MatchingNode<T>> results = new Array<>();
+        gatherMatchingScores(rootNodes, filter, results);
+        smartFilter(results);
+
+        expandAll();
+
+        autoSelectionIndex = 0;
+        selectFilteredNodeByIndex();
+    }
+
+    private void smartFilter (Array<MatchingNode<T>> nodes) {
+        for (int i = 0; i < nodes.size; i++) {
+            if (nodes.get(i).filterPositive()) {
+                nodes.get(i).node.filtered = false;
+                nodes.get(i).node.actor.setVisible(true);
+                setAllParentsNotFiltered(nodes.get(i).node);
+                setAllChildrenNotFiltered(nodes.get(i).node);
+            } else {
+                nodes.get(i).node.filtered = true;
+                nodes.get(i).node.actor.setVisible(false);
+            }
+        }
+    }
+
     public void filter (Array<Node<T>> nodes, String filter) {
         for (int i = 0; i < nodes.size; i++) {
-
             if (nodes.get(i).name.toLowerCase().contains(filter)) {
                 filter(nodes.get(i).children, filter);
 

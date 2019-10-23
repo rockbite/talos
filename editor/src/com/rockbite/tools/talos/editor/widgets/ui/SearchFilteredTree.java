@@ -38,7 +38,7 @@ public class SearchFilteredTree<T> extends Table {
         textField.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                tree.filter(textField.getText());
+                tree.smartFilter(textField.getText());
                 tree.invalidateHierarchy();
                 tree.invalidate();
                 tree.layout();
