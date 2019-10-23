@@ -1,0 +1,399 @@
+{
+"metaData": {
+	"scopeDefaults": [
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	]
+},
+"emitters": [
+	{
+		"name": "default_emitter",
+		"modules": [
+			{
+				"class": "ParticleModuleWrapper",
+				"id": 0,
+				"x": -39,
+				"y": -130,
+				"module": {
+					"data": {
+						"class": "ParticleModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "EmitterModuleWrapper",
+				"id": 1,
+				"x": -58,
+				"y": 170,
+				"module": {
+					"data": {
+						"class": "EmitterModule",
+						"index": 1,
+						"delay": 0,
+						"duration": 1,
+						"rate": 5
+					}
+				}
+			},
+			{
+				"class": "PolylineModuleWrapper",
+				"id": 2,
+				"titleOverride": "Beam Renderer",
+				"x": -449,
+				"y": 163,
+				"module": {
+					"data": {
+						"class": "PolylineModule",
+						"index": 2,
+						"points": 50,
+						"regionName": "fire"
+					}
+				},
+				"fileName": null,
+				"filePath": null
+			},
+			{
+				"class": "FromToModuleWrapper",
+				"id": 3,
+				"x": -205,
+				"y": -130,
+				"module": {
+					"data": {
+						"class": "FromToModule",
+						"index": 3
+					}
+				},
+				"fromX": -3.588236,
+				"fromY": -0.019608429,
+				"toX": 3.196078,
+				"toY": 0
+			},
+			{
+				"class": "NoiseModuleWrapper",
+				"id": 4,
+				"titleOverride": "Simplex Noise",
+				"x": -1049,
+				"y": 501,
+				"module": {
+					"data": {
+						"class": "NoiseModule",
+						"index": 4,
+						"frequency": 4
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 5,
+				"x": -897,
+				"y": 76,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 5,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.16049683,
+								"y": 0.14581299
+							},
+							{
+								"x": 0.49383017,
+								"y": 0.29164633
+							},
+							{
+								"x": 0.8395089,
+								"y": 0.15622966
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 6,
+				"titleOverride": "System Input",
+				"x": -1560,
+				"y": 645,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 6,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 7,
+				"titleOverride": "Tells Module Point Index",
+				"x": -1435,
+				"y": 225,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 7,
+						"scopeKey": 6
+					}
+				}
+			},
+			{
+				"class": "EmConfigModuleWrapper",
+				"id": 8,
+				"x": 141,
+				"y": 171,
+				"module": {
+					"data": {
+						"class": "EmConfigModule",
+						"index": 8,
+						"additive": true,
+						"attached": false,
+						"continuous": true,
+						"aligned": false
+					}
+				}
+			},
+			{
+				"class": "StaticValueModuleWrapper",
+				"id": 9,
+				"x": -223,
+				"y": 171,
+				"module": {
+					"data": {
+						"class": "StaticValueModule",
+						"index": 9,
+						"value": 2
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 10,
+				"x": -569,
+				"y": 575,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 10,
+						"a": 0,
+						"b": 0,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 11,
+				"titleOverride": "Noise Scale",
+				"x": -852,
+				"y": 544,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 11,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.5020596,
+								"y": 0.6874809
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "GradientColorModuleWrapper",
+				"id": 12,
+				"x": -944,
+				"y": 250,
+				"module": {
+					"data": {
+						"class": "GradientColorModule",
+						"index": 12,
+						"points": [
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 0
+							},
+							{
+								"r": 0.101960786,
+								"g": 0.43137255,
+								"b": 1,
+								"pos": 0.4984715
+							},
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 1
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 13,
+				"x": -1254,
+				"y": 578,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 13,
+						"a": 0,
+						"b": 0.2,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 14,
+				"x": -483,
+				"y": -142,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 14,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.135807,
+								"y": 0.8645662
+							},
+							{
+								"x": 0.48971418,
+								"y": 1
+							},
+							{
+								"x": 0.864202,
+								"y": 0.84373283
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 3,
+				"slotFrom": 1,
+				"slotTo": 7
+			},
+			{
+				"moduleFrom": 3,
+				"slotFrom": 2,
+				"slotTo": 13
+			},
+			{
+				"moduleFrom": 3,
+				"slotTo": 14
+			},
+			{
+				"moduleFrom": 2,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 4,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 5
+			},
+			{
+				"moduleFrom": 8,
+				"moduleTo": 1,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 9,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 5,
+				"moduleTo": 2,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 2
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 2,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 11
+			},
+			{
+				"moduleFrom": 4,
+				"moduleTo": 10
+			},
+			{
+				"moduleFrom": 13,
+				"moduleTo": 4
+			},
+			{
+				"moduleFrom": 14,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 11,
+				"moduleTo": 10,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 12
+			},
+			{
+				"moduleFrom": 6,
+				"moduleTo": 13
+			}
+		],
+		"groups": [
+			{
+				"text": "BEAM NOISE",
+				"modules": [ 10, 6, 13, 11, 4 ],
+				"color": -1.3926823E38
+			}
+		]
+	}
+]
+}
