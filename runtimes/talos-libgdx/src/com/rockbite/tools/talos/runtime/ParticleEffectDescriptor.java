@@ -99,6 +99,8 @@ public class ParticleEffectDescriptor {
 			particleEffectInstance.addEmitter(emitterDescriptor);
 		}
 
+		particleEffectInstance.sortEmitters();
+
 		return particleEffectInstance;
 	}
 

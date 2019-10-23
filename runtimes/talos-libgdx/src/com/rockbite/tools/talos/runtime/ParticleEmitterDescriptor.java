@@ -15,6 +15,8 @@ public class ParticleEmitterDescriptor {
     ParticleModule particleModule;
     EmitterModule emitterModule;
 
+    private int sortPosition;
+
     public static ObjectSet<Class> registeredModules;
 
     public ParticleEmitterDescriptor (ParticleEffectDescriptor descriptor) {
@@ -140,6 +142,15 @@ public class ParticleEmitterDescriptor {
     }
 
     public boolean isContinuous() {
-        return getEmitterModule().isContinnuous();
+        return getEmitterModule().isContinuous();
     }
+
+    public int getSortPosition() {
+        return sortPosition;
+    }
+
+    public void setSortPosition(int sortPosition) {
+        this.sortPosition = sortPosition;
+    }
+
 }

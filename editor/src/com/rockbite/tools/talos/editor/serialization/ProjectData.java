@@ -27,6 +27,7 @@ public class ProjectData {
 		for (ParticleEmitterWrapper key : moduleWrappers.keys()) {
 			final EmitterData emitterData = new EmitterData();
 			emitterData.name = key.getName();
+			emitterData.sortPosition = key.getEmitter().getSortPosition();
 			emitterData.modules.addAll(moduleWrappers.get(key));
 
 			final Array<ModuleBoardWidget.NodeConnection> nodeConns = nodeConnections.get(key);

@@ -5,7 +5,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
-import com.rockbite.tools.talos.runtime.modules.FromToModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 
 public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements IDragPointProvider {
 
@@ -87,5 +88,14 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
         super.read(json, jsonData);
         dragFrom.set(jsonData.getFloat("fromX", 0), jsonData.getFloat("fromY", 0));
         dragTo.set(jsonData.getFloat("toX", 0), jsonData.getFloat("toY", 0));
+    }
+
+    @Override
+    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+
+        if(slot.getIndex() == FromToModule.FROM) return Vector2Module.class;
+        if(slot.getIndex() == FromToModule.TO) return Vector2Module.class;
+
+        return null;
     }
 }

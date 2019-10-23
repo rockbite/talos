@@ -10,7 +10,9 @@ public class ParticleEmitterInstance {
 
     private final ParticleEffectInstance parentParticleInstance;
 	public boolean isComplete = false;
-	ParticleEmitterDescriptor emitterGraph;
+	public ParticleEmitterDescriptor emitterGraph;
+
+	public boolean isAdditive = true;
 
 	Vector2 position = new Vector2();
 	float duration;
@@ -60,7 +62,7 @@ public class ParticleEmitterInstance {
 
 		delay = emitterModule.getDelay();
 		duration = emitterModule.getDuration();
-		isContinuous = emitterModule.isContinnuous();
+		isContinuous = emitterModule.isContinuous();
 
 		delayTimer = delay;
 
@@ -89,9 +91,10 @@ public class ParticleEmitterInstance {
 
 		delay = emitterModule.getDelay();
 		duration = emitterModule.getDuration();
-		isContinuous = emitterModule.isContinnuous();
+		isContinuous = emitterModule.isContinuous();
 		rate = emitterModule.getRate();
 		isAttached = emitterModule.isAttached();
+		isAdditive = emitterModule.isAdditive();
 
 		if(delayTimer > 0) {
 			delayTimer -= delta;

@@ -15,8 +15,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 	Color color = new Color(Color.WHITE);
 
-
-
 	public SpriteBatchParticleRenderer (Batch batch) {
 		this.batch = batch;
 	}
@@ -32,7 +30,12 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
 			if(!particleEmitter.isVisible) continue;
-			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
+			if(particleEmitter.isAdditive) {
+				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+			} else {
+				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			}
+ 			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
 				renderParticle(batch, particleEmitter.activeParticles.get(j));
 			}
 		}

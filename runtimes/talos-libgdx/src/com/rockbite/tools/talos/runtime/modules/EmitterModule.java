@@ -64,7 +64,7 @@ public class EmitterModule extends Module {
         return rate.getFloat();
     }
 
-    public boolean isContinnuous() {
+    public boolean isContinuous() {
         fetchInputSlotValue(CONFIG);
 
         if(config.isEmpty()) return false;
@@ -86,6 +86,14 @@ public class EmitterModule extends Module {
         if(config.isEmpty()) return false;
 
         return config.aligned;
+    }
+
+    public boolean isAdditive() {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return true;
+
+        return config.additive;
     }
 
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {

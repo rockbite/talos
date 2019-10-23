@@ -6,7 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.editor.widgets.NoiseImage;
-import com.rockbite.tools.talos.runtime.modules.NoiseModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 
 public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
 
@@ -52,4 +53,15 @@ public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
         slider.setValue(20f - module.getFrequency() + 0.5f);
 
     }
+
+
+    @Override
+    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+
+        if(slot.getIndex() == NoiseModule.X) return InputModule.class;
+        if(slot.getIndex() == NoiseModule.Y) return InputModule.class;
+
+        return null;
+    }
+
 }

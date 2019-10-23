@@ -13,8 +13,8 @@ import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.IntegerInputWidget;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
-import com.rockbite.tools.talos.runtime.modules.PolylineModule;
-import com.rockbite.tools.talos.runtime.modules.TextureModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 
 import java.io.File;
 
@@ -153,4 +153,16 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
         filePath = path+"";
         fileName = fileHandle.name();
     }
+
+    @Override
+    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+
+        if(slot.getIndex() == PolylineModule.OFFSET) return NoiseModule.class;
+        if(slot.getIndex() == PolylineModule.THICKNESS) return CurveModule.class;
+        if(slot.getIndex() == PolylineModule.COLOR) return GradientColorModule.class;
+        if(slot.getIndex() == PolylineModule.TRANSPARENCY) return CurveModule.class;
+
+        return null;
+    }
+
 }
