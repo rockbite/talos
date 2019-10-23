@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
@@ -254,6 +255,16 @@ public class TimelineWidget extends Table {
                     }
 
                     return super.keyDown(event, keycode);
+                }
+            });
+
+            textField.addListener(new FocusListener() {
+                @Override
+                public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
+                    super.keyboardFocusChanged(event, actor, focused);
+                    if(!focused) {
+                        setStaticMode();
+                    }
                 }
             });
 
