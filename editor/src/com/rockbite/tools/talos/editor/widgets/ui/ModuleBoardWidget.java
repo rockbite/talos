@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Bezier;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -245,6 +247,33 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public void clearCC() {
         ccFromWrapper = null;
+    }
+
+    public void userSelectionApply(Rectangle rectangle) {
+        clearSelection();
+        Array<ModuleWrapper> wrappers = getModuleWrappers();
+        Rectangle moduleRect = new Rectangle();
+        for(int i = 0; i < wrappers.size; i++) {
+            ModuleWrapper wrapper = wrappers.get(i);
+            tmp.set(wrapper.getX(), wrapper.getY());
+            tmp.add(moduleContainer.getX(), moduleContainer.getY());
+            localToStageCoordinates(tmp);
+            moduleRect.set(tmp.x, tmp.y, wrapper.getWidth(), wrapper.getHeight());
+            boolean hit = Intersector.intersectRectangles(rectangle, moduleRect, moduleRect);
+
+            if(hit) {
+                // hit
+                addWrapperToSelection(wrapper);
+            }
+        }
+    }
+
+    public void selectAllModules() {
+        ObjectSet<ModuleWrapper> wrappers = new ObjectSet<>();
+        for(ModuleWrapper wrapper: getModuleWrappers()) {
+            wrappers.add(wrapper);
+        }
+        setSelectedWrappers(wrappers);
     }
 
 

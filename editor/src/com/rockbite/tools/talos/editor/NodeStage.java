@@ -4,9 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.FocusManager;
@@ -23,6 +26,8 @@ public class NodeStage {
     public Skin skin;
 
     public ModuleBoardWidget moduleBoardWidget;
+
+    private Image selectionRect;
 
     public NodeStage (Skin skin) {
         this.skin = skin;
@@ -52,12 +57,21 @@ public class NodeStage {
         stage.addListener(new InputListener() {
 
             boolean wasDragged;
+            Vector2 startPos = new Vector2();
+            Vector2 tmp = new Vector2();
+            Rectangle rectangle = new Rectangle();
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 TalosMain.Instance().UIStage().getStage().unfocusAll();
 
                 wasDragged = false;
+
+                if(button == 2) {
+                    selectionRect.setVisible(true);
+                    selectionRect.setSize(0, 0);
+                    startPos.set(x, y);
+                }
 
                 TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
 
@@ -69,6 +83,26 @@ public class NodeStage {
                 if(event.isHandled()) return;
 
                 wasDragged = true;
+
+                if(selectionRect.isVisible()) {
+                    tmp.set(x, y);
+                    tmp.sub(startPos);
+                    if(tmp.x < 0) {
+                        rectangle.setX(x);
+                    } else {
+                        rectangle.setX(startPos.x);
+                    }
+                    if(tmp.y < 0) {
+                        rectangle.setY(y);
+                    } else {
+                        rectangle.setY(startPos.y);
+                    }
+                    rectangle.setWidth(Math.abs(tmp.x));
+                    rectangle.setHeight(Math.abs(tmp.y));
+
+                    selectionRect.setPosition(rectangle.x, rectangle.y);
+                    selectionRect.setSize(rectangle.getWidth(), rectangle.getHeight());
+                }
 
                 super.touchDragged(event, x, y, pointer);
 
@@ -87,6 +121,12 @@ public class NodeStage {
                 if (button == 1 && !event.isHandled()) {
                     moduleBoardWidget.showPopup();
                 }
+
+                if(button == 2) {
+                    moduleBoardWidget.userSelectionApply(rectangle);
+                }
+
+                selectionRect.setVisible(false);
 
                 TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
             }
@@ -109,10 +149,16 @@ public class NodeStage {
                     moduleBoardWidget.pasteFromClipboard();
                 }
 
+                if(keycode == Input.Keys.A && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    moduleBoardWidget.selectAllModules();
+                }
+
                 return super.keyDown(event, keycode);
             }
         });
     }
+
+
 
 
     private void initActors() {
@@ -122,6 +168,11 @@ public class NodeStage {
         moduleBoardWidget = new ModuleBoardWidget(this);
 
         stage.addActor(moduleBoardWidget);
+
+        selectionRect = new Image(skin.getDrawable("orange_row"));
+        selectionRect.setSize(0, 0);
+        selectionRect.setVisible(false);
+        stage.addActor(selectionRect);
     }
 
 
