@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
@@ -21,7 +22,7 @@ import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.EditableLabel;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 
-public class ModuleWrapperGroup extends Group{
+public class ModuleWrapperGroup extends Group implements Json.Serializable{
 
     private ObjectSet<ModuleWrapper> wrappers = new ObjectSet();
 
@@ -44,7 +45,15 @@ public class ModuleWrapperGroup extends Group{
 
     PopupMenu settingsPopup;
 
+    public ModuleWrapperGroup() {
+
+    }
+
     public ModuleWrapperGroup(Skin skin) {
+       init(skin);
+    }
+
+    public void init(Skin skin) {
         this.skin = skin;
 
         frameImage = new Image(skin.getDrawable("group_frame"));
@@ -214,5 +223,36 @@ public class ModuleWrapperGroup extends Group{
         if(wrappers.size == 0) {
             TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(this);
         }
+    }
+
+    public void setText(String text) {
+        title.setText(text);
+    }
+
+    @Override
+    public Color getColor() {
+        return frameImage.getColor();
+    }
+
+    @Override
+    public void setColor(Color color) {
+        frameImage.setColor(color);
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("color", frameImage.getColor());
+        json.writeValue("text", title.getText());
+        json.writeValue("modules", wrappers);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        init(VisUI.getSkin());
+        Color color = json.readValue(Color.class, jsonData.get("color"));
+        String text = jsonData.getString("text");
+        wrappers = json.readValue(ObjectSet.class, jsonData.get("modules"));
+        setText(text);
+        setColor(color);
     }
 }

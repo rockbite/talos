@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.Curve;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
@@ -26,7 +25,6 @@ import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
-import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.modules.Module;
 
 public class ModuleBoardWidget extends WidgetGroup {
@@ -213,22 +211,94 @@ public class ModuleBoardWidget extends WidgetGroup {
         moduleWrapperGroup.remove();
     }
 
+    private Array<ModuleWrapperGroup> getSelectedGroups() {
+        Array<ModuleWrapperGroup> groups = getGroups();
+        Array<ModuleWrapperGroup> selectedGroups = new Array<>();
+        ObjectSet<ModuleWrapper> wrappers = getSelectedWrappers();
+        for(ModuleWrapperGroup group: groups) {
+            boolean isFullyContained = true;
+            for(ModuleWrapper wrapper: group.getModuleWrappers()) {
+                if(!wrappers.contains(wrapper)) {
+                    isFullyContained = false;
+                    break;
+                }
+            }
+            if(isFullyContained) {
+                //add this group
+                selectedGroups.add(group);
+            }
+        }
+
+        return selectedGroups;
+    }
+
+    private Array<NodeConnection> getSelectedConnections() {
+        Array<NodeConnection> arr = new Array<>();
+        ObjectSet<ModuleWrapper> wrappers = getSelectedWrappers();
+        Array<NodeConnection> connections = getCurrentConnections();
+        for(NodeConnection connection: connections) {
+            if(wrappers.contains(connection.fromModule) && wrappers.contains(connection.toModule)) {
+                arr.add(connection);
+            }
+        }
+
+        return arr;
+    }
+
+    public static class ClipboardPayload{
+        Array<NodeConnection> connections;
+        ObjectSet<ModuleWrapper> wrappers;
+        Array<ModuleWrapperGroup> groups;
+
+        public ClipboardPayload() {
+
+        }
+
+        public ClipboardPayload( ObjectSet<ModuleWrapper> wrappers, Array<NodeConnection> connections, Array<ModuleWrapperGroup> groups) {
+            this.wrappers = wrappers;
+            this.connections = connections;
+            this.groups = groups;
+        }
+    }
+
     public void copySelectedModules() {
+        Array<NodeConnection> connections = getSelectedConnections();
+        ObjectSet<ModuleWrapper> wrappers = getSelectedWrappers();
+        Array<ModuleWrapperGroup> groups = getSelectedGroups();
+
+        ClipboardPayload payload = new ClipboardPayload(wrappers, connections, groups);
+
         Json json = new Json();
-        String clipboard = json.toJson(getSelectedWrappers());
+        String clipboard = json.toJson(payload);
         Gdx.app.getClipboard().setContents(clipboard);
     }
 
     public void pasteFromClipboard() {
         String clipboard = Gdx.app.getClipboard().getContents();
 
+        ObjectMap<Integer, ModuleWrapper> previousWrapperIdMap = new ObjectMap<>();
+
+        boolean hasParticleModule = false;
+        boolean hasEmitterModule = false;
+        for(ModuleWrapper wrapper: getModuleWrappers()) {
+            if(wrapper instanceof ParticleModuleWrapper) hasParticleModule = true;
+            if(wrapper instanceof EmitterModuleWrapper) hasEmitterModule = true;
+        }
+
         Json json = new Json();
         try {
-            ObjectSet<ModuleWrapper> wrappers = json.fromJson(ObjectSet.class, clipboard);
+            ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
+
+            ObjectSet<ModuleWrapper> wrappers = payload.wrappers;
+            ObjectSet<ModuleWrapper> copiedWrappers = new ObjectSet<>();
             for(ModuleWrapper wrapper: wrappers) {
-                if(wrapper instanceof ParticleModuleWrapper || wrapper instanceof EmitterModuleWrapper) {
+                if(wrapper instanceof ParticleModuleWrapper && hasParticleModule) {
                     continue;
                 }
+                if(wrapper instanceof EmitterModuleWrapper && hasEmitterModule) {
+                    continue;
+                }
+                previousWrapperIdMap.put(wrapper.getId(), wrapper); // get old Id
                 getModuleWrappers().add(wrapper);
                 wrapper.moveBy(20, 20);
                 wrapper.setModule(wrapper.getModule());
@@ -238,10 +308,38 @@ public class ModuleBoardWidget extends WidgetGroup {
                 currentEmitterWrapper.getGraph().addModule(wrapper.getModule());
                 wrapper.getModule().setModuleGraph(currentEmitterWrapper.getGraph());
                 moduleContainer.addActor(wrapper);
-            }
-            setSelectedWrappers(wrappers);
-        } catch (Exception e) {
 
+                copiedWrappers.add(wrapper);
+            }
+
+            // now let's connect the connections
+            for(NodeConnection connection: payload.connections) {
+                ModuleWrapper fromWrapper = previousWrapperIdMap.get(connection.fromModule.getId());
+                ModuleWrapper toWrapper = previousWrapperIdMap.get(connection.toModule.getId());
+                if(fromWrapper == null || toWrapper == null) {
+                    continue;
+                }
+                makeConnection(fromWrapper, toWrapper, connection.fromSlot, connection.toSlot);
+            }
+
+            // now add groups
+            for(ModuleWrapperGroup group: payload.groups) {
+                ObjectSet<ModuleWrapper> newWrappers = new ObjectSet<>();
+                for(ModuleWrapper wrapper: group.getModuleWrappers()) {
+                    ModuleWrapper newWrapper = previousWrapperIdMap.get(wrapper.getId());
+                    if(newWrapper != null) {
+                        newWrappers.add(newWrapper);
+                    }
+                }
+                ModuleWrapperGroup newGroup = createGroupForWrappers(newWrappers);
+                newGroup.setText(group.getText());
+                newGroup.setColor(group.getColor());
+
+            }
+
+            setSelectedWrappers(copiedWrappers);
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -277,7 +375,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
 
-    public class NodeConnection {
+    public static class NodeConnection {
         public ModuleWrapper fromModule;
         public ModuleWrapper toModule;
         public int fromSlot;
