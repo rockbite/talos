@@ -50,13 +50,14 @@ public class Particle implements Pool.Poolable {
     public void update(float delta) {
         if(alpha == 1f) return;
 
-        alpha += delta/life;
-        if(alpha > 1f) alpha = 1f;
-
         //scope data
         ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
         if(particleModule == null) return;
         particleModule.updateScopeData(this);
+        life = particleModule.getLife();
+
+        alpha += delta/life;
+        if(alpha > 1f) alpha = 1f;
 
         //update variable values
         Vector2 target = particleModule.getTarget();
@@ -68,7 +69,6 @@ public class Particle implements Pool.Poolable {
         }
 
         float velocity = particleModule.getVelocity();
-        life = particleModule.getLife();
         transparency = particleModule.getTransparency();
 
         if(particleEmitter.emitterGraph.emitterModule.isAligned()) {
