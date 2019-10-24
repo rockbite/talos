@@ -126,7 +126,7 @@ public class UIStage {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.4", " - ");
+				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.5", "Many new features. much wow.");
 			}
 		});
 
