@@ -43,7 +43,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 	public void create () {
 
 		orthographicCamera = new OrthographicCamera();
-		float width = 10f;
+		float width = 2000f;
 		float aspect = (float)Gdx.graphics.getWidth()/(float)Gdx.graphics.getHeight();
 		orthographicCamera.setToOrtho(false, width, width / aspect);
 		shapeRenderer = new ShapeRenderer();
@@ -59,7 +59,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
 		descriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
-		descriptor.load(Gdx.files.internal("runtime.p"));
+		descriptor.load(Gdx.files.internal("test.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();
 

@@ -67,6 +67,7 @@ public class ParticleEffectDescriptor {
 					emitterDescriptor.emitterModule = (EmitterModule)module;
 				}
 				idMap.put(module.getIndex(), module);
+				emitterDescriptor.modules.add(module); // I cannot understand how this was working before. This is needed so that it can later reset requesters.
 			}
 
 			for (ConnectionData connection : emitter.connections) {
