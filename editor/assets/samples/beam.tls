@@ -304,6 +304,20 @@
 						]
 					}
 				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 15,
+				"x": -495,
+				"y": 418,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 15,
+						"x": 0,
+						"y": 0
+					}
+				}
 			}
 		],
 		"connections": [
@@ -349,10 +363,6 @@
 				"slotTo": 1
 			},
 			{
-				"moduleFrom": 10,
-				"moduleTo": 2
-			},
-			{
 				"moduleFrom": 12,
 				"moduleTo": 2,
 				"slotTo": 2
@@ -385,12 +395,21 @@
 			{
 				"moduleFrom": 6,
 				"moduleTo": 13
+			},
+			{
+				"moduleFrom": 15,
+				"moduleTo": 2
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 15,
+				"slotTo": 1
 			}
 		],
 		"groups": [
 			{
 				"text": "BEAM NOISE",
-				"modules": [ 10, 6, 13, 11, 4 ],
+				"modules": [ 11, 10, 13, 6, 4 ],
 				"color": -1.3926823E38
 			}
 		]

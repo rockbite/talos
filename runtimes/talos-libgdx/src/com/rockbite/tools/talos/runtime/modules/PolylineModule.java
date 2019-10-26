@@ -8,7 +8,7 @@ import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.assets.AssetProvider;
-import com.rockbite.tools.talos.runtime.render.drawables.PolylineDrawable;
+import com.rockbite.tools.talos.runtime.render.drawables.PolylineRenderer;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -18,6 +18,8 @@ public class PolylineModule extends Module {
     public static final int THICKNESS = 1;
     public static final int COLOR = 2;
     public static final int TRANSPARENCY = 3;
+    public static final int LEFT_TANGENT = 4;
+    public static final int RIGHT_TANGENT = 5;
 
     public static final int OUTPUT = 0;
 
@@ -26,13 +28,16 @@ public class PolylineModule extends Module {
     NumericalValue color;
     NumericalValue transparency;
 
+    NumericalValue leftTangent;
+    NumericalValue rightTangent;
+
     Color tmpColor = new Color();
 
     public String regionName;
 
     private DrawableValue outputValue;
 
-    private PolylineDrawable polylineDrawable;
+    private PolylineRenderer polylineDrawable;
     public int pointCount = 2;
 
     @Override
@@ -42,7 +47,10 @@ public class PolylineModule extends Module {
         color = createInputSlot(COLOR);
         transparency = createInputSlot(TRANSPARENCY);
 
-        polylineDrawable = new PolylineDrawable();
+        leftTangent = createInputSlot(LEFT_TANGENT);
+        rightTangent = createInputSlot(RIGHT_TANGENT);
+
+        polylineDrawable = new PolylineRenderer();
 
         outputValue = (DrawableValue) createOutputSlot(OUTPUT, new DrawableValue());
         outputValue.setDrawable(polylineDrawable);
@@ -84,7 +92,8 @@ public class PolylineModule extends Module {
                 offset.set(0);
             }
 
-            polylineDrawable.setPointData(i, 0, offset.getFloat(), thicknessVal, tmpColor);
+            polylineDrawable.setPointData(i, offset.get(0), offset.get(1), thicknessVal, tmpColor);
+            polylineDrawable.setTangents(leftTangent.get(0), leftTangent.get(1), rightTangent.get(0), rightTangent.get(1));
         }
         getScope().set(ScopePayload.REQUESTER_ID, requester);
     }

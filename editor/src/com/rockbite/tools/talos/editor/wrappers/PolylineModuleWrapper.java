@@ -47,6 +47,9 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
         addInputSlot("color",  PolylineModule.COLOR);
         addInputSlot("transparency",  PolylineModule.TRANSPARENCY);
 
+        addInputSlot("left tangent",  PolylineModule.LEFT_TANGENT);
+        addInputSlot("right tangent",  PolylineModule.RIGHT_TANGENT);
+
         interpolationPoints = new IntegerInputWidget("interpolation points", getSkin());
         interpolationPoints.setValue(0);
         leftWrapper.add(interpolationPoints).left().expandX();
