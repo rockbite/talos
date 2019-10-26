@@ -76,7 +76,7 @@ public class PreviewWidget extends ViewportWidget {
     private FloatCounter cpuTime = new FloatCounter(100);
     private float fps = 0;
 
-    private Array<Vector2> dragPoints = new Array<>();
+    private Array<DragPoint> dragPoints = new Array<>();
     private IDragPointProvider dragPointProvider = null;
 
     public PreviewWidget() {
@@ -122,7 +122,7 @@ public class PreviewWidget extends ViewportWidget {
             private Vector2 prevPos = new Vector2();
             private Vector2 pos = new Vector2();
 
-            private Vector2 currentlyDragging = null;
+            private DragPoint currentlyDragging = null;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -132,8 +132,8 @@ public class PreviewWidget extends ViewportWidget {
                 prevPos.set(x, y);
 
                 //detect drag points
-                for(Vector2 point: dragPoints) {
-                    if(pos.dst(point) < 0.2f * camera.zoom) {
+                for(DragPoint point: dragPoints) {
+                    if(pos.dst(point.position) < 0.2f * camera.zoom) {
                         // dragging a point
                         currentlyDragging = point;
                         return true;
@@ -167,7 +167,7 @@ public class PreviewWidget extends ViewportWidget {
                         camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
                     } else {
                         // dragging a point
-                        currentlyDragging.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
+                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
                         dragPointProvider.dragPointChanged(currentlyDragging);
                     }
                 }
@@ -353,8 +353,8 @@ public class PreviewWidget extends ViewportWidget {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(tmpColor);
 
-            for (Vector2 point : dragPoints) {
-                shapeRenderer.circle(point.x, point.y, 0.1f * camera.zoom, 15);
+            for (DragPoint point : dragPoints) {
+                shapeRenderer.circle(point.position.x, point.position.y, 0.1f * camera.zoom, 15);
             }
 
             shapeRenderer.end();
@@ -368,7 +368,7 @@ public class PreviewWidget extends ViewportWidget {
 
     public void registerForDragPoints(IDragPointProvider dragPointProvider) {
         this.dragPointProvider = dragPointProvider;
-        Vector2[] arr = dragPointProvider.fetchDragPoints();
+        DragPoint[] arr = dragPointProvider.fetchDragPoints();
         dragPoints.clear();
         for(int i = 0; i < arr.length; i++) {
             dragPoints.add(arr[i]);

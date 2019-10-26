@@ -165,6 +165,9 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
         if(slot.getIndex() == PolylineModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == PolylineModule.TRANSPARENCY) return CurveModule.class;
 
+        if(slot.getIndex() == PolylineModule.LEFT_TANGENT) return Vector2Module.class;
+        if(slot.getIndex() == PolylineModule.RIGHT_TANGENT) return Vector2Module.class;
+
         return null;
     }
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.widgets.ui.DragPoint;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
 import com.rockbite.tools.talos.runtime.modules.GlobalScopeModule;
 import com.rockbite.tools.talos.runtime.utils.InterpolationMappings;
@@ -19,11 +20,11 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
 
     VisSelectBox<String> selectBox;
 
-    Vector2 dragPoint;
+    DragPoint dragPoint;
 
     @Override
     protected void configureSlots() {
-        dragPoint = new Vector2(0, 0);
+        dragPoint = new DragPoint(0, 0);
 
         Array<String> array = new Array<>();
 
@@ -91,13 +92,13 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
     }
 
     @Override
-    public Vector2[] fetchDragPoints() {
-        return new Vector2[]{dragPoint};
+    public DragPoint[] fetchDragPoints() {
+        return new DragPoint[]{dragPoint};
     }
 
     @Override
-    public void dragPointChanged(Vector2 point) {
-        TalosMain.Instance().globalScope.setDynamicValue(module.getKey(), dragPoint);
+    public void dragPointChanged(DragPoint point) {
+        TalosMain.Instance().globalScope.setDynamicValue(module.getKey(), dragPoint.position);
     }
 
     @Override

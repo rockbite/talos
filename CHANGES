@@ -1,0 +1,33 @@
+[1.0.6]
+- Support for bezier curve logic in Beam Drawable. Adds left and right tangents.
+
+[1.0.5]
+- legacy libGDX particle file importer full functionality
+- Modules can now be renamed with double click on the title
+- Full Copy/Paste functionality for modules from emitter to the emitter. Works between different Talos windows.
+- Additive blend mode support in renderer and config properties for emitter
+- Global dynamic user set vars (global scope input)
+- Dynamic Drag point support for visualizing vector2 values in the preview window
+- Filtered search drop-down for module creation
+- Dropping curve in empty location auto-open's module popup.
+- Preview supports background and foreground images.
+- Viewport width can be changed with exact numbers in input box instead of just scroll for zoom
+- Particle in the preview window can be moved with right-click
+- Module multi-select with rectangle hit, with SHIFT, and with Ctrl+A
+- Categorized module list
+- Some modules now have their default values exposed as input fields
+- Performance numbers such as triangles, particle count, render times and more shown in preview
+- Runtime: attached mode
+- Runtime: loopable effects and support for API methods such as pause/start/stop allow completion
+- Batch legacy import functionality
+- Export for runtime format
+- Settings dialog for default asset location
+- Module Grouping with Ctrl+G, color and custom text for module groups
+- Up & Down positioning for emitters.
+- Fixed samples list to work, now you can see 3 example .tls in File->Samples menu
+- Offset dynamic shape module
+- Module to script in java code and manipulate inputs/outputs
+- Beam Renderer module
+- Random Input slot module
+- Simplex Noise module
+- From To to Position/Size/Rotation converter module

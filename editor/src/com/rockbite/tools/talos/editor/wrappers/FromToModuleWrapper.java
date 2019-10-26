@@ -6,14 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.widgets.ui.DragPoint;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
 
 public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements IDragPointProvider {
 
-    private Vector2 dragFrom;
-    private Vector2 dragTo;
+    private DragPoint dragFrom;
+    private DragPoint dragTo;
 
     private Label fromLabel;
     private Label toLabel;
@@ -41,10 +42,10 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
         addOutputSlot("size", FromToModule.LENGTH);
         addOutputSlot("position", FromToModule.POSITION);
 
-        dragFrom = new Vector2(-1, 0);
-        dragTo = new Vector2(1, 0);
+        dragFrom = new DragPoint(-1, 0);
+        dragTo = new DragPoint(1, 0);
         if(module != null) {
-            module.setDefaults(dragFrom, dragTo);
+            module.setDefaults(dragFrom.position, dragTo.position);
         }
     }
 
@@ -57,7 +58,7 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     @Override
     public void setModule(FromToModule module) {
         super.setModule(module);
-        module.setDefaults(dragFrom, dragTo);
+        module.setDefaults(dragFrom.position, dragTo.position);
     }
 
     @Override
@@ -66,19 +67,19 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     }
 
     @Override
-    public Vector2[] fetchDragPoints() {
-        return new Vector2[]{dragFrom, dragTo};
+    public DragPoint[] fetchDragPoints() {
+        return new DragPoint[]{dragFrom, dragTo};
     }
 
     @Override
-    public void dragPointChanged(Vector2 point) {
+    public void dragPointChanged(DragPoint point) {
         if(point == dragFrom) {
-            module.setDefaults(dragFrom, dragTo);
+            module.setDefaults(dragFrom.position, dragTo.position);
             markLabelAsHilighted(fromLabel);
         }
 
         if(point == dragTo) {
-            module.setDefaults(dragFrom, dragTo);
+            module.setDefaults(dragFrom.position, dragTo.position);
             markLabelAsHilighted(toLabel);
         }
     }
@@ -86,10 +87,10 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     @Override
     public void write(Json json) {
         super.write(json);
-        json.writeValue("fromX", dragFrom.x);
-        json.writeValue("fromY", dragFrom.y);
-        json.writeValue("toX", dragTo.x);
-        json.writeValue("toY", dragTo.y);
+        json.writeValue("fromX", dragFrom.position.x);
+        json.writeValue("fromY", dragFrom.position.y);
+        json.writeValue("toX", dragTo.position.x);
+        json.writeValue("toY", dragTo.position.y);
     }
 
     @Override
