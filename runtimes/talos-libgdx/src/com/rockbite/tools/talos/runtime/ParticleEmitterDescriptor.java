@@ -54,6 +54,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(PolylineModule.class);
             registeredModules.add(FromToModule.class);
             registeredModules.add(GlobalScopeModule.class);
+            registeredModules.add(FlipbookModule.class);
         }
     }
 

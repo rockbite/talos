@@ -20,7 +20,7 @@ import java.io.File;
 
 public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
 
-    TextureDropWidget dropWidget;
+    TextureDropWidget<Module> dropWidget;
     TextureRegion defaultRegion;
 
     String filePath;
@@ -61,7 +61,7 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
             }
         });
 
-        dropWidget = new TextureDropWidget(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin());
         rightWrapper.add(dropWidget).size(50).right().row();
 
         rightWrapper.add().growY().row();

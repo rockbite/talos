@@ -1,0 +1,113 @@
+package com.rockbite.tools.talos.runtime.modules;
+
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
+import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
+import com.rockbite.tools.talos.runtime.render.drawables.SpriteAnimationDrawable;
+import com.rockbite.tools.talos.runtime.values.DrawableValue;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
+
+public class FlipbookModule extends Module {
+
+    public static final int PHASE = 0;
+
+    public static final int OUTPUT = 0;
+
+    private String regionName;
+    private DrawableValue userDrawable;
+    private DrawableValue outputValue;
+
+    NumericalValue phaseVal;
+
+    int rows = 1;
+    int cols = 1;
+
+    public float duration;
+
+    SpriteAnimationDrawable spriteAnimation;
+
+    @Override
+    protected void defineSlots() {
+        phaseVal = createInputSlot(PHASE);
+        spriteAnimation = new SpriteAnimationDrawable();
+
+        outputValue = (DrawableValue) createOutputSlot(OUTPUT, new DrawableValue());
+        userDrawable = new DrawableValue();
+        userDrawable.setEmpty(true);
+    }
+
+    @Override
+    public void processValues() {
+        if(phaseVal.isEmpty()) {
+            phaseVal.set(getScope().getFloat(ScopePayload.TOTAL_TIME));
+        }
+
+        float time = phaseVal.getFloat();
+        time = time / duration;
+
+        spriteAnimation.setPhase(time - (int)time); // maybe another approach is better.
+
+        outputValue.set(userDrawable);
+    }
+
+    public void setRegion (String regionName, TextureRegion region) {
+        this.regionName = regionName;
+        if(region != null) {
+            spriteAnimation.set(region, rows, cols);
+            userDrawable.setDrawable(spriteAnimation);
+        }
+    }
+
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("regionName", regionName);
+
+        json.writeValue("rows", rows);
+        json.writeValue("cols", cols);
+
+        json.writeValue("duration", duration);
+    }
+
+
+    @Override
+    public void setModuleGraph(ParticleEmitterDescriptor graph) {
+        super.setModuleGraph(graph);
+        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+        setRegion(regionName, assetProvider.findRegion(regionName));
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        regionName = jsonData.getString("regionName", "fire");
+
+        rows = jsonData.getInt("rows", 1);
+        cols = jsonData.getInt("cols", 1);
+        duration = jsonData.getFloat("duration", 1);
+    }
+
+    public void setRows(int value) {
+        rows = value;
+        if(rows < 1) rows = 1;
+        spriteAnimation.set(rows, cols);
+    }
+
+    public void setCols(int value) {
+        cols = value;
+        if(cols < 1) cols = 1;
+        spriteAnimation.set(rows, cols);
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+}

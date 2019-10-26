@@ -6,12 +6,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.rockbite.tools.talos.runtime.modules.Module;
 
-public class TextureDropWidget extends Table {
+public class TextureDropWidget<F extends Module> extends Table {
 
     Image image;
 
     public TextureDropWidget(TextureRegion region, Skin skin) {
+        init(region, skin, 50f);
+    }
+
+    public TextureDropWidget(TextureRegion region, Skin skin, float width) {
+        init(region, skin, width);
+    }
+
+    public void init(TextureRegion region, Skin skin, float width) {
 
         Stack stack = new Stack();
 
@@ -21,7 +30,7 @@ public class TextureDropWidget extends Table {
         stack.add(image);
         stack.add(border);
 
-        add(stack).size(50);
+        add(stack).size(width);
 
     }
 

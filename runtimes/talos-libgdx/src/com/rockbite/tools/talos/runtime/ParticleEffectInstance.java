@@ -47,7 +47,7 @@ public class ParticleEffectInstance {
 	public void update (float delta) {
     	descriptor.setEffectReference(this);
 
-		if(totalTime > 3600) totalTime = 0;
+		if(totalTime > 3600) totalTime = 0; //TODO: maybe just supple TimeUtils time now instead...
 		totalTime += delta;
 
 		if(scopePayload != null) {

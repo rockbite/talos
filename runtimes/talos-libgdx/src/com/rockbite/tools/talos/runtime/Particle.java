@@ -53,11 +53,11 @@ public class Particle implements Pool.Poolable {
         //scope data
         ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
         if(particleModule == null) return;
-        particleModule.updateScopeData(this);
-        life = particleModule.getLife();
 
+        life = particleModule.getLife();
         alpha += delta/life;
         if(alpha > 1f) alpha = 1f;
+        particleModule.updateScopeData(this);
 
         //update variable values
         Vector2 target = particleModule.getTarget();

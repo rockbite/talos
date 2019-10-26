@@ -21,6 +21,7 @@
     <category name = "Rendering">
         <module name = "Beam Renderer" wrapper = "PolylineModuleWrapper">PolylineModule</module>
         <module name = "Sprite Renderer" wrapper = "TextureModuleWrapper">TextureModule</module>
+        <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
     </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>
