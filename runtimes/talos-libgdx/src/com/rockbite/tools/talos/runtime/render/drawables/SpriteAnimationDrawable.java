@@ -121,7 +121,7 @@ public class SpriteAnimationDrawable implements ParticleDrawable {
 
             Frame frame = animation.getKeyFrame(phase, false);
 
-            updateVertices(x, y, width, height, batch.getColor(), frame.u1, frame.v1, frame.u2, frame.v2, rotation);
+            updateVertices(x-width/2f, y-height/2f, width, height, batch.getColor(), frame.u1, frame.v1, frame.u2, frame.v2, rotation);
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
         }
 
