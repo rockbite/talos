@@ -1,5 +1,4 @@
-# talos
-Talos Particle Engine
+# talos vfx
 
 Website: [https://talosvfx.com/](https://talosvfx.com/)
 
