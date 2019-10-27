@@ -1,5 +1,7 @@
 # talos vfx
 
+[![Github All Releases](https://img.shields.io/github/downloads/rockbite/talos/total.svg)]()
+
 Website: [https://talosvfx.com/](https://talosvfx.com/)
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
