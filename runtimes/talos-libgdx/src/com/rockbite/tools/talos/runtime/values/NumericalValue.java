@@ -172,4 +172,12 @@ public class NumericalValue extends Value {
 	public String toString () {
 		return Arrays.toString(elements);
 	}
+
+	@Override
+	public void setEmpty(boolean isEmpty) {
+		super.setEmpty(isEmpty);
+		if(isEmpty) {
+			currentElementCount = 0;
+		}
+	}
 }

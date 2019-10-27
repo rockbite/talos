@@ -58,6 +58,9 @@ public class Slot {
     public void connect(Module targetModule, Slot targetSlot) {
         this.targetModule = targetModule;
         this.targetSlot = targetSlot;
+        if(value != null) {
+            value.setEmpty(true);
+        }
     }
 
     public Slot getTargetSlot() {
