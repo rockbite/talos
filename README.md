@@ -19,7 +19,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Custom pre-compiled java scriptwriting for value manipulation
   * Custom widget flaours allowing for same widget to look differently if it's just number or if number is angle
   
-### List of modules
+### List of modules (nodes)
 
   * Particle Module - main output hub for particle related properties (per particle)
   * Emitter module - main output hubg for emitter related properties such as delay, emissions and such
