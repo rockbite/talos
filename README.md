@@ -26,7 +26,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * System Input - list of inner system values that can be exposed and used by other modules (particle life, emitter life, time)
   * Global Values - dynamic list of values that can be assigned runtime, and used by modules
   * Mixer - Mixes values A & B with provided alpha ratio
-  * Shape Range - outputs random position values On or Withing provided shape (supports shape customisation, and morphing)
+  * Shape Range - outputs random position values On or Within provided shape (supports shape customisation, and morphing)
   * Number - Static number output
   * Position - Static position (x and y) output
   * Color - Static color (r,g,b) output
