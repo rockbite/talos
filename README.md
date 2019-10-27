@@ -21,7 +21,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   
 ### List of modules (nodes)
 
-  * Particle Module - main output hub for particle related properties (per particle)
+  * Particle module - main output hub for particle related properties (per particle)
   * Emitter module - main output hubg for emitter related properties such as delay, emissions and such
   * System Input - list of inner system values that can be exposed and used by other modules (particle life, emitter life, time)
   * Global Values - dynamic list of values that can be assigned runtime, and used by modules
@@ -42,6 +42,6 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Interpolation - Same as Curve but instead of custom points it is procedural meaning it's a formula
   * Math Operations - Add, substract, multiply, devide, sin, cos functions to be used with A and B values
   * Beam Position - Converts From and To positoin values into Rotation, Position & Size values that are used by Beam Renderer
-  * Emitter Config - Wrapes emitter configuration checkboxes into one UI. 
+  * Emitter Config - Wraps emitter configuration checkboxes into one UI. 
   * Script (Java) - Modules with 5 inputs and 5 outputs that can take a Java code as string to act open this values.
   
