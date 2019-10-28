@@ -420,7 +420,16 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         setTitleText(constructTitle());
     }
 
+    protected String getOverrideTitle() {
+        return null;
+    }
+
     public String constructTitle() {
+
+        String override = getOverrideTitle();
+        if(override != null) {
+            return override;
+        }
 
         if(!titleOverride.equals("")) {
             return titleOverride;

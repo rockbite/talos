@@ -35,13 +35,23 @@ public class FloatRangeInputWidget extends Table {
 
     private ChangeListener listener;
 
+    Table midTable;
+
     public FloatRangeInputWidget(String textMin, String textMax, Skin skin) {
+        build(textMin, textMax, skin, false);
+    }
+
+    public FloatRangeInputWidget(String textMin, String textMax, Skin skin, boolean isSimple) {
+        build(textMin, textMax, skin, isSimple);
+    }
+
+    public void build(String textMin, String textMax, Skin skin, boolean isSimple) {
         this.skin = skin;
 
         minInput = new FloatInputWidget(textMin, skin);
         maxInput = new FloatInputWidget(textMax, skin);
 
-        Table midTable = new Table();
+        midTable = new Table();
 
         equalsButton = new ImageButton(skin, "chain");
         mirrorButton = new ImageButton(skin, "mirror");
@@ -102,12 +112,19 @@ public class FloatRangeInputWidget extends Table {
             }
         });
 
-        midTable.add(mirrorButton).row();
-        midTable.add().height(8).row();
-        midTable.add(equalsButton);
-
         add(minInput);
-        add(midTable).width(41);
+
+        if(!isSimple) {
+            midTable.add(mirrorButton).row();
+            midTable.add().height(8).row();
+            midTable.add(equalsButton);
+
+            add(midTable).width(41);
+        } else {
+            add().width(10);
+            equalsButton.setChecked(false);
+        }
+
         add(maxInput);
 
     }

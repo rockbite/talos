@@ -71,6 +71,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(FromToModule.class);
             registeredModules.add(GlobalScopeModule.class);
             registeredModules.add(FlipbookModule.class);
+            registeredModules.add(FakeMotionBlurModule.class);
         }
     }
 

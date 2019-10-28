@@ -29,6 +29,9 @@
         <module name = "Noise" wrapper = "NoiseModuleWrapper">NoiseModule</module>
         <module name = "Multi Input" wrapper = "RandomInputModuleWrapper">RandomInputModule</module>
     </category>
+    <category name = "Motion and Physics">
+        <module name = "Fake Motion Blur" wrapper = "FakeMotionBlurModuleWrapper">FakeMotionBlurModule</module>
+    </category>
     <category name = "Curves and Math">
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
         <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
