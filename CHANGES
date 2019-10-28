@@ -1,6 +1,7 @@
 [1.0.6]
 - Support for bezier curve logic in Beam Drawable. Adds left and right tangents.
 - Sprite animations are now supported with FlipBook module
+- Camera pos and zoom are now saving and loading in/from .tls file metadata
 
 [1.0.5]
 - legacy libGDX particle file importer full functionality

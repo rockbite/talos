@@ -93,4 +93,8 @@ public class PreviewImageControllerWidget extends Table {
 
 		return Float.parseFloat(backgroundSizeField.getText());
 	}
+
+	public void setIsBackground(boolean isBackground) {
+		backgroundCheckBox.setChecked(isBackground);
+	}
 }

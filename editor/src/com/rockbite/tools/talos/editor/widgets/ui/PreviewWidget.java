@@ -95,6 +95,8 @@ public class PreviewWidget extends ViewportWidget {
     private Array<DragPoint> dragPoints = new Array<>();
     private IDragPointProvider dragPointProvider = null;
 
+    private String backgroundImagePath = "";
+
     public PreviewWidget() {
         super();
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
@@ -105,6 +107,7 @@ public class PreviewWidget extends ViewportWidget {
             public void removeImage () {
                 super.removeImage();
                 previewImage.setDrawable(null);
+                backgroundImagePath = "";
             }
         };
 
@@ -253,6 +256,8 @@ public class PreviewWidget extends ViewportWidget {
                 final TextureRegion textureRegion = new TextureRegion(texture);
                 previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
                 previewController.setImageWidth(10);
+
+                backgroundImagePath = fileHandle.path();
             }
         }
     }
@@ -407,5 +412,44 @@ public class PreviewWidget extends ViewportWidget {
     public void setCameraZoom(float zoom) {
         super.setCameraZoom(zoom);
         previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
+    }
+
+    public String getBackgroundImagePath() {
+        return backgroundImagePath;
+    }
+
+    public boolean isBackgroundImageInBack() {
+        return previewController.isBackground();
+    }
+
+    public void setImagebIsBackground(boolean isBackground) {
+        previewController.setIsBackground(isBackground);
+    }
+
+    public float getBgImageSize() {
+        return previewController.getImageWidth();
+    }
+
+    public void setBgImageSize(float size) {
+        previewController.setImageWidth(size);
+    }
+
+    public void setBackgroundImage(String bgImagePath) {
+        if(bgImagePath != null) {
+            addPreviewImage(new String[] {bgImagePath});
+        } else {
+            previewImage.setDrawable(null);
+            backgroundImagePath = "";
+        }
+    }
+
+    public void resetToDefaults() {
+        previewImage.setDrawable(null);
+        backgroundImagePath = "";
+        setBgImageSize(10f);
+        setImagebIsBackground(true);
+        setCameraZoom(1.4285715f);
+        setCameraPos(0, 0);
+        unregisterDragPoints();
     }
 }

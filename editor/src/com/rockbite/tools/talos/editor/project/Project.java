@@ -78,10 +78,10 @@ public class Project {
 		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
 
 		if (projectFileHandle.exists()) {
+			cleanData();
+
 			currentProjectPath = projectFileHandle.path();
 			projectData = projectSerializer.read(projectFileHandle);
-
-			cleanData();
 
 			ParticleEmitterWrapper firstEmitter = null;
 
@@ -177,7 +177,9 @@ public class Project {
 	}
 
 	private void cleanData() {
-		TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
+		TalosMain.Instance().UIStage().PreviewWidget().resetToDefaults();
+
+
 		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
 		activeWrappers.clear();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
