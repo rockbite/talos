@@ -23,12 +23,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
+import com.rockbite.tools.talos.editor.UIStage;
 import com.rockbite.tools.talos.editor.assets.ProjectAssetProvider;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
 import com.rockbite.tools.talos.editor.serialization.*;
+import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
@@ -42,6 +45,7 @@ import com.rockbite.tools.talos.runtime.serialization.ExportData;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class Project {
 
@@ -57,9 +61,17 @@ public class Project {
 
 	private String currentProjectPath = null;
 
+	private String projectFileName = null;
+
+	public FileTab currentTab;
+
 	private LegacyImporter importer;
 
 	private ProjectAssetProvider projectAssetProvider;
+
+	private ObjectMap<String, String> fileCache = new ObjectMap<>();
+	private ObjectMap<String, String> pathCache = new ObjectMap<>();
+	private boolean loading = false;
 
 	public Project () {
 		projectAssetProvider = new ProjectAssetProvider();
@@ -75,63 +87,83 @@ public class Project {
 	}
 
 	public void loadProject (FileHandle projectFileHandle) {
+		if (projectFileHandle.exists()) {
+			currentProjectPath = projectFileHandle.path();
+			projectFileName = projectFileHandle.name();
+			loadProject(projectFileHandle.readString());
+
+			currentTab = new FileTab(projectFileName);
+			TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
+		} else {
+			//error handle
+		}
+	}
+
+	public void loadProject (String data) {
+		loading = true;
 		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
 
-		if (projectFileHandle.exists()) {
-			cleanData();
+		cleanData();
 
-			currentProjectPath = projectFileHandle.path();
-			projectData = projectSerializer.read(projectFileHandle);
+		projectData = projectSerializer.read(data);
 
-			ParticleEmitterWrapper firstEmitter = null;
+		ParticleEmitterWrapper firstEmitter = null;
 
-			for(EmitterData emitterData: projectData.getEmitters()) {
-				IntMap<ModuleWrapper> map = new IntMap<>();
+		for(EmitterData emitterData: projectData.getEmitters()) {
+			IntMap<ModuleWrapper> map = new IntMap<>();
 
-				ParticleEmitterWrapper emitterWrapper = createNewEmitter(emitterData.name, emitterData.sortPosition);
+			ParticleEmitterWrapper emitterWrapper = createNewEmitter(emitterData.name, emitterData.sortPosition);
 
-				TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
+			TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
 
-				final ParticleEmitterDescriptor graph = emitterWrapper.getGraph();
-				for (ModuleWrapper module : emitterData.modules) {
-					map.put(module.getId(), module);
+			final ParticleEmitterDescriptor graph = emitterWrapper.getGraph();
+			for (ModuleWrapper module : emitterData.modules) {
+				map.put(module.getId(), module);
 
-					graph.addModule(module.getModule());
-					module.getModule().setModuleGraph(graph);
-				}
+				graph.addModule(module.getModule());
+				module.getModule().setModuleGraph(graph);
+			}
 
 
-				// time to load groups here
-				for(GroupData group: emitterData.groups) {
-					ObjectSet<ModuleWrapper> childWrappers = new ObjectSet<>();
-					for(Integer id: group.modules) {
-						if(map.get(id) != null) {
-							childWrappers.add(map.get(id));
-						}
+			// time to load groups here
+			for(GroupData group: emitterData.groups) {
+				ObjectSet<ModuleWrapper> childWrappers = new ObjectSet<>();
+				for(Integer id: group.modules) {
+					if(map.get(id) != null) {
+						childWrappers.add(map.get(id));
 					}
-					ModuleWrapperGroup moduleWrapperGroup = TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupForWrappers(childWrappers);
-					Color clr = new Color();
-					Color.abgr8888ToColor(clr, group.color);
-					moduleWrapperGroup.setData(group.text, clr);
 				}
+				ModuleWrapperGroup moduleWrapperGroup = TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupForWrappers(childWrappers);
+				Color clr = new Color();
+				Color.abgr8888ToColor(clr, group.color);
+				moduleWrapperGroup.setData(group.text, clr);
 			}
-
-			sortEmitters();
-
-			if(activeWrappers.size > 0) {
-				firstEmitter = activeWrappers.first();
-			}
-
-			if(firstEmitter != null) {
-				TalosMain.Instance().Project().setCurrentEmitterWrapper(firstEmitter);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(firstEmitter);
-			}
-
-			TalosMain.Instance().UIStage().setEmitters(activeWrappers);
-
-		} else {
-			//Error handle
 		}
+
+		sortEmitters();
+
+		if(activeWrappers.size > 0) {
+			firstEmitter = activeWrappers.first();
+		}
+
+		if(firstEmitter != null) {
+			TalosMain.Instance().Project().setCurrentEmitterWrapper(firstEmitter);
+			TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(firstEmitter);
+		}
+
+		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+
+		loading = false;
+	}
+
+	private void saveProjectToCache(String projectFileName) {
+		fileCache.put(projectFileName, getProjectString());
+		pathCache.put(projectFileName, currentProjectPath);
+	}
+
+	private void getProjectFromCache(String projectFileName) {
+		loadProject(fileCache.get(projectFileName));
+		currentProjectPath = pathCache.get(projectFileName);
 	}
 
 	public void sortEmitters() {
@@ -154,31 +186,56 @@ public class Project {
 	}
 
 	public void saveProject (FileHandle destination) {
-		projectData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
-		projectSerializer.write(destination, projectData);
-
+		String data = getProjectString();
+		destination.writeString(data, false);
+		currentTab.setDirty(false);
 		currentProjectPath = destination.path();
+		projectFileName = destination.name();
+
+		if(!currentTab.getFileName().equals(projectFileName)) {
+			clearCache(currentTab.getFileName());
+			currentTab.setFileName(projectFileName);
+			TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
+			fileCache.put(projectFileName, data);
+		}
+
 	}
 
-	public void loadDefaultProject() {
-		FileHandle fileHandle = Gdx.files.internal("samples/fire.tls");
-		if (fileHandle.exists()) {
-			TalosMain.Instance().Project().loadProject(fileHandle);
-		} else {
-			newProject();
-		}
+	public String getProjectString () {
+		projectData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
+		String data = projectSerializer.write(projectData);
+
+		return data;
 	}
 
 	public void newProject () {
+		if(currentTab != null) {
+			saveProjectToCache(projectFileName);
+		}
+
+		String newName = getNewFilename();
+		FileTab tab = new FileTab(newName);
+		TalosMain.Instance().UIStage().tabbedPane.add(tab);
+
 		cleanData();
 		projectData = new ProjectData();
 		createNewEmitter("default_emitter", 0);
 		currentProjectPath = null;
 	}
 
+	public String getNewFilename() {
+		int index = 1;
+		String name = "effect" + index + ".tls";
+		while (fileCache.containsKey(name)) {
+			index++;
+			name = "effect" + index + ".tls";
+		}
+
+		return name;
+	}
+
 	private void cleanData() {
 		TalosMain.Instance().UIStage().PreviewWidget().resetToDefaults();
-
 
 		TalosMain.Instance().NodeStage().moduleBoardWidget.clearAll();
 		activeWrappers.clear();
@@ -332,7 +389,38 @@ public class Project {
 
 	}
 
+	public void setDirty() {
+		if(!loading) {
+			currentTab.setDirty(true);
+		}
+	}
+
 	public Array<ParticleEmitterWrapper> getActiveWrappers() {
 		return activeWrappers;
+	}
+
+	public void loadFromTab(FileTab tab) {
+		String fileName = tab.getFileName();
+
+		if(currentTab != null) {
+			saveProjectToCache(projectFileName);
+			if(fileCache.containsKey(fileName)) {
+				getProjectFromCache(fileName);
+			}
+		}
+
+		projectFileName = fileName;
+		currentTab = tab;
+	}
+
+	public void removeTab(FileTab tab) {
+		String fileName = tab.getFileName();
+		clearCache(fileName);
+		currentTab = null;
+	}
+
+	public void clearCache(String fileName) {
+		pathCache.remove(fileName);
+		fileCache.remove(fileName);
 	}
 }

@@ -29,6 +29,10 @@ public class ProjectSerializer {
 
     public ProjectData read (FileHandle fileHandle) {
         if(!fileHandle.exists()) return null;
+        return read(fileHandle.readString());
+    }
+
+    public ProjectData read (String data) {
         Json json = new Json();
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: WrapperRegistry.map.values()) {
@@ -37,11 +41,14 @@ public class ProjectSerializer {
         for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
             json.addClassTag(clazz.getSimpleName(), clazz);
         }
-        return json.fromJson(ProjectData.class, fileHandle);
-
+        return json.fromJson(ProjectData.class, data);
     }
 
     public void write (FileHandle fileHandle, ProjectData projectData) {
+        fileHandle.writeString(write(projectData), false);
+    }
+
+    public String write (ProjectData projectData) {
         Json json = new Json();
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: WrapperRegistry.map.values()) {
@@ -52,7 +59,8 @@ public class ProjectSerializer {
         }
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(projectData);
-        fileHandle.writeString(data, false);
+
+        return data;
     }
 
     public void writeExport(FileHandle fileHandle, ExportData exportData) {

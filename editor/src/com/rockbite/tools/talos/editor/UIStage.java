@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -44,12 +45,15 @@ import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
+import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleListPopup;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
-import com.rockbite.tools.talos.editor.widgets.ui.SearchFilteredTree;
 import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
 import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
@@ -77,6 +81,8 @@ public class UIStage {
 
 	ModuleListPopup moduleListPopup;
 
+	public TabbedPane tabbedPane;
+
 	public UIStage (Skin skin) {
 		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
 		this.skin = skin;
@@ -91,6 +97,7 @@ public class UIStage {
 
 		defaults();
 		constructMenu();
+		constructTabPane();
 		constructSplitPanes();
 
 		initFileChoosers();
@@ -310,6 +317,33 @@ public class UIStage {
 		});
 	}
 
+
+	private void constructTabPane() {
+		tabbedPane = new TabbedPane();
+		fullScreenTable.row();
+		fullScreenTable.add(tabbedPane.getTable()).left().expandX().fillX().growX();
+
+		tabbedPane.addListener(new TabbedPaneListener() {
+			@Override
+			public void switchedTab(Tab tab) {
+				TalosMain.Instance().Project().loadFromTab((FileTab) tab);
+			}
+
+			@Override
+			public void removedTab(Tab tab) {
+				TalosMain.Instance().Project().removeTab((FileTab) tab);
+				if(tabbedPane.getTabs().size == 0) {
+					TalosMain.Instance().Project().newProject();
+				}
+			}
+
+			@Override
+			public void removedAllTabs() {
+
+			}
+		});
+	}
+
 	public PopupMenu createModuleListPopup() {
 		OrthographicCamera cam = (OrthographicCamera) TalosMain.Instance().NodeStage().getStage().getCamera();
 		Vector2 location = new Vector2(cam.position.x, cam.position.y);
@@ -378,7 +412,7 @@ public class UIStage {
 		stage.addActor(fileChooser.fadeIn());
 	}
 
-	private void saveProjectAction() {
+	public void saveProjectAction() {
 		if(!TalosMain.Instance().Project().isBoundToFile()) {
 			saveAsProjectAction();
 		} else {
