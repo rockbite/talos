@@ -402,4 +402,10 @@ public class PreviewWidget extends ViewportWidget {
             dragPoints.clear();
         }
     }
+
+    @Override
+    public void setCameraZoom(float zoom) {
+        super.setCameraZoom(zoom);
+        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
+    }
 }

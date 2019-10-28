@@ -16,6 +16,7 @@
 
 package com.rockbite.tools.talos.editor.serialization;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
@@ -36,6 +37,12 @@ public class MetaData implements Json.Serializable {
         }
         json.writeArrayEnd();
 
+        // now sync preview widget stuff
+        float camX = TalosMain.Instance().UIStage().PreviewWidget().getCameraPosX();
+        float camY = TalosMain.Instance().UIStage().PreviewWidget().getCameraPosY();
+
+        json.writeValue("previewCamPos", new Vector2(camX, camY));
+        json.writeValue("previewCamZoom", TalosMain.Instance().UIStage().PreviewWidget().getCameraZoom());
     }
 
     @Override
@@ -47,5 +54,15 @@ public class MetaData implements Json.Serializable {
             val.set(item.get(0).asFloat(), item.get(1).asFloat(), item.get(2).asFloat(), item.get(3).asFloat());
             TalosMain.Instance().globalScope.setDynamicValue(iter++, val);
         }
+
+        // preview widget stuff
+        if(jsonData.has("previewCamPos")) {
+            JsonValue camPos = jsonData.get("previewCamPos");
+            TalosMain.Instance().UIStage().PreviewWidget().setCameraPos(camPos.getFloat("x", 0), camPos.getFloat("y", 0));
+        } else {
+            TalosMain.Instance().UIStage().PreviewWidget().setCameraPos(0, 0);
+        }
+
+        TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
     }
 }

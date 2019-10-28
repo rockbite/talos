@@ -492,7 +492,7 @@ public class UIStage {
 		});
 		libraryContainer.setTouchable(Touchable.enabled);
 		VisSplitPane bottomPane = new VisSplitPane(timelineContainer, libraryContainer, false);
-
+		bottomPane.setSplitAmount(1f); // remove this line when the bottom-right panel content will be implemented
 		timelineContainer.add(timelineWidget).grow().expand().fill();
 		bottomTable.add(bottomPane).expand().grow();
 

@@ -156,4 +156,23 @@ public abstract class ViewportWidget extends Table {
 
     public abstract void drawContent(Batch batch, float parentAlpha);
 
+    public float getCameraPosX() {
+        return camera.position.x;
+    }
+
+    public float getCameraPosY() {
+        return camera.position.y;
+    }
+
+    public float getCameraZoom() {
+        return camera.zoom;
+    }
+
+    public void setCameraPos(float x, float y) {
+        camera.position.set(x, y, 0);
+    }
+
+    public void setCameraZoom(float zoom) {
+        camera.zoom = zoom;
+    }
 }
