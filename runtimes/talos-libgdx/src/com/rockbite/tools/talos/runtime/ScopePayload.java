@@ -34,6 +34,7 @@ public class ScopePayload {
     public static final int DRAWABLE_ASPECT_RATIO = 5;
     public static final int SECONDARY_SEED = 6;
     public static final int TOTAL_TIME = 7;
+    public static final int PARTICLE_POSITION = 8;
 
     private IntMap<NumericalValue> map = new IntMap<>();
 
@@ -50,6 +51,10 @@ public class ScopePayload {
 
     public void set(int index, float value) {
         map.get(index).set(value);
+    }
+
+    public void set(int index, Vector2 value) {
+        map.get(index).set(value.x, value.y);
     }
 
     public void set(int index, NumericalValue value) {

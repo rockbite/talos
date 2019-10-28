@@ -31,6 +31,7 @@
     </category>
     <category name = "Motion and Physics">
         <module name = "Fake Motion Blur" wrapper = "FakeMotionBlurModuleWrapper">FakeMotionBlurModule</module>
+        <module name = "Vector Field" wrapper = "VectorFieldModuleWrapper">VectorFieldModule</module>
     </category>
     <category name = "Curves and Math">
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
@@ -39,6 +40,8 @@
     </category>
     <category name = "Adapters">
         <module name = "Beam Position" wrapper = "FromToModuleWrapper">FromToModule</module>
+        <module name = "Cartesian to Radial" wrapper = "CartToRadModuleWrapper">CartToRadModule</module>
+        <module name = "Radial to Cartesian" wrapper = "RadToCartModuleWrapper">RadToCartModule</module>
     </category>
     <category name = "Advanced">
         <module name = "Emitter Config" wrapper = "EmConfigModuleWrapper">EmConfigModule</module>

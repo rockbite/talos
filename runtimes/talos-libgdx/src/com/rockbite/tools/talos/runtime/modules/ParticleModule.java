@@ -95,6 +95,7 @@ public class ParticleModule extends Module {
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
         getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
         getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
+        getScope().set(ScopePayload.PARTICLE_POSITION, particle.position);
     }
 
     public ParticleDrawable getDrawable() {
