@@ -146,7 +146,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         mainStage.getCurrentModuleGraph().removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
         mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot, true);
 
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
@@ -434,17 +434,17 @@ public class ModuleBoardWidget extends WidgetGroup {
             group.removeWrapper(wrapper);
         }
 
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
         final Module module;
         try {
             module = ClassReflection.newInstance(clazz);
-            module.setModuleGraph(TalosMain.Instance().Project().getCurrentModuleGraph());
+            module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
 
-            if (TalosMain.Instance().Project().getCurrentModuleGraph().addModule(module)) {
-                TalosMain.Instance().Project().setDirty();
+            if (TalosMain.Instance().TalosProject().getCurrentModuleGraph().addModule(module)) {
+                TalosMain.Instance().ProjectController().setDirty();
                 return createModuleWrapper(module, x, y);
             } else {
                 System.out.println("Did not create module: " + clazz.getSimpleName());
@@ -654,7 +654,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         from.attachModuleToMyOutput(to, slotFrom, slotTo);
         to.attachModuleToMyInput(from, slotTo, slotFrom);
 
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void connectNodeIfCan(ModuleWrapper currentWrapper, int currentSlot, boolean currentIsInput) {
@@ -800,7 +800,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 }
             }
         }
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void wrapperClickedUp(ModuleWrapper wrapper) {
@@ -834,7 +834,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         groupContainer.addActor(group);
 
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
 
         clearSelection();
 
@@ -853,7 +853,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             other.removeWrappers(wrappers);
         }
 
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void ungroupSelectedWrappers() {

@@ -29,11 +29,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
-import com.rockbite.tools.talos.editor.project.Project;
-import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ParticleEmitterInstance;
-
-import java.util.Comparator;
 
 public class TimelineWidget extends Table {
 
@@ -87,7 +83,7 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                final ParticleEmitterWrapper emitter = TalosMain.Instance().Project().createNewEmitter("emitter", -1);
+                final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", -1);
                 selectRow(emitter);
             }
         });
@@ -99,7 +95,7 @@ public class TimelineWidget extends Table {
 
                 ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
 
-                TalosMain.Instance().Project().removeEmitter(wrapper);
+                TalosMain.Instance().TalosProject().removeEmitter(wrapper);
             }
         });
 
@@ -132,7 +128,7 @@ public class TimelineWidget extends Table {
         int pos = wrapper.getEmitter().getSortPosition();
         int newPos = pos + changeBy;
 
-        Array<ParticleEmitterInstance> emitters = TalosMain.Instance().Project().getParticleEffect().getEmitters();
+        Array<ParticleEmitterInstance> emitters = TalosMain.Instance().TalosProject().getParticleEffect().getEmitters();
 
         if(newPos < 0 || newPos > emitters.size-1) return;
 
@@ -143,7 +139,7 @@ public class TimelineWidget extends Table {
         emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
         emTwo.emitterGraph.setSortPosition(tmp);
 
-        TalosMain.Instance().Project().sortEmitters();
+        TalosMain.Instance().TalosProject().sortEmitters();
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
@@ -163,7 +159,7 @@ public class TimelineWidget extends Table {
         listContent.add().expandY();
 
         if(emitterWrappers.size > 0) {
-            selectRow(TalosMain.Instance().Project().getCurrentEmitterWrapper());
+            selectRow(TalosMain.Instance().TalosProject().getCurrentEmitterWrapper());
         }
     }
 
@@ -177,7 +173,7 @@ public class TimelineWidget extends Table {
             }
         }
 
-        TalosMain.Instance().Project().setCurrentEmitterWrapper(emitterWrapper);
+        TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(emitterWrapper);
         TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrapper);
     }
 
@@ -259,7 +255,7 @@ public class TimelineWidget extends Table {
             eye.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    TalosMain.Instance().Project().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(!isMuted());
+                    TalosMain.Instance().TalosProject().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(!isMuted());
                 }
             });
 

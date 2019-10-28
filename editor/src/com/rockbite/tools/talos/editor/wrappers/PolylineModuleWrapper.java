@@ -95,7 +95,7 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
                 final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().Project().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
+                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
                 final TextureRegion textureRegion = new TextureRegion(texture);
                 module.setRegion(fileHandle.nameWithoutExtension(), textureRegion);
                 dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
@@ -119,7 +119,7 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
         fileName = jsonData.getString("fileName", null);
         filePath = jsonData.getString("filePath", null);
         if (filePath != null) {
-            final TextureRegion region = TalosMain.Instance().Project().getProjectAssetProvider().findRegion(fileName);
+            final TextureRegion region = TalosMain.Instance().TalosProject().getProjectAssetProvider().findRegion(fileName);
             if (region != null) {
                 dropWidget.setDrawable(new TextureRegionDrawable(region));
                 module.setRegion(fileName, region);
@@ -127,7 +127,7 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
                 FileHandle fileHandle = tryAndFineTexture(filePath);
 
                 final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().Project().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
+                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
                 final TextureRegion textureRegion = new TextureRegion(texture);
                 module.setRegion(fileHandle.nameWithoutExtension(), textureRegion);
                 dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
@@ -149,8 +149,8 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
         FileHandle fileHandle = Gdx.files.absolute(path);
         String fileName = fileHandle.name();
         if(!fileHandle.exists()) {
-            if(TalosMain.Instance().Project().getPath() != null) {
-                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().Project().getPath()).parent();
+            if(TalosMain.Instance().ProjectController().getPath() != null) {
+                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().ProjectController().getPath()).parent();
                 fileHandle = Gdx.files.absolute(parent.path() + "/" + fileName);
             }
 

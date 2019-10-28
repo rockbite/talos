@@ -197,13 +197,13 @@ public class NodeStage {
     }
 
     public ParticleEmitterDescriptor getCurrentModuleGraph() {
-        return TalosMain.Instance().Project().getCurrentModuleGraph();
+        return TalosMain.Instance().TalosProject().getCurrentModuleGraph();
     }
 
 
     public void onEmitterRemoved (ParticleEmitterWrapper wrapper) {
         moduleBoardWidget.removeEmitter(wrapper);
-        moduleBoardWidget.setCurrentEmitter(TalosMain.Instance().Project().getCurrentEmitterWrapper());
+        moduleBoardWidget.setCurrentEmitter(TalosMain.Instance().TalosProject().getCurrentEmitterWrapper());
     }
 
     public void fileDrop(String[] paths, float x, float y) {

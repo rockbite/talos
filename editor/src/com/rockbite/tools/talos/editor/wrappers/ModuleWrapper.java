@@ -658,7 +658,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
     }
 
     protected void setDirty() {
-        TalosMain.Instance().Project().setDirty();
+        TalosMain.Instance().ProjectController().setDirty();
     }
 }
 

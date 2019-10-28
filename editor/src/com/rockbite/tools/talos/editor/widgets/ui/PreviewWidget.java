@@ -21,13 +21,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.IndexData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -40,16 +37,10 @@ import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.wrappers.FromToModuleWrapper;
 import com.rockbite.tools.talos.editor.wrappers.IDragPointProvider;
-import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
-import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
-
-import java.lang.reflect.Field;
-import java.util.Hashtable;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -174,7 +165,7 @@ public class PreviewWidget extends ViewportWidget {
                 pos.set(tmp.x, tmp.y);
 
                 if(moving) {
-                    final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
+                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
                     particleEffect.setPosition(tmp.x, tmp.y);
                 } else {
                     getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
@@ -252,7 +243,7 @@ public class PreviewWidget extends ViewportWidget {
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
                 final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().Project().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
+                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
                 final TextureRegion textureRegion = new TextureRegion(texture);
                 previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
                 previewController.setImageWidth(10);
@@ -272,7 +263,7 @@ public class PreviewWidget extends ViewportWidget {
         }
 
         long timeBefore = TimeUtils.nanoTime();
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         particleEffect.update(Gdx.graphics.getDeltaTime());
         cpuTime.put( TimeUtils.timeSinceNanos(timeBefore));
 
@@ -350,7 +341,7 @@ public class PreviewWidget extends ViewportWidget {
 
         long timeBefore = TimeUtils.nanoTime();
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().Project().getParticleEffect();
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         particleEffect.render(particleRenderer);
 
         batch.flush();

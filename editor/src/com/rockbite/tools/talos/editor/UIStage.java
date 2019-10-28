@@ -26,7 +26,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -163,9 +162,9 @@ public class UIStage {
 		modulesMenu.addItem(removeSelectedModules);
 		modulesMenu.addItem(groupSelectedModules);
 
-		MenuItem newProject = new MenuItem("New Project");
-		MenuItem openProject = new MenuItem("Open Project");
-		MenuItem saveProject = new MenuItem("Save Project");
+		MenuItem newProject = new MenuItem("New TalosProject");
+		MenuItem openProject = new MenuItem("Open TalosProject");
+		MenuItem saveProject = new MenuItem("Save TalosProject");
 		MenuItem export = new MenuItem("Export");
 		MenuItem examples = new MenuItem("Examples");
 
@@ -182,7 +181,7 @@ public class UIStage {
 		PopupMenu examplesPopup = new PopupMenu();
 		examples.setSubMenu(examplesPopup);
 		initExampleList(examplesPopup);
-		MenuItem saveAsProject = new MenuItem("Save As Project");
+		MenuItem saveAsProject = new MenuItem("Save As TalosProject");
 		MenuItem exitApp = new MenuItem("Exit");
 
 		projectMenu.addItem(newProject);
@@ -302,7 +301,7 @@ public class UIStage {
 			@Override
 			public boolean keyDown(InputEvent event, int keycode) {
 				if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					TalosMain.Instance().Project().newProject();
+					TalosMain.Instance().ProjectController().newProject();
 				}
 				if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 					openProjectAction();
@@ -326,14 +325,14 @@ public class UIStage {
 		tabbedPane.addListener(new TabbedPaneListener() {
 			@Override
 			public void switchedTab(Tab tab) {
-				TalosMain.Instance().Project().loadFromTab((FileTab) tab);
+				TalosMain.Instance().ProjectController().loadFromTab((FileTab) tab);
 			}
 
 			@Override
 			public void removedTab(Tab tab) {
-				TalosMain.Instance().Project().removeTab((FileTab) tab);
+				TalosMain.Instance().ProjectController().removeTab((FileTab) tab);
 				if(tabbedPane.getTabs().size == 0) {
-					TalosMain.Instance().Project().newProject();
+					TalosMain.Instance().ProjectController().newProject();
 				}
 			}
 
@@ -387,7 +386,7 @@ public class UIStage {
 
 
 	private void newProjectAction() {
-		TalosMain.Instance().Project().newProject();
+		TalosMain.Instance().ProjectController().newProject();
 	}
 
 
@@ -405,7 +404,7 @@ public class UIStage {
 		fileChooser.setListener(new FileChooserAdapter() {
 			@Override
 			public void selected (Array<FileHandle> file) {
-				TalosMain.Instance().Project().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
+				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
 			}
 		});
 
@@ -413,10 +412,10 @@ public class UIStage {
 	}
 
 	public void saveProjectAction() {
-		if(!TalosMain.Instance().Project().isBoundToFile()) {
+		if(!TalosMain.Instance().ProjectController().isBoundToFile()) {
 			saveAsProjectAction();
 		} else {
-			TalosMain.Instance().Project().saveProject();
+			TalosMain.Instance().ProjectController().saveProject();
 		}
 	}
 
@@ -442,7 +441,7 @@ public class UIStage {
 					path += ".p";
 				}
 				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().Project().exportProject(handle);
+				TalosMain.Instance().TalosProject().exportProject(handle);
 			}
 		});
 
@@ -471,7 +470,7 @@ public class UIStage {
 					path += ".tls";
 				}
 				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().Project().saveProject(handle);
+				TalosMain.Instance().ProjectController().saveProject(handle);
 			}
 		});
 
@@ -488,7 +487,8 @@ public class UIStage {
 		fileChooser.setListener(new FileChooserAdapter() {
 			@Override
 			public void selected (Array<FileHandle> file) {
-				TalosMain.Instance().Project().importFromLegacyFormat(file.get(0));
+				TalosMain.Instance().TalosProject().importFromLegacyFormat(file.get(0));
+				TalosMain.Instance().ProjectController().unbindFromFile();
 			}
 		});
 
@@ -566,8 +566,8 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
-					TalosMain.Instance().Project().loadProject(Gdx.files.internal("samples/" + fileName));
-					TalosMain.Instance().Project().resetCurrentProjectPath();
+					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
+					TalosMain.Instance().ProjectController().unbindFromFile();
 				}
 			});
 		}

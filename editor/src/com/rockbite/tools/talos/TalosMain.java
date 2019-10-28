@@ -20,27 +20,22 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
-import com.rockbite.tools.talos.editor.project.Project;
+import com.rockbite.tools.talos.editor.project.IProject;
+import com.rockbite.tools.talos.editor.project.TalosProject;
+import com.rockbite.tools.talos.editor.project.ProjectController;
 import com.rockbite.tools.talos.editor.utils.CameraController;
 import com.rockbite.tools.talos.editor.utils.DropTargetListenerAdapter;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
-import java.io.File;
-import java.util.List;
 
 public class TalosMain extends ApplicationAdapter {
 
@@ -48,7 +43,7 @@ public class TalosMain extends ApplicationAdapter {
 	private NodeStage nodeStage;
 	private CameraController cameraController;
 
-	private Project project;
+	private ProjectController projectController;
 
 	private Skin skin;
 
@@ -74,8 +69,16 @@ public class TalosMain extends ApplicationAdapter {
 
 	private Preferences preferences;
 
-	public Project Project () {
-		return project;
+	public TalosProject TalosProject() {
+		return (TalosProject) projectController.getProject();
+	}
+
+	public IProject Project() {
+		return projectController.getProject();
+	}
+
+	public ProjectController ProjectController () {
+		return projectController;
 	}
 
 	public Preferences Prefs() {
@@ -111,7 +114,9 @@ public class TalosMain extends ApplicationAdapter {
 		uiStage = new UIStage(skin);
 		nodeStage = new NodeStage(skin);
 
-		project = new Project();
+		projectController = new ProjectController();
+		IProject project = new TalosProject();
+		projectController.setProject(project);
 
 		cameraController = new CameraController((OrthographicCamera)nodeStage.getStage().getCamera());
 
@@ -121,8 +126,8 @@ public class TalosMain extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage.getStage(), nodeStage.getStage(), cameraController));
 
 		// final init after all is done
-		//TalosMain.Instance().Project().loadDefaultProject();
-		TalosMain.Instance().Project().newProject();
+		//TalosMain.Instance().TalosProject().loadDefaultProject();
+		TalosMain.Instance().ProjectController().newProject();
 	}
 
 	@Override
