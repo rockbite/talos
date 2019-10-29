@@ -17,6 +17,12 @@ public class ProjectController {
 
     IProject currentProject;
 
+    public static TalosProject TLS = new TalosProject();
+
+    public ProjectController() {
+        currentProject = TLS;
+    }
+
     public void loadProject (FileHandle projectFileHandle) {
         if (projectFileHandle.exists()) {
             currentProjectPath = projectFileHandle.path();
@@ -26,7 +32,7 @@ public class ProjectController {
             currentProject.loadProject(projectFileHandle.readString());
             loading = false;
 
-            currentTab = new FileTab(projectFileName);
+            currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
         } else {
             //error handle
@@ -67,25 +73,25 @@ public class ProjectController {
         }
     }
 
-    public void newProject () {
+    public void newProject (IProject project) {
         if(currentTab != null) {
             saveProjectToCache(projectFileName);
         }
 
-        String newName = getNewFilename();
-        FileTab tab = new FileTab(newName);
+        String newName = getNewFilename(project);
+        FileTab tab = new FileTab(newName, project);
         TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
         currentProject.resetToNew();
         currentProjectPath = null;
     }
 
-    public String getNewFilename() {
+    public String getNewFilename(IProject project) {
         int index = 1;
-        String name = "effect" + index + ".tls";
+        String name = project.getProjectNameTemplate() + index + project.getExtension();
         while (fileCache.containsKey(name)) {
             index++;
-            name = "effect" + index + ".tls";
+            name = project.getProjectNameTemplate() + index + project.getExtension();
         }
 
         return name;
@@ -115,13 +121,20 @@ public class ProjectController {
 
         if(currentTab != null) {
             saveProjectToCache(projectFileName);
-            if(fileCache.containsKey(fileName)) {
-                getProjectFromCache(fileName);
-            }
+        }
+        if(fileCache.containsKey(fileName)) {
+            currentProject = tab.getProjectType();
+            getProjectFromCache(fileName);
         }
 
         projectFileName = fileName;
         currentTab = tab;
+        currentProject = currentTab.getProjectType();
+        if(tab.getProjectType() == TLS) {
+            TalosMain.Instance().UIStage().swapToTalosContent();
+        } else {
+            currentProject.initUIContent();
+        }
     }
 
     public void removeTab(FileTab tab) {

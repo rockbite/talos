@@ -147,6 +147,21 @@ public class TalosProject implements IProject {
 		createNewEmitter("default_emitter", 0);
 	}
 
+	@Override
+	public String getExtension() {
+		return ".tls";
+	}
+
+	@Override
+	public String getProjectNameTemplate() {
+		return "effect";
+	}
+
+	@Override
+	public void initUIContent() {
+
+	}
+
 	private void cleanData() {
 		TalosMain.Instance().UIStage().PreviewWidget().resetToDefaults();
 

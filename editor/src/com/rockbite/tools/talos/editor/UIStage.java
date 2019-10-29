@@ -50,6 +50,7 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
+import com.rockbite.tools.talos.editor.project.ProjectController;
 import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleListPopup;
 import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
@@ -81,6 +82,16 @@ public class UIStage {
 	ModuleListPopup moduleListPopup;
 
 	public TabbedPane tabbedPane;
+
+	private Menu toolsMenu;
+
+	private VisSplitPane bottomPane;
+	private Table leftTable;
+	private Table rightTable;
+	private Table bottomTable;
+
+	private Table bottomContainer;
+
 
 	public UIStage (Skin skin) {
 		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
@@ -139,6 +150,8 @@ public class UIStage {
 		menuBar.addMenu(projectMenu);
 		Menu modulesMenu = new Menu("Modules");
 		menuBar.addMenu(modulesMenu);
+		toolsMenu = new Menu("Tools");
+		menuBar.addMenu(toolsMenu);
 		Menu helpMenu = new Menu("Help");
 		MenuItem about = new MenuItem("About");
 		helpMenu.addItem(about);
@@ -301,7 +314,7 @@ public class UIStage {
 			@Override
 			public boolean keyDown(InputEvent event, int keycode) {
 				if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					TalosMain.Instance().ProjectController().newProject();
+					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 				}
 				if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 					openProjectAction();
@@ -332,7 +345,7 @@ public class UIStage {
 			public void removedTab(Tab tab) {
 				TalosMain.Instance().ProjectController().removeTab((FileTab) tab);
 				if(tabbedPane.getTabs().size == 0) {
-					TalosMain.Instance().ProjectController().newProject();
+					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 				}
 			}
 
@@ -386,7 +399,7 @@ public class UIStage {
 
 
 	private void newProjectAction() {
-		TalosMain.Instance().ProjectController().newProject();
+		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 
@@ -507,11 +520,11 @@ public class UIStage {
 		timelineWidget = new TimelineWidget(skin);
 
 		Table midTable = new Table();
-		Table bottomTable = new Table();
+		bottomTable = new Table();
 		bottomTable.setSkin(skin);
 		bottomTable.setBackground(skin.getDrawable("button-main-menu"));
 
-		Table timelineContainer = new Table();
+		bottomContainer = new Table();
 		Table libraryContainer = new Table();
 
 		libraryContainer.addListener(new ClickListener(0) { //Quick hack for library container intercepting touch as its an empty table currently
@@ -525,9 +538,9 @@ public class UIStage {
 			}
 		});
 		libraryContainer.setTouchable(Touchable.enabled);
-		VisSplitPane bottomPane = new VisSplitPane(timelineContainer, libraryContainer, false);
+		bottomPane = new VisSplitPane(bottomContainer, libraryContainer, false);
 		bottomPane.setSplitAmount(1f); // remove this line when the bottom-right panel content will be implemented
-		timelineContainer.add(timelineWidget).grow().expand().fill();
+		bottomContainer.add(timelineWidget).grow().expand().fill();
 		bottomTable.add(bottomPane).expand().grow();
 
 		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
@@ -535,9 +548,10 @@ public class UIStage {
 		verticalPane.setMinSplitAmount(0.2f);
 		verticalPane.setSplitAmount(0.7f);
 
-		Table leftTable = new Table(); leftTable.setSkin(skin);
+		leftTable = new Table();
+		leftTable.setSkin(skin);
 		leftTable.add(previewWidget).grow();
-		Table rightTable = new Table(); rightTable.setSkin(skin);
+		rightTable = new Table(); rightTable.setSkin(skin);
 		rightTable.add().grow();
 		VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
 		midTable.add(horizontalPane).expand().grow().fill();
@@ -547,6 +561,23 @@ public class UIStage {
 
 		fullScreenTable.row();
 		fullScreenTable.add(verticalPane).grow();
+	}
+
+	public void swapToAddonContent(Table left, Table right, Table bottom) {
+		leftTable.clearChildren();
+		rightTable.clearChildren();
+		bottomTable.clearChildren();
+		TalosMain.Instance().setNodeStageEnabled(false);
+	}
+
+	public void swapToTalosContent() {
+		leftTable.clearChildren();
+		rightTable.clearChildren();
+		bottomTable.clearChildren();
+
+		leftTable.add(previewWidget).grow();
+		bottomTable.add(bottomPane).expand().grow();
+		TalosMain.Instance().setNodeStageEnabled(true);
 	}
 
 
@@ -592,5 +623,9 @@ public class UIStage {
 
 	public PreviewWidget PreviewWidget() {
 		return previewWidget;
+	}
+
+	public Menu getToolsMenu() {
+		return toolsMenu;
 	}
 }

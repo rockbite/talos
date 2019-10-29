@@ -6,4 +6,10 @@ public interface IProject {
     String getProjectString();
 
     void resetToNew();
+
+    String getExtension();
+
+    String getProjectNameTemplate();
+
+    void initUIContent();
 }

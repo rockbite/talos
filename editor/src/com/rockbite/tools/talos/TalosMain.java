@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
+import com.rockbite.tools.talos.editor.addons.AddonController;
 import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.TalosProject;
 import com.rockbite.tools.talos.editor.project.ProjectController;
@@ -51,6 +52,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private static TalosMain instance;
 
+	private AddonController addonController;
+
 	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
 	public static TalosMain Instance () {
@@ -68,6 +71,8 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	private Preferences preferences;
+
+	private boolean nodeStageEnabled = true;
 
 	public TalosProject TalosProject() {
 		return (TalosProject) projectController.getProject();
@@ -103,6 +108,8 @@ public class TalosMain extends ApplicationAdapter {
 	public void create () {
 		TalosMain.instance = this;
 
+		addonController = new AddonController();
+
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
@@ -115,19 +122,18 @@ public class TalosMain extends ApplicationAdapter {
 		nodeStage = new NodeStage(skin);
 
 		projectController = new ProjectController();
-		IProject project = new TalosProject();
-		projectController.setProject(project);
 
 		cameraController = new CameraController((OrthographicCamera)nodeStage.getStage().getCamera());
 
 		uiStage.init();
 		nodeStage.init();
 
+		addonController.initAll();
+
 		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage.getStage(), nodeStage.getStage(), cameraController));
 
 		// final init after all is done
-		//TalosMain.Instance().TalosProject().loadDefaultProject();
-		TalosMain.Instance().ProjectController().newProject();
+		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 	@Override
@@ -135,8 +141,10 @@ public class TalosMain extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		nodeStage.getStage().act();
-		nodeStage.getStage().draw();
+		if(nodeStageEnabled) {
+			nodeStage.getStage().act();
+			nodeStage.getStage().draw();
+		}
 
 		uiStage.getStage().act();
 		uiStage.getStage().draw();
@@ -161,4 +169,7 @@ public class TalosMain extends ApplicationAdapter {
 		return cameraController;
 	}
 
+	public void setNodeStageEnabled(boolean nodeStageEnabled) {
+		this.nodeStageEnabled = nodeStageEnabled;
+	}
 }
