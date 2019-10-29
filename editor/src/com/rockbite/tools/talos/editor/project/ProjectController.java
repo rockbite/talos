@@ -32,7 +32,10 @@ public class ProjectController {
                 if(currentTab.isUnworthy()) {
                     clearCache(currentTab.getFileName());
                 } else {
+                    IProject tmp = currentProject;
+                    currentProject = currentTab.getProjectType();
                     saveProjectToCache(projectFileName);
+                    currentProject = tmp;
                 }
             }
             currentProjectPath = projectFileHandle.path();

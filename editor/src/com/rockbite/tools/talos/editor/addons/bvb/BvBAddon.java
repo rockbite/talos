@@ -21,6 +21,7 @@ public class BvBAddon implements IAddon {
     public void init() {
         BVB = new BvbProject(this);
 
+        /*
         Menu toolsMenu = TalosMain.Instance().UIStage().getToolsMenu();
         MenuItem newBvbProject = new MenuItem("New Skeletal Bridge");
         toolsMenu.addItem(newBvbProject);
@@ -32,6 +33,7 @@ public class BvBAddon implements IAddon {
                 TalosMain.Instance().ProjectController().newProject(BVB);
             }
         });
+        */
 
         buildUI();
     }
@@ -44,6 +46,9 @@ public class BvBAddon implements IAddon {
     public void initUIContent() {
         TalosMain.Instance().UIStage().swapToAddonContent(null, workspace, null);
         TalosMain.Instance().disableNodeStage();
+
+        // now need to disable some menu tabs
+        TalosMain.Instance().UIStage().Menu().disableSave();
     }
 
     @Override

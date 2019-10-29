@@ -17,15 +17,14 @@
 package com.rockbite.tools.talos.editor;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -33,12 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.widget.Menu;
-import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
@@ -52,10 +47,7 @@ import com.rockbite.tools.talos.editor.addons.IAddon;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.project.ProjectController;
-import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
-import com.rockbite.tools.talos.editor.widgets.ui.ModuleListPopup;
-import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
-import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
+import com.rockbite.tools.talos.editor.widgets.ui.*;
 import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 
@@ -76,7 +68,7 @@ public class UIStage {
 
 	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
-	SettingsDialog settingsDialog;
+	public SettingsDialog settingsDialog;
 
 	ColorPicker colorPicker;
 
@@ -84,14 +76,13 @@ public class UIStage {
 
 	public TabbedPane tabbedPane;
 
-	private Menu toolsMenu;
-
 	private VisSplitPane bottomPane;
 	private Table leftTable;
 	private Table rightTable;
 	private Table bottomTable;
 
 	private Table bottomContainer;
+	private MainMenu mainMenu;
 
 
 	public UIStage (Skin skin) {
@@ -164,191 +155,9 @@ public class UIStage {
 	}
 
 	private void constructMenu () {
-		Table topTable = new Table();
-		topTable.setBackground(skin.getDrawable("button-main-menu"));
-
-		MenuBar menuBar = new MenuBar();
-		Menu projectMenu = new Menu("File");
-		menuBar.addMenu(projectMenu);
-		Menu modulesMenu = new Menu("Modules");
-		menuBar.addMenu(modulesMenu);
-		toolsMenu = new Menu("Tools");
-		menuBar.addMenu(toolsMenu);
-		Menu helpMenu = new Menu("Help");
-		MenuItem about = new MenuItem("About");
-		helpMenu.addItem(about);
-		menuBar.addMenu(helpMenu);
-
-		about.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.5", "Many new features. much wow.");
-			}
-		});
-
-		MenuItem createModule = new MenuItem("Create Module");
-		PopupMenu createPopup = createModuleListPopup();
-		createModule.setSubMenu(createPopup);
-		MenuItem removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
-		MenuItem groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
-		MenuItem ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
-		modulesMenu.addItem(createModule);
-		modulesMenu.addItem(removeSelectedModules);
-		modulesMenu.addItem(groupSelectedModules);
-
-		MenuItem newProject = new MenuItem("New TalosProject");
-		MenuItem openProject = new MenuItem("Open TalosProject");
-		MenuItem saveProject = new MenuItem("Save TalosProject");
-		MenuItem export = new MenuItem("Export");
-		MenuItem examples = new MenuItem("Examples");
-
-		MenuItem legacy = new MenuItem("Legacy");
-		PopupMenu legacyPopup = new PopupMenu();
-		MenuItem legacyImportItem = new MenuItem("Import");
-		MenuItem legacyBatchImportItem = new MenuItem("Batch Convert");
-		legacyPopup.addItem(legacyImportItem);
-		legacyPopup.addItem(legacyBatchImportItem);
-		legacy.setSubMenu(legacyPopup);
-
-		MenuItem settings = new MenuItem("Preferences");
-
-		PopupMenu examplesPopup = new PopupMenu();
-		examples.setSubMenu(examplesPopup);
-		initExampleList(examplesPopup);
-		MenuItem saveAsProject = new MenuItem("Save As TalosProject");
-		MenuItem exitApp = new MenuItem("Exit");
-
-		projectMenu.addItem(newProject);
-		projectMenu.addItem(openProject);
-		projectMenu.addItem(saveProject);
-		projectMenu.addItem(saveAsProject);
-		projectMenu.addItem(export);
-		projectMenu.addSeparator();
-		projectMenu.addItem(examples);
-		projectMenu.addItem(legacy);
-		projectMenu.addSeparator();
-		projectMenu.addItem(settings);
-		projectMenu.addSeparator();
-		projectMenu.addItem(exitApp);
-
-		removeSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.deleteSelectedWrappers();
-			}
-		});
-
-		groupSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupFromSelectedWrappers();
-			}
-		});
-
-		ungroupSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.ungroupSelectedWrappers();
-			}
-		});
-
-		newProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				newProjectAction();
-			}
-		});
-
-		openProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				openProjectAction();
-			}
-		});
-
-		saveProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				saveProjectAction();
-			}
-		});
-
-		export.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				exportAction();
-			}
-		});
-
-		saveAsProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				saveAsProjectAction();
-			}
-		});
-
-		legacyImportItem.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				legacyImportAction();
-			}
-		});
-
-		legacyBatchImportItem.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				legacyBatchConvertAction();
-			}
-		});
-
-		exitApp.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				System.exit(0);
-			}
-		});
-		settings.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				stage.addActor(settingsDialog.fadeIn());
-			}
-		});
-
-		topTable.add(menuBar.getTable()).left().grow();
-
-		fullScreenTable.add(topTable).growX();
-
-		// adding key listeners for menu items
-		stage.addListener(new InputListener() {
-			@Override
-			public boolean keyDown(InputEvent event, int keycode) {
-				if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
-				}
-				if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					openProjectAction();
-				}
-				if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					saveProjectAction();
-				}
-
-				return super.keyDown(event, keycode);
-			}
-
-		});
+		mainMenu = new MainMenu(this);
+		mainMenu.build();
+		fullScreenTable.add(mainMenu).growX();
 	}
 
 
@@ -420,12 +229,12 @@ public class UIStage {
 	}
 
 
-	private void newProjectAction() {
+	public void newProjectAction() {
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 
-	private void openProjectAction() {
+	public void openProjectAction() {
 		fileChooser.setMode(FileChooser.Mode.OPEN);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
@@ -454,7 +263,7 @@ public class UIStage {
 		}
 	}
 
-	private void exportAction() {
+	public void exportAction() {
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
@@ -483,7 +292,7 @@ public class UIStage {
 		stage.addActor(fileChooser.fadeIn());
 	}
 
-	private void saveAsProjectAction() {
+	public void saveAsProjectAction() {
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
@@ -605,10 +414,12 @@ public class UIStage {
 		leftTable.add(previewWidget).grow();
 		bottomTable.add(bottomPane).expand().grow();
 		TalosMain.Instance().enableNodeStage();
+
+		mainMenu.enableSave();
 	}
 
 
-	private void initExampleList (PopupMenu examples) {
+	public void initExampleList (PopupMenu examples) {
 		FileHandle list = Gdx.files.internal("samples/list.xml");
 		XmlReader xmlReader = new XmlReader();
 		XmlReader.Element root = xmlReader.parse(list);
@@ -652,7 +463,11 @@ public class UIStage {
 		return previewWidget;
 	}
 
-	public Menu getToolsMenu() {
-		return toolsMenu;
+	public MainMenu Menu() {
+		return mainMenu;
+	}
+
+	public Skin getSkin() {
+		return skin;
 	}
 }
