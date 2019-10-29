@@ -109,11 +109,11 @@ public abstract class ViewportWidget extends Table {
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
 
-        localToScreenCoordinates(temp.set(getX(), getY()));
+        localToScreenCoordinates(temp.set(0, 0));
         int x = (int)temp.x;
         int y = (int)temp.y;
 
-        localToScreenCoordinates(temp.set(getX() + getWidth(), getY() + getHeight()));
+        localToScreenCoordinates(temp.set(getWidth(), getHeight()));
 
         int x2 = (int)temp.x;
         int y2 = (int)temp.y;

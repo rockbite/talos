@@ -27,7 +27,7 @@ public class BvBWorkspace extends ViewportWidget {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.WHITE);
 
-        shapeRenderer.circle(0, 0, 10);
+        shapeRenderer.circle(0, 0, 1f, 20);
         shapeRenderer.end();
 
         batch.begin();
