@@ -263,7 +263,7 @@ public class PreviewWidget extends ViewportWidget {
 
         //stupid hack, plz do it normal way
         if(PreviewWidget.this.hasScrollFocus() && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            camera.position.set(0, 0, 0);
+            resetCamera();
         }
 
         long timeBefore = TimeUtils.nanoTime();

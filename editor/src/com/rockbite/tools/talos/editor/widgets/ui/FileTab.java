@@ -10,6 +10,7 @@ public class FileTab extends Tab {
     public String fileName;
 
     private IProject projectType;
+    private boolean unworthy = false;
 
     public FileTab(String fileName, IProject projectType) {
         super(true, true);
@@ -45,5 +46,17 @@ public class FileTab extends Tab {
 
     public IProject getProjectType() {
         return projectType;
+    }
+
+    public void setUnworthy() {
+        unworthy = true;
+    }
+
+    public void setWorthy() {
+        unworthy = false;
+    }
+
+    public boolean isUnworthy() {
+        return unworthy;
     }
 }

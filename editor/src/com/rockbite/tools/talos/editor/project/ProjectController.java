@@ -27,8 +27,13 @@ public class ProjectController {
 
     public void loadProject (FileHandle projectFileHandle) {
         if (projectFileHandle.exists()) {
+            FileTab prevTab = currentTab;
             if(currentTab != null) {
-                saveProjectToCache(projectFileName);
+                if(currentTab.isUnworthy()) {
+                    clearCache(currentTab.getFileName());
+                } else {
+                    saveProjectToCache(projectFileName);
+                }
             }
             currentProjectPath = projectFileHandle.path();
             projectFileName = projectFileHandle.name();
@@ -38,6 +43,11 @@ public class ProjectController {
 
             currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
+
+
+            if(prevTab != null && prevTab.isUnworthy()) {
+                safeRemoveTab(prevTab);
+            }
         } else {
             //error handle
         }
@@ -78,16 +88,35 @@ public class ProjectController {
     }
 
     public void newProject (IProject project) {
+        FileTab prevTab = currentTab;
         if(currentTab != null) {
-            saveProjectToCache(projectFileName);
+            if(currentTab.isUnworthy()) {
+               clearCache(currentTab.getFileName());
+            } else {
+                saveProjectToCache(projectFileName);
+            }
         }
 
         String newName = getNewFilename(project);
         FileTab tab = new FileTab(newName, project);
+        tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
         TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
         currentProject.resetToNew();
         currentProjectPath = null;
+
+        if(prevTab != null && prevTab.isUnworthy()) {
+            safeRemoveTab(prevTab);
+        }
+    }
+
+    /**
+     * removes tab without listener crap
+     */
+    public void safeRemoveTab(FileTab tab) {
+        FileTab tmp = currentTab;
+        TalosMain.Instance().UIStage().tabbedPane.remove(tab);
+        currentTab = tmp;
     }
 
     public String getNewFilename(IProject project) {
@@ -117,6 +146,7 @@ public class ProjectController {
     public void setDirty() {
         if(!loading) {
             currentTab.setDirty(true);
+            currentTab.setWorthy();
         }
     }
 
