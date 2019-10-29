@@ -1,5 +1,7 @@
 package com.rockbite.tools.talos.editor.project;
 
+import com.badlogic.gdx.files.FileHandle;
+
 public interface IProject {
     void loadProject(String data);
 
@@ -12,4 +14,6 @@ public interface IProject {
     String getProjectNameTemplate();
 
     void initUIContent();
+
+    FileHandle findFileInDefaultPaths(String fileName);
 }

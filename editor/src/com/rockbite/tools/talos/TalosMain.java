@@ -21,13 +21,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
+import com.rockbite.tools.talos.editor.WorkplaceStage;
 import com.rockbite.tools.talos.editor.addons.AddonController;
 import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.TalosProject;
@@ -41,8 +41,10 @@ import java.awt.dnd.*;
 public class TalosMain extends ApplicationAdapter {
 
 	private UIStage uiStage;
+
 	private NodeStage nodeStage;
-	private CameraController cameraController;
+
+	private WorkplaceStage currentWorkplaceStage;
 
 	private ProjectController projectController;
 
@@ -72,7 +74,7 @@ public class TalosMain extends ApplicationAdapter {
 
 	private Preferences preferences;
 
-	private boolean nodeStageEnabled = true;
+	private InputMultiplexer inputMultiplexer;
 
 	public TalosProject TalosProject() {
 		return (TalosProject) projectController.getProject();
@@ -120,30 +122,50 @@ public class TalosMain extends ApplicationAdapter {
 
 		uiStage = new UIStage(skin);
 		nodeStage = new NodeStage(skin);
+		currentWorkplaceStage = nodeStage;
 
 		projectController = new ProjectController();
-
-		cameraController = new CameraController((OrthographicCamera)nodeStage.getStage().getCamera());
 
 		uiStage.init();
 		nodeStage.init();
 
 		addonController.initAll();
 
-		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage.getStage(), nodeStage.getStage(), cameraController));
+		inputMultiplexer = new InputMultiplexer(uiStage.getStage(), currentWorkplaceStage.getStage());
+
+		Gdx.input.setInputProcessor(inputMultiplexer);
 
 		// final init after all is done
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
+	public void disableNodeStage() {
+		currentWorkplaceStage = null;
+		inputMultiplexer.removeProcessor(nodeStage.getStage());
+	}
+
+	public void setThirdPartyStage(WorkplaceStage stage) {
+		currentWorkplaceStage = stage;
+		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+	}
+
+	public void enableNodeStage() {
+		currentWorkplaceStage = nodeStage;
+		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+	}
+
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
+		if(currentWorkplaceStage != null) {
+			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
+		} else {
+			Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
+		}
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		if(nodeStageEnabled) {
-			nodeStage.getStage().act();
-			nodeStage.getStage().draw();
+		if(currentWorkplaceStage != null) {
+			currentWorkplaceStage.getStage().act();
+			currentWorkplaceStage.getStage().draw();
 		}
 
 		uiStage.getStage().act();
@@ -151,13 +173,15 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public void resize (int width, int height) {
-		nodeStage.resize(width, height);
+		if(currentWorkplaceStage != null) {
+			currentWorkplaceStage.resize(width, height);
+		}
 		uiStage.resize(width, height);
 	}
 
 	@Override
 	public void dispose () {
-		nodeStage.getStage().dispose();
+		currentWorkplaceStage.getStage().dispose();
 		uiStage.getStage().dispose();
 	}
 
@@ -166,10 +190,10 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public CameraController getCameraController() {
-		return cameraController;
+		return currentWorkplaceStage.getCameraController();
 	}
 
-	public void setNodeStageEnabled(boolean nodeStageEnabled) {
-		this.nodeStageEnabled = nodeStageEnabled;
+	public AddonController Addons() {
+		return addonController;
 	}
 }

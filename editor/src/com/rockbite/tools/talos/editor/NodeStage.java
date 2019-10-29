@@ -34,9 +34,8 @@ import com.rockbite.tools.talos.editor.utils.GridRenderer;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 
-public class NodeStage {
+public class NodeStage extends WorkplaceStage {
 
-    private Stage stage;
 
     TextureAtlas atlas;
     public Skin skin;
@@ -46,17 +45,18 @@ public class NodeStage {
     private Image selectionRect;
 
     public NodeStage (Skin skin) {
+        super();
         this.skin = skin;
-        stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
     }
 
     public Skin getSkin() {
         return skin;
     }
 
+    @Override
     public void init () {
+        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
         initActors();
-
         initListeners();
     }
 
@@ -65,17 +65,20 @@ public class NodeStage {
         return stage;
     }
 
-    public void resize (int width, int height) {
-        stage.getViewport().update(width, height);
-    }
-
-    private void initListeners() {
+    @Override
+    protected void initListeners() {
         stage.addListener(new InputListener() {
 
             boolean wasDragged;
             Vector2 startPos = new Vector2();
             Vector2 tmp = new Vector2();
             Rectangle rectangle = new Rectangle();
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, int amount) {
+                TalosMain.Instance().getCameraController().scrolled(amount);
+                return super.scrolled(event, x, y, amount);
+            }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {

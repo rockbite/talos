@@ -48,6 +48,7 @@ import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.addons.IAddon;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.project.ProjectController;
@@ -138,7 +139,28 @@ public class UIStage {
 	}
 
 	public void fileDrop (String[] paths, float x, float y) {
-		previewWidget.fileDrop(x, y, paths);
+		// let's see what this can mean by extension
+		for(String path: paths) {
+			FileHandle handle = Gdx.files.absolute(path);
+			if(handle.exists()) {
+				String extension = handle.extension();
+				if(extension.equals("tls")) {
+					// load project file
+					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+					TalosMain.Instance().ProjectController().loadProject(handle);
+				} else {
+					// ask addons if they are interested
+					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
+					if(addon != null) {
+						break;
+					}
+				}
+			}
+		}
+
+		if(previewWidget.getStage() != null) {
+			previewWidget.fileDrop(x, y, paths);
+		}
 	}
 
 	private void constructMenu () {
@@ -567,7 +589,12 @@ public class UIStage {
 		leftTable.clearChildren();
 		rightTable.clearChildren();
 		bottomTable.clearChildren();
-		TalosMain.Instance().setNodeStageEnabled(false);
+		TalosMain.Instance().disableNodeStage();
+
+		leftTable.add(left).grow();
+		rightTable.add(right).grow();
+		bottomTable.add(bottom).expand().grow();
+
 	}
 
 	public void swapToTalosContent() {
@@ -577,7 +604,7 @@ public class UIStage {
 
 		leftTable.add(previewWidget).grow();
 		bottomTable.add(bottomPane).expand().grow();
-		TalosMain.Instance().setNodeStageEnabled(true);
+		TalosMain.Instance().enableNodeStage();
 	}
 
 

@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
 
+import java.io.File;
+
 public class ProjectController {
 
     private String currentProjectPath = null;
@@ -25,9 +27,11 @@ public class ProjectController {
 
     public void loadProject (FileHandle projectFileHandle) {
         if (projectFileHandle.exists()) {
+            if(currentTab != null) {
+                saveProjectToCache(projectFileName);
+            }
             currentProjectPath = projectFileHandle.path();
             projectFileName = projectFileHandle.name();
-
             loading = true;
             currentProject.loadProject(projectFileHandle.readString());
             loading = false;
@@ -150,9 +154,42 @@ public class ProjectController {
 
     public void setProject(IProject project) {
         currentProject = project;
+        if(project.equals(TLS)) {
+            TalosMain.Instance().UIStage().swapToTalosContent();
+        }
     }
 
     public IProject getProject() {
         return currentProject;
+    }
+
+    public FileHandle findFile(FileHandle initialFile) {
+        String fileName = initialFile.name();
+
+        // local is priority, then the path, then the default lookup
+        // do we currently have project loaded?
+        if(currentProjectPath != null) {
+            // we can look for local file then
+            FileHandle currentProjectHandle = Gdx.files.absolute(currentProjectPath);
+            if(currentProjectHandle.exists()) {
+                String localPath = currentProjectHandle.parent().path() + File.separator + fileName;
+                FileHandle localTry = Gdx.files.absolute(localPath);
+                if(localTry.exists()) {
+                    return localTry;
+                }
+            }
+        }
+
+        //Maybe the absolute path was a better ideas
+        if(initialFile.exists()) return initialFile;
+
+        //oh crap it's nowhere to be found, default path to the rescue!
+        FileHandle lastHopeHandle = currentProject.findFileInDefaultPaths(fileName);
+        if(lastHopeHandle != null && lastHopeHandle.exists()) {
+            return lastHopeHandle;
+        }
+
+        // well we did all we could. seppuku is imminent
+        return null;
     }
 }

@@ -16,6 +16,7 @@
 
 package com.rockbite.tools.talos.editor.project;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
@@ -27,6 +28,7 @@ import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
 import com.rockbite.tools.talos.editor.assets.ProjectAssetProvider;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
+import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.serialization.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
@@ -160,6 +162,13 @@ public class TalosProject implements IProject {
 	@Override
 	public void initUIContent() {
 
+	}
+
+	@Override
+	public FileHandle findFileInDefaultPaths(String fileName) {
+		String path = TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH);
+		FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
+		return handle;
 	}
 
 	private void cleanData() {

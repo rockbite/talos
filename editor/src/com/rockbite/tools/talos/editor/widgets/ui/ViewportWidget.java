@@ -175,4 +175,9 @@ public abstract class ViewportWidget extends Table {
     public void setCameraZoom(float zoom) {
         camera.zoom = zoom;
     }
+
+    public void setWorldWidth(float width) {
+        camera.viewportWidth = width;
+        camera.update();
+    }
 }
