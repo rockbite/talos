@@ -90,6 +90,9 @@ public class PreviewWidget extends ViewportWidget {
 
     public PreviewWidget() {
         super();
+
+        setWorldSize(10f);
+
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
@@ -99,6 +102,13 @@ public class PreviewWidget extends ViewportWidget {
                 super.removeImage();
                 previewImage.setDrawable(null);
                 backgroundImagePath = "";
+            }
+
+            @Override
+            public void gridSizeChanged(float size) {
+                super.gridSizeChanged(size);
+                setWorldSize(10f * size);
+                resetCamera();
             }
         };
 
@@ -218,12 +228,6 @@ public class PreviewWidget extends ViewportWidget {
         return vec;
     }
 
-    @Override
-    protected void cameraScrolledWithAmount (int amount) {
-        super.cameraScrolledWithAmount(amount);
-        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
-    }
-
     public void fileDrop (float x, float y, String[] paths) {
         temp.set(x, y);
         (getStage().getViewport()).unproject(temp);
@@ -296,33 +300,15 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-
         batch.end();
-
-        camera.zoom = previewController.getPreviewBoxWidth() / camera.viewportWidth;
-        float height =  previewController.getPreviewBoxWidth() * camera.viewportHeight / camera.viewportWidth;
-
-        tmpColor.set(Color.WHITE);
-        tmpColor.a = 0.2f;
-        Gdx.gl.glLineWidth(1f);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(- previewController.getPreviewBoxWidth()/2f+camera.position.x, 0,  previewController.getPreviewBoxWidth()/2f+camera.position.x, 0);
-        shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(0, -height/2f+camera.position.y, 0, height/2f + camera.position.y);
-        shapeRenderer.end();
-
+        drawGrid(batch, parentAlpha * 0.5f);
         batch.begin();
 
         mid.set(0, 0);
 
-
         float imagePrefWidth = previewImage.getPrefWidth();
         float imagePrefHeight = previewImage.getPrefHeight();
         float scale = imagePrefHeight / imagePrefWidth;
-
 
         float imageWidth = previewController.getImageWidth();
         float imageHeight = imageWidth * scale;
@@ -397,12 +383,6 @@ public class PreviewWidget extends ViewportWidget {
             this.dragPointProvider = null;
             dragPoints.clear();
         }
-    }
-
-    @Override
-    public void setCameraZoom(float zoom) {
-        super.setCameraZoom(zoom);
-        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
     }
 
     public String getBackgroundImagePath() {
