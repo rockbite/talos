@@ -50,7 +50,7 @@ public abstract class ViewportWidget extends Table {
     protected float maxZoom = 0.1f;
     protected float minZoom = 100f;
 
-    ShapeRenderer shapeRenderer;
+    protected ShapeRenderer shapeRenderer;
     private float gridSize;
     private float worldWidth = 1f;
 

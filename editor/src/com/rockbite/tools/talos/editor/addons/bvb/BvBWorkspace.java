@@ -2,7 +2,10 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
@@ -61,6 +64,25 @@ public class BvBWorkspace extends ViewportWidget {
 
         drawSpine(batch, parentAlpha);
         drawVFX(batch, parentAlpha);
+
+        batch.end();
+        drawTools(batch, parentAlpha);
+        batch.begin();
+    }
+
+    private void drawTools(Batch batch, float parentAlpha) {
+        Skeleton skeleton = skeletonContainer.getSkeleton();
+        if(skeleton == null) return;
+
+        Gdx.gl.glLineWidth(1f);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        for (Bone bone : skeleton.getBones()) {
+            shapeRenderer.circle(bone.getWorldX(), bone.getWorldY(), 2f);
+        }
+        shapeRenderer.end();
     }
 
     private void drawSpine(Batch batch, float parentAlpha) {
