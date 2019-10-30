@@ -155,6 +155,11 @@ public class TalosProject implements IProject {
 	}
 
 	@Override
+	public String getExportExtension() {
+		return ".p";
+	}
+
+	@Override
 	public String getProjectNameTemplate() {
 		return "effect";
 	}
@@ -169,6 +174,20 @@ public class TalosProject implements IProject {
 		String path = TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH);
 		FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
 		return handle;
+	}
+
+
+	public void exportProject(FileHandle handle) {
+		ExportData exportData = new ExportData();
+		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
+		handle.writeString(projectSerializer.writeExport(exportData), false);
+	}
+
+	@Override
+	public String exportProject() {
+		ExportData exportData = new ExportData();
+		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
+		return projectSerializer.writeExport(exportData);
 	}
 
 	private void cleanData() {
@@ -269,12 +288,6 @@ public class TalosProject implements IProject {
 	public void importFromLegacyFormat(FileHandle fileHandle) {
 		cleanData();
 		importer.read(fileHandle);
-	}
-
-	public void exportProject(FileHandle fileHandle) {
-		ExportData exportData = new ExportData();
-		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
-		projectSerializer.writeExport(fileHandle, exportData);
 	}
 
 	private void setToExportData (ExportData data, ModuleBoardWidget moduleBoardWidget) {

@@ -2,9 +2,9 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.Menu;
+import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.IAddon;
@@ -21,10 +21,18 @@ public class BvBAddon implements IAddon {
     public void init() {
         BVB = new BvbProject(this);
 
-        /*
-        Menu toolsMenu = TalosMain.Instance().UIStage().getToolsMenu();
-        MenuItem newBvbProject = new MenuItem("New Skeletal Bridge");
-        toolsMenu.addItem(newBvbProject);
+        buildUI();
+    }
+
+    @Override
+    public void buildMenu(MenuBar menuBar) {
+        Menu bvbMenu = new Menu("Skeletal Animations");
+
+        MenuItem newBvbProject = new MenuItem("New Project");
+        bvbMenu.addItem(newBvbProject);
+        MenuItem openBvbProject = new MenuItem("Open Project");
+        bvbMenu.addItem(openBvbProject);
+        // TODO: add other menu items here
 
         newBvbProject.addListener(new ClickListener() {
             @Override
@@ -33,9 +41,16 @@ public class BvBAddon implements IAddon {
                 TalosMain.Instance().ProjectController().newProject(BVB);
             }
         });
-        */
 
-        buildUI();
+        openBvbProject.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                TalosMain.Instance().UIStage().openProjectAction(BVB);
+            }
+        });
+
+        menuBar.addMenu(bvbMenu);
     }
 
     private void buildUI() {
@@ -48,7 +63,7 @@ public class BvBAddon implements IAddon {
         TalosMain.Instance().disableNodeStage();
 
         // now need to disable some menu tabs
-        TalosMain.Instance().UIStage().Menu().disableSave();
+        TalosMain.Instance().UIStage().Menu().disableTalosSpecific();
     }
 
     @Override

@@ -46,6 +46,7 @@ import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.IAddon;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
+import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.ProjectController;
 import com.rockbite.tools.talos.editor.widgets.ui.*;
 import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
@@ -233,14 +234,20 @@ public class UIStage {
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
+	public void openProjectAction(final IProject projectType) {
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Open", projectType);
+		if(defaultLocation.equals("")) {
+			TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
+		}
+		fileChooser.setDirectory(defaultLocation);
 
-	public void openProjectAction() {
 		fileChooser.setMode(FileChooser.Mode.OPEN);
 		fileChooser.setMultiSelectionEnabled(false);
+
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(projectType.getExtension());
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -248,11 +255,17 @@ public class UIStage {
 		fileChooser.setListener(new FileChooserAdapter() {
 			@Override
 			public void selected (Array<FileHandle> file) {
-				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
+				String path = file.first().file().getAbsolutePath();
+				TalosMain.Instance().ProjectController().setProject(projectType);
+				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(path));
 			}
 		});
 
 		stage.addActor(fileChooser.fadeIn());
+	}
+
+	public void openProjectAction() {
+		openProjectAction(ProjectController.TLS);
 	}
 
 	public void saveProjectAction() {
@@ -264,12 +277,18 @@ public class UIStage {
 	}
 
 	public void exportAction() {
+		IProject projectType = TalosMain.Instance().ProjectController().getProject();
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
+		fileChooser.setDirectory(defaultLocation);
+
+		final String ext = projectType.getExportExtension();
+
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".p");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -278,27 +297,34 @@ public class UIStage {
 			@Override
 			public void selected(Array<FileHandle> file) {
 				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(".p")) {
+				if(!path.endsWith(ext)) {
 					if(path.indexOf(".") > 0) {
 						path = path.substring(0, path.indexOf("."));
 					}
-					path += ".p";
+					path += ext;
 				}
 				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().TalosProject().exportProject(handle);
+				TalosMain.Instance().ProjectController().exportProject(handle);
 			}
 		});
+
+		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().getCurrentExportNameSuggestion());
 
 		stage.addActor(fileChooser.fadeIn());
 	}
 
 	public void saveAsProjectAction() {
+		IProject projectType = TalosMain.Instance().ProjectController().getProject();
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
+		fileChooser.setDirectory(defaultLocation);
+
+		final String ext = projectType.getExtension();
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -307,16 +333,18 @@ public class UIStage {
 			@Override
 			public void selected(Array<FileHandle> file) {
 				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(".tls")) {
+				if(!path.endsWith(ext)) {
 					if(path.indexOf(".") > 0) {
 						path = path.substring(0, path.indexOf("."));
 					}
-					path += ".tls";
+					path += ext;
 				}
 				FileHandle handle = Gdx.files.absolute(path);
 				TalosMain.Instance().ProjectController().saveProject(handle);
 			}
 		});
+
+		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
 
 		stage.addActor(fileChooser.fadeIn());
 	}
@@ -415,7 +443,7 @@ public class UIStage {
 		bottomTable.add(bottomPane).expand().grow();
 		TalosMain.Instance().enableNodeStage();
 
-		mainMenu.enableSave();
+		mainMenu.restore();
 	}
 
 

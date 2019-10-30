@@ -69,7 +69,7 @@ public abstract class ViewportWidget extends Table {
             @Override
             public boolean scrolled (InputEvent event, float x, float y, int amount) {
                 float currWidth = camera.viewportWidth * camera.zoom;
-                float nextWidth = currWidth * (1f + amount * 0.05f);
+                float nextWidth = currWidth * (1f + amount * 0.1f);
                 float nextZoom = nextWidth/camera.viewportWidth;
                 camera.zoom = nextZoom;
 

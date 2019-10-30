@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
+import com.rockbite.tools.talos.runtime.serialization.ExportData;
 
 import java.io.File;
 
@@ -44,6 +45,10 @@ public class ProjectController {
             currentProject.loadProject(projectFileHandle.readString());
             loading = false;
 
+
+            TalosMain.Instance().Prefs().putString("lastOpen"+currentProject.getExtension(), projectFileHandle.parent().path());
+            TalosMain.Instance().Prefs().flush();
+
             currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
 
@@ -71,7 +76,12 @@ public class ProjectController {
     public void saveProject (FileHandle destination) {
         String data = currentProject.getProjectString();
         destination.writeString(data, false);
+
+        TalosMain.Instance().Prefs().putString("lastSave"+currentProject.getExtension(), destination.parent().path());
+        TalosMain.Instance().Prefs().flush();
+
         currentTab.setDirty(false);
+        currentTab.setWorthy();
         currentProjectPath = destination.path();
         projectFileName = destination.name();
 
@@ -224,5 +234,32 @@ public class ProjectController {
 
         // well we did all we could. seppuku is imminent
         return null;
+    }
+
+    public void exportProject(FileHandle fileHandle) {
+        String data = currentProject.exportProject();
+        fileHandle.writeString(data, false);
+
+        TalosMain.Instance().Prefs().putString("lastExport"+currentProject.getExtension(), fileHandle.parent().path());
+        TalosMain.Instance().Prefs().flush();
+    }
+
+    public String getCurrentExportNameSuggestion() {
+        if(currentTab != null) {
+            String projectName = currentTab.getFileName();
+            String exportExt = currentProject.getExportExtension();
+            return projectName.substring(0, projectName.lastIndexOf(".")) + exportExt;
+        }
+        return "";
+    }
+
+    public String getLastDir(String action, IProject projectType) {
+        String path = TalosMain.Instance().Prefs().getString("last" + action + projectType.getExtension());
+        FileHandle handle = Gdx.files.absolute(path);
+        if(handle.exists()) {
+            return handle.path();
+        }
+
+        return "";
     }
 }

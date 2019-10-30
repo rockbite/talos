@@ -11,9 +11,13 @@ public interface IProject {
 
     String getExtension();
 
+    String getExportExtension();
+
     String getProjectNameTemplate();
 
     void initUIContent();
 
     FileHandle findFileInDefaultPaths(String fileName);
+
+    String exportProject();
 }

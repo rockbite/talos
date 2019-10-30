@@ -16,19 +16,31 @@ public class MainMenu extends Table {
 
     UIStage stage;
     private MenuItem saveProject;
+    private MenuItem export;
+    private MenuItem saveAsProject;
+    private Menu modulesMenu;
+    private MenuItem removeSelectedModules;
+    private MenuItem createModule;
+    private MenuItem groupSelectedModules;
+    private MenuItem ungroupSelectedModules;
 
     public MainMenu(UIStage stage) {
         this.stage = stage;
+
+        setBackground(stage.getSkin().getDrawable("button-main-menu"));
     }
 
     public void build() {
-        setBackground(stage.getSkin().getDrawable("button-main-menu"));
+        clearChildren();
 
         MenuBar menuBar = new MenuBar();
         Menu projectMenu = new Menu("File");
         menuBar.addMenu(projectMenu);
-        Menu modulesMenu = new Menu("Modules");
+        modulesMenu = new Menu("Modules");
         menuBar.addMenu(modulesMenu);
+
+        TalosMain.Instance().Addons().buildMenu(menuBar);
+
         Menu helpMenu = new Menu("Help");
         MenuItem about = new MenuItem("About");
         helpMenu.addItem(about);
@@ -42,20 +54,20 @@ public class MainMenu extends Table {
             }
         });
 
-        MenuItem createModule = new MenuItem("Create Module");
+        createModule = new MenuItem("Create Module");
         PopupMenu createPopup = stage.createModuleListPopup();
         createModule.setSubMenu(createPopup);
-        MenuItem removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
-        MenuItem groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
-        MenuItem ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
+        removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
+        groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
+        ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
         modulesMenu.addItem(createModule);
         modulesMenu.addItem(removeSelectedModules);
         modulesMenu.addItem(groupSelectedModules);
 
-        MenuItem newProject = new MenuItem("New TalosProject");
-        MenuItem openProject = new MenuItem("Open TalosProject");
-        saveProject = new MenuItem("Save TalosProject");
-        MenuItem export = new MenuItem("Export");
+        final MenuItem newProject = new MenuItem("New TalosProject");
+        final MenuItem openProject = new MenuItem("Open TalosProject");
+        saveProject = new MenuItem("Save");
+        export = new MenuItem("Export");
         MenuItem examples = new MenuItem("Examples");
 
         MenuItem legacy = new MenuItem("Legacy");
@@ -71,7 +83,7 @@ public class MainMenu extends Table {
         PopupMenu examplesPopup = new PopupMenu();
         examples.setSubMenu(examplesPopup);
         stage.initExampleList(examplesPopup);
-        MenuItem saveAsProject = new MenuItem("Save As TalosProject");
+        saveAsProject = new MenuItem("Save As");
         MenuItem exitApp = new MenuItem("Exit");
 
         projectMenu.addItem(newProject);
@@ -190,10 +202,14 @@ public class MainMenu extends Table {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+                    if(!newProject.isDisabled()) {
+                        TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+                    }
                 }
                 if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    stage.openProjectAction();
+                    if(!openProject.isDisabled()) {
+                        stage.openProjectAction();
+                    }
                 }
                 if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     if(!saveProject.isDisabled()) {
@@ -203,15 +219,28 @@ public class MainMenu extends Table {
 
                 return super.keyDown(event, keycode);
             }
-
         });
     }
 
-    public void disableSave() {
-        saveProject.setDisabled(true);
+    public void disableTalosSpecific() {
+        disableItem(removeSelectedModules);
+        disableItem(createModule);
+        disableItem(groupSelectedModules);
+        disableItem(ungroupSelectedModules);
     }
 
-    public void enableSave() {
-        saveProject.setDisabled(false);
+    public void disableItem(MenuItem item) {
+        item.setDisabled(true);
+    }
+
+    public void enableItem(MenuItem item) {
+        item.setDisabled(false);
+    }
+
+    public void restore() {
+        enableItem(removeSelectedModules);
+        enableItem(createModule);
+        enableItem(groupSelectedModules);
+        enableItem(ungroupSelectedModules);
     }
 }

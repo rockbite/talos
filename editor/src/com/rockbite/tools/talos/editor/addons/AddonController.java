@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.addons;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.widget.MenuBar;
 import com.rockbite.tools.talos.editor.addons.bvb.BvBAddon;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 
@@ -35,6 +36,12 @@ public class AddonController {
     public void announceLocalSettings(SettingsDialog settingsDialog) {
         for(IAddon addon: activeAddons) {
             addon.announceLocalSettings(settingsDialog);
+        }
+    }
+
+    public void buildMenu(MenuBar menuBar) {
+        for(IAddon addon: activeAddons) {
+            addon.buildMenu(menuBar);
         }
     }
 }

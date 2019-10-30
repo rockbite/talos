@@ -3,8 +3,6 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.addons.bvb.BvBAddon;
-import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.project.IProject;
 
 import java.io.File;
@@ -24,7 +22,7 @@ public class BvbProject implements IProject {
 
     @Override
     public String getProjectString() {
-        return null;
+        return "";
     }
 
     @Override
@@ -35,6 +33,11 @@ public class BvbProject implements IProject {
     @Override
     public String getExtension() {
         return ".bvb";
+    }
+
+    @Override
+    public String getExportExtension() {
+        return ".xml";
     }
 
     @Override
@@ -68,5 +71,10 @@ public class BvbProject implements IProject {
 
         FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
         return handle;
+    }
+
+    @Override
+    public String exportProject() {
+        return "";
     }
 }
