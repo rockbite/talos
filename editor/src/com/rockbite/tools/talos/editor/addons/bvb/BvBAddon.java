@@ -75,14 +75,16 @@ public class BvBAddon implements IAddon {
             return true;
         }
 
-        if(handle.extension().equals(".json")) {
+        if(handle.extension().equals("json")) {
             // cool let's load skeletal animation
+            workspace.setAnimation(handle);
 
             return true;
         }
 
-        if(handle.extension().equals(".p")) {
+        if(handle.extension().equals("p")) {
             // adding particle effect? I can do that
+            workspace.addParticleToLibrary(handle);
 
             return true;
         }

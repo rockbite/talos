@@ -50,7 +50,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.0.5", "Many new features. much wow.");
+                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.0.6", "When blue and yellow meet in the west, the silver cat feeds");
             }
         });
 
