@@ -26,7 +26,7 @@ public class BvBAddon implements IAddon {
 
     @Override
     public void buildMenu(MenuBar menuBar) {
-        Menu bvbMenu = new Menu("Skeletal Animations");
+        Menu bvbMenu = new Menu("Animations");
 
         MenuItem newBvbProject = new MenuItem("New Project");
         bvbMenu.addItem(newBvbProject);

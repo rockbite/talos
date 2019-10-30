@@ -29,8 +29,11 @@ public class ProjectController {
     public void loadProject (FileHandle projectFileHandle) {
         if (projectFileHandle.exists()) {
             FileTab prevTab = currentTab;
+            boolean removingUnworthy = false;
+
             if(currentTab != null) {
-                if(currentTab.isUnworthy()) {
+                if(currentTab.getProjectType() == currentProject && currentTab.isUnworthy()) {
+                    removingUnworthy = true;
                     clearCache(currentTab.getFileName());
                 } else {
                     IProject tmp = currentProject;
@@ -53,7 +56,7 @@ public class ProjectController {
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
 
 
-            if(prevTab != null && prevTab.isUnworthy()) {
+            if(removingUnworthy) {
                 safeRemoveTab(prevTab);
             }
         } else {
@@ -102,10 +105,14 @@ public class ProjectController {
 
     public void newProject (IProject project) {
         FileTab prevTab = currentTab;
+
+        boolean removingUnworthy = false;
+
         if(currentTab != null) {
-            if(currentTab.isUnworthy()) {
-               clearCache(currentTab.getFileName());
-            } else {
+            if(currentTab.getProjectType() == project && currentTab.isUnworthy()) {
+                removingUnworthy = true;
+                clearCache(currentTab.getFileName());
+            }  else {
                 saveProjectToCache(projectFileName);
             }
         }
@@ -118,7 +125,7 @@ public class ProjectController {
         currentProject.resetToNew();
         currentProjectPath = null;
 
-        if(prevTab != null && prevTab.isUnworthy()) {
+        if(removingUnworthy) {
             safeRemoveTab(prevTab);
         }
     }
