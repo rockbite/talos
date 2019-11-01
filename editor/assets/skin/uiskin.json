@@ -125,7 +125,8 @@
 		small-green: {font: small-font, fontColor: text-green }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
-		default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
+		default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey },
+		dark: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield-dark, cursor: cursor, messageFont: default-font, messageFontColor: grey },
 		small: {font: small-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey },
 		no-bg: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection,cursor: cursor, messageFont: default-font, messageFontColor: grey }
 	}

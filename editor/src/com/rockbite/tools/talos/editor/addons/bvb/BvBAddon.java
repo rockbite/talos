@@ -16,6 +16,7 @@ public class BvBAddon implements IAddon {
     public static BvbProject BVB;
 
     BvBWorkspace workspace;
+    PropertiesPanel propertiesPanel;
 
     @Override
     public void init() {
@@ -55,11 +56,12 @@ public class BvBAddon implements IAddon {
 
     private void buildUI() {
         workspace = new BvBWorkspace();
+        propertiesPanel = new PropertiesPanel(TalosMain.Instance().UIStage().getSkin());
     }
 
     @Override
     public void initUIContent() {
-        TalosMain.Instance().UIStage().swapToAddonContent(null, workspace, null);
+        TalosMain.Instance().UIStage().swapToAddonContent(propertiesPanel, workspace, null);
         TalosMain.Instance().disableNodeStage();
 
         // now need to disable some menu tabs

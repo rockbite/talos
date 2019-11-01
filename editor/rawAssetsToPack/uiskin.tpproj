@@ -1,6 +1,6 @@
 name=uiskin
 filename=
-output=../core/assets/skin
+output=../assets/skin
 
 alias=true
 alphaThreshold=0
