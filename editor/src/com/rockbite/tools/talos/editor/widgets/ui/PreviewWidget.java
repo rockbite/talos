@@ -208,25 +208,6 @@ public class PreviewWidget extends ViewportWidget {
         });
     }
 
-    /**
-     * I really dunno how this works rather then it does
-     * @param vec
-     * @return
-     */
-    private Vector3 getWorldFromLocal(Vector3 vec) {
-
-        float xA = (getWidth() - vec.x)/getWidth();
-        float yA = (getHeight() - vec.y)/getHeight();
-
-        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
-
-        camera.unproject(vec);
-
-        vec.x *= -1f; // I don't even know why
-        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
-
-        return vec;
-    }
 
     public void fileDrop (float x, float y, String[] paths) {
         temp.set(x, y);

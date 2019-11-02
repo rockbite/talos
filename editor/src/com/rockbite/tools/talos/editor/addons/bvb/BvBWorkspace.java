@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
@@ -41,6 +44,75 @@ public class BvBWorkspace extends ViewportWidget {
 
         setCameraPos(0, 0);
         bgColor.set(0.1f, 0.1f, 0.1f, 1f);
+
+
+        clearListeners();
+        addListeners();
+        addPanListener();
+    }
+
+    private void addListeners() {
+        addListener(new ClickListener() {
+
+            private Vector3 tmp3 = new Vector3();
+            private Vector2 pos = new Vector2();
+            private Vector2 tmp = new Vector2();
+
+            private AttachmentPoint movingPoint;
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                getWorldFromLocal(tmp3.set(x, y, 0));
+                pos.set(tmp3.x, tmp3.y);
+
+                // check for all attachment points
+                for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+                    AttachmentPoint position = effect.getPositionAttachment();
+                    Array<AttachmentPoint> attachments = effect.getAttachments();
+
+                    tmp = getAttachmentPosition(position);
+                    if(tmp.dst(pos) < 10f) {
+                        movingPoint = position;
+                        event.handle();
+                        return true;
+                    }
+
+                    for(AttachmentPoint point: attachments) {
+                        tmp = getAttachmentPosition(point);
+                        if(tmp.dst(pos) < 10f) {
+                            movingPoint = point;
+                            event.handle();
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                super.touchDragged(event, x, y, pointer);
+
+                getWorldFromLocal(tmp3.set(x, y, 0));
+                pos.set(tmp3.x, tmp3.y);
+
+                if(movingPoint != null && !movingPoint.isStatic()) {
+                    pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
+                    movingPoint.setOffset(pos.x, pos.y);
+                }
+
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                super.touchUp(event, x, y, pointer, button);
+
+                // now need to attach to nearest bone OR leave as is, based on translation mode
+
+                movingPoint = null;
+            }
+        });
     }
 
     public void setModeUI() {
