@@ -5,7 +5,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
-import com.rockbite.tools.talos.runtime.serialization.ExportData;
 
 import java.io.File;
 
@@ -16,6 +15,7 @@ public class ProjectController {
     public FileTab currentTab;
     private ObjectMap<String, String> fileCache = new ObjectMap<>();
     private ObjectMap<String, String> pathCache = new ObjectMap<>();
+    private ObjectMap<String, String> exporthPathCache = new ObjectMap<>();
     private boolean loading = false;
 
     IProject currentProject;
@@ -248,6 +248,8 @@ public class ProjectController {
     }
 
     public void exportProject(FileHandle fileHandle) {
+        exporthPathCache.put(projectFileName, fileHandle.path());
+
         String data = currentProject.exportProject();
         fileHandle.writeString(data, false);
 
@@ -272,5 +274,9 @@ public class ProjectController {
         }
 
         return "";
+    }
+
+    public String getExportPath() {
+        return exporthPathCache.get(projectFileName);
     }
 }

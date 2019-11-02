@@ -274,8 +274,16 @@ public class UIStage {
 			TalosMain.Instance().ProjectController().saveProject();
 		}
 	}
-
 	public void exportAction() {
+		String path = TalosMain.Instance().ProjectController().getExportPath();
+		if(path == null || path.isEmpty()) {
+			exportAsAction();
+		} else {
+			TalosMain.Instance().ProjectController().exportProject(Gdx.files.absolute(path));
+		}
+	}
+
+	public void exportAsAction() {
 		IProject projectType = TalosMain.Instance().ProjectController().getProject();
 		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
 		fileChooser.setDirectory(defaultLocation);

@@ -17,6 +17,7 @@ public class MainMenu extends Table {
     UIStage stage;
     private MenuItem saveProject;
     private MenuItem export;
+    private MenuItem exportAs;
     private MenuItem saveAsProject;
     private Menu modulesMenu;
     private MenuItem removeSelectedModules;
@@ -68,6 +69,7 @@ public class MainMenu extends Table {
         final MenuItem openProject = new MenuItem("Open TalosProject");
         saveProject = new MenuItem("Save");
         export = new MenuItem("Export");
+        exportAs = new MenuItem("Export As");
         MenuItem examples = new MenuItem("Examples");
 
         MenuItem legacy = new MenuItem("Legacy");
@@ -91,6 +93,7 @@ public class MainMenu extends Table {
         projectMenu.addItem(saveProject);
         projectMenu.addItem(saveAsProject);
         projectMenu.addItem(export);
+        projectMenu.addItem(exportAs);
         projectMenu.addSeparator();
         projectMenu.addItem(examples);
         projectMenu.addItem(legacy);
@@ -155,6 +158,14 @@ public class MainMenu extends Table {
             }
         });
 
+        exportAs.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                stage.exportAsAction();
+            }
+        });
+
         saveAsProject.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -214,6 +225,11 @@ public class MainMenu extends Table {
                 if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     if(!saveProject.isDisabled()) {
                         stage.saveProjectAction();
+                    }
+                }
+                if(keycode == Input.Keys.E && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    if(!saveProject.isDisabled()) {
+                        stage.exportAction();
                     }
                 }
 
