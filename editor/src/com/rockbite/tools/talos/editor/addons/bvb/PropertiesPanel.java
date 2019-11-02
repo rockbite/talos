@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.rockbite.tools.talos.TalosMain;
 
 public class PropertiesPanel extends Window {
 
