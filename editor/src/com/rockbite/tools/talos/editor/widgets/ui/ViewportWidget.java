@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -54,6 +55,7 @@ public abstract class ViewportWidget extends Table {
     private float gridSize;
     private float worldWidth = 1f;
 
+    private Vector3 tmp = new Vector3();
 
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
@@ -65,6 +67,11 @@ public abstract class ViewportWidget extends Table {
         cameraController = new CameraController(camera);
         cameraController.setInvert(true);
 
+        addPanListener();
+
+    }
+
+    protected void addPanListener() {
         addListener(new InputListener() {
             @Override
             public boolean scrolled (InputEvent event, float x, float y, int amount) {
@@ -83,7 +90,7 @@ public abstract class ViewportWidget extends Table {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 cameraController.touchDown((int)x, (int)y, pointer, button);
-                return true;
+                return !event.isHandled();
             }
 
             @Override
@@ -109,7 +116,6 @@ public abstract class ViewportWidget extends Table {
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
             }
         });
-
     }
 
     Vector2 temp = new Vector2();
@@ -194,7 +200,6 @@ public abstract class ViewportWidget extends Table {
         camera.update();
     }
 
-
     protected void setWorldSize(float worldWidth) {
         this.worldWidth = worldWidth;
         updateNumbers();
@@ -242,7 +247,7 @@ public abstract class ViewportWidget extends Table {
         x =  x - x % (gridSize*8f);
         y =  y - y % (gridSize*8f);
 
-        float thickness = 0.01f * camera.zoom * (getStage().getWidth()/getWidth());
+        float thickness = pixelToWorld(1.5f);
 
         for(int i = -countX/2-8; i <= countX/2+8; i++) {
             if(i % 4 == 0) gridColor.a = brightAlpha;
@@ -258,5 +263,37 @@ public abstract class ViewportWidget extends Table {
         }
 
         shapeRenderer.end();
+    }
+
+    /**
+     * I really dunno how this works rather then it does
+     * @param vec
+     * @return
+     */
+    protected Vector3 getWorldFromLocal(Vector3 vec) {
+
+        float xA = (getWidth() - vec.x)/getWidth();
+        float yA = (getHeight() - vec.y)/getHeight();
+
+        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
+
+        camera.unproject(vec);
+
+        vec.x *= -1f; // I don't even know why
+        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
+
+        return vec;
+    }
+
+    protected float pixelToWorld(float pixelSize) {
+        tmp.set(0, 0, 0);
+        camera.unproject(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(pixelSize, 0, 0);
+        camera.unproject(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline); //TODO: I am sure there is a better way to do this
     }
 }
