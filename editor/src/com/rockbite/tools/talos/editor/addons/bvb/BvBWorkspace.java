@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
@@ -25,6 +26,8 @@ public class BvBWorkspace extends ViewportWidget {
     private float speedMultiplier = 1f;
 
     private Array<ParticleEffectDescriptor> vfxLibrary = new Array<>();
+
+    private Vector2 tmp = new Vector2();
 
     BvBWorkspace() {
         setModeUI();
@@ -71,9 +74,10 @@ public class BvBWorkspace extends ViewportWidget {
     }
 
     private void drawTools(Batch batch, float parentAlpha) {
-        batch.end();
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
+
+        batch.end();
 
         Gdx.gl.glLineWidth(1f);
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -101,8 +105,33 @@ public class BvBWorkspace extends ViewportWidget {
          * Draw bound effects and their attachment points
          */
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+            // position attachment first
+            AttachmentPoint positionAttachment = effect.getPositionAttachment();
+            if(positionAttachment != null && !positionAttachment.isStatic()) {
+                Vector2 pos = getAttachmentPosition(positionAttachment);
+                shapeRenderer.setColor(Color.BLUE);
+                shapeRenderer.circle(pos.x, pos.y, 3f);
+            }
 
+            // now iterate through other non static attachments
+            shapeRenderer.setColor(Color.GREEN);
+            for(AttachmentPoint point: effect.getAttachments()) {
+                if(!point.isStatic()) {
+                    Vector2 pos = getAttachmentPosition(point);
+                    shapeRenderer.circle(pos.x, pos.y, 3f);
+                }
+            }
         }
+    }
+
+    private Vector2 getAttachmentPosition(AttachmentPoint point) {
+        if(!point.isStatic()) {
+            tmp.set(skeletonContainer.getBonePosX(point.getBoneName()), skeletonContainer.getBonePosY(point.getBoneName()));
+            tmp.add(point.getOffsetX(), point.getOffsetY());
+        } else{
+            tmp.set(point.getStaticValue().get(0), point.getStaticValue().get(1));
+        }
+        return tmp;
     }
 
     private void drawSpriteTools(Batch batch, float parentAlpha) {
@@ -155,7 +184,7 @@ public class BvBWorkspace extends ViewportWidget {
 
         //remove this
         BoundEffect effect = skeletonContainer.addEffect(descriptor);
-        //effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
+        effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
         return effect;
     }
 }

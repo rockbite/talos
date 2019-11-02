@@ -180,4 +180,12 @@ public class BoundEffect implements IPropertyProvider {
     public String getTitle () {
         return "Bound Effect Properties";
     }
+
+    public AttachmentPoint getPositionAttachment() {
+        return positionAttachment;
+    }
+
+    public Array<AttachmentPoint> getAttachments() {
+        return valueAttachments;
+    }
 }
