@@ -1,6 +1,7 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -100,8 +101,16 @@ public class BvBWorkspace extends ViewportWidget {
                 pos.set(tmp3.x, tmp3.y);
 
                 if(movingPoint != null && !movingPoint.isStatic()) {
-                    pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
-                    movingPoint.setOffset(pos.x, pos.y);
+
+                    if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+                        pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
+                        movingPoint.setOffset(pos.x, pos.y);
+                    } else {
+                        Bone closestBone = skeletonContainer.findClosestBone(pos);
+                        pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
+                        movingPoint.setOffset(pos.x, pos.y);
+                        movingPoint.setBone(closestBone.getData().getName());
+                    }
                 }
 
             }
@@ -110,9 +119,17 @@ public class BvBWorkspace extends ViewportWidget {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
-                // now need to attach to nearest bone OR leave as is, based on translation mode
-
                 movingPoint = null;
+            }
+
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+
+                if(keycode == Input.Keys.SPACE) {
+                    paused = !paused;
+                }
+
+                return super.keyDown(event, keycode);
             }
         });
     }
@@ -129,7 +146,7 @@ public class BvBWorkspace extends ViewportWidget {
     public void act(float delta) {
         super.act(delta);
         if(skeletonContainer != null) {
-            skeletonContainer.update(delta);
+            skeletonContainer.update(delta, paused);
         }
     }
 
@@ -202,11 +219,20 @@ public class BvBWorkspace extends ViewportWidget {
          */
         if(movingPoint != null && !movingPoint.isStatic()) {
             tmp2.set(getAttachmentPosition(movingPoint));
-            Bone bone = skeletonContainer.findClosestBone(tmp2);
-            tmp3.set(bone.getWorldX(), bone.getWorldY());
 
-            shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, 3f);
+            if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+                Bone bone = skeletonContainer.getBoneByName(movingPoint.getBoneName());
+                tmp3.set(bone.getWorldX(), bone.getWorldY());
+
+                shapeRenderer.setColor(Color.PURPLE);
+                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, 3f);
+            } else {
+                Bone bone = skeletonContainer.findClosestBone(tmp2);
+                tmp3.set(bone.getWorldX(), bone.getWorldY());
+
+                shapeRenderer.setColor(Color.WHITE);
+                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, 3f);
+            }
 
         }
     }

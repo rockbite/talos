@@ -69,6 +69,11 @@ public class AttachmentPoint {
         }
     }
 
+    public void setBone(String name) {
+        boneName = name;
+    }
+
+
     @Override
     public int hashCode() {
         return attachedToSlot;

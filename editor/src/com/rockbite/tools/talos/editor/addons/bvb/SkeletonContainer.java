@@ -70,11 +70,13 @@ public class SkeletonContainer {
         });
     }
 
-    public void update(float delta) {
+    public void update(float delta, boolean isSkeletonPaused) {
         if(skeleton == null) return;
 
-        animationState.update(delta);
-        animationState.apply(skeleton);
+        if(!isSkeletonPaused) {
+            animationState.update(delta);
+            animationState.apply(skeleton);
+        }
 
         for(BoundEffect effect: boundEffects) {
             effect.update(delta);
@@ -146,5 +148,9 @@ public class SkeletonContainer {
     public float getBoneDistance(Bone bone, Vector2 pos) {
         tmp.set(pos);
         return tmp.dst(bone.getWorldX(), bone.getWorldY());
+    }
+
+    public Bone getBoneByName(String boneName) {
+        return skeleton.findBone(boneName);
     }
 }

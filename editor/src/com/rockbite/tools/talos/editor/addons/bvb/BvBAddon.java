@@ -66,6 +66,8 @@ public class BvBAddon implements IAddon {
 
         // now need to disable some menu tabs
         TalosMain.Instance().UIStage().Menu().disableTalosSpecific();
+
+        TalosMain.Instance().UIStage().getStage().setKeyboardFocus(workspace);
     }
 
     @Override
@@ -77,18 +79,23 @@ public class BvBAddon implements IAddon {
             return true;
         }
 
-        if(handle.extension().equals("json")) {
-            // cool let's load skeletal animation
-            workspace.setAnimation(handle);
+        IProject currProjectType = TalosMain.Instance().ProjectController().getProject();
 
-            return true;
-        }
+        if(currProjectType == BVB) {
 
-        if(handle.extension().equals("p")) {
-            // adding particle effect? I can do that
-            workspace.addParticleToLibrary(handle);
+            if (handle.extension().equals("json")) {
+                // cool let's load skeletal animation
+                workspace.setAnimation(handle);
 
-            return true;
+                return true;
+            }
+
+            if (handle.extension().equals("p")) {
+                // adding particle effect? I can do that
+                workspace.addParticleToLibrary(handle);
+
+                return true;
+            }
         }
 
         return false;
