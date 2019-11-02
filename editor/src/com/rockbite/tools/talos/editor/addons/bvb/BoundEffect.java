@@ -55,6 +55,13 @@ public class BoundEffect implements Json.Serializable {
     private ScopePayload scopePayload;
 
     /**
+     * Start and complete event names, if empty then in sync with skeleton's animation loop
+     */
+    private String startEvent = "";
+
+    private String completeEvent = "";
+
+    /**
      * System vars
      */
     Vector2 tmpVec = new Vector2();
@@ -217,5 +224,13 @@ public class BoundEffect implements Json.Serializable {
             AttachmentPoint point = json.readValue(AttachmentPoint.class, valueAttachmentJson);
             valueAttachments.add(point);
         }
+    }
+
+    public String getStartEvent() {
+        return startEvent;
+    }
+
+    public String getCompleteEvent() {
+        return completeEvent;
     }
 }

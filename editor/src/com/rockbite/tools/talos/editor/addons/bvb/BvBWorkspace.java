@@ -82,6 +82,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
 
+                getStage().setKeyboardFocus(BvBWorkspace.this);
+
                 if(skeletonContainer.getSkeleton() == null) return false;
 
                 // check for all attachment points

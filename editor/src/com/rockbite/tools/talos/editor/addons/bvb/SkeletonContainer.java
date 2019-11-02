@@ -35,7 +35,7 @@ public class SkeletonContainer implements Json.Serializable {
         SkeletonJson json = new SkeletonJson(atlas);
 
         json.setScale(1f); // should be user set
-        SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
+        final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
         skeleton.setPosition(0, 0);
@@ -58,15 +58,38 @@ public class SkeletonContainer implements Json.Serializable {
             @Override
             public void event(AnimationState.TrackEntry entry, Event event) {
                 super.event(entry, event);
+
+                for(BoundEffect boundEffect: getBoundEffects()) {
+                    String startEvent = boundEffect.getStartEvent();
+                    String completeEvent = boundEffect.getCompleteEvent();
+                    if(startEvent.equals(event.getData().getName())) {
+                        boundEffect.startInstance();
+                    }
+                    if(completeEvent.equals(event.getData().getName())) {
+                        boundEffect.completeInstance();
+                    }
+                }
             }
 
             @Override
             public void start(AnimationState.TrackEntry entry) {
+                for(BoundEffect boundEffect: getBoundEffects()) {
+                    String eventName = boundEffect.getStartEvent();
+                    if(eventName.equals("")) {
+                        boundEffect.startInstance();
+                    }
+                }
                 super.start(entry);
             }
 
             @Override
             public void end(AnimationState.TrackEntry entry) {
+                for(BoundEffect boundEffect: getBoundEffects()) {
+                    String eventName = boundEffect.getCompleteEvent();
+                    if(eventName.equals("")) {
+                        boundEffect.completeInstance();
+                    }
+                }
                 super.end(entry);
             }
         });
