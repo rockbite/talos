@@ -155,7 +155,7 @@ public class BvBWorkspace extends ViewportWidget {
 
         //remove this
         BoundEffect effect = skeletonContainer.addEffect(descriptor);
-        effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
+        //effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
 
     }
 }
