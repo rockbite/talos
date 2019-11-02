@@ -1,13 +1,19 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.rockbite.tools.talos.editor.data.PropertyProviderCenter;
+import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
+import com.rockbite.tools.talos.editor.wrappers.Property;
+import com.rockbite.tools.talos.editor.wrappers.IPropertyProvider;
+import com.rockbite.tools.talos.editor.wrappers.ImmutableProperty;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class BoundEffect {
+public class BoundEffect implements IPropertyProvider {
 
     /**
      * parent skeleton container
@@ -171,5 +177,38 @@ public class BoundEffect {
 
     public Array<ParticleEffectInstance> getParticleEffects() {
         return particleEffects;
+    }
+
+    @Override
+    public Array<Property> getListOfProperties () {
+        Array<Property> properties = new Array<>();
+
+        Property<String> boneName = new ImmutableProperty<>("Bone Name", positionAttachment.getBoneName());
+        Property<Float> offsetX = new MutableProperty<Float>("Offset X", positionAttachment.getOffsetX()) {
+            @Override
+            public void changed (Float newValue) {
+                positionAttachment.setOffsetX(newValue);
+            }
+        };
+        Property<Float> offsetY = new MutableProperty<Float>("Offset Y", positionAttachment.getOffsetY()) {
+            @Override
+            public void changed (Float newValue) {
+                positionAttachment.setOffsetY(newValue);
+            }
+        };
+        Property<Boolean> behind = new MutableProperty<Boolean>("Is Behind", isBehind) {
+            @Override
+            public void changed (Boolean newValue) {
+                isBehind = newValue;
+            }
+        };
+
+        properties.add(boneName, offsetX, offsetY, behind);
+        return properties;
+    }
+
+    @Override
+    public String getTitle () {
+        return "Bound Effect Properties";
     }
 }

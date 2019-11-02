@@ -63,6 +63,7 @@ public class BvBAddon implements IAddon {
     public void initUIContent() {
         TalosMain.Instance().UIStage().swapToAddonContent(propertiesPanel, workspace, null);
         TalosMain.Instance().disableNodeStage();
+        propertiesPanel = new PropertiesPanel(TalosMain.Instance().getSkin());
 
         // now need to disable some menu tabs
         TalosMain.Instance().UIStage().Menu().disableTalosSpecific();
@@ -86,7 +87,8 @@ public class BvBAddon implements IAddon {
 
         if(handle.extension().equals("p")) {
             // adding particle effect? I can do that
-            workspace.addParticleToLibrary(handle);
+            BoundEffect boundEffect = workspace.addParticleToLibrary(handle);
+            propertiesPanel.addProperty(boundEffect);
 
             return true;
         }

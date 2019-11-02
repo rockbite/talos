@@ -121,7 +121,7 @@ public class BvBWorkspace extends ViewportWidget {
         skeletonContainer.setAnimation(jsonFileHandle, atlasFileHandle);
     }
 
-    public void addParticleToLibrary(FileHandle handle) {
+    public BoundEffect addParticleToLibrary(FileHandle handle) {
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
         assetProvider.setParticleFolder(handle.parent().path());
         descriptor.setAssetProvider(assetProvider);
@@ -132,6 +132,6 @@ public class BvBWorkspace extends ViewportWidget {
         //remove this
         BoundEffect effect = skeletonContainer.addEffect(descriptor);
         effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
-
+        return effect;
     }
 }

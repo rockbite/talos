@@ -53,4 +53,12 @@ public class AttachmentPoint {
     public float getOffsetY() {
         return offset.y;
     }
+
+    public void setOffsetX (float offsetX) {
+        offset.x = offsetX;
+    }
+
+    public void setOffsetY (float offsetY) {
+        offset.y = offsetY;
+    }
 }
