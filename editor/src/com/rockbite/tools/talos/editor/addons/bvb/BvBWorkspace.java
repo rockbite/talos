@@ -30,6 +30,7 @@ public class BvBWorkspace extends ViewportWidget {
     private AttachmentPoint movingPoint;
 
     private boolean paused = false;
+    private boolean showingTools = false;
     private float speedMultiplier = 1f;
 
     private Array<ParticleEffectDescriptor> vfxLibrary = new Array<>();
@@ -154,6 +155,9 @@ public class BvBWorkspace extends ViewportWidget {
                 if(keycode == Input.Keys.SPACE) {
                     paused = !paused;
                 }
+                if(keycode == Input.Keys.SHIFT_LEFT) {
+                    showingTools = !showingTools;
+                }
 
                 return super.keyDown(event, keycode);
             }
@@ -194,17 +198,22 @@ public class BvBWorkspace extends ViewportWidget {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 
-        batch.end();
+        if(showingTools) {
+            batch.end();
+            Gdx.gl.glLineWidth(1f);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        Gdx.gl.glLineWidth(1f);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        drawShapeRendererTools();
-        shapeRenderer.end();
-        batch.begin();
+            drawShapeRendererTools();
 
-        drawSpriteTools(batch, parentAlpha);
+            shapeRenderer.end();
+            batch.begin();
+
+            if(showingTools) {
+                drawSpriteTools(batch, parentAlpha);
+            }
+        }
     }
 
     private void drawShapeRendererTools() {
@@ -251,13 +260,13 @@ public class BvBWorkspace extends ViewportWidget {
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
                 shapeRenderer.setColor(Color.PURPLE);
-                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(1.5f));
+                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             } else {
                 Bone bone = skeletonContainer.findClosestBone(tmp2);
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
                 shapeRenderer.setColor(Color.WHITE);
-                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(1.5f));
+                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             }
 
         }
