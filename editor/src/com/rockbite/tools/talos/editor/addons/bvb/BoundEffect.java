@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -30,22 +31,10 @@ public class BoundEffect {
      */
     private Array<AttachmentPoint> valueAttachments;
     private AttachmentPoint positionAttachment;
-
-    /**
-     * Sets scope global values to all particle effect instances to use
-     */
-    private ObjectMap<Integer, NumericalValue> globalValues;
-
     /**
      * is it rendered behind animation or in front
      */
     private boolean isBehind;
-
-    /**
-     * rotation bound to certain global value index
-     */
-    private int rotationBindIndex = -1;
-    private String rotationBindBone;
 
     /**
      * if true this spawns only once at remains forever no matter what
@@ -60,7 +49,8 @@ public class BoundEffect {
     /**
      * System vars
      */
-    private NumericalValue tmp = new NumericalValue();
+    Vector2 tmpVec = new Vector2();
+    NumericalValue val = new NumericalValue();
 
 
     public BoundEffect(SkeletonContainer container, ParticleEffectDescriptor descriptor) {
@@ -69,7 +59,6 @@ public class BoundEffect {
         scopePayload = new ScopePayload();
         particleEffects = new Array<>();
         valueAttachments = new Array<>();
-        globalValues = new ObjectMap<>();
     }
 
     public void setForever(boolean isForever) {
@@ -84,30 +73,33 @@ public class BoundEffect {
     }
 
     public void update(float delta) {
-        // setting values
-        for(Integer key: globalValues.keys()) {
-            NumericalValue value = globalValues.get(key);
-            if(value != null) {
-                scopePayload.setDynamicValue(key, value);
-            }
-        }
-
-        // apply rotation info of bone
-        if(rotationBindIndex >= 0) {
-            scopePayload.setDynamicValue(rotationBindIndex, parent.getBoneRotation(rotationBindBone));
-        }
-
         // value attachments
         for(AttachmentPoint attachmentPoint: valueAttachments) {
-            NumericalValue val = tmp;
-            val.set(parent.getBonePosX(attachmentPoint.getBoneName()) + attachmentPoint.getOffsetX(), parent.getBonePosY(attachmentPoint.getBoneName()) + attachmentPoint.getOffsetY());
-            scopePayload.setDynamicValue(attachmentPoint.getIndex(), val);
+            if(attachmentPoint.isStatic()) {
+                scopePayload.setDynamicValue(attachmentPoint.getSlotId(), attachmentPoint.getStaticValue());
+            } else {
+                float rotation = parent.getBoneRotation(attachmentPoint.getBoneName());
+                tmpVec.set(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
+                tmpVec.add(attachmentPoint.getOffsetX(), attachmentPoint.getOffsetY());
+
+                if (attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.POSITION) {
+                    val.set(tmpVec.x, tmpVec.y);
+                } else if (attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.ROTATION) {
+                    val.set(rotation);
+                }
+            }
+
+            scopePayload.setDynamicValue(attachmentPoint.getSlotId(), val);
         }
 
         // update position for each instance and update effect itself
         for(ParticleEffectInstance instance: particleEffects) {
             if (positionAttachment != null) {
-                instance.setPosition(parent.getBonePosX(positionAttachment.getBoneName()) + positionAttachment.getOffsetX(), parent.getBonePosY(positionAttachment.getBoneName()) + positionAttachment.getOffsetY());
+                if(positionAttachment.isStatic()) {
+                    instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
+                } else {
+                    instance.setPosition(parent.getBonePosX(positionAttachment.getBoneName()) + positionAttachment.getOffsetX(), parent.getBonePosY(positionAttachment.getBoneName()) + positionAttachment.getOffsetY());
+                }
 
                 instance.update(delta);
             }
@@ -122,35 +114,13 @@ public class BoundEffect {
         return isBehind;
     }
 
-    public void setGlobalValue(Integer key, NumericalValue value) {
-        globalValues.put(key, value);
-    }
-
     public void removePositionAttachment() {
         positionAttachment = null;
     }
 
-    public void setPositionAttachement(String bone) {
+    public void setPositionAttachment(String bone) {
         positionAttachment = new AttachmentPoint();
-        positionAttachment.setBoneName(bone);
-    }
-
-    public void addValueAttachment(int index, String bone) {
-        AttachmentPoint point = new AttachmentPoint(index);
-        point.setBoneName(bone);
-        if(!valueAttachments.contains(point, false)) {
-            valueAttachments.add(point);
-        }
-    }
-
-    public void bindRotation(int index, String bone) {
-        rotationBindIndex = index;
-        rotationBindBone = bone;
-    }
-
-    public void unBindRotation() {
-        rotationBindIndex = -1;
-        rotationBindBone = null;
+        positionAttachment.setTypeAttached(bone, -1);
     }
 
     public void startInstance() {
