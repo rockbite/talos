@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -13,6 +14,8 @@ public class SkeletonContainer {
     private String currAnimName;
 
     private Array<BoundEffect> boundEffects = new Array<>();
+
+    private Vector2 tmp = new Vector2();
 
     public SkeletonContainer() {
 
@@ -124,5 +127,24 @@ public class SkeletonContainer {
         boundEffects.add(boundEffect);
 
         return boundEffect;
+    }
+
+    public Bone findClosestBone(Vector2 pos) {
+        Bone closestBone = skeleton.getRootBone();
+        float minDist = getBoneDistance(closestBone, pos);
+
+        for(Bone bone: skeleton.getBones()) {
+            float dist = getBoneDistance(bone, pos);
+            if(minDist > dist) {
+                minDist = dist;
+                closestBone = bone;
+            }
+        }
+        return closestBone;
+    }
+
+    public float getBoneDistance(Bone bone, Vector2 pos) {
+        tmp.set(pos);
+        return tmp.dst(bone.getWorldX(), bone.getWorldY());
     }
 }

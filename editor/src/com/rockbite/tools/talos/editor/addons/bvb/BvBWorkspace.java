@@ -25,12 +25,16 @@ public class BvBWorkspace extends ViewportWidget {
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer renderer;
 
+    private AttachmentPoint movingPoint;
+
     private boolean paused = false;
     private float speedMultiplier = 1f;
 
     private Array<ParticleEffectDescriptor> vfxLibrary = new Array<>();
 
     private Vector2 tmp = new Vector2();
+    private Vector2 tmp2 = new Vector2();
+    private Vector2 tmp3 = new Vector2();
 
     BvBWorkspace() {
         setModeUI();
@@ -57,8 +61,6 @@ public class BvBWorkspace extends ViewportWidget {
             private Vector3 tmp3 = new Vector3();
             private Vector2 pos = new Vector2();
             private Vector2 tmp = new Vector2();
-
-            private AttachmentPoint movingPoint;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -193,6 +195,19 @@ public class BvBWorkspace extends ViewportWidget {
                     shapeRenderer.circle(pos.x, pos.y, 3f);
                 }
             }
+        }
+
+        /**
+         * If attachment point of an effect is currently being moved, then draw line to it's origin or nearest bone
+         */
+        if(movingPoint != null && !movingPoint.isStatic()) {
+            tmp2.set(getAttachmentPosition(movingPoint));
+            Bone bone = skeletonContainer.findClosestBone(tmp2);
+            tmp3.set(bone.getWorldX(), bone.getWorldY());
+
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, 3f);
+
         }
     }
 
