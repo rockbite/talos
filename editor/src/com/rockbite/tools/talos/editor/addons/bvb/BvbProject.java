@@ -2,6 +2,10 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.project.IProject;
 
@@ -17,17 +21,22 @@ public class BvbProject implements IProject {
 
     @Override
     public void loadProject(String data) {
-
+        Json json = new Json();
+        JsonValue jsonValue = new JsonReader().parse(data);
+        bvBAddon.workspace.read(json, jsonValue);
     }
 
     @Override
     public String getProjectString() {
-        return "";
+        Json json = new Json();
+        json.setOutputType(JsonWriter.OutputType.json);
+        String data = json.prettyPrint(bvBAddon.workspace);
+        return data;
     }
 
     @Override
     public void resetToNew() {
-
+        bvBAddon.workspace.cleanWorkspace();
     }
 
     @Override

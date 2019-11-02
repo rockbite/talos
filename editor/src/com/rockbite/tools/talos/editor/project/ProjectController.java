@@ -213,6 +213,10 @@ public class ProjectController {
         return currentProject;
     }
 
+    public FileHandle findFile(String path) {
+        return findFile(Gdx.files.absolute(path));
+    }
+
     public FileHandle findFile(FileHandle initialFile) {
         String fileName = initialFile.name();
 

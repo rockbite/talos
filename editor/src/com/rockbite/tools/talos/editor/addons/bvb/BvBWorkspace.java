@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
@@ -21,10 +23,10 @@ import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
-public class BvBWorkspace extends ViewportWidget {
+public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
     private BvBAssetProvider assetProvider;
-    private SkeletonContainer skeletonContainer = new SkeletonContainer();
+    private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer renderer;
 
@@ -35,6 +37,7 @@ public class BvBWorkspace extends ViewportWidget {
     private float speedMultiplier = 1f;
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
+    private ObjectMap<String, String> pathMap = new ObjectMap<>();
 
     private Label hintLabel;
 
@@ -46,6 +49,7 @@ public class BvBWorkspace extends ViewportWidget {
         setModeUI();
 
         assetProvider = new BvBAssetProvider();
+        skeletonContainer = new SkeletonContainer(this);
 
         talosRenderer = new SpriteBatchParticleRenderer(null);
 
@@ -77,6 +81,8 @@ public class BvBWorkspace extends ViewportWidget {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
+
+                if(skeletonContainer.getSkeleton() == null) return false;
 
                 // check for all attachment points
                 for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
@@ -122,6 +128,8 @@ public class BvBWorkspace extends ViewportWidget {
                         movingPoint.setBone(closestBone.getData().getName());
                     }
                 }
+
+                TalosMain.Instance().ProjectController().setDirty();
             }
 
             @Override
@@ -203,6 +211,7 @@ public class BvBWorkspace extends ViewportWidget {
             batch.end();
             Gdx.gl.glLineWidth(1f);
             Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -317,16 +326,21 @@ public class BvBWorkspace extends ViewportWidget {
         }
     }
 
-    public void setAnimation(FileHandle jsonFileHandle) {
-        System.out.println("gavno");
+    public void setSkeleton(FileHandle jsonFileHandle) {
+        pathMap.put(jsonFileHandle.name(), jsonFileHandle.path());
+
         FileHandle atlasFileHandle = Gdx.files.absolute(jsonFileHandle.pathWithoutExtension() + ".atlas");
         jsonFileHandle = TalosMain.Instance().ProjectController().findFile(jsonFileHandle);
         atlasFileHandle = TalosMain.Instance().ProjectController().findFile(atlasFileHandle);
 
-        skeletonContainer.setAnimation(jsonFileHandle, atlasFileHandle);
+        skeletonContainer.setSkeleton(jsonFileHandle, atlasFileHandle);
+
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void addParticle(FileHandle handle) {
+        pathMap.put(handle.name(), handle.path());
+
         String name = handle.nameWithoutExtension();
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
         assetProvider.setParticleFolder(handle.parent().path());
@@ -336,6 +350,8 @@ public class BvBWorkspace extends ViewportWidget {
 
         BoundEffect effect = skeletonContainer.addEffect(name, descriptor);
         effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
+
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void updateParticle(FileHandle handle) {
@@ -347,7 +363,47 @@ public class BvBWorkspace extends ViewportWidget {
             descriptor.load(handle);
             vfxLibrary.put(name, descriptor);
 
-            BoundEffect effect = skeletonContainer.updateEffect(name, descriptor);
+            skeletonContainer.updateEffect(name, descriptor);
         }
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("skeleton", skeletonContainer);
+        json.writeObjectStart("paths");
+        for(String fileName: pathMap.keys()) {
+            json.writeValue(fileName, pathMap.get(fileName));
+        }
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        cleanWorkspace();
+        JsonValue paths = jsonData.get("paths");
+        pathMap.clear();
+        for(JsonValue path: paths) {
+            pathMap.put(path.name(), path.asString());
+        }
+
+        skeletonContainer = new SkeletonContainer(this);
+        skeletonContainer.read(json, jsonData.get("skeleton"));
+    }
+
+    public void cleanWorkspace() {
+        pathMap.clear();
+        skeletonContainer.clear();
+    }
+
+    public String getPath(String fileName) {
+        return pathMap.get(fileName);
+    }
+
+    public BvBAssetProvider getAssetProvider() {
+        return assetProvider;
+    }
+
+    public ObjectMap<String, ParticleEffectDescriptor> getVfxLibrary() {
+        return vfxLibrary;
     }
 }

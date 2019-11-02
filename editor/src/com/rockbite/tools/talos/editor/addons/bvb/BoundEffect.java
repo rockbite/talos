@@ -1,13 +1,17 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class BoundEffect {
+public class BoundEffect implements Json.Serializable {
 
     /**
      * parent skeleton container
@@ -56,6 +60,11 @@ public class BoundEffect {
     Vector2 tmpVec = new Vector2();
     NumericalValue val = new NumericalValue();
 
+    public BoundEffect() {
+        scopePayload = new ScopePayload();
+        particleEffects = new Array<>();
+        valueAttachments = new Array<>();
+    }
 
     public BoundEffect(String name, ParticleEffectDescriptor descriptor, SkeletonContainer container) {
         parent = container;
@@ -170,5 +179,43 @@ public class BoundEffect {
             instance.loopable = true; // this is evil
         }
         // else this will get auto-spawned on next event call anyway.
+    }
+
+    public void setParent(SkeletonContainer parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("effectName", name);
+        json.writeValue("isBehind", isBehind);
+        json.writeValue("positionAttachment", positionAttachment);
+        json.writeValue("valueAttachments", valueAttachments);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        String effectName = jsonData.getString("effectName");
+        String effectPath = parent.getWorkspace().getPath(effectName + ".p");
+        FileHandle effectHandle = TalosMain.Instance().ProjectController().findFile(effectPath);
+        this.name = effectName;
+
+        //TODO: refactor this
+        ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
+        parent.getWorkspace().getAssetProvider().setParticleFolder(effectHandle.parent().path());
+        descriptor.setAssetProvider(parent.getWorkspace().getAssetProvider());
+        descriptor.load(effectHandle);
+        parent.getWorkspace().getVfxLibrary().put(name, descriptor);
+
+        this.particleEffectDescriptor = descriptor;
+
+        setForever(true); // change this
+
+        positionAttachment = json.readValue(AttachmentPoint.class, jsonData.get("positionAttachment"));
+        JsonValue valueAttachmentsJson = jsonData.get("valueAttachments");
+        for(JsonValue valueAttachmentJson: valueAttachmentsJson) {
+            AttachmentPoint point = json.readValue(AttachmentPoint.class, valueAttachmentJson);
+            valueAttachments.add(point);
+        }
     }
 }

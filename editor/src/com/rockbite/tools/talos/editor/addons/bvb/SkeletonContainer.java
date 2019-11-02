@@ -4,12 +4,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 
 
-public class SkeletonContainer {
+public class SkeletonContainer implements Json.Serializable {
+
+    private final BvBWorkspace workspace;
 
     private Skeleton skeleton;
     private AnimationState animationState;
@@ -21,12 +26,11 @@ public class SkeletonContainer {
 
     private Vector2 tmp = new Vector2();
 
-    public SkeletonContainer() {
-
-
+    public SkeletonContainer(BvBWorkspace workspace) {
+        this.workspace = workspace;
     }
 
-    public void setAnimation(FileHandle jsonHandle, FileHandle atlasHandle) {
+    public void setSkeleton(FileHandle jsonHandle, FileHandle atlasHandle) {
         TextureAtlas atlas = new TextureAtlas(atlasHandle);
         SkeletonJson json = new SkeletonJson(atlas);
 
@@ -117,6 +121,18 @@ public class SkeletonContainer {
         return 0;
     }
 
+    public Array<BoundEffect> getBoundEffects(String skinName, String animationName) {
+        if(boundEffects.get(skinName) == null) {
+            boundEffects.put(skinName, new ObjectMap<String, Array<BoundEffect>>());
+        }
+        ObjectMap<String, Array<BoundEffect>> animations = boundEffects.get(skinName);
+        if(animations.get(animationName) == null) {
+            animations.put(animationName, new Array<BoundEffect>());
+        }
+
+        return animations.get(animationName);
+    }
+
     public Array<BoundEffect> getBoundEffects() {
         if(boundEffects.get(currentSkin.getName()) == null) {
             boundEffects.put(currentSkin.getName(), new ObjectMap<String, Array<BoundEffect>>());
@@ -127,6 +143,12 @@ public class SkeletonContainer {
         }
 
         return animations.get(currentAnimation.getName());
+    }
+
+    public BoundEffect addEffect(String skinName, String animationName, BoundEffect effect) {
+        getBoundEffects(skinName, animationName).add(effect);
+
+        return effect;
     }
 
     public BoundEffect addEffect(String name, ParticleEffectDescriptor descriptor) {
@@ -175,5 +197,55 @@ public class SkeletonContainer {
         }
 
         return null;
+    }
+
+    @Override
+    public void write(Json json) {
+        if(skeleton == null) return;
+
+        json.writeValue("skeletonName", skeleton.getData().getName());
+        for(String skinName: boundEffects.keys()) {
+            for(String animationName: boundEffects.get(skinName).keys()) {
+                json.writeArrayStart("boundEffects");
+                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                    json.writeObjectStart();
+                    json.writeValue("skin", skinName);
+                    json.writeValue("animation", animationName);
+                    json.writeValue("data", effect);
+                    json.writeObjectEnd();
+                }
+                json.writeArrayEnd();
+            }
+        }
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        String skeletonName = jsonData.getString("skeletonName");
+        String skeletonPath = workspace.getPath(skeletonName + ".json");
+        FileHandle jsonHandle = TalosMain.Instance().ProjectController().findFile(skeletonPath);
+        workspace.setSkeleton(jsonHandle);
+
+        boundEffects.clear();
+        // now let's load bound effects
+        JsonValue boundEffects = jsonData.get("boundEffects");
+        for(JsonValue boundEffect: boundEffects) {
+            String skin = boundEffect.getString("skin");
+            String animation = boundEffect.getString("animation");
+            JsonValue data = boundEffect.get("data");
+            BoundEffect effect = new BoundEffect();
+            effect.setParent(this);
+            effect.read(json, data);
+            addEffect(skin, animation, effect);
+        }
+    }
+
+    public void clear() {
+        skeleton = null;
+        boundEffects.clear();
+    }
+
+    public BvBWorkspace getWorkspace() {
+        return workspace;
     }
 }

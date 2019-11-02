@@ -85,11 +85,11 @@ public class BvBAddon implements IAddon {
 
             if (handle.extension().equals("json")) {
                 // cool let's load skeletal animation
-                workspace.setAnimation(handle);
+                workspace.setSkeleton(handle);
                 TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
                     @Override
                     public void updated(FileHandle handle) {
-                        workspace.setAnimation(handle);
+                        workspace.setSkeleton(handle);
                     }
                 });
 

@@ -1,9 +1,11 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class AttachmentPoint {
+public class AttachmentPoint implements Json.Serializable {
 
     private Type type;
     private AttachmentType attachmentType;
@@ -97,5 +99,39 @@ public class AttachmentPoint {
 
     public float getOffsetY() {
         return offset.y;
+    }
+
+    @Override
+    public void write(Json json) {
+        if(attachedToSlot >= 0) {
+            json.writeValue("slotId", attachedToSlot);
+        }
+        json.writeValue("type", type.name());
+        if(type == Type.ATTACHED) {
+            json.writeValue("attachmentType", attachmentType.name());
+            json.writeValue("boneName", boneName);
+            json.writeValue("offset", offset);
+        } else {
+            json.writeArrayStart("value");
+            json.writeValue(numericalValue.get(0));
+            json.writeValue(numericalValue.get(1));
+            json.writeValue(numericalValue.get(2));
+            json.writeArrayEnd();
+        }
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        attachedToSlot = jsonData.getInt("slotId", -1);
+        type = Type.valueOf(jsonData.getString("type", Type.STATIC.name()));
+
+        if(type == Type.ATTACHED) {
+            attachmentType = AttachmentType.valueOf(jsonData.getString("attachmentType", AttachmentType.POSITION.name()));
+            boneName = jsonData.getString("boneName");
+            offset = json.readValue(Vector2.class, jsonData.get("offset"));
+        } else {
+            JsonValue arr = jsonData.get("value");
+            numericalValue.set(arr.get(0).asFloat(), arr.get(1).asFloat(), arr.get(2).asFloat());
+        }
     }
 }
