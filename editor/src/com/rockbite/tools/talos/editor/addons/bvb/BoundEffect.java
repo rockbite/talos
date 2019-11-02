@@ -15,6 +15,11 @@ public class BoundEffect {
     SkeletonContainer parent;
 
     /**
+     * name of this effect
+     */
+    String name;
+
+    /**
      * even though this is one effect, many instances of it can be rendered at the same time
      * in cases when it starts more often then finishes
      */
@@ -52,8 +57,9 @@ public class BoundEffect {
     NumericalValue val = new NumericalValue();
 
 
-    public BoundEffect(SkeletonContainer container, ParticleEffectDescriptor descriptor) {
+    public BoundEffect(String name, ParticleEffectDescriptor descriptor, SkeletonContainer container) {
         parent = container;
+        this.name = name;
         this.particleEffectDescriptor = descriptor;
         scopePayload = new ScopePayload();
         particleEffects = new Array<>();
@@ -63,12 +69,18 @@ public class BoundEffect {
     public void setForever(boolean isForever) {
         if(isForever && !forever) {
             particleEffects.clear();
-            ParticleEffectInstance instance = particleEffectDescriptor.createEffectInstance();
-            instance.setScope(scopePayload);
-            particleEffects.add(instance);
+            ParticleEffectInstance instance = spawnEffect();
             instance.loopable = true; // this is evil
         }
         forever = isForever;
+    }
+
+    private ParticleEffectInstance spawnEffect() {
+        ParticleEffectInstance instance = particleEffectDescriptor.createEffectInstance();
+        instance.setScope(scopePayload);
+        particleEffects.add(instance);
+
+        return instance;
     }
 
     public void update(float delta) {
@@ -148,5 +160,15 @@ public class BoundEffect {
 
     public Array<AttachmentPoint> getAttachments() {
         return valueAttachments;
+    }
+
+    public void updateEffect(ParticleEffectDescriptor descriptor) {
+        particleEffectDescriptor = descriptor;
+        if(forever) {
+            particleEffects.clear();
+            ParticleEffectInstance instance = spawnEffect();
+            instance.loopable = true; // this is evil
+        }
+        // else this will get auto-spawned on next event call anyway.
     }
 }

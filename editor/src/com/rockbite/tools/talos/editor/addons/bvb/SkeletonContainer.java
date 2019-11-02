@@ -17,7 +17,7 @@ public class SkeletonContainer {
     private Animation currentAnimation;
     private Skin currentSkin;
 
-    private ObjectMap<SkinAnimationPair, Array<BoundEffect>> boundEffects = new ObjectMap<>();
+    private ObjectMap<String, ObjectMap<String, Array<BoundEffect>>> boundEffects = new ObjectMap<>();
 
     private Vector2 tmp = new Vector2();
 
@@ -76,7 +76,7 @@ public class SkeletonContainer {
             animationState.apply(skeleton);
         }
 
-        for(BoundEffect effect: getSubset()) {
+        for(BoundEffect effect: getBoundEffects()) {
             effect.update(delta);
         }
     }
@@ -118,29 +118,24 @@ public class SkeletonContainer {
     }
 
     public Array<BoundEffect> getBoundEffects() {
-        return getSubset();
-    }
-
-    public BoundEffect addEffect(ParticleEffectDescriptor descriptor) {
-        BoundEffect boundEffect = new BoundEffect(this, descriptor);
-        boundEffect.setForever(true);
-
-        getSubset().add(boundEffect);
-
-        return boundEffect;
-    }
-
-    private Array<BoundEffect> getSubset() {
-        SkinAnimationPair pair = subsetKey();
-        if(!boundEffects.containsKey(pair)) {
-            boundEffects.put(pair, new Array<BoundEffect>());
+        if(boundEffects.get(currentSkin.getName()) == null) {
+            boundEffects.put(currentSkin.getName(), new ObjectMap<String, Array<BoundEffect>>());
+        }
+        ObjectMap<String, Array<BoundEffect>> animations = boundEffects.get(currentSkin.getName());
+        if(animations.get(currentAnimation.getName()) == null) {
+            animations.put(currentAnimation.getName(), new Array<BoundEffect>());
         }
 
-        return boundEffects.get(pair);
+        return animations.get(currentAnimation.getName());
     }
 
-    private SkinAnimationPair subsetKey() {
-        return SkinAnimationPair.make(currentSkin, currentAnimation);
+    public BoundEffect addEffect(String name, ParticleEffectDescriptor descriptor) {
+        BoundEffect boundEffect = new BoundEffect(name, descriptor, this);
+        boundEffect.setForever(true);
+
+        getBoundEffects().add(boundEffect);
+
+        return boundEffect;
     }
 
     public Bone findClosestBone(Vector2 pos) {
@@ -164,5 +159,21 @@ public class SkeletonContainer {
 
     public Bone getBoneByName(String boneName) {
         return skeleton.findBone(boneName);
+    }
+
+    public BoundEffect updateEffect(String name, ParticleEffectDescriptor descriptor) {
+        for(ObjectMap<String, Array<BoundEffect>> skins: boundEffects.values()) {
+            for(Array<BoundEffect> animations: skins.values()) {
+                for(BoundEffect effect: animations) {
+                    if(effect.name.equals(name)) {
+                        // found it
+                        effect.updateEffect(descriptor);
+                        return effect;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

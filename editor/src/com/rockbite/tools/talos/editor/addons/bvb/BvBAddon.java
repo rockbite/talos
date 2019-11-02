@@ -86,13 +86,25 @@ public class BvBAddon implements IAddon {
             if (handle.extension().equals("json")) {
                 // cool let's load skeletal animation
                 workspace.setAnimation(handle);
+                TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
+                    @Override
+                    public void updated(FileHandle handle) {
+                        workspace.setAnimation(handle);
+                    }
+                });
 
                 return true;
             }
 
             if (handle.extension().equals("p")) {
                 // adding particle effect? I can do that
-                workspace.addParticleToLibrary(handle);
+                workspace.addParticle(handle);
+                TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
+                    @Override
+                    public void updated(FileHandle handle) {
+                        workspace.updateParticle(handle);
+                    }
+                });
 
                 return true;
             }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.ViewportWidget;
@@ -33,7 +34,7 @@ public class BvBWorkspace extends ViewportWidget {
     private boolean showingTools = false;
     private float speedMultiplier = 1f;
 
-    private Array<ParticleEffectDescriptor> vfxLibrary = new Array<>();
+    private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
 
     private Label hintLabel;
 
@@ -288,7 +289,6 @@ public class BvBWorkspace extends ViewportWidget {
 
     private void drawSpine(Batch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
-        AnimationState animationState = skeletonContainer.getAnimationState();
         if(skeleton == null) return;
 
         skeleton.setPosition(0, 0);
@@ -306,6 +306,9 @@ public class BvBWorkspace extends ViewportWidget {
     }
 
     private void drawVFX(Batch batch, float parentAlpha) {
+        Skeleton skeleton = skeletonContainer.getSkeleton();
+        if(skeleton == null) return;
+
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
@@ -315,6 +318,7 @@ public class BvBWorkspace extends ViewportWidget {
     }
 
     public void setAnimation(FileHandle jsonFileHandle) {
+        System.out.println("gavno");
         FileHandle atlasFileHandle = Gdx.files.absolute(jsonFileHandle.pathWithoutExtension() + ".atlas");
         jsonFileHandle = TalosMain.Instance().ProjectController().findFile(jsonFileHandle);
         atlasFileHandle = TalosMain.Instance().ProjectController().findFile(atlasFileHandle);
@@ -322,16 +326,28 @@ public class BvBWorkspace extends ViewportWidget {
         skeletonContainer.setAnimation(jsonFileHandle, atlasFileHandle);
     }
 
-    public void addParticleToLibrary(FileHandle handle) {
+    public void addParticle(FileHandle handle) {
+        String name = handle.nameWithoutExtension();
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
         assetProvider.setParticleFolder(handle.parent().path());
         descriptor.setAssetProvider(assetProvider);
         descriptor.load(handle);
+        vfxLibrary.put(name, descriptor);
 
-        vfxLibrary.add(descriptor);
-
-        //remove this
-        BoundEffect effect = skeletonContainer.addEffect(descriptor);
+        BoundEffect effect = skeletonContainer.addEffect(name, descriptor);
         effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
+    }
+
+    public void updateParticle(FileHandle handle) {
+        String name = handle.nameWithoutExtension();
+        if(vfxLibrary.containsKey(name)) {
+            ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
+            assetProvider.setParticleFolder(handle.parent().path());
+            descriptor.setAssetProvider(assetProvider);
+            descriptor.load(handle);
+            vfxLibrary.put(name, descriptor);
+
+            BoundEffect effect = skeletonContainer.updateEffect(name, descriptor);
+        }
     }
 }
