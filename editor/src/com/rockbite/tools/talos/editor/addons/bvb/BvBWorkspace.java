@@ -65,12 +65,13 @@ public class BvBWorkspace extends ViewportWidget {
         drawSpine(batch, parentAlpha);
         drawVFX(batch, parentAlpha);
 
-        batch.end();
+
         drawTools(batch, parentAlpha);
-        batch.begin();
+
     }
 
     private void drawTools(Batch batch, float parentAlpha) {
+        batch.end();
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 
@@ -78,11 +79,34 @@ public class BvBWorkspace extends ViewportWidget {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        drawShapeRendererTools();
+        shapeRenderer.end();
+        batch.begin();
+
+        drawSpriteTools(batch, parentAlpha);
+    }
+
+    private void drawShapeRendererTools() {
+        /**
+         * Drawing bones
+         */
+        Skeleton skeleton = skeletonContainer.getSkeleton();
         shapeRenderer.setColor(Color.RED);
         for (Bone bone : skeleton.getBones()) {
             shapeRenderer.circle(bone.getWorldX(), bone.getWorldY(), 2f);
         }
-        shapeRenderer.end();
+
+
+        /**
+         * Draw bound effects and their attachment points
+         */
+        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+
+        }
+    }
+
+    private void drawSpriteTools(Batch batch, float parentAlpha) {
+
     }
 
     private void drawSpine(Batch batch, float parentAlpha) {
@@ -131,7 +155,7 @@ public class BvBWorkspace extends ViewportWidget {
 
         //remove this
         BoundEffect effect = skeletonContainer.addEffect(descriptor);
-        effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
+        //effect.setPositionAttachement(skeletonContainer.getSkeleton().getRootBone().toString());
         return effect;
     }
 }

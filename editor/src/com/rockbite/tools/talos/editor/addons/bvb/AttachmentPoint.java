@@ -1,40 +1,80 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.math.Vector2;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class AttachmentPoint {
 
-    public static final int POSITION_TYPE = 0;
-    public static final int GLOBAL_VALUE_TYPE = 1;
+    private Type type;
+    private AttachmentType attachmentType;
+    private int attachedToSlot = 0;
 
-    private Vector2 offset = new Vector2();
-    private int type;
-
-    private int index = 0; // used when type is global value only
-
+    /**
+     * Attached to bone
+     */
     private String boneName;
+    private Vector2 offset = new Vector2();
+
+    /**
+     * attached to static numeric value
+     */
+    private NumericalValue numericalValue = new NumericalValue();
+
+    public boolean isStatic() {
+        return type == Type.STATIC;
+    }
+
+    public boolean seAttached() {
+        return type == Type.ATTACHED;
+    }
+
+    public AttachmentType getAttachmentType() {
+        return attachmentType;
+    }
+
+    public NumericalValue getStaticValue() {
+        return numericalValue;
+    }
+
+    enum Type {
+        STATIC,
+        ATTACHED
+    }
+
+    enum AttachmentType {
+        POSITION,
+        ROTATION
+    }
 
     public AttachmentPoint() {
-        index = 0;
-        type = POSITION_TYPE;
+        setTypeStatic(numericalValue, 0);
     }
 
-    public AttachmentPoint(int value) {
-        this.index = value;
-        type = GLOBAL_VALUE_TYPE;
+    public void setTypeAttached(String bone, int toSlot) {
+        type = Type.ATTACHED;
+        this.attachedToSlot = toSlot;
+        attachmentType = AttachmentType.POSITION;
+        boneName = bone;
     }
 
-    public void setBoneName(String boneName) {
-        this.boneName = boneName;
+    public void setTypeStatic(NumericalValue value, int toSlot) {
+        type = Type.STATIC;
+        this.attachedToSlot = toSlot;
+        numericalValue.set(value);
+    }
+
+    public void setTypeAttached(AttachmentType attachmentType) {
+        if(type == Type.ATTACHED) {
+            this.attachmentType = attachmentType;
+        }
     }
 
     @Override
     public int hashCode() {
-        return type * 10 + index;
+        return attachedToSlot;
     }
 
-    public void setData(String boneName, float offsetX, float offsetY) {
-        this.boneName = boneName;
+    public void setOffset(float offsetX, float offsetY) {
         offset.set(offsetX, offsetY);
     }
 
@@ -42,8 +82,8 @@ public class AttachmentPoint {
         return boneName;
     }
 
-    public int getIndex() {
-        return index;
+    public int getSlotId() {
+        return attachedToSlot;
     }
 
     public float getOffsetX() {
