@@ -55,6 +55,7 @@ public abstract class ViewportWidget extends Table {
     private float gridSize;
     private float worldWidth = 1f;
 
+    private Vector3 tmp = new Vector3();
 
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
@@ -99,7 +100,7 @@ public abstract class ViewportWidget extends Table {
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                cameraController.touchDragged((int)x, (int)y, pointer);System.out.println("b");
+                cameraController.touchDragged((int)x, (int)y, pointer);
             }
 
             @Override
@@ -199,7 +200,6 @@ public abstract class ViewportWidget extends Table {
         camera.update();
     }
 
-
     protected void setWorldSize(float worldWidth) {
         this.worldWidth = worldWidth;
         updateNumbers();
@@ -247,7 +247,7 @@ public abstract class ViewportWidget extends Table {
         x =  x - x % (gridSize*8f);
         y =  y - y % (gridSize*8f);
 
-        float thickness = 0.01f * camera.zoom * (getStage().getWidth()/getWidth());
+        float thickness = pixelToWorld(1.5f);
 
         for(int i = -countX/2-8; i <= countX/2+8; i++) {
             if(i % 4 == 0) gridColor.a = brightAlpha;
@@ -283,5 +283,17 @@ public abstract class ViewportWidget extends Table {
         vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
 
         return vec;
+    }
+
+    protected float pixelToWorld(float pixelSize) {
+        tmp.set(0, 0, 0);
+        camera.unproject(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(pixelSize, 0, 0);
+        camera.unproject(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline); //TODO: I am sure there is a better way to do this
     }
 }
