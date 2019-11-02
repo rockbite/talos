@@ -2,7 +2,6 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
@@ -141,5 +140,13 @@ public class BoundEffect {
 
     public Array<ParticleEffectInstance> getParticleEffects() {
         return particleEffects;
+    }
+
+    public AttachmentPoint getPositionAttachment() {
+        return positionAttachment;
+    }
+
+    public Array<AttachmentPoint> getAttachments() {
+        return valueAttachments;
     }
 }
