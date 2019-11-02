@@ -414,7 +414,7 @@ public class UIStage {
 		VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
 		midTable.add(horizontalPane).expand().grow().fill();
 		horizontalPane.setMaxSplitAmount(0.8f);
-		horizontalPane.setMinSplitAmount(0.2f);
+		horizontalPane.setMinSplitAmount(0.27f);
 		horizontalPane.setSplitAmount(0.3f);
 
 		fullScreenTable.row();

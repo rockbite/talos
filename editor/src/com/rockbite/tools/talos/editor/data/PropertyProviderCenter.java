@@ -1,16 +1,15 @@
 package com.rockbite.tools.talos.editor.data;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.CheckboxWidget;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.FloatWidget;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.LabelWidget;
+import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.rockbite.tools.talos.editor.wrappers.Property;
 
 public class PropertyProviderCenter {
 
-	private ObjectMap<Class, Pool<? extends PropertyWidget>> propertyWidgetMap = new ObjectMap<>();
+	private ObjectMap<Class, Class<? extends PropertyWidget>> propertyWidgetMap = new ObjectMap<>();
 
 	private static PropertyProviderCenter instance;
 
@@ -24,35 +23,24 @@ public class PropertyProviderCenter {
 	}
 
 	public PropertyWidget obtainWidgetForProperty (Property property) {
-		Pool<? extends PropertyWidget> pool = propertyWidgetMap.get(property.getValueClass());
-		PropertyWidget obtain = pool.obtain();
+		Class<? extends PropertyWidget> aClass = propertyWidgetMap.get(property.getValueClass());
+		PropertyWidget obtain = null;
+		try {
+			obtain = aClass.newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		obtain.configureForProperty(property);
 
 		return obtain;
 	}
 
 	private void registerMaps () {
-		Pool<LabelWidget> stringWidgetPool = new Pool<LabelWidget>() {
-			@Override
-			protected LabelWidget newObject () {
-				return new LabelWidget();
-			}
-		};
-		Pool<FloatWidget> floatWidgetPool = new Pool<FloatWidget>() {
-			@Override
-			protected FloatWidget newObject () {
-				return new FloatWidget();
-			}
-		};
-		Pool<CheckboxWidget> checkboxWidgetPool = new Pool<CheckboxWidget>() {
-			@Override
-			protected CheckboxWidget newObject () {
-				return new CheckboxWidget();
-			}
-		};
-
-		propertyWidgetMap.put(String.class, stringWidgetPool);
-		propertyWidgetMap.put(Float.class, floatWidgetPool);
-		propertyWidgetMap.put(Boolean.class, checkboxWidgetPool);
+		propertyWidgetMap.put(String.class, LabelWidget.class);
+		propertyWidgetMap.put(Float.class, FloatWidget.class);
+		propertyWidgetMap.put(Boolean.class, CheckboxWidget.class);
+		propertyWidgetMap.put(Array.class, GlobalValueWidget.class);
 	}
 }

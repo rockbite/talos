@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class ListWithCustomRows<T extends ListCustomRow> extends Table {
 
-	private Array<T> items = new Array();
+	private Array<T> items = new Array<>();
 	private T currentSelectedItem;
 
 	public ListWithCustomRows (Skin skin) {

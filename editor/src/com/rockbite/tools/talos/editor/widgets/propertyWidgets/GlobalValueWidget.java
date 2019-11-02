@@ -1,19 +1,17 @@
 package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.CollapsibleWidget;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
-import com.rockbite.tools.talos.runtime.values.NumericalValue;
+import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
 
-public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, AttachmentPoint>> {
+public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
 	CollapsibleWidget collapsibleWidget;
 	Label titleLabel;
@@ -21,8 +19,6 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 	Button addRowButton;
 	Button deleteRowButton;
 	private ListWithCustomRows<GlobalValueRowWidget> globalValueList;
-
-	int index;
 
 	Array<GlobalValueRowWidget> currentActiveValues = new Array<>();
 	Selection<GlobalValueWidget> currentSelection = new Selection<>();
@@ -38,19 +34,23 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 
 	public GlobalValueWidget () {
 		super();
-		debugAll();
 
 		Skin skin = TalosMain.Instance().getSkin();
 		topTable = new Table();
-		titleLabel = new Label("COLLAPSE THIS SHIT", skin);
-		collapseButton = new ImageButton(skin.getDrawable("ic-down"));
-		topTable.add(titleLabel).expandX();
+		titleLabel = new Label("attachments", skin);
+		collapseButton = new ImageButton(skin.getDrawable("panel-collapse-down"));
 		topTable.add(collapseButton);
+		titleLabel.setAlignment(Align.left);
+		topTable.add(titleLabel).expandX().left().padLeft(10);
 
 		mainTable = new Table();
+		mainTable.setFillParent(true);
+		mainTable.setBackground(skin.getDrawable("panel_button_bg"));
+
 		globalValueList = new ListWithCustomRows<>(skin);
-		addRowButton = new ImageButton(skin.getDrawable("ic-folder-aster"));
-		deleteRowButton = new ImageButton(skin.getDrawable("ic-file-delete"));
+		globalValueList.setBackground(skin.getDrawable("panel_input_bg"));
+		addRowButton = new ImageButton(skin.getDrawable("ic-input-file-add"));
+		deleteRowButton = new ImageButton(skin.getDrawable("ic-input-file-delete"));
 		mainTable.add(globalValueList).grow();
 
 		mainTable.row();
@@ -62,7 +62,7 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 		collapsibleWidget = new CollapsibleWidget(mainTable, false);
 		add(topTable).growX();
 		row();
-		add(collapsibleWidget).grow();
+		add(collapsibleWidget).grow().padTop(10);
 
 		addListeners();
 	}
@@ -71,7 +71,10 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 		collapseButton.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				collapsibleWidget.setCollapsed(collapseButton.isChecked());
+				boolean checked = collapseButton.isChecked();
+				Skin skin = TalosMain.Instance().getSkin();
+				collapseButton.setBackground(checked ? skin.getDrawable("panel-collapse-down") : skin.getDrawable("panel-collapse-right"));
+				collapsibleWidget.setCollapsed(checked);
 			}
 		});
 
@@ -91,12 +94,11 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 	}
 
 	private void addNewRow () {
-		if (hasAvailableGlobalPoint()) {
-			int nextAvailableIndex = getNextAvailableIndex();
-			GlobalValueRowWidget value = new GlobalValueRowWidget(GlobalValueWidget.this, nextAvailableIndex);
-			globalValueList.addItem(value);
-			localItems.put(nextAvailableIndex, value);
-		}
+		int nextAvailableIndex = getNextAvailableIndex();
+		AttachmentPoint attachmentPoint = bondedProperty.getValue().get(nextAvailableIndex);
+		GlobalValueRowWidget value = new GlobalValueRowWidget(GlobalValueWidget.this, attachmentPoint);
+		globalValueList.addItem(value);
+		localItems.put(nextAvailableIndex, value);
 	}
 
 	private void removeRow (GlobalValueRowWidget row) {
@@ -105,15 +107,7 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 	}
 
 	public int getNextAvailableIndex () {
-		ObjectMap<Integer, AttachmentPoint> value = bondedProperty.getValue();
-		int maximumIndex = getMaximumIndex();
-		for (int i = 0; i <= maximumIndex; i++) {
-			if (value.get(i) != null && localItems.get(i) == null) {
-				return i;
-			}
-		}
-
-		throw new GdxRuntimeException("Make Sure there is available binding point");
+		return 0;
 	}
 
 	private boolean hasAvailableGlobalPoint () {
@@ -122,13 +116,16 @@ public class GlobalValueWidget extends PropertyWidget<ObjectMap<Integer, Attachm
 
 	private int getMaximumIndex () {
 		int max = 0;
-		for (Integer key : bondedProperty.getValue().keys()) {
-			if (key > max) {
-				max = key;
+		for (AttachmentPoint key : bondedProperty.getValue()) {
+			if (key.getSlotId() > max) {
+				max = key.getSlotId();
 			}
 		}
 
 		return max;
 	}
 
+	public void askForNewPlace () {
+
+	}
 }

@@ -172,7 +172,15 @@ public class BoundEffect implements IPropertyProvider {
             }
         };
 
+		Property<Array<AttachmentPoint>> globalValues = new MutableProperty<Array<AttachmentPoint>>("", valueAttachments) {
+			@Override
+			public void changed (Array<AttachmentPoint> newValue) {
+
+			}
+		};
+
         properties.add(boneName, offsetX, offsetY, behind);
+        properties.add(globalValues);
         return properties;
     }
 

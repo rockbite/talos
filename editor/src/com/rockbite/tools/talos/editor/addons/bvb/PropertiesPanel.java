@@ -30,6 +30,7 @@ public class PropertiesPanel extends Window {
         setModal(false);
         setMovable(false);
         ScrollPane scrollPane = new ScrollPane(propertyGroup);
+        scrollPane.setScrollingDisabled(true, false);
         add(scrollPane).grow();
 
         reconstruct();
@@ -45,29 +46,17 @@ public class PropertiesPanel extends Window {
         propertyGroup.clear();
         propertyGroup.top().left();
 
+        debugAll();
+
         Table propertyTable = new Table();
-        GlobalValueWidget actor = new GlobalValueWidget();
-        ObjectMap<Integer, AttachmentPoint> entries = new ObjectMap<>();
-        entries.put(4, new AttachmentPoint());
-        Property<ObjectMap<Integer, AttachmentPoint>> objectMapProperty = new MutableProperty<ObjectMap<Integer, AttachmentPoint>>("zibil", entries) {
-            @Override
-            public void changed (ObjectMap<Integer, AttachmentPoint> newValue) {
-            }
-        };
-        actor.configureForProperty(objectMapProperty);
-        propertyTable.add(actor).growX();
         propertyGroup.add(propertyTable).growX();
-
         for (IPropertyProvider currentPropertyPanel : currentPropertyPanels) {
-
-//            Array<Property> listOfProperties = currentPropertyPanel.getListOfProperties();
-//            for (Property property : listOfProperties) {
-//                PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
-//                propertyTable.add(propertyWidget).expandX();
-//                propertyTable.row();
-//            }
-
-
+            Array<Property> listOfProperties = currentPropertyPanel.getListOfProperties();
+            for (Property property : listOfProperties) {
+                PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
+                propertyTable.add(propertyWidget).growX();
+                propertyTable.row();
+            }
         }
     }
 
