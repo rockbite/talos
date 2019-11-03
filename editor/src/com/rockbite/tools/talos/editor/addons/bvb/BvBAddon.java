@@ -98,14 +98,13 @@ public class BvBAddon implements IAddon {
 
             if (handle.extension().equals("p")) {
                 // adding particle effect? I can do that
-                BoundEffect boundEffect = workspace.addParticle(handle);
+                workspace.addParticle(handle);
                 TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
                     @Override
                     public void updated(FileHandle handle) {
                         workspace.updateParticle(handle);
                     }
                 });
-                propertiesPanel.addProperty(boundEffect);
 
                 return true;
             }
