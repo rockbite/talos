@@ -470,7 +470,9 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
+					TalosMain.Instance().ProjectController().lastDirTrackingDisable();
 					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
+					TalosMain.Instance().ProjectController().lastDirTrackingEnable();
 					TalosMain.Instance().ProjectController().unbindFromFile();
 				}
 			});

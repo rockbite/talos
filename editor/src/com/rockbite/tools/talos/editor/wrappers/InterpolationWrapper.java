@@ -20,15 +20,11 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Field;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
-import com.rockbite.tools.talos.runtime.modules.InterpolationModule;
+import com.rockbite.tools.talos.runtime.Slot;
+import com.rockbite.tools.talos.runtime.modules.*;
 import com.rockbite.tools.talos.runtime.utils.InterpolationMappings;
 
 public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
@@ -67,6 +63,14 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
                 module.setInterpolation(interp);
             }
         });
+    }
+
+
+    @Override
+    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+
+        if(slot.getIndex() == InterpolationModule.ALPHA) return InputModule.class;
+        return null;
     }
 
     @Override

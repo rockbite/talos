@@ -87,11 +87,13 @@ public class PreviewWidget extends ViewportWidget {
     private IDragPointProvider dragPointProvider = null;
 
     private String backgroundImagePath = "";
+    private float gridSize;
 
     public PreviewWidget() {
         super();
 
         setWorldSize(10f);
+        gridSize = 1f;
 
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
@@ -108,6 +110,7 @@ public class PreviewWidget extends ViewportWidget {
             public void gridSizeChanged(float size) {
                 super.gridSizeChanged(size);
                 setWorldSize(10f * size);
+                gridSize = size;
                 resetCamera();
             }
         };
@@ -404,5 +407,14 @@ public class PreviewWidget extends ViewportWidget {
         setCameraZoom(1.4285715f);
         setCameraPos(0, 0);
         unregisterDragPoints();
+    }
+
+    public float getGridSize() {
+        return gridSize;
+    }
+
+    public void setGridSize(float gridSize) {
+        this.gridSize = gridSize;
+        previewController.setGridSize(gridSize);
     }
 }
