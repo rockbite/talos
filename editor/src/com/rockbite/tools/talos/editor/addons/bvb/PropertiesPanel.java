@@ -57,8 +57,6 @@ public class PropertiesPanel extends Window {
         propertyWidgets.clear();
         propertyGroup.top().left();
 
-        debugAll();
-
         Table propertyTable = new Table();
         propertyGroup.add(propertyTable).growX();
         for (IPropertyProvider currentPropertyPanel : currentPropertyPanels) {
