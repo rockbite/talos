@@ -80,7 +80,8 @@
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 		default: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: default-font, selection: padded-list-selection, background: select-box-list-bg}, font: default-font, fontColor: white, disabledFontColor: grey }
-		small: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: small-font, selection: padded-list-selection, background: select-box-list-bg}, font: small-font, fontColor: white, disabledFontColor: grey }
+		small: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: small-font, selection: padded-list-selection, background: select-box-list-bg}, font: small-font, fontColor: white, disabledFontColor: grey },
+		propertyValue: {background: panel_select, backgroundOver: panel_select_selected, backgroundOpen: panel_select_selected, scrollStyle: default, listStyle: {font: default-font, selection: padded-list-selection, background: select-box-list-bg}, font: default-font, fontColor: white, disabledFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.SplitPane$SplitPaneStyle: {
 		default-vertical: {handle: splitpane-vertical }

@@ -1,19 +1,13 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.data.PropertyProviderCenter;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.GlobalValueWidget;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyProviderCenter;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.rockbite.tools.talos.editor.wrappers.IPropertyProvider;
-import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
-import com.rockbite.tools.talos.editor.wrappers.Property;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.Property;
 
 public class PropertiesPanel extends Window {
 
@@ -22,8 +16,8 @@ public class PropertiesPanel extends Window {
 
     Array<PropertyWidget> propertyWidgets = new Array<>();
 
-    public PropertiesPanel(Skin skin) {
-        super("Global Properties", skin);
+    public PropertiesPanel(IPropertyProvider propertyProvider, Skin skin) {
+        super(propertyProvider.getPropertyBoxTitle(), skin);
         setBackground(skin.getDrawable("panel"));
 
         padLeft(5);
@@ -35,7 +29,7 @@ public class PropertiesPanel extends Window {
         scrollPane.setScrollingDisabled(true, false);
         add(scrollPane).grow();
 
-        reconstruct();
+        setPropertyProvider(propertyProvider);
     }
 
     @Override
@@ -46,7 +40,7 @@ public class PropertiesPanel extends Window {
         }
     }
 
-    public void addProperty (IPropertyProvider propertyProvider) {
+    private void setPropertyProvider (IPropertyProvider propertyProvider) {
         currentPropertyPanels.clear();
         currentPropertyPanels.add(propertyProvider);
         reconstruct();
@@ -58,14 +52,16 @@ public class PropertiesPanel extends Window {
         propertyGroup.top().left();
 
         Table propertyTable = new Table();
-        propertyGroup.add(propertyTable).growX();
+        propertyGroup.add(propertyTable).growX().padRight(5);
         for (IPropertyProvider currentPropertyPanel : currentPropertyPanels) {
             Array<Property> listOfProperties = currentPropertyPanel.getListOfProperties();
-            for (Property property : listOfProperties) {
-                PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
-                propertyWidgets.add(propertyWidget);
-                propertyTable.add(propertyWidget).growX();
-                propertyTable.row();
+            if(listOfProperties != null) {
+                for (Property property : listOfProperties) {
+                    PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
+                    propertyWidgets.add(propertyWidget);
+                    propertyTable.add(propertyWidget).growX().pad(5f);
+                    propertyTable.row();
+                }
             }
         }
     }

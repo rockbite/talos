@@ -1,17 +1,13 @@
-package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
+package com.rockbite.tools.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.Bone;
 import com.kotcrab.vis.ui.widget.CollapsibleWidget;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
-import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
-import com.rockbite.tools.talos.editor.wrappers.Property;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 
 public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
@@ -66,6 +62,11 @@ public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 		add(collapsibleWidget).grow().padTop(10);
 
 		addListeners();
+	}
+
+	@Override
+	public Actor getValueActor() {
+		return null;
 	}
 
 	private void addListeners () {

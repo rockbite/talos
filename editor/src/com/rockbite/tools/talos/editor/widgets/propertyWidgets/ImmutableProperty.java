@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.editor.wrappers;
+package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
 public abstract class ImmutableProperty<T> extends Property<T> {
 

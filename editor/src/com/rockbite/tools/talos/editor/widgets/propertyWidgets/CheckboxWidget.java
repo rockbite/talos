@@ -2,14 +2,11 @@ package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
-import com.rockbite.tools.talos.editor.wrappers.Property;
 
 public class CheckboxWidget extends PropertyWidget<Boolean> {
+
 	private CheckBox checkBox;
 
 	@Override
@@ -17,10 +14,8 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 		checkBox.setChecked(bondedProperty.getValue());
 	}
 
-	public CheckboxWidget() {
-		super();
-		left();
-
+	@Override
+	public Actor getValueActor() {
 		checkBox = new CheckBox("", TalosMain.Instance().getSkin());
 		checkBox.addListener(new ChangeListener() {
 			@Override
@@ -29,7 +24,7 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 			}
 		});
 
-		add(checkBox).expandX();
+		return checkBox;
 	}
 
 	@Override

@@ -2,12 +2,12 @@ package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.tools.talos.editor.addons.bvb.GlobalValueWidget;
 
 
 public class ListWithCustomRows<T extends ListCustomRow> extends Table {

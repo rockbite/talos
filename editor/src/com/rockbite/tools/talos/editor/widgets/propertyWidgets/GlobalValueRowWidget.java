@@ -2,15 +2,14 @@ package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
+import com.rockbite.tools.talos.editor.addons.bvb.GlobalValueWidget;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
-import javafx.geometry.Pos;
 
 public class GlobalValueRowWidget extends ListCustomRow {
 

@@ -1,7 +1,9 @@
-package com.rockbite.tools.talos.editor.wrappers;
+package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 public abstract class Property<T> {
 
@@ -31,6 +33,21 @@ public abstract class Property<T> {
 
 	public Object getAdditionalProperty (String value) {
 		return additionalProperties.get(value);
+	}
+
+	public <E extends PropertyWidget> E getPropertyWidgetClass() {
+		Type genericType = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		if(genericType == String.class) {
+			return (E) new LabelWidget();
+		}
+		if(genericType == Boolean.class) {
+			return (E) new CheckboxWidget();
+		}
+		if(genericType == Float.class) {
+			return (E) new FloatWidget();
+		}
+
+		return null;
 	}
 
 }

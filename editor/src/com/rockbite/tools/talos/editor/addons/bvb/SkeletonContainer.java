@@ -9,10 +9,11 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 
 
-public class SkeletonContainer implements Json.Serializable {
+public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private final BvBWorkspace workspace;
 
@@ -270,5 +271,85 @@ public class SkeletonContainer implements Json.Serializable {
 
     public BvBWorkspace getWorkspace() {
         return workspace;
+    }
+
+    @Override
+    public Array<Property> getListOfProperties() {
+        Array<Property> properties = new Array<>();
+
+        final Property<String> skeletonName = new ImmutableProperty<String>("Skeleton", "N/A") {
+            @Override
+            public String getValue () {
+                if(skeleton != null) {
+                    return skeleton.getData().getName();
+                }
+                return "N/A";
+            }
+        };
+
+        final Property<String> currentSkinProperty = new StringListProperty("Skin", "N/A") {
+            @Override
+            public Array<String> getOptionsList() {
+                if(skeleton != null) {
+                    Array<String> result = new Array<>();
+                    for(Skin skin : skeleton.getData().getSkins()) {
+                        result.add(skin.getName());
+                    }
+                    return result;
+                }
+                return null;
+            }
+
+            @Override
+            public void changed(String newValue) {
+
+            }
+
+            @Override
+            public String getValue () {
+                if(currentSkin != null) {
+                    return currentSkin.getName();
+                }
+                return "N/A";
+            }
+        };
+
+        final Property<String> currentAnimationProperty = new StringListProperty("Animation", "N/A") {
+            @Override
+            public Array<String> getOptionsList() {
+                if(skeleton != null) {
+                    Array<String> result = new Array<>();
+                    for(Animation animation : skeleton.getData().getAnimations()) {
+                        result.add(animation.getName());
+                    }
+                    return result;
+                }
+                return null;
+            }
+
+            @Override
+            public void changed(String newValue) {
+
+            }
+
+            @Override
+            public String getValue () {
+                if(currentAnimation != null) {
+                    return currentAnimation.getName();
+                }
+                return "N/A";
+            }
+        };
+
+        properties.add(skeletonName);
+        properties.add(currentSkinProperty);
+        properties.add(currentAnimationProperty);
+
+        return properties;
+    }
+
+    @Override
+    public String getPropertyBoxTitle() {
+        return "Main Properties";
     }
 }

@@ -3,12 +3,10 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.rockbite.tools.talos.editor.data.PropertyProviderCenter;
-import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
-import com.rockbite.tools.talos.editor.wrappers.Property;
-import com.rockbite.tools.talos.editor.wrappers.IPropertyProvider;
-import com.rockbite.tools.talos.editor.wrappers.ImmutableProperty;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.MutableProperty;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.Property;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.ImmutableProperty;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
@@ -240,8 +238,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
     }
 
     @Override
-    public String getTitle () {
-        return "Bound Effect Properties";
+    public String getPropertyBoxTitle () {
+        return name;
     }
 
     public AttachmentPoint getPositionAttachment() {

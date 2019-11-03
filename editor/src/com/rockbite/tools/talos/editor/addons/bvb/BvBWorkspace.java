@@ -25,6 +25,7 @@ import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
+    private final BvBAddon bvb;
     private BvBAssetProvider assetProvider;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
@@ -45,7 +46,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
     private Vector2 tmp2 = new Vector2();
     private Vector2 tmp3 = new Vector2();
 
-    BvBWorkspace() {
+    BvBWorkspace(BvBAddon bvb) {
+        this.bvb = bvb;
         setModeUI();
 
         assetProvider = new BvBAssetProvider();
@@ -68,6 +70,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
         clearListeners();
         addListeners();
         addPanListener();
+
+        bvb.properties.addPanel(skeletonContainer);
     }
 
     private void addListeners() {
