@@ -13,7 +13,7 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 	private CheckBox checkBox;
 
 	@Override
-	protected void refresh () {
+	public void refresh () {
 		checkBox.setChecked(bondedProperty.getValue());
 	}
 

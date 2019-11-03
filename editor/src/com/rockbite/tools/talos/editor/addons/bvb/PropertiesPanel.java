@@ -20,6 +20,8 @@ public class PropertiesPanel extends Window {
     Table propertyGroup = new Table();
     Array<IPropertyProvider> currentPropertyPanels = new Array<>();
 
+    Array<PropertyWidget> propertyWidgets = new Array<>();
+
     public PropertiesPanel(Skin skin) {
         super("Global Properties", skin);
         setBackground(skin.getDrawable("panel"));
@@ -36,6 +38,14 @@ public class PropertiesPanel extends Window {
         reconstruct();
     }
 
+    @Override
+    public void act (float delta) {
+        super.act(delta);
+        for (PropertyWidget propertyWidget : propertyWidgets) {
+            propertyWidget.refresh();
+        }
+    }
+
     public void addProperty (IPropertyProvider propertyProvider) {
         currentPropertyPanels.clear();
         currentPropertyPanels.add(propertyProvider);
@@ -44,6 +54,7 @@ public class PropertiesPanel extends Window {
 
     private void reconstruct () {
         propertyGroup.clear();
+        propertyWidgets.clear();
         propertyGroup.top().left();
 
         debugAll();
@@ -54,6 +65,7 @@ public class PropertiesPanel extends Window {
             Array<Property> listOfProperties = currentPropertyPanel.getListOfProperties();
             for (Property property : listOfProperties) {
                 PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
+                propertyWidgets.add(propertyWidget);
                 propertyTable.add(propertyWidget).growX();
                 propertyTable.row();
             }

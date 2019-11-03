@@ -36,12 +36,12 @@ public class AttachmentPoint {
         return numericalValue;
     }
 
-    enum Type {
+    public enum Type {
         STATIC,
         ATTACHED
     }
 
-    enum AttachmentType {
+    public enum AttachmentType {
         POSITION,
         ROTATION
     }

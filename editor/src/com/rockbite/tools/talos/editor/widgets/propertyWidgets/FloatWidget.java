@@ -14,7 +14,7 @@ public class FloatWidget extends PropertyWidget<Float>{
 	private TextField valueChangeField;
 
 	@Override
-	protected void refresh () {
+	public void refresh () {
 		valueChangeField.setText(String.valueOf(bondedProperty.getValue()));
 	}
 

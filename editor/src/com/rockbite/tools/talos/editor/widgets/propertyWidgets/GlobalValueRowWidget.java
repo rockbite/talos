@@ -5,18 +5,21 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
+import com.rockbite.tools.talos.runtime.values.NumericalValue;
+import javafx.geometry.Pos;
 
 public class GlobalValueRowWidget extends ListCustomRow {
 
-	private GlobalValueWidget parentWidget;
-
-	AttachmentPoint attachmentPoint;
+	private final GlobalValueWidget parentWidget;
+	private int index;
 
 	Label identifier;
-	GlobalValueRowWidgetType type = GlobalValueRowWidgetType.BONE;
+	AttachmentPoint.Type type = AttachmentPoint.Type.STATIC;
+	AttachmentPoint.AttachmentType attachmentType = AttachmentPoint.AttachmentType.POSITION;
 	ImageButtonWithBackground typeToggleButton;
 
 	// BONE TYPE WIDGETS
@@ -28,14 +31,13 @@ public class GlobalValueRowWidget extends ListCustomRow {
 	TextField second;
 	TextField third;
 
-	public GlobalValueRowWidget (final GlobalValueWidget parentWidget, AttachmentPoint attachmentPoint) {
+	public GlobalValueRowWidget (final GlobalValueWidget parentWidget, int index) {
 		this.parentWidget = parentWidget;
 
-		this.attachmentPoint = attachmentPoint;
-
 		final Skin skin = TalosMain.Instance().getSkin();
+		setSkin(skin);
 
-		identifier = new Label(String.valueOf(attachmentPoint.getSlotId()), skin);
+		identifier = new Label(String.valueOf(index), skin);
 		identifier.setAlignment(Align.center);
 		Label.LabelStyle style = new Label.LabelStyle();
 		style.background = skin.getDrawable("panel_button_bg");
@@ -46,7 +48,7 @@ public class GlobalValueRowWidget extends ListCustomRow {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				parentWidget.askForNewPlace();
+				parentWidget.askForNewPlace(GlobalValueRowWidget.this);
 			}
 		});
 
@@ -55,7 +57,7 @@ public class GlobalValueRowWidget extends ListCustomRow {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				type = type == GlobalValueRowWidgetType.BONE ? GlobalValueRowWidgetType.STATIC : GlobalValueRowWidgetType.BONE;
+				type = type == AttachmentPoint.Type.ATTACHED ? AttachmentPoint.Type.STATIC: AttachmentPoint.Type.ATTACHED;
 				reconstruct();
 			}
 		});
@@ -63,6 +65,7 @@ public class GlobalValueRowWidget extends ListCustomRow {
 		typeToggleButton = new ImageButtonWithBackground(typeToggleImageButton, skin);
 
 		boneNames = new SelectBox<>(skin);
+		boneNames.setItems(parentWidget.getBoneNames());
 		boneNames.getStyle().backgroundOver = skin.getDrawable("panel_select_over");
 		boneNames.getStyle().background = skin.getDrawable("panel_select");
 
@@ -72,7 +75,8 @@ public class GlobalValueRowWidget extends ListCustomRow {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				boneTypeChangeButton.getStyle().imageUp = boneTypeChangeButton.isChecked() ? skin.getDrawable("ic-position") : skin.getDrawable("ic-refresh");
+				attachmentType = attachmentType == AttachmentPoint.AttachmentType.POSITION ? AttachmentPoint.AttachmentType.ROTATION : AttachmentPoint.AttachmentType.POSITION;
+				boneTypeChangeButton.getStyle().imageUp = attachmentType == AttachmentPoint.AttachmentType.POSITION ? skin.getDrawable("ic-position") : skin.getDrawable("ic-refresh");
 			}
 		});
 
@@ -99,22 +103,35 @@ public class GlobalValueRowWidget extends ListCustomRow {
 		};
 
 		reconstruct();
+		setIndex(index);
 	}
 
 	public int getIndex () {
-		return attachmentPoint.getSlotId();
+		return index;
+	}
+
+	public void setIndex (int index) {
+		this.index = index;
+		identifier.setText(String.valueOf(index));
 	}
 
 	public void setSelected (boolean selected) {
+		super.setSelected(selected);
+
+		if (selected) {
+			setBackground(getSkin().getDrawable("panel_select_over"));
+		} else {
+			setBackground((Drawable)null);
+		}
 	}
 
 	private void reconstruct () {
 		clearChildren();
-		pad(5);
+		pad(5, 0, 0,0);
 		defaults().pad(5);
 		left();
 		switch (type) {
-			case BONE:
+			case ATTACHED:
 				add(identifier).width(30f).height(25);
 				add(boneNames).growX().height(25);
 				add(boneTypeChange).width(30f).height(25);
@@ -130,8 +147,19 @@ public class GlobalValueRowWidget extends ListCustomRow {
 		}
 	}
 
-	public enum GlobalValueRowWidgetType {
-		BONE, STATIC
+	public void exportTo (AttachmentPoint attachmentPoint) {
+		if (type == AttachmentPoint.Type.STATIC) {
+			NumericalValue numericalValue = new NumericalValue();
+			numericalValue.set(Float.valueOf(first.getText()), Float.valueOf(second.getText()), Float.valueOf(third.getText()));
+			attachmentPoint.setTypeStatic(numericalValue, index);
+		} else {
+			String selected = boneNames.getSelected();
+			if (selected == null) {
+				selected = "root";
+			}
+			attachmentPoint.setTypeAttached(selected, index);
+			attachmentPoint.setTypeAttached(attachmentType);
+		}
 	}
 
 	public static class ImageButtonWithBackground extends Table {

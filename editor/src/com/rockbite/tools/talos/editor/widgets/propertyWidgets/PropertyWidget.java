@@ -6,7 +6,7 @@ import com.rockbite.tools.talos.editor.wrappers.Property;
 public abstract class PropertyWidget<T> extends Table {
 
 	protected Property<T> bondedProperty;
-	protected abstract void refresh();
+	public abstract void refresh();
 
 	public PropertyWidget () {}
 

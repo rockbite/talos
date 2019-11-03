@@ -152,8 +152,18 @@ public class BoundEffect implements IPropertyProvider {
     public Array<Property> getListOfProperties () {
         Array<Property> properties = new Array<>();
 
-        Property<String> boneName = new ImmutableProperty<>("Bone Name", positionAttachment.getBoneName());
+        Property<String> boneName = new ImmutableProperty<String>("Bone Name", positionAttachment.getBoneName()) {
+            @Override
+            public String getValue () {
+                return positionAttachment.getBoneName();
+            }
+        };
         Property<Float> offsetX = new MutableProperty<Float>("Offset X", positionAttachment.getOffsetX()) {
+            @Override
+            public Float getValue () {
+                return positionAttachment.getOffsetX();
+            }
+
             @Override
             public void changed (Float newValue) {
                 positionAttachment.setOffsetX(newValue);
@@ -161,11 +171,21 @@ public class BoundEffect implements IPropertyProvider {
         };
         Property<Float> offsetY = new MutableProperty<Float>("Offset Y", positionAttachment.getOffsetY()) {
             @Override
+            public Float getValue () {
+                return positionAttachment.getOffsetY();
+            }
+
+            @Override
             public void changed (Float newValue) {
                 positionAttachment.setOffsetY(newValue);
             }
         };
         Property<Boolean> behind = new MutableProperty<Boolean>("Is Behind", isBehind) {
+            @Override
+            public Boolean getValue () {
+                return isBehind;
+            }
+
             @Override
             public void changed (Boolean newValue) {
                 isBehind = newValue;
@@ -173,11 +193,18 @@ public class BoundEffect implements IPropertyProvider {
         };
 
 		Property<Array<AttachmentPoint>> globalValues = new MutableProperty<Array<AttachmentPoint>>("", valueAttachments) {
-			@Override
-			public void changed (Array<AttachmentPoint> newValue) {
+            @Override
+            public Array<AttachmentPoint> getValue () {
+                return valueAttachments;
+            }
 
+            @Override
+			public void changed (Array<AttachmentPoint> newValue) {
+                valueAttachments.clear();
+                valueAttachments.addAll(newValue);
 			}
 		};
+		globalValues.addAdditionalProperty("boneNames", parent.getSkeleton().getBones());
 
         properties.add(boneName, offsetX, offsetY, behind);
         properties.add(globalValues);

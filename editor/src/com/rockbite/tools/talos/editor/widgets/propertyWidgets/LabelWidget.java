@@ -11,7 +11,7 @@ public class LabelWidget extends PropertyWidget<String> {
 	private Label propertyValue;
 
 	@Override
-	protected void refresh () {
+	public void refresh () {
 		propertyValue.setText(bondedProperty.getValue());
 	}
 

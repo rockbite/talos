@@ -6,10 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.*;
+import com.esotericsoftware.spine.Bone;
 import com.kotcrab.vis.ui.widget.CollapsibleWidget;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
 import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
+import com.rockbite.tools.talos.editor.wrappers.Property;
 
 public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
@@ -18,17 +20,16 @@ public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 	Button collapseButton;
 	Button addRowButton;
 	Button deleteRowButton;
-	private ListWithCustomRows<GlobalValueRowWidget> globalValueList;
 
-	Array<GlobalValueRowWidget> currentActiveValues = new Array<>();
-	Selection<GlobalValueWidget> currentSelection = new Selection<>();
-	IntMap<GlobalValueRowWidget> localItems = new IntMap<>();
+	private ListWithCustomRows<GlobalValueRowWidget> globalValueList;
+	private Array<AttachmentPoint> tempArray = new Array<>();
+	private Array<String> boneNames = new Array<>();
 
 	Table topTable;
 	Table mainTable;
 
 	@Override
-	protected void refresh () {
+	public void refresh () {
 
 	}
 
@@ -95,37 +96,73 @@ public class GlobalValueWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
 	private void addNewRow () {
 		int nextAvailableIndex = getNextAvailableIndex();
-		AttachmentPoint attachmentPoint = bondedProperty.getValue().get(nextAvailableIndex);
-		GlobalValueRowWidget value = new GlobalValueRowWidget(GlobalValueWidget.this, attachmentPoint);
+		GlobalValueRowWidget value = new GlobalValueRowWidget(GlobalValueWidget.this, nextAvailableIndex);
 		globalValueList.addItem(value);
-		localItems.put(nextAvailableIndex, value);
-	}
 
-	private void removeRow (GlobalValueRowWidget row) {
-		localItems.remove(row.getIndex());
-		globalValueList.removeSelected();
+		refreshChanges();
 	}
 
 	public int getNextAvailableIndex () {
-		return 0;
-	}
+		int maximumIndex = getMaximumIndex();
+		for (int i = 0; i <= maximumIndex; i++) {
+			if (!hasItemWithIndex(i)) {
+				return i;
+			}
+		}
 
-	private boolean hasAvailableGlobalPoint () {
-		return localItems.size != bondedProperty.getValue().size;
+		return maximumIndex + 1;
 	}
 
 	private int getMaximumIndex () {
 		int max = 0;
-		for (AttachmentPoint key : bondedProperty.getValue()) {
-			if (key.getSlotId() > max) {
-				max = key.getSlotId();
+		for (GlobalValueRowWidget item : globalValueList.getItems()) {
+			if (item.getIndex() > max) {
+				max = item.getIndex();
 			}
 		}
-
 		return max;
 	}
 
-	public void askForNewPlace () {
+	private boolean hasItemWithIndex (int index) {
+		for (GlobalValueRowWidget item : globalValueList.getItems()) {
+			if (item.getIndex() == index) {
+				return true;
+			}
+		}
 
+		return false;
+	}
+
+	public void askForNewPlace (GlobalValueRowWidget widget) {
+		int nextAvailableIndex = getNextAvailableIndex();
+		widget.setIndex(nextAvailableIndex);
+		refreshChanges();
+	}
+
+	@Override
+	public void configureForProperty (Property property) {
+		super.configureForProperty(property);
+		Array<Bone> bones = (Array<Bone>) property.getAdditionalProperty("boneNames");
+		for (Bone bone : bones) {
+			boneNames.add(bone.toString());
+		}
+	}
+
+	private void refreshChanges () {
+		Array<GlobalValueRowWidget> widgets = globalValueList.getItems();
+		tempArray.clear();
+
+		for (GlobalValueRowWidget widget : widgets) {
+			AttachmentPoint attachmentPoint = new AttachmentPoint();
+
+			widget.exportTo(attachmentPoint);
+			tempArray.add(attachmentPoint);
+		}
+
+		((MutableProperty<Array<AttachmentPoint>>) bondedProperty).changed(tempArray);
+	}
+
+	public Array<String> getBoneNames () {
+		return boneNames;
 	}
 }
