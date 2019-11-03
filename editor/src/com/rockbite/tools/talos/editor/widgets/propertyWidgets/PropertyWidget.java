@@ -3,6 +3,7 @@ package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.rockbite.tools.talos.TalosMain;
 
@@ -10,25 +11,43 @@ public abstract class PropertyWidget<T> extends Table {
 
 	private Label propertyName;
 	protected Table valueContainer;
+	protected T value;
 
-	protected Property<T> bondedProperty;
+	ChangeListener listener;
 
-	public PropertyWidget () {
-		propertyName = new Label("", TalosMain.Instance().getSkin());
-		valueContainer = new Table();
-		add(propertyName).left();
-		propertyName.setAlignment(Align.left);
-		add(valueContainer).right().expandX().minWidth(170);
-
-		valueContainer.add(getValueActor()).growX().right();
+	public PropertyWidget (String name) {
+		build(name);
 	}
 
-	public abstract Actor getValueActor();
+	protected void build(String name) {
+		if(name != null) {
+			propertyName = new Label(name + ":", TalosMain.Instance().getSkin());
+			add(propertyName).left();
+			propertyName.setAlignment(Align.left);
+			valueContainer = new Table();
+			add(valueContainer).right().expandX().minWidth(170);
+			addToContainer(getSubWidget());
+		} else {
+			add(getSubWidget()).growX();
+		}
+	}
 
-	public abstract void refresh();
+	protected void addToContainer(Actor actor) {
+		valueContainer.add(actor).growX().right();
+	}
 
-	public void configureForProperty (Property property) {
-		this.bondedProperty = property;
-		propertyName.setText(property.getPropertyName());
+	public abstract T getValue();
+
+	public abstract Actor getSubWidget();
+
+	public void updateValue() {
+		this.value = getValue();
+		updateWidget(value);
+	}
+
+	public abstract void updateWidget(T value);
+
+	public void valueChanged(T value) {
+		// do no thing
 	}
 }

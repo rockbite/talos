@@ -4,19 +4,24 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.TalosMain;
 
 
-public class SelectBoxWidget extends PropertyWidget<String> {
+public abstract class SelectBoxWidget extends PropertyWidget<String> {
 
     Stack stack;
     Label noValueLabel;
     SelectBox<String> selectBox;
 
+    public SelectBoxWidget(String name) {
+        super(name);
+    }
+
     @Override
-    public Actor getValueActor() {
+    public Actor getSubWidget() {
         selectBox = new SelectBox<>(TalosMain.Instance().UIStage().getSkin(), "propertyValue");
         noValueLabel = new Label("", TalosMain.Instance().UIStage().getSkin());
         noValueLabel.setAlignment(Align.right);
@@ -26,24 +31,28 @@ public class SelectBoxWidget extends PropertyWidget<String> {
 
         noValueLabel.setVisible(false);
 
+        listener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String newValue = selectBox.getSelected();
+                valueChanged(newValue);
+            }
+        };
+        selectBox.addListener(listener);
+
         return stack;
     }
 
     @Override
-    public void configureForProperty(Property property) {
-        super.configureForProperty(property);
-
-        refresh();
-    }
-
-    @Override
-    public void refresh() {
-        StringListProperty stringListProperty = (StringListProperty) bondedProperty;
-        Array<String> list = stringListProperty.getOptionsList();
+    public void updateWidget(String value) {
+        Array<String> list = getOptionsList();
         if(list != null) {
             selectBox.setItems(list);
             selectBox.setVisible(true);
             noValueLabel.setVisible(false);
+            selectBox.removeListener(listener);
+            selectBox.setSelected(value);
+            selectBox.addListener(listener);
         } else {
             // show label with N/A
             selectBox.setVisible(false);
@@ -51,4 +60,6 @@ public class SelectBoxWidget extends PropertyWidget<String> {
             noValueLabel.setText("N/A");
         }
     }
+
+    public abstract Array<String> getOptionsList();
 }

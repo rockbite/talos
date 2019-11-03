@@ -142,4 +142,8 @@ public class AttachmentPoint implements Json.Serializable {
     public void setOffsetY (float offsetY) {
         offset.y = offsetY;
     }
+
+    public Type getType() {
+        return type;
+    }
 }

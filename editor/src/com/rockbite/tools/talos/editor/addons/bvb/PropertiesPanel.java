@@ -4,10 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyProviderCenter;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.Property;
 
 public class PropertiesPanel extends Window {
 
@@ -17,7 +15,7 @@ public class PropertiesPanel extends Window {
     Array<PropertyWidget> propertyWidgets = new Array<>();
 
     public PropertiesPanel(IPropertyProvider propertyProvider, Skin skin) {
-        super(propertyProvider.getPropertyBoxTitle(), skin);
+        super(propertyProvider.getPropertyBoxTitle(), skin, "default-nodim");
         setBackground(skin.getDrawable("panel"));
 
         padLeft(5);
@@ -25,6 +23,9 @@ public class PropertiesPanel extends Window {
 
         setModal(false);
         setMovable(false);
+        setResizable(false);
+        setRound(false);
+
         ScrollPane scrollPane = new ScrollPane(propertyGroup);
         scrollPane.setScrollingDisabled(true, false);
         add(scrollPane).grow();
@@ -36,7 +37,7 @@ public class PropertiesPanel extends Window {
     public void act (float delta) {
         super.act(delta);
         for (PropertyWidget propertyWidget : propertyWidgets) {
-            propertyWidget.refresh();
+            propertyWidget.updateValue();
         }
     }
 
@@ -54,10 +55,11 @@ public class PropertiesPanel extends Window {
         Table propertyTable = new Table();
         propertyGroup.add(propertyTable).growX().padRight(5);
         for (IPropertyProvider currentPropertyPanel : currentPropertyPanels) {
-            Array<Property> listOfProperties = currentPropertyPanel.getListOfProperties();
+
+            Array<PropertyWidget> listOfProperties = currentPropertyPanel.getListOfProperties();
+
             if(listOfProperties != null) {
-                for (Property property : listOfProperties) {
-                    PropertyWidget propertyWidget = PropertyProviderCenter.Instance().obtainWidgetForProperty(property);
+                for (PropertyWidget propertyWidget : listOfProperties) {
                     propertyWidgets.add(propertyWidget);
                     propertyTable.add(propertyWidget).growX().pad(5f);
                     propertyTable.row();

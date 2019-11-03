@@ -274,12 +274,13 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     }
 
     @Override
-    public Array<Property> getListOfProperties() {
-        Array<Property> properties = new Array<>();
+    public Array<PropertyWidget> getListOfProperties() {
 
-        final Property<String> skeletonName = new ImmutableProperty<String>("Skeleton", "N/A") {
+        Array<PropertyWidget> properties = new Array<>();
+
+        LabelWidget skeletonName = new LabelWidget("skeleton name") {
             @Override
-            public String getValue () {
+            public String getValue() {
                 if(skeleton != null) {
                     return skeleton.getData().getName();
                 }
@@ -287,7 +288,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             }
         };
 
-        final Property<String> currentSkinProperty = new StringListProperty("Skin", "N/A") {
+        SelectBoxWidget currentSkinWidget = new SelectBoxWidget("skin") {
             @Override
             public Array<String> getOptionsList() {
                 if(skeleton != null) {
@@ -301,20 +302,20 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             }
 
             @Override
-            public void changed(String newValue) {
-
-            }
-
-            @Override
-            public String getValue () {
+            public String getValue() {
                 if(currentSkin != null) {
                     return currentSkin.getName();
                 }
                 return "N/A";
             }
+
+            @Override
+            public void valueChanged(String value) {
+                currentSkin = skeleton.getData().findSkin(value);
+            }
         };
 
-        final Property<String> currentAnimationProperty = new StringListProperty("Animation", "N/A") {
+        SelectBoxWidget currentAnimationWidget = new SelectBoxWidget("animation") {
             @Override
             public Array<String> getOptionsList() {
                 if(skeleton != null) {
@@ -328,28 +329,34 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             }
 
             @Override
-            public void changed(String newValue) {
-
-            }
-
-            @Override
-            public String getValue () {
+            public String getValue() {
                 if(currentAnimation != null) {
                     return currentAnimation.getName();
                 }
                 return "N/A";
             }
+
+            @Override
+            public void valueChanged(String value) {
+                currentAnimation = skeleton.getData().findAnimation(value);
+                animationState.setAnimation(0, currentAnimation, true);
+            }
         };
 
         properties.add(skeletonName);
-        properties.add(currentSkinProperty);
-        properties.add(currentAnimationProperty);
+        properties.add(currentSkinWidget);
+        properties.add(currentAnimationWidget);
 
         return properties;
     }
 
     @Override
     public String getPropertyBoxTitle() {
-        return "Main Properties";
+        return "Skeleton Properties";
+    }
+
+    @Override
+    public int getPriority() {
+        return 1;
     }
 }

@@ -18,12 +18,14 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.ViewportWidget;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
-public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
+public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
     private final BvBAddon bvb;
     private BvBAssetProvider assetProvider;
@@ -39,6 +41,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
+
+    private BoundEffect selectedEffect = null;
 
     private Label hintLabel;
 
@@ -71,7 +75,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
         addListeners();
         addPanListener();
 
-        bvb.properties.addPanel(skeletonContainer);
+        bvb.properties.showPanel(this);
+        bvb.properties.showPanel(skeletonContainer);
     }
 
     private void addListeners() {
@@ -81,10 +86,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
             private Vector2 pos = new Vector2();
             private Vector2 tmp = new Vector2();
 
+            boolean stageClick;
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
+
+                stageClick = false;
 
                 getStage().setKeyboardFocus(BvBWorkspace.this);
 
@@ -99,6 +108,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
                     if(tmp.dst(pos) < pixelToWorld(10f)) {
                         movingPoint = position;
                         event.handle();
+                        effectSelected(effect);
                         return true;
                     }
 
@@ -107,12 +117,15 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
                         if(tmp.dst(pos) < pixelToWorld(10f)) {
                             movingPoint = point;
                             event.handle();
+                            effectSelected(effect);
                             return true;
                         }
                     }
                 }
 
-                return false;
+                stageClick = true;
+
+                return true;
             }
 
             @Override
@@ -161,6 +174,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
+                if(stageClick) {
+                    if(selectedEffect != null) {
+                        effectUnselected(selectedEffect);
+                    }
+                }
+
                 movingPoint = null;
             }
 
@@ -177,6 +196,16 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
                 return super.keyDown(event, keycode);
             }
         });
+    }
+
+    private void effectSelected(BoundEffect effect) {
+        selectedEffect = effect;
+        bvb.properties.showPanel(effect);
+    }
+
+    private void effectUnselected(BoundEffect effect) {
+        selectedEffect = null;
+        bvb.properties.hidePanel(effect);
     }
 
     public void setModeUI() {
@@ -396,6 +425,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
         skeletonContainer = new SkeletonContainer(this);
         skeletonContainer.read(json, jsonData.get("skeleton"));
+
+        bvb.properties.showPanel(skeletonContainer);
     }
 
     public void cleanWorkspace() {
@@ -413,5 +444,20 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
     public ObjectMap<String, ParticleEffectDescriptor> getVfxLibrary() {
         return vfxLibrary;
+    }
+
+    @Override
+    public Array<PropertyWidget> getListOfProperties() {
+        return null;
+    }
+
+    @Override
+    public String getPropertyBoxTitle() {
+        return "Workspace";
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
     }
 }

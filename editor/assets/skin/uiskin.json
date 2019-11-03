@@ -132,7 +132,8 @@
 		no-bg: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection,cursor: cursor, messageFont: default-font, messageFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
-		default: {checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white, disabledFontColor: grey }
+		default: {checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white, disabledFontColor: grey },
+		panel-checkbox: {checkboxOver: panel-check-over, checkboxOn: panel-check-on, checkboxOff: panel-check-off, font: default-font, fontColor: white, disabledFontColor: grey },
 		radio: {checkboxOn: radio-on, checkboxOff: radio-off, font: default-font, fontColor: white, disabledFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {

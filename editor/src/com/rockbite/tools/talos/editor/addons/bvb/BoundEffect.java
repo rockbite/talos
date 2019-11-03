@@ -2,11 +2,10 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.MutableProperty;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.Property;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.rockbite.tools.talos.editor.widgets.propertyWidgets.ImmutableProperty;
+import com.esotericsoftware.spine.Bone;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
@@ -175,50 +174,48 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
     }
 
     @Override
-    public Array<Property> getListOfProperties () {
-        Array<Property> properties = new Array<>();
+    public Array<PropertyWidget> getListOfProperties () {
+        Array<PropertyWidget> properties = new Array<>();
 
-        Property<String> boneName = new ImmutableProperty<String>("Bone Name", positionAttachment.getBoneName()) {
+        LabelWidget effectName = new LabelWidget("effect name") {
             @Override
-            public String getValue () {
-                return positionAttachment.getBoneName();
+            public String getValue() {
+               return name;
             }
         };
-        Property<Float> offsetX = new MutableProperty<Float>("Offset X", positionAttachment.getOffsetX()) {
-            @Override
-            public Float getValue () {
-                return positionAttachment.getOffsetX();
-            }
 
+        CheckboxWidget behind = new CheckboxWidget("is behind") {
             @Override
-            public void changed (Float newValue) {
-                positionAttachment.setOffsetX(newValue);
-            }
-        };
-        Property<Float> offsetY = new MutableProperty<Float>("Offset Y", positionAttachment.getOffsetY()) {
-            @Override
-            public Float getValue () {
-                return positionAttachment.getOffsetY();
-            }
-
-            @Override
-            public void changed (Float newValue) {
-                positionAttachment.setOffsetY(newValue);
-            }
-        };
-        Property<Boolean> behind = new MutableProperty<Boolean>("Is Behind", isBehind) {
-            @Override
-            public Boolean getValue () {
+            public Boolean getValue() {
                 return isBehind;
             }
 
             @Override
-            public void changed (Boolean newValue) {
-                isBehind = newValue;
+            public void valueChanged(Boolean value) {
+                isBehind = value;
             }
         };
 
-		Property<Array<AttachmentPoint>> globalValues = new MutableProperty<Array<AttachmentPoint>>("", valueAttachments) {
+        AttachmentPointWidget position = new AttachmentPointWidget(null) {
+            @Override
+            public Array<Bone> getBoneList() {
+                return parent.getSkeleton().getBones();
+            }
+
+            @Override
+            public AttachmentPoint getValue() {
+                return positionAttachment;
+            }
+        };
+
+        properties.add(effectName);
+        properties.add(behind);
+        properties.add(position);
+
+        return properties;
+
+/*
+		Property<Array<AttachmentPoint>> globalValues = new GlobalValuesProperty("", valueAttachments) {
             @Override
             public Array<AttachmentPoint> getValue () {
                 return valueAttachments;
@@ -230,16 +227,18 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 valueAttachments.addAll(newValue);
 			}
 		};
-		globalValues.addAdditionalProperty("boneNames", parent.getSkeleton().getBones());
-
-        properties.add(boneName, offsetX, offsetY, behind);
-        properties.add(globalValues);
-        return properties;
+		//globalValues.addAdditionalProperty("boneNames", parent.getSkeleton().getBones());
+*/
     }
 
     @Override
     public String getPropertyBoxTitle () {
         return name;
+    }
+
+    @Override
+    public int getPriority() {
+        return 2;
     }
 
     public AttachmentPoint getPositionAttachment() {

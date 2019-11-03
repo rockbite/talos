@@ -6,26 +6,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.rockbite.tools.talos.TalosMain;
 
-public class LabelWidget extends PropertyWidget<String> {
+public abstract class LabelWidget extends PropertyWidget<String> {
 
 	private Label propertyValue;
 
-	@Override
-	public void refresh () {
-		propertyValue.setText(bondedProperty.getValue());
-	}
-
-	public LabelWidget () {
-		super();
-
-
+	public LabelWidget(String name) {
+		super(name);
 	}
 
 	@Override
-	public Actor getValueActor() {
+	public Actor getSubWidget() {
 		propertyValue = new Label("", TalosMain.Instance().getSkin());
+		propertyValue.setWidth(170);
+		propertyValue.setEllipsis(true);
 		propertyValue.setAlignment(Align.right);
 
 		return propertyValue;
+	}
+
+	@Override
+	public void updateWidget(String value) {
+		propertyValue.setText(value);
 	}
 }
