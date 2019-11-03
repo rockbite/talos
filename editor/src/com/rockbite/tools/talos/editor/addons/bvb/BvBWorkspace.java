@@ -213,7 +213,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
             batch.end();
             Gdx.gl.glLineWidth(1f);
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -300,6 +299,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
 
     private void drawSpine(Batch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
+        AnimationState animationState = skeletonContainer.getAnimationState();
         if(skeleton == null) return;
 
         skeleton.setPosition(0, 0);
@@ -340,7 +340,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
         TalosMain.Instance().ProjectController().setDirty();
     }
 
-    public void addParticle(FileHandle handle) {
+    public BoundEffect addParticle(FileHandle handle) {
         pathMap.put(handle.name(), handle.path());
 
         String name = handle.nameWithoutExtension();
@@ -354,6 +354,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable {
         effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
 
         TalosMain.Instance().ProjectController().setDirty();
+
+        return effect;
     }
 
     public void updateParticle(FileHandle handle) {

@@ -38,12 +38,12 @@ public class AttachmentPoint implements Json.Serializable {
         return numericalValue;
     }
 
-    enum Type {
+    public enum Type {
         STATIC,
         ATTACHED
     }
 
-    enum AttachmentType {
+    public enum AttachmentType {
         POSITION,
         ROTATION
     }
@@ -133,5 +133,13 @@ public class AttachmentPoint implements Json.Serializable {
             JsonValue arr = jsonData.get("value");
             numericalValue.set(arr.get(0).asFloat(), arr.get(1).asFloat(), arr.get(2).asFloat());
         }
+    }
+
+    public void setOffsetX (float offsetX) {
+        offset.x = offsetX;
+    }
+
+    public void setOffsetY (float offsetY) {
+        offset.y = offsetY;
     }
 }

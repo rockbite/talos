@@ -3,6 +3,12 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.rockbite.tools.talos.editor.data.PropertyProviderCenter;
+import com.rockbite.tools.talos.editor.wrappers.MutableProperty;
+import com.rockbite.tools.talos.editor.wrappers.Property;
+import com.rockbite.tools.talos.editor.wrappers.IPropertyProvider;
+import com.rockbite.tools.talos.editor.wrappers.ImmutableProperty;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
@@ -11,7 +17,7 @@ import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class BoundEffect implements Json.Serializable {
+public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
     /**
      * parent skeleton container
@@ -168,6 +174,74 @@ public class BoundEffect implements Json.Serializable {
 
     public Array<ParticleEffectInstance> getParticleEffects() {
         return particleEffects;
+    }
+
+    @Override
+    public Array<Property> getListOfProperties () {
+        Array<Property> properties = new Array<>();
+
+        Property<String> boneName = new ImmutableProperty<String>("Bone Name", positionAttachment.getBoneName()) {
+            @Override
+            public String getValue () {
+                return positionAttachment.getBoneName();
+            }
+        };
+        Property<Float> offsetX = new MutableProperty<Float>("Offset X", positionAttachment.getOffsetX()) {
+            @Override
+            public Float getValue () {
+                return positionAttachment.getOffsetX();
+            }
+
+            @Override
+            public void changed (Float newValue) {
+                positionAttachment.setOffsetX(newValue);
+            }
+        };
+        Property<Float> offsetY = new MutableProperty<Float>("Offset Y", positionAttachment.getOffsetY()) {
+            @Override
+            public Float getValue () {
+                return positionAttachment.getOffsetY();
+            }
+
+            @Override
+            public void changed (Float newValue) {
+                positionAttachment.setOffsetY(newValue);
+            }
+        };
+        Property<Boolean> behind = new MutableProperty<Boolean>("Is Behind", isBehind) {
+            @Override
+            public Boolean getValue () {
+                return isBehind;
+            }
+
+            @Override
+            public void changed (Boolean newValue) {
+                isBehind = newValue;
+            }
+        };
+
+		Property<Array<AttachmentPoint>> globalValues = new MutableProperty<Array<AttachmentPoint>>("", valueAttachments) {
+            @Override
+            public Array<AttachmentPoint> getValue () {
+                return valueAttachments;
+            }
+
+            @Override
+			public void changed (Array<AttachmentPoint> newValue) {
+                valueAttachments.clear();
+                valueAttachments.addAll(newValue);
+			}
+		};
+		globalValues.addAdditionalProperty("boneNames", parent.getSkeleton().getBones());
+
+        properties.add(boneName, offsetX, offsetY, behind);
+        properties.add(globalValues);
+        return properties;
+    }
+
+    @Override
+    public String getTitle () {
+        return "Bound Effect Properties";
     }
 
     public AttachmentPoint getPositionAttachment() {
