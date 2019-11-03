@@ -19,7 +19,6 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	public CheckboxWidget() {
 		super();
-
 		left();
 
 		checkBox = new CheckBox("", TalosMain.Instance().getSkin());
