@@ -29,6 +29,7 @@ import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
 import com.rockbite.tools.talos.editor.WorkplaceStage;
 import com.rockbite.tools.talos.editor.addons.AddonController;
+import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
 import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.TalosProject;
 import com.rockbite.tools.talos.editor.project.ProjectController;
@@ -73,6 +74,8 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	private Preferences preferences;
+
+	private FileTracker fileTracker = new FileTracker();
 
 	private InputMultiplexer inputMultiplexer;
 
@@ -168,6 +171,8 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.getStage().draw();
 		}
 
+		fileTracker.update();
+
 		uiStage.getStage().act();
 		uiStage.getStage().draw();
 	}
@@ -195,5 +200,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	public AddonController Addons() {
 		return addonController;
+	}
+
+	public FileTracker FileTracker() {
+		return fileTracker;
 	}
 }

@@ -115,4 +115,8 @@ public class PreviewImageControllerWidget extends Table {
 	public void setIsBackground(boolean isBackground) {
 		backgroundCheckBox.setChecked(isBackground);
 	}
+
+	public void setGridSize(float gridSize) {
+		backgroundSizeField.setText(gridSize+"");
+	}
 }

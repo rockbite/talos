@@ -274,8 +274,16 @@ public class UIStage {
 			TalosMain.Instance().ProjectController().saveProject();
 		}
 	}
-
 	public void exportAction() {
+		String path = TalosMain.Instance().ProjectController().getExportPath();
+		if(path == null || path.isEmpty()) {
+			exportAsAction();
+		} else {
+			TalosMain.Instance().ProjectController().exportProject(Gdx.files.absolute(path));
+		}
+	}
+
+	public void exportAsAction() {
 		IProject projectType = TalosMain.Instance().ProjectController().getProject();
 		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
 		fileChooser.setDirectory(defaultLocation);
@@ -462,7 +470,9 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
+					TalosMain.Instance().ProjectController().lastDirTrackingDisable();
 					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
+					TalosMain.Instance().ProjectController().lastDirTrackingEnable();
 					TalosMain.Instance().ProjectController().unbindFromFile();
 				}
 			});

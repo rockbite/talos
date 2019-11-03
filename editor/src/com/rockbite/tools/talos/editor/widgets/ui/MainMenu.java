@@ -2,10 +2,12 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.TalosMain;
@@ -17,12 +19,14 @@ public class MainMenu extends Table {
     UIStage stage;
     private MenuItem saveProject;
     private MenuItem export;
+    private MenuItem exportAs;
     private MenuItem saveAsProject;
     private Menu modulesMenu;
     private MenuItem removeSelectedModules;
     private MenuItem createModule;
     private MenuItem groupSelectedModules;
     private MenuItem ungroupSelectedModules;
+    private PopupMenu openRecentPopup;
 
     public MainMenu(UIStage stage) {
         this.stage = stage;
@@ -66,9 +70,14 @@ public class MainMenu extends Table {
 
         final MenuItem newProject = new MenuItem("New TalosProject");
         final MenuItem openProject = new MenuItem("Open TalosProject");
+        MenuItem openRecent = new MenuItem("Open Recent");
         saveProject = new MenuItem("Save");
         export = new MenuItem("Export");
+        exportAs = new MenuItem("Export As");
         MenuItem examples = new MenuItem("Examples");
+
+        openRecentPopup = new PopupMenu();
+        openRecent.setSubMenu(openRecentPopup);
 
         MenuItem legacy = new MenuItem("Legacy");
         PopupMenu legacyPopup = new PopupMenu();
@@ -88,9 +97,11 @@ public class MainMenu extends Table {
 
         projectMenu.addItem(newProject);
         projectMenu.addItem(openProject);
+        projectMenu.addItem(openRecent);
         projectMenu.addItem(saveProject);
         projectMenu.addItem(saveAsProject);
         projectMenu.addItem(export);
+        projectMenu.addItem(exportAs);
         projectMenu.addSeparator();
         projectMenu.addItem(examples);
         projectMenu.addItem(legacy);
@@ -155,6 +166,14 @@ public class MainMenu extends Table {
             }
         });
 
+        exportAs.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                stage.exportAsAction();
+            }
+        });
+
         saveAsProject.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -216,10 +235,17 @@ public class MainMenu extends Table {
                         stage.saveProjectAction();
                     }
                 }
+                if(keycode == Input.Keys.E && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    if(!saveProject.isDisabled()) {
+                        stage.exportAction();
+                    }
+                }
 
                 return super.keyDown(event, keycode);
             }
         });
+
+        TalosMain.Instance().ProjectController().updateRecentsList();
     }
 
     public void disableTalosSpecific() {
@@ -242,5 +268,29 @@ public class MainMenu extends Table {
         enableItem(createModule);
         enableItem(groupSelectedModules);
         enableItem(ungroupSelectedModules);
+    }
+
+    public void updateRecentsList(Array<String> list) {
+        openRecentPopup.clear();
+
+        for(String path: list) {
+            final FileHandle handle = Gdx.files.absolute(path);
+            if(!handle.exists()) continue;;
+            String name = handle.name();
+            MenuItem item = new MenuItem(name);
+            item.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    if(handle.extension().equals("tls")) {
+                        TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+                        TalosMain.Instance().ProjectController().loadProject(handle);
+                    } else {
+                        TalosMain.Instance().Addons().projectFileDrop(handle);
+                    }
+                }
+            });
+            openRecentPopup.addItem(item);
+        }
     }
 }

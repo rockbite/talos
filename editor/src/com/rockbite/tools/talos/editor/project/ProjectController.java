@@ -1,13 +1,14 @@
 package com.rockbite.tools.talos.editor.project;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
-import com.rockbite.tools.talos.runtime.serialization.ExportData;
 
 import java.io.File;
+import java.util.Comparator;
 
 public class ProjectController {
 
@@ -16,11 +17,13 @@ public class ProjectController {
     public FileTab currentTab;
     private ObjectMap<String, String> fileCache = new ObjectMap<>();
     private ObjectMap<String, String> pathCache = new ObjectMap<>();
+    private ObjectMap<String, String> exporthPathCache = new ObjectMap<>();
     private boolean loading = false;
 
     IProject currentProject;
 
     public static TalosProject TLS = new TalosProject();
+    private boolean lastDirTracking = true;
 
     public ProjectController() {
         currentProject = TLS;
@@ -46,11 +49,13 @@ public class ProjectController {
             projectFileName = projectFileHandle.name();
             loading = true;
             currentProject.loadProject(projectFileHandle.readString());
+            reportProjectFileInterraction(projectFileHandle);
             loading = false;
 
-
-            TalosMain.Instance().Prefs().putString("lastOpen"+currentProject.getExtension(), projectFileHandle.parent().path());
-            TalosMain.Instance().Prefs().flush();
+            if(lastDirTracking) {
+                TalosMain.Instance().Prefs().putString("lastOpen" + currentProject.getExtension(), projectFileHandle.parent().path());
+                TalosMain.Instance().Prefs().flush();
+            }
 
             currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
@@ -79,6 +84,8 @@ public class ProjectController {
     public void saveProject (FileHandle destination) {
         String data = currentProject.getProjectString();
         destination.writeString(data, false);
+
+        reportProjectFileInterraction(destination);
 
         TalosMain.Instance().Prefs().putString("lastSave"+currentProject.getExtension(), destination.parent().path());
         TalosMain.Instance().Prefs().flush();
@@ -213,6 +220,10 @@ public class ProjectController {
         return currentProject;
     }
 
+    public FileHandle findFile(String path) {
+        return findFile(Gdx.files.absolute(path));
+    }
+
     public FileHandle findFile(FileHandle initialFile) {
         String fileName = initialFile.name();
 
@@ -244,6 +255,8 @@ public class ProjectController {
     }
 
     public void exportProject(FileHandle fileHandle) {
+        exporthPathCache.put(projectFileName, fileHandle.path());
+
         String data = currentProject.exportProject();
         fileHandle.writeString(data, false);
 
@@ -268,5 +281,83 @@ public class ProjectController {
         }
 
         return "";
+    }
+
+    public String getExportPath() {
+        return exporthPathCache.get(projectFileName);
+    }
+
+    public void lastDirTrackingDisable() {
+        lastDirTracking = false;
+    }
+
+    public void lastDirTrackingEnable() {
+        lastDirTracking = true;
+    }
+
+    public static class RecentsEntry {
+        String path;
+        long time;
+
+        public RecentsEntry() {
+
+        }
+
+        public RecentsEntry(String path, long time) {
+            this.path = path;
+            this.time = time;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return path.equals(((RecentsEntry)obj).path);
+        }
+    }
+
+    Comparator<RecentsEntry> recentsEntryComparator = new Comparator<RecentsEntry>() {
+        @Override
+        public int compare(RecentsEntry o1, RecentsEntry o2) {
+            return (int) (o2.time - o1.time);
+        }
+    };
+
+    public void reportProjectFileInterraction(FileHandle handle) {
+        Preferences prefs = TalosMain.Instance().Prefs();
+        String data = prefs.getString("recents");
+        Array<RecentsEntry> list = new Array<>();
+        //read
+        Json json = new Json();
+        if(data != null && !data.isEmpty()) {
+            list = json.fromJson(list.getClass(), data);
+        }
+        RecentsEntry newEntry = new RecentsEntry(handle.path(), TimeUtils.millis());
+        list.removeValue(newEntry, false);
+        list.add(newEntry);
+        //sort
+        list.sort(recentsEntryComparator);
+        //write
+        String result = json.toJson(list);
+        prefs.putString("recents", result);
+        prefs.flush();
+        updateRecentsList();
+    }
+
+    public Array<String> updateRecentsList() {
+        Preferences prefs = TalosMain.Instance().Prefs();
+        String data = prefs.getString("recents");
+        Array<String> list = new Array<>();
+        //read
+        Json json = new Json();
+        if(data != null && !data.isEmpty()) {
+            Array<RecentsEntry> rList = new Array<>();
+            rList = json.fromJson(rList.getClass(), data);
+            for(RecentsEntry entry: rList) {
+                list.add(entry.path);
+            }
+        }
+
+        TalosMain.Instance().UIStage().Menu().updateRecentsList(list);
+
+        return list;
     }
 }

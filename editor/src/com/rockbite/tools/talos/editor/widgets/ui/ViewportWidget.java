@@ -247,7 +247,7 @@ public abstract class ViewportWidget extends Table {
         x =  x - x % (gridSize*8f);
         y =  y - y % (gridSize*8f);
 
-        float thickness = pixelToWorld(1.5f);
+        float thickness = pixelToWorld(1.2f);
 
         for(int i = -countX/2-8; i <= countX/2+8; i++) {
             if(i % 4 == 0) gridColor.a = brightAlpha;
@@ -294,6 +294,6 @@ public abstract class ViewportWidget extends Table {
         camera.unproject(tmp);
         float pos = tmp.x;
 
-        return Math.abs(pos - baseline); //TODO: I am sure there is a better way to do this
+        return Math.abs(pos - baseline) * (getStage().getWidth()/getWidth()); //TODO: I am sure there is a better way to do this
     }
 }
