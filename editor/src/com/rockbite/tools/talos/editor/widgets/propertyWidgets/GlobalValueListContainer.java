@@ -37,8 +37,6 @@ public class GlobalValueListContainer extends Table {
 
         ImageButton newRowButton = new ImageButton(getSkin().getDrawable("ic-input-file-add"));
         bottomPanel.add(newRowButton).left().padLeft(2);
-        ImageButton deleteRowButton = new ImageButton(getSkin().getDrawable("ic-input-file-delete"));
-        bottomPanel.add(deleteRowButton).left().padLeft(2);
         bottomPanel.add().expandX();
 
         listContainer.add(list).grow().minHeight(90);
@@ -51,14 +49,6 @@ public class GlobalValueListContainer extends Table {
                 addNewRow();
             }
         });
-
-        deleteRowButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                deleteSelectedRow();
-            }
-        });
-
     }
 
     private void addNewRow() {
@@ -90,7 +80,7 @@ public class GlobalValueListContainer extends Table {
     }
 
     private AttachmentPointBox createBoxWidget(AttachmentPoint point, boolean skipSlotData) {
-        final AttachmentPointBox attachmentPointBox = new AttachmentPointBox(getSkin());
+        final AttachmentPointBox attachmentPointBox = new AttachmentPointBox(getSkin(), this);
         attachmentPointBox.setBoneList(boneNameList);
         attachmentPointBox.setData(point);
 
@@ -106,13 +96,6 @@ public class GlobalValueListContainer extends Table {
                int index = getAvailableSlotIndex();
                 if(index == -1) return;
                 attachmentPointBox.setSlotIndex(index);
-            }
-        });
-
-        attachmentPointBox.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                list.select(attachmentPointBox);
             }
         });
 
@@ -143,5 +126,10 @@ public class GlobalValueListContainer extends Table {
         }
 
         return indexToTry;
+    }
+
+    public void deletePoint(AttachmentPoint point) {
+        attachmentPoints.removeValue(point, true);
+        setData(attachmentPoints);
     }
 }

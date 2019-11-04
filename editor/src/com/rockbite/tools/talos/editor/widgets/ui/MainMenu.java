@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -29,6 +30,7 @@ public class MainMenu extends Table {
     private PopupMenu openRecentPopup;
 
     public MainMenu(UIStage stage) {
+        setSkin(stage.getSkin());
         this.stage = stage;
 
         setBackground(stage.getSkin().getDrawable("button-main-menu"));
@@ -68,11 +70,11 @@ public class MainMenu extends Table {
         modulesMenu.addItem(removeSelectedModules);
         modulesMenu.addItem(groupSelectedModules);
 
-        final MenuItem newProject = new MenuItem("New TalosProject");
-        final MenuItem openProject = new MenuItem("Open TalosProject");
-        MenuItem openRecent = new MenuItem("Open Recent");
-        saveProject = new MenuItem("Save");
-        export = new MenuItem("Export");
+        final MenuItem newProject = new MenuItem("New TalosProject", icon("ic-file-new"));
+        final MenuItem openProject = new MenuItem("Open TalosProject", icon("ic-folder"));
+        MenuItem openRecent = new MenuItem("Open Recent", icon("ic-folder-recent"));
+        saveProject = new MenuItem("Save", icon("ic-save"));
+        export = new MenuItem("Export" , icon("ic-download"));
         exportAs = new MenuItem("Export As");
         MenuItem examples = new MenuItem("Examples");
 
@@ -92,7 +94,7 @@ public class MainMenu extends Table {
         PopupMenu examplesPopup = new PopupMenu();
         examples.setSubMenu(examplesPopup);
         stage.initExampleList(examplesPopup);
-        saveAsProject = new MenuItem("Save As");
+        saveAsProject = new MenuItem("Save As", icon("ic-save-aster"));
         MenuItem exitApp = new MenuItem("Exit");
 
         projectMenu.addItem(newProject);
@@ -292,5 +294,9 @@ public class MainMenu extends Table {
             });
             openRecentPopup.addItem(item);
         }
+    }
+
+    private Image icon(String name) {
+        return new Image(getSkin().getDrawable(name));
     }
 }

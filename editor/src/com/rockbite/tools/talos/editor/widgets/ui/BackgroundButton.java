@@ -17,4 +17,13 @@ public class BackgroundButton extends Table {
 
         add(button);
     }
+
+    public BackgroundButton(Skin skin, Drawable drawable) {
+        setSkin(skin);
+        setBackground(getSkin().getDrawable("panel_button_bg"));
+
+        button = new ImageButton(drawable);
+
+        add(button);
+    }
 }

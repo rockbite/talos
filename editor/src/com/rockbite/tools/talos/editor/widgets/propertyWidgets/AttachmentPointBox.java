@@ -25,6 +25,7 @@ public class AttachmentPointBox extends Table {
 
     SlotWidget slotWidget;
     BackgroundButton typeToggleButton;
+    BackgroundButton deleteButton;
 
     NumericalValueField numericalValueField;
 
@@ -115,13 +116,14 @@ public class AttachmentPointBox extends Table {
         }
     }
 
-    public AttachmentPointBox(Skin skin) {
+    public AttachmentPointBox(Skin skin, final GlobalValueListContainer container) {
         setSkin(skin);
 
         numericalValueField = new NumericalValueField(getSkin());
         slotWidget = new SlotWidget("0", getSkin());
         boneWidget = new BoneWidget(getSkin());
         typeToggleButton = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-chain"), getSkin().getDrawable("ic-settings"));
+        deleteButton = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-trash-red"));
 
         stack = new Stack();
         stack.add(numericalValueField);
@@ -130,6 +132,7 @@ public class AttachmentPointBox extends Table {
         add(slotWidget).padRight(6f).width(32);
         add(stack).expandX().growX();
         add(typeToggleButton).padLeft(6f).height(25);
+        add(deleteButton).padLeft(6f).height(25);
 
         boneWidget.setVisible(false);
 
@@ -138,6 +141,13 @@ public class AttachmentPointBox extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 toggleAttachType();
+            }
+        });
+
+        deleteButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                container.deletePoint(point);
             }
         });
     }

@@ -34,7 +34,7 @@ public class CustomList<T extends Actor> extends Table {
         containers.clear();
         for(T item: items) {
             Table container = new Table();
-            container.add(item).growX().padTop(2f).padBottom(2f);
+            container.add(item).growX().pad(2f).padLeft(4f).padRight(4f);
             add(container).growX().row();
             containers.put(item, container);
         }
@@ -56,17 +56,5 @@ public class CustomList<T extends Actor> extends Table {
     public void addAll(Array<T> items) {
         items.addAll(items);
         rebuild();
-    }
-
-    public void select(T itemToSelect) {
-        for(T item: items) {
-            unselect(item);
-        }
-        //containers.get(itemToSelect).setBackground(getSkin().getDrawable("panel_input_bg_selected"));
-    }
-
-    public void unselect(T item) {
-        Drawable nullDrawable = null; // well. I have never encountered this problem before, so that's a first.
-        containers.get(item).setBackground(nullDrawable);
     }
 }
