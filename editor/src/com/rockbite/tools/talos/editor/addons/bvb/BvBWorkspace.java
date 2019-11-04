@@ -27,7 +27,7 @@ import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
-    private final BvBAddon bvb;
+    public final BvBAddon bvb;
     private BvBAssetProvider assetProvider;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
@@ -42,7 +42,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
 
-    private BoundEffect selectedEffect = null;
+    public BoundEffect selectedEffect = null;
 
     private Label hintLabel;
 
@@ -143,6 +143,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                         pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
                         movingPoint.setOffset(pos.x, pos.y);
                         movingPoint.setBone(closestBone.getData().getName());
+                        bvb.properties.updateValues();
                     }
                 }
 
@@ -195,7 +196,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.showPanel(effect);
     }
 
-    private void effectUnselected(BoundEffect effect) {
+    public void effectUnselected(BoundEffect effect) {
         selectedEffect = null;
         bvb.properties.hidePanel(effect);
     }
@@ -363,6 +364,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         skeletonContainer.setSkeleton(jsonFileHandle, atlasFileHandle);
 
         TalosMain.Instance().ProjectController().setDirty();
+
+        bvb.properties.updateValues();
     }
 
     public BoundEffect addParticle(FileHandle handle) {
@@ -418,6 +421,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         skeletonContainer = new SkeletonContainer(this);
         skeletonContainer.read(json, jsonData.get("skeleton"));
 
+        bvb.properties.cleanPanels();
+        bvb.properties.showPanel(this);
         bvb.properties.showPanel(skeletonContainer);
     }
 

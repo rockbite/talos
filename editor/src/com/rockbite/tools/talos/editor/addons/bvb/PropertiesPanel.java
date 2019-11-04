@@ -7,35 +7,41 @@ import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
-public class PropertiesPanel extends Window {
+public class PropertiesPanel extends Table {
 
+    Label titleLabel;
     Table propertyGroup = new Table();
     Array<IPropertyProvider> currentPropertyPanels = new Array<>();
 
     Array<PropertyWidget> propertyWidgets = new Array<>();
 
     public PropertiesPanel(IPropertyProvider propertyProvider, Skin skin) {
-        super(propertyProvider.getPropertyBoxTitle(), skin, "default-nodim");
+        setSkin(skin);
         setBackground(skin.getDrawable("panel"));
 
         padLeft(5);
         padTop(25);
 
-        setModal(false);
-        setMovable(false);
-        setResizable(false);
         setRound(false);
 
-        ScrollPane scrollPane = new ScrollPane(propertyGroup);
-        scrollPane.setScrollingDisabled(true, false);
-        add(scrollPane).grow();
+        titleLabel = new Label("", getSkin());
+        Table titleContainer = new Table();
+        titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).expandX().left().row();
+        titleContainer.add().expandY();
+
+        Stack stack = new Stack();
+        stack.add(propertyGroup);
+        stack.add(titleContainer);
+
+        add(stack).grow();
 
         setPropertyProvider(propertyProvider);
+
+        setTitle(propertyProvider.getPropertyBoxTitle());
     }
 
-    @Override
-    public void act (float delta) {
-        super.act(delta);
+    private void setTitle(String title) {
+        titleLabel.setText(title);
     }
 
     private void setPropertyProvider (IPropertyProvider propertyProvider) {
@@ -67,6 +73,9 @@ public class PropertiesPanel extends Window {
     }
 
 
-
-
+    public void updateValues() {
+        for(PropertyWidget widget: propertyWidgets) {
+            widget.updateValue();
+        }
+    }
 }

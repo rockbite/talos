@@ -340,6 +340,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             public void valueChanged(String value) {
                 currentAnimation = skeleton.getData().findAnimation(value);
                 animationState.setAnimation(0, currentAnimation, true);
+
+                workspace.effectUnselected(workspace.selectedEffect);
             }
         };
 

@@ -41,8 +41,8 @@ public class NumericalValueField extends Table {
             }
         });
 
-        add(x).padRight(6f).prefWidth(52).minWidth(10).growX();
-        add(y).prefWidth(52).minWidth(10).growX();
-        add(z).padLeft(6f).prefWidth(52).minWidth(10).growX();
+        add(x).padRight(6f).prefWidth(52).minWidth(10).growX().height(25);
+        add(y).prefWidth(52).minWidth(10).growX().height(25);
+        add(z).padLeft(6f).prefWidth(52).minWidth(10).growX().height(25);
     }
 }

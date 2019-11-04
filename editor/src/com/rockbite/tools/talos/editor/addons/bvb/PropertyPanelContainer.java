@@ -17,6 +17,7 @@ public class PropertyPanelContainer extends Table {
     ScrollPane scrollPane;
 
     ObjectMap<Class, IPropertyProvider> providerSet = new ObjectMap<>();
+    Array<PropertiesPanel> panelList = new Array<>();
 
     public PropertyPanelContainer(Skin skin) {
         setSkin(skin);
@@ -50,16 +51,31 @@ public class PropertyPanelContainer extends Table {
             }
         });
 
+        panelList.clear();
+
         for(IPropertyProvider provider: list) {
             PropertiesPanel panel = new PropertiesPanel(provider, getSkin());
 
             container.add(panel).growX().top().padBottom(5);
             container.row();
+
+            panelList.add(panel);
         }
     }
 
     public void hidePanel(IPropertyProvider propertyProvider) {
         providerSet.remove(propertyProvider.getClass());
         build();
+    }
+
+    public void updateValues() {
+        for(PropertiesPanel panel: panelList) {
+            panel.updateValues();
+        }
+    }
+
+    public void cleanPanels() {
+        providerSet.clear();
+        panelList.clear();
     }
 }

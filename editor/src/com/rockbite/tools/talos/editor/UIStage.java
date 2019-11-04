@@ -410,9 +410,9 @@ public class UIStage {
 		bottomTable.add(bottomPane).expand().grow();
 
 		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
-		verticalPane.setMaxSplitAmount(0.8f);
-		verticalPane.setMinSplitAmount(0.2f);
-		verticalPane.setSplitAmount(0.7f);
+		verticalPane.setMaxSplitAmount(0.95f);
+		verticalPane.setMinSplitAmount(0.05f);
+		verticalPane.setSplitAmount(0.8f);
 
 		leftTable = new Table();
 		leftTable.setSkin(skin);
@@ -422,7 +422,7 @@ public class UIStage {
 		VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
 		midTable.add(horizontalPane).expand().grow().fill();
 		horizontalPane.setMaxSplitAmount(0.8f);
-		horizontalPane.setMinSplitAmount(0.27f);
+		horizontalPane.setMinSplitAmount(0.2f);
 		horizontalPane.setSplitAmount(0.3f);
 
 		fullScreenTable.row();

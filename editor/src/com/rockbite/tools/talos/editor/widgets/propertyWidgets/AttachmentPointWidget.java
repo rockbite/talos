@@ -13,7 +13,14 @@ public abstract class AttachmentPointWidget extends PropertyWidget<AttachmentPoi
     @Override
     public Actor getSubWidget() {
         attachmentPointBox = new AttachmentPointBox(TalosMain.Instance().UIStage().getSkin(), "position");
-        attachmentPointBox.setBoneList(getBoneList());
+
+        Array<String> boneNameList = new Array<>();
+        boneNameList.clear();
+        for(Bone bone: getBoneList()) {
+            boneNameList.add(bone.getData().getName());
+        }
+
+        attachmentPointBox.setBoneList(boneNameList);
         return attachmentPointBox;
     }
 

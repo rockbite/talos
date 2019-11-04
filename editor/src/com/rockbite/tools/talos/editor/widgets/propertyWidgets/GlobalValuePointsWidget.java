@@ -13,6 +13,7 @@ public abstract class GlobalValuePointsWidget extends PropertyWidget<Array<Attac
     @Override
     public Actor getSubWidget() {
         listContainer = new GlobalValueListContainer(TalosMain.Instance().getSkin());
+        listContainer.setBoneList(getBoneList());
         return listContainer;
     }
 

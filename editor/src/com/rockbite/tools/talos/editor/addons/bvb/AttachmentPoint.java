@@ -65,6 +65,16 @@ public class AttachmentPoint implements Json.Serializable {
         numericalValue.set(value);
     }
 
+    public void setTypeAttached() {
+        type = Type.ATTACHED;
+        attachmentType = AttachmentType.POSITION;
+        if(boneName == null || boneName.isEmpty()) boneName = "root";
+    }
+
+    public void setTypeStatic() {
+        type = Type.STATIC;
+    }
+
     public void setTypeAttached(AttachmentType attachmentType) {
         if(type == Type.ATTACHED) {
             this.attachmentType = attachmentType;
@@ -135,6 +145,15 @@ public class AttachmentPoint implements Json.Serializable {
         }
     }
 
+
+    public void setATAngle() {
+        attachmentType = AttachmentType.ROTATION;
+    }
+
+    public void setATPosition() {
+        attachmentType = AttachmentType.POSITION;
+    }
+
     public void setOffsetX (float offsetX) {
         offset.x = offsetX;
     }
@@ -145,5 +164,9 @@ public class AttachmentPoint implements Json.Serializable {
 
     public Type getType() {
         return type;
+    }
+
+    public void setSlotId(int id) {
+        attachedToSlot = id;
     }
 }

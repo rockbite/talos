@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Event;
+import com.esotericsoftware.spine.EventData;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -196,6 +198,40 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             }
         };
 
+        SelectBoxWidget startEventWidget = new SelectBoxWidget("Start Emitting") {
+            @Override
+            public Array<String> getOptionsList() {
+                return getEvents();
+            }
+
+            @Override
+            public String getValue() {
+                return startEvent;
+            }
+
+            @Override
+            public void valueChanged(String value) {
+               setStartEvent(value);
+            }
+        };
+
+        SelectBoxWidget completeEventWidget = new SelectBoxWidget("Stop Emitting") {
+            @Override
+            public Array<String> getOptionsList() {
+                return getEvents();
+            }
+
+            @Override
+            public String getValue() {
+                return completeEvent;
+            }
+
+            @Override
+            public void valueChanged(String value) {
+                setCompleteEvent(value);
+            }
+        };
+
         AttachmentPointWidget position = new AttachmentPointWidget() {
             @Override
             public Array<Bone> getBoneList() {
@@ -222,15 +258,40 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
         properties.add(effectName);
         properties.add(behind);
+        properties.add(startEventWidget);
+        properties.add(completeEventWidget);
         properties.add(position);
         properties.add(globalValues);
 
         return properties;
     }
 
+    private void setStartEvent(String value) {
+        startEvent = value;
+        if(!startEvent.isEmpty()) {
+            forever = false;
+        } else {
+            forever = true;
+        }
+    }
+
+    private void setCompleteEvent(String value) {
+        completeEvent = value;
+    }
+
+    protected Array<String> getEvents() {
+        Array<EventData> events = parent.getSkeleton().getData().getEvents();
+        Array<String> result = new Array<>();
+        result.add("");
+        for(EventData eventData: events) {
+            result.add(eventData.getName());
+        }
+        return result;
+    }
+
     @Override
     public String getPropertyBoxTitle () {
-        return name;
+        return "Effect: " + name;
     }
 
     @Override
@@ -266,6 +327,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         json.writeValue("isBehind", isBehind);
         json.writeValue("positionAttachment", positionAttachment);
         json.writeValue("valueAttachments", valueAttachments);
+        json.writeValue("startEvent", startEvent);
+        json.writeValue("completeEvent", completeEvent);
     }
 
     @Override
@@ -292,6 +355,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             AttachmentPoint point = json.readValue(AttachmentPoint.class, valueAttachmentJson);
             valueAttachments.add(point);
         }
+
+        setStartEvent(jsonData.getString("startEvent", ""));
+        setCompleteEvent(jsonData.getString("completeEvent", ""));
     }
 
     public String getStartEvent() {

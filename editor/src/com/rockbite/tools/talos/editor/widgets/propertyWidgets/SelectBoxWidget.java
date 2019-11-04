@@ -47,10 +47,10 @@ public abstract class SelectBoxWidget extends PropertyWidget<String> {
     public void updateWidget(String value) {
         Array<String> list = getOptionsList();
         if(list != null) {
+            selectBox.removeListener(listener);
             selectBox.setItems(list);
             selectBox.setVisible(true);
             noValueLabel.setVisible(false);
-            selectBox.removeListener(listener);
             selectBox.setSelected(value);
             selectBox.addListener(listener);
         } else {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
 
 public class CustomList<T extends Actor> extends Table {
 
@@ -30,8 +30,26 @@ public class CustomList<T extends Actor> extends Table {
         clearChildren();
         for(T item: items) {
             Table container = new Table();
-            container.add(item).growX();
+            container.add(item).growX().padTop(2f).padBottom(2f);
             add(container).growX().row();
         }
+
+        add().expandY();
+    }
+
+    public void clearItems() {
+        clearItems(true);
+    }
+
+    public void clearItems(boolean rebuild) {
+        items.clear();
+        if(rebuild) {
+            rebuild();
+        }
+    }
+
+    public void addAll(Array<T> items) {
+        items.addAll(items);
+        rebuild();
     }
 }
