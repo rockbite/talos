@@ -6,20 +6,19 @@ import com.esotericsoftware.spine.Bone;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
 
-public abstract class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
+public abstract class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
-    AttachmentPointBox attachmentPointBox;
+    GlobalValueListContainer listContainer;
 
     @Override
     public Actor getSubWidget() {
-        attachmentPointBox = new AttachmentPointBox(TalosMain.Instance().UIStage().getSkin(), "position");
-        attachmentPointBox.setBoneList(getBoneList());
-        return attachmentPointBox;
+        listContainer = new GlobalValueListContainer(TalosMain.Instance().getSkin());
+        return listContainer;
     }
 
     @Override
-    public void updateWidget(AttachmentPoint value) {
-        attachmentPointBox.setData(value);
+    public void updateWidget(Array<AttachmentPoint> value) {
+        listContainer.setData(value);
     }
 
     public abstract Array<Bone> getBoneList();

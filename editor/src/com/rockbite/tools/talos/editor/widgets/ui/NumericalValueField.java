@@ -13,11 +13,11 @@ public class NumericalValueField extends Table {
 
     public NumericalValueField(Skin skin) {
         setSkin(skin);
-        final TextField x = new TextField("", getSkin());
+        final TextField x = new TextField("0.0", getSkin(), "panel");
         x.setTextFieldFilter(new TextField.TextFieldFilter.DigitsOnlyFilter());
-        final TextField y = new TextField("", getSkin());
+        final TextField y = new TextField("0.0", getSkin(), "panel");
         y.setTextFieldFilter(new TextField.TextFieldFilter.DigitsOnlyFilter());
-        final TextField z = new TextField("", getSkin());
+        final TextField z = new TextField("0.0", getSkin(), "panel");
         z.setTextFieldFilter(new TextField.TextFieldFilter.DigitsOnlyFilter());
 
         x.addListener(new ChangeListener() {
@@ -41,8 +41,8 @@ public class NumericalValueField extends Table {
             }
         });
 
-        add(x);
-        add(y);
-        add(z);
+        add(x).padRight(6f).prefWidth(52).minWidth(10).growX();
+        add(y).prefWidth(52).minWidth(10).growX();
+        add(z).padLeft(6f).prefWidth(52).minWidth(10).growX();
     }
 }

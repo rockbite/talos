@@ -22,7 +22,7 @@ public class AttachmentPointBox extends Table {
 
     protected class BoneWidget extends Table {
 
-        SelectBox<TruncatedString> boneList;
+        SelectBox<String> boneList;
         ImageButton attachmentTypeToggle;
 
         public BoneWidget(Skin skin) {
@@ -39,20 +39,20 @@ public class AttachmentPointBox extends Table {
             boneList = new SelectBox<>(getSkin(), "propertyValue");
             attachmentTypeToggle = new ImageButton(getSkin());
 
-            add(boneList).height(25f).growX();
+            add(boneList).height(25f).growX().minWidth(10).prefWidth(52);
             attachmentTypeToggle.setChecked(attachmentType == AttachmentPoint.AttachmentType.POSITION);
         }
 
         public void setBoneList(Array<Bone> bones) {
-            Array<TruncatedString> list = new Array<>();
+            Array<String> list = new Array<>();
             for(Bone bone: bones) {
-                list.add(new TruncatedString(bone.getData().getName(), 32));
+                list.add(bone.getData().getName());
             }
             boneList.setItems(list);
         }
 
         public void setSelectedBone(String boneName) {
-            boneList.setSelected(new TruncatedString(boneName, 32));
+            boneList.setSelected(boneName);
         }
     }
 
@@ -76,17 +76,21 @@ public class AttachmentPointBox extends Table {
 
     public AttachmentPointBox(Skin skin) {
         setSkin(skin);
+
+        numericalValueField = new NumericalValueField(getSkin());
+        slotWidget = new SlotWidget("0", getSkin());
+        boneWidget = new BoneWidget(getSkin());
+        typeToggleButton = new ImageButton(getSkin().getDrawable("ic-chain"), getSkin().getDrawable("ic-chain"), getSkin().getDrawable("ic-settings"));
+
         stack = new Stack();
         stack.add(numericalValueField);
         stack.add(boneWidget);
 
-        slotWidget = new SlotWidget("", getSkin());
-        boneWidget = new BoneWidget(getSkin());
-        typeToggleButton = new ImageButton(getSkin());
+        add(slotWidget).padRight(6f).width(32);
+        add(stack).expandX().growX();
+        add(typeToggleButton).padLeft(6f);
 
-        add(slotWidget).padRight(6f);
-        add(stack);
-        add(typeToggleButton);
+        boneWidget.setVisible(false);
     }
 
     /**

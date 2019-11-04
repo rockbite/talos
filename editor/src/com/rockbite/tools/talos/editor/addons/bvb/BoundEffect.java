@@ -196,7 +196,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             }
         };
 
-        AttachmentPointWidget position = new AttachmentPointWidget(null) {
+        AttachmentPointWidget position = new AttachmentPointWidget() {
             @Override
             public Array<Bone> getBoneList() {
                 return parent.getSkeleton().getBones();
@@ -208,27 +208,24 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             }
         };
 
-        properties.add(effectName);
-        properties.add(behind);
-        properties.add(position);
-
-        return properties;
-
-/*
-		Property<Array<AttachmentPoint>> globalValues = new GlobalValuesProperty("", valueAttachments) {
+        GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget() {
             @Override
-            public Array<AttachmentPoint> getValue () {
-                return valueAttachments;
+            public Array<Bone> getBoneList() {
+                return parent.getSkeleton().getBones();
             }
 
             @Override
-			public void changed (Array<AttachmentPoint> newValue) {
-                valueAttachments.clear();
-                valueAttachments.addAll(newValue);
-			}
-		};
-		//globalValues.addAdditionalProperty("boneNames", parent.getSkeleton().getBones());
-*/
+            public Array<AttachmentPoint> getValue() {
+                return valueAttachments;
+            }
+        };
+
+        properties.add(effectName);
+        properties.add(behind);
+        properties.add(position);
+        properties.add(globalValues);
+
+        return properties;
     }
 
     @Override

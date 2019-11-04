@@ -86,14 +86,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             private Vector2 pos = new Vector2();
             private Vector2 tmp = new Vector2();
 
-            boolean stageClick;
-
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
-
-                stageClick = false;
 
                 getStage().setKeyboardFocus(BvBWorkspace.this);
 
@@ -123,9 +119,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                     }
                 }
 
-                stageClick = true;
+                if(selectedEffect != null) {
+                    effectUnselected(selectedEffect);
+                }
 
-                return true;
+                return false;
             }
 
             @Override
@@ -173,12 +171,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-
-                if(stageClick) {
-                    if(selectedEffect != null) {
-                        effectUnselected(selectedEffect);
-                    }
-                }
 
                 movingPoint = null;
             }

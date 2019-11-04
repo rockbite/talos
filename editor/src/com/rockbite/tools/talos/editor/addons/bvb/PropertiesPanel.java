@@ -36,9 +36,6 @@ public class PropertiesPanel extends Window {
     @Override
     public void act (float delta) {
         super.act(delta);
-        for (PropertyWidget propertyWidget : propertyWidgets) {
-            propertyWidget.updateValue();
-        }
     }
 
     private void setPropertyProvider (IPropertyProvider propertyProvider) {
@@ -61,6 +58,7 @@ public class PropertiesPanel extends Window {
             if(listOfProperties != null) {
                 for (PropertyWidget propertyWidget : listOfProperties) {
                     propertyWidgets.add(propertyWidget);
+                    propertyWidget.updateValue();
                     propertyTable.add(propertyWidget).growX().pad(5f);
                     propertyTable.row();
                 }

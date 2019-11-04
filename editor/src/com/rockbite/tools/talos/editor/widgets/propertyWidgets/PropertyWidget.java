@@ -15,6 +15,10 @@ public abstract class PropertyWidget<T> extends Table {
 
 	ChangeListener listener;
 
+	public PropertyWidget () {
+		build(null);
+	}
+
 	public PropertyWidget (String name) {
 		build(name);
 	}
