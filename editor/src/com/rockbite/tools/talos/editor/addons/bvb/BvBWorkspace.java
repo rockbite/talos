@@ -223,6 +223,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         drawGrid(batch, parentAlpha);
         batch.begin();
 
+        drawVFXBefore(batch, parentAlpha);
         drawSpine(batch, parentAlpha);
         drawVFX(batch, parentAlpha);
 
@@ -342,12 +343,26 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         batch.setBlendFunctionSeparate(a1, a2, a3, a4);
     }
 
+    private void drawVFXBefore(Batch batch, float parentAlpha) {
+        Skeleton skeleton = skeletonContainer.getSkeleton();
+        if(skeleton == null) return;
+
+        talosRenderer.setBatch(batch);
+        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+            if(!effect.isBehind()) continue;
+            for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
+                talosRenderer.render(particleEffectInstance);
+            }
+        }
+    }
+
     private void drawVFX(Batch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+            if(effect.isBehind()) continue;
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
             }
