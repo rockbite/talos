@@ -296,4 +296,8 @@ public abstract class ViewportWidget extends Table {
 
         return Math.abs(pos - baseline) * (getStage().getWidth()/getWidth()); //TODO: I am sure there is a better way to do this
     }
+
+    public float getWorldWidth() {
+        return worldWidth;
+    }
 }

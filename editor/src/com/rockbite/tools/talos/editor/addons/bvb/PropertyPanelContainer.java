@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.util.Comparator;
@@ -64,6 +63,7 @@ public class PropertyPanelContainer extends Table {
     }
 
     public void hidePanel(IPropertyProvider propertyProvider) {
+        if(propertyProvider == null) return;
         providerSet.remove(propertyProvider.getClass());
         build();
     }

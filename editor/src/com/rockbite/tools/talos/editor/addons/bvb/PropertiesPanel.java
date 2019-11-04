@@ -65,9 +65,10 @@ public class PropertiesPanel extends Table {
                 for (PropertyWidget propertyWidget : listOfProperties) {
                     propertyWidgets.add(propertyWidget);
                     propertyWidget.updateValue();
-                    propertyTable.add(propertyWidget).growX().pad(5f);
+                    propertyTable.add(propertyWidget).growX().pad(5f).padBottom(0);
                     propertyTable.row();
                 }
+                propertyTable.add().height(5);
             }
         }
     }

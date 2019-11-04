@@ -18,6 +18,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.CheckboxWidget;
+import com.rockbite.tools.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.ui.ViewportWidget;
@@ -37,7 +39,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private boolean paused = false;
     private boolean showingTools = false;
+
     private float speedMultiplier = 1f;
+    private boolean preMultipliedAlpha = false;
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
@@ -213,7 +217,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public void act(float delta) {
         super.act(delta);
         if(skeletonContainer != null) {
-            skeletonContainer.update(delta, paused);
+            skeletonContainer.update(delta * speedMultiplier, paused);
         }
     }
 
@@ -337,6 +341,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         int a2 = batch.getBlendDstFunc();
         int a3 = batch.getBlendSrcFuncAlpha();
         int a4 = batch.getBlendDstFuncAlpha();
+        renderer.setPremultipliedAlpha(preMultipliedAlpha);
         renderer.draw(batch, skeleton); // Draw the skeleton images.
 
         // fixing back the blending because PMA is shit
@@ -422,6 +427,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             json.writeValue(fileName, pathMap.get(fileName));
         }
         json.writeObjectEnd();
+        json.writeValue("pma", preMultipliedAlpha);
+        json.writeValue("speed", speedMultiplier);
+        json.writeValue("wordSize", getWorldWidth());
+        json.writeValue("zoom", camera.zoom);
+        json.writeValue("cameraPosX", camera.position.x);
+        json.writeValue("cameraPosY", camera.position.y);
     }
 
     @Override
@@ -435,6 +446,13 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         skeletonContainer = new SkeletonContainer(this);
         skeletonContainer.read(json, jsonData.get("skeleton"));
+
+        preMultipliedAlpha = jsonData.getBoolean("pma", false);
+        speedMultiplier = jsonData.getFloat("speed", 1f);
+        setWorldSize(jsonData.getFloat("wordSize", 1280));
+        camera.zoom = jsonData.getFloat("zoom", camera.zoom);
+        camera.position.x = jsonData.getFloat("cameraPosX", 0);
+        camera.position.y = jsonData.getFloat("cameraPosY", 0);
 
         bvb.properties.cleanPanels();
         bvb.properties.showPanel(this);
@@ -460,7 +478,50 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     @Override
     public Array<PropertyWidget> getListOfProperties() {
-        return null;
+        Array<PropertyWidget> properties = new Array<>();
+
+
+        CheckboxWidget preMultipliedAlphaWidget = new CheckboxWidget("premultiplied alpha") {
+            @Override
+            public Boolean getValue() {
+                return preMultipliedAlpha;
+            }
+
+            @Override
+            public void valueChanged(Boolean value) {
+                preMultipliedAlpha = value;
+            }
+        };
+
+        FloatPropertyWidget speed = new FloatPropertyWidget("speed multiplier") {
+            @Override
+            public Float getValue() {
+                return speedMultiplier;
+            }
+
+            @Override
+            public void valueChanged(Float value) {
+                speedMultiplier = value;
+            }
+        };
+
+        FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width") {
+            @Override
+            public Float getValue() {
+                return getWorldWidth();
+            }
+
+            @Override
+            public void valueChanged(Float value) {
+                setWorldSize(value);
+            }
+        };
+
+        properties.add(preMultipliedAlphaWidget);
+        properties.add(speed);
+        properties.add(worldWidthWidget);
+
+        return properties;
     }
 
     @Override

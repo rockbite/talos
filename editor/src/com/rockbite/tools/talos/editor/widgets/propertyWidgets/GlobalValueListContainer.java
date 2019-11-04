@@ -64,6 +64,7 @@ public class GlobalValueListContainer extends Table {
     private void addNewRow() {
         AttachmentPoint newPoint = new AttachmentPoint();
         AttachmentPointBox attachmentPointBox = createBoxWidget(newPoint, false);
+        if(attachmentPointBox == null) return;
         attachmentPoints.add(newPoint);
         list.addItem(attachmentPointBox);
     }
@@ -95,6 +96,7 @@ public class GlobalValueListContainer extends Table {
 
         if(!skipSlotData) {
             int index = getAvailableSlotIndex();
+            if(index == -1) return null;
             attachmentPointBox.setSlotIndex(index);
         }
 
@@ -102,7 +104,15 @@ public class GlobalValueListContainer extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                int index = getAvailableSlotIndex();
+                if(index == -1) return;
                 attachmentPointBox.setSlotIndex(index);
+            }
+        });
+
+        attachmentPointBox.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                list.select(attachmentPointBox);
             }
         });
 
@@ -126,7 +136,7 @@ public class GlobalValueListContainer extends Table {
                 return indexToTry;
             } else {
                 indexToTry++;
-                if(indexToTry > 10) {
+                if(indexToTry > 9) {
                     return -1;
                 }
             }

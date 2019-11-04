@@ -241,6 +241,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 json.writeArrayEnd();
             }
         }
+        json.writeValue("currSkin", currentSkin.getName());
+        json.writeValue("currAnimation", currentAnimation.getName());
     }
 
     @Override
@@ -262,6 +264,13 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             effect.read(json, data);
             addEffect(skin, animation, effect);
         }
+
+        String currentSkinName = jsonData.getString("currSkin", currentSkin.getName());
+        String currentAnimationName = jsonData.getString("currAnimation", currentAnimation.getName());
+
+        currentSkin = skeleton.getData().findSkin(currentSkinName);
+        currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
+        animationState.setAnimation(0, currentAnimation, true);
     }
 
     public void clear() {
