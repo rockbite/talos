@@ -381,13 +381,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public void setSkeleton(FileHandle jsonFileHandle) {
         pathMap.put(jsonFileHandle.name(), jsonFileHandle.path());
 
-        FileHandle atlasFileHandle = Gdx.files.absolute(jsonFileHandle.pathWithoutExtension() + ".atlas");
-        jsonFileHandle = TalosMain.Instance().ProjectController().findFile(jsonFileHandle);
-        atlasFileHandle = TalosMain.Instance().ProjectController().findFile(atlasFileHandle);
-
-        skeletonContainer.setSkeleton(jsonFileHandle, atlasFileHandle);
-
-        TalosMain.Instance().ProjectController().setDirty();
+        skeletonContainer.setSkeleton(jsonFileHandle);
 
         bvb.properties.updateValues();
     }
@@ -437,6 +431,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeValue("zoom", camera.zoom);
         json.writeValue("cameraPosX", camera.position.x);
         json.writeValue("cameraPosY", camera.position.y);
+        if(selectedEffect != null) {
+            json.writeValue("selectedEffect", selectedEffect.name);
+        }
     }
 
     @Override
@@ -461,6 +458,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.cleanPanels();
         bvb.properties.showPanel(this);
         bvb.properties.showPanel(skeletonContainer);
+
+        String selectedEffect = jsonData.getString("selectedEffect", null);
+        BoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
+        if(effect != null) effectSelected(effect);
     }
 
     public void cleanWorkspace() {

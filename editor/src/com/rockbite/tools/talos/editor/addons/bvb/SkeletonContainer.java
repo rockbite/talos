@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -29,6 +30,16 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     public SkeletonContainer(BvBWorkspace workspace) {
         this.workspace = workspace;
+    }
+
+    public void setSkeleton(FileHandle jsonFileHandle) {
+        FileHandle atlasFileHandle = Gdx.files.absolute(jsonFileHandle.pathWithoutExtension() + ".atlas");
+        jsonFileHandle = TalosMain.Instance().ProjectController().findFile(jsonFileHandle);
+        atlasFileHandle = TalosMain.Instance().ProjectController().findFile(atlasFileHandle);
+
+        setSkeleton(jsonFileHandle, atlasFileHandle);
+
+        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void setSkeleton(FileHandle jsonHandle, FileHandle atlasHandle) {
@@ -250,7 +261,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         String skeletonName = jsonData.getString("skeletonName");
         String skeletonPath = workspace.getPath(skeletonName + ".json");
         FileHandle jsonHandle = TalosMain.Instance().ProjectController().findFile(skeletonPath);
-        workspace.setSkeleton(jsonHandle);
+
+        setSkeleton(jsonHandle);
 
         boundEffects.clear();
         // now let's load bound effects
@@ -370,4 +382,16 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public int getPriority() {
         return 1;
     }
+
+    public BoundEffect getEffectByName(String selectedEffect) {
+        if(selectedEffect == null) return null;
+        for(BoundEffect effect: getBoundEffects()) {
+            if(effect.name.equals(selectedEffect)) {
+                return effect;
+            }
+        }
+
+        return null;
+    }
+
 }
