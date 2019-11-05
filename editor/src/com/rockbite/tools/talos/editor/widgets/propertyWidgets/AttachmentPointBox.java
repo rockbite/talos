@@ -39,7 +39,7 @@ public class AttachmentPointBox extends Table {
         public BoneWidget(Skin skin) {
             setSkin(skin);
             boneList = new SelectBox<>(getSkin(), "propertyValue");
-            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-target"), getSkin().getDrawable("ic-refresh"));
+            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("icon-target"), getSkin().getDrawable("icon-angle"));
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52).padRight(6f);
             add(attachmentTypeToggle);
@@ -49,7 +49,7 @@ public class AttachmentPointBox extends Table {
         public BoneWidget(Skin skin, AttachmentPoint.AttachmentType attachmentType) {
             setSkin(skin);
             boneList = new SelectBox<>(getSkin(), "propertyValue");
-            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-target"), getSkin().getDrawable("ic-refresh"));
+            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("icon-target"), getSkin().getDrawable("icon-angle"));
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52);
             attachmentTypeToggle.button.setChecked(attachmentType != AttachmentPoint.AttachmentType.POSITION);
@@ -122,7 +122,7 @@ public class AttachmentPointBox extends Table {
         numericalValueField = new NumericalValueField(getSkin());
         slotWidget = new SlotWidget("0", getSkin());
         boneWidget = new BoneWidget(getSkin());
-        typeToggleButton = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-chain"), getSkin().getDrawable("ic-settings"));
+        typeToggleButton = new BackgroundButton(getSkin(), getSkin().getDrawable("icon-chain"), getSkin().getDrawable("icon-edit"));
         deleteButton = new BackgroundButton(getSkin(), getSkin().getDrawable("ic-trash-red"));
 
         stack = new Stack();

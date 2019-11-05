@@ -54,6 +54,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private Vector2 tmp3 = new Vector2();
 
     BvBWorkspace(BvBAddon bvb) {
+        setSkin(TalosMain.Instance().getSkin());
         this.bvb = bvb;
         setModeUI();
 
@@ -266,16 +267,23 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         }
     }
 
-    private void drawShapeRendererTools() {
+    private void drawSpriteTools(Batch batch, float parentAlpha) {
         /**
          * Drawing bones
          */
         Skeleton skeleton = skeletonContainer.getSkeleton();
-        shapeRenderer.setColor(Color.RED);
         for (Bone bone : skeleton.getBones()) {
-            shapeRenderer.circle(bone.getWorldX(), bone.getWorldY(), pixelToWorld(3f));
-        }
+            //shapeRenderer.circle(bone.getWorldX(), bone.getWorldY(), pixelToWorld(3f));
 
+            batch.setColor(1f, 1f, 1f, 1f);
+            float width = pixelToWorld(10f);
+            float height = pixelToWorld(30f);
+            float rotation = bone.getRotation();
+            float originX = pixelToWorld(5);
+            float originY = pixelToWorld(8);
+
+            batch.draw(getSkin().getRegion("bone"), bone.getWorldX() - originX, bone.getWorldY() - originY, originX, originY, width, height, 1f, 1f, rotation);
+        }
 
         /**
          * Draw bound effects and their attachment points
@@ -285,8 +293,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             AttachmentPoint positionAttachment = effect.getPositionAttachment();
             if(positionAttachment != null && !positionAttachment.isStatic()) {
                 Vector2 pos = getAttachmentPosition(positionAttachment);
-                shapeRenderer.setColor(Color.BLUE);
-                shapeRenderer.circle(pos.x, pos.y, pixelToWorld(5f));
+
+                batch.setColor(1f, 1f, 1f, 1f);
+                float size = pixelToWorld(12f);
+                batch.draw(getSkin().getRegion("vfx-red"), pos.x-size/2f, pos.y-size/2f, size, size);
             }
 
             // now iterate through other non static attachments
@@ -294,11 +304,17 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             for(AttachmentPoint point: effect.getAttachments()) {
                 if(!point.isStatic()) {
                     Vector2 pos = getAttachmentPosition(point);
-                    shapeRenderer.circle(pos.x, pos.y, pixelToWorld(5f));
+
+                    batch.setColor(1f, 1f, 1f, 1f);
+                    float size = pixelToWorld(12f);
+                    batch.draw(getSkin().getRegion("vfx-green"), pos.x-size/2f, pos.y-size/2f, size, size);
                 }
             }
         }
+    }
 
+
+    private void drawShapeRendererTools() {
         /**
          * If attachment point of an effect is currently being moved, then draw line to it's origin or nearest bone
          */
@@ -330,10 +346,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             tmp.set(point.getStaticValue().get(0), point.getStaticValue().get(1));
         }
         return tmp;
-    }
-
-    private void drawSpriteTools(Batch batch, float parentAlpha) {
-
     }
 
     private void drawSpine(Batch batch, float parentAlpha) {
