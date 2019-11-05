@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -49,6 +48,98 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         json.setScale(1f); // should be user set
         final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
 
+        // before moving forward let's check if things are missing
+        boolean hasGoners = checkForGoners(skeletonData);
+
+        if(!hasGoners) {
+            configureSkeleton(skeletonData);
+        }
+    }
+
+    public boolean checkForGoners(final SkeletonData skeletonData) {
+        final ObjectSet<String> skinsToRemove = new ObjectSet<>();
+        final ObjectSet<String> animationsToRemove = new ObjectSet<>();
+        final Array<BoundEffect> effectsToRemove = new Array<>();
+
+        for(String skinName: boundEffects.keys()) {
+            if(skeletonData.findSkin(skinName) == null) {
+                skinsToRemove.add(skinName);
+            }
+            for(String animationName: boundEffects.get(skinName).keys()) {
+                if(skeletonData.findAnimation(animationName) == null) {
+                    animationsToRemove.add(animationName);
+                }
+                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                    if(!effect.getPositionAttachment().isStatic() && skeletonData.findBone(effect.getPositionAttachment().getBoneName()) == null) {
+                        effectsToRemove.add(effect);
+                    }
+                    for(AttachmentPoint point: effect.getAttachments()) {
+                        if(!point.isStatic() && skeletonData.findBone(point.getBoneName()) == null) {
+                            if(!effectsToRemove.contains(effect, true)) {
+                                effectsToRemove.add(effect);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if(skinsToRemove.size > 0 || animationsToRemove.size > 0 || effectsToRemove.size > 0) {
+            String description = "Skeleton data has been reloaded with some breaking changes (missing skins, animations or bones). \n This will result in removal of ";
+            description += skinsToRemove.size + " skins, ";
+            description += animationsToRemove.size + " animations, ";
+            description += effectsToRemove.size + " effects.";
+            description += "\n Are you sure you want to update this skeleton?";
+
+            Dialogs.showOptionDialog(TalosMain.Instance().UIStage().getStage(), "Skeleton Reload Issue", description, Dialogs.OptionDialogType.YES_NO, new OptionDialogListener() {
+                @Override
+                public void yes() {
+                    for(String skinName: skinsToRemove) {
+                        boundEffects.remove(skinName);
+                    }
+
+                    for(String skinName: boundEffects.keys()) {
+                        for(String animName: animationsToRemove) {
+                            boundEffects.get(skinName).remove(animName);
+                        }
+                    }
+
+                    for(BoundEffect effect: effectsToRemove) {
+                        if(workspace.selectedEffect == effect) {
+                            workspace.effectUnselected(effect);
+                        }
+                    }
+
+                    for(String skinName: boundEffects.keys()) {
+                        for(String animationName: boundEffects.get(skinName).keys()) {
+                            boundEffects.get(skinName).get(animationName).removeAll(effectsToRemove, true);
+                        }
+                    }
+
+                    configureSkeleton(skeletonData);
+                    workspace.bvb.properties.showPanel(SkeletonContainer.this);
+                }
+
+                @Override
+                public void no() {
+
+                }
+
+                @Override
+                public void cancel() {
+
+                }
+            });
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public void configureSkeleton(SkeletonData skeletonData) {
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
         skeleton.setPosition(0, 0);
 

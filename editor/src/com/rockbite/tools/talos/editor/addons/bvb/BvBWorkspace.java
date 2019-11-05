@@ -185,6 +185,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 if(keycode == Input.Keys.SPACE) {
                     paused = !paused;
                 }
+                if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
+                    if(selectedEffect != null) {
+                        effectUnselected(selectedEffect);
+                    }
+                }
                 if(keycode == Input.Keys.ENTER) {
                     camera.position.set(0, 0, 0);
                     setWorldSize(getWorldWidth());
@@ -469,7 +474,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeObjectEnd();
         json.writeValue("pma", preMultipliedAlpha);
         json.writeValue("speed", speedMultiplier);
-        json.writeValue("wordSize", getWorldWidth());
+        json.writeValue("worldSize", getWorldWidth());
         json.writeValue("zoom", camera.zoom);
         json.writeValue("cameraPosX", camera.position.x);
         json.writeValue("cameraPosY", camera.position.y);
@@ -492,7 +497,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         preMultipliedAlpha = jsonData.getBoolean("pma", false);
         speedMultiplier = jsonData.getFloat("speed", 1f);
-        setWorldSize(jsonData.getFloat("wordSize", 1280));
+        setWorldSize(jsonData.getFloat("worldSize", 1280));
         camera.zoom = jsonData.getFloat("zoom", camera.zoom);
         camera.position.x = jsonData.getFloat("cameraPosX", 0);
         camera.position.y = jsonData.getFloat("cameraPosY", 0);
