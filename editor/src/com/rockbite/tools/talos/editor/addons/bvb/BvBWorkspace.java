@@ -278,7 +278,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             batch.setColor(1f, 1f, 1f, 1f);
             float width = pixelToWorld(10f);
             float height = pixelToWorld(30f);
-            float rotation = bone.getRotation();
+            float rotation = bone.getRotation() - 90f;
             float originX = pixelToWorld(5);
             float originY = pixelToWorld(8);
 
