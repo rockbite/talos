@@ -11,7 +11,13 @@
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ]
-	]
+	],
+	"previewCamPos": {},
+	"previewCamZoom": 1.4285715,
+	"bgImagePath": "",
+	"bgImageIsInBack": true,
+	"bgImageSize": 10,
+	"gridSize": 1
 },
 "emitters": [
 	{
@@ -64,18 +70,18 @@
 			{
 				"class": "FromToModuleWrapper",
 				"id": 3,
-				"x": -205,
+				"x": -206,
 				"y": -130,
 				"module": {
 					"data": {
 						"class": "FromToModule",
-						"index": 3
+						"index": 3,
+						"fromX": 4.7086997,
+						"fromY": -0.03990548,
+						"toX": -5.1077404,
+						"toY": -0.039903656
 					}
-				},
-				"fromX": -3.588236,
-				"fromY": -0.019608429,
-				"toX": 3.196078,
-				"toY": 0
+				}
 			},
 			{
 				"class": "NoiseModuleWrapper",
@@ -409,7 +415,7 @@
 		"groups": [
 			{
 				"text": "BEAM NOISE",
-				"modules": [ 11, 10, 13, 6, 4 ],
+				"modules": [ 10, 13, 11, 6, 4 ],
 				"color": -1.3926823E38
 			}
 		]
