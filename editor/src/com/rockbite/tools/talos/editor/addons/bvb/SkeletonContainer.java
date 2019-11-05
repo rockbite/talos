@@ -223,7 +223,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public float getBoneRotation(String boneName) {
         Bone bone = skeleton.findBone(boneName);
         if(bone != null) {
-            return bone.getRotation();
+            return bone.getWorldRotationX();
         }
 
         return 0;
