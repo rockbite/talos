@@ -234,6 +234,46 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return null;
     }
 
+
+
+    public Array<String> getUsedParticleEffectNames() {
+        Array<String> result = new Array<>();
+
+        if(skeleton == null) return result;
+
+        for(String skinName: boundEffects.keys()) {
+            for(String animationName: boundEffects.get(skinName).keys()) {
+                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                   result.add(effect.name);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void writeExport(Json json) {
+        if(skeleton == null) return;
+
+        json.writeValue("skeletonName", skeleton.getData().getName());
+
+        for(String skinName: boundEffects.keys()) {
+            for(String animationName: boundEffects.get(skinName).keys()) {
+                json.writeArrayStart("boundEffects");
+                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                    json.writeObjectStart();
+                    json.writeValue("skin", skinName);
+                    json.writeValue("animation", animationName);
+                    json.writeValue("data", effect);
+                    json.writeObjectEnd();
+                }
+                json.writeArrayEnd();
+            }
+        }
+
+        return;
+    }
+
     @Override
     public void write(Json json) {
         if(skeleton == null) return;
@@ -393,5 +433,4 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
         return null;
     }
-
 }

@@ -12,10 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.CheckboxWidget;
@@ -26,6 +23,8 @@ import com.rockbite.tools.talos.editor.widgets.ui.ViewportWidget;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
+
+import java.io.StringWriter;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
@@ -417,6 +416,49 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         }
     }
 
+    /**
+     * jesus it took a while to figure this out... like 8 minutes
+     *
+     * @return final json string
+     */
+    public String writeExport() {
+        try {
+            StringWriter stringWriter = new StringWriter();
+            Json json = new Json();
+            json .setOutputType(JsonWriter.OutputType.json);
+            json.setWriter(stringWriter);
+            json.getWriter().object();
+
+            writeExport(json);
+
+            return stringWriter.toString() + "}";
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return "";
+    }
+
+    private void writeExport(Json json) {
+        json.writeObjectStart("skeleton");
+        skeletonContainer.writeExport(json);
+        json.writeObjectEnd();
+
+        json.writeValue("pma", preMultipliedAlpha);
+
+        json.writeObjectStart("metadata");
+        json.writeArrayStart("assets");
+        Array<String> result = skeletonContainer.getUsedParticleEffectNames();
+        for(String name: result) {
+            json.writeObjectStart();
+            json.writeValue("name", name);
+            json.writeValue("type", "vfx");
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
+        json.writeObjectEnd();
+    }
+
     @Override
     public void write(Json json) {
         json.writeValue("skeleton", skeletonContainer);
@@ -463,6 +505,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         BoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
         if(effect != null) effectSelected(effect);
     }
+
 
     public void cleanWorkspace() {
         pathMap.clear();

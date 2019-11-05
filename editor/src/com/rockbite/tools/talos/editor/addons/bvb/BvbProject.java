@@ -46,7 +46,7 @@ public class BvbProject implements IProject {
 
     @Override
     public String getExportExtension() {
-        return ".xml";
+        return ".json";
     }
 
     @Override
@@ -84,6 +84,6 @@ public class BvbProject implements IProject {
 
     @Override
     public String exportProject() {
-        return "";
+        return bvBAddon.workspace.writeExport();
     }
 }
