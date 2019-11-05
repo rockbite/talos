@@ -389,7 +389,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        String skeletonName = jsonData.getString("skeletonName");
+        String skeletonName = jsonData.getString("skeletonName", "");
+        if(skeletonName.isEmpty()) return;
+
         String skeletonPath = workspace.getPath(skeletonName + ".json");
         FileHandle jsonHandle = TalosMain.Instance().ProjectController().findFile(skeletonPath);
 
