@@ -417,5 +417,9 @@ public class PreviewWidget extends ViewportWidget {
     public void setGridSize(float gridSize) {
         this.gridSize = gridSize;
         previewController.setGridSize(gridSize);
+
+        setWorldSize(10f * gridSize);
+        this.gridSize = gridSize;
+        resetCamera();
     }
 }
