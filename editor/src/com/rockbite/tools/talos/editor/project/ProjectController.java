@@ -180,7 +180,7 @@ public class ProjectController {
     public void loadFromTab(FileTab tab) {
         String fileName = tab.getFileName();
 
-        if(currentTab != null) {
+        if(currentTab != null && currentTab != tab) {
             saveProjectToCache(projectFileName);
         }
         if(fileCache.containsKey(fileName)) {

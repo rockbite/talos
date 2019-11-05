@@ -526,4 +526,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
         return null;
     }
+
+    public void removeEffect(BoundEffect effect) {
+        getBoundEffects().removeValue(effect, true);
+    }
 }

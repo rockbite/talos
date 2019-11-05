@@ -188,6 +188,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 }
                 if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
                     if(selectedEffect != null) {
+                        skeletonContainer.removeEffect(selectedEffect);
                         effectUnselected(selectedEffect);
                     }
                 }
