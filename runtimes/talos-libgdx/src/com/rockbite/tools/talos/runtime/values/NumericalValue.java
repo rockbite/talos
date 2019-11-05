@@ -111,6 +111,10 @@ public class NumericalValue extends Value {
 		}
 	}
 
+	public void set(int index, float value) {
+		elements[index] = value;
+	}
+
 	public void set(float value) {
 		currentElementCount = 1;
 		elements[0] = value;

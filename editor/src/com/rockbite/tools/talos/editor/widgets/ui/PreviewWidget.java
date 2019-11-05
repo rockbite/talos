@@ -87,9 +87,14 @@ public class PreviewWidget extends ViewportWidget {
     private IDragPointProvider dragPointProvider = null;
 
     private String backgroundImagePath = "";
+    private float gridSize;
 
     public PreviewWidget() {
         super();
+
+        setWorldSize(10f);
+        gridSize = 1f;
+
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
@@ -99,6 +104,14 @@ public class PreviewWidget extends ViewportWidget {
                 super.removeImage();
                 previewImage.setDrawable(null);
                 backgroundImagePath = "";
+            }
+
+            @Override
+            public void gridSizeChanged(float size) {
+                super.gridSizeChanged(size);
+                setWorldSize(10f * size);
+                gridSize = size;
+                resetCamera();
             }
         };
 
@@ -198,31 +211,6 @@ public class PreviewWidget extends ViewportWidget {
         });
     }
 
-    /**
-     * I really dunno how this works rather then it does
-     * @param vec
-     * @return
-     */
-    private Vector3 getWorldFromLocal(Vector3 vec) {
-
-        float xA = (getWidth() - vec.x)/getWidth();
-        float yA = (getHeight() - vec.y)/getHeight();
-
-        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
-
-        camera.unproject(vec);
-
-        vec.x *= -1f; // I don't even know why
-        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
-
-        return vec;
-    }
-
-    @Override
-    protected void cameraScrolledWithAmount (int amount) {
-        super.cameraScrolledWithAmount(amount);
-        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
-    }
 
     public void fileDrop (float x, float y, String[] paths) {
         temp.set(x, y);
@@ -259,7 +247,7 @@ public class PreviewWidget extends ViewportWidget {
 
         //stupid hack, plz do it normal way
         if(PreviewWidget.this.hasScrollFocus() && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            camera.position.set(0, 0, 0);
+            resetCamera();
         }
 
         long timeBefore = TimeUtils.nanoTime();
@@ -296,33 +284,15 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-
         batch.end();
-
-        camera.zoom = previewController.getPreviewBoxWidth() / camera.viewportWidth;
-        float height =  previewController.getPreviewBoxWidth() * camera.viewportHeight / camera.viewportWidth;
-
-        tmpColor.set(Color.WHITE);
-        tmpColor.a = 0.2f;
-        Gdx.gl.glLineWidth(1f);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(- previewController.getPreviewBoxWidth()/2f+camera.position.x, 0,  previewController.getPreviewBoxWidth()/2f+camera.position.x, 0);
-        shapeRenderer.setColor(tmpColor);
-        shapeRenderer.line(0, -height/2f+camera.position.y, 0, height/2f + camera.position.y);
-        shapeRenderer.end();
-
+        drawGrid(batch, parentAlpha * 0.5f);
         batch.begin();
 
         mid.set(0, 0);
 
-
         float imagePrefWidth = previewImage.getPrefWidth();
         float imagePrefHeight = previewImage.getPrefHeight();
         float scale = imagePrefHeight / imagePrefWidth;
-
 
         float imageWidth = previewController.getImageWidth();
         float imageHeight = imageWidth * scale;
@@ -361,6 +331,7 @@ public class PreviewWidget extends ViewportWidget {
             tmpColor.a = 0.8f;
             Gdx.gl.glLineWidth(1f);
             Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(tmpColor);
@@ -397,12 +368,6 @@ public class PreviewWidget extends ViewportWidget {
             this.dragPointProvider = null;
             dragPoints.clear();
         }
-    }
-
-    @Override
-    public void setCameraZoom(float zoom) {
-        super.setCameraZoom(zoom);
-        previewController.setFieldOfWidth(camera.zoom * camera.viewportWidth);
     }
 
     public String getBackgroundImagePath() {
@@ -442,5 +407,14 @@ public class PreviewWidget extends ViewportWidget {
         setCameraZoom(1.4285715f);
         setCameraPos(0, 0);
         unregisterDragPoints();
+    }
+
+    public float getGridSize() {
+        return gridSize;
+    }
+
+    public void setGridSize(float gridSize) {
+        this.gridSize = gridSize;
+        previewController.setGridSize(gridSize);
     }
 }

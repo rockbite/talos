@@ -5,6 +5,13 @@
 - Added fake motion blur module that calculates particle size based on how fast it moves
 - Added turbulence vector field module alongside with adapters to convert from polar to cartesian and back
 - Added tab so multiple projects can be worked on at once
+- Now last open/save/export locations are remembered to suggest in dialog as default
+- New architecture to support addons and multi project behaviour (.tls projects now how to save and behave as well as .bvb projects)
+- Added Spine animation bone attachment tool - big deal.
+- Attractor module - makes particles start in one direction but then move towards attractor
+- Recently Opened files menu now remembers your last open
+- Open/Save/Export dialogs now remember your last choice
+- Added Export As option, which means that export is a quick export to last location with Ctrl+E, while export as will ask for path
 
 [1.0.5]
 - legacy libGDX particle file importer full functionality

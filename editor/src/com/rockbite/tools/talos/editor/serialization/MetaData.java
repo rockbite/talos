@@ -47,6 +47,7 @@ public class MetaData implements Json.Serializable {
         json.writeValue("bgImagePath", TalosMain.Instance().UIStage().PreviewWidget().getBackgroundImagePath());
         json.writeValue("bgImageIsInBack", TalosMain.Instance().UIStage().PreviewWidget().isBackgroundImageInBack());
         json.writeValue("bgImageSize", TalosMain.Instance().UIStage().PreviewWidget().getBgImageSize());
+        json.writeValue("gridSize", TalosMain.Instance().UIStage().PreviewWidget().getGridSize());
     }
 
     @Override
@@ -67,6 +68,7 @@ public class MetaData implements Json.Serializable {
             TalosMain.Instance().UIStage().PreviewWidget().setCameraPos(0, 0);
         }
 
+        TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
         TalosMain.Instance().UIStage().PreviewWidget().setBackgroundImage(jsonData.getString("bgImagePath", null));
         TalosMain.Instance().UIStage().PreviewWidget().setImagebIsBackground(jsonData.getBoolean("bgImageIsInBack", true));

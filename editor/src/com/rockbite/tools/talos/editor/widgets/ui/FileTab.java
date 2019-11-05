@@ -3,14 +3,18 @@ package com.rockbite.tools.talos.editor.widgets.ui;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.project.IProject;
 
 public class FileTab extends Tab {
 
     public String fileName;
 
-    public FileTab(String fileName) {
-        super(true, true);
+    private IProject projectType;
+    private boolean unworthy = false;
 
+    public FileTab(String fileName, IProject projectType) {
+        super(true, true);
+        this.projectType = projectType;
         this.fileName = fileName;
     }
     @Override
@@ -38,5 +42,21 @@ public class FileTab extends Tab {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public IProject getProjectType() {
+        return projectType;
+    }
+
+    public void setUnworthy() {
+        unworthy = true;
+    }
+
+    public void setWorthy() {
+        unworthy = false;
+    }
+
+    public boolean isUnworthy() {
+        return unworthy;
     }
 }

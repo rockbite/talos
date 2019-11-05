@@ -16,6 +16,7 @@
 
 package com.rockbite.tools.talos.editor.project;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
@@ -27,6 +28,7 @@ import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
 import com.rockbite.tools.talos.editor.assets.ProjectAssetProvider;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
+import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.serialization.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
@@ -147,6 +149,47 @@ public class TalosProject implements IProject {
 		createNewEmitter("default_emitter", 0);
 	}
 
+	@Override
+	public String getExtension() {
+		return ".tls";
+	}
+
+	@Override
+	public String getExportExtension() {
+		return ".p";
+	}
+
+	@Override
+	public String getProjectNameTemplate() {
+		return "effect";
+	}
+
+	@Override
+	public void initUIContent() {
+
+	}
+
+	@Override
+	public FileHandle findFileInDefaultPaths(String fileName) {
+		String path = TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH);
+		FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
+		return handle;
+	}
+
+
+	public void exportProject(FileHandle handle) {
+		ExportData exportData = new ExportData();
+		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
+		handle.writeString(projectSerializer.writeExport(exportData), false);
+	}
+
+	@Override
+	public String exportProject() {
+		ExportData exportData = new ExportData();
+		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
+		return projectSerializer.writeExport(exportData);
+	}
+
 	private void cleanData() {
 		TalosMain.Instance().UIStage().PreviewWidget().resetToDefaults();
 
@@ -245,12 +288,6 @@ public class TalosProject implements IProject {
 	public void importFromLegacyFormat(FileHandle fileHandle) {
 		cleanData();
 		importer.read(fileHandle);
-	}
-
-	public void exportProject(FileHandle fileHandle) {
-		ExportData exportData = new ExportData();
-		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
-		projectSerializer.writeExport(fileHandle, exportData);
 	}
 
 	private void setToExportData (ExportData data, ModuleBoardWidget moduleBoardWidget) {

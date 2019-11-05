@@ -80,7 +80,8 @@
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 		default: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: default-font, selection: padded-list-selection, background: select-box-list-bg}, font: default-font, fontColor: white, disabledFontColor: grey }
-		small: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: small-font, selection: padded-list-selection, background: select-box-list-bg}, font: small-font, fontColor: white, disabledFontColor: grey }
+		small: {background: default-select, backgroundOver: default-select-over, scrollStyle: default, listStyle: {font: small-font, selection: padded-list-selection, background: select-box-list-bg}, font: small-font, fontColor: white, disabledFontColor: grey },
+		propertyValue: {background: panel_select, backgroundOver: panel_select_selected, backgroundOpen: panel_select_selected, scrollStyle: default, listStyle: {font: default-font, selection: padded-list-selection, background: select-box-list-bg}, font: default-font, fontColor: white, disabledFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.SplitPane$SplitPaneStyle: {
 		default-vertical: {handle: splitpane-vertical }
@@ -125,12 +126,15 @@
 		small-green: {font: small-font, fontColor: text-green }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
-		default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey }
+		default: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey },
+		dark: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield-dark, cursor: cursor, messageFont: default-font, messageFontColor: grey },
 		small: {font: small-font, fontColor: white, disabledFontColor: grey, selection: selection, background: textfield, cursor: cursor, messageFont: default-font, messageFontColor: grey },
-		no-bg: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection,cursor: cursor, messageFont: default-font, messageFontColor: grey }
+		no-bg: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection,cursor: cursor, messageFont: default-font, messageFontColor: grey },
+		panel: {font: default-font, fontColor: white, disabledFontColor: grey, selection: selection, background: panel_input_bg, focusedBackground: panel_input_bg_selected, cursor: cursor, messageFont: default-font, messageFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
-		default: {checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white, disabledFontColor: grey }
+		default: {checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white, disabledFontColor: grey },
+		panel-checkbox: {checkboxOver: panel-check-over, checkboxOn: panel-check-on, checkboxOff: panel-check-off, font: default-font, fontColor: white, disabledFontColor: grey },
 		radio: {checkboxOn: radio-on, checkboxOff: radio-off, font: default-font, fontColor: white, disabledFontColor: grey }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
@@ -229,7 +233,8 @@
 		light-grey: {fontColor: light-grey, underline: white, font: default-font }
 	}
 	com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane$TabbedPaneStyle: {
-		default: {background: menu-bg, separatorBar: list-selection, buttonStyle: {down: button-down, up: button, checked: button-down, over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey} }
+		default: {background: mainMenuBg, separatorBar: list-selection, buttonStyle: {down: button-down, up: button, checked: button-down, over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey} },
+		main-tabs: {background: mainMenuBg, separatorBar: list-selection, buttonStyle: {down: tab-bg, up: button, checked: tab-bg-selected, over: tab-bg-selected, disabled: tab-bg, font: default-font, fontColor: white, disabledFontColor: grey} }
 	}
 	com.kotcrab.vis.ui.widget.spinner.Spinner$SpinnerStyle: {
 		default: {down: select-down, up: select-up }

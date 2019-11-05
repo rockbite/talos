@@ -17,23 +17,24 @@
 package com.rockbite.tools.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.utils.CameraController;
+
 
 public abstract class ViewportWidget extends Table {
 
@@ -45,22 +46,41 @@ public abstract class ViewportWidget extends Table {
 
     public CameraController cameraController;
 
-    public ViewportWidget() {
-        camera = new OrthographicCamera();
-        camera.viewportWidth = 7;
+    protected Color bgColor = new Color(Color.BLACK);
 
+    protected float maxZoom = 0.1f;
+    protected float minZoom = 100f;
+
+    protected ShapeRenderer shapeRenderer;
+    private float gridSize;
+    private float worldWidth = 1f;
+
+    private Vector3 tmp = new Vector3();
+
+    public ViewportWidget() {
+        shapeRenderer = new ShapeRenderer();
+        camera = new OrthographicCamera();
+        camera.viewportWidth = 10;
 
         setTouchable(Touchable.enabled);
-
 
         cameraController = new CameraController(camera);
         cameraController.setInvert(true);
 
+        addPanListener();
+
+    }
+
+    protected void addPanListener() {
         addListener(new InputListener() {
             @Override
             public boolean scrolled (InputEvent event, float x, float y, int amount) {
-                camera.zoom += amount * 0.5f;
-                camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 100f);
+                float currWidth = camera.viewportWidth * camera.zoom;
+                float nextWidth = currWidth * (1f + amount * 0.1f);
+                float nextZoom = nextWidth/camera.viewportWidth;
+                camera.zoom = nextZoom;
+
+                camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
                 camera.update();
                 cameraScrolledWithAmount(amount);
 
@@ -70,7 +90,7 @@ public abstract class ViewportWidget extends Table {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 cameraController.touchDown((int)x, (int)y, pointer, button);
-                return true;
+                return !event.isHandled();
             }
 
             @Override
@@ -96,7 +116,6 @@ public abstract class ViewportWidget extends Table {
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
             }
         });
-
     }
 
     Vector2 temp = new Vector2();
@@ -109,11 +128,11 @@ public abstract class ViewportWidget extends Table {
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
 
-        localToScreenCoordinates(temp.set(getX(), getY()));
+        localToScreenCoordinates(temp.set(0, 0));
         int x = (int)temp.x;
         int y = (int)temp.y;
 
-        localToScreenCoordinates(temp.set(getX() + getWidth(), getY() + getHeight()));
+        localToScreenCoordinates(temp.set(getWidth(), getHeight()));
 
         int x2 = (int)temp.x;
         int y2 = (int)temp.y;
@@ -123,7 +142,7 @@ public abstract class ViewportWidget extends Table {
 
         HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+        Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         float aspect = getWidth()/getHeight();
@@ -174,5 +193,111 @@ public abstract class ViewportWidget extends Table {
 
     public void setCameraZoom(float zoom) {
         camera.zoom = zoom;
+    }
+
+    public void setViewportWidth(float width) {
+        camera.viewportWidth = width;
+        camera.update();
+    }
+
+    protected void setWorldSize(float worldWidth) {
+        this.worldWidth = worldWidth;
+        updateNumbers();
+    }
+
+    private void updateNumbers() {
+        camera.zoom = worldWidth/camera.viewportWidth;
+        gridSize = worldWidth/40f;
+        float minWidth = gridSize * 4f;
+        float maxWidth = worldWidth * 2f;
+        minZoom = minWidth/camera.viewportWidth;
+        maxZoom = maxWidth/camera.viewportWidth;
+        camera.update();
+    }
+
+    protected void resetCamera() {
+        camera.position.set(0, 0, 0);
+        camera.zoom = worldWidth/camera.viewportWidth;
+    }
+
+    protected void drawGrid(Batch batch, float parentAlpha) {
+        Gdx.gl.glLineWidth(1f);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        Color gridColor = new Color(Color.GRAY);
+
+        int minCount = 3;
+        int maxCount = 100;
+
+        float width = camera.viewportWidth * camera.zoom;
+        float height = camera.viewportHeight * camera.zoom;
+
+        float x = camera.position.x;
+        float y = camera.position.y;
+
+        int countX = MathUtils.ceil(width/gridSize);
+        int countY = MathUtils.ceil(height/gridSize);
+
+        float falloff = ((float)(MathUtils.clamp(countX, minCount, maxCount)-minCount))/(maxCount-minCount);
+        float brightAlpha = (1f-falloff*0.95f) * 0.5f * parentAlpha;
+        float dimAlpha = gridColor.a * 0.05f * parentAlpha;
+
+        // camera offsets
+        x =  x - x % (gridSize*8f);
+        y =  y - y % (gridSize*8f);
+
+        float thickness = pixelToWorld(1.2f);
+
+        for(int i = -countX/2-8; i <= countX/2+8; i++) {
+            if(i % 4 == 0) gridColor.a = brightAlpha;
+            else gridColor.a = dimAlpha;
+            shapeRenderer.setColor(gridColor);
+            shapeRenderer.rectLine(i * gridSize + x , -height/2f + y - gridSize*8f, i * gridSize + x, height/2f + y + gridSize*8f, thickness);
+        }
+        for(int i = -countY/2-8; i <= countY/2+8; i++) {
+            if(i % 4 == 0) gridColor.a = brightAlpha;
+            else gridColor.a = dimAlpha;
+            shapeRenderer.setColor(gridColor);
+            shapeRenderer.rectLine(-width/2f + x - gridSize * 8f, i * gridSize + y, width/2f + x + gridSize*8f, i * gridSize + y, thickness);
+        }
+
+        shapeRenderer.end();
+    }
+
+    /**
+     * I really dunno how this works rather then it does
+     * @param vec
+     * @return
+     */
+    protected Vector3 getWorldFromLocal(Vector3 vec) {
+
+        float xA = (getWidth() - vec.x)/getWidth();
+        float yA = (getHeight() - vec.y)/getHeight();
+
+        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
+
+        camera.unproject(vec);
+
+        vec.x *= -1f; // I don't even know why
+        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
+
+        return vec;
+    }
+
+    protected float pixelToWorld(float pixelSize) {
+        tmp.set(0, 0, 0);
+        camera.unproject(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(pixelSize, 0, 0);
+        camera.unproject(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline) * (getStage().getWidth()/getWidth()); //TODO: I am sure there is a better way to do this
+    }
+
+    public float getWorldWidth() {
+        return worldWidth;
     }
 }

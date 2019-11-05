@@ -6,6 +6,7 @@ dependencies {
     api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     api "com.kotcrab.vis:vis-ui:$visuiVersion"
     implementation 'com.github.jitpack:gradle-simple:1.0'
+    compile "com.esotericsoftware.spine:spine-libgdx:3.8.55.1"
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

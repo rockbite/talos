@@ -63,7 +63,7 @@ public class ProjectSerializer {
         return data;
     }
 
-    public void writeExport(FileHandle fileHandle, ExportData exportData) {
+    public String writeExport(ExportData exportData) {
         Json json = new Json();
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
@@ -72,6 +72,7 @@ public class ProjectSerializer {
 
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.toJson(exportData);
-        fileHandle.writeString(data, false);
+
+        return data;
     }
 }

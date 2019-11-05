@@ -17,13 +17,11 @@
 package com.rockbite.tools.talos.editor;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -33,12 +31,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.widget.Menu;
-import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
@@ -48,12 +42,12 @@ import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.addons.IAddon;
 import com.rockbite.tools.talos.editor.dialogs.BatchConvertDialog;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
-import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
-import com.rockbite.tools.talos.editor.widgets.ui.ModuleListPopup;
-import com.rockbite.tools.talos.editor.widgets.ui.PreviewWidget;
-import com.rockbite.tools.talos.editor.widgets.ui.TimelineWidget;
+import com.rockbite.tools.talos.editor.project.IProject;
+import com.rockbite.tools.talos.editor.project.ProjectController;
+import com.rockbite.tools.talos.editor.widgets.ui.*;
 import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 
@@ -74,13 +68,22 @@ public class UIStage {
 
 	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
-	SettingsDialog settingsDialog;
+	public SettingsDialog settingsDialog;
 
 	ColorPicker colorPicker;
 
 	ModuleListPopup moduleListPopup;
 
 	public TabbedPane tabbedPane;
+
+	private VisSplitPane bottomPane;
+	private Table leftTable;
+	private Table rightTable;
+	private Table bottomTable;
+
+	private Table bottomContainer;
+	private MainMenu mainMenu;
+
 
 	public UIStage (Skin skin) {
 		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
@@ -127,193 +130,34 @@ public class UIStage {
 	}
 
 	public void fileDrop (String[] paths, float x, float y) {
-		previewWidget.fileDrop(x, y, paths);
+		// let's see what this can mean by extension
+		for(String path: paths) {
+			FileHandle handle = Gdx.files.absolute(path);
+			if(handle.exists()) {
+				String extension = handle.extension();
+				if(extension.equals("tls")) {
+					// load project file
+					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+					TalosMain.Instance().ProjectController().loadProject(handle);
+				} else {
+					// ask addons if they are interested
+					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
+					if(addon != null) {
+						break;
+					}
+				}
+			}
+		}
+
+		if(previewWidget.getStage() != null) {
+			previewWidget.fileDrop(x, y, paths);
+		}
 	}
 
 	private void constructMenu () {
-		Table topTable = new Table();
-		topTable.setBackground(skin.getDrawable("button-main-menu"));
-
-		MenuBar menuBar = new MenuBar();
-		Menu projectMenu = new Menu("File");
-		menuBar.addMenu(projectMenu);
-		Menu modulesMenu = new Menu("Modules");
-		menuBar.addMenu(modulesMenu);
-		Menu helpMenu = new Menu("Help");
-		MenuItem about = new MenuItem("About");
-		helpMenu.addItem(about);
-		menuBar.addMenu(helpMenu);
-
-		about.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				VisDialog dialog = Dialogs.showOKDialog(stage, "About Talos 1.0.5", "Many new features. much wow.");
-			}
-		});
-
-		MenuItem createModule = new MenuItem("Create Module");
-		PopupMenu createPopup = createModuleListPopup();
-		createModule.setSubMenu(createPopup);
-		MenuItem removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
-		MenuItem groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
-		MenuItem ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
-		modulesMenu.addItem(createModule);
-		modulesMenu.addItem(removeSelectedModules);
-		modulesMenu.addItem(groupSelectedModules);
-
-		MenuItem newProject = new MenuItem("New TalosProject");
-		MenuItem openProject = new MenuItem("Open TalosProject");
-		MenuItem saveProject = new MenuItem("Save TalosProject");
-		MenuItem export = new MenuItem("Export");
-		MenuItem examples = new MenuItem("Examples");
-
-		MenuItem legacy = new MenuItem("Legacy");
-		PopupMenu legacyPopup = new PopupMenu();
-		MenuItem legacyImportItem = new MenuItem("Import");
-		MenuItem legacyBatchImportItem = new MenuItem("Batch Convert");
-		legacyPopup.addItem(legacyImportItem);
-		legacyPopup.addItem(legacyBatchImportItem);
-		legacy.setSubMenu(legacyPopup);
-
-		MenuItem settings = new MenuItem("Preferences");
-
-		PopupMenu examplesPopup = new PopupMenu();
-		examples.setSubMenu(examplesPopup);
-		initExampleList(examplesPopup);
-		MenuItem saveAsProject = new MenuItem("Save As TalosProject");
-		MenuItem exitApp = new MenuItem("Exit");
-
-		projectMenu.addItem(newProject);
-		projectMenu.addItem(openProject);
-		projectMenu.addItem(saveProject);
-		projectMenu.addItem(saveAsProject);
-		projectMenu.addItem(export);
-		projectMenu.addSeparator();
-		projectMenu.addItem(examples);
-		projectMenu.addItem(legacy);
-		projectMenu.addSeparator();
-		projectMenu.addItem(settings);
-		projectMenu.addSeparator();
-		projectMenu.addItem(exitApp);
-
-		removeSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.deleteSelectedWrappers();
-			}
-		});
-
-		groupSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupFromSelectedWrappers();
-			}
-		});
-
-		ungroupSelectedModules.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				TalosMain.Instance().NodeStage().moduleBoardWidget.ungroupSelectedWrappers();
-			}
-		});
-
-		newProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				newProjectAction();
-			}
-		});
-
-		openProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				openProjectAction();
-			}
-		});
-
-		saveProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				saveProjectAction();
-			}
-		});
-
-		export.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				exportAction();
-			}
-		});
-
-		saveAsProject.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				saveAsProjectAction();
-			}
-		});
-
-		legacyImportItem.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				legacyImportAction();
-			}
-		});
-
-		legacyBatchImportItem.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				legacyBatchConvertAction();
-			}
-		});
-
-		exitApp.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				System.exit(0);
-			}
-		});
-		settings.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-				stage.addActor(settingsDialog.fadeIn());
-			}
-		});
-
-		topTable.add(menuBar.getTable()).left().grow();
-
-		fullScreenTable.add(topTable).growX();
-
-		// adding key listeners for menu items
-		stage.addListener(new InputListener() {
-			@Override
-			public boolean keyDown(InputEvent event, int keycode) {
-				if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					TalosMain.Instance().ProjectController().newProject();
-				}
-				if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					openProjectAction();
-				}
-				if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-					saveProjectAction();
-				}
-
-				return super.keyDown(event, keycode);
-			}
-
-		});
+		mainMenu = new MainMenu(this);
+		mainMenu.build();
+		fullScreenTable.add(mainMenu).growX();
 	}
 
 
@@ -332,7 +176,7 @@ public class UIStage {
 			public void removedTab(Tab tab) {
 				TalosMain.Instance().ProjectController().removeTab((FileTab) tab);
 				if(tabbedPane.getTabs().size == 0) {
-					TalosMain.Instance().ProjectController().newProject();
+					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 				}
 			}
 
@@ -385,18 +229,24 @@ public class UIStage {
 	}
 
 
-	private void newProjectAction() {
-		TalosMain.Instance().ProjectController().newProject();
+	public void newProjectAction() {
+		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
+	public void openProjectAction(final IProject projectType) {
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Open", projectType);
+		if(defaultLocation.equals("")) {
+			TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
+		}
+		fileChooser.setDirectory(defaultLocation);
 
-	private void openProjectAction() {
 		fileChooser.setMode(FileChooser.Mode.OPEN);
 		fileChooser.setMultiSelectionEnabled(false);
+
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(projectType.getExtension());
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -404,11 +254,17 @@ public class UIStage {
 		fileChooser.setListener(new FileChooserAdapter() {
 			@Override
 			public void selected (Array<FileHandle> file) {
-				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(file.first().file().getAbsolutePath()));
+				String path = file.first().file().getAbsolutePath();
+				TalosMain.Instance().ProjectController().setProject(projectType);
+				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(path));
 			}
 		});
 
 		stage.addActor(fileChooser.fadeIn());
+	}
+
+	public void openProjectAction() {
+		openProjectAction(ProjectController.TLS);
 	}
 
 	public void saveProjectAction() {
@@ -418,14 +274,28 @@ public class UIStage {
 			TalosMain.Instance().ProjectController().saveProject();
 		}
 	}
+	public void exportAction() {
+		String path = TalosMain.Instance().ProjectController().getExportPath();
+		if(path == null || path.isEmpty()) {
+			exportAsAction();
+		} else {
+			TalosMain.Instance().ProjectController().exportProject(Gdx.files.absolute(path));
+		}
+	}
 
-	private void exportAction() {
+	public void exportAsAction() {
+		IProject projectType = TalosMain.Instance().ProjectController().getProject();
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
+		fileChooser.setDirectory(defaultLocation);
+
+		final String ext = projectType.getExportExtension();
+
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".p");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -434,27 +304,34 @@ public class UIStage {
 			@Override
 			public void selected(Array<FileHandle> file) {
 				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(".p")) {
+				if(!path.endsWith(ext)) {
 					if(path.indexOf(".") > 0) {
 						path = path.substring(0, path.indexOf("."));
 					}
-					path += ".p";
+					path += ext;
 				}
 				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().TalosProject().exportProject(handle);
+				TalosMain.Instance().ProjectController().exportProject(handle);
 			}
 		});
+
+		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().getCurrentExportNameSuggestion());
 
 		stage.addActor(fileChooser.fadeIn());
 	}
 
-	private void saveAsProjectAction() {
+	public void saveAsProjectAction() {
+		IProject projectType = TalosMain.Instance().ProjectController().getProject();
+		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
+		fileChooser.setDirectory(defaultLocation);
+
+		final String ext = projectType.getExtension();
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".tls");
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
 			}
 		});
 		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
@@ -463,16 +340,18 @@ public class UIStage {
 			@Override
 			public void selected(Array<FileHandle> file) {
 				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(".tls")) {
+				if(!path.endsWith(ext)) {
 					if(path.indexOf(".") > 0) {
 						path = path.substring(0, path.indexOf("."));
 					}
-					path += ".tls";
+					path += ext;
 				}
 				FileHandle handle = Gdx.files.absolute(path);
 				TalosMain.Instance().ProjectController().saveProject(handle);
 			}
 		});
+
+		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
 
 		stage.addActor(fileChooser.fadeIn());
 	}
@@ -507,11 +386,11 @@ public class UIStage {
 		timelineWidget = new TimelineWidget(skin);
 
 		Table midTable = new Table();
-		Table bottomTable = new Table();
+		bottomTable = new Table();
 		bottomTable.setSkin(skin);
 		bottomTable.setBackground(skin.getDrawable("button-main-menu"));
 
-		Table timelineContainer = new Table();
+		bottomContainer = new Table();
 		Table libraryContainer = new Table();
 
 		libraryContainer.addListener(new ClickListener(0) { //Quick hack for library container intercepting touch as its an empty table currently
@@ -525,19 +404,20 @@ public class UIStage {
 			}
 		});
 		libraryContainer.setTouchable(Touchable.enabled);
-		VisSplitPane bottomPane = new VisSplitPane(timelineContainer, libraryContainer, false);
+		bottomPane = new VisSplitPane(bottomContainer, libraryContainer, false);
 		bottomPane.setSplitAmount(1f); // remove this line when the bottom-right panel content will be implemented
-		timelineContainer.add(timelineWidget).grow().expand().fill();
+		bottomContainer.add(timelineWidget).grow().expand().fill();
 		bottomTable.add(bottomPane).expand().grow();
 
 		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
-		verticalPane.setMaxSplitAmount(0.8f);
-		verticalPane.setMinSplitAmount(0.2f);
-		verticalPane.setSplitAmount(0.7f);
+		verticalPane.setMaxSplitAmount(0.95f);
+		verticalPane.setMinSplitAmount(0.05f);
+		verticalPane.setSplitAmount(0.8f);
 
-		Table leftTable = new Table(); leftTable.setSkin(skin);
+		leftTable = new Table();
+		leftTable.setSkin(skin);
 		leftTable.add(previewWidget).grow();
-		Table rightTable = new Table(); rightTable.setSkin(skin);
+		rightTable = new Table(); rightTable.setSkin(skin);
 		rightTable.add().grow();
 		VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
 		midTable.add(horizontalPane).expand().grow().fill();
@@ -549,8 +429,32 @@ public class UIStage {
 		fullScreenTable.add(verticalPane).grow();
 	}
 
+	public void swapToAddonContent(Table left, Table right, Table bottom) {
+		leftTable.clearChildren();
+		rightTable.clearChildren();
+		bottomTable.clearChildren();
+		TalosMain.Instance().disableNodeStage();
 
-	private void initExampleList (PopupMenu examples) {
+		leftTable.add(left).grow();
+		rightTable.add(right).grow();
+		bottomTable.add(bottom).expand().grow();
+
+	}
+
+	public void swapToTalosContent() {
+		leftTable.clearChildren();
+		rightTable.clearChildren();
+		bottomTable.clearChildren();
+
+		leftTable.add(previewWidget).grow();
+		bottomTable.add(bottomPane).expand().grow();
+		TalosMain.Instance().enableNodeStage();
+
+		mainMenu.restore();
+	}
+
+
+	public void initExampleList (PopupMenu examples) {
 		FileHandle list = Gdx.files.internal("samples/list.xml");
 		XmlReader xmlReader = new XmlReader();
 		XmlReader.Element root = xmlReader.parse(list);
@@ -566,7 +470,9 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
+					TalosMain.Instance().ProjectController().lastDirTrackingDisable();
 					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
+					TalosMain.Instance().ProjectController().lastDirTrackingEnable();
 					TalosMain.Instance().ProjectController().unbindFromFile();
 				}
 			});
@@ -592,5 +498,13 @@ public class UIStage {
 
 	public PreviewWidget PreviewWidget() {
 		return previewWidget;
+	}
+
+	public MainMenu Menu() {
+		return mainMenu;
+	}
+
+	public Skin getSkin() {
+		return skin;
 	}
 }
