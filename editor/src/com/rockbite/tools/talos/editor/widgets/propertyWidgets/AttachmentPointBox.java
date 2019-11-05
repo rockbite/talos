@@ -1,5 +1,6 @@
 package com.rockbite.tools.talos.editor.widgets.propertyWidgets;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,7 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
+import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.bvb.AttachmentPoint;
+import com.rockbite.tools.talos.editor.addons.bvb.AttachmentTypeToggle;
+import com.rockbite.tools.talos.editor.addons.bvb.BvBAddon;
 import com.rockbite.tools.talos.editor.widgets.ui.BackgroundButton;
 import com.rockbite.tools.talos.editor.widgets.ui.NumericalValueField;
 
@@ -34,12 +38,12 @@ public class AttachmentPointBox extends Table {
         AttachmentPoint point;
 
         SelectBox<String> boneList;
-        BackgroundButton attachmentTypeToggle;
+        AttachmentTypeToggle attachmentTypeToggle;
 
         public BoneWidget(Skin skin) {
             setSkin(skin);
             boneList = new SelectBox<>(getSkin(), "propertyValue");
-            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("icon-target"), getSkin().getDrawable("icon-angle"));
+            attachmentTypeToggle = new AttachmentTypeToggle(getSkin());
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52).padRight(6f);
             add(attachmentTypeToggle);
@@ -49,10 +53,9 @@ public class AttachmentPointBox extends Table {
         public BoneWidget(Skin skin, AttachmentPoint.AttachmentType attachmentType) {
             setSkin(skin);
             boneList = new SelectBox<>(getSkin(), "propertyValue");
-            attachmentTypeToggle = new BackgroundButton(getSkin(), getSkin().getDrawable("icon-target"), getSkin().getDrawable("icon-angle"));
+            attachmentTypeToggle = new AttachmentTypeToggle(getSkin());
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52);
-            attachmentTypeToggle.button.setChecked(attachmentType != AttachmentPoint.AttachmentType.POSITION);
             addListeners();
         }
 
@@ -61,12 +64,22 @@ public class AttachmentPointBox extends Table {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     if(point != null) {
-                        if(attachmentTypeToggle.button.isChecked()) {
-                            point.setATAngle();
-                        } else {
-                            point.setATPosition();
-                        }
+                        point.setAttachmentType(attachmentTypeToggle.getAttachmentType());
                     }
+                }
+            });
+
+
+            boneList.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    // change the bone
+                    if(point == null) return;
+                    Vector2 pos = new Vector2();
+                    Bone bone = ((BvBAddon) TalosMain.Instance().Addons().getAddon(BvBAddon.class)).getWorkspace().getSkeletonContainer().getBoneByName(boneList.getSelected());
+                    pos.sub(bone.getWorldX(), bone.getWorldY());
+                    point.setOffset(pos.x, pos.y);
+                    point.setBone(bone.getData().getName());
                 }
             });
         }
@@ -80,7 +93,7 @@ public class AttachmentPointBox extends Table {
         }
 
         public void setAttachmentType(AttachmentPoint.AttachmentType attachmentType) {
-            attachmentTypeToggle.button.setChecked(attachmentType != AttachmentPoint.AttachmentType.POSITION);
+            attachmentTypeToggle.setAttachmentType(attachmentType);
         }
 
         public void setPoint(AttachmentPoint point) {

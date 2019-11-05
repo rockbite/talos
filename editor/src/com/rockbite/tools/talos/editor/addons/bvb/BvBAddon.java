@@ -124,4 +124,8 @@ public class BvBAddon implements IAddon {
         settingsDialog.addPathSetting("BVB .p Default Path", "bvbParticlePath");
         settingsDialog.addPathSetting("BVB Spine Atlas lookup", "bvbSpineAtlasPath");
     }
+
+    public BvBWorkspace getWorkspace() {
+        return  workspace;
+    }
 }

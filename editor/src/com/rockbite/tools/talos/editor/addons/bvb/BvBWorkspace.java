@@ -599,4 +599,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public int getPriority() {
         return 0;
     }
+
+    public SkeletonContainer getSkeletonContainer() {
+        return skeletonContainer;
+    }
 }

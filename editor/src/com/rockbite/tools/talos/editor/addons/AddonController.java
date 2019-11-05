@@ -44,4 +44,14 @@ public class AddonController {
             addon.buildMenu(menuBar);
         }
     }
+
+    public IAddon getAddon(Class addonClass) {
+        for(IAddon addon: activeAddons) {
+            if (addon.getClass() == addonClass) {
+                return addon;
+            }
+        }
+
+        return null;
+    }
 }

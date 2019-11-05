@@ -1,12 +1,14 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Event;
 import com.esotericsoftware.spine.EventData;
+import com.esotericsoftware.spine.Slot;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -110,7 +112,16 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             if(attachmentPoint.isStatic()) {
                 scopePayload.setDynamicValue(attachmentPoint.getSlotId(), attachmentPoint.getStaticValue());
             } else {
-                float rotation = parent.getBoneRotation(attachmentPoint.getBoneName());
+                Bone bone = parent.getBoneByName(attachmentPoint.getBoneName());
+                float rotation = bone.getWorldRotationX();
+                Color color = Color.WHITE;
+                for(Slot slot: parent.getSkeleton().getSlots()) {
+                    if(slot.getBone().getData().getName().equals(bone.getData().getName())) {
+                        //can be many
+                        color = slot.getColor();
+                        break;
+                    }
+                }
                 tmpVec.set(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
                 tmpVec.add(attachmentPoint.getOffsetX(), attachmentPoint.getOffsetY());
 
@@ -118,6 +129,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                     val.set(tmpVec.x, tmpVec.y);
                 } else if (attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.ROTATION) {
                     val.set(rotation);
+                } else if(attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.TRANSPARENCY) {
+                    val.set(color.a);
+                } else if(attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.COLOR) {
+                    val.set(color.r, color.g, color.b);
                 }
             }
 
@@ -271,7 +286,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         if(!startEvent.isEmpty()) {
             forever = false;
         } else {
-            forever = true;
+            setForever(true);
         }
     }
 
