@@ -1,7 +1,10 @@
 package com.rockbite.tools.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.utils.VectorField;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -23,6 +26,7 @@ public class VectorFieldModule extends Module {
 
     Vector2 pos = new Vector2();
     Vector2 tmp = new Vector2();
+
     VectorField vectorField;
 
     @Override
@@ -61,6 +65,21 @@ public class VectorFieldModule extends Module {
 
         angle.set(tmp.angle());
         velocity.set(tmp.len());
+    }
 
+    @Override
+    public void write(Json json) {
+        super.write(json);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+
+        String fgaAssetName = jsonData.getString("fgaAssetName", "");
+        if(!fgaAssetName.isEmpty()) {
+            AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+            //assetProvider.getBinary(fgaAssetName);
+        }
     }
 }
