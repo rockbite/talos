@@ -7,7 +7,7 @@ dependencies {
 
 }
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 sourceSets.main.resources.srcDirs = ["assets"]

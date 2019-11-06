@@ -60,6 +60,9 @@ public class ProjectController {
             currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
 
+            final Array<String> savedResourcePaths = currentProject.getSavedResourcePaths();
+            TalosMain.Instance().FileTracker().addSavedResourcePathsFor(currentTab, savedResourcePaths);
+
             if(removingUnworthy) {
                 safeRemoveTab(prevTab);
             }
@@ -128,6 +131,8 @@ public class ProjectController {
         tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
         TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
+        TalosMain.Instance().FileTracker().addTab(tab);
+
         currentProject.resetToNew();
         currentProjectPath = null;
 
@@ -164,7 +169,7 @@ public class ProjectController {
         currentProjectPath = null;
     }
 
-    public String getPath() {
+    public String getCurrentProjectPath () {
         return currentProjectPath;
     }
 

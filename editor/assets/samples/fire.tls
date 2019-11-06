@@ -56,8 +56,7 @@
 						"regionName": "fire"
 					}
 				},
-				"fileName": null,
-				"filePath": null
+				"fileName": fire,
 			},
 			{
 				"class": "EmConfigModuleWrapper",

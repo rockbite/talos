@@ -26,7 +26,7 @@ import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 
 public class ProjectData {
 
-	private MetaData metaData = new MetaData();
+	public MetaData metaData = new MetaData();
 
 	private Array<EmitterData> emitters = new Array<>();
 

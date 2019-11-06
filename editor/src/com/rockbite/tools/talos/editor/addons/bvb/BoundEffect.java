@@ -350,8 +350,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
         //TODO: refactor this
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-        parent.getWorkspace().getAssetProvider().setParticleFolder(effectHandle.parent().path());
-        descriptor.setAssetProvider(parent.getWorkspace().getAssetProvider());
+        descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
         descriptor.load(effectHandle);
         parent.getWorkspace().getVfxLibrary().put(name, descriptor);
 

@@ -24,6 +24,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
 import com.rockbite.tools.talos.runtime.modules.Module;
@@ -35,24 +37,13 @@ public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleW
     protected TextureDropWidget<Module> dropWidget;
     protected TextureRegion defaultRegion;
 
-    protected String filePath;
-    protected String fileName;
-
-    boolean isDefaultSet = false; //TODO: this is a hack for loading
+    protected String fileName = "fire";
 
     @Override
     protected void configureSlots() {
-        defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
+        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+        defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
         dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin());
-    }
-
-    @Override
-    public void setModule(T module) {
-        super.setModule(module);
-        if(!isDefaultSet) {
-            setModuleRegion("fire", defaultRegion);
-            isDefaultSet = true;
-        }
     }
 
     public abstract void setModuleRegion(String name, TextureRegion region);
@@ -68,13 +59,25 @@ public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleW
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
                 final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
-                final TextureRegion textureRegion = new TextureRegion(texture);
-                setModuleRegion(fileHandle.nameWithoutExtension(), textureRegion);
-                dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
+                final TextureRegion region = new TextureRegion(texture);
+                TalosMain.Instance().TalosProject().getProjectAssetProvider().addToAtlas(fileHandle.nameWithoutExtension(), region);
+                setModuleRegion(fileHandle.nameWithoutExtension(), region);
+                dropWidget.setDrawable(new TextureRegionDrawable(region));
 
-                filePath = paths[0]+"";
-                fileName = fileHandle.name();
+                fileName = fileHandle.nameWithoutExtension();
+
+                TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
+                    @Override
+                    public void updated(FileHandle handle) {
+
+                        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+                        TextureRegion region = projectAssetProvider.replaceRegion(handle);
+
+                        setModuleRegion(handle.nameWithoutExtension(), region);
+                        dropWidget.setDrawable(new TextureRegionDrawable(region));
+
+                    }
+                });
             }
         }
     }
@@ -84,40 +87,26 @@ public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleW
         super.read(json, jsonData);
 
         fileName = jsonData.getString("fileName", null);
-        filePath = jsonData.getString("filePath", null);
-        if (filePath != null) {
-            final TextureRegion region = TalosMain.Instance().TalosProject().getProjectAssetProvider().findRegion(fileName);
-            if (region != null) {
-                dropWidget.setDrawable(new TextureRegionDrawable(region));
-                setModuleRegion(fileName, region);
-            } else {
-                FileHandle fileHandle = tryAndFindTexture(filePath);
 
-                final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
-                final TextureRegion textureRegion = new TextureRegion(texture);
-                setModuleRegion(fileHandle.nameWithoutExtension(), textureRegion);
-                dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
+        final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+        final TextureRegion textureRegion = assetProvider.findAsset(fileName, TextureRegion.class);
 
-                filePath = fileHandle.path();
-                fileName = fileHandle.name();
-            }
-        }
+        setModuleRegion(fileName, textureRegion);
+        dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
     }
 
     @Override
     public void write (Json json) {
         super.write(json);
         json.writeValue("fileName", fileName);
-        json.writeValue("filePath", filePath);
     }
 
     private FileHandle tryAndFindTexture(String path) {
         FileHandle fileHandle = Gdx.files.absolute(path);
         String fileName = fileHandle.name();
         if(!fileHandle.exists()) {
-            if(TalosMain.Instance().ProjectController().getPath() != null) {
-                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().ProjectController().getPath()).parent();
+            if(TalosMain.Instance().ProjectController().getCurrentProjectPath() != null) {
+                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().ProjectController().getCurrentProjectPath()).parent();
                 fileHandle = Gdx.files.absolute(parent.path() + "/" + fileName);
             }
 
@@ -136,7 +125,6 @@ public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleW
             setModuleRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }
-        filePath = path+"";
         fileName = fileHandle.name();
     }
 }

@@ -1,7 +1,12 @@
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.utils.VectorField;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
@@ -23,13 +28,12 @@ public class VectorFieldModule extends Module {
 
     Vector2 pos = new Vector2();
     Vector2 tmp = new Vector2();
+
+    public String fgaFileName;
     VectorField vectorField;
 
     @Override
     protected void defineSlots() {
-
-        vectorField = new VectorField();
-
         scale = createInputSlot(SIZE_SCALE);
         force = createInputSlot(FORCE_SCALE);
         position = createInputSlot(POSITION);
@@ -40,6 +44,7 @@ public class VectorFieldModule extends Module {
 
     @Override
     public void processValues() {
+        if(vectorField == null) return;
         float scaleVal = 1f;
         if(!scale.isEmpty()) {
             scaleVal = scale.getFloat();
@@ -61,6 +66,35 @@ public class VectorFieldModule extends Module {
 
         angle.set(tmp.angle());
         velocity.set(tmp.len());
+    }
 
+    @Override
+    public void setModuleGraph(ParticleEmitterDescriptor graph) {
+        super.setModuleGraph(graph);
+        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+        if(fgaFileName != null && !fgaFileName.isEmpty()) {
+            setVectorField(assetProvider.findAsset(fgaFileName, VectorField.class), fgaFileName);
+        }
+    }
+
+    @Override
+    public void write(Json json) {
+        super.write(json);
+        json.writeValue("fgaAssetName", fgaFileName);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        fgaFileName = jsonData.getString("fgaAssetName", "");
+    }
+
+    public void setVectorField(VectorField vectorField, String fileName) {
+        this.vectorField = vectorField;
+        fgaFileName = fileName;
+    }
+
+    public VectorField getVectorField() {
+        return vectorField;
     }
 }

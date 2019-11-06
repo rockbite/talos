@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector3;
 
 public class VectorField {
 
-    int xSize;
-    int ySize;
-    int zSize;
+    public int xSize;
+    public int ySize;
+    public int zSize;
 
     Vector3[][][] field;
 
@@ -19,10 +19,20 @@ public class VectorField {
 
     Vector2 fieldPos = new Vector2();
 
-    Vector2 tmp = new Vector2();
-
     public VectorField() {
-        FileHandle fileHandle = Gdx.files.absolute("C:\\Users\\User\\Desktop\\VF_Perlin_LowFreq_8x8x8.fga");
+
+    }
+
+    public VectorField (FileHandle handle) {
+        setBakedData(handle);
+    }
+
+    public void setBakedData(FileHandle fileHandle) {
+        if(!fileHandle.extension().equals("fga")) {
+            // throw exception and return
+            return;
+        }
+
         String content = fileHandle.readString();
         String[] arr = content.split(",");
         xSize = Integer.parseInt(arr[0]);

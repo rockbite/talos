@@ -35,6 +35,11 @@ public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModu
     FloatInputWidget duration;
 
     @Override
+    public void setModuleToDefaults () {
+        module.regionName = "fire";
+    }
+
+    @Override
     protected void configureSlots() {
         super.configureSlots();
         dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin(), 100f);

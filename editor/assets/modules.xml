@@ -31,7 +31,7 @@
     </category>
     <category name = "Motion and Physics">
         <module name = "Fake Motion Blur" wrapper = "FakeMotionBlurModuleWrapper">FakeMotionBlurModule</module>
-        <!--<module name = "Vector Field" wrapper = "VectorFieldModuleWrapper">VectorFieldModule</module>-->
+        <module name = "Vector Field" wrapper = "VectorFieldModuleWrapper">VectorFieldModule</module>
         <module name = "Attractor" wrapper = "AttractorModuleWrapper">AttractorModule</module>
     </category>
     <category name = "Curves and Math">

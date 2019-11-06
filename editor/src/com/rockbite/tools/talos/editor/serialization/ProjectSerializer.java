@@ -18,6 +18,8 @@ package com.rockbite.tools.talos.editor.serialization;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.wrappers.WrapperRegistry;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.serialization.ExportData;
@@ -25,6 +27,23 @@ import com.rockbite.tools.talos.runtime.serialization.ExportData;
 public class ProjectSerializer {
 
     public ProjectSerializer () {
+    }
+
+    /**
+     * Very naughty
+     * @param data
+     */
+    public void prereadhack (String data) {
+        JsonReader jsonReader = new JsonReader();
+        final JsonValue parse = jsonReader.parse(data);
+        final JsonValue metaData = parse.get("metaData");
+        final JsonValue resourcePaths = metaData.get("resourcePaths");
+        if (resourcePaths != null) {
+            final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+            for (JsonValue resourcePath : resourcePaths) {
+                projectAssetProvider.addUnknownResource(resourcePath.asString());
+            }
+        }
     }
 
     public ProjectData read (FileHandle fileHandle) {
@@ -75,4 +94,6 @@ public class ProjectSerializer {
 
         return data;
     }
+
+
 }

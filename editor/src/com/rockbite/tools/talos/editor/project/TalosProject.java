@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.ParticleEmitterWrapper;
 import com.rockbite.tools.talos.editor.LegacyImporter;
-import com.rockbite.tools.talos.editor.assets.ProjectAssetProvider;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.data.ModuleWrapperGroup;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.serialization.*;
@@ -52,12 +52,11 @@ public class TalosProject implements IProject {
 	private ParticleEffectDescriptor particleEffectDescriptor;
 	private ParticleEmitterWrapper currentEmitterWrapper;
 	private LegacyImporter importer;
-	private ProjectAssetProvider projectAssetProvider;
-
-
+	private TalosAssetProvider projectAssetProvider;
+	private MetaData readMetaData;
 
 	public TalosProject() {
-		projectAssetProvider = new ProjectAssetProvider();
+		projectAssetProvider = new TalosAssetProvider();
 
 		projectSerializer = new ProjectSerializer();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
@@ -75,7 +74,9 @@ public class TalosProject implements IProject {
 
 		cleanData();
 
+		projectSerializer.prereadhack(data);
 		projectData = projectSerializer.read(data);
+		readMetaData = projectData.metaData;
 
 		ParticleEmitterWrapper firstEmitter = null;
 
@@ -167,6 +168,11 @@ public class TalosProject implements IProject {
 	@Override
 	public void initUIContent() {
 
+	}
+
+	@Override
+	public Array<String> getSavedResourcePaths () {
+		return readMetaData.getResourcePathStrings();
 	}
 
 	@Override
@@ -269,7 +275,7 @@ public class TalosProject implements IProject {
 		return currentEmitterWrapper.getGraph();
 	}
 
-	public ProjectAssetProvider getProjectAssetProvider () {
+	public TalosAssetProvider getProjectAssetProvider () {
 		return projectAssetProvider;
 	}
 

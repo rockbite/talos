@@ -92,6 +92,13 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
 
     }
 
+    /**
+     * Called only when creating a new Module, not when deserializing
+     */
+    public void setModuleToDefaults () {
+
+    }
+
     class SlotRowData {
         String title;
         int key;

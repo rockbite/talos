@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.CheckboxWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -29,7 +30,6 @@ import java.io.StringWriter;
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
     public final BvBAddon bvb;
-    private BvBAssetProvider assetProvider;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer renderer;
@@ -58,7 +58,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         this.bvb = bvb;
         setModeUI();
 
-        assetProvider = new BvBAssetProvider();
         skeletonContainer = new SkeletonContainer(this);
 
         talosRenderer = new SpriteBatchParticleRenderer(null);
@@ -408,8 +407,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         String name = handle.nameWithoutExtension();
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-        assetProvider.setParticleFolder(handle.parent().path());
-        descriptor.setAssetProvider(assetProvider);
+        descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
         descriptor.load(handle);
         vfxLibrary.put(name, descriptor);
 
@@ -425,8 +423,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         String name = handle.nameWithoutExtension();
         if(vfxLibrary.containsKey(name)) {
             ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-            assetProvider.setParticleFolder(handle.parent().path());
-            descriptor.setAssetProvider(assetProvider);
+            descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
             descriptor.load(handle);
             vfxLibrary.put(name, descriptor);
 
@@ -532,10 +529,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     public String getPath(String fileName) {
         return pathMap.get(fileName);
-    }
-
-    public BvBAssetProvider getAssetProvider() {
-        return assetProvider;
     }
 
     public ObjectMap<String, ParticleEffectDescriptor> getVfxLibrary() {

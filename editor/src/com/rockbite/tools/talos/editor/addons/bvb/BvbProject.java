@@ -2,6 +2,7 @@ package com.rockbite.tools.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -80,6 +81,11 @@ public class BvbProject implements IProject {
 
         FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
         return handle;
+    }
+
+    @Override
+    public Array<String> getSavedResourcePaths () {
+        return new Array<>();
     }
 
     @Override
