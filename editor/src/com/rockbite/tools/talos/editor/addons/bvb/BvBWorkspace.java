@@ -277,11 +277,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             //shapeRenderer.circle(bone.getWorldX(), bone.getWorldY(), pixelToWorld(3f));
 
             batch.setColor(1f, 1f, 1f, 1f);
-            float width = pixelToWorld(10f);
-            float height = pixelToWorld(30f);
+            float width = pixelToWorld(29f);
+            float height = pixelToWorld(29f);
             float rotation = bone.getWorldRotationX() - 90f;
-            float originX = pixelToWorld(5);
-            float originY = pixelToWorld(8);
+            float originX = pixelToWorld(15);
+            float originY = pixelToWorld(15);
 
             batch.draw(getSkin().getRegion("bone"), bone.getWorldX() - originX, bone.getWorldY() - originY, originX, originY, width, height, 1f, 1f, rotation);
         }
