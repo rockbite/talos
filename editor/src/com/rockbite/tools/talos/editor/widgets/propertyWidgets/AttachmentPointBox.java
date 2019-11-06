@@ -193,17 +193,19 @@ public class AttachmentPointBox extends Table {
     }
 
 
-    public void setData(AttachmentPoint point) {
+    public void setData (AttachmentPoint point) {
         this.point = point;
         if(point.getType() == AttachmentPoint.Type.ATTACHED) {
             boneWidget.setVisible(true);
             if(numericalValueField != null) {
                 numericalValueField.setVisible(false);
+                numericalValueField.setNumericalValue(point.getStaticValue());
             }
             boneWidget.setSelectedBone(point.getBoneName());
         } else {
             boneWidget.setVisible(false);
             numericalValueField.setVisible(true);
+            numericalValueField.setNumericalValue(point.getStaticValue());
         }
 
         slotWidget.setSlotId(point.getSlotId());
@@ -212,7 +214,7 @@ public class AttachmentPointBox extends Table {
     }
 
 
-    public SlotWidget getSlotWidget() {
+    public SlotWidget getSlotWidget () {
         return slotWidget;
     }
 

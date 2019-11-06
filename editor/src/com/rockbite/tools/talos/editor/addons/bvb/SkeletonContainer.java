@@ -373,9 +373,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         if(skeleton == null) return;
 
         json.writeValue("skeletonName", skeleton.getData().getName());
+        json.writeArrayStart("boundEffects");
         for(String skinName: boundEffects.keys()) {
             for(String animationName: boundEffects.get(skinName).keys()) {
-                json.writeArrayStart("boundEffects");
                 for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
                     json.writeObjectStart();
                     json.writeValue("skin", skinName);
@@ -383,9 +383,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     json.writeValue("data", effect);
                     json.writeObjectEnd();
                 }
-                json.writeArrayEnd();
             }
         }
+        json.writeArrayEnd();
         json.writeValue("currSkin", currentSkin.getName());
         json.writeValue("currAnimation", currentAnimation.getName());
     }

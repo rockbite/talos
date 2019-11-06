@@ -60,7 +60,6 @@ public class ProjectController {
             currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
 
-
             if(removingUnworthy) {
                 safeRemoveTab(prevTab);
             }
