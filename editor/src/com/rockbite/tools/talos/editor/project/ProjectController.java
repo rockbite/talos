@@ -76,9 +76,9 @@ public class ProjectController {
 
     private void getProjectFromCache(String projectFileName) {
         loading = true;
+        currentProjectPath = pathCache.get(projectFileName);
         currentProject.loadProject(fileCache.get(projectFileName));
         loading = false;
-        currentProjectPath = pathCache.get(projectFileName);
     }
 
     public void saveProject (FileHandle destination) {
