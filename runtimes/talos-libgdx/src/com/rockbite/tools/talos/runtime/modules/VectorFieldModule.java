@@ -44,7 +44,7 @@ public class VectorFieldModule extends Module {
 
     @Override
     public void processValues() {
-        if(vectorField != null) return;
+        if(vectorField == null) return;
         float scaleVal = 1f;
         if(!scale.isEmpty()) {
             scaleVal = scale.getFloat();
