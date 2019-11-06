@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector3;
 
 public class VectorField {
 
-    int xSize;
-    int ySize;
-    int zSize;
+    public int xSize;
+    public int ySize;
+    public int zSize;
 
     Vector3[][][] field;
 
