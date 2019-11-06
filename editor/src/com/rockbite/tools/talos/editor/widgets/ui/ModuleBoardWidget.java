@@ -442,11 +442,15 @@ public class ModuleBoardWidget extends WidgetGroup {
         final Module module;
         try {
             module = ClassReflection.newInstance(clazz);
-            module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
 
             if (TalosMain.Instance().TalosProject().getCurrentModuleGraph().addModule(module)) {
                 TalosMain.Instance().ProjectController().setDirty();
-                return createModuleWrapper(module, x, y);
+
+                final ModuleWrapper moduleWrapper = createModuleWrapper(module, x, y);
+                moduleWrapper.setModuleToDefaults();
+                module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
+
+                return moduleWrapper;
             } else {
                 System.out.println("Did not create module: " + clazz.getSimpleName());
                 return null;

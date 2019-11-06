@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.wrappers.IDragPointProvider;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
@@ -222,7 +223,7 @@ public class PreviewWidget extends ViewportWidget {
     }
 
     public void addPreviewImage (String[] paths) {
-        if(paths.length == 1) {
+        if (paths.length == 1) {
 
             String resourcePath = paths[0];
             FileHandle fileHandle = Gdx.files.absolute(resourcePath);
@@ -230,10 +231,9 @@ public class PreviewWidget extends ViewportWidget {
             final String extension = fileHandle.extension();
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
-                fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
-                final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
-                final TextureRegion textureRegion = new TextureRegion(texture);
+                final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+                final TextureRegion textureRegion = assetProvider.findAsset(fileHandle.name(), TextureRegion.class);
+
                 previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
                 previewController.setImageWidth(10);
 

@@ -79,7 +79,7 @@ public class VectorFieldModule extends Module {
         String fgaAssetName = jsonData.getString("fgaAssetName", "");
         if(!fgaAssetName.isEmpty()) {
             AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-            //assetProvider.getBinary(fgaAssetName);
+            vectorField = assetProvider.findAsset(fgaAssetName, VectorField.class);
         }
     }
 }

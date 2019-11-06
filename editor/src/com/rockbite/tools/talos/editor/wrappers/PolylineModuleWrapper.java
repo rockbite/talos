@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.IntegerInputWidget;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
@@ -34,24 +35,18 @@ import com.rockbite.tools.talos.runtime.modules.*;
 
 import java.io.File;
 
-public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
-
-    TextureDropWidget<Module> dropWidget;
-    TextureRegion defaultRegion;
-
-    String filePath;
-    String fileName;
-    boolean isDefaultSet = false; //TODO: this is a hack for loading
+public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModule> {
 
     private IntegerInputWidget interpolationPoints;
 
     @Override
-    public void setModule(PolylineModule module) {
-        super.setModule(module);
-        if(!isDefaultSet) {
-            module.setRegion("fire", defaultRegion);
-            isDefaultSet = true;
-        }
+    public void setModuleToDefaults () {
+        module.regionName = "fire";
+    }
+
+    @Override
+    public void setModuleRegion (String name, TextureRegion region) {
+        module.setRegion(name, region);
     }
 
     @Override
@@ -85,28 +80,6 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
     }
 
     @Override
-    public void fileDrop(String[] paths, float x, float y) {
-        if(paths.length == 1) {
-
-            String resourcePath = paths[0];
-            FileHandle fileHandle = Gdx.files.absolute(resourcePath);
-
-            final String extension = fileHandle.extension();
-
-            if (extension.endsWith("png") || extension.endsWith("jpg")) {
-                final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
-                final TextureRegion textureRegion = new TextureRegion(texture);
-                module.setRegion(fileHandle.nameWithoutExtension(), textureRegion);
-                dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
-
-                filePath = paths[0]+"";
-                fileName = fileHandle.name();
-            }
-        }
-    }
-
-    @Override
     protected float reportPrefWidth() {
         return 180;
     }
@@ -115,42 +88,19 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         interpolationPoints.setValue(module.pointCount - 2);
-
-        fileName = jsonData.getString("fileName", null);
-        filePath = jsonData.getString("filePath", null);
-        if (filePath != null) {
-            final TextureRegion region = TalosMain.Instance().TalosProject().getProjectAssetProvider().findRegion(fileName);
-            if (region != null) {
-                dropWidget.setDrawable(new TextureRegionDrawable(region));
-                module.setRegion(fileName, region);
-            } else {
-                FileHandle fileHandle = tryAndFineTexture(filePath);
-
-                final Texture texture = new Texture(fileHandle);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
-                final TextureRegion textureRegion = new TextureRegion(texture);
-                module.setRegion(fileHandle.nameWithoutExtension(), textureRegion);
-                dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
-
-                filePath = fileHandle.path();
-                fileName = fileHandle.name();
-            }
-        }
     }
 
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("fileName", fileName);
-        json.writeValue("filePath", filePath);
     }
 
     private FileHandle tryAndFineTexture(String path) {
         FileHandle fileHandle = Gdx.files.absolute(path);
         String fileName = fileHandle.name();
         if(!fileHandle.exists()) {
-            if(TalosMain.Instance().ProjectController().getPath() != null) {
-                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().ProjectController().getPath()).parent();
+            if(TalosMain.Instance().ProjectController().getCurrentProjectPath() != null) {
+                FileHandle parent = Gdx.files.absolute(TalosMain.Instance().ProjectController().getCurrentProjectPath()).parent();
                 fileHandle = Gdx.files.absolute(parent.path() + "/" + fileName);
             }
 
@@ -169,7 +119,6 @@ public class PolylineModuleWrapper extends ModuleWrapper<PolylineModule> {
             module.setRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }
-        filePath = path+"";
         fileName = fileHandle.name();
     }
 

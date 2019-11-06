@@ -23,6 +23,10 @@ public class VectorField {
 
     }
 
+    public VectorField (FileHandle handle) {
+        setBakedData(handle);
+    }
+
     public void setBakedData(FileHandle fileHandle) {
         if(!fileHandle.extension().equals("fga")) {
             // throw exception and return

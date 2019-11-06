@@ -1,15 +1,40 @@
 package com.rockbite.tools.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.project.IProject;
+import com.rockbite.tools.talos.editor.widgets.ui.FileTab;
 
 public class FileTracker {
 
-    ObjectMap<FileHandle, FileEntry> files = new ObjectMap<>();
+
+    ObjectMap<FileTab, ObjectMap<FileHandle, FileEntry>> tabMaps = new ObjectMap<>();
 
     public FileTracker() {
 
+    }
+
+    public void addSavedResourcePathsFor (FileTab currentTab, Array<String> savedResourcePaths) {
+        final ObjectMap<FileHandle, FileEntry> entries = new ObjectMap<>();
+        for (String savedResourcePath : savedResourcePaths) {
+            FileHandle fileHandle = Gdx.files.absolute(savedResourcePath);
+            FileEntry fileEntry = new FileEntry(fileHandle, new Tracker() {
+                @Override
+                public void updated (FileHandle handle) {
+
+                }
+            });
+            entries.put(fileHandle, fileEntry);
+        }
+
+        tabMaps.put(currentTab, entries);
+    }
+
+    public void addTab (FileTab tab) {
+        tabMaps.put(tab, new ObjectMap<>());
     }
 
     public class FileEntry {
@@ -30,26 +55,52 @@ public class FileTracker {
         void updated(FileHandle handle);
     }
 
+    public ObjectMap<FileHandle, FileEntry> getCurrentTabFiles () {
+        return tabMaps.get(TalosMain.Instance().ProjectController().currentTab);
+    }
+
+
     public void trackFile(FileHandle fileHandle, Tracker tracker) {
-        FileEntry fileEntry = new FileEntry(fileHandle, tracker);
-        files.put(fileHandle, fileEntry);
+        final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
+
+        if (!tabMaps.containsKey(currentTab)) {
+            tabMaps.put(currentTab, new ObjectMap<>());
+        }
+
+        final ObjectMap<FileHandle, FileEntry> entries = tabMaps.get(currentTab);
+        entries.put(fileHandle, new FileEntry(fileHandle, tracker));
     }
 
     public void update() {
         Array<FileHandle> filesToRemove = new Array<>();
 
-        for(FileEntry entry: files.values()) {
-            if(!entry.fileHandle.exists()) {
-                filesToRemove.add(entry.fileHandle);
+        final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
+
+        for (ObjectMap.Entry<FileTab, ObjectMap<FileHandle, FileEntry>> tabMapEntry : tabMaps) {
+            boolean isCurrentTab = tabMapEntry.key == currentTab;
+
+            final ObjectMap<FileHandle, FileEntry> files = tabMapEntry.value;
+
+
+            for (ObjectMap.Entry<FileHandle, FileEntry> entry : files) {
+                final FileEntry fileEntry = entry.value;
+                if(!fileEntry.fileHandle.exists()) {
+                    filesToRemove.add(fileEntry.fileHandle);
+                }
+                if(fileEntry.lastModified < fileEntry.fileHandle.lastModified()) {
+                    if (isCurrentTab) {
+                        fileEntry.callback.updated(fileEntry.fileHandle);
+                    }
+                    fileEntry.lastModified = fileEntry.fileHandle.lastModified();
+                }
             }
-            if(entry.lastModified < entry.fileHandle.lastModified()) {
-                entry.callback.updated(entry.fileHandle);
-                entry.lastModified = entry.fileHandle.lastModified();
+
+
+            for (FileHandle handle: filesToRemove) {
+                files.remove(handle);
             }
         }
 
-        for(FileHandle handle: filesToRemove) {
-            files.remove(handle);
-        }
+
     }
 }

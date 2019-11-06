@@ -32,7 +32,7 @@ public class FlipbookModule extends Module {
 
     public static final int OUTPUT = 0;
 
-    private String regionName;
+    public String regionName;
     private DrawableValue userDrawable;
     private DrawableValue outputValue;
 
@@ -94,7 +94,7 @@ public class FlipbookModule extends Module {
     public void setModuleGraph(ParticleEmitterDescriptor graph) {
         super.setModuleGraph(graph);
         final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-        setRegion(regionName, assetProvider.findRegion(regionName));
+        setRegion(regionName, assetProvider.findAsset(regionName, TextureRegion.class));
     }
 
     @Override

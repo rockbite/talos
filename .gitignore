@@ -82,3 +82,4 @@ Thumbs.db
 build/
 editor/build
 runtimes/build/
+/runtimes/talos-libgdx/out/

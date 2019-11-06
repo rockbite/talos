@@ -16,13 +16,19 @@
 
 package com.rockbite.tools.talos.editor.serialization;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MetaData implements Json.Serializable {
+
+    private Array<String> resourcePathStrings = new Array<>();
 
     @Override
     public void write(Json json) {
@@ -48,6 +54,14 @@ public class MetaData implements Json.Serializable {
         json.writeValue("bgImageIsInBack", TalosMain.Instance().UIStage().PreviewWidget().isBackgroundImageInBack());
         json.writeValue("bgImageSize", TalosMain.Instance().UIStage().PreviewWidget().getBgImageSize());
         json.writeValue("gridSize", TalosMain.Instance().UIStage().PreviewWidget().getGridSize());
+
+        final ObjectMap<FileHandle, FileTracker.FileEntry> currentTabFiles = TalosMain.Instance().FileTracker().getCurrentTabFiles();
+
+        json.writeArrayStart("resourcePaths");
+        for (ObjectMap.Entry<FileHandle, FileTracker.FileEntry> currentTabFile : currentTabFiles) {
+            json.writeValue(currentTabFile.key.path());
+        }
+        json.writeArrayEnd();
     }
 
     @Override
@@ -74,5 +88,17 @@ public class MetaData implements Json.Serializable {
         TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
 
+        JsonValue resourcePaths = jsonData.get("resourcePaths");
+        if (resourcePaths != null) {
+            iter = 0;
+            for (JsonValue item : resourcePaths) {
+                final String filePath = item.asString();
+                resourcePathStrings.add(filePath);
+            }
+        }
+    }
+
+    public Array<String> getResourcePathStrings () {
+        return resourcePathStrings;
     }
 }
