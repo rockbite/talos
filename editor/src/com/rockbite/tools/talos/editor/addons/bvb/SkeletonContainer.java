@@ -176,24 +176,27 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
             @Override
             public void start(AnimationState.TrackEntry entry) {
-                for(BoundEffect boundEffect: getBoundEffects()) {
-                    String eventName = boundEffect.getStartEvent();
-                    if(eventName.equals("")) {
-                        boundEffect.startInstance();
-                    }
-                }
+
                 super.start(entry);
             }
 
             @Override
-            public void end(AnimationState.TrackEntry entry) {
+            public void complete(AnimationState.TrackEntry entry) {
+                /**
+                 * A loop has been done, so stopping and starting
+                 */
                 for(BoundEffect boundEffect: getBoundEffects()) {
-                    String eventName = boundEffect.getCompleteEvent();
-                    if(eventName.equals("")) {
+                    String completeEventName = boundEffect.getCompleteEvent();
+                    if(completeEventName.equals("")) {
                         boundEffect.completeInstance();
                     }
+                    String startEventName = boundEffect.getStartEvent();
+                    if(startEventName.equals("")) {
+                        boundEffect.startInstance();
+                    }
                 }
-                super.end(entry);
+
+                super.complete(entry);
             }
         });
     }

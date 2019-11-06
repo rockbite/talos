@@ -230,6 +230,7 @@ public class PreviewWidget extends ViewportWidget {
             final String extension = fileHandle.extension();
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
+                fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
                 final Texture texture = new Texture(fileHandle);
                 TalosMain.Instance().TalosProject().getProjectAssetProvider().addTextureAsTextureRegion(fileHandle.nameWithoutExtension(), texture);
                 final TextureRegion textureRegion = new TextureRegion(texture);
@@ -414,7 +415,8 @@ public class PreviewWidget extends ViewportWidget {
     }
 
     public void setGridSize(float gridSize) {
-        this.gridSize = gridSize;
         previewController.setGridSize(gridSize);
+        setWorldSize(10f * gridSize);
+        this.gridSize = gridSize;
     }
 }

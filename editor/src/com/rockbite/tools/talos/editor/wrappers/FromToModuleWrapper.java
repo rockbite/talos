@@ -35,6 +35,8 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     private Label fromLabel;
     private Label toLabel;
 
+    private boolean lock = false;
+
     @Override
     protected void wrapperSelected() {
         PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
@@ -74,7 +76,9 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     @Override
     public void setModule(FromToModule module) {
         super.setModule(module);
-        module.setDefaults(dragFrom.position, dragTo.position);
+        if(!lock) {
+            module.setDefaults(dragFrom.position, dragTo.position);
+        }
     }
 
     @Override
@@ -101,19 +105,12 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     }
 
     @Override
-    public void write(Json json) {
-        super.write(json);
-        json.writeValue("fromX", dragFrom.position.x);
-        json.writeValue("fromY", dragFrom.position.y);
-        json.writeValue("toX", dragTo.position.x);
-        json.writeValue("toY", dragTo.position.y);
-    }
-
-    @Override
     public void read(Json json, JsonValue jsonData) {
+        lock = true;
         super.read(json, jsonData);
-        dragFrom.set(jsonData.getFloat("fromX", 0), jsonData.getFloat("fromY", 0));
-        dragTo.set(jsonData.getFloat("toX", 0), jsonData.getFloat("toY", 0));
+        lock = false;
+        dragFrom.position.set(module.defaultFrom);
+        dragTo.position.set(module.defaultTo);
     }
 
     @Override

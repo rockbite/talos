@@ -247,13 +247,12 @@ public class TalosProject implements IProject {
 		particleEffectDescriptor.removeEmitter(wrapper.getEmitter());
 
 		activeWrappers.removeValue(wrapper, true);
-		TalosMain.Instance().NodeStage().onEmitterRemoved(wrapper);
-
 		if (activeWrappers.size > 0) {
 			currentEmitterWrapper = activeWrappers.peek();
 		} else {
 			currentEmitterWrapper = null;
 		}
+		TalosMain.Instance().NodeStage().onEmitterRemoved(wrapper);
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 
 	}

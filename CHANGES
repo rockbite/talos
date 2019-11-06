@@ -12,6 +12,7 @@
 - Recently Opened files menu now remembers your last open
 - Open/Save/Export dialogs now remember your last choice
 - Added Export As option, which means that export is a quick export to last location with Ctrl+E, while export as will ask for path
+- Fixed bug with emitters not deleting properly
 
 [1.0.5]
 - legacy libGDX particle file importer full functionality

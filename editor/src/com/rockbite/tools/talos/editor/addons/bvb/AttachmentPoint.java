@@ -8,7 +8,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 public class AttachmentPoint implements Json.Serializable {
 
     private Type type;
-    private AttachmentType attachmentType;
+    private AttachmentType attachmentType = AttachmentType.POSITION;
     private int attachedToSlot = 0;
 
     /**
@@ -45,7 +45,15 @@ public class AttachmentPoint implements Json.Serializable {
 
     public enum AttachmentType {
         POSITION,
-        ROTATION
+        ROTATION,
+        TRANSPARENCY,
+        COLOR;
+
+        private static AttachmentType[] vals = values();
+        public AttachmentType next()
+        {
+            return vals[(this.ordinal()+1) % vals.length];
+        }
     }
 
     public AttachmentPoint() {
@@ -145,13 +153,8 @@ public class AttachmentPoint implements Json.Serializable {
         }
     }
 
-
-    public void setATAngle() {
-        attachmentType = AttachmentType.ROTATION;
-    }
-
-    public void setATPosition() {
-        attachmentType = AttachmentType.POSITION;
+    public void setAttachmentType(AttachmentType attachmentType) {
+        this.attachmentType =attachmentType;
     }
 
     public void setOffsetX (float offsetX) {

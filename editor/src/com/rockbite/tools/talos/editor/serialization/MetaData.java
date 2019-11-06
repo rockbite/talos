@@ -68,11 +68,11 @@ public class MetaData implements Json.Serializable {
             TalosMain.Instance().UIStage().PreviewWidget().setCameraPos(0, 0);
         }
 
-        TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
-        TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
         TalosMain.Instance().UIStage().PreviewWidget().setBackgroundImage(jsonData.getString("bgImagePath", null));
         TalosMain.Instance().UIStage().PreviewWidget().setImagebIsBackground(jsonData.getBoolean("bgImageIsInBack", true));
         TalosMain.Instance().UIStage().PreviewWidget().setBgImageSize(jsonData.getFloat("bgImageSize", 10));
+        TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
+        TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
 
     }
 }
