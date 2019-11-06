@@ -283,11 +283,6 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
     private void setStartEvent(String value) {
         startEvent = value;
-        if(!startEvent.isEmpty()) {
-            forever = false;
-        } else {
-            setForever(true);
-        }
     }
 
     private void setCompleteEvent(String value) {
@@ -362,8 +357,6 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
         this.particleEffectDescriptor = descriptor;
 
-        setForever(true); // change this
-
         positionAttachment = json.readValue(AttachmentPoint.class, jsonData.get("positionAttachment"));
         JsonValue valueAttachmentsJson = jsonData.get("valueAttachments");
         for(JsonValue valueAttachmentJson: valueAttachmentsJson) {
@@ -373,6 +366,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
         setStartEvent(jsonData.getString("startEvent", ""));
         setCompleteEvent(jsonData.getString("completeEvent", ""));
+
+        setForever(startEvent.equals("") && completeEvent.equals(""));
     }
 
     public String getStartEvent() {
