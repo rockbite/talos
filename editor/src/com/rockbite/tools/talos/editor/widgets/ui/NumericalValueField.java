@@ -26,21 +26,24 @@ public class NumericalValueField extends Table {
         x.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                value.set(0, Float.parseFloat(x.getText()));
+                String text = x.getText().isEmpty() ? "0" : x.getText();
+                value.set(0, Float.parseFloat(text));
             }
         });
 
         y.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                value.set(1, Float.parseFloat(y.getText()));
+                String text = x.getText().isEmpty() ? "0" : y.getText();
+                value.set(1, Float.parseFloat(text));
             }
         });
 
         z.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                value.set(2, Float.parseFloat(z.getText()));
+                String text = x.getText().isEmpty() ? "0" : z.getText();
+                value.set(2, Float.parseFloat(text));
             }
         });
 
