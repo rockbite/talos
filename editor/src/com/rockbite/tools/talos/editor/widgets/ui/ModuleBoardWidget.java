@@ -322,6 +322,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 wrapper.setModule(wrapper.getModule());
                 int id = getUniqueIdForModuleWrapper();
                 wrapper.setId(id);
+                wrapper.getModule().setIndex(id);
                 wrapper.setBoard(this);
                 currentEmitterWrapper.getGraph().addModule(wrapper.getModule());
                 wrapper.getModule().setModuleGraph(currentEmitterWrapper.getGraph());
