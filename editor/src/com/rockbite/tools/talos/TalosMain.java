@@ -81,7 +81,7 @@ public class TalosMain extends ApplicationAdapter {
 	private InputMultiplexer inputMultiplexer;
 
 	public TalosProject TalosProject() {
-		return (TalosProject) projectController.getProject();
+		return ProjectController.TLS;
 	}
 
 	public IProject Project() {

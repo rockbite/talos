@@ -366,6 +366,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         setStartEvent(jsonData.getString("startEvent", ""));
         setCompleteEvent(jsonData.getString("completeEvent", ""));
 
+        isBehind = jsonData.getBoolean("isBehind");
+
         setForever(startEvent.equals("") && completeEvent.equals(""));
     }
 
