@@ -21,10 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Bezier;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -268,6 +265,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         ObjectSet<ModuleWrapper> wrappers;
         Array<ModuleWrapperGroup> groups;
 
+        public Vector2 cameraPositionAtCopy = new Vector2();
+
         public ClipboardPayload() {
 
         }
@@ -285,6 +284,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         Array<ModuleWrapperGroup> groups = getSelectedGroups();
 
         ClipboardPayload payload = new ClipboardPayload(wrappers, connections, groups);
+        Vector3 camPos = TalosMain.Instance().NodeStage().getStage().getCamera().position;
+        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
 
         Json json = new Json();
         String clipboard = json.toJson(payload);
@@ -307,6 +308,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         try {
             ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
 
+            Vector3 camPosAtPaste = TalosMain.Instance().NodeStage().getStage().getCamera().position;
+            Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+            offset.sub(payload.cameraPositionAtCopy);
+
             ObjectSet<ModuleWrapper> wrappers = payload.wrappers;
             ObjectSet<ModuleWrapper> copiedWrappers = new ObjectSet<>();
             for(ModuleWrapper wrapper: wrappers) {
@@ -318,7 +323,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 }
                 previousWrapperIdMap.put(wrapper.getId(), wrapper); // get old Id
                 getModuleWrappers().add(wrapper);
-                wrapper.moveBy(20, 20);
+                wrapper.moveBy(offset.x, offset.y);
                 wrapper.setModule(wrapper.getModule());
                 int id = getUniqueIdForModuleWrapper();
                 wrapper.setId(id);
