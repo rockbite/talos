@@ -134,9 +134,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 } else if(attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.COLOR) {
                     val.set(color.r, color.g, color.b);
                 }
-            }
 
-            scopePayload.setDynamicValue(attachmentPoint.getSlotId(), val);
+                scopePayload.setDynamicValue(attachmentPoint.getSlotId(), val);
+            }
         }
 
         // update position for each instance and update effect itself
