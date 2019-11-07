@@ -234,10 +234,12 @@ public class PreviewWidget extends ViewportWidget {
                 final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
                 final TextureRegion textureRegion = assetProvider.findAsset(fileHandle.name(), TextureRegion.class);
 
-                previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
-                previewController.setImageWidth(10);
+                if(textureRegion != null) {
+                    previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
+                    previewController.setImageWidth(10);
 
-                backgroundImagePath = fileHandle.path();
+                    backgroundImagePath = fileHandle.path();
+                }
             }
         }
     }

@@ -93,9 +93,14 @@ public class TalosAssetProvider extends BaseAssetProvider {
 		final TextureAtlas.AtlasRegion region = atlas.findRegion(assetName);
 		if (region == null) {
 			//Look in all paths, and hopefully load the requested asset, or fail (crash)
+			//if has extension remove it
+			if(assetName.contains(".")) {
+				assetName = assetName.substring(0, assetName.lastIndexOf("."));
+			}
 			final FileHandle file = findFile(assetName);
 			if (file == null || !file.exists()) {
-				throw new GdxRuntimeException("No region found for: " + assetName + " from provider");
+				//throw new GdxRuntimeException("No region found for: " + assetName + " from provider");
+				return null;
 			}
 			Texture texture = new Texture(file);
 			TextureRegion textureRegion = new TextureRegion(texture);
@@ -107,7 +112,7 @@ public class TalosAssetProvider extends BaseAssetProvider {
 
 	private FileHandle findFile (String regionName) {
 		String fileName = regionName + ".png";
-		FileHandle handle = Gdx.files.absolute(TalosMain.Instance().ProjectController().getCurrentProjectPath() + File.separator + fileName);
+		FileHandle handle = Gdx.files.absolute(Gdx.files.absolute(TalosMain.Instance().ProjectController().getCurrentProjectPath()).parent().path() + File.separator + fileName);
 		return TalosMain.Instance().ProjectController().findFile(handle);
 	}
 
