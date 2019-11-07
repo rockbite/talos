@@ -53,6 +53,8 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
         map.put(ScopePayload.PARTICLE_ALPHA, "Particle.alpha - Lifetime");
         map.put(ScopePayload.EMITTER_ALPHA_AT_P_INIT, "Duration at particle init");
         map.put(ScopePayload.SECONDARY_SEED, "Secondary Seed");
+        map.put(ScopePayload.PARTICLE_POSITION, "Particle position");
+        map.put(ScopePayload.TOTAL_TIME, "Global Time");
 
 
         selectBox = addSelectBox(map.values());

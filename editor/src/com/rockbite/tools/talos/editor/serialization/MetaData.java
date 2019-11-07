@@ -57,11 +57,13 @@ public class MetaData implements Json.Serializable {
 
         final ObjectMap<FileHandle, FileTracker.FileEntry> currentTabFiles = TalosMain.Instance().FileTracker().getCurrentTabFiles();
 
-        json.writeArrayStart("resourcePaths");
-        for (ObjectMap.Entry<FileHandle, FileTracker.FileEntry> currentTabFile : currentTabFiles) {
-            json.writeValue(currentTabFile.key.path());
+        if(currentTabFiles != null) {
+            json.writeArrayStart("resourcePaths");
+            for (ObjectMap.Entry<FileHandle, FileTracker.FileEntry> currentTabFile : currentTabFiles) {
+                json.writeValue(currentTabFile.key.path());
+            }
+            json.writeArrayEnd();
         }
-        json.writeArrayEnd();
     }
 
     @Override

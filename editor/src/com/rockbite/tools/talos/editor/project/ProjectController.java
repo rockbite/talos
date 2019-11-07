@@ -205,7 +205,9 @@ public class ProjectController {
     public void removeTab(FileTab tab) {
         String fileName = tab.getFileName();
         clearCache(fileName);
-        currentTab = null;
+        if(tab == currentTab) {
+            currentTab = null;
+        }
     }
 
     public void clearCache(String fileName) {
