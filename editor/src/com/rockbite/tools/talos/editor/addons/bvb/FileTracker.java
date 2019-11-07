@@ -18,6 +18,9 @@ public class FileTracker {
     }
 
     public void addSavedResourcePathsFor (FileTab currentTab, Array<String> savedResourcePaths) {
+
+        if(savedResourcePaths == null) return;
+
         final ObjectMap<FileHandle, FileEntry> entries = new ObjectMap<>();
         for (String savedResourcePath : savedResourcePaths) {
             FileHandle fileHandle = Gdx.files.absolute(savedResourcePath);

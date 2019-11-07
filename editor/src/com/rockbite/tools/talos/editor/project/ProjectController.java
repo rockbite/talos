@@ -48,6 +48,7 @@ public class ProjectController {
             currentProjectPath = projectFileHandle.path();
             projectFileName = projectFileHandle.name();
             loading = true;
+            currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
             currentProject.loadProject(projectFileHandle.readString());
             reportProjectFileInterraction(projectFileHandle);
             loading = false;
@@ -57,7 +58,6 @@ public class ProjectController {
                 TalosMain.Instance().Prefs().flush();
             }
 
-            currentTab = new FileTab(projectFileName, currentProject);
             TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
 
             final Array<String> savedResourcePaths = currentProject.getSavedResourcePaths();

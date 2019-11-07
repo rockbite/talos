@@ -85,7 +85,7 @@ public class BvbProject implements IProject {
 
     @Override
     public Array<String> getSavedResourcePaths () {
-        return new Array<>();
+        return null;
     }
 
     @Override

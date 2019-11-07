@@ -18,11 +18,19 @@ public class BvBAddon implements IAddon {
     BvBWorkspace workspace;
     PropertyPanelContainer properties;
 
+    public FileTracker.Tracker spineTracker;
+    public FileTracker.Tracker particleTracker;
+
     @Override
     public void init() {
         BVB = new BvbProject(this);
 
         buildUI();
+
+        spineTracker = handle -> workspace.setSkeleton(handle);
+
+        particleTracker = handle -> workspace.updateParticle(handle);
+
     }
 
     @Override
@@ -86,12 +94,7 @@ public class BvBAddon implements IAddon {
             if (handle.extension().equals("json")) {
                 // cool let's load skeletal animation
                 workspace.setSkeleton(handle);
-                TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
-                    @Override
-                    public void updated(FileHandle handle) {
-                        workspace.setSkeleton(handle);
-                    }
-                });
+                TalosMain.Instance().FileTracker().trackFile(handle, spineTracker);
 
                 return true;
             }
@@ -99,12 +102,7 @@ public class BvBAddon implements IAddon {
             if (handle.extension().equals("p")) {
                 // adding particle effect? I can do that
                 workspace.addParticle(handle);
-                TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
-                    @Override
-                    public void updated(FileHandle handle) {
-                        workspace.updateParticle(handle);
-                    }
-                });
+                TalosMain.Instance().FileTracker().trackFile(handle, particleTracker);
 
                 return true;
             }

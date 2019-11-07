@@ -398,6 +398,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         String skeletonPath = workspace.getPath(skeletonName + ".json");
         FileHandle jsonHandle = TalosMain.Instance().ProjectController().findFile(skeletonPath);
 
+        // track this file
+        TalosMain.Instance().FileTracker().trackFile(jsonHandle, workspace.bvb.spineTracker);
+
         setSkeleton(jsonHandle);
 
         boundEffects.clear();

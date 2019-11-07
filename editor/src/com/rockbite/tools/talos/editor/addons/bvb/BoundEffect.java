@@ -354,6 +354,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         descriptor.load(effectHandle);
         parent.getWorkspace().getVfxLibrary().put(name, descriptor);
 
+        // track this file
+        TalosMain.Instance().FileTracker().trackFile(effectHandle, parent.getWorkspace().bvb.particleTracker);
+
         this.particleEffectDescriptor = descriptor;
 
         positionAttachment = json.readValue(AttachmentPoint.class, jsonData.get("positionAttachment"));

@@ -22,6 +22,19 @@ public class FileTab extends Tab {
         return fileName;
     }
 
+
+    @Override
+    public int hashCode() {
+        return fileName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(fileName == null || obj == null) return false;
+
+        return fileName.equals(((FileTab)obj).fileName);
+    }
+
     @Override
     public boolean save() {
         if(isSavable()) {
