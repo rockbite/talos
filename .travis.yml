@@ -9,6 +9,7 @@ os:
 before_install:
   - chmod +x gradlew
 
+
 branches:
   only:
     - master
@@ -16,6 +17,8 @@ branches:
 cache:
   directories:
     - $HOME/.gradle
+
+install: true
 
 script:
   - ./gradlew clean build
