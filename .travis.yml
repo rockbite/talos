@@ -1,0 +1,16 @@
+language: java
+
+os:
+  - linux
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - $HOME/.gradle
+
+
+script:
+  - ./gradlew clean build
