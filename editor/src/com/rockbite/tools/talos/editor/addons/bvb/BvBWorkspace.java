@@ -140,10 +140,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                     if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
                         pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
+                        pos.rotate(-skeletonContainer.getBoneRotation(movingPoint.getBoneName()));
                         movingPoint.setOffset(pos.x, pos.y);
                     } else {
                         Bone closestBone = skeletonContainer.findClosestBone(pos);
                         pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
+                        pos.rotate(-closestBone.getWorldRotationX());
                         movingPoint.setOffset(pos.x, pos.y);
                         movingPoint.setBone(closestBone.getData().getName());
                         bvb.properties.updateValues();
@@ -340,8 +342,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private Vector2 getAttachmentPosition(AttachmentPoint point) {
         if(!point.isStatic()) {
-            tmp.set(skeletonContainer.getBonePosX(point.getBoneName()), skeletonContainer.getBonePosY(point.getBoneName()));
-            tmp.add(point.getOffsetX(), point.getOffsetY());
+            tmp.set(point.getOffsetX(), point.getOffsetY());
+            tmp.rotate(skeletonContainer.getBoneRotation(point.getBoneName()));
+            tmp.add(skeletonContainer.getBonePosX(point.getBoneName()), skeletonContainer.getBonePosY(point.getBoneName()));
         } else{
             tmp.set(point.getStaticValue().get(0), point.getStaticValue().get(1));
         }
