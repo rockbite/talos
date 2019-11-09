@@ -27,7 +27,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 import java.util.Comparator;
 
-public class GradientColorModule extends Module {
+public class GradientColorModule extends AbstractModule {
 
 	public static final int ALPHA = 0;
 	public static final int OUTPUT = 0;

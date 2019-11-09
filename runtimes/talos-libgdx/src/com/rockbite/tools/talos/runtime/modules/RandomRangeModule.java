@@ -23,7 +23,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 import java.util.Random;
 
-public class RandomRangeModule extends Module {
+public class RandomRangeModule extends AbstractModule {
 
     public static final int OUTPUT = 0;
 

@@ -25,7 +25,7 @@ import com.rockbite.tools.talos.editor.widgets.FloatInputWidget;
 import com.rockbite.tools.talos.editor.widgets.IntegerInputWidget;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
 import com.rockbite.tools.talos.runtime.modules.FlipbookModule;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModule> {
 
@@ -42,7 +42,7 @@ public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModu
     @Override
     protected void configureSlots() {
         super.configureSlots();
-        dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin(), 100f);
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin(), 100f);
 
         addInputSlot("phase",  FlipbookModule.PHASE);
 

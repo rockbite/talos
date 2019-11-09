@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class GlobalScopeModule extends Module {
+public class GlobalScopeModule extends AbstractModule {
 
     public static final int OUTPUT = 0;
     NumericalValue output;

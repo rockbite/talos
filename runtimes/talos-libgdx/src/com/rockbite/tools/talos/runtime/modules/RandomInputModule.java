@@ -25,7 +25,7 @@ import com.rockbite.tools.talos.runtime.values.Value;
 
 import java.util.Random;
 
-public class RandomInputModule extends Module {
+public class RandomInputModule extends AbstractModule {
 
     Class valueType = null;
 
@@ -45,7 +45,7 @@ public class RandomInputModule extends Module {
     }
 
     @Override
-    public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
+    public void attachModuleToMyInput(AbstractModule module, int mySlot, int targetSlot) {
         addInputSlot(slotCount++);
         super.attachModuleToMyInput(module, mySlot, targetSlot);
 

@@ -23,7 +23,7 @@ import com.rockbite.tools.talos.editor.widgets.CurveDataProvider;
 import com.rockbite.tools.talos.editor.widgets.CurveWidget;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements CurveDataProvider {
 
@@ -50,7 +50,7 @@ public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements Cu
     }
 
     @Override
-    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule> getSlotsPreferredModule(Slot slot) {
         if(slot.getIndex() == CurveModule.ALPHA) return InputModule.class;
 
         return null;

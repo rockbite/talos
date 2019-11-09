@@ -67,7 +67,7 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
 
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == InterpolationModule.ALPHA) return InputModule.class;
         return null;

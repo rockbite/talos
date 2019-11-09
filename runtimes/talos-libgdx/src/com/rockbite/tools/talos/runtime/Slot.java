@@ -16,7 +16,7 @@
 
 package com.rockbite.tools.talos.runtime;
 
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.values.Value;
 
 public class Slot {
@@ -25,15 +25,15 @@ public class Slot {
     private boolean isInput;
     private Flavour flavour;
 
-    private Module currentModule;
-    private Module targetModule;
+    private AbstractModule currentModule;
+    private AbstractModule targetModule;
     private Slot targetSlot;
 
     private Value value;
 
     private String text = "";
 
-    public Module getTargetModule() {
+    public AbstractModule getTargetModule() {
         return targetModule;
     }
 
@@ -53,7 +53,7 @@ public class Slot {
         ANGLE
     }
 
-    public Slot(Module currentModule, int index, boolean isInput) {
+    public Slot(AbstractModule currentModule, int index, boolean isInput) {
         this.currentModule = currentModule;
         this.index = index;
         this.isInput = isInput;
@@ -67,7 +67,7 @@ public class Slot {
         return index;
     }
 
-    public void connect(Module targetModule, Slot targetSlot) {
+    public void connect(AbstractModule targetModule, Slot targetSlot) {
         this.targetModule = targetModule;
         this.targetSlot = targetSlot;
         if(value != null) {

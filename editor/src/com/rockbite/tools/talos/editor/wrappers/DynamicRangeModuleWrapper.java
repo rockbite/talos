@@ -58,7 +58,7 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
     }
 
     @Override
-    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule> getSlotsPreferredModule(Slot slot) {
         if(slot.getIndex() == DynamicRangeModule.ALPHA) return InputModule.class;
 
         return null;

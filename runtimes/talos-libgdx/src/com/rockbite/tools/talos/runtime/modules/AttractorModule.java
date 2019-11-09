@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class AttractorModule extends Module {
+public class AttractorModule extends AbstractModule {
 
     public static final int INITIAL_ANGLE = 0;
     public static final int INITIAL_VELOCITY = 1;

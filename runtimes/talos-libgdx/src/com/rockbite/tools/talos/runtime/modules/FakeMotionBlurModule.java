@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class FakeMotionBlurModule extends Module {
+public class FakeMotionBlurModule extends AbstractModule {
 
     public static final int VELOCITY = 0;
     public static final int SIZE = 0;

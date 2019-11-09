@@ -26,7 +26,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import java.util.Comparator;
 import java.util.Random;
 
-public class OffsetModule extends Module {
+public class OffsetModule extends AbstractModule {
 
     public static final int ALPHA = 0;
 

@@ -31,19 +31,16 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.widget.*;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.widgets.ui.DynamicTable;
 import com.rockbite.tools.talos.editor.widgets.ui.EditableLabel;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.runtime.Slot;
-import com.rockbite.tools.talos.runtime.modules.ColorModule;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public abstract class ModuleWrapper<T extends Module> extends VisWindow implements Json.Serializable {
+public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow implements Json.Serializable {
 
     protected T module;
     protected DynamicTable leftWrapper, rightWrapper, contentWrapper;
@@ -386,7 +383,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         if(slot == null) return;
 
         if(slot.isInput()) {
-            Class<? extends Module> clazz = getSlotsPreferredModule(slot);
+            Class<? extends AbstractModule> clazz = getSlotsPreferredModule(slot);
 
             if (clazz != null) {
                 ModuleWrapper newWrapper = moduleBoardWidget.createModule(clazz, getX(), getY());
@@ -413,7 +410,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
         }
     }
 
-    public Class<? extends Module> getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule> getSlotsPreferredModule(Slot slot) {
         return null;
     }
 
@@ -658,7 +655,7 @@ public abstract class ModuleWrapper<T extends Module> extends VisWindow implemen
  		setY(jsonData.getFloat("y"));
  		titleOverride = jsonData.getString("titleOverride", "");
 
-        module = (T)json.readValue(Module.class, jsonData.get("module").get("data"));
+        module = (T)json.readValue(AbstractModule.class, jsonData.get("module").get("data"));
         //TODO: this has to be create through module graph to go with properr creation channels
 
         setModule(module);

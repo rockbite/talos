@@ -25,7 +25,7 @@ import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import com.rockbite.tools.talos.runtime.values.Value;
 
-public abstract class Module implements Json.Serializable {
+public abstract class AbstractModule implements Json.Serializable {
 
     protected ParticleEmitterDescriptor graph;
 
@@ -36,7 +36,7 @@ public abstract class Module implements Json.Serializable {
 
     private float lastRequester;
 
-    public Module () {
+    public AbstractModule () {
         init();
     }
 
@@ -50,17 +50,17 @@ public abstract class Module implements Json.Serializable {
 
     protected abstract void defineSlots();
 
-    public void attachModuleToMyInput(Module module, int mySlot, int targetSlot) {
+    public void attachModuleToMyInput(AbstractModule module, int mySlot, int targetSlot) {
         if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
         inputSlots.get(mySlot).connect(module, module.outputSlots.get(targetSlot));
     }
 
-    public void attachModuleToMyOutput(Module module, int mySlot, int targetSlot) {
+    public void attachModuleToMyOutput(AbstractModule module, int mySlot, int targetSlot) {
         if(inputSlots.get(mySlot) == null || module.outputSlots.get(targetSlot) == null) return;
         outputSlots.get(mySlot).connect(module, module.inputSlots.get(targetSlot));
     }
 
-    public void detach(Module module) {
+    public void detach(AbstractModule module) {
         for(Slot slot : inputSlots.values()) {
             if(slot.getTargetModule() == module) {
                 slot.getTargetSlot().detach();
@@ -75,7 +75,7 @@ public abstract class Module implements Json.Serializable {
         }
     }
 
-    public boolean isConnectedTo(Module module) {
+    public boolean isConnectedTo(AbstractModule module) {
         for(Slot slot : inputSlots.values()) {
             if(slot.getTargetModule() == module) {
                 return true;

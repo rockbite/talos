@@ -18,7 +18,7 @@ public class AttractorModuleWrapper extends ModuleWrapper<AttractorModule> {
 
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == AttractorModule.INITIAL_ANGLE) return RandomRangeModule.class;
         if(slot.getIndex() == AttractorModule.INITIAL_VELOCITY) return RandomRangeModule.class;

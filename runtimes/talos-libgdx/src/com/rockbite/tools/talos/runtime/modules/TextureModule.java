@@ -24,7 +24,7 @@ import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 
-public class TextureModule extends Module {
+public class TextureModule extends AbstractModule {
 
     public static final int OUTPUT = 0;
 

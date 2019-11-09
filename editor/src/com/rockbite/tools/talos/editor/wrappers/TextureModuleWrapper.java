@@ -17,19 +17,13 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.modules.TextureModule;
-
-import java.io.File;
 
 public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule> {
 
@@ -57,7 +51,7 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
 
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
 
-        dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
 
         addOutputSlot("output", TextureModule.OUTPUT);
 

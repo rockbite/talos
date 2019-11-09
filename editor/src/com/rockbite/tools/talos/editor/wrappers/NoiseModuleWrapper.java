@@ -72,7 +72,7 @@ public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
 
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == NoiseModule.X) return InputModule.class;
         if(slot.getIndex() == NoiseModule.Y) return InputModule.class;

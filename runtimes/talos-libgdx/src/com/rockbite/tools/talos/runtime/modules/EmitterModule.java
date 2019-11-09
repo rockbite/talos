@@ -23,7 +23,7 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.EmConfigValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class EmitterModule extends Module {
+public class EmitterModule extends AbstractModule {
 
     public static final int DELAY = 0;
     public static final int DURATION = 1;

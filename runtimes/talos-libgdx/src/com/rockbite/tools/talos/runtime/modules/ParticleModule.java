@@ -26,7 +26,7 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class ParticleModule extends Module {
+public class ParticleModule extends AbstractModule {
 
     public static final int ID = 0;
     public static final int TAG = 1;

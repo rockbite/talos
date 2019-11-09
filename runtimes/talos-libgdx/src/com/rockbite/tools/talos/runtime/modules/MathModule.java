@@ -22,7 +22,7 @@ import com.rockbite.tools.talos.runtime.Expression;
 import com.rockbite.tools.talos.runtime.utils.MathExpressionMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class MathModule extends Module {
+public class MathModule extends AbstractModule {
 
     public static final int A = 0;
     public static final int B = 1;

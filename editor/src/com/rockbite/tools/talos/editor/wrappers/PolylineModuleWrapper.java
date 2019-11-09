@@ -72,7 +72,7 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
             }
         });
 
-        dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
         rightWrapper.add(dropWidget).size(50).right().row();
 
         rightWrapper.add().growY().row();
@@ -123,7 +123,7 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
     }
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == PolylineModule.OFFSET) return NoiseModule.class;
         if(slot.getIndex() == PolylineModule.THICKNESS) return CurveModule.class;

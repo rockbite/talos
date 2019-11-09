@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.Slot;
 import com.rockbite.tools.talos.runtime.modules.*;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.render.drawables.TextureRegionDrawable;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
@@ -66,7 +66,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     }
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == ParticleModule.DRAWABLE) return TextureModule.class;
         if(slot.getIndex() == ParticleModule.OFFSET) return Vector2Module.class;
