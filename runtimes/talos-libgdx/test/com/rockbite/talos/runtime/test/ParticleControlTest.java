@@ -36,9 +36,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.rockbite.talos.runtime.test.utils.CameraController;
+import com.rockbite.talos.runtime.test.utils.TestAssetProvider;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
-import com.rockbite.tools.talos.runtime.assets.TextureAtlasAssetProvider;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -74,7 +74,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 
 		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
-		descriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
+		descriptor.setAssetProvider(new TestAssetProvider(atlas));
 		descriptor.load(Gdx.files.internal("test.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();

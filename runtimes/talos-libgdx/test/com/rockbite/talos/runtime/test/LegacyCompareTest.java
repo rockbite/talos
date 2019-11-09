@@ -32,10 +32,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.rockbite.talos.runtime.test.utils.TestAssetProvider;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ScopePayload;
-import com.rockbite.tools.talos.runtime.assets.TextureAtlasAssetProvider;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -118,7 +118,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
 		public TalosActor (FileHandle effect, TextureAtlas atlas, ParticleRenderer renderer) {
 			this.renderer = renderer;
-			particleEffectDescriptor.setAssetProvider(new TextureAtlasAssetProvider(atlas));
+			particleEffectDescriptor.setAssetProvider(new TestAssetProvider(atlas));
 			particleEffectDescriptor.load(effect);
 			particleEffect = particleEffectDescriptor.createEffectInstance();
 			particleEffect.setScope(scope);
