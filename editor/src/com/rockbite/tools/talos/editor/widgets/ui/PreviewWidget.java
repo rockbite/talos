@@ -231,14 +231,16 @@ public class PreviewWidget extends ViewportWidget {
             final String extension = fileHandle.extension();
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
-                final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-                final TextureRegion textureRegion = assetProvider.findAsset(fileHandle.name(), TextureRegion.class);
+                fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
+                final TextureRegion textureRegion = new TextureRegion(new Texture(fileHandle));
 
                 if(textureRegion != null) {
                     previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
                     previewController.setImageWidth(10);
 
                     backgroundImagePath = fileHandle.path();
+
+                    TalosMain.Instance().ProjectController().setDirty();
                 }
             }
         }
