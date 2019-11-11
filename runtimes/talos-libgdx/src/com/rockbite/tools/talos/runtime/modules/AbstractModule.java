@@ -216,4 +216,16 @@ public abstract class AbstractModule implements Json.Serializable {
     public IntMap<Slot> getOutputSlots() {
         return outputSlots;
     }
+
+    public String getJavaTemplate() {
+        return "";
+    }
+
+    protected String replaceStatics(String string, float[] values) {
+        int key = 0;
+        for(float val: values) {
+            string = string.replaceAll("\\{\\$[v]([" +(key++)+ "]*)\\}", val+"f");
+        }
+        return string;
+    }
 }

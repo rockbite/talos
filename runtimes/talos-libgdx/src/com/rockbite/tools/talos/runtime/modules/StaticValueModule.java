@@ -64,4 +64,10 @@ public class StaticValueModule extends AbstractModule {
         setStaticValue(jsonData.getFloat("value"));
     }
 
+    @Override
+    public String getJavaTemplate() {
+        String template = replaceStatics("{$o0}.set({$v0});", new float[]{staticValue.getFloat()});
+
+        return template;
+    }
 }

@@ -32,6 +32,7 @@ import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.serialization.*;
 import com.rockbite.tools.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
+import com.rockbite.tools.talos.runtime.GraphCompiler;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
@@ -88,6 +89,7 @@ public class TalosProject implements IProject {
 			TalosMain.Instance().NodeStage().moduleBoardWidget.loadEmitterToBoard(emitterWrapper, emitterData);
 
 			final ParticleEmitterDescriptor graph = emitterWrapper.getGraph();
+
 			for (ModuleWrapper module : emitterData.modules) {
 				map.put(module.getId(), module);
 
@@ -109,6 +111,13 @@ public class TalosProject implements IProject {
 				Color.abgr8888ToColor(clr, group.color);
 				moduleWrapperGroup.setData(group.text, clr);
 			}
+
+
+
+			// testing
+			GraphCompiler graphCompiler = new GraphCompiler(graph);
+			String result = graphCompiler.compile();
+			System.out.println(result);
 		}
 
 		sortEmitters();

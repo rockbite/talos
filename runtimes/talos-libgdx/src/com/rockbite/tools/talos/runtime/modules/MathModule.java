@@ -99,4 +99,11 @@ public class MathModule extends AbstractModule {
     public float getDefaultB() {
         return defaultB;
     }
+
+    @Override
+    public String getJavaTemplate() {
+        String template = "({$i0}).sum(({$i1}), ({$o0}));";
+
+        return template;
+    }
 }
