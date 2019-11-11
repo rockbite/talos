@@ -21,7 +21,7 @@ import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 public class ParticleEmitterWrapper {
 
     private String emitterName = "";
-    private boolean isMuted;
+    public boolean isMuted;
     private boolean isSolo;
     private int position;
 

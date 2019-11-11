@@ -441,6 +441,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
 
         TalosMain.Instance().ProjectController().setDirty();
+        TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
     public ModuleWrapper createModule (Class<? extends AbstractModule> clazz, float x, float y) {

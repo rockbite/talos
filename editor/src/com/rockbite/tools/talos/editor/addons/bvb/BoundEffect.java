@@ -146,7 +146,12 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 if(positionAttachment.isStatic()) {
                     instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
                 } else {
-                    instance.setPosition(parent.getBonePosX(positionAttachment.getBoneName()) + positionAttachment.getOffsetX(), parent.getBonePosY(positionAttachment.getBoneName()) + positionAttachment.getOffsetY());
+                    tmpVec.set(positionAttachment.getOffsetX(), positionAttachment.getOffsetY());
+                    Bone bone = parent.getBoneByName(positionAttachment.getBoneName());
+                    float rotation = bone.getWorldRotationX();
+                    tmpVec.rotate(rotation);
+                    tmpVec.add(parent.getBonePosX(positionAttachment.getBoneName()), parent.getBonePosY(positionAttachment.getBoneName()));
+                    instance.setPosition(tmpVec.x, tmpVec.y);
                 }
 
                 instance.update(delta);
@@ -348,6 +353,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         String effectPath = parent.getWorkspace().getPath(effectName + ".p");
         FileHandle effectHandle = TalosMain.Instance().ProjectController().findFile(effectPath);
         this.name = effectName;
+
+        parent.getWorkspace().registerTalosAssets(effectHandle);
 
         //TODO: refactor this
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();

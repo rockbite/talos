@@ -25,6 +25,7 @@ import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
+import java.io.File;
 import java.io.StringWriter;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
@@ -406,7 +407,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     public BoundEffect addParticle(FileHandle handle) {
+        if(skeletonContainer.getSkeleton() == null) return null;
         pathMap.put(handle.name(), handle.path());
+
+        registerTalosAssets(handle);
 
         String name = handle.nameWithoutExtension();
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
@@ -420,6 +424,23 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         TalosMain.Instance().ProjectController().setDirty();
 
         return effect;
+    }
+
+    public void registerTalosAssets(FileHandle handle) {
+        JsonReader jsonReader = new JsonReader();
+        final JsonValue parse = jsonReader.parse(handle);
+        final JsonValue metaData = parse.get("metadata");
+        final JsonValue resourcePaths = metaData.get("resources");
+        for(JsonValue path: resourcePaths) {
+            String name = path.asString();
+            String possiblePath = handle.parent() + File.separator + name + ".png"; // this is handling only PNG's which is bad
+            TalosMain.Instance().FileTracker().trackFile(Gdx.files.absolute(possiblePath), new FileTracker.Tracker() {
+                @Override
+                public void updated(FileHandle handle) {
+                    // this is not good either... but whatever
+                }
+            });
+        }
     }
 
     public void updateParticle(FileHandle handle) {

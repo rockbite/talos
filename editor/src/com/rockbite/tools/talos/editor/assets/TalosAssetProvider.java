@@ -63,9 +63,18 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	}
 
 	private void registerUnknownHandlerParsers () {
-		extensionToAssetParser.put("png", handle -> addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle))));
-		extensionToAssetParser.put("jpg", handle -> addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle))));
-		extensionToAssetParser.put("fga", handle -> addVectorField(handle.nameWithoutExtension(), new VectorField(handle)));
+		extensionToAssetParser.put("png", handle -> {
+			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle)));
+		});
+		extensionToAssetParser.put("jpg", handle -> {
+			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle)));
+		});
+		extensionToAssetParser.put("fga", handle -> {
+			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			addVectorField(handle.nameWithoutExtension(), new VectorField(handle));
+		});
 	}
 
 	private void addDefaultAssets () {
@@ -97,10 +106,14 @@ public class TalosAssetProvider extends BaseAssetProvider {
 			if(assetName.contains(".")) {
 				assetName = assetName.substring(0, assetName.lastIndexOf("."));
 			}
-			final FileHandle file = findFile(assetName);
+			FileHandle file = findFile(assetName);
 			if (file == null || !file.exists()) {
 				//throw new GdxRuntimeException("No region found for: " + assetName + " from provider");
-				return null;
+				// try the tracker first
+				file = TalosMain.Instance().FileTracker().findFileByName(assetName + ".png");
+				if(file == null) {
+					return null;
+				}
 			}
 			Texture texture = new Texture(file);
 			TextureRegion textureRegion = new TextureRegion(texture);
