@@ -39,6 +39,7 @@ public class TextureRegionDrawable implements ParticleDrawable {
     	region.setSize(width, height);
     	region.setOriginCenter();
     	region.setRotation(rotation);
+    	region.setColor(batch.getColor());
     	region.draw(batch);
     }
 
