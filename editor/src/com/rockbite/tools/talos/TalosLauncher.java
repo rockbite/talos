@@ -16,20 +16,17 @@
 
 package com.rockbite.tools.talos;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl.LwjglFrame;
-
-import java.awt.dnd.DropTarget;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 public class TalosLauncher {
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();		
-		config.width = 1200;
-		config.height = 700;
-		config.title = "Talos";
-		TalosMain talos = new TalosMain();
-		LwjglFrame frame = new LwjglFrame(talos, config);
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowedMode(1200, 700);
+		config.setTitle("Talos");
 
-		DropTarget dropTarget = new DropTarget(frame, talos.getDropTargetListener());
+		TalosMain talos = new TalosMain();
+
+		new Lwjgl3Application(talos, config);
 	}
 }

@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class Vector2Module extends Module {
+public class Vector2Module extends AbstractModule {
 
     public static final int X = 0;
     public static final int Y = 1;

@@ -18,8 +18,10 @@ package com.rockbite.tools.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -35,10 +37,14 @@ import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.TalosProject;
 import com.rockbite.tools.talos.editor.project.ProjectController;
 import com.rockbite.tools.talos.editor.utils.CameraController;
-import com.rockbite.tools.talos.editor.utils.DropTargetListenerAdapter;
 import com.rockbite.tools.talos.runtime.ScopePayload;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFWDropCallback;
 
 import java.awt.dnd.*;
+
+import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosMain extends ApplicationAdapter {
 
@@ -51,8 +57,6 @@ public class TalosMain extends ApplicationAdapter {
 	private ProjectController projectController;
 
 	private Skin skin;
-
-	private DropTargetListener dropTargetListener;
 
 	private static TalosMain instance;
 
@@ -96,22 +100,37 @@ public class TalosMain extends ApplicationAdapter {
 		return preferences;
 	}
 
-	public DropTargetListener getDropTargetListener () {
-		return dropTargetListener;
-	}
-
 	public TalosMain () {
-		dropTargetListener = new DropTargetListenerAdapter() {
-			@Override
-			protected void doDrop (String[] finalPaths, float x, float y) {
-				nodeStage.fileDrop(finalPaths, x, y);
-				uiStage.fileDrop(finalPaths, x, y);
-			}
-		};
 	}
 
 	@Override
 	public void create () {
+		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
+			@Override
+			public void invoke (long window, int count, long names) {
+
+				PointerBuffer namebuffer = memPointerBuffer(names, count);
+				final String[] filesPaths = new String[count];
+				for (int i = 0; i < count; i++) {
+					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
+					filesPaths[i] = pathToObject;
+				}
+
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						final int x = Gdx.input.getX();
+						final int y = Gdx.input.getY();
+
+						nodeStage.fileDrop(filesPaths, x, y);
+						uiStage.fileDrop(filesPaths, x, y);
+					}
+				});
+			}
+		});
+
+
 		TalosMain.instance = this;
 
 		addonController = new AddonController();

@@ -40,6 +40,17 @@ public class FileTracker {
         tabMaps.put(tab, new ObjectMap<>());
     }
 
+    public FileHandle findFileByName(String name) {
+        final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
+        for(FileHandle handle: tabMaps.get(currentTab).keys()) {
+            if(handle.name().equals(name) || handle.nameWithoutExtension().equals(name)) {
+                if(handle.exists()) return handle;
+            }
+        }
+
+        return null;
+    }
+
     public class FileEntry {
         FileHandle fileHandle;
         Tracker callback;

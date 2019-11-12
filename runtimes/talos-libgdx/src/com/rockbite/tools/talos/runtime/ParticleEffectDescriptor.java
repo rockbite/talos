@@ -16,19 +16,14 @@
 
 package com.rockbite.tools.talos.runtime;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.modules.EmitterModule;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.modules.ParticleModule;
 import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.runtime.serialization.ExportData;
@@ -72,9 +67,9 @@ public class ParticleEffectDescriptor {
 		for (ExportData.EmitterExportData emitter : exportData.emitters) {
 			ParticleEmitterDescriptor emitterDescriptor = new ParticleEmitterDescriptor(this);
 
-			IntMap<Module> idMap = new IntMap<>();
+			IntMap<AbstractModule> idMap = new IntMap<>();
 
-			for (Module module: emitter.modules) {
+			for (AbstractModule module: emitter.modules) {
 				module.setModuleGraph(emitterDescriptor);
 				if (module instanceof ParticleModule) {
 					emitterDescriptor.particleModule = (ParticleModule)module;
@@ -92,8 +87,8 @@ public class ParticleEffectDescriptor {
 				final int slotFrom = connection.slotFrom;
 				final int slotTo = connection.slotTo;
 
-				Module moduleFrom = idMap.get(moduleFromId);
-				Module moduleTo = idMap.get(moduleToId);
+				AbstractModule moduleFrom = idMap.get(moduleFromId);
+				AbstractModule moduleTo = idMap.get(moduleToId);
 
 				if (moduleFrom == null) {
 					throw new GdxRuntimeException("No module from found for id: " + moduleFromId);

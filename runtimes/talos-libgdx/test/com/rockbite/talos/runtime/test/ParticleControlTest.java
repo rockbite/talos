@@ -28,7 +28,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.utils.TextureProvider;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -37,9 +36,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.rockbite.talos.runtime.test.utils.CameraController;
+import com.rockbite.talos.runtime.test.utils.TestAssetProvider;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
-import com.rockbite.tools.talos.runtime.assets.BaseAssetProvider;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
 import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -73,18 +72,9 @@ public class ParticleControlTest extends ApplicationAdapter {
 
 		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
 
-		final TextureAtlas atlas = new TextureAtlas();
+		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
-		descriptor.setAssetProvider(new BaseAssetProvider() {
-			@Override
-			public <T> T findAsset (String assetName, Class<T> clazz) {
-				if (clazz.equals(TextureRegion.class)) {
-					return (T) atlas.findRegion(assetName);
-				}
-
-				return null;
-			}
-		});
+		descriptor.setAssetProvider(new TestAssetProvider(atlas));
 		descriptor.load(Gdx.files.internal("test.p"));
 
 		particleEffectInstance = descriptor.createEffectInstance();

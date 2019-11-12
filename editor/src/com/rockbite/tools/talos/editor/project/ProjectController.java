@@ -189,6 +189,7 @@ public class ProjectController {
         }
         if(fileCache.containsKey(fileName)) {
             currentProject = tab.getProjectType();
+            currentTab =  tab;
             getProjectFromCache(fileName);
         }
 

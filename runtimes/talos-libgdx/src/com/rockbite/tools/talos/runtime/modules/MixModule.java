@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class MixModule extends Module {
+public class MixModule extends AbstractModule {
 
     public static final int ALPHA = 0;
     public static final int VAL1 = 1;

@@ -26,7 +26,7 @@ import com.rockbite.tools.talos.runtime.render.drawables.SpriteAnimationDrawable
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class FlipbookModule extends Module {
+public class FlipbookModule extends AbstractModule {
 
     public static final int PHASE = 0;
 

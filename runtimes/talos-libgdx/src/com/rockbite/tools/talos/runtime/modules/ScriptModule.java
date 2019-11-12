@@ -23,7 +23,7 @@ import com.rockbite.tools.talos.runtime.script.ScriptCompiler;
 import com.rockbite.tools.talos.runtime.scripts.SimpleReturnScript;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class ScriptModule extends Module {
+public class ScriptModule extends AbstractModule {
 
     public static final int INPUT1 = 0;
     public static final int INPUT2 = 1;

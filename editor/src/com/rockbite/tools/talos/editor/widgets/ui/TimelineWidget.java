@@ -255,6 +255,7 @@ public class TimelineWidget extends Table {
             eye.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
+                    wrapper.isMuted = isMuted();
                     TalosMain.Instance().TalosProject().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(!isMuted());
                 }
             });
@@ -327,6 +328,7 @@ public class TimelineWidget extends Table {
             label.setText(emitter.getName());
             textField.setText(emitter.getName());
             wrapper = emitter;
+            eye.setChecked(!emitter.isMuted);
         }
     }
 }

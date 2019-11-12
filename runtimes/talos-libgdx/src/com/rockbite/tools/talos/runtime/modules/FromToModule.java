@@ -24,7 +24,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 /**
  * Calculates the position, rotatoin and length of particle beam based on from and to vector values
  */
-public class FromToModule extends Module {
+public class FromToModule extends AbstractModule {
 
     public static final int FROM = 0;
     public static final int TO = 1;

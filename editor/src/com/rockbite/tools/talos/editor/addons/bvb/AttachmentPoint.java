@@ -153,6 +153,15 @@ public class AttachmentPoint implements Json.Serializable {
         }
     }
 
+    public float getOffsetLength() {
+        return offset.angle();
+    }
+
+    public float getOffsetAngle() {
+        return offset.angle();
+    }
+
+    
     public void setAttachmentType(AttachmentType attachmentType) {
         this.attachmentType =attachmentType;
     }

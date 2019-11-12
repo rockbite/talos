@@ -18,7 +18,7 @@ package com.rockbite.tools.talos.runtime;
 
 import com.badlogic.gdx.utils.*;
 import com.rockbite.tools.talos.runtime.modules.*;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 public class ParticleEmitterDescriptor {
 
@@ -26,7 +26,7 @@ public class ParticleEmitterDescriptor {
 
     ScopePayload scopePayload;
 
-    Array<Module> modules = new Array<>();
+    Array<AbstractModule> modules = new Array<>();
 
     ParticleModule particleModule;
     EmitterModule emitterModule;
@@ -79,7 +79,7 @@ public class ParticleEmitterDescriptor {
         }
     }
 
-    public boolean addModule (Module module) {
+    public boolean addModule (AbstractModule module) {
         boolean added = true;
         if (module instanceof ParticleModule) {
             if (particleModule == null) {
@@ -104,9 +104,9 @@ public class ParticleEmitterDescriptor {
 
     }
 
-    public void removeModule(Module module) {
+    public void removeModule(AbstractModule module) {
         // was this module connected to someone?
-        for(Module toModule: modules) {
+        for(AbstractModule toModule: modules) {
             if(toModule.isConnectedTo(module)) {
                 toModule.detach(module);
             }
@@ -122,14 +122,14 @@ public class ParticleEmitterDescriptor {
         }
     }
 
-    public void connectNode(Module from, Module to, int slotFrom, int slotTo) {
+    public void connectNode(AbstractModule from, AbstractModule to, int slotFrom, int slotTo) {
         // slotTo is the input of module to
         // slotFrom is the output of slot from
         from.attachModuleToMyOutput(to, slotFrom, slotTo);
         to.attachModuleToMyInput(from, slotTo, slotFrom);
     }
 
-    public void removeNode(Module module, int slot,boolean isInput) {
+    public void removeNode(AbstractModule module, int slot,boolean isInput) {
         module.detach(slot, isInput);
     }
 
@@ -138,7 +138,7 @@ public class ParticleEmitterDescriptor {
     }
 
     public void resetRequesters() {
-        for(Module module: modules) {
+        for(AbstractModule module: modules) {
             module.resetLastRequester();
         }
     }
@@ -147,7 +147,7 @@ public class ParticleEmitterDescriptor {
         return emitterModule;
     }
 
-    public Array<Module> getModules() {
+    public Array<AbstractModule> getModules() {
         return modules;
     }
 

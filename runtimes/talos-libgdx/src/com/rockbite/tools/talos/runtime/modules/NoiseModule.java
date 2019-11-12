@@ -22,7 +22,7 @@ import com.rockbite.tools.talos.runtime.ScopePayload;
 import com.rockbite.tools.talos.runtime.utils.SimplexNoise;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class NoiseModule extends Module {
+public class NoiseModule extends AbstractModule {
 
     public static final int X = 0;
     public static final int Y = 1;

@@ -28,7 +28,7 @@ import com.rockbite.tools.talos.runtime.render.drawables.PolylineRenderer;
 import com.rockbite.tools.talos.runtime.values.DrawableValue;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class PolylineModule extends Module {
+public class PolylineModule extends AbstractModule {
 
     public static final int OFFSET = 0;
     public static final int THICKNESS = 1;

@@ -114,7 +114,7 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     }
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == FromToModule.FROM) return Vector2Module.class;
         if(slot.getIndex() == FromToModule.TO) return Vector2Module.class;

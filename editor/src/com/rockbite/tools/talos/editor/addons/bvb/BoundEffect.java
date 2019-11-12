@@ -122,8 +122,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                         break;
                     }
                 }
-                tmpVec.set(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
-                tmpVec.add(attachmentPoint.getOffsetX(), attachmentPoint.getOffsetY());
+                tmpVec.set(attachmentPoint.getOffsetX(), attachmentPoint.getOffsetY());
+                tmpVec.rotate(rotation);
+                tmpVec.add(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
 
                 if (attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.POSITION) {
                     val.set(tmpVec.x, tmpVec.y);
@@ -134,9 +135,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 } else if(attachmentPoint.getAttachmentType() == AttachmentPoint.AttachmentType.COLOR) {
                     val.set(color.r, color.g, color.b);
                 }
-            }
 
-            scopePayload.setDynamicValue(attachmentPoint.getSlotId(), val);
+                scopePayload.setDynamicValue(attachmentPoint.getSlotId(), val);
+            }
         }
 
         // update position for each instance and update effect itself
@@ -145,7 +146,12 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 if(positionAttachment.isStatic()) {
                     instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
                 } else {
-                    instance.setPosition(parent.getBonePosX(positionAttachment.getBoneName()) + positionAttachment.getOffsetX(), parent.getBonePosY(positionAttachment.getBoneName()) + positionAttachment.getOffsetY());
+                    tmpVec.set(positionAttachment.getOffsetX(), positionAttachment.getOffsetY());
+                    Bone bone = parent.getBoneByName(positionAttachment.getBoneName());
+                    float rotation = bone.getWorldRotationX();
+                    tmpVec.rotate(rotation);
+                    tmpVec.add(parent.getBonePosX(positionAttachment.getBoneName()), parent.getBonePosY(positionAttachment.getBoneName()));
+                    instance.setPosition(tmpVec.x, tmpVec.y);
                 }
 
                 instance.update(delta);
@@ -347,6 +353,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         String effectPath = parent.getWorkspace().getPath(effectName + ".p");
         FileHandle effectHandle = TalosMain.Instance().ProjectController().findFile(effectPath);
         this.name = effectName;
+
+        parent.getWorkspace().registerTalosAssets(effectHandle);
 
         //TODO: refactor this
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();

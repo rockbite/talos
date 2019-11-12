@@ -22,9 +22,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
-public class TextureDropWidget<F extends Module> extends Table {
+public class TextureDropWidget<F extends AbstractModule> extends Table {
 
     Image image;
 

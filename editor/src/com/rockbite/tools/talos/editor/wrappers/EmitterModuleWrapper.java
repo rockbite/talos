@@ -69,7 +69,7 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
     }
 
     @Override
-    public Class<? extends Module>  getSlotsPreferredModule(Slot slot) {
+    public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
         if(slot.getIndex() == EmitterModule.RATE) {
             return StaticValueModule.class;
         }

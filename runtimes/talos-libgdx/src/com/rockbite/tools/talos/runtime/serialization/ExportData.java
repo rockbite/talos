@@ -18,7 +18,7 @@ package com.rockbite.tools.talos.runtime.serialization;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 public class ExportData {
 
@@ -32,7 +32,7 @@ public class ExportData {
 
     public static class EmitterExportData {
         public String name;
-        public Array<Module> modules = new Array<>();
+        public Array<AbstractModule> modules = new Array<>();
         public Array<ConnectionData> connections = new Array<>();
 
         @Override
@@ -42,7 +42,7 @@ public class ExportData {
             stringBuilder.append(name);
             stringBuilder.append("\n");
 
-            for (Module module : modules) {
+            for (AbstractModule module : modules) {
                 stringBuilder.append("\t");
                 stringBuilder.append("ModuleID: ");
                 stringBuilder.append(module.getIndex());

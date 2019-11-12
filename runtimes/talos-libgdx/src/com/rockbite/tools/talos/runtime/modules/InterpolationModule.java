@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.runtime.utils.InterpolationMappings;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class InterpolationModule extends Module {
+public class InterpolationModule extends AbstractModule {
 
     public static final int ALPHA = 0;
     public static final int OUTPUT = 0;

@@ -1,0 +1,24 @@
+language: java
+
+jdk:
+  - oraclejdk9
+
+os:
+  - linux
+
+before_install:
+  - chmod +x gradlew
+
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - $HOME/.gradle
+
+install: true
+
+script:
+  - ./gradlew clean build

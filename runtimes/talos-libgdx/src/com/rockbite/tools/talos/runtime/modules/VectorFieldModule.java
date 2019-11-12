@@ -1,6 +1,5 @@
 package com.rockbite.tools.talos.runtime.modules;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -10,7 +9,7 @@ import com.rockbite.tools.talos.runtime.assets.AssetProvider;
 import com.rockbite.tools.talos.runtime.utils.VectorField;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class VectorFieldModule extends Module {
+public class VectorFieldModule extends AbstractModule {
 
     public static final int SIZE_SCALE = 0;
     public static final int FORCE_SCALE = 1;

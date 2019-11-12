@@ -26,7 +26,7 @@ import com.rockbite.tools.talos.runtime.values.NumericalValue;
 import java.util.Comparator;
 
 
-public class CurveModule extends Module {
+public class CurveModule extends AbstractModule {
 
     public static final int ALPHA = 0;
     public static final int OUTPUT = 0;

@@ -38,7 +38,7 @@ import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.editor.serialization.EmitterData;
 import com.rockbite.tools.talos.editor.wrappers.*;
 import com.rockbite.tools.talos.runtime.*;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 public class ModuleBoardWidget extends WidgetGroup {
     ShapeRenderer shapeRenderer;
@@ -441,10 +441,11 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
 
         TalosMain.Instance().ProjectController().setDirty();
+        TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
-    public ModuleWrapper createModule (Class<? extends Module> clazz, float x, float y) {
-        final Module module;
+    public ModuleWrapper createModule (Class<? extends AbstractModule> clazz, float x, float y) {
+        final AbstractModule module;
         try {
             module = ClassReflection.newInstance(clazz);
 
@@ -465,7 +466,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public <T extends Module> ModuleWrapper createModuleWrapper (T module, float x, float y) {
+    public <T extends AbstractModule> ModuleWrapper createModuleWrapper (T module, float x, float y) {
         ModuleWrapper<T> moduleWrapper = null;
 
         if (module == null) return null;
@@ -500,7 +501,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         return moduleWrapper;
     }
 
-    private <T extends Module> void tryAndConnectLasCC(ModuleWrapper<T> moduleWrapper) {
+    private <T extends AbstractModule> void tryAndConnectLasCC(ModuleWrapper<T> moduleWrapper) {
         if(ccFromWrapper != null) {
             Class fromClass;
             Slot fromSlotObject;

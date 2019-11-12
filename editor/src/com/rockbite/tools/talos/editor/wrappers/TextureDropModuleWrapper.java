@@ -28,13 +28,13 @@ import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
 import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.widgets.TextureDropWidget;
-import com.rockbite.tools.talos.runtime.modules.Module;
+import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 
 import java.io.File;
 
-public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleWrapper<T> {
+public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends ModuleWrapper<T> {
 
-    protected TextureDropWidget<Module> dropWidget;
+    protected TextureDropWidget<AbstractModule> dropWidget;
     protected TextureRegion defaultRegion;
 
     protected String fileName = "fire";
@@ -43,7 +43,7 @@ public abstract class TextureDropModuleWrapper<T extends Module> extends ModuleW
     protected void configureSlots() {
         final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
         defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
-        dropWidget = new TextureDropWidget<Module>(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
 
     public abstract void setModuleRegion(String name, TextureRegion region);

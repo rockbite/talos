@@ -3,7 +3,7 @@ package com.rockbite.tools.talos.runtime.modules;
 import com.badlogic.gdx.math.Vector2;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
-public class RadToCartModule extends Module {
+public class RadToCartModule extends AbstractModule {
 
     public static final int A = 0;
     public static final int L = 1;

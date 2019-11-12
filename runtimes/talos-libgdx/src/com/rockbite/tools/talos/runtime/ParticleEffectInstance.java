@@ -80,7 +80,9 @@ public class ParticleEffectInstance {
 		if(particleCount == 0 && loopable) {
 			for (int i = 0; i < emitters.size; i++) {
 				if(!emitters.get(i).isContinuous) {
-					emitters.get(i).restart();
+					if(emitters.get(i).delayTimer == 0) {
+						emitters.get(i).restart();
+					}
 				}
 			}
 		}
