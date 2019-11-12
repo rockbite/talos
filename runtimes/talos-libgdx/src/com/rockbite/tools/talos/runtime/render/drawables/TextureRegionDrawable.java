@@ -16,6 +16,7 @@
 
 package com.rockbite.tools.talos.runtime.render.drawables;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -37,7 +38,7 @@ public class TextureRegionDrawable implements ParticleDrawable {
     public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
     	region.setPosition(x - width / 2, y - height / 2);
     	region.setSize(width, height) ;
-    	region.setOriginCenter();
+    	region.setOrigin(width / 2, height / 2);
     	region.setRotation(rotation);
     	region.setColor(batch.getColor());
     	region.draw(batch);
