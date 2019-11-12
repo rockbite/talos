@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 
 public class SpriteAnimationDrawable implements ParticleDrawable {
@@ -141,6 +142,17 @@ public class SpriteAnimationDrawable implements ParticleDrawable {
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
         }
 
+    }
+
+    @Override
+    public void draw (Batch batch, Particle particle, Color color) {
+        float rotation = particle.rotation;
+        float width = particle.size.x;
+        float height = particle.size.y;
+        float y = particle.getY();
+        float x = particle.getX();
+
+        draw(batch, x, y, width, height, rotation);
     }
 
     @Override

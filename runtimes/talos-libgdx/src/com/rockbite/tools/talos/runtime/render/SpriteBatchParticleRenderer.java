@@ -63,12 +63,11 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		color.set(particle.color);
 		color.mul(particle.particleEmitter.tint);
 		color.a = particle.transparency;
-		float rotation = particle.rotation;
 		batch.setColor(color);
 
 		if (particle.drawable != null) {
 			particle.drawable.setSeed(particle.seed);
-			particle.drawable.draw(batch, particle.getX(), particle.getY(), particle.size.x, particle.size.y, rotation);
+			particle.drawable.draw(batch, particle, color);
 		}
 	}
 }

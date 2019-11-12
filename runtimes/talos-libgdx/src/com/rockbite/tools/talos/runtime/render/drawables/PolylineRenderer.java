@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 
 public class PolylineRenderer implements ParticleDrawable {
@@ -61,6 +62,17 @@ public class PolylineRenderer implements ParticleDrawable {
             polylinePool.free(polylineMap.get(tmpArr.get(i)));
             polylineMap.remove(tmpArr.get(i));
         }
+    }
+
+    @Override
+    public void draw (Batch batch, Particle particle, Color color) {
+        float rotation = particle.rotation;
+        float width = particle.size.x;
+        float height = particle.size.y;
+        float y = particle.getY();
+        float x = particle.getX();
+
+        draw(batch, x, y, width, height, rotation);
     }
 
     @Override
