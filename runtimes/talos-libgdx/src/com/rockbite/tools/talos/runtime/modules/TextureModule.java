@@ -16,6 +16,7 @@
 
 package com.rockbite.tools.talos.runtime.modules;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -45,7 +46,7 @@ public class TextureModule extends AbstractModule {
         outputValue.set(userDrawable);
     }
 
-    public void setRegion (String regionName, TextureRegion region) {
+    public void setRegion (String regionName, Sprite region) {
         this.regionName = regionName;
         if(region != null) {
             userDrawable.setDrawable(new TextureRegionDrawable(region));
@@ -56,7 +57,7 @@ public class TextureModule extends AbstractModule {
     public void setModuleGraph(ParticleEmitterDescriptor graph) {
         super.setModuleGraph(graph);
         final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-        setRegion(regionName, assetProvider.findAsset(regionName, TextureRegion.class));
+        setRegion(regionName, assetProvider.findAsset(regionName, Sprite.class));
     }
 
     @Override
