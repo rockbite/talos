@@ -17,18 +17,19 @@
 package com.rockbite.tools.talos.runtime.render.drawables;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 
 public class TextureRegionDrawable implements ParticleDrawable {
 
-    private TextureRegion region;
+    private Sprite region;
 
-    public TextureRegionDrawable(TextureRegion region) {
+    public TextureRegionDrawable(Sprite region) {
         this.region = region;
     }
 
-    public void setRegion(TextureRegion region) {
+    public void setRegion(Sprite region) {
         this.region = region;
     }
 
