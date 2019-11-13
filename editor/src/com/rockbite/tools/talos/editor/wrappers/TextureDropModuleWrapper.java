@@ -19,6 +19,7 @@ package com.rockbite.tools.talos.editor.wrappers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
@@ -46,7 +47,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
 
-    public abstract void setModuleRegion(String name, TextureRegion region);
+    public abstract void setModuleRegion(String name, Sprite region);
 
     @Override
     public void fileDrop(String[] paths, float x, float y) {
@@ -59,7 +60,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
 
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
                 final Texture texture = new Texture(fileHandle);
-                final TextureRegion region = new TextureRegion(texture);
+                final Sprite region = new Sprite(texture);
                 TalosMain.Instance().TalosProject().getProjectAssetProvider().addToAtlas(fileHandle.nameWithoutExtension(), region);
                 setModuleRegion(fileHandle.nameWithoutExtension(), region);
                 dropWidget.setDrawable(new TextureRegionDrawable(region));
@@ -71,7 +72,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                     public void updated(FileHandle handle) {
 
                         final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-                        TextureRegion region = projectAssetProvider.replaceRegion(handle);
+                        Sprite region = projectAssetProvider.replaceRegion(handle);
 
                         setModuleRegion(handle.nameWithoutExtension(), region);
                         dropWidget.setDrawable(new TextureRegionDrawable(region));
@@ -89,7 +90,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
         fileName = jsonData.getString("fileName", null);
 
         final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-        final TextureRegion textureRegion = assetProvider.findAsset(fileName, TextureRegion.class);
+        final Sprite textureRegion = assetProvider.findAsset(fileName, Sprite.class);
 
         setModuleRegion(fileName, textureRegion);
         dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
@@ -121,7 +122,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     public void setTexture(String path) {
         FileHandle fileHandle = tryAndFindTexture(path);
         if(fileHandle.exists()) {
-            TextureRegion region = new TextureRegion(new Texture(fileHandle));
+            Sprite region = new Sprite(new Texture(fileHandle));
             setModuleRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }

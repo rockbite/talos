@@ -19,6 +19,7 @@ package com.rockbite.tools.talos.editor.assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -58,6 +59,7 @@ public class TalosAssetProvider extends BaseAssetProvider {
 
 
 	private void registerDefaultHandlers () {
+		setAssetHandler(Sprite.class,this::findSpriteOrLoad);
 		setAssetHandler(TextureRegion.class,this::findRegionOrLoad);
 		setAssetHandler(VectorField.class, this::findVectorOrLoad);
 	}
@@ -123,6 +125,31 @@ public class TalosAssetProvider extends BaseAssetProvider {
 		return region;
 	}
 
+	private Sprite findSpriteOrLoad (String assetName) {
+		final Sprite region = atlas.createSprite(assetName);
+		if (region == null) {
+			//Look in all paths, and hopefully load the requested asset, or fail (crash)
+			//if has extension remove it
+			if(assetName.contains(".")) {
+				assetName = assetName.substring(0, assetName.lastIndexOf("."));
+			}
+			FileHandle file = findFile(assetName);
+			if (file == null || !file.exists()) {
+				//throw new GdxRuntimeException("No region found for: " + assetName + " from provider");
+				// try the tracker first
+				file = TalosMain.Instance().FileTracker().findFileByName(assetName + ".png");
+				if(file == null) {
+					return null;
+				}
+			}
+			Texture texture = new Texture(file);
+			Sprite textureRegion = new Sprite(texture);
+			atlas.addRegion(assetName, textureRegion);
+			return textureRegion;
+		}
+		return region;
+	}
+
 	private FileHandle findFile (String regionName) {
 		String fileName = regionName + ".png";
 		String currentProjectPath = TalosMain.Instance().ProjectController().getCurrentProjectPath();
@@ -131,9 +158,9 @@ public class TalosAssetProvider extends BaseAssetProvider {
 		return TalosMain.Instance().ProjectController().findFile(handle);
 	}
 
-	public TextureRegion replaceRegion (FileHandle handle) {
+	public Sprite replaceRegion (FileHandle handle) {
 		Texture texture = new Texture(handle);
-		final TextureRegion textureRegion = new TextureRegion(texture);
+		final Sprite textureRegion = new Sprite(texture);
 
 		final Array<TextureAtlas.AtlasRegion> regions = atlas.getRegions();
 

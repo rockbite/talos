@@ -16,28 +16,47 @@
 
 package com.rockbite.tools.talos.runtime.render.drawables;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.rockbite.tools.talos.runtime.Particle;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 
 public class TextureRegionDrawable implements ParticleDrawable {
 
-    private TextureRegion region;
+    private Sprite region;
 
-    public TextureRegionDrawable(TextureRegion region) {
+    public TextureRegionDrawable(Sprite region) {
         this.region = region;
     }
 
-    public void setRegion(TextureRegion region) {
+    public void setRegion(Sprite region) {
         this.region = region;
     }
 
     @Override
-    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
-        batch.draw(region, x - width/2f, y - height/2f, width/2f, height/2f, width, height,1f,1f, rotation);
-    }
+    public void draw(Batch batch, Particle particle, Color color) {
+		float rotation = particle.rotation;
+		float width = particle.size.x;
+		float height = particle.size.y;
+		float y = particle.getY();
+		float x = particle.getX();
+		region.setColor(color);
 
-    @Override
+		draw(batch, x, y, width, height, rotation);
+	}
+
+	@Override
+	public void draw (Batch batch, float x, float y, float width, float height, float rotation) {
+		region.setPosition(x - width / 2, y - height / 2);
+		region.setSize(width, height) ;
+		region.setOrigin(width / 2, height / 2);
+		region.setRotation(rotation);
+		region.draw(batch);
+	}
+
+	@Override
     public float getAspectRatio() {
         if(region == null) {
             return 1;

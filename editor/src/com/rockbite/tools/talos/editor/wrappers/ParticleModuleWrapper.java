@@ -17,6 +17,7 @@
 package com.rockbite.tools.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.rockbite.tools.talos.runtime.ParticleDrawable;
 import com.rockbite.tools.talos.runtime.Slot;
@@ -30,7 +31,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
     public ParticleModuleWrapper() {
         super();
-        defaultDrawable = new TextureRegionDrawable(new TextureRegion(new Texture("fire.png")));
+        defaultDrawable = new TextureRegionDrawable(new Sprite(new Texture("fire.png")));
     }
 
     @Override
