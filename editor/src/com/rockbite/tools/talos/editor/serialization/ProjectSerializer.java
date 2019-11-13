@@ -37,11 +37,13 @@ public class ProjectSerializer {
         JsonReader jsonReader = new JsonReader();
         final JsonValue parse = jsonReader.parse(data);
         final JsonValue metaData = parse.get("metaData");
-        final JsonValue resourcePaths = metaData.get("resourcePaths");
-        if (resourcePaths != null) {
-            final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-            for (JsonValue resourcePath : resourcePaths) {
-                projectAssetProvider.addUnknownResource(resourcePath.asString());
+        if(metaData != null) {
+            final JsonValue resourcePaths = metaData.get("resourcePaths");
+            if (resourcePaths != null) {
+                final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+                for (JsonValue resourcePath : resourcePaths) {
+                    projectAssetProvider.addUnknownResource(resourcePath.asString());
+                }
             }
         }
     }
