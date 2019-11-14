@@ -434,7 +434,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         for(JsonValue path: resourcePaths) {
             String name = path.asString();
             String possiblePath = handle.parent() + File.separator + name + ".png"; // this is handling only PNG's which is bad
-            TalosMain.Instance().FileTracker().trackFile(Gdx.files.absolute(possiblePath), new FileTracker.Tracker() {
+            FileHandle fileHandle = TalosMain.Instance().ProjectController().findFile(possiblePath);
+            TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
                 @Override
                 public void updated(FileHandle handle) {
                     // this is not good either... but whatever

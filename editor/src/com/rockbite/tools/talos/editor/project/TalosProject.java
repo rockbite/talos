@@ -35,6 +35,7 @@ import com.rockbite.tools.talos.editor.wrappers.ModuleWrapper;
 import com.rockbite.tools.talos.runtime.ParticleEmitterDescriptor;
 import com.rockbite.tools.talos.runtime.ParticleEffectInstance;
 import com.rockbite.tools.talos.runtime.ParticleEffectDescriptor;
+import com.rockbite.tools.talos.runtime.modules.PolylineModule;
 import com.rockbite.tools.talos.runtime.modules.TextureModule;
 import com.rockbite.tools.talos.runtime.serialization.ConnectionData;
 import com.rockbite.tools.talos.runtime.serialization.ExportData;
@@ -308,6 +309,18 @@ public class TalosProject implements IProject {
 				if (wrapper.getModule() instanceof TextureModule) {
 					TextureModule textureModule = (TextureModule)wrapper.getModule();
 					String name = textureModule.regionName;
+					if (name == null)
+						name = "fire";
+					if (name.contains(".")) {
+						name = name.substring(0, name.lastIndexOf("."));
+					}
+					if (!data.metadata.resources.contains(name, false)) {
+						data.metadata.resources.add(name);
+					}
+				}
+				if (wrapper.getModule() instanceof PolylineModule) {
+					PolylineModule module = (PolylineModule)wrapper.getModule();
+					String name = module.regionName;
 					if (name == null)
 						name = "fire";
 					if (name.contains(".")) {

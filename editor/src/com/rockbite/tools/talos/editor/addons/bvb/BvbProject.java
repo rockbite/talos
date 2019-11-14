@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.rockbite.tools.talos.TalosMain;
+import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
 import com.rockbite.tools.talos.editor.project.IProject;
 
 import java.io.File;
@@ -74,6 +75,9 @@ public class BvbProject implements IProject {
         } else if(extension.equals("atlas")) {
             // looking for an atlas file for your spine animation I am guessing
             path = TalosMain.Instance().Prefs().getString("bvbSpineAtlasPath");
+        } else if(extension.equals("png")) {
+            // looking for an atlas file for your spine animation I am guessing
+            path = TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH);
         } else {
             //uh well we're screwed I don't know where to look for this guy
             return null;
