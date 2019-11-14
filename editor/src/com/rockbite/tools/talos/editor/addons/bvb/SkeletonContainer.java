@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
+import com.esotericsoftware.spine.attachments.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.rockbite.tools.talos.TalosMain;
@@ -42,8 +43,15 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     }
 
     public void setSkeleton(FileHandle jsonHandle, FileHandle atlasHandle) {
-        TextureAtlas atlas = new TextureAtlas(atlasHandle);
-        SkeletonJson json = new SkeletonJson(atlas);
+        SkeletonJson json;
+        if(atlasHandle == null) {
+            json = new SkeletonJson(new EmptyAttachmentLoader() {
+
+            });
+        } else {
+            TextureAtlas atlas = new TextureAtlas(atlasHandle);
+            json = new SkeletonJson(atlas);
+        }
 
         json.setScale(1f); // should be user set
         final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
