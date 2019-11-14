@@ -54,6 +54,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private Vector2 tmp2 = new Vector2();
     private Vector2 tmp3 = new Vector2();
 
+    private int selectIndex = 0;
+
     BvBWorkspace(BvBAddon bvb) {
         setSkin(TalosMain.Instance().getSkin());
         this.bvb = bvb;
@@ -99,6 +101,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                 if(skeletonContainer.getSkeleton() == null) return false;
 
+                Array<AttachmentPoint> possiblePoints = new Array<>();
+                ObjectMap<AttachmentPoint, BoundEffect> pointEffectMap = new ObjectMap<>();
+
                 // check for all attachment points
                 for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
                     AttachmentPoint position = effect.getPositionAttachment();
@@ -106,21 +111,27 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                     tmp = getAttachmentPosition(position);
                     if(tmp.dst(pos) < pixelToWorld(10f)) {
-                        movingPoint = position;
-                        event.handle();
-                        effectSelected(effect);
-                        return true;
+                        possiblePoints.add(position);
+                        pointEffectMap.put(position, effect);
                     }
 
                     for(AttachmentPoint point: attachments) {
                         tmp = getAttachmentPosition(point);
                         if(tmp.dst(pos) < pixelToWorld(10f)) {
-                            movingPoint = point;
-                            event.handle();
-                            effectSelected(effect);
-                            return true;
+                            possiblePoints.add(point);
+                            pointEffectMap.put(point, effect);
                         }
                     }
+                }
+
+                if(possiblePoints.size > 0) {
+                    AttachmentPoint point = possiblePoints.get(selectIndex % possiblePoints.size);
+                    BoundEffect effect = pointEffectMap.get(point);
+                    movingPoint = point;
+                    event.handle();
+                    effectSelected(effect);
+                    selectIndex++;
+                    return true;
                 }
 
                 if(selectedEffect != null) {
