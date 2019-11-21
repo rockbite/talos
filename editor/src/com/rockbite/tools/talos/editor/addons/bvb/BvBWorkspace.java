@@ -163,8 +163,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                         bvb.properties.updateValues();
                     }
                 }
-
-                TalosMain.Instance().ProjectController().setDirty();
             }
 
             @Override
@@ -190,6 +188,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
+                if(movingPoint != null) {
+                    TalosMain.Instance().ProjectController().setDirty();
+                }
+
                 movingPoint = null;
             }
 
@@ -211,6 +213,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 }
                 if(keycode == Input.Keys.SHIFT_LEFT) {
                     showingTools = !showingTools;
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().undo();
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().redo();
                 }
 
                 return super.keyDown(event, keycode);

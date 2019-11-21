@@ -85,7 +85,9 @@ public class ProjectController {
     private void getProjectFromCache(String projectFileName) {
         loading = true;
         currentProjectPath = pathCache.get(projectFileName);
-        currentProject.loadProject(fileCache.get(projectFileName));
+        String string = fileCache.get(projectFileName);
+        currentProject.loadProject(string);
+        snapshotTracker.reset(string);
         loading = false;
     }
 
