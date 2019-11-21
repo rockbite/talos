@@ -124,6 +124,7 @@ public class TalosProject implements IProject {
 		}
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+		TalosMain.Instance().NodeStage().getStage().setKeyboardFocus(null);
 	}
 
 	public void sortEmitters() {
