@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
+import com.rockbite.tools.talos.editor.project.FileTracker;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.CheckboxWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.rockbite.tools.talos.editor.widgets.propertyWidgets.IPropertyProvider;

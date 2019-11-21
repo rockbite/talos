@@ -172,6 +172,14 @@ public class NodeStage extends WorkplaceStage {
                     moduleBoardWidget.selectAllModules();
                 }
 
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().undo();
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().redo();
+                }
+
                 return super.keyDown(event, keycode);
             }
         });

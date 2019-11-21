@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
+import com.rockbite.tools.talos.editor.project.FileTracker;
 import com.rockbite.tools.talos.editor.assets.TalosAssetProvider;
 import com.rockbite.tools.talos.runtime.modules.VectorFieldModule;
 import com.rockbite.tools.talos.runtime.utils.VectorField;

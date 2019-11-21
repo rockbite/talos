@@ -450,11 +450,11 @@ public class ModuleBoardWidget extends WidgetGroup {
             module = ClassReflection.newInstance(clazz);
 
             if (TalosMain.Instance().TalosProject().getCurrentModuleGraph().addModule(module)) {
-                TalosMain.Instance().ProjectController().setDirty();
-
                 final ModuleWrapper moduleWrapper = createModuleWrapper(module, x, y);
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
+
+                TalosMain.Instance().ProjectController().setDirty();
 
                 return moduleWrapper;
             } else {
@@ -811,13 +811,12 @@ public class ModuleBoardWidget extends WidgetGroup {
                 }
             }
         }
-        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void wrapperClickedUp(ModuleWrapper wrapper) {
 
         if(wasWrapperDragged != null) {
-
+            TalosMain.Instance().ProjectController().setDirty();
         } else {
             // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
             if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {

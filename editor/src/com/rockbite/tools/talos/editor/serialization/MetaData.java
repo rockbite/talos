@@ -23,7 +23,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.rockbite.tools.talos.TalosMain;
-import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
+import com.rockbite.tools.talos.editor.project.FileTracker;
 import com.rockbite.tools.talos.runtime.values.NumericalValue;
 
 public class MetaData implements Json.Serializable {

@@ -22,11 +22,15 @@ public class ProjectController {
 
     IProject currentProject;
 
+    private SnapshotTracker snapshotTracker;
+
     public static TalosProject TLS = new TalosProject();
     private boolean lastDirTracking = true;
 
     public ProjectController() {
         currentProject = TLS;
+
+        snapshotTracker = new SnapshotTracker();
     }
 
     public void loadProject (FileHandle projectFileHandle) {
@@ -49,7 +53,9 @@ public class ProjectController {
             projectFileName = projectFileHandle.name();
             loading = true;
             currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
-            currentProject.loadProject(projectFileHandle.readString());
+            String string = projectFileHandle.readString();
+            currentProject.loadProject(string);
+            snapshotTracker.reset(string);
             reportProjectFileInterraction(projectFileHandle);
             loading = false;
 
@@ -80,6 +86,12 @@ public class ProjectController {
         loading = true;
         currentProjectPath = pathCache.get(projectFileName);
         currentProject.loadProject(fileCache.get(projectFileName));
+        loading = false;
+    }
+
+    private void getProjectFromString(String string) {
+        loading = true;
+        currentProject.loadProject(string);
         loading = false;
     }
 
@@ -134,6 +146,7 @@ public class ProjectController {
         TalosMain.Instance().FileTracker().addTab(tab);
 
         currentProject.resetToNew();
+        snapshotTracker.reset(currentProject.getProjectString());
         currentProjectPath = null;
 
         if(removingUnworthy) {
@@ -178,7 +191,14 @@ public class ProjectController {
         if(!loading) {
             currentTab.setDirty(true);
             currentTab.setWorthy();
+
+            // also add this as snapshot
+            snapshotTracker.addSnapshot(getProjectString());
         }
+    }
+
+    private String getProjectString() {
+        return currentProject.getProjectString();
     }
 
     public void loadFromTab(FileTab tab) {
@@ -300,6 +320,20 @@ public class ProjectController {
 
     public void lastDirTrackingEnable() {
         lastDirTracking = true;
+    }
+
+    public void undo() {
+        boolean changed = snapshotTracker.moveBack();
+        if(changed) {
+            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+        }
+    }
+
+    public void redo() {
+        boolean changed = snapshotTracker.moveForward();
+        if(changed) {
+            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+        }
     }
 
     public static class RecentsEntry {

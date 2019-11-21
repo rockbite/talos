@@ -1,4 +1,4 @@
-package com.rockbite.tools.talos.editor.addons.bvb;
+package com.rockbite.tools.talos.editor.project;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

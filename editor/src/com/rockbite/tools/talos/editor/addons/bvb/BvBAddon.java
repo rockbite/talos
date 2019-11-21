@@ -9,6 +9,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.rockbite.tools.talos.TalosMain;
 import com.rockbite.tools.talos.editor.addons.IAddon;
 import com.rockbite.tools.talos.editor.dialogs.SettingsDialog;
+import com.rockbite.tools.talos.editor.project.FileTracker;
 import com.rockbite.tools.talos.editor.project.IProject;
 
 public class BvBAddon implements IAddon {

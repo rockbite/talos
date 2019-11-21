@@ -18,11 +18,9 @@ package com.rockbite.tools.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -32,7 +30,7 @@ import com.rockbite.tools.talos.editor.NodeStage;
 import com.rockbite.tools.talos.editor.UIStage;
 import com.rockbite.tools.talos.editor.WorkplaceStage;
 import com.rockbite.tools.talos.editor.addons.AddonController;
-import com.rockbite.tools.talos.editor.addons.bvb.FileTracker;
+import com.rockbite.tools.talos.editor.project.FileTracker;
 import com.rockbite.tools.talos.editor.project.IProject;
 import com.rockbite.tools.talos.editor.project.TalosProject;
 import com.rockbite.tools.talos.editor.project.ProjectController;
@@ -40,8 +38,6 @@ import com.rockbite.tools.talos.editor.utils.CameraController;
 import com.rockbite.tools.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
-
-import java.awt.dnd.*;
 
 import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
