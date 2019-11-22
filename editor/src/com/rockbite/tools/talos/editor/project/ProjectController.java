@@ -338,6 +338,10 @@ public class ProjectController {
         }
     }
 
+    public void closeCurrentTab() {
+        safeRemoveTab(currentTab);
+    }
+
     public static class RecentsEntry {
         String path;
         long time;

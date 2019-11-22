@@ -32,17 +32,19 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         this.workspace = workspace;
     }
 
-    public void setSkeleton(FileHandle jsonFileHandle) {
+    public boolean setSkeleton(FileHandle jsonFileHandle) {
         FileHandle atlasFileHandle = Gdx.files.absolute(jsonFileHandle.pathWithoutExtension() + ".atlas");
         jsonFileHandle = TalosMain.Instance().ProjectController().findFile(jsonFileHandle);
         atlasFileHandle = TalosMain.Instance().ProjectController().findFile(atlasFileHandle);
 
-        setSkeleton(jsonFileHandle, atlasFileHandle);
+        boolean success = setSkeleton(jsonFileHandle, atlasFileHandle);
 
         TalosMain.Instance().ProjectController().setDirty();
+
+        return success;
     }
 
-    public void setSkeleton(FileHandle jsonHandle, FileHandle atlasHandle) {
+    public boolean setSkeleton(FileHandle jsonHandle, FileHandle atlasHandle) {
         SkeletonJson json;
         if(atlasHandle == null) {
             json = new SkeletonJson(new EmptyAttachmentLoader() {
@@ -57,9 +59,13 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
 
         // before moving forward let's check if things are missing
-        checkForGoners(skeletonData);
+        boolean hasGoners = checkForGoners(skeletonData);
 
-        configureSkeleton(skeletonData);
+        if (!hasGoners) {
+            configureSkeleton(skeletonData);
+        }
+
+        return !hasGoners;
     }
 
     public boolean checkForGoners(final SkeletonData skeletonData) {
@@ -125,16 +131,18 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
                     configureSkeleton(skeletonData);
                     workspace.bvb.properties.showPanel(SkeletonContainer.this);
+
+                    TalosMain.Instance().ProjectController().setDirty();
                 }
 
                 @Override
                 public void no() {
-
+                    TalosMain.Instance().ProjectController().closeCurrentTab();
                 }
 
                 @Override
                 public void cancel() {
-
+                    TalosMain.Instance().ProjectController().closeCurrentTab();
                 }
             });
 
@@ -420,15 +428,16 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             effect.read(json, data);
             addEffect(skin, animation, effect);
         }
+        boolean wasSet = setSkeleton(jsonHandle);
 
-        setSkeleton(jsonHandle);
+        if (wasSet) {
+            String currentSkinName = jsonData.getString("currSkin", currentSkin.getName());
+            String currentAnimationName = jsonData.getString("currAnimation", currentAnimation.getName());
 
-        String currentSkinName = jsonData.getString("currSkin", currentSkin.getName());
-        String currentAnimationName = jsonData.getString("currAnimation", currentAnimation.getName());
-
-        currentSkin = skeleton.getData().findSkin(currentSkinName);
-        currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
-        animationState.setAnimation(0, currentAnimation, true);
+            currentSkin = skeleton.getData().findSkin(currentSkinName);
+            currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
+            animationState.setAnimation(0, currentAnimation, true);
+        }
     }
 
     public void clear() {
