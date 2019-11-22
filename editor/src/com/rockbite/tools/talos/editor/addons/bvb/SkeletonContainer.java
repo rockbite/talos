@@ -57,11 +57,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
 
         // before moving forward let's check if things are missing
-        boolean hasGoners = checkForGoners(skeletonData);
+        checkForGoners(skeletonData);
 
-        if(!hasGoners) {
-            configureSkeleton(skeletonData);
-        }
+        configureSkeleton(skeletonData);
     }
 
     public boolean checkForGoners(final SkeletonData skeletonData) {
@@ -409,7 +407,6 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         // track this file
         TalosMain.Instance().FileTracker().trackFile(jsonHandle, workspace.bvb.spineTracker);
 
-        setSkeleton(jsonHandle);
 
         boundEffects.clear();
         // now let's load bound effects
@@ -423,6 +420,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             effect.read(json, data);
             addEffect(skin, animation, effect);
         }
+
+        setSkeleton(jsonHandle);
 
         String currentSkinName = jsonData.getString("currSkin", currentSkin.getName());
         String currentAnimationName = jsonData.getString("currAnimation", currentAnimation.getName());
