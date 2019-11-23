@@ -153,7 +153,9 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	private FileHandle findFile (String regionName) {
 		String fileName = regionName + ".png";
 		String currentProjectPath = TalosMain.Instance().ProjectController().getCurrentProjectPath();
-		if(currentProjectPath == null) return null;
+		if(currentProjectPath == null) {
+			return TalosMain.Instance().ProjectController().findFile(fileName);
+		}
 		FileHandle handle = Gdx.files.absolute(Gdx.files.absolute(currentProjectPath).parent().path() + File.separator + fileName);
 		return TalosMain.Instance().ProjectController().findFile(handle);
 	}
