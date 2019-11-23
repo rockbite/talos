@@ -16,12 +16,15 @@
 
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.rockbite.tools.talos.runtime.assets.AssetProvider;
+import com.rockbite.tools.talos.runtime.assets.AtlasAssetProvider;
 import com.rockbite.tools.talos.runtime.modules.EmitterModule;
 import com.rockbite.tools.talos.runtime.modules.AbstractModule;
 import com.rockbite.tools.talos.runtime.modules.ParticleModule;
@@ -41,6 +44,11 @@ public class ParticleEffectDescriptor {
 
 	public ParticleEffectDescriptor () {
 
+	}
+
+	public ParticleEffectDescriptor(FileHandle fileHandle, TextureAtlas atlas) {
+		setAssetProvider(new AtlasAssetProvider(atlas));
+		load(fileHandle);
 	}
 
 	public void addEmitter (ParticleEmitterDescriptor emitter) {
@@ -112,6 +120,9 @@ public class ParticleEffectDescriptor {
 		}
 
 		particleEffectInstance.sortEmitters();
+
+		// create default scope
+		particleEffectInstance.setScope(new ScopePayload());
 
 		return particleEffectInstance;
 	}

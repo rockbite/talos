@@ -16,9 +16,11 @@
 
 package com.rockbite.tools.talos.runtime;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.tools.talos.runtime.render.ParticleRenderer;
+import com.rockbite.tools.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.util.Comparator;
 
@@ -27,6 +29,11 @@ public class ParticleEffectInstance {
     private final ParticleEffectDescriptor descriptor;
 
     private Array<ParticleEmitterInstance> emitters = new Array<>();
+
+	/**
+	 * Default renderer
+	 */
+	private SpriteBatchParticleRenderer renderer = new SpriteBatchParticleRenderer();
 
     Vector2 position = new Vector2();
 
@@ -86,6 +93,11 @@ public class ParticleEffectInstance {
 				}
 			}
 		}
+	}
+
+	public void render (Batch batch) {
+    	renderer.setBatch(batch);
+		renderer.render(this);
 	}
 
 	public void render (ParticleRenderer particleRenderer) {

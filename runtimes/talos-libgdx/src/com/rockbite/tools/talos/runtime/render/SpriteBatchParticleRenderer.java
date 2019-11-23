@@ -31,6 +31,10 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 	Color color = new Color(Color.WHITE);
 
+	public SpriteBatchParticleRenderer () {
+
+	}
+
 	public SpriteBatchParticleRenderer (Batch batch) {
 		this.batch = batch;
 	}
