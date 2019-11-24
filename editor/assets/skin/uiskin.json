@@ -1,8 +1,5 @@
 {
-	com.badlogic.gdx.graphics.g2d.BitmapFont: {
-		default-font: { file: skin/default-font.fnt },
-		small-font: { file: skin/small-font.fnt }
-	},
+
 	com.badlogic.gdx.graphics.Color: {
 		black: {a: 1, b: 0, g: 0, r: 0 }
 		white: {a: 1, b: 1, g: 1, r: 1 }

@@ -25,6 +25,8 @@ public class TalosLauncher {
 		config.setWindowedMode(1200, 700);
 		config.setTitle("Talos");
 
+		config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 16);
+
 		TalosMain talos = new TalosMain();
 
 		new Lwjgl3Application(talos, config);
