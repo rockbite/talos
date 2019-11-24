@@ -22,14 +22,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
-import com.badlogic.gdx.graphics.g2d.DistanceFieldFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
@@ -141,26 +134,8 @@ public class TalosMain extends ApplicationAdapter {
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
-		skin = new Skin();
+		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
 		skin.addRegions(atlas);
-
-		Texture fontTexture = new Texture(Gdx.files.internal("skin/roboto-dff.png"), true);
-		fontTexture.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
-		DistanceFieldFont distanceFieldFont = new DistanceFieldFont(Gdx.files.internal("skin/roboto-dff.fnt"), new TextureRegion(fontTexture)) {
-
-			@Override
-			public BitmapFontCache newFontCache () {
-				return new CustomCache(this, this.usesIntegerPositions());
-			}
-		};
-		distanceFieldFont.setDistanceFieldSmoothing(10);
-		distanceFieldFont.setUseIntegerPositions(true);
-
-		skin.add("default-font", distanceFieldFont, BitmapFont.class);
-		skin.add("small-font", distanceFieldFont, BitmapFont.class);
-
-		skin.load(Gdx.files.internal("skin/uiskin.json"));
-
 
 		VisUI.load(skin);
 
@@ -181,40 +156,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		// final init after all is done
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
-	}
-
-
-	static private class CustomCache extends BitmapFontCache {
-
-		private final ShaderProgram distanceFieldShader;
-
-		public CustomCache (DistanceFieldFont font, boolean integer) {
-			super(font, integer);
-			distanceFieldShader = DistanceFieldFont.createDistanceFieldShader();
-		}
-
-		private float getSmoothingFactor () {
-			final DistanceFieldFont font = (DistanceFieldFont)super.getFont();
-			return font.getDistanceFieldSmoothing() * font.getScaleX();
-		}
-
-		@Override
-		public void draw (Batch spriteBatch) {
-			final ShaderProgram cache = spriteBatch.getShader();
-			spriteBatch.setShader(distanceFieldShader);
-			spriteBatch.getShader().setUniformf("u_smoothing", getSmoothingFactor());
-			super.draw(spriteBatch);
-			spriteBatch.setShader(cache);
-		}
-
-		@Override
-		public void draw (Batch spriteBatch, int start, int end) {
-			final ShaderProgram cache = spriteBatch.getShader();
-			spriteBatch.setShader(distanceFieldShader);
-			spriteBatch.getShader().setUniformf("u_smoothing", getSmoothingFactor());
-			super.draw(spriteBatch, start, end);
-			spriteBatch.setShader(cache);
-		}
 	}
 
 	public void disableNodeStage() {
