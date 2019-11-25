@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'nexus'
+
+
 dependencies {
     implementation project(":runtimes:talos-libgdx")
     api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -54,3 +67,39 @@ task distLegacyTest(type: Jar) {
 }
 
 dist.dependsOn classes
+
+
+
+modifyPom {
+    project {
+        name "Talos Editor"
+        description "Talos Editor"
+        url "https://github.com/rockbite/talos"
+        inceptionYear "2019"
+
+        scm {
+            url "https://github.com/rockbite/talos"
+            connection "scm:https://rockbite@github.com/rockbite/talos.git"
+            developerConnection "scm:git://github.com/rockbite/talos.git"
+        }
+
+        licenses {
+            license {
+                name "The Apache Software License, Version 2.0"
+                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution "repo"
+            }
+        }
+
+        developers {
+            developer {
+                id "Tom-Ski"
+                name "Tom Wojciechowsk"
+            }
+            developer {
+                id "azakhary"
+                name "Avetis Zakharyan"
+            }
+        }
+    }
+}

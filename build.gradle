@@ -2,14 +2,16 @@ allprojects {
 
     apply plugin: "java-library"
 
-    group = "com.github.rockbite"
-    version = '0.0.1'
+
+    group = "com.talosvfx"
+    version = '1.0.7-SNAPSHOT'
 
     ext {
         appName = "talos"
         gdxVersion = '1.9.10'
         visuiVersion = '1.4.2'
     }
+
 
     repositories {
         mavenLocal()
@@ -19,20 +21,5 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
-    }
-
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
     }
 }

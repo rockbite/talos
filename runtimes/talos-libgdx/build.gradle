@@ -1,4 +1,14 @@
-apply plugin: "maven"
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'nexus'
 
 
 dependencies {
@@ -16,10 +26,37 @@ sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.test.java.srcDirs = ["test/"]
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            pom.artifactId = 'talos-libgdx'
+
+modifyPom {
+    project {
+        name "Talos Libgdx Runtime"
+        description "Talos runtime for use in LibGDX projects"
+        url "https://github.com/rockbite/talos"
+        inceptionYear "2019"
+
+        scm {
+            url "https://github.com/rockbite/talos"
+            connection "scm:https://rockbite@github.com/rockbite/talos.git"
+            developerConnection "scm:git://github.com/rockbite/talos.git"
+        }
+
+        licenses {
+            license {
+                name "The Apache Software License, Version 2.0"
+                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution "repo"
+            }
+        }
+
+        developers {
+            developer {
+                id "Tom-Ski"
+                name "Tom Wojciechowsk"
+            }
+            developer {
+                id "azakhary"
+                name "Avetis Zakharyan"
+            }
         }
     }
 }
