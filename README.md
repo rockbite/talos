@@ -1,7 +1,8 @@
 # talos vfx
+![Build Status](http://jenkins.svc.rockbitegames.com:8080/buildStatus/icon?job=Talos)[![Github All Releases](https://img.shields.io/github/downloads/rockbite/talos/total.svg)]()
 
+Travis
 [![Build Status](https://travis-ci.com/rockbite/talos.svg?branch=master)](https://travis-ci.com/rockbite/talos)
-[![Github All Releases](https://img.shields.io/github/downloads/rockbite/talos/total.svg)]()
 
 Website: [https://talosvfx.com/](https://talosvfx.com/)
 
