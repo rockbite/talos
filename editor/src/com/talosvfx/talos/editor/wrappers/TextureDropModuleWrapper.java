@@ -126,6 +126,6 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             setModuleRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }
-        fileName = fileHandle.name();
+        fileName = fileHandle.nameWithoutExtension();
     }
 }

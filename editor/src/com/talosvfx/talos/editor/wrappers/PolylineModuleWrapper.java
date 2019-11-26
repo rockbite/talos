@@ -119,7 +119,7 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
             module.setRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }
-        fileName = fileHandle.name();
+        fileName = fileHandle.nameWithoutExtension();
     }
 
     @Override
