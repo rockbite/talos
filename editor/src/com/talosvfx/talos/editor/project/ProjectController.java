@@ -374,8 +374,12 @@ public class ProjectController {
         Array<RecentsEntry> list = new Array<>();
         //read
         Json json = new Json();
-        if(data != null && !data.isEmpty()) {
-            list = json.fromJson(list.getClass(), data);
+        try {
+            if (data != null && !data.isEmpty()) {
+                list = json.fromJson(list.getClass(), data);
+            }
+        } catch( Exception e) {
+
         }
         RecentsEntry newEntry = new RecentsEntry(handle.path(), TimeUtils.millis());
         list.removeValue(newEntry, false);
@@ -394,16 +398,21 @@ public class ProjectController {
         String data = prefs.getString("recents");
         Array<String> list = new Array<>();
         //read
-        Json json = new Json();
-        if(data != null && !data.isEmpty()) {
-            Array<RecentsEntry> rList = new Array<>();
-            rList = json.fromJson(rList.getClass(), data);
-            for(RecentsEntry entry: rList) {
-                list.add(entry.path);
-            }
-        }
 
-        TalosMain.Instance().UIStage().Menu().updateRecentsList(list);
+        try {
+            Json json = new Json();
+            if (data != null && !data.isEmpty()) {
+                Array<RecentsEntry> rList = new Array<>();
+                rList = json.fromJson(rList.getClass(), data);
+                for (RecentsEntry entry : rList) {
+                    list.add(entry.path);
+                }
+            }
+
+            TalosMain.Instance().UIStage().Menu().updateRecentsList(list);
+        } catch (Exception e) {
+
+        }
 
         return list;
     }

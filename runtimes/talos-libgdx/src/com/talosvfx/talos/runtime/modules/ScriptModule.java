@@ -98,8 +98,8 @@ public class ScriptModule extends AbstractModule {
 
     private static final String replace = "%SCRIPT%";
     private static final String template =
-        "import com.rockbite.tools.talos.runtime.scripts.SimpleReturnScript;" 
-        + "import com.rockbite.tools.talos.runtime.values.NumericalValue;"
+        "import com.talosvfx.talos.runtime.scripts.SimpleReturnScript;"
+        + "import com.talosvfx.talos.runtime.values.NumericalValue;"
         + "public class SimpleRunIm extends SimpleReturnScript {"
         + "public void evaulate (NumericalValue i1, NumericalValue i2, NumericalValue i3, NumericalValue i4, NumericalValue i5, NumericalValue o1, NumericalValue o2, NumericalValue o3, NumericalValue o4, NumericalValue o5) {"
         + "%SCRIPT%"

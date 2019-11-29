@@ -96,7 +96,7 @@ public class ModuleListPopup extends VisWindow {
             public void chosen(FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     try {
-                        Class clazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + nameToModuleClass.get(node.name));
+                        Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
                             TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
@@ -139,8 +139,8 @@ public class ModuleListPopup extends VisWindow {
 
     private void registerModule(XmlReader.Element module) {
         try {
-            Class moduleClazz = ClassReflection.forName("com.rockbite.tools.talos.runtime.modules." + module.getText());
-            Class wrapperClazz =ClassReflection.forName("com.rockbite.tools.talos.editor.wrappers." + module.getAttribute("wrapper"));
+            Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + module.getText());
+            Class wrapperClazz =ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
             TalosMain.Instance().moduleNames.put(wrapperClazz, module.getAttribute("name"));
         } catch (ReflectionException e) {

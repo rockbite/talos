@@ -25,7 +25,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 sourceSets.main.resources.srcDirs = ["assets"]
 
-project.ext.mainClassName = "com.rockbite.tools.talos.TalosLauncher"
+project.ext.mainClassName = "com.talosvfx.talos.TalosLauncher"
 project.ext.assetsDir = new File("assets")
 
 
@@ -58,7 +58,7 @@ task dist(type: Jar) {
 
 task distLegacyTest(type: Jar) {
     manifest {
-        attributes 'Main-Class': "com.rockbite.tools.talos.test.LegacyCompareTest"
+        attributes 'Main-Class': "com.talosvfx.talos.test.LegacyCompareTest"
     }
     from {
         configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
