@@ -54,17 +54,17 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			}
  			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
-				renderParticle(batch, particleEmitter.activeParticles.get(j));
+				renderParticle(batch, particleEmitter.activeParticles.get(j), particleEffectInstance.alpha);
 			}
 		}
 
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	private void renderParticle (Batch batch, Particle particle) {
+	private void renderParticle (Batch batch, Particle particle, float parentAlpha) {
 		color.set(particle.color);
 		color.mul(particle.particleEmitter.tint);
-		color.a = particle.transparency;
+		color.a = particle.transparency * parentAlpha;
 		batch.setColor(color);
 
 		if (particle.drawable != null) {

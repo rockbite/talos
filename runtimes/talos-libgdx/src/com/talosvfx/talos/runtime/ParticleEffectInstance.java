@@ -48,6 +48,8 @@ public class ParticleEffectInstance {
 
     private EmitterComparator emitterComparator = new EmitterComparator();
 
+    public float alpha = 1f;
+
     public class EmitterComparator implements Comparator<ParticleEmitterInstance> {
 
 		@Override
@@ -65,6 +67,10 @@ public class ParticleEffectInstance {
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).setScope(scope);
 		}
+	}
+
+	public ScopePayload getScope() {
+    	return scopePayload;
 	}
 
 	public void update (float delta) {
