@@ -46,11 +46,7 @@ public class TextureModule extends AbstractModule {
     }
 
     public void setRegion (String regionName, Sprite region) {
-        if (regionName.contains(".")) {
-            this.regionName = regionName.substring(0, regionName.lastIndexOf("."));
-        } else {
-            this.regionName = regionName;
-        }
+        this.regionName = regionName;
         
         if (region != null) {
             userDrawable.setDrawable(new TextureRegionDrawable(region));
@@ -67,7 +63,7 @@ public class TextureModule extends AbstractModule {
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("regionName", regionName);
+        json.writeValue("regionName", regionName.substring(0, regionName.lastIndexOf(".")));
     }
 
     @Override
