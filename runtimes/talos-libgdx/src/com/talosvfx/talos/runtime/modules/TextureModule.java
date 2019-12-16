@@ -46,8 +46,13 @@ public class TextureModule extends AbstractModule {
     }
 
     public void setRegion (String regionName, Sprite region) {
-        this.regionName = regionName;
-        if(region != null) {
+        if (regionName.contains(".")) {
+            this.regionName = regionName.substring(0, regionName.lastIndexOf("."));
+        } else {
+            this.regionName = regionName;
+        }
+        
+        if (region != null) {
             userDrawable.setDrawable(new TextureRegionDrawable(region));
         }
     }
