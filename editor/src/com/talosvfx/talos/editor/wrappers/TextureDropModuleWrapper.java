@@ -87,8 +87,10 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
 
-        fileName = jsonData.getString("fileName", null);
-
+        String fileNameFromJson = jsonData.getString("fileName", null);
+        
+        fileName = fileNameFromJson.contains(".") ? fileNameFromJson.substring(0, fileNameFromJson.lastIndexOf(".")) : fileNameFromJson;
+    
         final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
         final Sprite textureRegion = assetProvider.findAsset(fileName, Sprite.class);
 

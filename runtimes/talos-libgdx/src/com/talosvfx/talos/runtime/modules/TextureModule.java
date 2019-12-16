@@ -63,7 +63,7 @@ public class TextureModule extends AbstractModule {
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("regionName", regionName.substring(0, regionName.lastIndexOf(".")));
+        json.writeValue("regionName", regionName);
     }
 
     @Override
