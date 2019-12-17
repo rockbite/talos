@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime.render.drawables;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Bezier;
@@ -103,8 +104,8 @@ public class Polyline implements Pool.Poolable {
     }
 
     public void draw(Batch batch, TextureRegion region, float x, float y) {
-        if(batch instanceof PolygonSpriteBatch) {
-            PolygonSpriteBatch polygonSpriteBatch = (PolygonSpriteBatch) batch;
+        if(batch instanceof PolygonBatch) {
+            PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;
 
             updatePointPositions(x, y);
