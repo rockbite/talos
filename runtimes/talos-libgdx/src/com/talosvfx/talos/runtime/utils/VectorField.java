@@ -59,8 +59,12 @@ public class VectorField {
         float y = (((pos.y - fieldPos.y) / scale) * 0.5f + 0.5f) * ySize;
         int z = 0;
 
-        if(MathUtils.floor(x) < 0 || MathUtils.ceil(x) > xSize - 1
-                || MathUtils.floor(y) < 0 || MathUtils.ceil(y) > ySize - 1) {
+        if(MathUtils.floor(x) < 0 || MathUtils.ceil(x) > xSize - 1 || MathUtils.floor(y) < 0 || MathUtils.ceil(y) > ySize - 1) {
+            result.set(0, 0);
+            return result;
+        }
+
+        if(MathUtils.floor(x) > xSize - 1 || MathUtils.ceil(x) < 0 || MathUtils.floor(y) > ySize - 1 || MathUtils.ceil(y) < 0) {
             result.set(0, 0);
             return result;
         }
