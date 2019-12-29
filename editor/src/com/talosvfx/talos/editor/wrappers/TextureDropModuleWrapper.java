@@ -38,7 +38,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     protected TextureDropWidget<AbstractModule> dropWidget;
     protected TextureRegion defaultRegion;
 
-    protected String fileName = "fire";
+    protected String regionName = "fire";
+    protected String filePath = null;
 
     @Override
     protected void configureSlots() {
@@ -65,7 +66,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                 setModuleRegion(fileHandle.nameWithoutExtension(), region);
                 dropWidget.setDrawable(new TextureRegionDrawable(region));
 
-                fileName = fileHandle.nameWithoutExtension();
+                regionName = fileHandle.nameWithoutExtension();
+                filePath = fileHandle.path();
 
                 TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
                     @Override
@@ -87,19 +89,32 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
 
-        fileName = jsonData.getString("fileName", null);
+        filePath = jsonData.getString("filePath", null);
+        regionName = jsonData.getString("regionName", null);
 
+        // hack for older version to patch broken files (we should do version transition logic and move it there later)
+        if(jsonData.has("fileName")) {
+            filePath = jsonData.getString("fileName");
+            regionName = filePath;
+            if(filePath.contains(".")) {
+                regionName =  regionName.substring(0, regionName.lastIndexOf("."));
+            } else {
+                filePath = filePath + ".png";
+            }
+        }
+    
         final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-        final Sprite textureRegion = assetProvider.findAsset(fileName, Sprite.class);
+        final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
-        setModuleRegion(fileName, textureRegion);
+        setModuleRegion(regionName, textureRegion);
         dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
     }
 
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("fileName", fileName);
+        json.writeValue("filePath", filePath);
+        json.writeValue("regionName", regionName);
     }
 
     private FileHandle tryAndFindTexture(String path) {
@@ -126,6 +141,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             setModuleRegion(fileHandle.nameWithoutExtension(), region);
             dropWidget.setDrawable(new TextureRegionDrawable(region));
         }
-        fileName = fileHandle.nameWithoutExtension();
+        filePath = fileHandle.path();
+        regionName = fileHandle.nameWithoutExtension();
     }
 }
