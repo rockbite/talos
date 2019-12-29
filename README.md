@@ -26,7 +26,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
 ### List of modules (nodes)
 
   * Particle module - main output hub for particle related properties (per particle)
-  * Emitter module - main output hubg for emitter related properties such as delay, emissions and such
+  * Emitter module - main output hub for emitter related properties such as delay, emissions and such
   * System Input - list of inner system values that can be exposed and used by other modules (particle life, emitter life, time)
   * Global Values - dynamic list of values that can be assigned runtime, and used by modules
   * Mixer - Mixes values A & B with provided alpha ratio
@@ -41,7 +41,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Random Range - generates random value in given range
   * Dynamic Random Range - interpolates between 2 number ranges using provided curve
   * Noise - outputs simplex noise, with modifiable frequency
-  * Multi Input - has dynamic amount of inputs, chooses one randomply and set's it to output
+  * Multi Input - has dynamic amount of inputs, chooses one randomly and set's it to output
   * Curve - Allows for user made curve with provided points, outputs single value
   * Interpolation - Same as Curve but instead of custom points it is procedural meaning it's a formula
   * Math Operations - Add, substract, multiply, devide, sin, cos functions to be used with A and B values
