@@ -37,6 +37,7 @@ import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.modules.PolylineModule;
 import com.talosvfx.talos.runtime.modules.TextureModule;
+import com.talosvfx.talos.runtime.modules.VectorFieldModule;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
@@ -329,6 +330,19 @@ public class TalosProject implements IProject {
 					}
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
+					}
+				}
+				if (wrapper.getModule() instanceof VectorFieldModule) {
+					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
+					String fgaFileName = vectorFieldModule.fgaFileName;
+					if (fgaFileName == null) {
+						return;
+					}
+					if (fgaFileName.contains(".")) {
+						fgaFileName = fgaFileName.substring(0, fgaFileName.lastIndexOf("."));
+					}
+					if (!data.metadata.resources.contains(fgaFileName, false)) {
+						data.metadata.resources.add(fgaFileName);
 					}
 				}
 			}
