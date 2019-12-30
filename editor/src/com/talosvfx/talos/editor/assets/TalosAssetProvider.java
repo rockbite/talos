@@ -94,7 +94,9 @@ public class TalosAssetProvider extends BaseAssetProvider {
 			final FileHandle file = findFile(assetName);
 
 			vectorField = new VectorField();
-			vectorField.setBakedData(file);
+			if (file != null && file.exists()) {
+				vectorField.setBakedData(file);
+			}
 		}
 		return vectorField;
 	}
