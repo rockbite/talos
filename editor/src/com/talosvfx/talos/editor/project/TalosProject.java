@@ -314,7 +314,9 @@ public class TalosProject implements IProject {
 					if (name == null)
 						name = "fire";
 					if (name.contains(".")) {
-						name = name.substring(0, name.lastIndexOf("."));
+						String[] split = name.split("\\.");
+						int length = split.length;
+						name = split[length - 2] + "." + split[length - 1];
 					}
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
@@ -326,7 +328,9 @@ public class TalosProject implements IProject {
 					if (name == null)
 						name = "fire";
 					if (name.contains(".")) {
-						name = name.substring(0, name.lastIndexOf("."));
+						String[] split = name.split("\\.");
+						int length = split.length;
+						name = split[length - 2] + "." + split[length - 1];
 					}
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
@@ -339,7 +343,9 @@ public class TalosProject implements IProject {
 						return;
 					}
 					if (fgaFileName.contains(".")) {
-						fgaFileName = fgaFileName.substring(0, fgaFileName.lastIndexOf("."));
+						String[] split = fgaFileName.split("\\.");
+						int length = split.length;
+						fgaFileName = split[length - 2] + "." + split[length - 1];
 					}
 					if (!data.metadata.resources.contains(fgaFileName, false)) {
 						data.metadata.resources.add(fgaFileName);
