@@ -313,11 +313,7 @@ public class TalosProject implements IProject {
 					String name = textureModule.regionName;
 					if (name == null)
 						name = "fire";
-					if (name.contains(".")) {
-						String[] split = name.split("\\.");
-						int length = split.length;
-						name = split[length - 2] + "." + split[length - 1];
-					}
+
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
 					}
@@ -327,11 +323,7 @@ public class TalosProject implements IProject {
 					String name = module.regionName;
 					if (name == null)
 						name = "fire";
-					if (name.contains(".")) {
-						String[] split = name.split("\\.");
-						int length = split.length;
-						name = split[length - 2] + "." + split[length - 1];
-					}
+
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
 					}
@@ -339,14 +331,15 @@ public class TalosProject implements IProject {
 				if (wrapper.getModule() instanceof VectorFieldModule) {
 					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
 					String fgaFileName = vectorFieldModule.fgaFileName;
+
 					if (fgaFileName == null) {
 						return;
 					}
-					if (fgaFileName.contains(".")) {
-						String[] split = fgaFileName.split("\\.");
-						int length = split.length;
-						fgaFileName = split[length - 2] + "." + split[length - 1];
+
+					if (!fgaFileName.endsWith(".fga")) {
+						fgaFileName = fgaFileName + ".fga";
 					}
+
 					if (!data.metadata.resources.contains(fgaFileName, false)) {
 						data.metadata.resources.add(fgaFileName);
 					}
