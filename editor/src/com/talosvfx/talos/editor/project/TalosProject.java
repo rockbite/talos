@@ -335,11 +335,7 @@ public class TalosProject implements IProject {
 					if (fgaFileName == null) {
 						return;
 					}
-
-					if (!fgaFileName.endsWith(".fga")) {
-						fgaFileName = fgaFileName + ".fga";
-					}
-
+					fgaFileName = fgaFileName + ".fga";
 					if (!data.metadata.resources.contains(fgaFileName, false)) {
 						data.metadata.resources.add(fgaFileName);
 					}
