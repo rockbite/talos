@@ -313,9 +313,7 @@ public class TalosProject implements IProject {
 					String name = textureModule.regionName;
 					if (name == null)
 						name = "fire";
-					if (name.contains(".")) {
-						name = name.substring(0, name.lastIndexOf("."));
-					}
+
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
 					}
@@ -325,9 +323,7 @@ public class TalosProject implements IProject {
 					String name = module.regionName;
 					if (name == null)
 						name = "fire";
-					if (name.contains(".")) {
-						name = name.substring(0, name.lastIndexOf("."));
-					}
+
 					if (!data.metadata.resources.contains(name, false)) {
 						data.metadata.resources.add(name);
 					}
@@ -335,12 +331,11 @@ public class TalosProject implements IProject {
 				if (wrapper.getModule() instanceof VectorFieldModule) {
 					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
 					String fgaFileName = vectorFieldModule.fgaFileName;
+
 					if (fgaFileName == null) {
 						return;
 					}
-					if (fgaFileName.contains(".")) {
-						fgaFileName = fgaFileName.substring(0, fgaFileName.lastIndexOf("."));
-					}
+					fgaFileName = fgaFileName + ".fga";
 					if (!data.metadata.resources.contains(fgaFileName, false)) {
 						data.metadata.resources.add(fgaFileName);
 					}
