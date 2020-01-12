@@ -19,12 +19,17 @@ package com.talosvfx.talos.runtime.render.drawables;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
 public class TextureRegionDrawable implements ParticleDrawable {
 
     private Sprite region;
+
+    public TextureRegionDrawable() {
+
+    }
 
     public TextureRegionDrawable(Sprite region) {
         this.region = region;
@@ -41,6 +46,9 @@ public class TextureRegionDrawable implements ParticleDrawable {
 		float height = particle.size.y;
 		float y = particle.getY();
 		float x = particle.getX();
+
+		if(region == null) return;
+
 		region.setColor(color);
 
 		draw(batch, x, y, width, height, rotation);
@@ -66,5 +74,10 @@ public class TextureRegionDrawable implements ParticleDrawable {
     @Override
     public void setSeed(float seed) {
 
+    }
+
+    @Override
+    public TextureRegion getTextureRegion() {
+        return region;
     }
 }

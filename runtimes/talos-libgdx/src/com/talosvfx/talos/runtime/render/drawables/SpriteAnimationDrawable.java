@@ -170,6 +170,11 @@ public class SpriteAnimationDrawable implements ParticleDrawable {
         phase = phase - (int)phase; // normalize to 0-1
     }
 
+    @Override
+    public TextureRegion getTextureRegion() {
+        return region;
+    }
+
     public void setPhase(float phase) {
         globalPhase = phase;
         globalPhase = globalPhase - (int)phase; // normalize to 0-1

@@ -103,6 +103,35 @@ public class Polyline implements Pool.Poolable {
         points.get(index).thickness = thickness;
     }
 
+    public Array<PointData> getPoints() {
+        return points;
+    }
+
+    public void draw(Batch batch, TextureRegion region) {
+        if(batch instanceof PolygonBatch) {
+            PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
+            this.batch = polygonSpriteBatch;
+
+            for(int i = 0; i < points.size - 1; i++) {
+                // extrude each point
+                extrudePoint(region, i, 0);
+                extrudePoint(region, i, 1);
+
+                // creating indexes
+                indexes[i * 6] =     (short) (i * 4);
+                indexes[i * 6 + 1] = (short) (i * 4 + 1);
+                indexes[i * 6 + 2] = (short) (i * 4 + 3);
+                indexes[i * 6 + 3] = (short) (i * 4);
+                indexes[i * 6 + 4] = (short) (i * 4 + 3);
+                indexes[i * 6 + 5] = (short) (i * 4 + 2);
+
+            }
+
+            // do the actual drawing
+            polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
+        }
+    }
+
     public void draw(Batch batch, TextureRegion region, float x, float y) {
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;

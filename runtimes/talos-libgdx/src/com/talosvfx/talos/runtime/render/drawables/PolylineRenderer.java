@@ -85,6 +85,11 @@ public class PolylineRenderer implements ParticleDrawable {
         this.seed = seed;
     }
 
+    @Override
+    public TextureRegion getTextureRegion() {
+        return region;
+    }
+
     public void setRegion(TextureRegion region) {
         this.region = region;
     }
@@ -107,6 +112,8 @@ public class PolylineRenderer implements ParticleDrawable {
             polyline.initPoints(interpolationPointCount);
             polylineMap.put(seed, polyline);
         }
+
+        cacheExpire.put(seed, TimeUtils.millis());
 
         return polylineMap.get(seed);
     }

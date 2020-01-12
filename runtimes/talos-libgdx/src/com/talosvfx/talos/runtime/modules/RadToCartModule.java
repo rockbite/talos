@@ -21,6 +21,8 @@ public class RadToCartModule extends AbstractModule {
         l = createInputSlot(L);
 
         output = createOutputSlot(OUTPUT);
+
+        a.setFlavour(NumericalValue.Flavour.ANGLE);
     }
 
     @Override

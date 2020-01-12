@@ -18,7 +18,7 @@ public class CartToRadModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
-        position= createInputSlot(POSITION);
+        position = createInputSlot(POSITION);
 
         angle = createOutputSlot(ANGLE);
         length = createOutputSlot(LENGTH);

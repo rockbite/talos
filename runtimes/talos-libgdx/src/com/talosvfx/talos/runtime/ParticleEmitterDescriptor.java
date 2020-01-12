@@ -68,6 +68,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(RandomInputModule.class);
             registeredModules.add(NoiseModule.class);
             registeredModules.add(PolylineModule.class);
+            registeredModules.add(RibbonModule.class);
             registeredModules.add(FromToModule.class);
             registeredModules.add(GlobalScopeModule.class);
             registeredModules.add(FlipbookModule.class);
@@ -76,6 +77,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(RadToCartModule.class);
             registeredModules.add(CartToRadModule.class);
             registeredModules.add(AttractorModule.class);
+            registeredModules.add(ForceApplierModule.class);
         }
     }
 

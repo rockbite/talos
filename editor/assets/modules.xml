@@ -20,6 +20,7 @@
     </category>
     <category name = "Rendering">
         <module name = "Beam Renderer" wrapper = "PolylineModuleWrapper">PolylineModule</module>
+        <module name = "Ribbon Renderer" wrapper = "RibbonModuleWrapper">RibbonModule</module>
         <module name = "Sprite Renderer" wrapper = "TextureModuleWrapper">TextureModule</module>
         <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
     </category>
@@ -33,6 +34,7 @@
         <module name = "Fake Motion Blur" wrapper = "FakeMotionBlurModuleWrapper">FakeMotionBlurModule</module>
         <module name = "Vector Field" wrapper = "VectorFieldModuleWrapper">VectorFieldModule</module>
         <module name = "Attractor" wrapper = "AttractorModuleWrapper">AttractorModule</module>
+        <module name = "ForceApplier" wrapper = "ForceApplierModuleWrapper">ForceApplierModule</module>
     </category>
     <category name = "Curves and Math">
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>

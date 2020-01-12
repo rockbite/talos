@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public interface ParticleDrawable {
 
@@ -28,4 +29,6 @@ public interface ParticleDrawable {
     float getAspectRatio();
 
     void setSeed(float seed);
+
+    TextureRegion getTextureRegion();
 }

@@ -35,6 +35,8 @@ public class ScopePayload {
     public static final int TOTAL_TIME = 7;
     public static final int PARTICLE_POSITION = 8;
 
+    private Particle processingParticleRef;
+
     private IntMap<NumericalValue> map = new IntMap<>();
 
     private IntMap<NumericalValue> dynamicValues = new IntMap<>();
@@ -50,6 +52,14 @@ public class ScopePayload {
 
     public void set(int index, float value) {
         map.get(index).set(value);
+    }
+
+    public void setParticle(Particle particle) {
+        processingParticleRef = particle;
+    }
+
+    public Particle currParticle() {
+        return processingParticleRef;
     }
 
     public void set(int index, float x, float y) {

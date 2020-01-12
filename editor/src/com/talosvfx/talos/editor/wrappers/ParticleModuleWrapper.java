@@ -53,12 +53,12 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         addSeparator(true);
 
         addInputSlot("velocity",  ParticleModule.VELOCITY);
-        addInputSlot("gravity",  ParticleModule.GRAVITY);
+        //addInputSlot("gravity",  ParticleModule.GRAVITY);
         addInputSlot("target",  ParticleModule.TARGET);
         addInputSlot("color",  ParticleModule.COLOR);
         addInputSlot("transparency",  ParticleModule.TRANSPARENCY);
         addInputSlot("angle",  ParticleModule.ANGLE);
-        addInputSlot("mass",  ParticleModule.MASS);
+        //addInputSlot("mass",  ParticleModule.MASS);
 
         addInputSlot("rotation",  ParticleModule.ROTATION);
         addInputSlot("size",  ParticleModule.SIZE);
