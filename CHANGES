@@ -1,3 +1,7 @@
+[1.0.7]
+- Added Ribbon renderer and module to render nice trails after moving particles
+- Added physics module to produce velocity and angle values from sum of applied forces (given mass is 1)
+
 [1.0.6]
 - Support for bezier curve logic in Beam Drawable. Adds left and right tangents.
 - Sprite animations are now supported with FlipBook module
