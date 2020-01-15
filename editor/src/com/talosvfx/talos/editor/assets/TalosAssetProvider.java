@@ -66,14 +66,17 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	private void registerUnknownHandlerParsers () {
 		extensionToAssetParser.put("png", handle -> {
 			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			if(handle == null) return;
 			addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle)));
 		});
 		extensionToAssetParser.put("jpg", handle -> {
 			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			if(handle == null) return;
 			addToAtlas(handle.nameWithoutExtension(), new TextureRegion(new Texture(handle)));
 		});
 		extensionToAssetParser.put("fga", handle -> {
 			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			if(handle == null) return;
 			addVectorField(handle.nameWithoutExtension(), new VectorField(handle));
 		});
 	}

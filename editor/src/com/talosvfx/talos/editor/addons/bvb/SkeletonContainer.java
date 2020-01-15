@@ -54,7 +54,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             json = new SkeletonJson(atlas);
         }
 
-        json.setScale(1f); // should be user set
+        json.setScale(workspace.spineScaleWidget.getValue());
         final SkeletonData skeletonData = json.readSkeletonData(jsonHandle);
 
         // before moving forward let's check if things are missing

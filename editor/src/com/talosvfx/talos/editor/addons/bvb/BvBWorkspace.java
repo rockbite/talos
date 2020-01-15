@@ -54,6 +54,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private Vector2 tmp2 = new Vector2();
     private Vector2 tmp3 = new Vector2();
 
+    public FloatPropertyWidget spineScaleWidget;
+
     private int selectIndex = 0;
 
     BvBWorkspace(BvBAddon bvb) {
@@ -531,6 +533,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeValue("pma", preMultipliedAlpha);
         json.writeValue("speed", speedMultiplier);
         json.writeValue("worldSize", getWorldWidth());
+        json.writeValue("spineScale", getSpineScale());
         json.writeValue("zoom", camera.zoom);
         json.writeValue("cameraPosX", camera.position.x);
         json.writeValue("cameraPosY", camera.position.y);
@@ -554,6 +557,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         preMultipliedAlpha = jsonData.getBoolean("pma", false);
         speedMultiplier = jsonData.getFloat("speed", 1f);
         setWorldSize(jsonData.getFloat("worldSize", 1280));
+        float scl = jsonData.getFloat("spineScale", 1);
+        spineScaleWidget.setValue(scl);
+        skeletonContainer.getSkeleton().setScale(1f/scl, 1f/scl);
         camera.zoom = jsonData.getFloat("zoom", camera.zoom);
         camera.position.x = jsonData.getFloat("cameraPosX", 0);
         camera.position.y = jsonData.getFloat("cameraPosY", 0);
@@ -610,7 +616,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
         };
 
+
         FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width") {
+
             @Override
             public Float getValue() {
                 return getWorldWidth();
@@ -622,11 +630,35 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
         };
 
+        spineScaleWidget = new FloatPropertyWidget("spine scale") {
+            @Override
+            public Float getValue() {
+                return getSpineScale();
+            }
+
+            @Override
+            public void valueChanged(Float value) {
+                setSpineScale(value);
+            }
+        };
+
+
         properties.add(preMultipliedAlphaWidget);
         properties.add(speed);
         properties.add(worldWidthWidget);
+        properties.add(spineScaleWidget);
 
         return properties;
+    }
+
+    private void setSpineScale(Float scale) {
+        if(skeletonContainer == null || skeletonContainer.getSkeleton() == null) return;
+        skeletonContainer.getSkeleton().setScale(1f/scale, 1f/scale);
+    }
+
+    private Float getSpineScale() {
+        if(skeletonContainer == null || skeletonContainer.getSkeleton() == null) return 1f;
+        return 1f/skeletonContainer.getSkeleton().getScaleX();
     }
 
     @Override

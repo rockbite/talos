@@ -41,4 +41,9 @@ public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
         textField.setText(value + "");
         textField.addListener(listener);
     }
+
+    public void setValue(float value) {
+        textField.setText(value + "");
+        this.value = value;
+    }
 }
