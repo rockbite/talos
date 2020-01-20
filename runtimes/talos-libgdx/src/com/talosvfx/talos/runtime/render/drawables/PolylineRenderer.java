@@ -59,7 +59,9 @@ public class PolylineRenderer implements ParticleDrawable {
         }
         for(int i = 0; i < tmpArr.size; i++) {
             cacheExpire.remove(tmpArr.get(i));
-            polylinePool.free(polylineMap.get(tmpArr.get(i)));
+            if(polylineMap.containsKey(tmpArr.get(i))) {
+                polylinePool.free(polylineMap.get(tmpArr.get(i)));
+            }
             polylineMap.remove(tmpArr.get(i));
         }
     }
