@@ -150,6 +150,12 @@ public class NodeStage extends WorkplaceStage {
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+
+                if(keycode == Input.Keys.ENTER) {
+                   // find particle or emitter or then any other module and focus on it
+                    moduleBoardWidget.resetCameraToWorkspace();
+                }
+
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     moduleBoardWidget.createGroupFromSelectedWrappers();
                 }

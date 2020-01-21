@@ -29,11 +29,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
+import com.talosvfx.talos.runtime.modules.ParticleModule;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
@@ -868,6 +870,37 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public void ungroupSelectedWrappers() {
         ungroupWrappers(getSelectedWrappers());
+    }
+
+    public void resetCameraToWorkspace() {
+        Array<ModuleWrapper> wrappers = getModuleWrappers();
+        ModuleWrapper particleWrapper = null;
+        ModuleWrapper emitterWrapper = null;
+        ModuleWrapper otherWrapper = null;
+        for(ModuleWrapper wrapper: wrappers) {
+            if(wrapper instanceof ParticleModuleWrapper) {
+                particleWrapper = wrapper;
+            }
+            if(wrapper instanceof EmitterModuleWrapper) {
+                emitterWrapper = wrapper;
+            }
+            otherWrapper = wrapper;
+        }
+
+        ModuleWrapper finalWrapper;
+
+        if(particleWrapper != null) finalWrapper = particleWrapper;
+        else if(emitterWrapper != null) finalWrapper = emitterWrapper;
+        else finalWrapper = otherWrapper;
+
+        if(finalWrapper != null) {
+
+            tmp.set(finalWrapper.getX() + finalWrapper.getWidth()/2f, finalWrapper.getY() + finalWrapper.getHeight()/2f);
+            tmp.add(moduleContainer.getX(), moduleContainer.getY());
+            localToStageCoordinates(tmp);
+
+            TalosMain.Instance().NodeStage().getCamera().position.set(tmp.x, tmp.y, 0);
+        }
     }
 
 }

@@ -64,7 +64,7 @@ public class UIStage {
 	Table fullScreenTable;
 
 	private TimelineWidget timelineWidget;
-	private PreviewWidget previewWidget;
+	public PreviewWidget previewWidget;
 
 	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
