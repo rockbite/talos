@@ -559,7 +559,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         setWorldSize(jsonData.getFloat("worldSize", 1280));
         float scl = jsonData.getFloat("spineScale", 1);
         spineScaleWidget.setValue(scl);
-        skeletonContainer.getSkeleton().setScale(1f/scl, 1f/scl);
+        skeletonContainer.setScale(1f/scl, 1f/scl);
         camera.zoom = jsonData.getFloat("zoom", camera.zoom);
         camera.position.x = jsonData.getFloat("cameraPosX", 0);
         camera.position.y = jsonData.getFloat("cameraPosY", 0);

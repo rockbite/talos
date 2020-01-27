@@ -27,6 +27,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private Vector2 tmp = new Vector2();
 
+    private Vector2 scale = new Vector2(1f, 1f);
+
     public SkeletonContainer(BvBWorkspace workspace) {
         this.workspace = workspace;
     }
@@ -155,6 +157,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public void configureSkeleton(SkeletonData skeletonData) {
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
         skeleton.setPosition(0, 0);
+
+        skeleton.setScale(scale.x, scale.y);
 
         currentAnimation = skeleton.getData().getAnimations().get(0);
         currentSkin = skeleton.getData().getSkins().first();
@@ -550,5 +554,12 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     public void removeEffect(BoundEffect effect) {
         getBoundEffects().removeValue(effect, true);
+    }
+
+    public void setScale(float x, float y) {
+        scale.set(x, y);
+        if(skeleton != null) {
+            skeleton.setScale(x, y);
+        }
     }
 }
