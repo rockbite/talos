@@ -62,7 +62,7 @@ public class NumericalValueField extends Table {
     private static class FloatTextFilter implements TextField.TextFieldFilter {
         @Override
         public boolean acceptChar (TextField textField, char c) {
-            return Character.isDigit(c) || (c == '.' && !textField.getText().contains("."));
+            return Character.isDigit(c) || (c == '.' && !textField.getText().contains(".") || (c == '-' && !textField.getText().contains("-")));
         }
     }
 }
