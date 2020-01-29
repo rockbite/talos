@@ -56,7 +56,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.0.7", "Fix for bvb crash");
+                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.0.7", "Civilized Error Reporting will now prevent app from crashing and closing");
             }
         });
 

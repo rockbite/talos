@@ -34,88 +34,108 @@ public class ProjectController {
     }
 
     public void loadProject (FileHandle projectFileHandle) {
-        if (projectFileHandle.exists()) {
-            FileTab prevTab = currentTab;
-            boolean removingUnworthy = false;
+        try {
+            if (projectFileHandle.exists()) {
+                FileTab prevTab = currentTab;
+                boolean removingUnworthy = false;
 
-            if(currentTab != null) {
-                if(currentTab.getProjectType() == currentProject && currentTab.isUnworthy()) {
-                    removingUnworthy = true;
-                    clearCache(currentTab.getFileName());
-                } else {
-                    IProject tmp = currentProject;
-                    currentProject = currentTab.getProjectType();
-                    saveProjectToCache(projectFileName);
-                    currentProject = tmp;
+                if (currentTab != null) {
+                    if (currentTab.getProjectType() == currentProject && currentTab.isUnworthy()) {
+                        removingUnworthy = true;
+                        clearCache(currentTab.getFileName());
+                    } else {
+                        IProject tmp = currentProject;
+                        currentProject = currentTab.getProjectType();
+                        saveProjectToCache(projectFileName);
+                        currentProject = tmp;
+                    }
                 }
+                currentProjectPath = projectFileHandle.path();
+                projectFileName = projectFileHandle.name();
+                loading = true;
+                currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
+                String string = projectFileHandle.readString();
+                currentProject.loadProject(string);
+                snapshotTracker.reset(string);
+                reportProjectFileInterraction(projectFileHandle);
+                loading = false;
+
+                if (lastDirTracking) {
+                    TalosMain.Instance().Prefs().putString("lastOpen" + currentProject.getExtension(), projectFileHandle.parent().path());
+                    TalosMain.Instance().Prefs().flush();
+                }
+
+                TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
+
+                final Array<String> savedResourcePaths = currentProject.getSavedResourcePaths();
+                TalosMain.Instance().FileTracker().addSavedResourcePathsFor(currentTab, savedResourcePaths);
+
+                if (removingUnworthy) {
+                    safeRemoveTab(prevTab);
+                }
+            } else {
+                //error handle
             }
-            currentProjectPath = projectFileHandle.path();
-            projectFileName = projectFileHandle.name();
-            loading = true;
-            currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
-            String string = projectFileHandle.readString();
-            currentProject.loadProject(string);
-            snapshotTracker.reset(string);
-            reportProjectFileInterraction(projectFileHandle);
-            loading = false;
-
-            if(lastDirTracking) {
-                TalosMain.Instance().Prefs().putString("lastOpen" + currentProject.getExtension(), projectFileHandle.parent().path());
-                TalosMain.Instance().Prefs().flush();
-            }
-
-            TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
-
-            final Array<String> savedResourcePaths = currentProject.getSavedResourcePaths();
-            TalosMain.Instance().FileTracker().addSavedResourcePathsFor(currentTab, savedResourcePaths);
-
-            if(removingUnworthy) {
-                safeRemoveTab(prevTab);
-            }
-        } else {
-            //error handle
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
         }
     }
 
     private void saveProjectToCache(String projectFileName) {
-        fileCache.put(projectFileName, currentProject.getProjectString());
-        pathCache.put(projectFileName, currentProjectPath);
+        try {
+            fileCache.put(projectFileName, currentProject.getProjectString());
+            pathCache.put(projectFileName, currentProjectPath);
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        }
     }
 
     private void getProjectFromCache(String projectFileName) {
-        loading = true;
-        currentProjectPath = pathCache.get(projectFileName);
-        String string = fileCache.get(projectFileName);
-        currentProject.loadProject(string);
-        snapshotTracker.reset(string);
-        loading = false;
+        try {
+            loading = true;
+            currentProjectPath = pathCache.get(projectFileName);
+            String string = fileCache.get(projectFileName);
+            currentProject.loadProject(string);
+            snapshotTracker.reset(string);
+            loading = false;
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        }
     }
 
     private void getProjectFromString(String string) {
-        loading = true;
-        currentProject.loadProject(string);
-        loading = false;
+        try {
+            loading = true;
+            currentProject.loadProject(string);
+            loading = false;
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        }
     }
 
     public void saveProject (FileHandle destination) {
-        String data = currentProject.getProjectString();
-        destination.writeString(data, false);
+        try {
+            String data = currentProject.getProjectString();
+            destination.writeString(data, false);
 
-        reportProjectFileInterraction(destination);
+            reportProjectFileInterraction(destination);
 
-        TalosMain.Instance().Prefs().putString("lastSave"+currentProject.getExtension(), destination.parent().path());
-        TalosMain.Instance().Prefs().flush();
+            TalosMain.Instance().Prefs().putString("lastSave" + currentProject.getExtension(), destination.parent().path());
+            TalosMain.Instance().Prefs().flush();
 
-        currentTab.setDirty(false);
-        currentTab.setWorthy();
-        currentProjectPath = destination.path();
-        projectFileName = destination.name();
+            currentTab.setDirty(false);
+            currentTab.setWorthy();
+            currentProjectPath = destination.path();
+            projectFileName = destination.name();
 
-        if(!currentTab.getFileName().equals(projectFileName)) {
-            clearCache(currentTab.getFileName());
-            currentTab.setFileName(projectFileName);
-            TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
-            fileCache.put(projectFileName, data);
+            if (!currentTab.getFileName().equals(projectFileName)) {
+                clearCache(currentTab.getFileName());
+                currentTab.setFileName(projectFileName);
+                TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
+                fileCache.put(projectFileName, data);
+            }
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
         }
     }
 

@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
+import com.talosvfx.talos.editor.dialogs.ErrorReporting;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
@@ -69,6 +70,8 @@ public class TalosMain extends ApplicationAdapter {
 	public UIStage UIStage () {
 		return uiStage;
 	}
+
+	public ErrorReporting errorReporting;
 
 	public NodeStage NodeStage () {
 		return nodeStage;
@@ -140,6 +143,9 @@ public class TalosMain extends ApplicationAdapter {
 		VisUI.load(skin);
 
 		uiStage = new UIStage(skin);
+
+		errorReporting = new ErrorReporting();
+
 		nodeStage = new NodeStage(skin);
 		currentWorkplaceStage = nodeStage;
 
@@ -175,14 +181,14 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		if(currentWorkplaceStage != null) {
+		if (currentWorkplaceStage != null) {
 			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {
 			Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
 		}
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		if(currentWorkplaceStage != null) {
+		if (currentWorkplaceStage != null) {
 			currentWorkplaceStage.getStage().act();
 			currentWorkplaceStage.getStage().draw();
 		}
@@ -191,6 +197,10 @@ public class TalosMain extends ApplicationAdapter {
 
 		uiStage.getStage().act();
 		uiStage.getStage().draw();
+	}
+
+	public void reportException(Throwable e) {
+		errorReporting.reportException(e);
 	}
 
 	public void resize (int width, int height) {

@@ -422,10 +422,15 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void deleteSelectedWrappers() {
-       for(ModuleWrapper wrapper : getSelectedWrappers()) {
-           deleteWrapper(wrapper);
-       }
-       clearSelection();
+        try {
+            for (ModuleWrapper wrapper : getSelectedWrappers()) {
+                deleteWrapper(wrapper);
+            }
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        }
+
+        clearSelection();
     }
 
     public void deleteWrapper(ModuleWrapper wrapper) {
