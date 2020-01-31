@@ -156,6 +156,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                         pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
                         pos.rotate(-skeletonContainer.getBoneRotation(movingPoint.getBoneName()));
                         movingPoint.setOffset(pos.x, pos.y);
+                        bvb.properties.updateValues();
                     } else {
                         Bone closestBone = skeletonContainer.findClosestBone(pos);
                         pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
