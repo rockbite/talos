@@ -23,10 +23,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -265,23 +262,32 @@ public abstract class ViewportWidget extends Table {
         shapeRenderer.end();
     }
 
-    /**
-     * I really dunno how this works rather then it does
-     * @param vec
-     * @return
-     */
-    protected Vector3 getWorldFromLocal(Vector3 vec) {
 
-        float xA = (getWidth() - vec.x)/getWidth();
-        float yA = (getHeight() - vec.y)/getHeight();
 
-        vec.set(Gdx.graphics.getWidth() * xA, Gdx.graphics.getHeight() * yA, 0);
+    private void getViewportBounds (Rectangle out) {
+        localToScreenCoordinates(temp.set(0, 0));
+        int x = (int)temp.x;
+        int y = (int)temp.y;
 
-        camera.unproject(vec);
+        localToScreenCoordinates(temp.set(getWidth(), getHeight()));
 
-        vec.x *= -1f; // I don't even know why
-        vec.add(camera.position.x * 2f, 0, 0); // this makes it even more weird. but okay...
+        int x2 = (int)temp.x;
+        int y2 = (int)temp.y;
 
+        int ssWidth = x2 - x;
+        int ssHeight = y - y2;
+
+        y = Gdx.graphics.getHeight() - y;
+
+        out.set(x, y, ssWidth, ssHeight);
+    }
+
+    protected Vector3 getWorldFromLocal (Vector3 vec) {
+        Vector2 vector2 = localToScreenCoordinates(new Vector2(vec.x, vec.y));
+
+        getViewportBounds(Rectangle.tmp);
+
+        camera.unproject(vec.set(vector2.x, vector2.y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
         return vec;
     }
 

@@ -2,11 +2,13 @@ package com.talosvfx.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.EventData;
 import com.esotericsoftware.spine.Slot;
+import com.talosvfx.talos.editor.utils.NumberUtils;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -263,6 +265,13 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
             }
         };
 
+        LabelWidget offset = new LabelWidget("Offset") {
+            @Override
+            public String getValue() {
+                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getOffsetY(), 3);
+            }
+        };
+
         GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget() {
             @Override
             public Array<Bone> getBoneList() {
@@ -280,6 +289,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         properties.add(startEventWidget);
         properties.add(completeEventWidget);
         properties.add(position);
+        properties.add(offset);
         properties.add(globalValues);
 
         return properties;
