@@ -27,6 +27,7 @@ public class ParticleEmitterInstance {
     private final ParticleEffectInstance parentParticleInstance;
 	public boolean isComplete = false;
 	public ParticleEmitterDescriptor emitterGraph;
+	private ScopePayload scopePayload;
 
 	public boolean isAdditive = true;
 
@@ -193,8 +194,12 @@ public class ParticleEmitterInstance {
 	}
 
     public void setScope (ScopePayload scope) {
-        emitterGraph.setScope(scope);
+        this.scopePayload = scope;
     }
+
+    public ScopePayload getScope () {
+    	return scopePayload;
+	}
 
     public ParticleEffectInstance getEffect() {
     	return parentParticleInstance;

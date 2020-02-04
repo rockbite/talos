@@ -24,8 +24,6 @@ public class ParticleEmitterDescriptor {
 
     private final ParticleEffectDescriptor particleEffectResourceDescriptor;
 
-    ScopePayload scopePayload;
-
     Array<AbstractModule> modules = new Array<>();
 
     ParticleModule particleModule;
@@ -151,14 +149,6 @@ public class ParticleEmitterDescriptor {
 
     public Array<AbstractModule> getModules() {
         return modules;
-    }
-
-    public void setScope (ScopePayload scope) {
-        this.scopePayload = scope;
-    }
-
-    public ScopePayload getScope () {
-        return scopePayload;
     }
 
     public ParticleEffectDescriptor getEffectDescriptor() {
