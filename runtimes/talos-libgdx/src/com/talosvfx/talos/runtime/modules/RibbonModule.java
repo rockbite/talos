@@ -141,7 +141,7 @@ public class RibbonModule extends AbstractModule {
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         detail = jsonData.getInt("details", 10);
-        memoryDuration = jsonData.getInt("memory", 10);
+        memoryDuration = jsonData.getFloat("memory", 10);
         RibbonRenderer renderer = (RibbonRenderer) outputValue.getDrawable();
         renderer.setConfig(detail, memoryDuration);
     }
