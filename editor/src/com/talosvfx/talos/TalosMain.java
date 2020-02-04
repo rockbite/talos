@@ -122,8 +122,12 @@ public class TalosMain extends ApplicationAdapter {
 						final int x = Gdx.input.getX();
 						final int y = Gdx.input.getY();
 
-						nodeStage.fileDrop(filesPaths, x, y);
-						uiStage.fileDrop(filesPaths, x, y);
+						try {
+							nodeStage.fileDrop(filesPaths, x, y);
+							uiStage.fileDrop(filesPaths, x, y);
+						}  catch (Exception e) {
+							TalosMain.Instance().reportException(e);
+						}
 					}
 				});
 			}
