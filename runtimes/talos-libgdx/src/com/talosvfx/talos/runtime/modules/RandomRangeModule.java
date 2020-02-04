@@ -25,7 +25,13 @@ import java.util.Random;
 
 public class RandomRangeModule extends AbstractModule {
 
+    public static final int MIN_INPUT = 0;
+    public static final int MAX_INPUT = 1;
+
     public static final int OUTPUT = 0;
+
+    NumericalValue minInput;
+    NumericalValue maxInput;
 
     NumericalValue output;
 
@@ -35,16 +41,25 @@ public class RandomRangeModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
+        minInput = createInputSlot(MIN_INPUT);
+        maxInput = createInputSlot(MAX_INPUT);
+
         output = createOutputSlot(OUTPUT);
     }
 
     @Override
     public void processValues() {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * index * 1000)));
+        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000)));
         // what's worse, keeping thousands of long values, or keeping floats but casting 1000 times to long?
         // I'll leave the answer to the reader
 
         float startPos = random.nextFloat();
+
+        float min = this.min;
+        float max = this.max;
+
+        if(!minInput.isEmpty()) min = minInput.getFloat();
+        if(!maxInput.isEmpty()) max = maxInput.getFloat();
 
         float res = min + (max - min) * startPos;
 
