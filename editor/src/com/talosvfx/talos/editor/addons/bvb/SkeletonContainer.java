@@ -162,6 +162,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
         currentAnimation = skeleton.getData().getAnimations().get(0);
         currentSkin = skeleton.getData().getSkins().first();
+        skeleton.setSkin(currentSkin);
 
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
         animationState = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
@@ -491,6 +492,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             @Override
             public void valueChanged(String value) {
                 currentSkin = skeleton.getData().findSkin(value);
+                skeleton.setSkin(currentSkin);
             }
         };
 

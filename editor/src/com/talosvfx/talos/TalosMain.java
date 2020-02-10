@@ -212,7 +212,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
-		currentWorkplaceStage.getStage().dispose();
+		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
+			currentWorkplaceStage.getStage().dispose();
+		}
 		uiStage.getStage().dispose();
 	}
 
