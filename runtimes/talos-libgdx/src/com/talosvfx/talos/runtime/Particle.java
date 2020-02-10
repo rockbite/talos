@@ -94,7 +94,7 @@ public class Particle implements Pool.Poolable {
         }
 
         drawable = particleModule.getDrawable(); // important to get drawable before size
-        particleEmitter.emitterGraph.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());
+        particleEmitter.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());
 
         size.set(particleModule.getSize());
         Vector2 positionOverride = particleModule.getPosition();

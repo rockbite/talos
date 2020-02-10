@@ -113,6 +113,7 @@ public class ParticleEffectDescriptor {
 
 	public ParticleEffectInstance createEffectInstance() {
 		ParticleEffectInstance particleEffectInstance = new ParticleEffectInstance(this);
+		setEffectReference(particleEffectInstance);
 
 		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
 			particleEffectInstance.addEmitter(emitterDescriptor);

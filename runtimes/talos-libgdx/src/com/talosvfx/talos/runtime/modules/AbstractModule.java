@@ -180,7 +180,7 @@ public abstract class AbstractModule implements Json.Serializable {
     }
 
     public ScopePayload getScope() {
-        return graph.getScope();
+        return graph.getEffectDescriptor().getInstanceReference().getScope();
     }
 
     public Slot getInputSlot(int slotId) {
