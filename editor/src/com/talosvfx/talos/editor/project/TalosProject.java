@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.serialization.*;
+import com.talosvfx.talos.editor.utils.FileUtils;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -181,7 +182,9 @@ public class TalosProject implements IProject {
 	@Override
 	public FileHandle findFileInDefaultPaths(String fileName) {
 		String path = TalosMain.Instance().Prefs().getString(SettingsDialog.ASSET_PATH);
-		FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
+
+		FileHandle handle = FileUtils.findFileRecursive(path, fileName, 10);
+
 		return handle;
 	}
 

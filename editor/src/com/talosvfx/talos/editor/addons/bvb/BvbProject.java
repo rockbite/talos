@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.utils.FileUtils;
 
 import java.io.File;
 
@@ -83,7 +84,8 @@ public class BvbProject implements IProject {
             return null;
         }
 
-        FileHandle handle = Gdx.files.absolute(path + File.separator + fileName);
+        FileHandle handle = FileUtils.findFileRecursive(path, fileName, 10);
+
         return handle;
     }
 

@@ -53,7 +53,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             });
         } else {
             TextureAtlas atlas = new TextureAtlas(atlasHandle);
-            json = new SkeletonJson(atlas);
+            json = new SkeletonJson(new SkeletonAttachmentLoader(atlas));
         }
 
         json.setScale(workspace.spineScaleWidget.getValue());
