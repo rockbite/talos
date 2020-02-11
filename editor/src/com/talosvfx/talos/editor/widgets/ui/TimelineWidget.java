@@ -104,8 +104,10 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
-                moveWrapperSortingPosition(wrapper, -1);
+                if (getSelectedRow() != null) {
+                    ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
+                    moveWrapperSortingPosition(wrapper, -1);
+                }
             }
         });
 
@@ -114,32 +116,38 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
-                moveWrapperSortingPosition(wrapper, 1);
-
+                if (getSelectedRow() != null) {
+                    ParticleEmitterWrapper wrapper = getSelectedRow().wrapper;
+                    moveWrapperSortingPosition(wrapper, 1);
+                }
             }
         });
     }
 
     public void moveWrapperSortingPosition(ParticleEmitterWrapper wrapper, int changeBy) { // -1 or 1
-        if(changeBy < -1) changeBy = -1;
-        if(changeBy > 1) changeBy = 1;
+        try {
+            if(changeBy < -1) changeBy = -1;
+            if(changeBy > 1) changeBy = 1;
 
-        int pos = wrapper.getEmitter().getSortPosition();
-        int newPos = pos + changeBy;
+            int pos = wrapper.getEmitter().getSortPosition();
+            int newPos = pos + changeBy;
 
-        Array<ParticleEmitterInstance> emitters = TalosMain.Instance().TalosProject().getParticleEffect().getEmitters();
+            Array<ParticleEmitterInstance> emitters = TalosMain.Instance().TalosProject().getParticleEffect().getEmitters();
 
-        if(newPos < 0 || newPos > emitters.size-1) return;
+            if(pos < 0 || pos > emitters.size-1) return;
+            if(newPos < 0 || newPos > emitters.size-1) return;
 
-        // let's swap
-        ParticleEmitterInstance emOne = emitters.get(pos);
-        ParticleEmitterInstance emTwo = emitters.get(newPos);
-        int tmp = emOne.emitterGraph.getSortPosition();
-        emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
-        emTwo.emitterGraph.setSortPosition(tmp);
+            // let's swap
+            ParticleEmitterInstance emOne = emitters.get(pos);
+            ParticleEmitterInstance emTwo = emitters.get(newPos);
+            int tmp = emOne.emitterGraph.getSortPosition();
+            emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
+            emTwo.emitterGraph.setSortPosition(tmp);
 
-        TalosMain.Instance().TalosProject().sortEmitters();
+            TalosMain.Instance().TalosProject().sortEmitters();
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        }
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
