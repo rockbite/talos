@@ -16,19 +16,17 @@ public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
     @Override
     public Actor getSubWidget() {
         textField = new TextField("", TalosMain.Instance().getSkin(), "panel");
-        textField.setTextFieldFilter(new TextField.TextFieldFilter() {
-            @Override
-            public boolean acceptChar(TextField textField, char c) {
-                return Character.isDigit(c) || c == '.';
-            }
-        });
+        textField.setTextFieldFilter(new FloatFieldFilter());
 
         listener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(textField.getText().isEmpty()) return;
-
-                valueChanged(Float.parseFloat(textField.getText()));
+                try {
+                    valueChanged(Float.parseFloat(textField.getText()));
+                } catch (NumberFormatException e){
+                    valueChanged(0f);
+                }
             }
         };
         textField.addListener(listener);

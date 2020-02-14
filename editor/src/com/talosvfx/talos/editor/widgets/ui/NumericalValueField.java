@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatFieldFilter;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class NumericalValueField extends Table {
@@ -17,33 +18,45 @@ public class NumericalValueField extends Table {
     public NumericalValueField(Skin skin) {
         setSkin(skin);
         x = new TextField("0.0", getSkin(), "panel");
-        x.setTextFieldFilter(new FloatTextFilter());
+        x.setTextFieldFilter(new FloatFieldFilter());
         y = new TextField("0.0", getSkin(), "panel");
-        y.setTextFieldFilter(new FloatTextFilter());
+        y.setTextFieldFilter(new FloatFieldFilter());
         z = new TextField("0.0", getSkin(), "panel");
-        z.setTextFieldFilter(new FloatTextFilter());
+        z.setTextFieldFilter(new FloatFieldFilter());
 
         x.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String text = x.getText().isEmpty() ? "0" : x.getText();
-                value.set(0, Float.parseFloat(text));
+                try {
+                    float parseFloat = Float.parseFloat(x.getText());
+                    value.set(0, parseFloat);
+                } catch (NumberFormatException e) {
+                    value.set(0, 0f);
+                }
             }
         });
 
         y.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String text = x.getText().isEmpty() ? "0" : y.getText();
-                value.set(1, Float.parseFloat(text));
+                try {
+                    float parseFloat = Float.parseFloat(y.getText());
+                    value.set(1, parseFloat);
+                } catch (NumberFormatException e) {
+                    value.set(1, 0f);
+                }
             }
         });
 
         z.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String text = x.getText().isEmpty() ? "0" : z.getText();
-                value.set(2, Float.parseFloat(text));
+                try {
+                    float parseFloat = Float.parseFloat(z.getText());
+                    value.set(2, parseFloat);
+                } catch (NumberFormatException e) {
+                    value.set(2, 0f);
+                }
             }
         });
 
@@ -57,12 +70,5 @@ public class NumericalValueField extends Table {
         this.x.setText(String.valueOf(value.get(0)));
         this.y.setText(String.valueOf(value.get(1)));
         this.z.setText(String.valueOf(value.get(2)));
-    }
-
-    private static class FloatTextFilter implements TextField.TextFieldFilter {
-        @Override
-        public boolean acceptChar (TextField textField, char c) {
-            return Character.isDigit(c) || (c == '.' && !textField.getText().contains(".") || (c == '-' && !textField.getText().contains("-")));
-        }
     }
 }
