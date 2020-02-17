@@ -23,6 +23,7 @@ import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.values.StringValue;
 import com.talosvfx.talos.runtime.values.Value;
 
 public abstract class AbstractModule implements Json.Serializable {
@@ -35,6 +36,8 @@ public abstract class AbstractModule implements Json.Serializable {
     protected int index = -1;
 
     private float lastRequester;
+
+    protected String shaderCode = "";
 
     public AbstractModule () {
         init();
@@ -215,5 +218,31 @@ public abstract class AbstractModule implements Json.Serializable {
 
     public IntMap<Slot> getOutputSlots() {
         return outputSlots;
+    }
+
+    public void processShaderCode() {
+
+    }
+
+    protected void fetchOutputShaderCode() {
+        // now time to fetch the compile bits
+        shaderCode = "";
+        for(Slot inputSlot : inputSlots.values()) {
+            if(inputSlot == null) {
+                break;
+            }
+            if(inputSlot.getTargetSlot() == null) {
+                if(inputSlot.getValue() == null) break;
+
+                inputSlot.getValue().setEmpty(true);
+            } else {
+                inputSlot.getTargetModule().processShaderCode();
+                shaderCode += inputSlot.getTargetModule().fetchShaderCode(inputSlot.getTargetSlot().getIndex());
+            }
+        }
+    }
+
+    protected String fetchShaderCode(int index) {
+        return ((StringValue)outputSlots.get(index).getValue()).getString();
     }
 }

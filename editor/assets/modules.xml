@@ -41,6 +41,10 @@
         <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
         <module name = "Math Operations" wrapper = "MathModuleWrapper">MathModule</module>
     </category>
+    <category name = "Shader Modules">
+        <module name = "Fragment Shader" wrapper = "ShaderModuleWrapper">ShaderModule</module>
+        <module name = "Sample Texture" wrapper = "Sample2DFragModuleWrapper">Sample2DFragModule</module>
+    </category>
     <category name = "Adapters">
         <module name = "Beam Position" wrapper = "FromToModuleWrapper">FromToModule</module>
         <module name = "Cartesian to Radial" wrapper = "CartToRadModuleWrapper">CartToRadModule</module>

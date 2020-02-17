@@ -19,6 +19,7 @@ package com.talosvfx.talos.runtime.render;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEmitterInstance;
@@ -45,6 +46,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	public void render (ParticleEffectInstance particleEffectInstance) {
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 
+		ShaderProgram defaultShader = batch.getShader();
+
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
 			if(!particleEmitter.isVisible) continue;
@@ -59,6 +62,10 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		}
 
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+		if(batch.getShader() != defaultShader) {
+			batch.setShader(defaultShader);
+		}
 	}
 
 	private void renderParticle (Batch batch, Particle particle, float parentAlpha) {

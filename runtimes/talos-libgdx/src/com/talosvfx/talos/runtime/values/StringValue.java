@@ -16,5 +16,20 @@
 
 package com.talosvfx.talos.runtime.values;
 
-public class StringValue {
+public class StringValue extends Value {
+
+    private String string;
+
+    public String getString() {
+        return string;
+    }
+
+    @Override
+    public void set(Value value) {
+        string = ((StringValue)value).getString();
+    }
+
+    public void set(String string) {
+        this.string = string;
+    }
 }
