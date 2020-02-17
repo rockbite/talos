@@ -201,6 +201,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
 
+                if(keycode == Input.Keys.F5) {
+                    // find particle or emitter or then any other module and focus on it
+                    camera.position.set(0, 0, 0);
+                    setWorldSize(getWorldWidth());
+                }
                 if(keycode == Input.Keys.SPACE) {
                     paused = !paused;
                 }
