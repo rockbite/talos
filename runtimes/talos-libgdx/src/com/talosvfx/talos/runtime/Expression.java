@@ -73,4 +73,11 @@ public abstract class Expression {
             a.abs(out);
         }
     };
+
+    static public final Expression divide = new Expression() {
+        @Override
+        public void apply(NumericalValue a, NumericalValue b, NumericalValue out) {
+            a.div(b, out);
+        }
+    };
 }
