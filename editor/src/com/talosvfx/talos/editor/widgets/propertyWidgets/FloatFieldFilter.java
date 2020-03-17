@@ -10,7 +10,7 @@ public class FloatFieldFilter implements TextField.TextFieldFilter {
             return true;
         }
         if(c == '.') {
-            if(textField.getText().length() > 0) {
+            if(textField.getText() != null && textField.getText().length() > 0) {
                 if(textField.getText().contains(".")) {
                     return false;
                 } else {
