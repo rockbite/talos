@@ -20,6 +20,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
@@ -27,6 +28,8 @@ import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.TextureModule;
 
 public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule> {
+
+    private Label assetNameLabel;
 
     public TextureModuleWrapper() {
         super();
@@ -45,6 +48,7 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
     @Override
     public void setModuleRegion (String name, Sprite region) {
         module.setRegion(name, region);
+        assetNameLabel.setText(name);
     }
 
     @Override
@@ -55,6 +59,10 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
 
         addOutputSlot("output", TextureModule.OUTPUT);
+
+        assetNameLabel = new Label("fire", getSkin());
+
+        contentWrapper.add(assetNameLabel).padLeft(10).colspan(2).expand().fill().row();
 
         contentWrapper.add(dropWidget).size(50).left().padLeft(10);
         contentWrapper.add().expandX();
