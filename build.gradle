@@ -7,8 +7,8 @@ allprojects {
     version = '1.0.7'
 
     if(hasProperty("release")) {
-        
-    } else if (hasProperty("snapshot")) {
+
+    } else {
         version += "-SNAPSHOT"
     }
 
