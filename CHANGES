@@ -4,6 +4,7 @@
 - Civilized Error Reporting will now prevent app from crashing and closing
 - Random Range Module now supports input slots
 - System Input Module now exposes particle seed for randomness operations
+- Various Bugfixes
 
 [1.0.6]
 - Support for bezier curve logic in Beam Drawable. Adds left and right tangents.
