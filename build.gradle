@@ -6,8 +6,7 @@ allprojects {
     group = "com.talosvfx"
     version = '1.0.7'
 
-    if(hasProperty("release")) {
-
+    if(project.hasProperty("release")) {
     } else {
         version += "-SNAPSHOT"
     }
