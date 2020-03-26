@@ -4,7 +4,13 @@ allprojects {
 
 
     group = "com.talosvfx"
-    version = '1.0.7-SNAPSHOT'
+    version = '1.0.7'
+
+    if(hasProperty("release")) {
+        
+    } else if (hasProperty("snapshot")) {
+        version += "-SNAPSHOT"
+    }
 
     ext {
         appName = "talos"
