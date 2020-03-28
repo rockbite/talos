@@ -27,6 +27,12 @@ sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.test.java.srcDirs = ["test/"]
 
 
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
+
 modifyPom {
     project {
         name "Talos Libgdx Runtime"
