@@ -48,6 +48,8 @@ public class GradientWidget extends Actor {
 
     private Color tmpColor = new Color();
 
+    private final String TRIANGLE = "triangle";
+
     public interface GradientWidgetListener {
         public void colorPickerShow(ColorPoint point);
     }
@@ -239,7 +241,7 @@ public class GradientWidget extends Actor {
         Array<ColorPoint> points = module.getPoints();
 
         for(int i = 0; i < points.size; i++) {
-            Drawable backgroundFrame = getSkin().getDrawable("triangle");
+            Drawable backgroundFrame = getSkin().getDrawable(TRIANGLE);
             batch.setColor(points.get(i).color);
             backgroundFrame.draw(batch, getX() + areaPos.x + areaSize.x * points.get(i).pos - 9, getY() + areaPos.y - 16f, 18f, 16f);
         }

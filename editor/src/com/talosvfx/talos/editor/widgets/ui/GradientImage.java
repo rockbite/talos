@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.talosvfx.talos.runtime.values.ColorPoint;
 
 public class GradientImage extends Actor {
@@ -34,6 +35,14 @@ public class GradientImage extends Actor {
     private Array<ColorPoint> points = new Array<>();
 
     Texture white;
+
+    StringBuilder stringBuilder = new StringBuilder();
+
+    private final String U_POINT_COUNT = "u_pointCount";
+    private final String U_ARR_NAME = "u_gradientPoints[";
+
+    private final String U_PARAM_COLOR = "].color";
+    private final String U_PARAM_ALPHA = "].alpha";
 
     public GradientImage(Skin skin) {
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
@@ -66,12 +75,18 @@ public class GradientImage extends Actor {
         ShaderProgram prevShader = batch.getShader();
         batch.setShader(shaderProgram);
 
-        shaderProgram.setUniformi("u_pointCount", points.size);
+        shaderProgram.setUniformi(U_POINT_COUNT, points.size);
 
         for(int i = 0; i < points.size; i++){
             ColorPoint point = points.get(i);
-            shaderProgram.setUniformf("u_gradientPoints[" + i + "].color", point.color.r, point.color.g, point.color.b, 1f);
-            shaderProgram.setUniformf("u_gradientPoints[" + i + "].alpha", point.pos);
+
+            stringBuilder.clear();
+            stringBuilder.append(U_ARR_NAME).append(i).append(U_PARAM_COLOR);
+            shaderProgram.setUniformf(stringBuilder.toString(), point.color.r, point.color.g, point.color.b, 1f);
+
+            stringBuilder.clear();
+            stringBuilder.append(U_ARR_NAME).append(i).append(U_PARAM_ALPHA);
+            shaderProgram.setUniformf(stringBuilder.toString(), point.pos);
         }
 
         // do the rendering

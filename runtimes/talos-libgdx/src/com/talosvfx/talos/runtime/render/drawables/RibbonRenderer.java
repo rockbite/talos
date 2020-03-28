@@ -30,7 +30,6 @@ public class RibbonRenderer implements ParticleDrawable {
         }
     };
     ObjectMap<Particle, Polyline> polylineMap = new ObjectMap<>();
-    ObjectMap<Particle, Long> cacheExpire = new ObjectMap<>();
     Array<Particle> tmpArr = new Array<>();
 
     private Color tmpColor = new Color();
@@ -53,22 +52,17 @@ public class RibbonRenderer implements ParticleDrawable {
 
         polyline.draw(batch, ribbonRegion);
 
-        // remove items from cache
-        long timeNow = TimeUtils.millis();
         tmpArr.clear();
-        for(Particle key: cacheExpire.keys()) {
-            if(timeNow - cacheExpire.get(key) > 200f) {
+        for(Particle key: polylineMap.keys()) {
+            if(key.alpha == 1f) {
                 tmpArr.add(key);
             }
         }
         for(int i = 0; i < tmpArr.size; i++) {
-            cacheExpire.remove(tmpArr.get(i));
-            if(polylineMap.get(tmpArr.get(i)) != null) {
+            if(polylineMap.containsKey(tmpArr.get(i))) {
                 polylinePool.free(polylineMap.get(tmpArr.get(i)));
             }
             polylineMap.remove(tmpArr.get(i));
-
-            accumulator.clean(tmpArr.get(i)); // clean accumulator
         }
     }
 
@@ -90,8 +84,6 @@ public class RibbonRenderer implements ParticleDrawable {
             polyline.initPoints(interpolationPointCount);
             polylineMap.put(particleRef, polyline);
         }
-
-        cacheExpire.put(particleRef, TimeUtils.millis());
 
         return polylineMap.get(particleRef);
     }

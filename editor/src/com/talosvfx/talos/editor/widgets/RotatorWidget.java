@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.StringBuilder;
 
 public class RotatorWidget extends Actor {
 
@@ -44,11 +45,19 @@ public class RotatorWidget extends Actor {
 
     private boolean isActive = false;
 
+    private final String ROTATOR = "rotator";
+    private final String ROTATORBG = "rotator-bg";
+    private final String ROTATORACTIVE = "rotator-active";
+
+    StringBuilder stringBuilder;
+
     public RotatorWidget(Skin skin) {
         this.skin = skin;
-        image = new Image(skin.getDrawable("rotator"));
+        image = new Image(skin.getDrawable(ROTATOR));
 
         label = new Label("", skin, "small");
+
+        stringBuilder = new StringBuilder();
 
         addListener(new ClickListener() {
 
@@ -110,16 +119,20 @@ public class RotatorWidget extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        getSkin().getDrawable("rotator-bg").draw(batch, getX(), getY(), getWidth(), getHeight());
+        getSkin().getDrawable(ROTATORBG).draw(batch, getX(), getY(), getWidth(), getHeight());
 
-        label.setText((int)value + "");
+        int intVal = (int) value;
+        stringBuilder.clear();
+        stringBuilder.append(intVal);
+
+        label.setText(stringBuilder.toString());
         label.setPosition(getX() + getWidth()/2f - label.getPrefWidth()/2f, getY() + getHeight()/2f + 20 - label.getPrefHeight()/2f);
         label.draw(batch, parentAlpha);
 
 
-        image.setDrawable(skin.getDrawable("rotator"));
+        image.setDrawable(skin.getDrawable(ROTATOR));
         if(isActive) {
-            image.setDrawable(skin.getDrawable("rotator-active"));
+            image.setDrawable(skin.getDrawable(ROTATORACTIVE));
         }
         image.setPosition(getX(), getY());
         image.setSize(getWidth(), getHeight());
