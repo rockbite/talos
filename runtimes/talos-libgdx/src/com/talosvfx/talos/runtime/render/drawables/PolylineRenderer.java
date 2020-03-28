@@ -28,7 +28,7 @@ import com.talosvfx.talos.runtime.ParticleDrawable;
 
 public class PolylineRenderer implements ParticleDrawable {
 
-    float seed;
+    Particle particleRef;
     int interpolationPointCount;
 
     public Pool<Polyline> polylinePool = new Pool<Polyline>() {
@@ -39,9 +39,9 @@ public class PolylineRenderer implements ParticleDrawable {
     };
     private TextureRegion region;
 
-    ObjectMap<Float, Polyline> polylineMap = new ObjectMap<>();
-    ObjectMap<Float, Long> cacheExpire = new ObjectMap<>();
-    Array<Float> tmpArr = new Array<>();
+    ObjectMap<Particle, Polyline> polylineMap = new ObjectMap<>();
+    ObjectMap<Particle, Long> cacheExpire = new ObjectMap<>();
+    Array<Particle> tmpArr = new Array<>();
 
     @Override
     public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
@@ -52,9 +52,9 @@ public class PolylineRenderer implements ParticleDrawable {
         // remove items from cache
         long timeNow = TimeUtils.millis();
         tmpArr.clear();
-        for(Float seed: cacheExpire.keys()) {
-            if(timeNow - cacheExpire.get(seed) > 200f) {
-                tmpArr.add(seed);
+        for(Particle key: cacheExpire.keys()) {
+            if(timeNow - cacheExpire.get(key) > 200f) {
+                tmpArr.add(key);
             }
         }
         for(int i = 0; i < tmpArr.size; i++) {
@@ -83,8 +83,8 @@ public class PolylineRenderer implements ParticleDrawable {
     }
 
     @Override
-    public void setSeed(float seed) {
-        this.seed = seed;
+    public void setCurrentParticle (Particle particle) {
+        this.particleRef = particle;
     }
 
     @Override
@@ -109,15 +109,15 @@ public class PolylineRenderer implements ParticleDrawable {
     }
 
     private Polyline polyline() {
-        if(polylineMap.get(seed) == null) {
+        if(polylineMap.get(particleRef) == null) {
             Polyline polyline = polylinePool.obtain();
             polyline.initPoints(interpolationPointCount);
-            polylineMap.put(seed, polyline);
+            polylineMap.put(particleRef, polyline);
         }
 
-        cacheExpire.put(seed, TimeUtils.millis());
+        cacheExpire.put(particleRef, TimeUtils.millis());
 
-        return polylineMap.get(seed);
+        return polylineMap.get(particleRef);
     }
 
     public void setTangents(float leftX, float leftY, float rightX, float rightY) {

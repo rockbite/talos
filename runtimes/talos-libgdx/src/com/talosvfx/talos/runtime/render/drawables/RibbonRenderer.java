@@ -15,7 +15,7 @@ import com.talosvfx.talos.runtime.ParticleDrawable;
 
 public class RibbonRenderer implements ParticleDrawable {
 
-    float seed;
+    Particle particleRef;
     int interpolationPointCount;
 
     PointMemoryAccumulator accumulator;
@@ -29,9 +29,9 @@ public class RibbonRenderer implements ParticleDrawable {
             return new Polyline();
         }
     };
-    ObjectMap<Float, Polyline> polylineMap = new ObjectMap<>();
-    ObjectMap<Float, Long> cacheExpire = new ObjectMap<>();
-    Array<Float> tmpArr = new Array<>();
+    ObjectMap<Particle, Polyline> polylineMap = new ObjectMap<>();
+    ObjectMap<Particle, Long> cacheExpire = new ObjectMap<>();
+    Array<Particle> tmpArr = new Array<>();
 
     private Color tmpColor = new Color();
 
@@ -45,20 +45,20 @@ public class RibbonRenderer implements ParticleDrawable {
         if(interpolationPointCount < 1) return;
         if(ribbonRegion == null) return;
 
-        accumulator.update(seed, x, y);
+        accumulator.update(particleRef, x, y);
 
         Polyline polyline = polyline();
 
-        accumulator.setDrawLocations(seed, polyline.getPoints());
+        accumulator.setDrawLocations(particleRef, polyline.getPoints());
 
         polyline.draw(batch, ribbonRegion);
 
         // remove items from cache
         long timeNow = TimeUtils.millis();
         tmpArr.clear();
-        for(Float seed: cacheExpire.keys()) {
-            if(timeNow - cacheExpire.get(seed) > 200f) {
-                tmpArr.add(seed);
+        for(Particle key: cacheExpire.keys()) {
+            if(timeNow - cacheExpire.get(key) > 200f) {
+                tmpArr.add(key);
             }
         }
         for(int i = 0; i < tmpArr.size; i++) {
@@ -85,15 +85,15 @@ public class RibbonRenderer implements ParticleDrawable {
     }
 
     private Polyline polyline() {
-        if(polylineMap.get(seed) == null) {
+        if(polylineMap.get(particleRef) == null) {
             Polyline polyline = polylinePool.obtain();
             polyline.initPoints(interpolationPointCount);
-            polylineMap.put(seed, polyline);
+            polylineMap.put(particleRef, polyline);
         }
 
-        cacheExpire.put(seed, TimeUtils.millis());
+        cacheExpire.put(particleRef, TimeUtils.millis());
 
-        return polylineMap.get(seed);
+        return polylineMap.get(particleRef);
     }
 
     @Override
@@ -102,10 +102,9 @@ public class RibbonRenderer implements ParticleDrawable {
     }
 
     @Override
-    public void setSeed(float seed) {
-        this.seed = seed;
+    public void setCurrentParticle (Particle particle) {
+        this.particleRef = particle;
     }
-
 
     @Override
     public TextureRegion getTextureRegion() {
@@ -124,7 +123,7 @@ public class RibbonRenderer implements ParticleDrawable {
     }
 
     public void adjustPointData() {
-        float pointAlpha = accumulator.getPointAlpha(seed);
+        float pointAlpha = accumulator.getPointAlpha(particleRef);
         Polyline polyline = polyline();
         for(int i = 1; i < polyline.points.size; i++) {
             float topThickness = polyline.points.get(i).thickness;
@@ -155,10 +154,10 @@ public class RibbonRenderer implements ParticleDrawable {
         int pointCount;
         float memoryDuration;
 
-        ObjectMap<Float, Vector2> leadPoints = new ObjectMap<>();
-        ObjectMap<Float, Float> leadLife = new ObjectMap<>();
-        ObjectMap<Float, Array<Vector2>> allPoints = new ObjectMap<>();
-        ObjectMap<Float, Integer> pointCounts = new ObjectMap<>();
+        ObjectMap<Particle, Vector2> leadPoints = new ObjectMap<>();
+        ObjectMap<Particle, Float> leadLife = new ObjectMap<>();
+        ObjectMap<Particle, Array<Vector2>> allPoints = new ObjectMap<>();
+        ObjectMap<Particle, Integer> pointCounts = new ObjectMap<>();
 
         Vector2 tmpVec = new Vector2();
 
@@ -174,20 +173,20 @@ public class RibbonRenderer implements ParticleDrawable {
             pointCounts.clear();
         }
 
-        public void clean(float id) {
-            leadPoints.remove(id);
-            leadLife.remove(id);
-            allPoints.remove(id);
-            pointCounts.remove(id);
+        public void clean(Particle particle) {
+            leadPoints.remove(particle);
+            leadLife.remove(particle);
+            allPoints.remove(particle);
+            pointCounts.remove(particle);
         }
 
-        private void initIfNull(float id) {
-            if(!leadPoints.containsKey(id)) {
-                leadPoints.put(id, new Vector2());
-                leadLife.put(id, 0f);
-                pointCounts.put(id, 0);
+        private void initIfNull(Particle particle) {
+            if(!leadPoints.containsKey(particle)) {
+                leadPoints.put(particle, new Vector2());
+                leadLife.put(particle, 0f);
+                pointCounts.put(particle, 0);
                 Array<Vector2> arr = new Array<>(pointCount - 1);
-                allPoints.put(id, arr);
+                allPoints.put(particle, arr);
                 for(int i = 0; i < pointCount - 1; i++) {
                     arr.add(new Vector2());
                 }
@@ -195,54 +194,54 @@ public class RibbonRenderer implements ParticleDrawable {
             }
         }
 
-        public void update(float id, float x, float y) {
-            initIfNull(id);
+        public void update(Particle particle, float x, float y) {
+            initIfNull(particle);
 
             float delta = Gdx.graphics.getDeltaTime();
 
-            leadPoints.get(id).set(x, y);
+            leadPoints.get(particle).set(x, y);
 
-            leadLife.put(id, leadLife.get(id) + delta);
+            leadLife.put(particle, leadLife.get(particle) + delta);
 
-            if(leadLife.get(id) > memoryDuration/pointCount) { // adding new point data
-                Array<Vector2> points = allPoints.get(id);
-                int currPointCount = pointCounts.get(id);
+            if(leadLife.get(particle) > memoryDuration/pointCount) { // adding new point data
+                Array<Vector2> points = allPoints.get(particle);
+                int currPointCount = pointCounts.get(particle);
                 if(currPointCount < pointCount - 1) {
                     currPointCount++;
                 }
-                pointCounts.put(id, currPointCount);
+                pointCounts.put(particle, currPointCount);
                 // now shift
                 for(int i  = currPointCount - 1; i > 0; i--) {
                     points.get(i).set(points.get(i-1));
                 }
-                points.get(0).set(leadPoints.get(id)); // set the value of lead point
+                points.get(0).set(leadPoints.get(particle)); // set the value of lead point
 
-                leadLife.put(id, leadLife.get(id) - memoryDuration/pointCount);
+                leadLife.put(particle, leadLife.get(particle) - memoryDuration/pointCount);
             }
         }
 
-        public void setDrawLocations(float id, Array<Polyline.PointData> points) {
+        public void setDrawLocations(Particle particle, Array<Polyline.PointData> points) {
             if(points != null && points.size == pointCount) {
-                points.get(0).position.set(leadPoints.get(id));
+                points.get(0).position.set(leadPoints.get(particle));
 
                 for(int i = 0; i < points.size-1; i++) {
 
-                    if(i >= 0 && i < pointCounts.get(id)) {
-                        Vector2 top = allPoints.get(id).get(i);
-                        Vector2 bottom = leadPoints.get(id);
+                    if(i >= 0 && i < pointCounts.get(particle)) {
+                        Vector2 top = allPoints.get(particle).get(i);
+                        Vector2 bottom = leadPoints.get(particle);
                         if(i > 0) {
-                            bottom = allPoints.get(id).get(i - 1);
+                            bottom = allPoints.get(particle).get(i - 1);
                         }
-                        tmpVec.set(bottom).sub(top).scl(leadLife.get(id)/(memoryDuration/pointCount)).add(top);
+                        tmpVec.set(bottom).sub(top).scl(leadLife.get(particle)/(memoryDuration/pointCount)).add(top);
                     } else {
-                        tmpVec.set(allPoints.get(id).get(i));
+                        tmpVec.set(allPoints.get(particle).get(i));
                     }
 
-                    if(i < pointCounts.get(id)) {
+                    if(i < pointCounts.get(particle)) {
                         points.get(i + 1).position.set(tmpVec);
                     } else {
-                        if(pointCounts.get(id) > 0) {
-                            points.get(i + 1).position.set(allPoints.get(id).get(pointCounts.get(id) - 1));
+                        if(pointCounts.get(particle) > 0) {
+                            points.get(i + 1).position.set(allPoints.get(particle).get(pointCounts.get(particle) - 1));
                         } else {
                             points.get(i + 1).color.a = 0;
                         }
@@ -251,9 +250,9 @@ public class RibbonRenderer implements ParticleDrawable {
             }
         }
 
-        public float getPointAlpha(float id) {
-            if(leadLife == null || leadLife.get(id) == null) return 0;
-            return leadLife.get(id)/(memoryDuration/pointCount);
+        public float getPointAlpha(Particle particle) {
+            if(leadLife == null || leadLife.get(particle) == null) return 0;
+            return leadLife.get(particle)/(memoryDuration/pointCount);
         }
     }
 }

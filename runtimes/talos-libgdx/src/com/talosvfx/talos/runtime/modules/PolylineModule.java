@@ -75,7 +75,7 @@ public class PolylineModule extends AbstractModule {
     @Override
     public void fetchAllInputSlotValues() {
         float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
-        polylineDrawable.setSeed(requester);
+        polylineDrawable.setCurrentParticle(getScope().currParticle());
 
         for(int i = 0; i < pointCount; i++) {
 

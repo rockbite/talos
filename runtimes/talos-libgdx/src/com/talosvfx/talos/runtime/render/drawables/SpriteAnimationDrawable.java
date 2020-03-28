@@ -165,8 +165,8 @@ public class SpriteAnimationDrawable implements ParticleDrawable {
     }
 
     @Override
-    public void setSeed(float seed) {
-        phase = globalPhase + seed;
+    public void setCurrentParticle(Particle particle) {
+        phase = globalPhase + particle.seed;
         phase = phase - (int)phase; // normalize to 0-1
     }
 

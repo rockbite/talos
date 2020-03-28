@@ -38,12 +38,16 @@ import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWDropCallback;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
 import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosMain extends ApplicationAdapter {
+
+	private static boolean focused = true;
 
 	private UIStage uiStage;
 
@@ -166,6 +170,21 @@ public class TalosMain extends ApplicationAdapter {
 
 		// final init after all is done
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+
+
+		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
+			@Override
+			public void invoke (long window, boolean focused) {
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						TalosMain.focused = focused;
+					}
+				});
+			}
+		});
+		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
+
 	}
 
 	public void disableNodeStage() {
@@ -185,6 +204,14 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		if (!focused) {
+			try {
+				Thread.sleep(16);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		if (currentWorkplaceStage != null) {
 			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {

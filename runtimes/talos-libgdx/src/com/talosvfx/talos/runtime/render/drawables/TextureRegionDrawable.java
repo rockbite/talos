@@ -72,7 +72,7 @@ public class TextureRegionDrawable implements ParticleDrawable {
     }
 
     @Override
-    public void setSeed(float seed) {
+    public void setCurrentParticle(Particle particle) {
 
     }
 

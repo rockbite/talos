@@ -56,7 +56,7 @@ public class RibbonModule extends AbstractModule {
 
         RibbonRenderer renderer = (RibbonRenderer) outputValue.getDrawable();
 
-        renderer.setSeed(requester);
+        renderer.setCurrentParticle(getScope().currParticle());
         for(int i = 0; i < detail; i++) {
 
             float pointAlpha = (float)i/(detail-1);

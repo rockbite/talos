@@ -68,7 +68,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		batch.setColor(color);
 
 		if (particle.drawable != null) {
-			particle.drawable.setSeed(particle.seed);
+			particle.drawable.setCurrentParticle(particle);
 			particle.drawable.draw(batch, particle, color);
 		}
 	}

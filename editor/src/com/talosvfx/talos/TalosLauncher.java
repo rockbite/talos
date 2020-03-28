@@ -24,6 +24,7 @@ public class TalosLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 700);
 		config.setTitle("Talos");
+		config.useVsync(false);
 
 		TalosMain talos = new TalosMain();
 

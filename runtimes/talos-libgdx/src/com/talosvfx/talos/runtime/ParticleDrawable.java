@@ -28,7 +28,7 @@ public interface ParticleDrawable {
 
     float getAspectRatio();
 
-    void setSeed(float seed);
+    void setCurrentParticle(Particle particle);
 
     TextureRegion getTextureRegion();
 }
