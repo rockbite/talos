@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
@@ -147,7 +144,7 @@ public class RibbonRenderer implements ParticleDrawable {
         float memoryDuration;
 
         ObjectMap<Particle, Vector2> leadPoints = new ObjectMap<>();
-        ObjectMap<Particle, Float> leadLife = new ObjectMap<>();
+        ObjectFloatMap<Particle> leadLife = new ObjectFloatMap<>();
         ObjectMap<Particle, Array<Vector2>> allPoints = new ObjectMap<>();
         ObjectMap<Particle, Integer> pointCounts = new ObjectMap<>();
 
@@ -167,7 +164,7 @@ public class RibbonRenderer implements ParticleDrawable {
 
         public void clean(Particle particle) {
             leadPoints.remove(particle);
-            leadLife.remove(particle);
+            leadLife.remove(particle, 0);
             allPoints.remove(particle);
             pointCounts.remove(particle);
         }
@@ -193,9 +190,9 @@ public class RibbonRenderer implements ParticleDrawable {
 
             leadPoints.get(particle).set(x, y);
 
-            leadLife.put(particle, leadLife.get(particle) + delta);
+            leadLife.put(particle, leadLife.get(particle, 0f) + delta);
 
-            if(leadLife.get(particle) > memoryDuration/pointCount) { // adding new point data
+            if(leadLife.get(particle, 0f) > memoryDuration/pointCount) { // adding new point data
                 Array<Vector2> points = allPoints.get(particle);
                 int currPointCount = pointCounts.get(particle);
                 if(currPointCount < pointCount - 1) {
@@ -208,7 +205,7 @@ public class RibbonRenderer implements ParticleDrawable {
                 }
                 points.get(0).set(leadPoints.get(particle)); // set the value of lead point
 
-                leadLife.put(particle, leadLife.get(particle) - memoryDuration/pointCount);
+                leadLife.put(particle, leadLife.get(particle, 0f) - memoryDuration/pointCount);
             }
         }
 
@@ -224,7 +221,7 @@ public class RibbonRenderer implements ParticleDrawable {
                         if(i > 0) {
                             bottom = allPoints.get(particle).get(i - 1);
                         }
-                        tmpVec.set(bottom).sub(top).scl(leadLife.get(particle)/(memoryDuration/pointCount)).add(top);
+                        tmpVec.set(bottom).sub(top).scl(leadLife.get(particle, 0f)/(memoryDuration/pointCount)).add(top);
                     } else {
                         tmpVec.set(allPoints.get(particle).get(i));
                     }
@@ -243,8 +240,8 @@ public class RibbonRenderer implements ParticleDrawable {
         }
 
         public float getPointAlpha(Particle particle) {
-            if(leadLife == null || leadLife.get(particle) == null) return 0;
-            return leadLife.get(particle)/(memoryDuration/pointCount);
+            if(leadLife == null) return 0;
+            return leadLife.get(particle, 0f)/(memoryDuration/pointCount);
         }
     }
 }
