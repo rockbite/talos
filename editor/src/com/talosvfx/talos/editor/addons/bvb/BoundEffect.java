@@ -122,7 +122,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                         break;
                     }
                 }
-                tmpVec.set(attachmentPoint.getOffsetX(), attachmentPoint.getOffsetY());
+                tmpVec.set(attachmentPoint.getOffsetX() * bone.getWorldScaleX(), attachmentPoint.getOffsetY() * bone.getWorldScaleY());
                 tmpVec.rotate(rotation);
                 tmpVec.add(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
 
