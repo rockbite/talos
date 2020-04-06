@@ -20,7 +20,7 @@ public class FileUtils {
             for(int i = 0; i < list.length; i++) {
                 if(list[i].isDirectory()) {
                     FileHandle result = findFileRecursive(list[i].path(), fileName, depthLeft-1);
-                    if(result.exists()) {
+                    if(result != null && result.exists()) {
                         return result;
                     }
                 }

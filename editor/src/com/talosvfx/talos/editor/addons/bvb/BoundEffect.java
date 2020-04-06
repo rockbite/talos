@@ -113,6 +113,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 scopePayload.setDynamicValue(attachmentPoint.getSlotId(), attachmentPoint.getStaticValue());
             } else {
                 Bone bone = parent.getBoneByName(attachmentPoint.getBoneName());
+                attachmentPoint.setBoneScale(bone.getWorldScaleX());
                 float rotation = bone.getWorldRotationX();
                 Color color = Color.WHITE;
                 for(Slot slot: parent.getSkeleton().getSlots()) {
@@ -122,7 +123,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                         break;
                     }
                 }
-                tmpVec.set(attachmentPoint.getOffsetX() * bone.getWorldScaleX(), attachmentPoint.getOffsetY() * bone.getWorldScaleY());
+
+                tmpVec.set(attachmentPoint.getWorldOffsetX(), attachmentPoint.getWorldOffsetY());
                 tmpVec.rotate(rotation);
                 tmpVec.add(parent.getBonePosX(attachmentPoint.getBoneName()), parent.getBonePosY(attachmentPoint.getBoneName()));
 
@@ -146,8 +148,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
                 if(positionAttachment.isStatic()) {
                     instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
                 } else {
-                    tmpVec.set(positionAttachment.getOffsetX(), positionAttachment.getOffsetY());
                     Bone bone = parent.getBoneByName(positionAttachment.getBoneName());
+                    positionAttachment.setBoneScale(bone.getWorldScaleX());
+
+                    tmpVec.set(positionAttachment.getWorldOffsetX(), positionAttachment.getWorldOffsetY());
                     float rotation = bone.getWorldRotationX();
                     tmpVec.rotate(rotation);
                     tmpVec.add(parent.getBonePosX(positionAttachment.getBoneName()), parent.getBonePosY(positionAttachment.getBoneName()));
@@ -268,7 +272,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         LabelWidget offset = new LabelWidget("Offset") {
             @Override
             public String getValue() {
-                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getOffsetY(), 3);
+                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetY(), 3);
             }
         };
 
