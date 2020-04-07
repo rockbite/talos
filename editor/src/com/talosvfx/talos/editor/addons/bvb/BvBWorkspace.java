@@ -153,15 +153,18 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 if(movingPoint != null && !movingPoint.isStatic()) {
 
                     if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
-                        pos.sub(skeletonContainer.getBonePosX(movingPoint.getBoneName()), skeletonContainer.getBonePosY(movingPoint.getBoneName()));
+                        Bone boneByName = skeletonContainer.getBoneByName(movingPoint.getBoneName());
+                        float boneWorldScale = skeletonContainer.getSkeleton().getScaleX();
+                        pos.sub(boneByName.getWorldX(), boneByName.getWorldY());
                         pos.rotate(-skeletonContainer.getBoneRotation(movingPoint.getBoneName()));
-                        movingPoint.setOffset(pos.x, pos.y);
+                        movingPoint.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
                         bvb.properties.updateValues();
                     } else {
                         Bone closestBone = skeletonContainer.findClosestBone(pos);
+                        float boneWorldScale = skeletonContainer.getSkeleton().getScaleX();
                         pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
                         pos.rotate(-closestBone.getWorldRotationX());
-                        movingPoint.setOffset(pos.x, pos.y);
+                        movingPoint.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
                         movingPoint.setBone(closestBone.getData().getName());
                         bvb.properties.updateValues();
                     }
@@ -372,7 +375,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private Vector2 getAttachmentPosition(AttachmentPoint point) {
         if(!point.isStatic()) {
-            tmp.set(point.getOffsetX(), point.getOffsetY());
+            tmp.set(point.getWorldOffsetX(), point.getWorldOffsetY());
             tmp.rotate(skeletonContainer.getBoneRotation(point.getBoneName()));
             tmp.add(skeletonContainer.getBonePosX(point.getBoneName()), skeletonContainer.getBonePosY(point.getBoneName()));
         } else{
