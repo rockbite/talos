@@ -154,14 +154,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                     if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
                         Bone boneByName = skeletonContainer.getBoneByName(movingPoint.getBoneName());
-                        float boneWorldScale = skeletonContainer.getSkeleton().getScaleX();
+                        float boneWorldScale = boneByName.getWorldScaleX();
                         pos.sub(boneByName.getWorldX(), boneByName.getWorldY());
                         pos.rotate(-skeletonContainer.getBoneRotation(movingPoint.getBoneName()));
                         movingPoint.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
                         bvb.properties.updateValues();
                     } else {
                         Bone closestBone = skeletonContainer.findClosestBone(pos);
-                        float boneWorldScale = skeletonContainer.getSkeleton().getScaleX();
+                        float boneWorldScale = closestBone.getWorldScaleX();
                         pos.sub(closestBone.getWorldX(), closestBone.getWorldY());
                         pos.rotate(-closestBone.getWorldRotationX());
                         movingPoint.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
