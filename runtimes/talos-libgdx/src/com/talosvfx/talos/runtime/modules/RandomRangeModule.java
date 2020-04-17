@@ -56,9 +56,6 @@ public class RandomRangeModule extends AbstractModule {
         // I'll leave the answer to the reader
         long seed = (long) (getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000);
 
-        distributed = false;
-        //TODO: this is not working well so turning off for now, but must come back at some point
-
         float startPos;
         if(!distributed) {
             random.setSeed(seed);

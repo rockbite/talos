@@ -58,13 +58,11 @@ public class DistributedRandom {
 
     public class Distribution implements Pool.Poolable {
 
-        private final int RESOLUTION = 10;
-
         private long lastAccess;
 
         Random random = new Random();
 
-        public float[] data = new float[RESOLUTION];
+        private int segment = 0;
 
         public Distribution() {
             reset();
@@ -72,9 +70,7 @@ public class DistributedRandom {
 
         @Override
         public void reset () {
-            for(int i = 0; i < RESOLUTION; i++) {
-                data[i] = 1f/RESOLUTION;
-            }
+            segment = 0;
             lastAccess = TimeUtils.millis();
         }
 
@@ -82,58 +78,18 @@ public class DistributedRandom {
             random.setSeed(seed);
         }
 
-        private void normalize(boolean heal) {
-            float sum = 0;
-            for(int i = 0; i < RESOLUTION; i++) {
-                if (1f/RESOLUTION - data[i] > 0) {
-                    data[i] += (1f/RESOLUTION - data[i])/3f;
-                }
-                sum+= data[i];
-            }
-            for(int i = 0; i < RESOLUTION; i++) {
-                data[i] *= 1f/sum;
-            }
-        }
-
         public float nextFloat () {
             lastAccess = TimeUtils.millis();
 
-            normalize(true);
-
-            float roll = random.nextFloat();
-            float cursor = 0;
-            int segment = 0;
-            for(int i = 0; i < RESOLUTION; i++) {
-                if(roll >= cursor && roll <= cursor + data[i]) {
-                    segment = i;
-                    break;
-                }
-                cursor += data[i];
+            if(segment == 0) {
+                segment = random.nextBoolean() ? 1 : 2;
+            } else if(segment == 1) {
+                segment = random.nextBoolean() ? 0 : 2;
+            } else {
+                if (segment == 2) segment = random.nextBoolean() ? 0 : 1;
             }
 
-            //leave footprint
-            float step = 1f/ RESOLUTION;
-            data[segment] -= step;
-            if(data[segment] < 0) {
-                data[segment] = 0;
-            }
-            for(int i = 1; i <= (RESOLUTION/4); i++) {
-                float reduce = i * step * (1f/(1 + RESOLUTION/4));
-                if(segment-i >= 0) {
-                    data[segment - i] -= reduce;
-                    if(data[segment - i] < 0) {
-                        data[segment - i] = 0;
-                    }
-                }
-                if(segment + i < data.length) {
-                    data[segment + i] -= reduce;
-                    if(data[segment + i] < 0) {
-                        data[segment + i] = 0;
-                    }
-                }
-            }
-
-            return (1f/RESOLUTION) * (segment + random.nextFloat());
+            return (1f/3f) * (segment + random.nextFloat());
         }
 
         public boolean isExpired() {
