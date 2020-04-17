@@ -16,6 +16,8 @@ public class AttachmentPoint implements Json.Serializable {
      */
     private String boneName;
     private Vector2 offset = new Vector2();
+    private float boneScale = 1.0f;
+
 
     /**
      * attached to static numeric value
@@ -37,6 +39,11 @@ public class AttachmentPoint implements Json.Serializable {
     public NumericalValue getStaticValue() {
         return numericalValue;
     }
+
+    public void setBoneScale (float scale) {
+        this.boneScale = scale;
+    }
+
 
     public enum Type {
         STATIC,
@@ -101,6 +108,14 @@ public class AttachmentPoint implements Json.Serializable {
 
     public void setOffset(float offsetX, float offsetY) {
         offset.set(offsetX, offsetY);
+    }
+
+    public float getWorldOffsetX () {
+        return offset.x * boneScale;
+    }
+
+    public float getWorldOffsetY () {
+        return offset.y * boneScale;
     }
 
     public String getBoneName() {

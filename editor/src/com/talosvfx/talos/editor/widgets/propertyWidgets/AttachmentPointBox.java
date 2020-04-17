@@ -75,7 +75,8 @@ public class AttachmentPointBox extends Table {
                     Vector2 pos = new Vector2();
                     Bone bone = ((BvBAddon) TalosMain.Instance().Addons().getAddon(BvBAddon.class)).getWorkspace().getSkeletonContainer().getBoneByName(boneList.getSelected());
                     pos.sub(bone.getWorldX(), bone.getWorldY());
-                    point.setOffset(pos.x, pos.y);
+                    float boneWorldScale = bone.getWorldScaleX();
+                    point.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
                     point.setBone(bone.getData().getName());
                 }
             });
