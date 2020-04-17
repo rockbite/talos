@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
 import com.talosvfx.talos.runtime.modules.RandomRangeModule;
 import com.talosvfx.talos.runtime.values.NumericalValue;
@@ -29,6 +30,7 @@ import com.talosvfx.talos.runtime.values.NumericalValue;
 public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
     FloatRangeInputWidget inputRange;
+    private VisCheckBox distribution;
 
     @Override
     public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
@@ -48,7 +50,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
     @Override
     protected float reportPrefWidth() {
-        return 250;
+        return 190;
     }
 
     @Override
@@ -58,6 +60,9 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
         addInputSlot("max", RandomRangeModule.MAX_INPUT);
 
         addOutputSlot("result", 0);
+
+        distribution = new VisCheckBox("distributed");
+        rightWrapper.add(distribution).right().expandX().padRight(3).row();
 
         inputRange = new FloatRangeInputWidget("Min", "Max", getSkin());
         inputRange.setValue(1, 1);
@@ -73,6 +78,12 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
             }
         });
 
+        distribution.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                module.setDistributed(distribution.isChecked());
+            }
+        });
     }
 
     private void updateValues() {
@@ -91,5 +102,6 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     public void setData(float min, float max) {
         inputRange.setValue(min, max);
         updateValues();
+        distribution.setChecked(module.isDistributed());
     }
 }

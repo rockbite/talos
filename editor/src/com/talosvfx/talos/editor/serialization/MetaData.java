@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class MetaData implements Json.Serializable {
@@ -54,6 +55,13 @@ public class MetaData implements Json.Serializable {
         json.writeValue("bgImageIsInBack", TalosMain.Instance().UIStage().PreviewWidget().isBackgroundImageInBack());
         json.writeValue("bgImageSize", TalosMain.Instance().UIStage().PreviewWidget().getBgImageSize());
         json.writeValue("gridSize", TalosMain.Instance().UIStage().PreviewWidget().getGridSize());
+
+        // particle position
+        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+        if(particleEffect != null) {
+            json.writeValue("particlePositionX", particleEffect.getPosition().x);
+            json.writeValue("particlePositionY", particleEffect.getPosition().y);
+        }
 
         final ObjectMap<FileHandle, FileTracker.FileEntry> currentTabFiles = TalosMain.Instance().FileTracker().getCurrentTabFiles();
 
@@ -89,6 +97,14 @@ public class MetaData implements Json.Serializable {
         TalosMain.Instance().UIStage().PreviewWidget().setBgImageSize(jsonData.getFloat("bgImageSize", 10));
         TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
+
+        // particle position
+        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+        if(particleEffect != null) {
+            float pPosX = jsonData.getFloat("particlePositionX", 0);
+            float pPosY = jsonData.getFloat("particlePositionY", 0);
+            particleEffect.setPosition(pPosX, pPosY);
+        }
 
         JsonValue resourcePaths = jsonData.get("resourcePaths");
         if (resourcePaths != null) {

@@ -19,6 +19,7 @@ package com.talosvfx.talos.runtime.modules;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.ScopePayload;
+import com.talosvfx.talos.runtime.utils.DistributedRandom;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 import java.util.Random;
@@ -38,6 +39,8 @@ public class RandomRangeModule extends AbstractModule {
     private float min = 1, max = 1;
 
     private Random random = new Random();
+    private DistributedRandom distributedRandom = new DistributedRandom();
+    private boolean distributed = false;
 
     @Override
     protected void defineSlots() {
@@ -49,11 +52,21 @@ public class RandomRangeModule extends AbstractModule {
 
     @Override
     public void processValues() {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000)));
         // what's worse, keeping thousands of long values, or keeping floats but casting 1000 times to long?
         // I'll leave the answer to the reader
+        long seed = (long) (getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000);
 
-        float startPos = random.nextFloat();
+        distributed = false;
+        //TODO: this is not working well so turning off for now, but must come back at some point
+
+        float startPos;
+        if(!distributed) {
+            random.setSeed(seed);
+            startPos = random.nextFloat();
+        } else {
+            distributedRandom.setSeed((int) (10000 * (index+1)));
+            startPos = distributedRandom.nextFloat();
+        }
 
         float min = this.min;
         float max = this.max;
@@ -88,13 +101,22 @@ public class RandomRangeModule extends AbstractModule {
         super.write(json);
         json.writeValue("min", min);
         json.writeValue("max", max);
+        json.writeValue("distributed", distributed);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        min = jsonData.getFloat("min");
-        max = jsonData.getFloat("max");
+        min = jsonData.getFloat("min", 0);
+        max = jsonData.getFloat("max", 0);
+        distributed = jsonData.getBoolean("distributed", false);
     }
 
+    public boolean isDistributed () {
+        return distributed;
+    }
+
+    public void setDistributed (boolean checked) {
+        distributed = checked;
+    }
 }

@@ -22,6 +22,7 @@
         <module name = "Beam Renderer" wrapper = "PolylineModuleWrapper">PolylineModule</module>
         <module name = "Ribbon Renderer" wrapper = "RibbonModuleWrapper">RibbonModule</module>
         <module name = "Sprite Renderer" wrapper = "TextureModuleWrapper">TextureModule</module>
+        <module name = "Nine Patch Renderer" wrapper = "NinePatchModuleWrapper">NinePatchModule</module>
         <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
     </category>
     <category name = "Randomness">

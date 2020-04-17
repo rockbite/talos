@@ -1,3 +1,9 @@
+[1.0.8]
+- Added none patch drawable for particles
+- Particle position is now remembered in project data
+- Distributed mode now distributes random values more smoothly (but slower)
+
+
 [1.0.7]
 - Added Ribbon renderer and module to render nice trails after moving particles
 - Added physics module to produce velocity and angle values from sum of applied forces (given mass is 1)

@@ -18,12 +18,10 @@ package com.talosvfx.talos.editor.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 public class IntegerInputWidget extends Table {
 
@@ -35,6 +33,14 @@ public class IntegerInputWidget extends Table {
     private int value;
 
     public IntegerInputWidget(String text, Skin skin) {
+        make(text, skin, Align.left);
+    }
+
+    public IntegerInputWidget(String text, Skin skin, int align) {
+        make(text, skin, align);
+    }
+
+    private void make(String text, Skin skin, int align) {
         setSkin(skin);
 
         Table table = new Table();
@@ -43,8 +49,20 @@ public class IntegerInputWidget extends Table {
         regularCarrier = new TextField("", getSkin());
         regularCarrier.setTextFieldFilter(new TextField.TextFieldFilter.DigitsOnlyFilter());
 
-        table.add(regularLabel).left().row();
-        table.add(regularCarrier).left().padTop(5).width(68);
+        Cell labelCell = table.add(regularLabel);
+        if(align == Align.left) {
+            labelCell.left();
+        } else {
+            labelCell.right();
+        }
+        labelCell.row();
+        Cell carrierCell = table.add(regularCarrier);
+        if(align == Align.left) {
+            carrierCell.left();
+        } else {
+            carrierCell.right();
+        }
+        carrierCell.padTop(5).width(68);
 
         regularCarrier.addListener(new ChangeListener() {
             @Override

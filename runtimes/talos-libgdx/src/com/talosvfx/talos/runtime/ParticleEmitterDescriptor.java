@@ -76,6 +76,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(CartToRadModule.class);
             registeredModules.add(AttractorModule.class);
             registeredModules.add(ForceApplierModule.class);
+            registeredModules.add(NinePatchModule.class);
         }
     }
 
