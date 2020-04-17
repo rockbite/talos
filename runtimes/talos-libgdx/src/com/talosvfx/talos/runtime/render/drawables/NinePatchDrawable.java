@@ -59,4 +59,9 @@ public class NinePatchDrawable implements ParticleDrawable {
         }
         this.region = region;
     }
+
+    public void resetPatch (int[] splits) {
+        if(region == null) return;
+        ninePatch =  new NinePatch(region, splits[0], splits[1], splits[2], splits[3]);
+    }
 }

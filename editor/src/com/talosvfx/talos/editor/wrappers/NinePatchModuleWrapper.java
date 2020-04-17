@@ -53,6 +53,7 @@ public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
 
     private void updateValues() {
         module.setSplits(leftSplit.getValue(), rightSplit.getValue(), topSplit.getValue(), bottomSplit.getValue());
+        module.resetPatch();
     }
 
     @Override

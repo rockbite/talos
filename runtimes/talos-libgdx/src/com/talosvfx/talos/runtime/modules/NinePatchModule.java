@@ -67,4 +67,9 @@ public class NinePatchModule extends AbstractModule {
     public int[] getSplits () {
         return splits;
     }
+
+    public void resetPatch () {
+        NinePatchDrawable patchDrawable = (NinePatchDrawable) outputValue.getDrawable();
+        patchDrawable.resetPatch(splits);
+    }
 }
