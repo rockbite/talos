@@ -133,8 +133,6 @@ public class DistributedRandom {
                 }
             }
 
-            System.out.println(segment);
-
             return (1f/RESOLUTION) * (segment + random.nextFloat());
         }
 
