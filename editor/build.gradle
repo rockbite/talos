@@ -13,9 +13,10 @@ apply plugin: 'nexus'
 
 dependencies {
     implementation project(":runtimes:talos-libgdx")
-    api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
     implementation "info.debatty:java-string-similarity:1.2.1"
     implementation "com.github.Tom-Ski:spine-runtimes:3.9-beta"
 }

@@ -1,7 +1,6 @@
 package com.talosvfx.talos.runtime.utils;
 
 import com.badlogic.gdx.utils.*;
-import com.sun.org.apache.regexp.internal.RE;
 
 import java.util.Iterator;
 import java.util.Random;
