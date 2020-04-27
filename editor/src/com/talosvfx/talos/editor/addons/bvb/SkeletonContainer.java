@@ -180,6 +180,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             public void event(AnimationState.TrackEntry entry, Event event) {
                 super.event(entry, event);
 
+                getWorkspace().flyLabel(event.getData().getName());
+
                 for(BoundEffect boundEffect: getBoundEffects()) {
                     String startEvent = boundEffect.getStartEvent();
                     String completeEvent = boundEffect.getCompleteEvent();

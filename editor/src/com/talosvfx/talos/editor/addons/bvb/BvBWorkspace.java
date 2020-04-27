@@ -9,7 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
@@ -58,10 +60,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private int selectIndex = 0;
 
+    private Group topUI = new Group();
+
     BvBWorkspace(BvBAddon bvb) {
         setSkin(TalosMain.Instance().getSkin());
         this.bvb = bvb;
         setModeUI();
+
+        topUI.setTransform(false);
 
         skeletonContainer = new SkeletonContainer(this);
 
@@ -263,6 +269,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if(skeletonContainer != null) {
             skeletonContainer.update(delta * speedMultiplier, paused);
         }
+
+        topUI.act(delta);
     }
 
     @Override
@@ -278,6 +286,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         drawTools(batch, parentAlpha);
 
+        topUI.draw(batch, parentAlpha);
     }
 
     private void drawTools(Batch batch, float parentAlpha) {
@@ -682,5 +691,25 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     public SkeletonContainer getSkeletonContainer() {
         return skeletonContainer;
+    }
+
+    public void flyLabel (String text) {
+        Label label = new Label(text, TalosMain.Instance().getSkin());
+        label.setPosition(getWidth()/2f - label.getPrefWidth()/2f, 0);
+        addActor(label);
+
+        label.addAction(Actions.fadeOut(0.4f));
+
+        label.addAction(Actions.sequence(
+                Actions.moveBy(0, 100, 0.5f),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run () {
+                        label.remove();
+                    }
+                })
+        ));
+
+
     }
 }
