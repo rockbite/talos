@@ -286,7 +286,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         drawTools(batch, parentAlpha);
 
-        topUI.draw(batch, parentAlpha);
+        if(showingTools) {
+            topUI.draw(batch, parentAlpha);
+        }
     }
 
     private void drawTools(Batch batch, float parentAlpha) {
