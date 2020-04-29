@@ -16,15 +16,17 @@
 
 package com.talosvfx.talos;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
@@ -36,6 +38,7 @@ import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -103,7 +106,17 @@ public class TalosMain extends ApplicationAdapter {
 		return preferences;
 	}
 
+	public ScreenshotService Screeshot() {
+		return screenshotService;
+	}
+
+	private ScreenshotService screenshotService;
+
+	public Cursor pickerCursor;
+	private Cursor currentCursor;
+
 	public TalosMain () {
+
 	}
 
 	@Override
@@ -140,6 +153,8 @@ public class TalosMain extends ApplicationAdapter {
 
 		TalosMain.instance = this;
 
+		screenshotService = new ScreenshotService();
+
 		addonController = new AddonController();
 
 		preferences = Gdx.app.getPreferences("talos-preferences");
@@ -149,6 +164,8 @@ public class TalosMain extends ApplicationAdapter {
 		skin.addRegions(atlas);
 
 		VisUI.load(skin);
+
+		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
 
 		uiStage = new UIStage(skin);
 
@@ -185,6 +202,17 @@ public class TalosMain extends ApplicationAdapter {
 		});
 		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
 
+	}
+
+	public void setCursor(Cursor cursor) {
+		if(currentCursor != cursor) {
+			if(cursor != null) {
+				Gdx.graphics.setCursor(cursor);
+			} else {
+				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+			}
+			currentCursor = cursor;
+		}
 	}
 
 	public void disableNodeStage() {
@@ -228,6 +256,8 @@ public class TalosMain extends ApplicationAdapter {
 
 		uiStage.getStage().act();
 		uiStage.getStage().draw();
+
+		screenshotService.postRender();
 	}
 
 	public void reportException(Throwable e) {
@@ -246,6 +276,7 @@ public class TalosMain extends ApplicationAdapter {
 		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
 			currentWorkplaceStage.getStage().dispose();
 		}
+		pickerCursor.dispose();
 		uiStage.getStage().dispose();
 	}
 
