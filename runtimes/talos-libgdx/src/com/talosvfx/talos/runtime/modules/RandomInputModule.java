@@ -77,10 +77,10 @@ public class RandomInputModule extends AbstractModule {
         Value output = outputSlots.get(0).getValue();
         if(output != null) {
             random.setSeed((long) ((getScope().getFloat(ScopePayload.EMITTER_ALPHA_AT_P_INIT) * 10000 * (index+1) * 1000)));
-            int index = MathUtils.floor(random.nextFloat() * (inputSlots.size - 1));
+            int index = MathUtils.round(random.nextFloat() * (inputSlots.size - 1));
 
             Value input = inputSlots.get(index).getValue();
-            if(input != null) {
+            if(input != null && !input.isEmpty()) {
                 output.set(input);
             }
         }
