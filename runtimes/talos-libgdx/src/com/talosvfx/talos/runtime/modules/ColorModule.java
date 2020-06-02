@@ -26,16 +26,18 @@ public class ColorModule extends AbstractModule {
     public static final int R = 0;
     public static final int G = 1;
     public static final int B = 2;
+    public static final int A = 3;
     public static final int OUTPUT = 0;
 
     NumericalValue r;
     NumericalValue g;
     NumericalValue b;
+    NumericalValue a;
     NumericalValue output;
 
     Color tmpColor = new Color();
 
-    float defaultR = 1, defaultG = 0, defaultB = 0;
+    float defaultR = 1, defaultG = 0, defaultB = 0,defaultA = 1;
 
     public ColorModule () {
 
@@ -46,6 +48,7 @@ public class ColorModule extends AbstractModule {
         r = createInputSlot(R);
         g = createInputSlot(G);
         b = createInputSlot(B);
+        a = createInputSlot(A);
 
         output = createOutputSlot(OUTPUT);
     }
@@ -57,7 +60,7 @@ public class ColorModule extends AbstractModule {
         if(g.isEmpty()) g.set(defaultG);
         if(b.isEmpty()) b.set(defaultB);
 
-        output.set(r, g, b);
+        output.set(r, g, b,a);
     }
 
     public void setR(float r) {
@@ -80,16 +83,16 @@ public class ColorModule extends AbstractModule {
     @Override
     public void write (Json json) {
         super.write(json);
-        json.writeValue("r", defaultR);
-        json.writeValue("g", defaultG);
-        json.writeValue("b", defaultB);
+        json.writeValue("color",getColor().toString());
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        defaultR = jsonData.getFloat("r");
-        defaultG = jsonData.getFloat("g");
-        defaultB = jsonData.getFloat("b");
+        tmpColor = Color.valueOf(jsonData.getString("color"));
+        defaultR = tmpColor.r;
+        defaultG = tmpColor.g;
+        defaultB = tmpColor.b;
+        defaultA = tmpColor.a;
     }
 }
