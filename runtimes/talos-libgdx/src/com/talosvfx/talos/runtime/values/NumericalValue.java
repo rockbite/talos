@@ -149,6 +149,22 @@ public class NumericalValue extends Value {
 		elements[1] = val2.getFloat();
 		elements[2] = val3.getFloat();
 	}
+	public void set(NumericalValue val1, NumericalValue val2, NumericalValue val3,NumericalValue val4) {
+		currentElementCount = 4;
+		elements[0] = val1.getFloat();
+		elements[1] = val2.getFloat();
+		elements[2] = val3.getFloat();
+		elements[4] = val4.getFloat();
+	}
+	public void set(NumericalValue ... val) {
+		currentElementCount = val.length;
+		if(elements.length < val.length) {
+			elements = new float[val.length];
+		}
+		for (int i = 0; i < val.length ; i++) {
+			elements[i] = val[i].getFloat();
+		}
+	}
 
 	public void set(float val1, float val2, float val3) {
 		currentElementCount = 3;
@@ -164,7 +180,12 @@ public class NumericalValue extends Value {
 		elements[2] = val3;
 		elements[3] = val3;
 	}
-
+	
+	public void set(float ... vals) {
+		currentElementCount = vals.length;
+		elements = vals;
+	}
+	
 	public float getFloat() {
 		return elements[0];
 	}
