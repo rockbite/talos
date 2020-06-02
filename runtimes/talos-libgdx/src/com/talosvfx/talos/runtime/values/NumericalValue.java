@@ -154,7 +154,7 @@ public class NumericalValue extends Value {
 		elements[0] = val1.getFloat();
 		elements[1] = val2.getFloat();
 		elements[2] = val3.getFloat();
-		elements[4] = val4.getFloat();
+		elements[3] = val4.getFloat();
 	}
 	public void set(NumericalValue ... val) {
 		currentElementCount = val.length;
