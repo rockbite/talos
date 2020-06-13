@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.EventData;
 import com.esotericsoftware.spine.Slot;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.talosvfx.talos.editor.utils.NumberUtils;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
@@ -365,6 +367,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
         String effectPath = parent.getWorkspace().getPath(effectName + ".p");
         FileHandle effectHandle = TalosMain.Instance().ProjectController().findFile(effectPath);
         this.name = effectName;
+
+        if(effectHandle == null || !effectHandle.exists()) {
+           throw new GdxRuntimeException("Particle effect not found");
+        }
 
         parent.getWorkspace().registerTalosAssets(effectHandle);
 

@@ -431,8 +431,12 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             JsonValue data = boundEffect.get("data");
             BoundEffect effect = new BoundEffect();
             effect.setParent(this);
-            effect.read(json, data);
-            addEffect(skin, animation, effect);
+            try {
+                effect.read(json, data);
+                addEffect(skin, animation, effect);
+            } catch (Exception e) {
+                // can't add this effect as it failed to load
+            }
         }
         boolean wasSet = setSkeleton(jsonHandle);
 
