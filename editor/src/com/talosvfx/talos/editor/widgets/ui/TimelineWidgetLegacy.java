@@ -31,7 +31,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterInstance;
 
-public class TimelineWidget extends Table {
+@Deprecated
+public class TimelineWidgetLegacy extends Table {
 
     Table listContent;
 
@@ -39,7 +40,7 @@ public class TimelineWidget extends Table {
 
     EmitterRow selectedRow;
 
-    public TimelineWidget(Skin skin) {
+    public TimelineWidgetLegacy(Skin skin) {
         setSkin(skin);
 
         Table topBar = new Table();
@@ -207,9 +208,9 @@ public class TimelineWidget extends Table {
         private boolean selecteed = true;
 
         private ParticleEmitterWrapper wrapper;
-        private TimelineWidget timeline;
+        private TimelineWidgetLegacy timeline;
 
-        public EmitterRow(final TimelineWidget timeline, Skin skin) {
+        public EmitterRow(final TimelineWidgetLegacy timeline, Skin skin) {
             this.timeline = timeline;
             setSkin(skin);
             setBackground(getSkin().getDrawable("red_row"));

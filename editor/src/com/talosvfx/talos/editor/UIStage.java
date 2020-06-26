@@ -63,7 +63,7 @@ public class UIStage {
 
 	Table fullScreenTable;
 
-	private TimelineWidget timelineWidget;
+	private TimelineWidgetLegacy timelineWidget;
 	public PreviewWidget previewWidget;
 
 	FileChooser fileChooser;
@@ -383,7 +383,7 @@ public class UIStage {
 	private void constructSplitPanes () {
 		previewWidget = new PreviewWidget();
 
-		timelineWidget = new TimelineWidget(skin);
+		timelineWidget = new TimelineWidgetLegacy(skin);
 
 		Table midTable = new Table();
 		bottomTable = new Table();
@@ -480,7 +480,7 @@ public class UIStage {
 		}
 	}
 
-	public TimelineWidget Timeline() {
+	public TimelineWidgetLegacy Timeline() {
 		return timelineWidget;
 	}
 
