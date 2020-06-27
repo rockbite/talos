@@ -14,4 +14,10 @@ public interface TimelineItemDataProvider<U> {
     U getIdentifier();
 
     int getIndex();
+
+    float getDurationOne ();
+
+    float getDurationTwo ();
+
+    float getTimePosition ();
 }

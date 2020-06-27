@@ -82,4 +82,22 @@ public class ParticleEmitterWrapper implements TimelineItemDataProvider<Particle
     public int getIndex() {
         return getEmitter().getSortPosition();
     }
+
+    @Override
+    public float getDurationOne () {
+        if(getEmitter().getEmitterModule() == null) return 0;
+        return getEmitter().getEmitterModule().getDuration();
+    }
+
+    @Override
+    public float getDurationTwo () {
+        if(getEmitter().getParticleModule() == null) return 0;
+        return getEmitter().getParticleModule().getLife();
+    }
+
+    @Override
+    public float getTimePosition () {
+        if(getEmitter().getEmitterModule() == null) return 0;
+        return getEmitter().getEmitterModule().getDelay();
+    }
 }

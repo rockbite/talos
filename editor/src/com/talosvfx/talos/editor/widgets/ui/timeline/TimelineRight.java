@@ -88,9 +88,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         Table content = new Table();
 
         TimeCursor timeCursorWidget = new TimeCursor(getSkin());
-        timeCursorWidget.setPosition(100, 0);
-
-        timeCursorWidget.addAction(Actions.moveBy(200, 0, 4f));
+        timeCursorWidget.setPosition(0, 0);
 
         addActor(timeCursorWidget);
 

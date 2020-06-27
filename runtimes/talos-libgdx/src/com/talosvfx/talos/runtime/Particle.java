@@ -52,13 +52,15 @@ public class Particle implements Pool.Poolable {
 
         this.seed = MathUtils.random();
 
+        // inner variable defaults
+        alpha = 0f;
+
         particleModule.updateScopeData(this);
+
+        life = particleModule.getLife(); // really makes more sense like this, for deterministic purposes
 
         position.set(particleModule.getStartPosition()); // offset
         spawnPosition.set(particleEmitter.getEffect().position);
-
-        // inner variable defaults
-        alpha = 0f;
 
         durationAtInit = particleEmitter.alpha;
     }
@@ -70,7 +72,6 @@ public class Particle implements Pool.Poolable {
         ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
         if(particleModule == null) return;
 
-        life = particleModule.getLife();
         alpha += delta/life;
         if(alpha > 1f) alpha = 1f;
         particleModule.updateScopeData(this);

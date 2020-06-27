@@ -85,4 +85,5 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
         setData(emitterWrappers);
     }
+
 }
