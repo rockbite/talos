@@ -1,15 +1,29 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.DynamicSlider;
 import com.talosvfx.talos.editor.widgets.ui.common.FlatButton;
 
 public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
     private Table contentTable;
     private ScrollPane scrollPane;
+
+    private float timeWindowSize;
+    private float timeWindowPosition = 0f;
+    private float timeCursor = 0f;
+
+
+    private Slider zoomSlider;
+
+    private DynamicSlider timeSlider;
+    private Slider scroll;
 
     public TimelineRight(TimelineWidget timeline) {
         super(timeline);
@@ -27,6 +41,28 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         mainPart.add(contentPane).grow().row();
         mainPart.add(bottomPanel).height(18).growX().padLeft(-1).row();
+
+        initListeners();
+
+        Table controls = buildControls();
+        contentPane.addActor(controls);
+    }
+
+    private void initListeners() {
+        zoomSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateTimeWindow(zoomSlider.getValue());
+            }
+        });
+    }
+
+    private void updateTimeWindow(float value) {
+        value = value / 100f; // normalize to 0-1
+        value = 1f - value;
+
+        timeWindowSize = (float) (5f + Math.pow(value * 4f, 3.425f));
+
     }
 
     private Table buildContentContainerPane () {
@@ -48,6 +84,19 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         return content;
     }
 
+    private Table buildControls() {
+        Table content = new Table();
+
+        TimeCursor timeCursorWidget = new TimeCursor(getSkin());
+        timeCursorWidget.setPosition(100, 0);
+
+        timeCursorWidget.addAction(Actions.moveBy(200, 0, 4f));
+
+        addActor(timeCursorWidget);
+
+        return content;
+    }
+
     private Table buildRightPart () {
         Table content = new Table();
 
@@ -63,15 +112,16 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         FlatButton up = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         up.flipVertical();
         up.getIconCell().padTop(2);
-        Slider slider = new Slider(0, 10, 1, true, getSkin(), "timeline-vertical");
-        slider.setHeight(10);
+
+        scroll = new Slider(0, 100, 1, true, getSkin(), "timeline-vertical");
+        scroll.setHeight(10);
         FlatButton down = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         down.flipHorizontal();
         down.flipVertical();
-        down.getIconCell().padTop(2);
+        down.getIconCell().padTop(2).padRight(2);
         Table sliderTable = new Table();
         sliderTable.add(up).size(18).row();
-        sliderTable.add(slider).growY().width(18).padTop(-1).padBottom(-1).row();
+        sliderTable.add(scroll).growY().width(18).padTop(-1).padBottom(-1).row();
         sliderTable.add(down).size(18).row();
 
         mainTable.add(sliderTable).padLeft(-1).grow().row();
@@ -93,7 +143,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         Table timeBar = new Table();
         timeBar.setBackground(getSkin().getDrawable("timeline-time-bar"));
-        topPart.add(timeBar).height(17).padTop(8).growX().expandY().top().row();
+        topPart.add(timeBar).height(17).padTop(7).growX().expandY().top().row();
 
         return header;
     }
@@ -124,7 +174,9 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private Table buildBottomPanel () {
         Table contentContainer = new Table();
 
-        Slider slider = new Slider(0, 10, 1, false, getSkin(), "timeline-horizontal");
+        timeSlider = new DynamicSlider( false, getSkin());
+        timeSlider.setValue(0);
+        timeSlider.updateConfig(0, timeWindowSize);
 
         FlatButton left = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         left.flipHorizontal();
@@ -133,14 +185,16 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         right.getIconCell().padTop(2).padLeft(2);
 
         Table sliderTable = new Table();
-        sliderTable.add(left).padTop(-1).width(24).height(18);
-        sliderTable.add(slider).padLeft(-1).padRight(-1).grow().height(18).padTop(1);
-        sliderTable.add(right).padTop(-1).width(24).height(18);
+        sliderTable.add(left).padTop(0).width(24).height(18);
+        sliderTable.add(timeSlider).padLeft(-1).padRight(-1).grow().height(17).padTop(0);
+        sliderTable.add(right).padTop(0).width(24).height(18);
 
         FlatButton defaultZoomBtn = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-resize"));
         defaultZoomBtn.getIconCell().padTop(1);
 
-        Slider zoomSlider = new Slider(0, 10, 1, false, getSkin(), "mini-slider");
+        zoomSlider = new Slider(0, 100, 1, false, getSkin(), "mini-slider");
+        zoomSlider.setValue(50);
+        updateTimeWindow(zoomSlider.getValue());
 
         Image border = new Image(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.BLACK));
 
@@ -198,6 +252,17 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     }
 
     private void addItemToTable(Table item) {
-        contentTable.add(item).growX().top().height(25).row();
+        contentTable.add(item).growX().top().height(21).row();
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        // update time related values
+        for(TimeRow<U> row: getItems()) {
+            row.updateTimeWindow(timeWindowPosition, timeWindowSize);
+        }
+        timeSlider.updateConfig(0, timeWindowSize);
     }
 }

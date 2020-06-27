@@ -158,8 +158,8 @@ public class TalosProject implements IProject {
 	public void resetToNew(){
 		cleanData();
 		projectData = new ProjectData();
-		loadEmitter("default_emitter", 0);
-
+		currentEmitterWrapper = loadEmitter("default_emitter", 0);
+		TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 	}

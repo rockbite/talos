@@ -236,6 +236,6 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
     }
 
     private void addItemToTable(Table item) {
-        contentTable.add(item).growX().top().height(25).row();
+        contentTable.add(item).growX().top().height(21).row();
     }
 }

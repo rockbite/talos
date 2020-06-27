@@ -13,6 +13,8 @@ public class ColorLibrary {
     public static Color FONT_WHITE = new Color(Color.valueOf("#cccccc"));
     public static Color FONT_GRAY = new Color(Color.valueOf("#919191"));
 
+    public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
+
     public enum BackgroundColor {
         LIGHT_GRAY ("#525252"),
         PANEL_GRAY ("#4e4d4d"),

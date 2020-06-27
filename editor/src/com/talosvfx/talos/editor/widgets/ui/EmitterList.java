@@ -47,7 +47,14 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 for(ParticleEmitterWrapper wrapper: selector) {
                     TalosMain.Instance().TalosProject().removeEmitter(wrapper);
                 }
+                
                 removeItems(selector);
+
+                Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+                if(activeWrappers.size == 0) {
+                    // we need to create default one
+                    TalosMain.Instance().TalosProject().resetToNew();
+                }
             }
         });
     }
