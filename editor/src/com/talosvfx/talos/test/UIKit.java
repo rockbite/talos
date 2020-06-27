@@ -7,15 +7,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
-import com.talosvfx.talos.editor.widgets.ui.timeline.ItemDataProvider;
-import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItems;
-import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
+import com.talosvfx.talos.editor.widgets.ui.EmitterList;
 
 public class UIKit extends ApplicationAdapter {
 
@@ -46,32 +40,9 @@ public class UIKit extends ApplicationAdapter {
 
         table = new Table();
 
-        //makeToolbar();
-        TimelineWidget timeline = new TimelineWidget(skin);
+        EmitterList emitterList = new EmitterList(skin);
         table.add().grow().row();
-        table.add(timeline).height(250).growX().bottom();
-
-
-        Array<ItemDataProvider> items = new Array<>();
-        for(int i = 0; i < 4; i++) {
-            items.add(new ItemDataProvider() {
-                @Override
-                public Array<Button> registerSecondaryActionButtons () {
-                    return null;
-                }
-
-                @Override
-                public Array<Button> registerMainActionButtons () {
-                    return null;
-                }
-
-                @Override
-                public String getItemName () {
-                    return "Test Emitter";
-                }
-            });
-        }
-        timeline.setData(items);
+        table.add(emitterList).height(250).growX().bottom();
 
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);

@@ -63,7 +63,7 @@ public class UIStage {
 
 	Table fullScreenTable;
 
-	private TimelineWidgetLegacy timelineWidget;
+	private EmitterList emitterList;
 	public PreviewWidget previewWidget;
 
 	FileChooser fileChooser;
@@ -383,7 +383,7 @@ public class UIStage {
 	private void constructSplitPanes () {
 		previewWidget = new PreviewWidget();
 
-		timelineWidget = new TimelineWidgetLegacy(skin);
+		emitterList = new EmitterList(skin);
 
 		Table midTable = new Table();
 		bottomTable = new Table();
@@ -406,12 +406,12 @@ public class UIStage {
 		libraryContainer.setTouchable(Touchable.enabled);
 		bottomPane = new VisSplitPane(bottomContainer, libraryContainer, false);
 		bottomPane.setSplitAmount(1f); // remove this line when the bottom-right panel content will be implemented
-		bottomContainer.add(timelineWidget).grow().expand().fill();
+		bottomContainer.add(emitterList).grow().expand().fill();
 		bottomTable.add(bottomPane).expand().grow();
 
 		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
-		verticalPane.setMaxSplitAmount(0.95f);
-		verticalPane.setMinSplitAmount(0.05f);
+		verticalPane.setMaxSplitAmount(0.7f);
+		verticalPane.setMinSplitAmount(0.3f);
 		verticalPane.setSplitAmount(0.8f);
 
 		leftTable = new Table();
@@ -480,8 +480,8 @@ public class UIStage {
 		}
 	}
 
-	public TimelineWidgetLegacy Timeline() {
-		return timelineWidget;
+	public EmitterList Timeline() {
+		return emitterList;
 	}
 
 	public void resize (int width, int height) {
@@ -489,7 +489,7 @@ public class UIStage {
 	}
 
 	public void setEmitters (Array<ParticleEmitterWrapper> emitterWrappers) {
-		timelineWidget.setEmitters(emitterWrappers);
+		emitterList.setEmitters(emitterWrappers);
 	}
 
 	public void showColorPicker(ColorPickerListener listener) {

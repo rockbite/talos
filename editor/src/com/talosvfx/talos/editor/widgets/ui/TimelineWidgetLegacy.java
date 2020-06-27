@@ -84,8 +84,8 @@ public class TimelineWidgetLegacy extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", -1);
-                selectRow(emitter);
+                //final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().loadEmitter("emitter", -1);
+                //selectRow(emitter);
             }
         });
 
@@ -126,6 +126,7 @@ public class TimelineWidgetLegacy extends Table {
     }
 
     public void moveWrapperSortingPosition(ParticleEmitterWrapper wrapper, int changeBy) { // -1 or 1
+        /*
         try {
             if(changeBy < -1) changeBy = -1;
             if(changeBy > 1) changeBy = 1;
@@ -145,10 +146,10 @@ public class TimelineWidgetLegacy extends Table {
             emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
             emTwo.emitterGraph.setSortPosition(tmp);
 
-            TalosMain.Instance().TalosProject().sortEmitters();
+            //TalosMain.Instance().TalosProject().sortEmitters();
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
-        }
+        }*/
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {

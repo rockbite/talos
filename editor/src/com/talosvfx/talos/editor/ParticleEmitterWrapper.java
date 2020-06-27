@@ -16,14 +16,17 @@
 
 package com.talosvfx.talos.editor;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 
-public class ParticleEmitterWrapper {
+public class ParticleEmitterWrapper implements TimelineItemDataProvider<ParticleEmitterWrapper> {
 
     private String emitterName = "";
     public boolean isMuted;
     private boolean isSolo;
-    private int position;
+    private float position;
 
     private ParticleEmitterDescriptor moduleGraph;
 
@@ -45,5 +48,38 @@ public class ParticleEmitterWrapper {
 
     public ParticleEmitterDescriptor getEmitter() {
         return moduleGraph;
+    }
+
+    @Override
+    public Array<Button> registerSecondaryActionButtons() {
+        return null;
+    }
+
+    @Override
+    public Array<Button> registerMainActionButtons() {
+        return null;
+    }
+
+    @Override
+    public String getItemName() {
+        return emitterName;
+    }
+
+    public float getPosition() {
+        return position;
+    }
+
+    public void setPosition(float position) {
+        this.position = position;
+    }
+
+    @Override
+    public ParticleEmitterWrapper getIdentifier() {
+        return this;
+    }
+
+    @Override
+    public int getIndex() {
+        return getEmitter().getSortPosition();
     }
 }

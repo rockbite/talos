@@ -1,29 +1,20 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.FlatButton;
 
-public class TimelineMain extends Table {
+public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
-    private Pool<TimelineRow> rowPool;
-    private Array<TimelineRow> rows = new Array<>();
     private Table contentTable;
+    private ScrollPane scrollPane;
 
-    private TimelineRow selectedRow = null;
+    public TimelineRight(TimelineWidget timeline) {
+        super(timeline);
 
-    public TimelineMain(Skin skin) {
-        setSkin(skin);
-
-        setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.PANEL_GRAY));
+        setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.PANEL_GRAY));
 
         Table contentPane = buildContentContainerPane();
         Table bottomPanel = buildBottomPanel();
@@ -36,13 +27,6 @@ public class TimelineMain extends Table {
 
         mainPart.add(contentPane).grow().row();
         mainPart.add(bottomPanel).height(18).growX().padLeft(-1).row();
-
-        rowPool = new Pool<TimelineRow>() {
-            @Override
-            protected TimelineRow newObject () {
-                return new TimelineRow(skin);
-            }
-        };
     }
 
     private Table buildContentContainerPane () {
@@ -80,6 +64,7 @@ public class TimelineMain extends Table {
         up.flipVertical();
         up.getIconCell().padTop(2);
         Slider slider = new Slider(0, 10, 1, true, getSkin(), "timeline-vertical");
+        slider.setHeight(10);
         FlatButton down = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         down.flipHorizontal();
         down.flipVertical();
@@ -119,11 +104,21 @@ public class TimelineMain extends Table {
         content.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.DARK_GRAY));
 
         contentTable = new Table();
-        ScrollPane scrollPane = new ScrollPane(contentTable);
+        scrollPane = new ScrollPane(contentTable);
+        scrollPane.setSmoothScrolling(false);
+        scrollPane.setOverscroll(false, false);
 
         content.add(scrollPane).growX().expand().top().row();
 
         return content;
+    }
+
+    public float getScrollPos() {
+        return scrollPane.getScrollY();
+    }
+
+    public void setScrollPos(float pos) {
+        scrollPane.setScrollY(pos);
     }
 
     private Table buildBottomPanel () {
@@ -161,125 +156,48 @@ public class TimelineMain extends Table {
         return contentContainer;
     }
 
-    public void setData (Array<ItemDataProvider> items) {
-        clearRows();
 
-        int index = 0;
-        for(ItemDataProvider item: items) {
-            TimelineRow row = rowPool.obtain();
-            row.setIndex(index++);
-            rows.add(row);
-
-            contentTable.add(row).growX().top().height(24).row();
-
-            row.addListener(new ClickListener() {
-                @Override
-                public void clicked (InputEvent event, float x, float y) {
-                    if(event.isCancelled()) return;
-                    selectRow(row);
-
-                    ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
-                    try {
-                        fire(changeEvent);
-                    } finally {
-                        Pools.free(changeEvent);
-                    }
-                }
-            });
-        }
+    @Override
+    protected TimeRow<U> createNewItem() {
+        return new TimeRow<U>(timeline);
     }
 
-    public int getSelectedIndex () {
-        return rows.indexOf(selectedRow, true);
-    }
+    @Override
+    protected void addItem(TimeRow<U> item) {
+        super.addItem(item);
 
+        addItemToTable(item);
 
-    public void setSelected(int index) {
-        if(index < 0) return;
-        selectRow(rows.get(index));
-    }
+        item.addListener(new ClickListener() {
 
-    private void selectRow(TimelineRow newRow) {
-        if(selectedRow != null) {
-            selectedRow.setSelected(false);
-        }
-        newRow.setSelected(true);
-        selectedRow = newRow;
-    }
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
 
-    public void clearSelection() {
-        if(selectedRow != null) {
-            selectedRow.setSelected(false);
-        }
+                if(event.isCancelled()) return;
 
-        selectedRow = null;
-    }
-
-    public void clearRows() {
-        for(TimelineRow row: rows) {
-            rowPool.free(row);
-        }
-        rows.clear();
-    }
-
-    public class TimelineRow extends Table implements Pool.Poolable {
-
-        private int index =  -1;
-        private final Drawable selectedBackground;
-        private Drawable[] backgrounds;
-
-        private boolean isSelected = false;
-
-        public TimelineRow(Skin skin) {
-            setSkin(skin);
-
-            setHeight(20);
-
-            Drawable lightBackground = skin.getDrawable("timeline-row-light");
-            Drawable darkBackground = skin.getDrawable("timeline-row-dark");
-
-            backgrounds = new Drawable[2];
-            backgrounds[0] = lightBackground;
-            backgrounds[1] = darkBackground;
-
-            selectedBackground = skin.getDrawable("timeline-row-selected");
-
-            setBackground(lightBackground); // this will be set as zebra pattern later by parent
-
-            setTouchable(Touchable.enabled);
-        }
-
-        @Override
-        public void reset () {
-            super.reset();
-        }
-
-        public boolean isSelected() {
-            return isSelected;
-        }
-
-        public void setSelected(boolean isSelected) {
-            this.isSelected = isSelected;
-
-            if(isSelected) {
-                setBackground(selectedBackground);
-            } else {
-                setIndex(index);
+                timeline.onRowClicked(item);
             }
+        });
+    }
+
+    @Override
+    public void clearItems() {
+        super.clearItems();
+
+        contentTable.clearChildren();
+    }
+
+    @Override
+    protected void rebuildFromData() {
+        contentTable.clearChildren();
+
+        for(TimeRow item: getItems()) {
+            addItemToTable(item);
         }
+    }
 
-        public void setIndex (int index) {
-            if(index == -1) {
-                setBackground(backgrounds[0]);
-            } else {
-                int backgroundIndex = index % backgrounds.length;
-                Drawable background = backgrounds[backgroundIndex];
-
-                this.index = index;
-
-                setBackground(background);
-            }
-        }
-
+    private void addItemToTable(Table item) {
+        contentTable.add(item).growX().top().height(25).row();
     }
 }
