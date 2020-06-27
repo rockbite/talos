@@ -244,11 +244,14 @@ public class TalosProject implements IProject {
 	public ParticleEmitterWrapper createNewEmitter (String emitterName, float sortPosition) {
 		ParticleEmitterWrapper emitterWrapper = initEmitter(emitterName);
 		activeWrappers.add(emitterWrapper);
+		currentEmitterWrapper = emitterWrapper;
 
 		emitterWrapper.setPosition(sortPosition);
 		sortEmitters();
 
 		TalosMain.Instance().ProjectController().setDirty();
+
+		TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
 
 		return emitterWrapper;
 	}
@@ -256,9 +259,12 @@ public class TalosProject implements IProject {
 	public ParticleEmitterWrapper loadEmitter(String emitterName, int sortPosition) {
 		ParticleEmitterWrapper emitterWrapper = initEmitter(emitterName);
 		activeWrappers.add(emitterWrapper);
+		currentEmitterWrapper = emitterWrapper;
 
 		emitterWrapper.getEmitter().setSortPosition(sortPosition);
 		emitterWrapper.setPosition(sortPosition);
+
+		TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
 
 		return emitterWrapper;
 	}
