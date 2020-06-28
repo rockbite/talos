@@ -15,8 +15,15 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
 
     private Table contentTable;
     private Label typeLabel;
-    private SquareButton repeatBtn;
     private ScrollPane scrollPane;
+
+    private SquareButton repeatBtn;
+    private SquareButton newBtn;
+    private SquareButton playBack;
+    private SquareButton play;
+
+    private SquareButton upBtn;
+    private SquareButton downBtn;
 
     public TimelineLeft(TimelineWidget timeline) {
         super(timeline);
@@ -46,15 +53,20 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
         Skin skin = getSkin();
         SquareButton ffBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"));
         ffBack.flipHorizontal();
-        SquareButton playBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        playBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true);
         playBack.flipHorizontal();
-        SquareButton play = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        play = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true);
         SquareButton ffForward = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"));
         repeatBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-repeat"), true);
 
-        SquareButton newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
         newBtn.getIconCell().padTop(2).padLeft(1);
         SquareButton deleteBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-delete"));
+
+        upBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        upBtn.flipVertical();
+        downBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        downBtn.flipVertical(); downBtn.flipHorizontal();
 
         Table header = new Table();
         header.setBackground(skin.getDrawable("timeline-top-bar-bg"));
@@ -63,11 +75,13 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
         Table bottomPart = new Table();
 
         topPart.add(ffBack).padLeft(6).left();
-        topPart.add(playBack).padLeft(6).left();
+        //topPart.add(playBack).padLeft(6).left(); // TODO: add this back when we can support
         topPart.add(play).padLeft(6).left();
         topPart.add(ffForward).padLeft(6).left();
         topPart.add(repeatBtn).padLeft(6).left();
         topPart.add().growX().minWidth(20);
+        topPart.add(upBtn).padRight(6).right();
+        topPart.add(downBtn).padRight(10).right();
         topPart.add(newBtn).right().padRight(6);
         topPart.add(deleteBtn).right().padRight(6);
 
@@ -123,6 +137,18 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 timeline.onActionButtonClicked(TimelineListener.Type.newItem);
+            }
+        });
+        upBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                timeline.onActionButtonClicked(TimelineListener.Type.up);
+            }
+        });
+        downBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                timeline.onActionButtonClicked(TimelineListener.Type.down);
             }
         });
 
@@ -237,5 +263,21 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
 
     private void addItemToTable(Table item) {
         contentTable.add(item).growX().top().height(21).row();
+    }
+
+    public SquareButton getNewButton() {
+        return newBtn;
+    }
+
+    public SquareButton getPlayButton() {
+        return play;
+    }
+
+    public SquareButton getPlayBackButton() {
+        return playBack;
+    }
+
+    public SquareButton getRepeatButton() {
+        return repeatBtn;
     }
 }

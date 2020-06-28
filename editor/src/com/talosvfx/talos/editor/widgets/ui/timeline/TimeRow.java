@@ -22,11 +22,16 @@ public class TimeRow<U> extends BasicRow<U> {
     public void updateTimeWindow(float timeWindowPosition, float timeWindowSize) {
         if(dataProviderRef == null) return;
 
-        float durationOne = dataProviderRef.getDurationOne();
-        float durationTwo = dataProviderRef.getDurationTwo();
         float timePosition = dataProviderRef.getTimePosition();
 
-        areaWidget.set(durationOne, durationTwo, timePosition);
+        if(dataProviderRef.isFull()) {
+            float durationOne = dataProviderRef.getDurationOne();
+            areaWidget.setFull(durationOne, timePosition);
+        } else {
+            float durationOne = dataProviderRef.getDurationOne();
+            float durationTwo = dataProviderRef.getDurationTwo();
+            areaWidget.set(durationOne, durationTwo, timePosition);
+        }
 
         float widgetWidth = (areaWidget.getTimeSize()/timeWindowSize) * getWidth();
 
@@ -43,19 +48,38 @@ public class TimeRow<U> extends BasicRow<U> {
 
     private class AreaWidget extends Table {
 
-        private final Cell<Image> leftCell;
-        private final Cell<Image> rightCell;
+        private final Table fullTable;
+        private final Table partTable;
+        private final Image left;
+        private final Image right;
         private float leftDuration;
         private float rightDuration;
         private float timePosition;
 
         public AreaWidget(Skin skin) {
-            setSkin(skin);
-            Image left = new Image(getSkin().getDrawable("timeline-timeline-item-left"));
-            Image right = new Image(getSkin().getDrawable("timeline-timeline-item-right"));
 
-            leftCell = add(left).grow();
-            rightCell = add(right).grow();
+            setSkin(skin);
+
+            Stack stack = new Stack();
+
+            partTable = new Table();
+            fullTable = new Table();
+
+            stack.add(partTable);
+            stack.add(fullTable);
+
+            fullTable.setVisible(false);
+
+            left = new Image(getSkin().getDrawable("timeline-timeline-item-left"));
+            right = new Image(getSkin().getDrawable("timeline-timeline-item-right"));
+            Image full = new Image(getSkin().getDrawable("timeline-timeline-item-full"));
+
+            partTable.addActor(left);
+            partTable.addActor(right);
+
+            fullTable.add(full).grow();
+
+            add(stack).expand().grow();
         }
 
         public void set (float durationOne, float durationTwo, float timePosition) {
@@ -63,8 +87,19 @@ public class TimeRow<U> extends BasicRow<U> {
             rightDuration = durationTwo;
             this.timePosition = timePosition;
 
-            leftCell.width(Value.percentWidth(leftDuration/getTimeSize(), this));
-            rightCell.width(Value.percentWidth(rightDuration/getTimeSize(), this));
+            partTable.setVisible(true);
+            fullTable.setVisible(false);
+        }
+
+        @Override
+        public void setWidth (float width) {
+            super.setWidth(width);
+
+            if(rightDuration > 0) {
+                left.setWidth((width * leftDuration) / getTimeSize());
+                right.setWidth((width * rightDuration) / getTimeSize());
+                right.setX(left.getWidth());
+            }
         }
 
         public float getTimeSize () {
@@ -74,6 +109,16 @@ public class TimeRow<U> extends BasicRow<U> {
         public float getTimePosition() {
             return timePosition;
         }
+
+        public void setFull (float durationOne, float timePosition) {
+            partTable.setVisible(false);
+            fullTable.setVisible(true);
+
+            this.leftDuration = durationOne;
+            this.rightDuration = 0;
+
+            this.timePosition = timePosition;
+        }
     }
 
     @Override
@@ -81,11 +126,5 @@ public class TimeRow<U> extends BasicRow<U> {
         super.setFrom(dataProvider);
 
         dataProviderRef = dataProvider;
-
-        float durationOne = dataProvider.getDurationOne();
-        float durationTwo = dataProvider.getDurationTwo();
-        float timePosition = dataProvider.getTimePosition();
-
-        areaWidget.set(durationOne, durationTwo, timePosition);
     }
 }

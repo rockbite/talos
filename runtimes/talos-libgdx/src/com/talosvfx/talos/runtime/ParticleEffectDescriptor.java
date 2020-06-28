@@ -129,6 +129,9 @@ public class ParticleEffectDescriptor {
 
 	public boolean isContinuous() {
 		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
+			if(emitterDescriptor.getEmitterModule() == null) {
+				return false;
+			}
 			if(emitterDescriptor.isContinuous()) {
 				return true;
 			}

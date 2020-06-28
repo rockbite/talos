@@ -219,6 +219,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 super.complete(entry);
             }
         });
+
+        effectScopeUpdated();
     }
 
     public void update(float delta, boolean isSkeletonPaused) {
@@ -242,6 +244,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public AnimationState getAnimationState() {
         return animationState;
     }
+
+    public Animation getCurrentAnimation() {return currentAnimation; }
 
     public float getBoneRotation(String boneName) {
         Bone bone = skeleton.findBone(boneName);
@@ -297,6 +301,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public BoundEffect addEffect(String skinName, String animationName, BoundEffect effect) {
         getBoundEffects(skinName, animationName).add(effect);
 
+        effect.setDrawOrder(getBoundEffects().size-1); // todo this is not going to work well and is not tested
+
         return effect;
     }
 
@@ -305,6 +311,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         boundEffect.setForever(true);
 
         getBoundEffects().add(boundEffect);
+        boundEffect.setDrawOrder(getBoundEffects().size-1); // todo this is not going to work well and is not tested
 
         return boundEffect;
     }
@@ -448,6 +455,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             skeleton.setSkin(currentSkin);
             currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
             animationState.setAnimation(0, currentAnimation, true);
+
+            effectScopeUpdated();
         }
     }
 
@@ -500,6 +509,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             public void valueChanged(String value) {
                 currentSkin = skeleton.getData().findSkin(value);
                 skeleton.setSkin(currentSkin);
+                effectScopeUpdated();
             }
         };
 
@@ -530,6 +540,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 animationState.setAnimation(0, currentAnimation, true);
 
                 workspace.effectUnselected(workspace.selectedEffect);
+
+                effectScopeUpdated();
             }
         };
 
@@ -570,5 +582,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         if(skeleton != null) {
             skeleton.setScale(x, y);
         }
+    }
+
+    private void effectScopeUpdated() {
+        workspace.effectScopeUpdated();
     }
 }

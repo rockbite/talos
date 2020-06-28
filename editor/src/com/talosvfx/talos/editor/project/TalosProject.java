@@ -105,6 +105,9 @@ public class TalosProject implements IProject {
 				module.getModule().setModuleGraph(graph);
 			}
 
+			particleEffectDescriptor.setEffectReference(particleEffect); // important
+			particleEffectDescriptor.addEmitter(graph);
+			particleEffect.init();
 
 			// time to load groups here
 			for(GroupData group: emitterData.groups) {
@@ -235,6 +238,7 @@ public class TalosProject implements IProject {
 		ParticleEmitterDescriptor moduleGraph = TalosMain.Instance().TalosProject().particleEffectDescriptor.createEmitterDescriptor();
 		emitterWrapper.setModuleGraph(moduleGraph);
 
+		//particleEffect.addAdvancedEmitter(moduleGraph);
 		particleEffect.addEmitter(moduleGraph);
 
 		return emitterWrapper;
@@ -379,5 +383,42 @@ public class TalosProject implements IProject {
 
 	public Array<ParticleEmitterWrapper> getActiveWrappers() {
 		return activeWrappers;
+	}
+
+	public float estimateTotalEffectDuration() {
+		Array<ParticleEmitterWrapper> activeWrappers = getActiveWrappers();
+
+		if (particleEffectDescriptor.isContinuous()) {
+			float maxWindow = 0;
+			for (ParticleEmitterWrapper wrapper : activeWrappers) {
+				if(wrapper.getEmitter().getEmitterModule() != null) {
+					float duration = wrapper.getEmitter().getEmitterModule().getDuration();
+
+					float totalWaitTime = duration;
+
+					if (maxWindow < totalWaitTime) {
+						maxWindow = totalWaitTime;
+					}
+				}
+			}
+
+			return maxWindow;
+		} else {
+			float maxWindow = 0;
+			for (ParticleEmitterWrapper wrapper : activeWrappers) {
+				if(wrapper.getEmitter().getEmitterModule() != null) {
+					float delay = wrapper.getEmitter().getEmitterModule().getDelay();
+					float duration = wrapper.getEmitter().getEmitterModule().getDuration();
+
+					float totalWaitTime = delay + duration;
+
+					if (maxWindow < totalWaitTime) {
+						maxWindow = totalWaitTime;
+					}
+				}
+			}
+
+			return maxWindow;
+		}
 	}
 }

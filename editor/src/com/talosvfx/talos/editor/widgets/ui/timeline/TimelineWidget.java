@@ -105,6 +105,10 @@ public abstract class TimelineWidget<U> extends Table {
         return leftList.getSelected();
     }
 
+    public TimelineLeft<U> getActionWidget() {
+        return leftList;
+    }
+
     public boolean isItemVisible (U identifier) {
         ActionRow<U> item = leftList.getItem(identifier);
 
@@ -122,7 +126,7 @@ public abstract class TimelineWidget<U> extends Table {
     }
 
     public void onVisibilityToggled(ActionRow<U> item) {
-        fire(obtainEvent().as(TimelineListener.Type.visibilityChanged).target(item));
+        fire(obtainEvent().as(TimelineListener.Type.visibilityChanged).target(item).payload(item.isItemVisible()));
     }
 
     public void onSelectorToggled(ActionRow<U> item) {
@@ -171,13 +175,9 @@ public abstract class TimelineWidget<U> extends Table {
         // sync trackers
         leftScrollTracker = leftList.getScrollPos();
         rightScrollTracker = rightList.getScrollPos();
+    }
 
-
-        // test shit
-        if(Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
-            ParticleEmitterDescriptor graph = TalosMain.Instance().TalosProject().getActiveWrappers().first().getGraph();
-            TinyEmitter tinyEmitter = new TinyEmitter(graph);
-            tinyEmitter.simulate();
-        }
+    public void setTimeCursor (float time) {
+        rightList.setTimeCursor(time);
     }
 }

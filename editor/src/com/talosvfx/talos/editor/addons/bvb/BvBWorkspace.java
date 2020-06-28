@@ -32,7 +32,8 @@ import java.io.StringWriter;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
-    public final BvBAddon bvb;
+    private static BvBWorkspace instance;
+    public BvBAddon bvb;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer renderer;
@@ -62,9 +63,22 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private Group topUI = new Group();
 
-    BvBWorkspace(BvBAddon bvb) {
-        setSkin(TalosMain.Instance().getSkin());
+    public static BvBWorkspace getInstance() {
+        if(instance == null) {
+            instance = new BvBWorkspace();
+        }
+        return instance;
+    }
+
+    public void setBvBAddon(BvBAddon bvb) {
         this.bvb = bvb;
+
+        bvb.properties.showPanel(this);
+        bvb.properties.showPanel(skeletonContainer);
+    }
+
+    private BvBWorkspace() {
+        setSkin(TalosMain.Instance().getSkin());
         setModeUI();
 
         topUI.setTransform(false);
@@ -89,8 +103,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         addListeners();
         addPanListener();
 
-        bvb.properties.showPanel(this);
-        bvb.properties.showPanel(skeletonContainer);
+        instance = this;
     }
 
     private void addListeners() {
@@ -217,6 +230,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 }
                 if(keycode == Input.Keys.SPACE) {
                     paused = !paused;
+                    bvb.getTimeline().setPaused(paused);
                 }
                 if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
                     if(selectedEffect != null) {
@@ -713,5 +727,17 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         ));
 
 
+    }
+
+    public void effectScopeUpdated () {
+        bvb.getTimeline().updateEffectList(skeletonContainer.getBoundEffects());
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 }

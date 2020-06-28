@@ -101,6 +101,13 @@ public class ActionRow<U> extends BasicRow<U> {
         super.setFrom(dataProvider);
 
         label.setText(dataProvider.getItemName());
+        boolean isVisible = dataProvider.isItemVisible();
+        if (isItemVisible) {
+            eye.getColor().a = 1f;
+        } else {
+            eye.getColor().a = 0.3f;
+        }
+        this.isItemVisible = isVisible;
     }
 
     public boolean isSelectorChecked() {

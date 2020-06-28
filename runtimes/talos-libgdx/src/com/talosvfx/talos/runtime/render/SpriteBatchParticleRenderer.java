@@ -19,6 +19,7 @@ package com.talosvfx.talos.runtime.render;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEmitterInstance;
@@ -46,15 +47,15 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
-			final ParticleEmitterInstance particleEmitter = particleEffectInstance.getEmitters().get(i);
-			if(!particleEmitter.isVisible) continue;
-			if(particleEmitter.isAdditive) {
+			final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
+			if(!particleEmitter.isVisible()) continue;
+			if(particleEmitter.isAdditive()) {
 				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 			} else {
 				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			}
- 			for (int j = 0; j < particleEmitter.activeParticles.size; j++) {
-				renderParticle(batch, particleEmitter.activeParticles.get(j), particleEffectInstance.alpha);
+ 			for (int j = 0; j < particleEmitter.getActiveParticleCount(); j++) {
+				renderParticle(batch, particleEmitter.getActiveParticles().get(j), particleEffectInstance.alpha);
 			}
 		}
 
@@ -63,7 +64,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 	private void renderParticle (Batch batch, Particle particle, float parentAlpha) {
 		color.set(particle.color);
-		color.mul(particle.particleEmitter.tint);
+		color.mul(particle.getEmitter().getTint());
 		color.a = particle.transparency * parentAlpha;
 		batch.setColor(color);
 

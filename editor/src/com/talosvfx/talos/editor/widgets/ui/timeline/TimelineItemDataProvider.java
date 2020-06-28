@@ -15,9 +15,13 @@ public interface TimelineItemDataProvider<U> {
 
     int getIndex();
 
+    boolean isFull();
+
     float getDurationOne ();
 
     float getDurationTwo ();
 
     float getTimePosition ();
+
+    boolean isItemVisible ();
 }

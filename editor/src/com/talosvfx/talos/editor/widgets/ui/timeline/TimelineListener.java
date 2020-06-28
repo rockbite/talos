@@ -15,7 +15,7 @@ public class TimelineListener implements EventListener {
                     onItemSelect(timelineEvent.getTargetIdentifier());
                     break;
                 case visibilityChanged:
-                    onItemVisibilityChange(timelineEvent.getTargetIdentifier());
+                    onItemVisibilityChange(timelineEvent.getTargetIdentifier(), (Boolean) timelineEvent.payload);
                     break;
                 case selectorUpdated:
                     onSelectorUpdate();
@@ -43,6 +43,12 @@ public class TimelineListener implements EventListener {
                     break;
                 case rename:
                     onItemRename(timelineEvent.getTargetIdentifier(), (String) timelineEvent.payload);
+                    break;
+                case up:
+                    onUp();
+                    break;
+                case down:
+                    onDown();
                     break;
             }
         }
@@ -88,7 +94,7 @@ public class TimelineListener implements EventListener {
     }
 
 
-    protected void onItemVisibilityChange(Object identifier) {}
+    protected void onItemVisibilityChange(Object identifier, boolean isVisible) {}
 
 
     protected void onSelectorUpdate() {}
@@ -100,6 +106,8 @@ public class TimelineListener implements EventListener {
     protected void onNewClicked() {}
     protected void onDeleteClicked() {}
     protected void onToggleLoop(boolean loopEnabled) {}
+    protected void onDown () {}
+    protected void onUp () {}
 
     protected void onItemRename(Object identifier, String newName) {}
 
@@ -114,6 +122,8 @@ public class TimelineListener implements EventListener {
         newItem,
         deleteSelection,
         toggleLoop,
-        rename
+        rename,
+        up,
+        down
     }
 }

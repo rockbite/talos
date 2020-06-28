@@ -18,7 +18,9 @@ package com.talosvfx.talos.editor;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 
 public class ParticleEmitterWrapper implements TimelineItemDataProvider<ParticleEmitterWrapper> {
@@ -84,20 +86,49 @@ public class ParticleEmitterWrapper implements TimelineItemDataProvider<Particle
     }
 
     @Override
+    public boolean isFull () {
+        if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return false;
+
+        return getEmitter().isContinuous();
+    }
+
+    @Override
     public float getDurationOne () {
-        if(getEmitter().getEmitterModule() == null) return 0;
+        if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
+
+        if(getEmitter().getEffectDescriptor().isContinuous() && !getEmitter().isContinuous()) {
+            // apparently if effect is continuous, non continuous effect currently don't play
+            return 0;
+        }
+
         return getEmitter().getEmitterModule().getDuration();
     }
 
     @Override
     public float getDurationTwo () {
-        if(getEmitter().getParticleModule() == null) return 0;
+        if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
+
+        if(getEmitter().getEffectDescriptor().isContinuous() && !getEmitter().isContinuous()) {
+            // apparently if effect is continuous, non continuous effect currently don't play
+            return 0;
+        }
+
+        if(getEmitter().isContinuous()) {
+            return 0;
+        }
+
         return getEmitter().getParticleModule().getLife();
     }
 
     @Override
     public float getTimePosition () {
-        if(getEmitter().getEmitterModule() == null) return 0;
+        if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
+
         return getEmitter().getEmitterModule().getDelay();
+    }
+
+    @Override
+    public boolean isItemVisible () {
+        return !isMuted;
     }
 }

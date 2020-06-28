@@ -6,12 +6,14 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.DynamicSlider;
 import com.talosvfx.talos.editor.widgets.ui.common.FlatButton;
 
 public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
+    private final Table contentPane;
     private Table contentTable;
     private ScrollPane scrollPane;
 
@@ -19,18 +21,22 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private float timeWindowPosition = 0f;
     private float timeCursor = 0f;
 
-
     private Slider zoomSlider;
 
     private DynamicSlider timeSlider;
     private Slider scroll;
+    private TimeCursor timeCursorWidget;
+
+    private StringBuilder stringBuilder = new StringBuilder();
+    private final String ZERO_STRING = "0";
+    private final String TIME_SEPARATOR_STRING = " : ";
 
     public TimelineRight(TimelineWidget timeline) {
         super(timeline);
 
         setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.PANEL_GRAY));
 
-        Table contentPane = buildContentContainerPane();
+        contentPane = buildContentContainerPane();
         Table bottomPanel = buildBottomPanel();
 
         Table mainPart = new Table();
@@ -87,7 +93,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private Table buildControls() {
         Table content = new Table();
 
-        TimeCursor timeCursorWidget = new TimeCursor(getSkin());
+        timeCursorWidget = new TimeCursor(getSkin());
         timeCursorWidget.setPosition(0, 0);
 
         addActor(timeCursorWidget);
@@ -262,5 +268,29 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
             row.updateTimeWindow(timeWindowPosition, timeWindowSize);
         }
         timeSlider.updateConfig(0, timeWindowSize);
+    }
+
+    public void setTimeCursor (float time) {
+        timeCursor = time;
+
+        float pos = (time/timeWindowSize) * contentPane.getWidth() * 0.5f; // unclear yet why i need to device by two
+
+        timeCursorWidget.setPosition(pos, 0);
+
+        int seconds = (int) time;
+        int millis = (int)((time - seconds) * 10) * 10;
+
+        stringBuilder.clear();
+        if(seconds < 10) {
+            stringBuilder.append(ZERO_STRING);
+        }
+        stringBuilder.append(seconds);
+        stringBuilder.append(TIME_SEPARATOR_STRING);
+        if(millis < 10) {
+            stringBuilder.append(ZERO_STRING);
+        }
+        stringBuilder.append(millis);
+
+        timeCursorWidget.setLabelValue(stringBuilder.toString());
     }
 }

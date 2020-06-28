@@ -21,6 +21,9 @@ public class DynamicSlider extends Slider {
 
         String drawableName = "timeline-slider-" + (vertical? "vertical" : "horizontal");
         knobDrawable = getSkin().newDrawable(drawableName);
+        SliderStyle style = new SliderStyle();
+        setStyle(style);
+
         Drawable staticDrawable = getStyle().knobAfter = getSkin().getDrawable(drawableName);
         getStyle().knob = knobDrawable;
         getStyle().knobOver = knobDrawable;
