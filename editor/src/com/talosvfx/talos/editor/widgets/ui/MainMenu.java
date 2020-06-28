@@ -56,7 +56,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.0.7.2", ":P");
+                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.1.0", "Added support for read-only timeline, dynamic data manipulation coming with 1.1.1");
             }
         });
 
