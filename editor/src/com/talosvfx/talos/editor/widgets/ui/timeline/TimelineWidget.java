@@ -1,10 +1,15 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.simulation.TinyEmitter;
 
 public abstract class TimelineWidget<U> extends Table {
 
@@ -166,5 +171,13 @@ public abstract class TimelineWidget<U> extends Table {
         // sync trackers
         leftScrollTracker = leftList.getScrollPos();
         rightScrollTracker = rightList.getScrollPos();
+
+
+        // test shit
+        if(Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
+            ParticleEmitterDescriptor graph = TalosMain.Instance().TalosProject().getActiveWrappers().first().getGraph();
+            TinyEmitter tinyEmitter = new TinyEmitter(graph);
+            tinyEmitter.simulate();
+        }
     }
 }
