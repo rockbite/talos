@@ -404,21 +404,22 @@ public class TalosProject implements IProject {
 
 			return maxWindow;
 		} else {
-			float maxWindow = 0;
+			float furthestPoint = 0;
 			for (ParticleEmitterWrapper wrapper : activeWrappers) {
-				if(wrapper.getEmitter().getEmitterModule() != null) {
+				if(wrapper.getEmitter().getEmitterModule() != null && wrapper.getEmitter().getParticleModule() != null) {
 					float delay = wrapper.getEmitter().getEmitterModule().getDelay();
 					float duration = wrapper.getEmitter().getEmitterModule().getDuration();
+					float life = wrapper.getEmitter().getParticleModule().getLife();
 
-					float totalWaitTime = delay + duration;
+					float point = delay + duration + life;
 
-					if (maxWindow < totalWaitTime) {
-						maxWindow = totalWaitTime;
+					if (furthestPoint < point) {
+						furthestPoint = point;
 					}
 				}
 			}
 
-			return maxWindow;
+			return furthestPoint;
 		}
 	}
 }
