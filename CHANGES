@@ -1,3 +1,10 @@
+[1.1.0]
+- Read only timeline for BVB
+- Read only timeline for Talos
+- Data simulation emitter added to runtime but not used yet (will be able to play effects in "reverse"), which is needed for 1.1.1
+- Some stability and bug fixes on draw order
+- Fixed bug with multiple input module not working properly
+
 [1.0.8]
 - Added none patch drawable for particles
 - Particle position is now remembered in project data
