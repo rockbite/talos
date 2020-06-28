@@ -28,12 +28,12 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onUp () {
-
+                moveItemSorting(1.5f);
             }
 
             @Override
             protected void onDown () {
-
+                moveItemSorting(-1.5f);
             }
 
             @Override
@@ -101,20 +101,35 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         });
     }
 
+    private void moveItemSorting(float moveBy) {
+        ParticleEmitterWrapper selectedItem = getSelectedItem();
+
+        if(selectedItem != null) {
+            float sortPosition = selectedItem.getEmitter().getSortPosition() + moveBy;
+            selectedItem.setPosition(sortPosition);
+            TalosMain.Instance().TalosProject().sortEmitters();
+
+            Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+            activeWrappers.reverse();
+            setData(activeWrappers);
+            setSelected(selectedItem);
+        }
+    }
+
     private void createNewEmitterClicked() {
         ParticleEmitterWrapper selectedItem = getSelectedItem();
         float sortPosition = 0;
         // if nothing is selected we are adding on top
         if(selectedItem != null) {
-            sortPosition = selectedItem.getEmitter().getSortPosition() - 0.5f;
+            sortPosition = selectedItem.getEmitter().getSortPosition() + 0.5f;
         }
 
         final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", sortPosition);
         Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-        addNewItem(emitter);
 
         // update all items
-        updateItemData(activeWrappers);
+        activeWrappers.reverse();
+        setData(activeWrappers);
 
         setSelected(emitter);
     }
@@ -125,7 +140,14 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
-        setData(emitterWrappers);
+        if(emitterWrappers.size > 0) {
+            emitterWrappers.reverse();
+            setData(emitterWrappers);
+            setSelected(emitterWrappers.first());
+
+            TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(emitterWrappers.first());
+            TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrappers.first());
+        }
     }
 
     @Override
