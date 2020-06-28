@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class TimeRow<U> extends BasicRow<U> {
@@ -72,7 +73,12 @@ public class TimeRow<U> extends BasicRow<U> {
 
             left = new Image(getSkin().getDrawable("timeline-timeline-item-left"));
             right = new Image(getSkin().getDrawable("timeline-timeline-item-right"));
+            right.setColor(new Color(Color.WHITE));
+            right.getColor().a = 0.3f;
+            left.setY(0.5f);
+            right.setY(0.5f);
             Image full = new Image(getSkin().getDrawable("timeline-timeline-item-full"));
+            full.setY(1); // uh just.. fml
 
             partTable.addActor(left);
             partTable.addActor(right);

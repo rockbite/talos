@@ -273,7 +273,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     public void setTimeCursor (float time) {
         timeCursor = time;
 
-        float pos = (time/timeWindowSize) * contentPane.getWidth() * 0.5f; // unclear yet why i need to device by two
+        float pos = (time/timeWindowSize) * contentPane.getWidth() * 0.5f; // jesus, this is 0.5 is just... I can't, this is so stupid. wtf
 
         timeCursorWidget.setPosition(pos, 0);
 
