@@ -59,12 +59,14 @@ public class ParticleList extends TimelineWidget<BoundEffect> {
     @Override
     public void act (float delta) {
         super.act(delta);
-        float animTime = workspace.getSkeletonContainer().getAnimationState().getTracks().first().getTrackTime();
-        float duration = workspace.getSkeletonContainer().getCurrentAnimation().getDuration();
+        if (workspace.getSkeletonContainer().getAnimationState() != null) {
+            float animTime = workspace.getSkeletonContainer().getAnimationState().getTracks().first().getTrackTime();
+            float duration = workspace.getSkeletonContainer().getCurrentAnimation().getDuration();
 
-        float time = animTime % duration;
+            float time = animTime % duration;
 
-        setTimeCursor(time);
+            setTimeCursor(time);
+        }
     }
 
     public void setPaused (boolean paused) {
