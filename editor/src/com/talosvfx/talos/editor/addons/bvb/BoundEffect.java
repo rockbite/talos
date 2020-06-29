@@ -462,6 +462,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         } else {
             float maxDuration = 0;
             Array<ParticleEmitterDescriptor> emitterModuleGraphs = particleEffectDescriptor.emitterModuleGraphs;
+            if(particleEffectDescriptor.getInstanceReference() == null) return 0;
             for (ParticleEmitterDescriptor descriptor : emitterModuleGraphs) {
                 float duration = descriptor.getEmitterModule().getDuration();
                 if (maxDuration < duration) {
@@ -480,6 +481,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         } else {
             float maxLife = 0;
             Array<ParticleEmitterDescriptor> emitterModuleGraphs = particleEffectDescriptor.emitterModuleGraphs;
+            if(particleEffectDescriptor.getInstanceReference() == null) return 0;
             for (ParticleEmitterDescriptor descriptor : emitterModuleGraphs) {
 
                 float life = descriptor.getParticleModule().getLife();

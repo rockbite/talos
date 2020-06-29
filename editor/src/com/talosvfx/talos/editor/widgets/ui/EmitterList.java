@@ -159,7 +159,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
         float time = totalTime % duration;
 
-        setTimeCursor(time);
+        //setTimeCursor(time);
     }
 
     public void setPaused (boolean paused) {
