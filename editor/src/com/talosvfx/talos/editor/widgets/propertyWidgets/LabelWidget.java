@@ -16,7 +16,6 @@ public abstract class LabelWidget extends PropertyWidget<String> {
 	@Override
 	public Actor getSubWidget() {
 		propertyValue = new Label("", TalosMain.Instance().getSkin());
-		propertyValue.setWidth(170);
 		propertyValue.setEllipsis(true);
 		propertyValue.setAlignment(Align.right);
 

@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.widgets.ui.timeline;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -179,5 +180,15 @@ public abstract class TimelineWidget<U> extends Table {
 
     public void setTimeCursor (float time) {
         rightList.setTimeCursor(time);
+    }
+
+    public float stageToTime (Vector2 vec2) {
+        rightList.getTimeBar().stageToLocalCoordinates(vec2);
+        float posPercent = vec2.x/rightList.getTimeBar().getWidth();
+        float time = posPercent * rightList.getTimeWindowSize();
+
+        if(time < 0) return 0;
+
+        return time;
     }
 }

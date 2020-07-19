@@ -37,7 +37,7 @@ public abstract class PropertyWidget<T> extends Table {
 	}
 
 	protected void addToContainer(Actor actor) {
-		valueContainer.add(actor).growX().right();
+		valueContainer.add(actor).growX().width(0).right();
 	}
 
 	public abstract T getValue();

@@ -410,9 +410,9 @@ public class UIStage {
 		bottomTable.add(bottomPane).expand().grow();
 
 		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
-		verticalPane.setMaxSplitAmount(0.7f);
-		verticalPane.setMinSplitAmount(0.1f);
-		verticalPane.setSplitAmount(0.9f);
+		verticalPane.setMaxSplitAmount(0.70f);
+		verticalPane.setMinSplitAmount(0.3f);
+		verticalPane.setSplitAmount(0.7f);
 
 		leftTable = new Table();
 		leftTable.setSkin(skin);

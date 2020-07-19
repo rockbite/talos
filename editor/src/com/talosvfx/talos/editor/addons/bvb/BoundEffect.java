@@ -75,8 +75,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      * Start and complete event names, if empty then in sync with skeleton's animation loop
      */
     private String startEvent = "";
-
     private String completeEvent = "";
+    private float startTime = 0;
 
     /**
      * System vars
@@ -100,12 +100,13 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     }
 
     public void setForever(boolean isForever) {
+        /*
         if(isForever && !forever) {
             particleEffects.clear();
             ParticleEffectInstance instance = spawnEffect();
             instance.loopable = true; // this is evil
         }
-        forever = isForever;
+        forever = isForever;*/
     }
 
     private ParticleEffectInstance spawnEffect() {
@@ -405,7 +406,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
         isBehind = jsonData.getBoolean("isBehind");
 
-        setForever(startEvent.equals("") && completeEvent.equals(""));
+        //setForever(startEvent.equals("") && completeEvent.equals(""));
     }
 
     public String getStartEvent() {
@@ -496,7 +497,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
     @Override
     public float getTimePosition () {
-        return 0;
+        return startTime;
     }
 
     @Override
@@ -504,7 +505,21 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         return true;
     }
 
+    @Override
+    public void setTimePosition (float time) {
+        if (particleEffectDescriptor.isContinuous()) {
+            return;
+        }
+
+        startTime = time;
+        if(startTime < 0) startTime = 0;
+    }
+
     public void setDrawOrder (int drawOrder) {
         this.drawOrder = drawOrder;
+    }
+
+    public boolean isContinuous () {
+        return particleEffectDescriptor.isContinuous();
     }
 }

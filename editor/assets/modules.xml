@@ -49,6 +49,7 @@
     </category>
     <category name = "Advanced">
         <module name = "Emitter Config" wrapper = "EmConfigModuleWrapper">EmConfigModule</module>
+        <module name = "Scope" wrapper = "ScopeModuleWrapper">NANModule</module>
         <module name = "Script (Java)" wrapper = "ScriptModuleWrapper">ScriptModule</module>
     </category>
 </modules>

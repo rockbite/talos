@@ -259,7 +259,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         });
     }
 
-    private void effectSelected(BoundEffect effect) {
+    public void effectSelected(BoundEffect effect) {
         selectedEffect = effect;
         bvb.properties.showPanel(effect);
     }
@@ -477,6 +477,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         BoundEffect effect = skeletonContainer.addEffect(name, descriptor);
         effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
+
+        bvb.getTimeline().updateEffectList(skeletonContainer.getBoundEffects());
 
         TalosMain.Instance().ProjectController().setDirty();
 

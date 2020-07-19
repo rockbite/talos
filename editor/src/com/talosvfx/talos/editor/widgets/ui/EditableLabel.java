@@ -52,11 +52,11 @@ public class EditableLabel extends Table {
         stack.add(labelTable);
         stack.add(inputTable);
 
-        add(stack).grow();
+        add(stack).expand().grow();
 
         label = new Label(text, getSkin(), "default");
-        labelTable.add(label);
-        labelTable.add().expandX();
+        label.setEllipsis(true);
+        labelTable.add(label).growX().width(0);
 
 
         textField = new TextField(text, getSkin(), "no-bg");
