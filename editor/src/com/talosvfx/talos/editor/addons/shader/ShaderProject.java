@@ -29,7 +29,7 @@ public class ShaderProject implements IProject {
 
     @Override
     public String getExtension () {
-        return ".shd";
+        return ".shader";
     }
 
     @Override

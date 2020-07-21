@@ -83,6 +83,8 @@ public class UIStage {
 
 	private Table bottomContainer;
 	private MainMenu mainMenu;
+	private VisSplitPane horizontalPane;
+	private VisSplitPane verticalPane;
 
 
 	public UIStage (Skin skin) {
@@ -409,7 +411,7 @@ public class UIStage {
 		bottomContainer.add(emitterList).grow().expand().fill();
 		bottomTable.add(bottomPane).expand().grow();
 
-		VisSplitPane verticalPane = new VisSplitPane(midTable, bottomTable, true);
+		verticalPane = new VisSplitPane(midTable, bottomTable, true);
 		verticalPane.setMaxSplitAmount(0.70f);
 		verticalPane.setMinSplitAmount(0.3f);
 		verticalPane.setSplitAmount(0.7f);
@@ -419,7 +421,7 @@ public class UIStage {
 		leftTable.add(previewWidget).grow();
 		rightTable = new Table(); rightTable.setSkin(skin);
 		rightTable.add().grow();
-		VisSplitPane horizontalPane = new VisSplitPane(leftTable, rightTable, false);
+		horizontalPane = new VisSplitPane(leftTable, rightTable, false);
 		midTable.add(horizontalPane).expand().grow().fill();
 		horizontalPane.setMaxSplitAmount(0.8f);
 		horizontalPane.setMinSplitAmount(0.2f);
@@ -439,9 +441,21 @@ public class UIStage {
 		rightTable.add(right).grow();
 		bottomTable.add(bottom).expand().grow();
 
+		if(left == null && right == null && bottom != null) {
+			horizontalPane.setVisible(false);
+		}
+
+		if(left == null && right == null && bottom == null) {
+			horizontalPane.setVisible(false);
+			verticalPane.setVisible(false);
+		}
+
 	}
 
 	public void swapToTalosContent() {
+		verticalPane.setVisible(true);
+		horizontalPane.setVisible(true);
+
 		leftTable.clearChildren();
 		rightTable.clearChildren();
 		bottomTable.clearChildren();
@@ -507,5 +521,22 @@ public class UIStage {
 
 	public Skin getSkin() {
 		return skin;
+	}
+
+	public void showFileChooser(String extension, FileChooserAdapter listener) {
+		fileChooser.setMode(FileChooser.Mode.OPEN);
+		fileChooser.setMultiSelectionEnabled(false);
+
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(extension);
+			}
+		});
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(listener);
+
+		stage.addActor(fileChooser.fadeIn());
 	}
 }

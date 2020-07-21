@@ -1,4 +1,4 @@
-<modules>
+<modules classPath = "com.talosvfx.talos.runtime.modules">
     <category name = "Main Modules">
         <module name = "Particle" wrapper = "ParticleModuleWrapper">ParticleModule</module>
         <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>

@@ -1,0 +1,8 @@
+<modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
+    <category name = "General">
+        <module name = "Output">ColorOutput</module>
+        <module name = "Sample Texture">SampleTextureNode</module>
+        <module name = "Color">ColorNode</module>
+        <module name = "Mixer">MixNode</module>
+    </category>
+</modules>
