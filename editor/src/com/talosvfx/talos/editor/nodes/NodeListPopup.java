@@ -30,7 +30,7 @@ public class NodeListPopup extends VisWindow {
     private String classPath;
 
     interface NodeListListener {
-        void chosen(Class clazz, float x, float y);
+        void chosen(Class clazz, XmlReader.Element module, float x, float y);
     }
 
     private NodeListListener nodeListListener;
@@ -99,7 +99,7 @@ public class NodeListPopup extends VisWindow {
                     if(nodeListListener != null) {
                         try {
                             Class clazz = ClassReflection.forName(classPath + "." + nodeClazzName);
-                            nodeListListener.chosen(clazz, createLocation.x, createLocation.y);
+                            nodeListListener.chosen(clazz, registry.get(clazz), createLocation.x, createLocation.y);
                         } catch (ReflectionException e) {
                             e.printStackTrace();
                         }
@@ -131,7 +131,7 @@ public class NodeListPopup extends VisWindow {
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
             FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("name"), new Label(module.getAttribute("name"), getSkin()));
-            nameToNodeClass.put(module.getAttribute("name"), module.getText());
+            nameToNodeClass.put(module.getAttribute("name"), module.getAttribute("title"));
 
             registerNode(module);
 

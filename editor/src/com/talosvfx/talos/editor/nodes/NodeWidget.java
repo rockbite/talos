@@ -6,17 +6,14 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
-import com.kotcrab.vis.ui.widget.VisLabel;
+import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 public abstract class NodeWidget extends EmptyWindow {
 
-    protected Table leftTable;
-    protected Table rightTable;
     EditableLabel title;
 
     protected IntMap<Image> inputSlotMap = new IntMap<>();
@@ -73,25 +70,15 @@ public abstract class NodeWidget extends EmptyWindow {
         row();
         add(content).expand().grow().top().pad(7, 10, 17, 9);
 
-        Stack mainStack = new Stack();
-        leftTable = new Table();
-        rightTable = new Table();
         dynamicContentTable = new Table();
 
-        mainStack.add(leftTable);
-        mainStack.add(rightTable);
-        mainStack.add(dynamicContentTable);
+        content.add(dynamicContentTable).growX().expand().top();
 
-        content.add(mainStack).growX().expand().top();
 
-        configureConnections();
-        buildContent();
 
 
         pack();
         layout();
-        leftTable.add().expandY().top().row();
-        rightTable.add().expandY().top().row();
 
         setModal(false);
         setMovable(true);
@@ -129,10 +116,6 @@ public abstract class NodeWidget extends EmptyWindow {
         });
     }
 
-    protected void buildContent () {
-
-    }
-
     public void setConfig(XmlReader.Element config) {
         String titleString = config.getAttribute("name");
         title.setText(titleString);
@@ -148,8 +131,7 @@ public abstract class NodeWidget extends EmptyWindow {
         return 32;
     }
 
-    protected abstract void configureConnections();
-
+    /*
     protected void addConnection(String title, int key, int align) {
         if(align == Align.top || align == Align.bottom) {
             throw new GdxRuntimeException("node connections can be only from left or right");
@@ -178,6 +160,7 @@ public abstract class NodeWidget extends EmptyWindow {
             outputSlots.add(key);
         }
     }
+     */
 
     private void configureNodeActions (Image icon, int key, boolean isInput) {
         if(isInput) {
@@ -340,5 +323,21 @@ public abstract class NodeWidget extends EmptyWindow {
 
     public IntArray getOutputSlots () {
         return outputSlots;
+    }
+
+    public void constructNode(XmlReader.Element module) {
+        int rowCount = module.getChildCount();
+        for (int i = 0; i < rowCount; i++) {
+            XmlReader.Element row = module.getChild(i);
+
+            // find class for row from map and instantiate widget using reflection
+
+            // pass row element to that widget to configure it
+
+            // add that widget to dynamicContentTable
+
+            // ask widget if it contains port, and declare that port
+
+        }
     }
 }

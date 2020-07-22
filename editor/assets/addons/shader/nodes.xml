@@ -1,8 +1,15 @@
 <modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
     <category name = "General">
-        <module name = "Output">ColorOutput</module>
-        <module name = "Sample Texture">SampleTextureNode</module>
-        <module name = "Color">ColorNode</module>
-        <module name = "Mixer">MixNode</module>
+        <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
+            <select name="operation">
+                <option value = "ADD">Add</option>
+                <option value = "SUB">Subsctract</option>
+                <option value = "MUL">Multiply</option>
+                <option value = "DIV">Divide</option>
+            </select>
+            <checkbox name="clamp" />
+            <value port="input" name="valueA" type="vec4">Value</value>
+            <value port="input" name="valueB" type="vec4">Value</value>
+        </module>
     </category>
 </modules>

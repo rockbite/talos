@@ -38,9 +38,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage {
         nodeListPopup = new NodeListPopup(nodeData);
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
             @Override
-            public void chosen (Class clazz, float x, float y) {
+            public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
                 if(NodeWidget.class.isAssignableFrom(clazz)) {
                     NodeWidget node = createNode(clazz, x, y);
+                    node.constructNode(module);
 
                     Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
                 }
