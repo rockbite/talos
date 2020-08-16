@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -28,7 +29,7 @@ import com.talosvfx.talos.TalosMain;
 
 public class EditableLabel extends Table {
 
-    Table labelTabel;
+    Table labelTable;
     Table inputTable;
 
     Label label;
@@ -45,17 +46,17 @@ public class EditableLabel extends Table {
 
         Stack stack = new Stack();
 
-        labelTabel = new Table();
+        labelTable = new Table();
         inputTable = new Table();
 
-        stack.add(labelTabel);
+        stack.add(labelTable);
         stack.add(inputTable);
 
         add(stack).grow();
 
         label = new Label(text, getSkin(), "default");
-        labelTabel.add(label);
-        labelTabel.add().expandX();
+        labelTable.add(label);
+        labelTable.add().expandX();
 
 
         textField = new TextField(text, getSkin(), "no-bg");
@@ -117,21 +118,28 @@ public class EditableLabel extends Table {
     }
 
     public void setEditMode() {
-        labelTabel.setVisible(false);
+        labelTable.setVisible(false);
         inputTable.setVisible(true);
-        textField.setWidth(label.getPrefWidth());
+        textField.setWidth(label.getPrefWidth() + 10);
         textField.setText(label.getText().toString());
-        TalosMain.Instance().NodeStage().getStage().unfocusAll();
+        if( TalosMain.Instance() != null) {
+            TalosMain.Instance().NodeStage().getStage().unfocusAll();
+        }
         getStage().setKeyboardFocus(textField);
         textField.selectAll();
     }
 
     public void setStaticMode() {
-        labelTabel.setVisible(true);
+        labelTable.setVisible(true);
         inputTable.setVisible(false);
 
         label.setText(textField.getText());
         textField.clearSelection();
+    }
+
+    @Override
+    public void setColor (Color color) {
+        label.setColor(color);
     }
 
     public String getText() {

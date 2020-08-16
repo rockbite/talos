@@ -151,6 +151,18 @@ public class NodeStage extends WorkplaceStage {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
 
+                if(keycode == Input.Keys.SPACE) {
+                    boolean paused = TalosMain.Instance().TalosProject().getParticleEffect().isPaused();
+                    if(paused) {
+                        TalosMain.Instance().TalosProject().getParticleEffect().resume();
+                    } else {
+                        TalosMain.Instance().TalosProject().getParticleEffect().pause();
+                    }
+
+                    TalosMain.Instance().UIStage().Timeline().setPaused(paused);
+                }
+
+
                 if(keycode == Input.Keys.F5) {
                    // find particle or emitter or then any other module and focus on it
                     moduleBoardWidget.resetCameraToWorkspace();

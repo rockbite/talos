@@ -31,7 +31,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterInstance;
 
-public class TimelineWidget extends Table {
+@Deprecated
+public class TimelineWidgetLegacy extends Table {
 
     Table listContent;
 
@@ -39,7 +40,7 @@ public class TimelineWidget extends Table {
 
     EmitterRow selectedRow;
 
-    public TimelineWidget(Skin skin) {
+    public TimelineWidgetLegacy(Skin skin) {
         setSkin(skin);
 
         Table topBar = new Table();
@@ -83,8 +84,8 @@ public class TimelineWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", -1);
-                selectRow(emitter);
+                //final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().loadEmitter("emitter", -1);
+                //selectRow(emitter);
             }
         });
 
@@ -125,6 +126,7 @@ public class TimelineWidget extends Table {
     }
 
     public void moveWrapperSortingPosition(ParticleEmitterWrapper wrapper, int changeBy) { // -1 or 1
+        /*
         try {
             if(changeBy < -1) changeBy = -1;
             if(changeBy > 1) changeBy = 1;
@@ -144,10 +146,10 @@ public class TimelineWidget extends Table {
             emOne.emitterGraph.setSortPosition(emTwo.emitterGraph.getSortPosition());
             emTwo.emitterGraph.setSortPosition(tmp);
 
-            TalosMain.Instance().TalosProject().sortEmitters();
+            //TalosMain.Instance().TalosProject().sortEmitters();
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
-        }
+        }*/
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
@@ -207,9 +209,9 @@ public class TimelineWidget extends Table {
         private boolean selecteed = true;
 
         private ParticleEmitterWrapper wrapper;
-        private TimelineWidget timeline;
+        private TimelineWidgetLegacy timeline;
 
-        public EmitterRow(final TimelineWidget timeline, Skin skin) {
+        public EmitterRow(final TimelineWidgetLegacy timeline, Skin skin) {
             this.timeline = timeline;
             setSkin(skin);
             setBackground(getSkin().getDrawable("red_row"));

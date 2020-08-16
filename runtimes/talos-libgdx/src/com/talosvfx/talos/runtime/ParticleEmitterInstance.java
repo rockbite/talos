@@ -21,8 +21,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
+import com.talosvfx.talos.runtime.modules.ParticleModule;
 
-public class ParticleEmitterInstance {
+public class ParticleEmitterInstance implements IEmitter {
 
     private final ParticleEffectInstance parentParticleInstance;
 	public boolean isComplete = false;
@@ -148,7 +149,7 @@ public class ParticleEmitterInstance {
 			for (int i = 0; i < count; i++) {
 				Particle particle = particlePool.obtain();
 				if (emitterGraph.getParticleModule() != null) {
-					particle.init(emitterGraph.getParticleModule(), this);
+					particle.init(this);
 					activeParticles.add(particle);
 				}
 			}
@@ -174,6 +175,26 @@ public class ParticleEmitterInstance {
 		emitterGraph.resetRequesters();
 	}
 
+	@Override
+	public ParticleEmitterDescriptor getEmitterGraph () {
+		return emitterGraph;
+	}
+
+	@Override
+	public boolean isVisible () {
+		return isVisible;
+	}
+
+	@Override
+	public boolean isAdditive () {
+		return isAdditive;
+	}
+
+	@Override
+	public Array<Particle> getActiveParticles () {
+		return activeParticles;
+	}
+
 	private void updateParticles(float delta) {
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
 			Particle particle = activeParticles.get(i);
@@ -193,15 +214,60 @@ public class ParticleEmitterInstance {
         isStopped = false;
 	}
 
-    public void setScope (ScopePayload scope) {
+	@Override
+	public float getDelayRemaining () {
+		return delayTimer;
+	}
+
+	public void setScope (ScopePayload scope) {
         this.scopePayload = scope;
     }
 
-    public ScopePayload getScope () {
+	@Override
+	public int getActiveParticleCount () {
+		return activeParticles.size;
+	}
+
+	@Override
+	public boolean isContinuous () {
+		return isContinuous;
+	}
+
+	@Override
+	public boolean isComplete () {
+		return isComplete;
+	}
+
+	@Override
+	public float getAlpha () {
+		return alpha;
+	}
+
+	@Override
+	public ParticleModule getParticleModule () {
+		return emitterGraph.getParticleModule();
+	}
+
+	@Override
+	public EmitterModule getEmitterModule () {
+		return emitterGraph.getEmitterModule();
+	}
+
+	@Override
+	public Vector2 getEffectPosition () {
+		return getEffect().position;
+	}
+
+	public ScopePayload getScope () {
     	return scopePayload;
 	}
 
-    public ParticleEffectInstance getEffect() {
+	@Override
+	public Color getTint () {
+		return tint;
+	}
+
+	public ParticleEffectInstance getEffect() {
     	return parentParticleInstance;
 	}
 

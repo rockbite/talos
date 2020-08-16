@@ -90,7 +90,7 @@ public class ParticleModule extends AbstractModule {
     }
 
     public void updateScopeData(Particle particle) {
-        getScope().set(ScopePayload.EMITTER_ALPHA, particle.particleEmitter.alpha);
+        getScope().set(ScopePayload.EMITTER_ALPHA, particle.getEmitterAlpha());
         getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
         getScope().set(ScopePayload.REQUESTER_ID, particle.seed);

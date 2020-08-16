@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.spine.Bone;
@@ -15,12 +16,14 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
-public class BoundEffect implements Json.Serializable, IPropertyProvider  {
+public class BoundEffect implements Json.Serializable, IPropertyProvider, TimelineItemDataProvider<BoundEffect> {
 
     /**
      * parent skeleton container
@@ -52,6 +55,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
      * is it rendered behind animation or in front
      */
     private boolean isBehind;
+
+    /**
+     * Draw order of this effect
+     */
+    private int drawOrder;
 
     /**
      * if true this spawns only once at remains forever no matter what
@@ -406,5 +414,97 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider  {
 
     public String getCompleteEvent() {
         return completeEvent;
+    }
+
+    /**
+     * Timeline Data goes here
+     */
+
+    @Override
+    public Array<Button> registerSecondaryActionButtons () {
+        return null;
+    }
+
+    @Override
+    public Array<Button> registerMainActionButtons () {
+        return null;
+    }
+
+    @Override
+    public String getItemName () {
+        return name;
+    }
+
+    @Override
+    public BoundEffect getIdentifier () {
+        return this;
+    }
+
+    @Override
+    public int getIndex () {
+        return drawOrder;
+    }
+
+    @Override
+    public boolean isFull () {
+        if(particleEffectDescriptor.emitterModuleGraphs.size == 0) return false;
+
+        if (particleEffectDescriptor.isContinuous()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public float getDurationOne () {
+        if (particleEffectDescriptor.isContinuous()) {
+            return BvBWorkspace.getInstance().getSkeletonContainer().getCurrentAnimation().getDuration();
+        } else {
+            float maxDuration = 0;
+            Array<ParticleEmitterDescriptor> emitterModuleGraphs = particleEffectDescriptor.emitterModuleGraphs;
+            if(particleEffectDescriptor.getInstanceReference() == null) return 0;
+            for (ParticleEmitterDescriptor descriptor : emitterModuleGraphs) {
+                float duration = descriptor.getEmitterModule().getDuration();
+                if (maxDuration < duration) {
+                    maxDuration = duration;
+                }
+            }
+
+            return maxDuration;
+        }
+    }
+
+    @Override
+    public float getDurationTwo () {
+        if (particleEffectDescriptor.isContinuous()) {
+            return BvBWorkspace.getInstance().getSkeletonContainer().getCurrentAnimation().getDuration();
+        } else {
+            float maxLife = 0;
+            Array<ParticleEmitterDescriptor> emitterModuleGraphs = particleEffectDescriptor.emitterModuleGraphs;
+            if(particleEffectDescriptor.getInstanceReference() == null) return 0;
+            for (ParticleEmitterDescriptor descriptor : emitterModuleGraphs) {
+
+                float life = descriptor.getParticleModule().getLife();
+                if (maxLife < life) {
+                    maxLife = life;
+                }
+            }
+
+            return maxLife;
+        }
+    }
+
+    @Override
+    public float getTimePosition () {
+        return 0;
+    }
+
+    @Override
+    public boolean isItemVisible () {
+        return true;
+    }
+
+    public void setDrawOrder (int drawOrder) {
+        this.drawOrder = drawOrder;
     }
 }

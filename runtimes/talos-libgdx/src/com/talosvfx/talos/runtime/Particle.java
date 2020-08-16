@@ -24,7 +24,7 @@ import com.talosvfx.talos.runtime.modules.ParticleModule;
 
 public class Particle implements Pool.Poolable {
 
-    public ParticleEmitterInstance particleEmitter;
+    private IEmitter emitterReference;
 
     public Vector2 spawnPosition = new Vector2();
     public Vector2 position = new Vector2();
@@ -47,32 +47,51 @@ public class Particle implements Pool.Poolable {
         // empty constructor
     }
 
-    public void init(ParticleModule particleModule, ParticleEmitterInstance particleEmitter) {
-        this.particleEmitter = particleEmitter;
-
+    public void init(IEmitter emitterReference) {
         this.seed = MathUtils.random();
+        init(emitterReference, seed);
+    }
 
-        particleModule.updateScopeData(this);
+    public void init(IEmitter emitterReference, float seed) {
+        this.emitterReference = emitterReference;
+        ParticleModule particleModule = emitterReference.getParticleModule();
 
-        position.set(particleModule.getStartPosition()); // offset
-        spawnPosition.set(particleEmitter.getEffect().position);
+        this.seed = seed;
 
         // inner variable defaults
         alpha = 0f;
 
-        durationAtInit = particleEmitter.alpha;
+        particleModule.updateScopeData(this);
+
+        life = particleModule.getLife(); // really makes more sense like this, for deterministic purposes
+
+        position.set(particleModule.getStartPosition()); // offset
+        spawnPosition.set(emitterReference.getEffectPosition());
+
+        durationAtInit = emitterReference.getAlpha();
     }
 
     public void update(float delta) {
         if(alpha == 1f) return;
 
+        if(emitterReference == null) return;
+
         //scope data
-        ParticleModule particleModule = particleEmitter.emitterGraph.getParticleModule();
+        ParticleModule particleModule = emitterReference.getParticleModule();
         if(particleModule == null) return;
 
-        life = particleModule.getLife();
+        life = particleModule.getLife(); // maybe should remove this
+
         alpha += delta/life;
         if(alpha > 1f) alpha = 1f;
+
+        applyAlpha(alpha, delta);
+    }
+
+    public void applyAlpha(float alpha, float delta) {
+        ParticleModule particleModule = emitterReference.getParticleModule();
+        if(particleModule == null) return;
+
         particleModule.updateScopeData(this);
 
         //update variable values
@@ -87,14 +106,14 @@ public class Particle implements Pool.Poolable {
         float velocity = particleModule.getVelocity();
         transparency = particleModule.getTransparency();
 
-        if(particleEmitter.emitterGraph.emitterModule.isAligned()) {
+        if(emitterReference.getEmitterModule().isAligned()) {
             rotation = angle + particleModule.getRotation();
         } else {
             rotation = particleModule.getRotation();
         }
 
         drawable = particleModule.getDrawable(); // important to get drawable before size
-        particleEmitter.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());
+        emitterReference.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());
 
         size.set(particleModule.getSize());
         Vector2 positionOverride = particleModule.getPosition();
@@ -110,16 +129,16 @@ public class Particle implements Pool.Poolable {
     }
 
     public float getX() {
-        if(particleEmitter.isAttached()) {
-            return particleEmitter.getEffect().position.x + position.x;
+        if(emitterReference.getEmitterModule().isAttached()) {
+            return emitterReference.getEffectPosition().x + position.x;
         } else {
             return spawnPosition.x + position.x;
         }
     }
 
     public float getY() {
-        if(particleEmitter.isAttached()) {
-            return particleEmitter.getEffect().position.y + position.y;
+        if(emitterReference.getEmitterModule().isAttached()) {
+            return emitterReference.getEffectPosition().y + position.y;
         } else {
             return spawnPosition.y + position.y;
         }
@@ -128,5 +147,13 @@ public class Particle implements Pool.Poolable {
     @Override
     public void reset() {
 
+    }
+
+    public float getEmitterAlpha () {
+        return emitterReference.getAlpha();
+    }
+
+    public IEmitter getEmitter () {
+        return emitterReference;
     }
 }
