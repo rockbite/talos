@@ -18,7 +18,7 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
     implementation "info.debatty:java-string-similarity:1.2.1"
-    implementation "com.github.Tom-Ski:spine-runtimes:3.9-beta"
+    implementation "com.github.Tom-Ski:spine-runtimes:3.9-8e40258"
 }
 
 sourceCompatibility = 1.8
