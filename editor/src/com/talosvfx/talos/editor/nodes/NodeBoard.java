@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
@@ -44,7 +45,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     private DynamicNodeStage nodeStage;
 
     private NodeWidget ccFromNode = null;
-    private int ccFromSlot = 0;
+    private String ccFromSlot = null;
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
     private NodeWidget wasNodeSelectedOnDown = null;
@@ -56,8 +57,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public static class NodeConnection {
         public NodeWidget fromNode;
         public NodeWidget toNode;
-        public int fromId;
-        public int toId;
+        public String fromId;
+        public String toId;
     }
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
@@ -154,7 +155,9 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             node.init(skin, this);
             node.setConfig(config);
             node.setPosition(x - node.getWidth()/2f, y - node.getHeight()/2f);
+
             addActor(node);
+
             nodes.add(node);
 
             int counter = nodeCounter.getAndIncrement(clazz, 0, 1);
@@ -200,11 +203,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         if(ccFromNode != null) {
             Class fromClass;
             Slot fromSlotObject;
-            IntArray toSlots;
+            Array<String> toSlots;
             NodeWidget fromModule;
             NodeWidget toModule;
-            int fromSlot = 0;
-            int toSlot = 0;
+            String fromSlot = null;
+            String toSlot = null;
             if(ccCurrentIsInput) {
                 toSlots = nodeWidget.getOutputSlots();
 
@@ -221,7 +224,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             }
 
             for(int i = 0; i < toSlots.size; i++) {
-                int slot = toSlots.get(i);
+                String slot = toSlots.get(i);
                 // we can connect
                 if(ccCurrentIsInput) {
                     fromSlot = slot;
@@ -238,11 +241,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     }
 
 
-    public NodeConnection findConnection(NodeWidget node, boolean isInput, int key) {
+    public NodeConnection findConnection(NodeWidget node, boolean isInput, String key) {
         NodeConnection nodeToFind =  null;
         for(NodeConnection nodeConnection: nodeConnections) {
-            if((isInput && nodeConnection.toId == key && node == nodeConnection.toNode) ||
-                    (!isInput && nodeConnection.toId == key && node == nodeConnection.fromNode)) {
+            if((isInput && nodeConnection.toId.equals(key) && node == nodeConnection.toNode) ||
+                    (!isInput && nodeConnection.toId.equals(key) && node == nodeConnection.fromNode)) {
                 // found the node let's remove it
                 nodeToFind = nodeConnection;
             }
@@ -272,7 +275,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         }
     }
 
-    public NodeConnection addConnectionCurve(NodeWidget from, NodeWidget to, int slotForm, int slotTo) {
+    public NodeConnection addConnectionCurve(NodeWidget from, NodeWidget to, String slotForm, String slotTo) {
         NodeConnection connection = new NodeConnection();
         connection.fromNode = from;
         connection.toNode = to;
@@ -287,8 +290,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         return connection;
     }
 
-    public void connectNodeIfCan(NodeWidget currentNode, int currentSlot, boolean currentIsInput) {
-        int[] result = new int[2];
+    public void connectNodeIfCan(NodeWidget currentNode, String currentSlot, boolean currentIsInput) {
+        Object[] result = new Object[2];
         NodeWidget target = null;
         boolean targetIsInput = false;
         // iterate over all widgets that are not current and see if mouse is over any of their slots, need to only connect input to output or output to input
@@ -296,10 +299,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             if(node != currentNode) {
                 node.findHoveredSlot(result);
 
-                if(result[0] >= 0 ) {
+                if((String)result[0] != null ) {
                     // found match
                     target = node;
-                    if(result[1] == 0) {
+                    if((int)result[1] == 0) {
                         targetIsInput = true;
                     } else {
                         targetIsInput = false;
@@ -326,17 +329,17 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         } else {
             // yay we are connecting
             NodeWidget fromWrapper, toWrapper;
-            int fromSlot, toSlot;
+            String fromSlot, toSlot;
 
             if(targetIsInput) {
                 fromWrapper = currentNode;
                 toWrapper = target;
                 fromSlot = currentSlot;
-                toSlot = result[0];
+                toSlot = (String)result[0];
             } else {
                 fromWrapper = target;
                 toWrapper = currentNode;
-                fromSlot = result[0];
+                fromSlot = (String)result[0];
                 toSlot = currentSlot;
             }
 
@@ -356,7 +359,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         return nodes;
     }
 
-    public void makeConnection(NodeWidget from, NodeWidget to, int slotFrom, int slotTo) {
+    public void makeConnection(NodeWidget from, NodeWidget to, String slotFrom, String slotTo) {
         NodeConnection connection = addConnectionCurve(from, to, slotFrom, slotTo);
 
         from.attachNodeToMyOutput(to, slotFrom, slotTo);
@@ -402,11 +405,12 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     }
 
     public void updateSelectionBackgrounds() {
+        //todo: set pRoper header bgs
         for(NodeWidget wrapper : nodes) {
             if(getSelectedNodes().contains(wrapper)) {
-                wrapper.setBackground("window-blue");
+                //wrapper.setBackground("window-blue");
             } else {
-                wrapper.setBackground("window");
+                //wrapper.setBackground("window");
             }
         }
     }

@@ -15,11 +15,11 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     protected ShaderBox shaderBox;
 
-    protected ObjectMap<Integer, String> inputStrings = new ObjectMap<>();
+    protected ObjectMap<String, String> inputStrings = new ObjectMap<>();
 
     public abstract void prepareDeclarations(ShaderBuilder shaderBuilder);
 
-    public abstract String writeOutputCode(int slotId);
+    public abstract String writeOutputCode(String slotId);
 
     @Override
     public void init (Skin skin, NodeBoard nodeBoard) {
@@ -28,8 +28,8 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     public void processTree(ShaderBuilder shaderBuilder) {
         inputStrings.clear();
-        ObjectMap<Integer, NodeWidget.Connection> inputs = getInputs();
-        for(Integer id : inputs.keys()) {
+        ObjectMap<String, NodeWidget.Connection> inputs = getInputs();
+        for(String id : inputs.keys()) {
             NodeWidget.Connection connection = inputs.get(id);
             AbstractShaderNode node = (AbstractShaderNode)connection.targetNode;
 
@@ -42,7 +42,7 @@ public abstract class AbstractShaderNode extends NodeWidget {
         prepareDeclarations(shaderBuilder);
     }
 
-    protected void previewOutput(int slotId) {
+    protected void previewOutput(String slotId) {
         previewBuilder.reset();
         processTree(previewBuilder);
         String val = writeOutputCode(slotId);
@@ -52,7 +52,7 @@ public abstract class AbstractShaderNode extends NodeWidget {
     @Override
     public void graphUpdated () {
         super.graphUpdated();
-        previewOutput(0);
+        //previewOutput(0);
     }
 
     @Override

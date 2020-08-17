@@ -131,7 +131,7 @@ public class NodeListPopup extends VisWindow {
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
             FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("name"), new Label(module.getAttribute("name"), getSkin()));
-            nameToNodeClass.put(module.getAttribute("name"), module.getAttribute("title"));
+            nameToNodeClass.put(module.getAttribute("name"), module.getAttribute("name"));
 
             registerNode(module);
 
@@ -142,7 +142,7 @@ public class NodeListPopup extends VisWindow {
 
     private void registerNode(XmlReader.Element module) {
         try {
-            Class nodeClazz = ClassReflection.forName(classPath + "." + module.getText());
+            Class nodeClazz = ClassReflection.forName(classPath + "." + module.getAttribute("name"));
             registry.put(nodeClazz, module);
         } catch (ReflectionException e) {
             e.printStackTrace();

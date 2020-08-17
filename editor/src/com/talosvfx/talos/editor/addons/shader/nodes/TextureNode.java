@@ -1,14 +1,26 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
 
 public class TextureNode extends AbstractShaderNode {
-
     @Override
-    protected void configureConnections () {
+    public void prepareDeclarations(ShaderBuilder shaderBuilder) {
 
     }
 
+    @Override
+    public String writeOutputCode(String slotId) {
+        return null;
+    }
+
+    /*
+    @Override
+    protected void configureConnections () {
+
+    }*/
+
+    /*
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
 
@@ -17,5 +29,5 @@ public class TextureNode extends AbstractShaderNode {
     @Override
     public String writeOutputCode (int slotId) {
         return null;
-    }
+    }*/
 }

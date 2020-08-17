@@ -6,34 +6,42 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public abstract class NodeWidget extends EmptyWindow {
 
     EditableLabel title;
 
-    protected IntMap<Image> inputSlotMap = new IntMap<>();
-    protected IntMap<Image> outputSlotMap = new IntMap<>();
+    protected ObjectMap<String, Table> inputSlotMap = new ObjectMap<>();
+    protected ObjectMap<String, Table> outputSlotMap = new ObjectMap<>();
 
     NodeBoard nodeBoard;
 
-    private int hoveredSlot = -1;
+    private String hoveredSlot = null;
     private boolean hoveredSlotIsInput = false;
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
     private NodeWidget lastAttachedNode;
 
-    protected IntArray inputSlots = new IntArray();
-    protected IntArray outputSlots = new IntArray();
+    protected Array<String> inputSlots = new Array();
+    protected Array<String> outputSlots = new Array();
 
-    protected ObjectMap<Integer, Connection> inputs = new ObjectMap();
-    protected ObjectMap<Integer, Connection> outputs = new ObjectMap();
-    protected Table dynamicContentTable;
+    protected ObjectMap<String, Connection> inputs = new ObjectMap();
+    protected ObjectMap<String, Connection> outputs = new ObjectMap();
     private int id = 0;
+
+    private final ObjectMap<String, Class<? extends AbstractWidget>> widgetClassMap = new ObjectMap<>();
+
+    private Table widgetContainer = new Table();
 
     public void graphUpdated () {
 
@@ -48,42 +56,58 @@ public abstract class NodeWidget extends EmptyWindow {
     }
 
     public class Connection {
-        public int targetSlot;
+        public String targetSlot;
         public NodeWidget targetNode;
 
-        public Connection(NodeWidget targetNode, int targetSlot) {
+        public Connection(NodeWidget targetNode, String targetSlot) {
             this.targetNode = targetNode;
             this.targetSlot = targetSlot;
         }
     }
 
+    private void initMaps() {
+        widgetClassMap.put("value", LabelWidget.class);
+        widgetClassMap.put("select", SelectWidget.class);
+        widgetClassMap.put("checkbox", CheckBoxWidget.class);
+        widgetClassMap.put("dynamicValue", ValueWidget.class);
+        // group is handled manually for now
+    }
+
     public void init(Skin skin, NodeBoard nodeBoard) {
         super.init(skin);
+        initMaps();
         this.nodeBoard = nodeBoard;
 
-        setBackground(skin.getDrawable("window"));
+        Stack mainStack = new Stack();
+        Table backgroundTable = new Table();
+        Table contentTable = new Table();
+
+        mainStack.add(backgroundTable);
+        mainStack.add(contentTable);
+
+        Table headerTable = new Table();
+        Table bodyTable = new Table();
+
+        headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", ColorLibrary.BackgroundColor.RED));
+        bodyTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-body", ColorLibrary.BackgroundColor.WHITE));
+        setBackground(ColorLibrary.obtainBackground(getSkin(), "node-shadow-border", ColorLibrary.BackgroundColor.WHITE));
+
+        backgroundTable.add(headerTable).growX().height(32).row();
+        backgroundTable.add(bodyTable).grow().row();
 
         title = new EditableLabel("Node Title", skin);
-        add(title).expandX().top().left().padTop(8).padLeft(15).height(15);
+        headerTable.add(title).expandX().top().left().padLeft(12).height(15);
 
-        Table content = new Table();
-        row();
-        add(content).expand().grow().top().pad(7, 10, 17, 9);
+        contentTable.add(widgetContainer).padLeft(16).padRight(16).grow().top().padTop(32);
+        contentTable.row();
+        contentTable.add().height(15).row();
+        contentTable.add().growY();
 
-        dynamicContentTable = new Table();
-
-        content.add(dynamicContentTable).growX().expand().top();
-
-
-
-
-        pack();
-        layout();
+        add(mainStack).width(266).pad(15);
 
         setModal(false);
         setMovable(true);
-
-        setWidth(200);
+        setResizable(false);
 
         addCaptureListener(new InputListener() {
 
@@ -93,7 +117,9 @@ public abstract class NodeWidget extends EmptyWindow {
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 prev.set(x, y);
                 NodeWidget.this.localToStageCoordinates(prev);
-                nodeBoard.nodeClicked(NodeWidget.this);
+                if(nodeBoard != null) {
+                    nodeBoard.nodeClicked(NodeWidget.this);
+                }
                 return true;
             }
 
@@ -102,7 +128,9 @@ public abstract class NodeWidget extends EmptyWindow {
                 tmp.set(x, y);
                 NodeWidget.this.localToStageCoordinates(tmp);
                 super.touchDragged(event, x, y, pointer);
-                nodeBoard.wrapperMovedBy(NodeWidget.this, tmp.x - prev.x, tmp.y - prev.y);
+                if(nodeBoard != null) {
+                    nodeBoard.wrapperMovedBy(NodeWidget.this, tmp.x - prev.x, tmp.y - prev.y);
+                }
 
                 prev.set(tmp);
             }
@@ -110,10 +138,18 @@ public abstract class NodeWidget extends EmptyWindow {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                nodeBoard.nodeClickedUp(NodeWidget.this);
+                if(nodeBoard != null) {
+                    nodeBoard.nodeClickedUp(NodeWidget.this);
+                }
                 event.cancel();
             }
         });
+    }
+
+    @Override
+    public void invalidateHierarchy() {
+        super.invalidateHierarchy();
+        pack();
     }
 
     public void setConfig(XmlReader.Element config) {
@@ -123,53 +159,39 @@ public abstract class NodeWidget extends EmptyWindow {
 
     @Override
     public float getTitlePrefWidth () {
+        if(title == null) return 0;
         return title.getPrefWidth();
     }
 
     @Override
     public float getDragPadTop () {
-        return 32;
+        return 32 + 15;
     }
 
-    /*
-    protected void addConnection(String title, int key, int align) {
-        if(align == Align.top || align == Align.bottom) {
-            throw new GdxRuntimeException("node connections can be only from left or right");
-        }
 
-        Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
+    protected void addConnection(AbstractWidget widget, String variableName, boolean isInput) {
 
-        if(Align.isLeft(align)) {
-            slotRow.add(icon).left().padLeft(2);
-            slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
-            leftTable.add(slotRow).left().expandX().top().padTop(5);
-            leftTable.row();
-            configureNodeActions(icon, key, true);
 
-            inputSlots.add(key);
-        }
-        if(Align.isRight(align)) {
-            slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
-            slotRow.add(icon).right().padRight(2);
-            rightTable.add(slotRow).right().expandX().top().padTop(5);
-            rightTable.row();
-            configureNodeActions(icon, key, false);
+        Table portTable = widget.addPort(isInput);
 
-            outputSlots.add(key);
-        }
-    }
-     */
-
-    private void configureNodeActions (Image icon, int key, boolean isInput) {
-        if(isInput) {
-            inputSlotMap.put(key, icon);
+        if (isInput) {
+             configureNodeActions(portTable, variableName, true);
+            inputSlots.add(variableName);
         } else {
-            outputSlotMap.put(key, icon);
+            configureNodeActions(portTable, variableName, false);
+            outputSlots.add(variableName);
+        }
+    }
+
+
+    private void configureNodeActions (Table port, String key, boolean isInput) {
+        if(isInput) {
+            inputSlotMap.put(key, port);
+        } else {
+            outputSlotMap.put(key, port);
         }
 
-        icon.addListener(new ClickListener() {
+        port.addListener(new ClickListener() {
 
             private Vector2 tmp = new Vector2();
             private Vector2 tmp2 = new Vector2();
@@ -178,7 +200,7 @@ public abstract class NodeWidget extends EmptyWindow {
 
             private boolean currentIsInput = false;
 
-            private int currentSlot;
+            private String currentSlot;
 
             private boolean dragged;
 
@@ -187,9 +209,9 @@ public abstract class NodeWidget extends EmptyWindow {
                 currentIsInput = isInput;
                 currentWrapper = NodeWidget.this;
                 tmp.set(x, y);
-                icon.localToStageCoordinates(tmp);
-                tmp2.set(icon.getWidth()/2f, icon.getHeight()/2f);
-                icon.localToStageCoordinates(tmp2);
+                port.localToStageCoordinates(tmp);
+                tmp2.set(port.getWidth()/2f, port.getHeight()/2f);
+                port.localToStageCoordinates(tmp2);
 
                 currentSlot = key;
 
@@ -218,7 +240,7 @@ public abstract class NodeWidget extends EmptyWindow {
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
                 tmp.set(x, y);
-                icon.localToStageCoordinates(tmp);
+                port.localToStageCoordinates(tmp);
                 nodeBoard.updateActiveCurve(tmp.x, tmp.y);
 
                 dragged = true;
@@ -246,46 +268,46 @@ public abstract class NodeWidget extends EmptyWindow {
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                hoveredSlot = -1;
+                hoveredSlot = null;
             }
         });
     }
 
-    public void getInputSlotPos(int id, Vector2 tmp) {
+    public void getInputSlotPos(String id, Vector2 tmp) {
         if(inputSlotMap.get(id) == null) return;
         tmp.set(inputSlotMap.get(id).getWidth()/2f, inputSlotMap.get(id).getHeight()/2f);
         inputSlotMap.get(id).localToStageCoordinates(tmp);
     }
 
-    public void getOutputSlotPos(int id, Vector2 tmp) {
+    public void getOutputSlotPos(String id, Vector2 tmp) {
         if(outputSlotMap.get(id) == null) return;
         tmp.set(outputSlotMap.get(id).getWidth()/2f, outputSlotMap.get(id).getHeight()/2f);
         outputSlotMap.get(id).localToStageCoordinates(tmp);
     }
 
-    public void setSlotActive(int slotTo, boolean isInput) {
+    public void setSlotActive(String slotTo, boolean isInput) {
         if(isInput) {
             if(inputSlotMap.get(slotTo) == null) return;
-            inputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
+            //inputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
         } else {
             if(outputSlotMap.get(slotTo) == null) return;
-            outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
+            //outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
         }
     }
 
-    public void setSlotInactive (int toId, boolean isInput) {
+    public void setSlotInactive (String toId, boolean isInput) {
         if(isInput) {
-            inputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
+            //inputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
             inputs.remove(toId);
         } else {
-            outputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
+            //outputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
             outputs.remove(toId);
             lastAttachedNode = null;
         }
     }
 
-    public boolean findHoveredSlot(int[] result) {
-        if(hoveredSlot >= 0) {
+    public boolean findHoveredSlot(Object[] result) {
+        if(hoveredSlot != null) {
             result[0] = hoveredSlot;
             if(hoveredSlotIsInput) {
                 result[1] = 0;
@@ -296,40 +318,100 @@ public abstract class NodeWidget extends EmptyWindow {
             return true;
         }
 
-        result[0] = -1;
+        result[0] = null;
         result[1] = -1;
         return false;
     }
 
-    public void slotClicked(int slotId, boolean isInput) {
+    public void slotClicked(String slotId, boolean isInput) {
         //: todo do autojump
     }
 
-    public void attachNodeToMyInput(NodeWidget node, int mySlot, int targetSlot) {
+    public void attachNodeToMyInput(NodeWidget node, String mySlot, String targetSlot) {
         inputs.put(mySlot, new Connection(node, targetSlot));
     }
 
-    public void attachNodeToMyOutput(NodeWidget node, int mySlot, int targetSlot) {
+    public void attachNodeToMyOutput(NodeWidget node, String mySlot, String targetSlot) {
         outputs.put(mySlot, new Connection(node, targetSlot));
     }
 
-    public IntArray getInputSlots () {
+    public Array<String> getInputSlots () {
         return inputSlots;
     }
 
-    public ObjectMap<Integer, Connection> getInputs() {
+    public ObjectMap<String, Connection> getInputs() {
         return inputs;
     }
 
-    public IntArray getOutputSlots () {
+    public Array<String> getOutputSlots () {
         return outputSlots;
+    }
+
+    private void addRow(XmlReader.Element row, int index, int count, boolean isGroup) {
+        String tagName = row.getName();
+        Class<? extends AbstractWidget> clazz = widgetClassMap.get(tagName);
+
+        if (clazz != null) {
+            try {
+                AbstractWidget widget = ClassReflection.newInstance(clazz);
+                widget.init(getSkin());
+
+                widget.loadFromXML(row);
+
+                if(widget instanceof ValueWidget && isGroup) {
+                    ValueWidget valueWidget = (ValueWidget) widget;
+                    if(index == 0) {
+                        valueWidget.setType(ValueWidget.Type.TOP);
+                    } else if(index == count - 1) {
+                        valueWidget.setType(ValueWidget.Type.BOTTOM);
+                    } else {
+                        valueWidget.setType(ValueWidget.Type.MID);
+                    }
+                }
+
+                if (isGroup) {
+                    float padTop = 0;
+                    if(index == 0) {
+                        padTop = 10;
+                    }
+                    widgetContainer.add(widget).padTop(padTop).padBottom(1).growX().row();
+                } else {
+                    widgetContainer.add(widget).padTop(10).padBottom(10).growX().row();
+                }
+
+                String variableName = row.getAttribute("name");
+
+                // does it have a port?
+                if(row.hasAttribute("port")) {
+                    String portType = row.getAttribute("port", "input");
+                    if(portType.equals("input")) {
+                        addConnection(widget, variableName, true);
+                    } else if (portType.equals("output")) {
+                        addConnection(widget, variableName, false);
+                    }
+                }
+
+            } catch (ReflectionException exception) {
+
+            }
+        } else {
+            if (tagName.equals("group")) {
+                XmlReader.Element group = row;
+                for (int i = 0; i < group.getChildCount(); i++) {
+                    XmlReader.Element groupRow = group.getChild(i);
+                    if(groupRow.getName().equals("dynamicValue")) {
+                        addRow(groupRow, i, group.getChildCount(), true);
+                    }
+                }
+            }
+        }
     }
 
     public void constructNode(XmlReader.Element module) {
         int rowCount = module.getChildCount();
         for (int i = 0; i < rowCount; i++) {
             XmlReader.Element row = module.getChild(i);
-
+            addRow(row, i, rowCount, false);
             // find class for row from map and instantiate widget using reflection
 
             // pass row element to that widget to configure it
@@ -337,7 +419,7 @@ public abstract class NodeWidget extends EmptyWindow {
             // add that widget to dynamicContentTable
 
             // ask widget if it contains port, and declare that port
-
         }
+        widgetContainer.add().growY().row();
     }
 }

@@ -11,8 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
-import javax.xml.soap.Text;
-
 public class ShaderBox extends Actor {
 
     ShaderProgram shaderProgram;

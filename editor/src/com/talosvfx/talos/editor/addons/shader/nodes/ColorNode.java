@@ -8,6 +8,7 @@ import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 
@@ -21,6 +22,16 @@ public class ColorNode extends AbstractShaderNode {
     public final int OUTPUT_B = 3;
     public final int OUTPUT_A = 4;
 
+    @Override
+    public void prepareDeclarations(ShaderBuilder shaderBuilder) {
+
+    }
+
+    @Override
+    public String writeOutputCode(String slotId) {
+        return null;
+    }
+/*
     @Override
     protected void configureConnections () {
         addConnection("RGBA", OUTPUT_RGBA, Align.right);
@@ -51,23 +62,25 @@ public class ColorNode extends AbstractShaderNode {
         });
 
         updatePreview();
-    }
-
+    }*/
+/*
     private void updatePreview () {
-        previewOutput(OUTPUT_RGBA);
+        //previewOutput(OUTPUT_RGBA);
     }
 
-    @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
 
     }
 
-    @Override
-    public String writeOutputCode (int slotId) {
+    public String writeOutputCode (String slotId) {
         if(slotId == OUTPUT_RGBA) {
             return "vec4(" + color.r + ", " + color.g + ", " + color.b + ", " + color.a + ")";
         }
 
+
+
         return null;
     }
+
+ */
 }
