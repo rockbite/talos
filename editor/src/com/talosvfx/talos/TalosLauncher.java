@@ -22,7 +22,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 public class TalosLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(1200, 700);
+		config.setWindowedMode(1200, 900);
 		config.setTitle("Talos");
 		config.useVsync(false);
 

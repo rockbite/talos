@@ -18,6 +18,7 @@ public class BvBAddon implements IAddon {
 
     BvBWorkspace workspace;
     PropertyPanelContainer properties;
+    ParticleList particleList;
 
     public FileTracker.Tracker spineTracker;
     public FileTracker.Tracker particleTracker;
@@ -65,12 +66,14 @@ public class BvBAddon implements IAddon {
 
     private void buildUI() {
         properties = new PropertyPanelContainer(TalosMain.Instance().UIStage().getSkin());
-        workspace = new BvBWorkspace(this);
+        workspace = BvBWorkspace.getInstance();
+        workspace.setBvBAddon(this);
+        particleList = new ParticleList(workspace, TalosMain.Instance().UIStage().getSkin());
     }
 
     @Override
     public void initUIContent() {
-        TalosMain.Instance().UIStage().swapToAddonContent(properties, workspace, null);
+        TalosMain.Instance().UIStage().swapToAddonContent(properties, workspace, particleList);
         TalosMain.Instance().disableNodeStage();
 
         // now need to disable some menu tabs
@@ -126,5 +129,9 @@ public class BvBAddon implements IAddon {
 
     public BvBWorkspace getWorkspace() {
         return  workspace;
+    }
+
+    public ParticleList getTimeline () {
+        return particleList;
     }
 }

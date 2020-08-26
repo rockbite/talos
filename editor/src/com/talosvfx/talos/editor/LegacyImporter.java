@@ -70,7 +70,8 @@ public class LegacyImporter {
         try {
             reader = new BufferedReader(new InputStreamReader(input), 512);
             while (true) {
-                processEmitter(reader);
+                int index = 0;
+                processEmitter(reader, index++);
                 if (reader.readLine() == null) break;
             }
         } catch (IOException ex) {
@@ -411,7 +412,7 @@ public class LegacyImporter {
         return nextY;
     }
 
-    private void processEmitter(BufferedReader reader) {
+    private void processEmitter(BufferedReader reader, int index) {
         leftX = 200;
         rightX =500;
         yStart = 400;
@@ -419,7 +420,7 @@ public class LegacyImporter {
 
         try {
             String emitterName = readString(reader, "name");
-            TalosMain.Instance().TalosProject().createNewEmitter(emitterName, -1);
+            TalosMain.Instance().TalosProject().loadEmitter(emitterName, index);
             ParticleModuleWrapper particleModuleWrapper = (ParticleModuleWrapper) stage.moduleBoardWidget.createModule(ParticleModule.class, rightX, yStart);
             EmitterModuleWrapper emitterModuleWrapper = (EmitterModuleWrapper) stage.moduleBoardWidget.createModule(EmitterModule.class, rightX, yStart+200);
 

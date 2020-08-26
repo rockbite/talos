@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.simulation.TinyEmitter;
 
 import java.util.Comparator;
 
@@ -28,7 +29,7 @@ public class ParticleEffectInstance {
 
     private final ParticleEffectDescriptor descriptor;
 
-    private Array<ParticleEmitterInstance> emitters = new Array<>();
+    private Array<IEmitter> emitters = new Array<>();
 
 	/**
 	 * Default renderer
@@ -50,11 +51,27 @@ public class ParticleEffectInstance {
 
     public float alpha = 1f;
 
-    public class EmitterComparator implements Comparator<ParticleEmitterInstance> {
+    private boolean paused = false;
+
+	public void init () {
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).init();
+		}
+	}
+
+	public float getTotalTime () {
+		return totalTime;
+	}
+
+	public boolean isPaused () {
+		return paused;
+	}
+
+	public class EmitterComparator implements Comparator<IEmitter> {
 
 		@Override
-		public int compare(ParticleEmitterInstance o1, ParticleEmitterInstance o2) {
-			return o1.emitterGraph.getSortPosition() - o2.emitterGraph.getSortPosition();
+		public int compare(IEmitter o1, IEmitter o2) {
+			return o1.getEmitterGraph().getSortPosition() - o2.getEmitterGraph().getSortPosition();
 		}
 	}
 
@@ -74,6 +91,10 @@ public class ParticleEffectInstance {
 	}
 
 	public void update (float delta) {
+		if(paused) return;
+
+		if(isComplete() && !loopable) return;
+
     	descriptor.setEffectReference(this);
 
 		if(totalTime > 3600) totalTime = 0; //TODO: maybe just supple TimeUtils time now instead...
@@ -87,13 +108,13 @@ public class ParticleEffectInstance {
 		nodeCalls = 0;
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).update(delta);
-			particleCount += emitters.get(i).activeParticles.size;
+			particleCount += emitters.get(i).getActiveParticleCount();
 		}
 
 		if(particleCount == 0 && loopable) {
 			for (int i = 0; i < emitters.size; i++) {
-				if(!emitters.get(i).isContinuous) {
-					if(emitters.get(i).delayTimer == 0) {
+				if(!emitters.get(i).isContinuous()) {
+					if(emitters.get(i).getDelayRemaining() == 0) {
 						emitters.get(i).restart();
 					}
 				}
@@ -115,9 +136,14 @@ public class ParticleEffectInstance {
         emitters.add(particleEmitterInstance);
     }
 
+    public void addAdvancedEmitter(ParticleEmitterDescriptor particleEmitterDescriptor) {
+		final TinyEmitter emitter = new TinyEmitter(particleEmitterDescriptor, this);
+		emitters.add(emitter);
+	}
+
 	public void removeEmitterForEmitterDescriptor (ParticleEmitterDescriptor emitter) {
 		for (int i = emitters.size - 1; i >= 0; i--) {
-			if (emitters.get(i).emitterGraph == emitter) {
+			if (emitters.get(i).getEmitterGraph() == emitter) {
 				emitters.removeIndex(i);
 			}
 		}
@@ -138,7 +164,7 @@ public class ParticleEffectInstance {
     	if(loopable) return false;
 
 		for (int i = 0; i < emitters.size; i++) {
-			if (!emitters.get(i).isComplete) {
+			if (!emitters.get(i).isComplete()) {
 				return false;
 			}
 		}
@@ -157,12 +183,14 @@ public class ParticleEffectInstance {
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).pause();
 		}
+		paused = true;
 	}
 
 	public void resume() {
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).resume();
 		}
+		paused = false;
 	}
 
 
@@ -170,17 +198,19 @@ public class ParticleEffectInstance {
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).restart();
 		}
+		paused = false;
+		totalTime = 0;
 	}
 
 
 
-	public Array<ParticleEmitterInstance> getEmitters () {
+	public Array<IEmitter> getEmitters () {
         return emitters;
     }
 
-    public ParticleEmitterInstance getEmitter(ParticleEmitterDescriptor descriptor) {
-    	for(ParticleEmitterInstance instance: emitters) {
-    		if(instance.emitterGraph == descriptor) {
+    public IEmitter getEmitter(ParticleEmitterDescriptor descriptor) {
+    	for(IEmitter instance: emitters) {
+    		if(instance.getEmitterGraph() == descriptor) {
     			return instance;
 			}
 		}
@@ -212,7 +242,7 @@ public class ParticleEffectInstance {
 	public void sortEmitters() {
 		emitters.sort(emitterComparator);
 		for(int i = 0; i < emitters.size; i++) {
-			emitters.get(i).emitterGraph.setSortPosition(i);
+			emitters.get(i).getEmitterGraph().setSortPosition(i);
 		}
 	}
 }
