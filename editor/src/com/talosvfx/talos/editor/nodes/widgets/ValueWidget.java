@@ -310,14 +310,17 @@ public class ValueWidget extends AbstractWidget {
     @Override
     public void loadFromXML(XmlReader.Element element) {
         String text = element.getText();
+        float defaultValue = element.getFloatAttribute("default", 0);
         float min = element.getFloatAttribute("min", 0);
-        float max = element.getFloatAttribute("min", 9999);
+        float max = element.getFloatAttribute("max", 9999);
         float step = element.getFloatAttribute("step", 0.01f);
         boolean progress = element.getBooleanAttribute("progress", false);
 
         setRange(min, max);
         setStep(step);
         setShowProgress(progress);
+
+        setValue(defaultValue);
 
         setLabel(text);
     }

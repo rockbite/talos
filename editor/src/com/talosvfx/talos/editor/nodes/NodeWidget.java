@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -69,6 +70,7 @@ public abstract class NodeWidget extends EmptyWindow {
         widgetClassMap.put("value", LabelWidget.class);
         widgetClassMap.put("select", SelectWidget.class);
         widgetClassMap.put("checkbox", CheckBoxWidget.class);
+        widgetClassMap.put("color", ColorWidget.class);
         widgetClassMap.put("dynamicValue", ValueWidget.class);
         // group is handled manually for now
     }
@@ -100,6 +102,9 @@ public abstract class NodeWidget extends EmptyWindow {
 
         contentTable.add(widgetContainer).padLeft(16).padRight(16).grow().top().padTop(32);
         contentTable.row();
+
+        addAdditionalContent(contentTable);
+
         contentTable.add().height(15).row();
         contentTable.add().growY();
 
@@ -146,6 +151,10 @@ public abstract class NodeWidget extends EmptyWindow {
         });
     }
 
+    protected void addAdditionalContent(Table contentTable) {
+
+    }
+
     @Override
     public void invalidateHierarchy() {
         super.invalidateHierarchy();
@@ -153,7 +162,7 @@ public abstract class NodeWidget extends EmptyWindow {
     }
 
     public void setConfig(XmlReader.Element config) {
-        String titleString = config.getAttribute("name");
+        String titleString = config.getAttribute("title");
         title.setText(titleString);
     }
 
@@ -170,8 +179,6 @@ public abstract class NodeWidget extends EmptyWindow {
 
 
     protected void addConnection(AbstractWidget widget, String variableName, boolean isInput) {
-
-
         Table portTable = widget.addPort(isInput);
 
         if (isInput) {
@@ -399,7 +406,7 @@ public abstract class NodeWidget extends EmptyWindow {
                 XmlReader.Element group = row;
                 for (int i = 0; i < group.getChildCount(); i++) {
                     XmlReader.Element groupRow = group.getChild(i);
-                    if(groupRow.getName().equals("dynamicValue")) {
+                    if(groupRow.getName().equals("dynamicValue") || groupRow.getName().equals("value")) {
                         addRow(groupRow, i, group.getChildCount(), true);
                     }
                 }
@@ -412,14 +419,8 @@ public abstract class NodeWidget extends EmptyWindow {
         for (int i = 0; i < rowCount; i++) {
             XmlReader.Element row = module.getChild(i);
             addRow(row, i, rowCount, false);
-            // find class for row from map and instantiate widget using reflection
-
-            // pass row element to that widget to configure it
-
-            // add that widget to dynamicContentTable
-
-            // ask widget if it contains port, and declare that port
         }
+
         widgetContainer.add().growY().row();
     }
 }

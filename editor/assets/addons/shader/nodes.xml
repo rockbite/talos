@@ -1,5 +1,24 @@
 <modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
-    <category name = "General">
+    <category name = "general" title="General">
+        <module name = "ColorNode" title = "Color" keywords = "color">
+            <group>
+                <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="output" name="outputRGB" type="vec4">RGB</value>
+                <value port="output" name="outputAlpha" type="vec4">Alpha</value>
+            </group>
+            <color port="input" name="color" type="vec4">Input Color</color>
+        </module>
+        <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
+            <value port="input" name="inputColor" type="vec4">Input Color</value>
+        </module>
+        <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
+            <value port="output" name="outputValue" type="vec4">Output Value</value>
+            <dynamicValue port="input" name="frac" type="vec4" max = "1" step="0.001" progress="true" default="0.5">Frac</dynamicValue>
+            <group>
+                <value port="input" name="valueA" type="vec4">Value A</value>
+                <value port="input" name="valueB" type="vec4">Value B</value>
+            </group>
+        </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
             <value port="output" name="outputValue" type="vec4">Output Value</value>
             <select name="operation">

@@ -7,27 +7,10 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 
 public class ColorOutput extends AbstractShaderNode {
 
-    public final int INPUT_RGBA = 0;
-
-    /*
-    @Override
-    protected void configureConnections () {
-        addConnection("color", INPUT_RGBA, Align.left);
-    }
-
-    @Override
-    protected void buildContent () {
-        shaderBox = new ShaderBox();
-        dynamicContentTable.add(shaderBox).padTop(30).growX().expand().height(150).padLeft(-17).padRight(-16);
-    }*/
+    public final String INPUT_RGBA = "inputColor";
 
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
 
-    }/*
-
-    @Override
-    public String writeOutputCode (int slotId) {
-        return null;
     }
 
     public void buildFragmentShader(ShaderBuilder shaderBuilder) {
@@ -46,8 +29,9 @@ public class ColorOutput extends AbstractShaderNode {
     @Override
     public void graphUpdated () {
         buildFragmentShader(previewBuilder);
+        super.graphUpdated();
     }
-    */
+
 
     @Override
     public String writeOutputCode(String slotId) {
