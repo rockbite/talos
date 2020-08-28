@@ -15,8 +15,8 @@ public class MathNode extends AbstractShaderNode {
 
     @Override
     public void prepareDeclarations(ShaderBuilder shaderBuilder) {
-        String exprA = inputStrings.get(INPUT_A);
-        String exprB = inputStrings.get(INPUT_B);
+        String exprA = getExpression(INPUT_A, null);
+        String exprB = getExpression(INPUT_B, null);
 
         boolean clamp = (boolean) widgetMap.get(CLAMP).getValue();
 
@@ -33,18 +33,13 @@ public class MathNode extends AbstractShaderNode {
             operand = "/";
         }
 
-        if(exprA == null) {
-            exprA = "vec4(0.0)";
-        }
-        if(exprB == null) {
-            exprB = "vec4(0.0)";
-        }
-
         String expression = "(" + exprA + ") " + operand + " (" + exprB + ")";
 
         if (clamp) {
-            expression = "clamp(" + expression +  ", 0.0, 1.0)";
+            expression = "fract(" + expression +  ")";
         }
+
+        expression = "vec4(" + expression + ")";
 
         shaderBuilder.addLine("vec4 sumVar" + getId() + " = " + expression);
     }

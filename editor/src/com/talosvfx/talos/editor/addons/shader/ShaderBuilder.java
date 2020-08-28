@@ -10,6 +10,8 @@ public class ShaderBuilder {
 
     private ObjectMap<String, UniformData> declaredUniforms = new ObjectMap<>();
 
+    private ObjectMap<String, String> variableMap = new ObjectMap<>();
+
     public ShaderBuilder() {
 
     }
@@ -17,6 +19,8 @@ public class ShaderBuilder {
     public void reset() {
         mainContent = "";
         shaderProgramCache = null;
+        variableMap.clear();
+        declaredUniforms.clear();
     }
 
     public String getFragmentString () {
@@ -92,6 +96,13 @@ public class ShaderBuilder {
 
     public void addLine (String line) {
         mainContent += line + ";\n";
+    }
+
+    public void declareVariable (Type type, String name, String value) {
+        if(!variableMap.containsKey(name)) {
+            addLine(type.getTypeString() + " " + name + " = " + value);
+            variableMap.put(name, value);
+        }
     }
 
     public class UniformData {

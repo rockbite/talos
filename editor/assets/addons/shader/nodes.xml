@@ -1,14 +1,14 @@
 <modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
     <category name = "general" title="General">
         <module name = "TimeNode" title = "Timer" keywords = "timer">
-            <value port="output" name="outputValue">System time value</value>
+            <value port="output" name="outputValue" type="float">System time value</value>
         </module>
-        <module name = "NumberNode" title = "Number Node" keywords = "number,float">
+        <module name = "NumberNode" title = "Number" keywords = "number,float">
             <dynamicValue port="output" name="outputValue" type="float" min="-1000" max="1000">X: </dynamicValue>
         </module>
         <module name = "Vector2Node" title = "Vector2" keywords = "vector2,position">
+            <value port="output" name="outputValue" type="vec2">Output</value>
             <group>
-                <value port="output" name="outputValue" type="vec2">Output</value>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>

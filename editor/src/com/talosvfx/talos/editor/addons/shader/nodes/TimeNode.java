@@ -16,7 +16,7 @@ public class TimeNode extends AbstractShaderNode {
 
         time += delta;
 
-        time = (float) (time - Math.floor(time));
+        //time = (float) (time - Math.floor(time));
     }
 
     @Override

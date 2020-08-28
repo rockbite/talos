@@ -34,6 +34,10 @@ public class SampleTextureNode extends AbstractShaderNode {
         showShaderBox();
     }
 
+    @Override
+    protected boolean isInputDynamic () {
+        return true;
+    }
 
     @Override
     public void prepareDeclarations(ShaderBuilder shaderBuilder) {
@@ -49,7 +53,7 @@ public class SampleTextureNode extends AbstractShaderNode {
 
         boolean wrap = (boolean) widgetMap.get(WRAP).getValue();
 
-        String sample = "v_texCoords * " + uvMul + " + " + uvOffset;
+        String sample = "(v_texCoords - 0.5)/(" + uvMul + ") + 0.5 + " + uvOffset;
 
         if(wrap) {
             sample = "fract(" + sample + ")";

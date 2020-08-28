@@ -11,16 +11,21 @@ public class Vector2Node extends AbstractShaderNode {
 
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
+        String xVal = getExpression(X, null);
+        String yVal = getExpression(Y, null);
 
+        String vec = "vec2(" + xVal + ", " + yVal + ")";
+        shaderBuilder.declareVariable(ShaderBuilder.Type.VEC2, "vec2Val" + getId(), vec);
     }
 
     @Override
     public String writeOutputCode (String slotId) {
-        String xVal = getExpression(X, null);
-        String yVal = getExpression(Y, null);
+        return "vec2Val" + getId();
+    }
 
-        String vec = "(vec2(" + xVal + ", " + yVal + "))";
-
-        return vec;
+    @Override
+    protected String getPreviewLine (String expression) {
+        String output = "vec2Val" + getId();
+        return "gl_FragColor = vec4(" + output + ".x, " + output + ".y, 0.0, 1.0)";
     }
 }

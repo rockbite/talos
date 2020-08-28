@@ -1,17 +1,18 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
 public abstract class AbstractShaderNode extends NodeWidget {
@@ -108,18 +109,31 @@ public abstract class AbstractShaderNode extends NodeWidget {
     public void act (float delta) {
         super.act(delta);
 
-        if(shaderBox != null && shaderBox.isVisible()) {
+        if(shaderBox != null && isInputDynamic()) {
             updatePreview();
         }
+
+        if(!isInputDynamic() && isInputDynamic) {
+            isInputDynamic = false;
+            inputStateChanged(isInputDynamic);
+        }
+    }
+
+    protected boolean isInputDynamic() {
+        return getInputs().size > 0;
     }
 
     protected void updatePreview() {
         previewBuilder.reset();
         processTree(previewBuilder);
         String val = writeOutputCode(getPreviewOutputName());
-        previewBuilder.addLine("gl_FragColor = " + val);
+        previewBuilder.addLine(getPreviewLine(val));
 
         shaderBox.setShader(previewBuilder);
+    }
+
+    protected String getPreviewLine(String expression) {
+        return "gl_FragColor = vec4(" + expression + ")";
     }
 
     protected String getPreviewOutputName () {
@@ -132,15 +146,96 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     public String getExpression(String slot, String def) {
         String val = inputStrings.get(slot);
+
+        //  check type compatibility
+        ShaderBuilder.Type targetType = getTargetVarType(slot);
+        ShaderBuilder.Type varType = getVarType(slot);
+
+        if(val == null) {
+            ShaderBuilder.Type autoType = ShaderBuilder.Type.FLOAT;
+            if(widgetMap.get(slot) instanceof ColorWidget) {
+                autoType = ShaderBuilder.Type.VEC4;
+            }
+
+            targetType = autoType;
+            varType = autoType;
+        }
+
+        if(targetType != varType) {
+            val = castTypes(val, targetType, varType);
+        }
+
         if(val == null) {
             if(def == null) {
-                val = widgetMap.get(slot).getValue() + "";
+                if(widgetMap.get(slot) instanceof ColorWidget) {
+                    Color clr = ((ColorWidget) widgetMap.get(slot)).getValue();
+                    val = "(vec4(" + clr.r + ", " + clr.g + ", " + clr.b + ", " + clr.a + "))";
+                } else {
+                    val = widgetMap.get(slot).getValue() + "";
+                }
             } else {
                 val = def;
             }
         }
 
         return val;
+    }
+
+    public String castTypes(String expression, ShaderBuilder.Type fromType,  ShaderBuilder.Type toType) {
+
+        if(fromType == ShaderBuilder.Type.FLOAT) {
+            expression = toType.getTypeString() + "(" + expression + ")";
+        } else {
+            if(toType == ShaderBuilder.Type.FLOAT) {
+                expression = expression + ".x";
+            } else {
+                String[] fields = {"r", "g", "b", "a"};
+                ObjectIntMap<String> sizeMap = new ObjectIntMap<>();
+                sizeMap.put(ShaderBuilder.Type.VEC2.getTypeString(), 2);
+                sizeMap.put(ShaderBuilder.Type.VEC3.getTypeString(), 4);
+                sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);
+
+                String newExpression = toType.getTypeString() + "(";
+
+                for(int i = 0; i < sizeMap.get(toType.getTypeString(), 0); i++) {
+                    int sizeToPut = sizeMap.get(fromType.getTypeString(), 0);
+                    if(i < sizeToPut) {
+                        String field = fields[i];
+                        newExpression += "("+expression+")." + field + ",";
+                    } else {
+                        newExpression += "0.0,";
+                    }
+                }
+                newExpression = newExpression.substring(0, newExpression.length() - 1) + ")";
+                expression = newExpression;
+            }
+        }
+
+        return expression;
+    }
+
+    public ShaderBuilder.Type getVarType(String name) {
+        String typeString = typeMap.get(name);
+        if(typeString.equals("float")) {
+            return ShaderBuilder.Type.FLOAT;
+        } else if(typeString.equals("vec2")) {
+            return ShaderBuilder.Type.VEC2;
+        } if(typeString.equals("vec3")) {
+            return ShaderBuilder.Type.VEC3;
+        }if(typeString.equals("vec4")) {
+            return ShaderBuilder.Type.VEC4;
+        } else {
+            return ShaderBuilder.Type.FLOAT;
+        }
+    }
+
+    protected ShaderBuilder.Type getTargetVarType(String name) {
+        if(inputs.get(name) != null && inputs.get(name).targetNode != null) {
+            String removeVarName = inputs.get(name).targetSlot;
+            return ((AbstractShaderNode)inputs.get(name).targetNode).getVarType(removeVarName);
+        } else {
+            return null;
+        }
     }
 
 }

@@ -50,13 +50,9 @@ public class ColorNode extends AbstractShaderNode {
 
     @Override
     public String writeOutputCode(String slotId) {
-        String inputColor = inputStrings.get(INPUT_COLOR);
+        String expression = getExpression(INPUT_COLOR, null);
 
-        String expression = "(vec4(" + color.r + ", " + color.g + ", " + color.b + ", " + color.a + "))";
-
-        if(inputColor != null) {
-            expression = "("+inputColor+")";
-        }
+        expression = "(" + expression + ")";
 
         if(slotId.equals(OUTPUT_RGBA)) {
             return expression;
