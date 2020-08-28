@@ -36,6 +36,8 @@ public abstract class NodeWidget extends EmptyWindow {
     protected Array<String> inputSlots = new Array();
     protected Array<String> outputSlots = new Array();
 
+    protected ObjectMap<String, AbstractWidget> widgetMap = new ObjectMap();
+
     protected ObjectMap<String, Connection> inputs = new ObjectMap();
     protected ObjectMap<String, Connection> outputs = new ObjectMap();
     private int id = 0;
@@ -387,6 +389,8 @@ public abstract class NodeWidget extends EmptyWindow {
                 }
 
                 String variableName = row.getAttribute("name");
+
+                widgetMap.put(variableName, widget);
 
                 // does it have a port?
                 if(row.hasAttribute("port")) {

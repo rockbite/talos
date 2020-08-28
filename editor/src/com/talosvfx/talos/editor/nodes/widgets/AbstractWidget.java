@@ -1,10 +1,12 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class AbstractWidget extends Table {
+public abstract class AbstractWidget<T> extends Table {
 
     protected Table content;
     protected Table portContainer;
@@ -49,4 +51,19 @@ public abstract class AbstractWidget extends Table {
 
         return portBody;
     }
+
+    protected boolean fireChangedEvent() {
+        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+
+        boolean var2;
+        try {
+            var2 = fire(changeEvent);
+        } finally {
+            Pools.free(changeEvent);
+        }
+
+        return var2;
+    }
+
+    public abstract T getValue();
 }

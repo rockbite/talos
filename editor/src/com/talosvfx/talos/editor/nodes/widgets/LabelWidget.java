@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader;
 
-public class LabelWidget extends AbstractWidget {
+public class LabelWidget extends AbstractWidget<Object> {
 
     private Label label;
 
@@ -43,5 +43,10 @@ public class LabelWidget extends AbstractWidget {
         }
 
         set(text, align);
+    }
+
+    @Override
+    public Object getValue () {
+        return null;
     }
 }

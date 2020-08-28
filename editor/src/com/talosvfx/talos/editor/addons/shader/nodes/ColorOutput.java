@@ -34,6 +34,16 @@ public class ColorOutput extends AbstractShaderNode {
 
 
     @Override
+    protected void updatePreview () {
+        shaderBox.setShader(previewBuilder);
+    }
+
+    @Override
+    protected String getPreviewOutputName () {
+        return null;
+    }
+
+    @Override
     public String writeOutputCode(String slotId) {
         return null;
     }

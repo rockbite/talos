@@ -12,7 +12,9 @@ import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public class ColorWidget extends AbstractWidget {
+public class ColorWidget extends AbstractWidget<Color> {
+
+    private Color color = new Color();
 
     @Override
     public void init(Skin skin) {
@@ -35,7 +37,10 @@ public class ColorWidget extends AbstractWidget {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);
+                        color.set(newColor);
                         colorButton.setColor(newColor);
+
+                        fireChangedEvent();
                     }
                 });
             }
@@ -45,6 +50,11 @@ public class ColorWidget extends AbstractWidget {
     @Override
     public void loadFromXML(XmlReader.Element element) {
 
+    }
+
+    @Override
+    public Color getValue () {
+        return color;
     }
 
 

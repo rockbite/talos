@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public class ValueWidget extends AbstractWidget {
+public class ValueWidget extends AbstractWidget<Float> {
 
     private final Table editing;
     private final Table main;
@@ -61,7 +61,7 @@ public class ValueWidget extends AbstractWidget {
         label = new Label("", skin);
         valueLabel = new Label("", skin);
         textField = new TextField("0", getSkin(), "no-bg");
-        progressDrawable = ColorLibrary.obtainClippedPatch(skin, getShape(), ColorLibrary.BackgroundColor.LIGHT_BLUE);
+        progressDrawable = ColorLibrary.createClippedPatch(skin, getShape(), ColorLibrary.BackgroundColor.LIGHT_BLUE);
 
         Stack mainStack = new Stack();
 
@@ -260,7 +260,9 @@ public class ValueWidget extends AbstractWidget {
         }
 
         setBackground(ColorLibrary.obtainBackground(getSkin(), shape, color));
-        progress.setBackground(ColorLibrary.obtainClippedPatch(getSkin(), shape, ColorLibrary.BackgroundColor.LIGHT_BLUE));
+        progressDrawable = ColorLibrary.createClippedPatch(getSkin(), shape, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+        progress.setBackground(progressDrawable);
+        updateProgress();
     }
 
     public void setLabel(String text) {
@@ -284,6 +286,8 @@ public class ValueWidget extends AbstractWidget {
         textField.setText(text);
 
         updateProgress();
+
+        fireChangedEvent();
     }
 
     private void updateProgress() {
@@ -323,6 +327,11 @@ public class ValueWidget extends AbstractWidget {
         setValue(defaultValue);
 
         setLabel(text);
+    }
+
+    @Override
+    public Float getValue () {
+        return value;
     }
 
     public void setType(Type type) {

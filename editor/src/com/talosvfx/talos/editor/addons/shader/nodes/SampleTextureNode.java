@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -14,40 +15,50 @@ public class SampleTextureNode extends AbstractShaderNode {
 
     private Texture texture;
 
-    public final int INPUT_UV = 0;
+    public final String INPUT_UV_OFFSET = "offsetUV";
+    public final String INPUT_UV_MUL = "mulUV";
 
-    public final int OUTPUT_RGBA = 0;
-    public final int OUTPUT_R = 1;
-    public final int OUTPUT_G = 2;
-    public final int OUTPUT_B = 3;
-    public final int OUTPUT_A = 4;
+    public final String CLAMP = "clamp";
+
+    public final String TEXTURE_ID = "texture";
+
+    public final String OUTPUT_RGBA = "outputRGBA";
+
+    @Override
+    protected String getPreviewOutputName () {
+        return OUTPUT_RGBA;
+    }
+
+    @Override
+    protected void inputStateChanged (boolean isInputDynamic) {
+        showShaderBox();
+    }
+
 
     @Override
     public void prepareDeclarations(ShaderBuilder shaderBuilder) {
-
+        shaderBuilder.declareUniform("u_texture" + getId(), ShaderBuilder.Type.TEXTURE, texture);
     }
 
     @Override
     public String writeOutputCode(String slotId) {
-        return null;
+        String output = "";
+
+        String uvOffset = getExpression(INPUT_UV_OFFSET, "vec2(0.0, 0.0)");
+        String uvMul = getExpression(INPUT_UV_MUL, "vec2(1.0, 1.0)");
+
+        String sample = "v_texCoords * " + uvMul + " + " + uvOffset;
+
+        if(slotId.equals(OUTPUT_RGBA)) {
+            output = "texture2D(" + "u_texture" + getId() + ", " + sample + ")";
+        }
+
+        return output;
     }
-/*
-    @Override
-    protected void configureConnections () {
-        addConnection("UV", 0, Align.left);
-
-        addConnection("RGBA", 0, Align.right);
-        addConnection("R", 1, Align.right);
-        addConnection("R", 2, Align.right);
-        addConnection("B", 3, Align.right);
-        addConnection("A", 4, Align.right);
-    }
 
     @Override
-    protected void buildContent () {
-        shaderBox = new ShaderBox();
-        rightTable.add(shaderBox).padTop(5).growX().expand().height(150).padRight(-16).padLeft(-16);
-
+    public void constructNode (XmlReader.Element module) {
+        super.constructNode(module);
 
         FileActorBinder.register(shaderBox, "png");
 
@@ -65,27 +76,4 @@ public class SampleTextureNode extends AbstractShaderNode {
             }
         });
     }
-*/
-    /*
-    private void updatePreview () {
-        previewOutput(OUTPUT_RGBA);
-    }
-
-    @Override
-    public void prepareDeclarations (ShaderBuilder shaderBuilder) {
-        shaderBuilder.declareUniform("u_texture" + getId(), ShaderBuilder.Type.TEXTURE, texture);
-    }
-
-    @Override
-    public String writeOutputCode (int slotId) {
-        String output = "";
-
-        if(slotId == OUTPUT_RGBA) {
-            output = "texture2D(" + "u_texture" + getId() + ", v_texCoords)";
-        }
-
-        return output;
-    }
-
-     */
 }

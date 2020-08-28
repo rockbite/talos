@@ -66,6 +66,13 @@ public class ColorLibrary {
         return instance;
     }
 
+    public static ClippedNinePatchDrawable createClippedPatch(Skin skin, String name, BackgroundColor backgroundColor) {
+        ClippedNinePatchDrawable drawable = new ClippedNinePatchDrawable((TextureAtlas.AtlasRegion) skin.getRegion(name));
+        drawable.setColor(backgroundColor.getColor());
+
+        return drawable;
+    }
+
     public static ClippedNinePatchDrawable obtainClippedPatch(Skin skin, String name, BackgroundColor backgroundColor) {
         int colorInteger = backgroundColor.color.toIntBits();
         int code = name.hashCode() * 31 + colorInteger;
