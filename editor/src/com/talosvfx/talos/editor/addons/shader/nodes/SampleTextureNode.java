@@ -18,7 +18,7 @@ public class SampleTextureNode extends AbstractShaderNode {
     public final String INPUT_UV_OFFSET = "offsetUV";
     public final String INPUT_UV_MUL = "mulUV";
 
-    public final String CLAMP = "clamp";
+    public final String WRAP = "wrap";
 
     public final String TEXTURE_ID = "texture";
 
@@ -47,7 +47,13 @@ public class SampleTextureNode extends AbstractShaderNode {
         String uvOffset = getExpression(INPUT_UV_OFFSET, "vec2(0.0, 0.0)");
         String uvMul = getExpression(INPUT_UV_MUL, "vec2(1.0, 1.0)");
 
+        boolean wrap = (boolean) widgetMap.get(WRAP).getValue();
+
         String sample = "v_texCoords * " + uvMul + " + " + uvOffset;
+
+        if(wrap) {
+            sample = "fract(" + sample + ")";
+        }
 
         if(slotId.equals(OUTPUT_RGBA)) {
             output = "texture2D(" + "u_texture" + getId() + ", " + sample + ")";

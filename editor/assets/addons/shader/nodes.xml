@@ -49,7 +49,7 @@
                 <value port="input" name="offsetUV" type="vec2">UV Offset</value>
                 <value port="input" name="mulUV" type="vec2">UV Mul</value>
             </group>
-            <checkbox name="clamp">Clamp Sample Coordinate</checkbox>
+            <checkbox name="wrap">Wrap Coordinates</checkbox>
         </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
             <value port="output" name="outputValue" type="vec4">Output Value</value>

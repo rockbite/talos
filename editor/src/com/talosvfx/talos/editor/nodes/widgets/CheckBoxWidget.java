@@ -12,13 +12,13 @@ public class CheckBoxWidget extends AbstractWidget<Boolean> {
     public void init(Skin skin) {
         super.init(skin);
 
-        checkBox = new CheckBox("Clamp Output", skin, "rounded-checkbox");
+        checkBox = new CheckBox("checkbox", skin, "rounded-checkbox");
         content.add(checkBox).left().expandX().height(32).padLeft(-5);
     }
 
     @Override
     public void loadFromXML(XmlReader.Element element) {
-
+        checkBox.setText(element.getText());
     }
 
     @Override
