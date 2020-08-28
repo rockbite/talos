@@ -1,5 +1,8 @@
 <modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
     <category name = "general" title="General">
+        <module name = "TimeNode" title = "Timer" keywords = "timer">
+            <value port="output" name="outputValue">System time value</value>
+        </module>
         <module name = "NumberNode" title = "Number Node" keywords = "number,float">
             <dynamicValue port="output" name="outputValue" type="float" min="-1000" max="1000">X: </dynamicValue>
         </module>

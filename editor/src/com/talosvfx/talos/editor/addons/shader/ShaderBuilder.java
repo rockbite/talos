@@ -100,6 +100,10 @@ public class ShaderBuilder {
         public Object payload;
     }
 
+    public interface IValueProvider {
+        float getValue();
+    }
+
     public enum Type {
         FLOAT("float"),
         INT("int"),

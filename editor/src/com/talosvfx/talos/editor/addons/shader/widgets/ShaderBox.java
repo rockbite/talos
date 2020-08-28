@@ -58,6 +58,10 @@ public class ShaderBox extends Actor {
 
                     bind++;
                 }
+                if(data.type == ShaderBuilder.Type.FLOAT && data.payload instanceof ShaderBuilder.IValueProvider) {
+                    ShaderBuilder.IValueProvider provider = (ShaderBuilder.IValueProvider) data.payload;
+                    shaderProgram.setUniformf(data.variableName, provider.getValue());
+                }
             }
 
             batch.draw(white, getX(), getY(), getWidth(), getHeight());
