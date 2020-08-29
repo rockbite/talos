@@ -112,6 +112,15 @@ public class EmitterModule extends AbstractModule {
         return config.additive;
     }
 
+
+    public boolean isBlendAdd () {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return false;
+
+        return config.isBlendAdd;
+    }
+
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
         getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in

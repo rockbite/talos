@@ -25,8 +25,6 @@ public class ShaderAddon implements IAddon {
 
     private ShaderBuilder shaderBuilder;
 
-    private ShaderTimeline timeline;
-
     @Override
     public void init () {
         SHADER_PROJECT = new ShaderProject(this);
@@ -38,12 +36,12 @@ public class ShaderAddon implements IAddon {
     }
 
     private void buildUI () {
-        timeline = new ShaderTimeline(TalosMain.Instance().UIStage().getSkin());
+
     }
 
     @Override
     public void initUIContent () {
-        TalosMain.Instance().UIStage().swapToAddonContent(null, null, timeline);
+        TalosMain.Instance().UIStage().swapToAddonContent(null, null, null);
         TalosMain.Instance().setThirdPartyStage(nodeStage);
 
         // now need to disable some menu tabs
@@ -96,7 +94,8 @@ public class ShaderAddon implements IAddon {
         openFile.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-               //
+                super.clicked(event, x, y);
+                TalosMain.Instance().UIStage().openProjectAction(SHADER_PROJECT);
             }
         });
 

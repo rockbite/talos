@@ -31,6 +31,7 @@ public class ParticleEmitterInstance implements IEmitter {
 	private ScopePayload scopePayload;
 
 	public boolean isAdditive = true;
+	private boolean isBlendAdd = false;
 
 	Vector2 position = new Vector2();
 	float duration;
@@ -113,6 +114,7 @@ public class ParticleEmitterInstance implements IEmitter {
 		rate = emitterModule.getRate();
 		isAttached = emitterModule.isAttached();
 		isAdditive = emitterModule.isAdditive();
+		isBlendAdd = emitterModule.isBlendAdd();
 
 		if(delayTimer > 0) {
 			delayTimer -= delta;
@@ -188,6 +190,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	@Override
 	public boolean isAdditive () {
 		return isAdditive;
+	}
+
+	@Override
+	public boolean isBlendAdd () {
+		return isBlendAdd;
 	}
 
 	@Override

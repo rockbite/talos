@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -13,12 +12,11 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class NodeWidget extends EmptyWindow {
+public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
     EditableLabel title;
 
@@ -43,6 +41,7 @@ public abstract class NodeWidget extends EmptyWindow {
     protected ObjectMap<String, Connection> inputs = new ObjectMap();
     protected ObjectMap<String, Connection> outputs = new ObjectMap();
     private int id = 0;
+    private int uniqueId = 0;
 
     private final ObjectMap<String, Class<? extends AbstractWidget>> widgetClassMap = new ObjectMap<>();
 
@@ -58,6 +57,14 @@ public abstract class NodeWidget extends EmptyWindow {
 
     public int getId() {
         return id;
+    }
+
+    public void setUniqueId (int uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public int getUniqueId() {
+        return uniqueId;
     }
 
     public class Connection {
@@ -429,5 +436,30 @@ public abstract class NodeWidget extends EmptyWindow {
         }
 
         widgetContainer.add().growY().row();
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("name", this.getClass().getSimpleName());
+        json.writeValue("id", getUniqueId());
+        json.writeValue("title", title.getText());
+        json.writeObjectStart("position");
+        json.writeValue("x", getX() + "");
+        json.writeValue("y", getY() + "");
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonValue) {
+        title.setText(jsonValue.getString("title", "Empty"));
+        setUniqueId(jsonValue.getInt("id"));
+        JsonValue position = jsonValue.get("position");
+        if(position != null) {
+            setX(position.getFloat("x", 0));
+            setY(position.getFloat("y", 0));
+        } else {
+            setX(0);
+            setY(0);
+        }
     }
 }

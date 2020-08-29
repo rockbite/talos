@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -66,4 +68,7 @@ public abstract class AbstractWidget<T> extends Table {
     }
 
     public abstract T getValue();
+
+    public abstract void read (Json json, JsonValue jsonValue);
+    public abstract void write (Json json, String name);
 }

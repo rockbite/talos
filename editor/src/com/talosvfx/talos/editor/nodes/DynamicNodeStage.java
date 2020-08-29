@@ -1,12 +1,13 @@
 package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.WorkplaceStage;
@@ -14,7 +15,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.utils.GridRenderer;
 
-public abstract class DynamicNodeStage extends WorkplaceStage {
+public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
 
     protected XmlReader.Element nodeData;
     public Skin skin;
@@ -109,5 +110,69 @@ public abstract class DynamicNodeStage extends WorkplaceStage {
                 }
             }
         });
+    }
+
+    public void write (Json json) {
+        Array<NodeWidget> nodes = nodeBoard.nodes;
+
+        json.writeArrayStart("list");
+        for (NodeWidget node: nodes) {
+            json.writeValue(node);
+        }
+        json.writeArrayEnd();
+
+        json.writeArrayStart("connections");
+        for (NodeBoard.NodeConnection connection: nodeBoard.nodeConnections) {
+            json.writeObjectStart();
+            json.writeValue("fromNode", connection.fromNode.getUniqueId());
+            json.writeValue("toNode", connection.toNode.getUniqueId());
+            json.writeValue("fromSlot", connection.fromId);
+            json.writeValue("toSlot", connection.toId);
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
+    }
+
+    public void read (Json json, JsonValue root) {
+        reset();
+
+        JsonValue nodes = root.get("list");
+        JsonValue connections = root.get("connections");
+
+        int idCounter = 0;
+
+        IntMap<NodeWidget> nodeMap = new IntMap<>();
+
+        for (JsonValue nodeData: nodes) {
+            String className = nodeData.getString("name");
+
+            Class clazz = nodeListPopup.getNodeClassByName(className);
+            if(clazz != null) {
+                NodeWidget node = createNode(clazz, 0, 0);
+                node.constructNode(nodeListPopup.getModuleByClassName(className));
+                node.read(json, nodeData);
+                idCounter = Math.max(idCounter, node.getUniqueId());
+                nodeMap.put(node.getUniqueId(), node);
+            }
+        }
+
+        nodeBoard.globalNodeCounter = idCounter;
+
+        for (JsonValue connectionData: connections) {
+            int fromNode = connectionData.getInt("fromNode");
+            int toNode = connectionData.getInt("toNode");
+            String fromSlot = connectionData.getString("fromSlot");
+            String toSlot = connectionData.getString("toSlot");
+
+            NodeWidget fromWidget = nodeMap.get(fromNode);
+            NodeWidget toWidget = nodeMap.get(toNode);
+
+            nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
+        }
+
+    }
+
+    public void reset () {
+        nodeBoard.reset();
     }
 }

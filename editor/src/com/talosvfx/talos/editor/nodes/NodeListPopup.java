@@ -29,6 +29,21 @@ public class NodeListPopup extends VisWindow {
 
     private String classPath;
 
+    public Class getNodeClassByName (String className) {
+        Class nodeClazz = null;
+        try {
+            nodeClazz = ClassReflection.forName(classPath + "." + className);
+        } catch (ReflectionException e) {
+            e.printStackTrace();
+        }
+
+        return nodeClazz;
+    }
+
+    public XmlReader.Element getModuleByClassName (String className) {
+        return registry.get(getNodeClassByName(className));
+    }
+
     interface NodeListListener {
         void chosen(Class clazz, XmlReader.Element module, float x, float y);
     }

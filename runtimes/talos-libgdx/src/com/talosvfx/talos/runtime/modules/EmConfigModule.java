@@ -36,6 +36,7 @@ public class EmConfigModule extends AbstractModule {
         userValue.attached = false;
         userValue.continuous = true;
         userValue.additive = true;
+        userValue.isBlendAdd = false;
         userValue.aligned = false;
     }
 
@@ -58,6 +59,7 @@ public class EmConfigModule extends AbstractModule {
     public void write(Json json) {
         super.write(json);
         json.writeValue("additive", getUserValue().additive);
+        json.writeValue("isBlendAdd", getUserValue().isBlendAdd);
         json.writeValue("attached", getUserValue().attached);
         json.writeValue("continuous", getUserValue().continuous);
         json.writeValue("aligned", getUserValue().aligned);
@@ -67,6 +69,7 @@ public class EmConfigModule extends AbstractModule {
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         getUserValue().additive = jsonData.getBoolean("additive");
+        getUserValue().isBlendAdd = jsonData.getBoolean("isBlendAdd", false);
         getUserValue().attached = jsonData.getBoolean("attached");
         getUserValue().continuous = jsonData.getBoolean("continuous");
         getUserValue().aligned = jsonData.getBoolean("aligned");

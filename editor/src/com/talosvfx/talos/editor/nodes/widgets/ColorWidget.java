@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
@@ -15,6 +17,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 public class ColorWidget extends AbstractWidget<Color> {
 
     private Color color = new Color();
+    private Table colorButton;
 
     @Override
     public void init(Skin skin) {
@@ -22,12 +25,13 @@ public class ColorWidget extends AbstractWidget<Color> {
 
         Label label = new Label("Color", skin);
 
-        Table colorButton = new Table();
+        colorButton = new Table();
         colorButton.setBackground(skin.newDrawable(ColorLibrary.SHAPE_SQUIRCLE));
 
         content.add(label).left().expandX().height(32);
         content.add(colorButton).right().expandX().height(32).width(96);
-        colorButton.setColor(Color.CORAL);
+        color.set(Color.CORAL);
+        colorButton.setColor(color);
 
         colorButton.setTouchable(Touchable.enabled);
         colorButton.addListener(new ClickListener() {
@@ -57,5 +61,15 @@ public class ColorWidget extends AbstractWidget<Color> {
         return color;
     }
 
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        color.set(jsonValue.asInt());
+        colorButton.setColor(color);
+    }
 
+    @Override
+    public void write (Json json, String name) {
+        int bits = color.toIntBits();
+        json.writeValue(name, bits);
+    }
 }

@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.nodes.widgets;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 
 public class LabelWidget extends AbstractWidget<Object> {
@@ -48,5 +50,15 @@ public class LabelWidget extends AbstractWidget<Object> {
     @Override
     public Object getValue () {
         return null;
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+
+    }
+
+    @Override
+    public void write (Json json, String name) {
+
     }
 }

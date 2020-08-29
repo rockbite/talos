@@ -38,6 +38,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     Vector2 tmp2 = new Vector2();
     Vector2 prev = new Vector2();
 
+    public int globalNodeCounter = 0;
     private ObjectIntMap<Class<? extends NodeWidget>> nodeCounter = new ObjectIntMap<>();
 
     private ObjectSet<NodeWidget> selectedNodes = new ObjectSet<>();
@@ -53,6 +54,14 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     public Array<NodeConnection> nodeConnections = new Array<>();
     public Array<NodeWidget> nodes = new Array<>();
+
+    public void reset () {
+        nodeCounter = new ObjectIntMap<>();
+        selectedNodes.clear();
+        nodeConnections.clear();
+        nodes.clear();
+        clearChildren();
+    }
 
     public static class NodeConnection {
         public NodeWidget fromNode;
@@ -162,6 +171,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
             int counter = nodeCounter.getAndIncrement(clazz, 0, 1);
             node.setId(counter);
+            node.setUniqueId(globalNodeCounter++);
 
             tryAndConnectLasCC(node);
         } catch (ReflectionException e) {

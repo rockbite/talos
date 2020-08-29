@@ -509,6 +509,7 @@ public class LegacyImporter {
             config.setContinuous(continuous);
             config.setAligned(aligned);
             config.setAdditive(additive);
+            config.setBlendAdd(false);
 
             // Backwards compatibility
             line = reader.readLine();

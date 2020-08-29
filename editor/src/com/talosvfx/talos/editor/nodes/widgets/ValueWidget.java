@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -332,6 +334,17 @@ public class ValueWidget extends AbstractWidget<Float> {
     @Override
     public Float getValue () {
         return value;
+    }
+
+
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        setValue(jsonValue.asFloat());
+    }
+
+    @Override
+    public void write (Json json, String name) {
+        json.writeValue(name, getValue());
     }
 
     public void setType(Type type) {

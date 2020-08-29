@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 
 public class CheckBoxWidget extends AbstractWidget<Boolean> {
@@ -24,5 +26,16 @@ public class CheckBoxWidget extends AbstractWidget<Boolean> {
     @Override
     public Boolean getValue () {
         return checkBox.isChecked();
+    }
+
+
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        checkBox.setChecked(jsonValue.asBoolean());
+    }
+
+    @Override
+    public void write (Json json, String name) {
+        json.writeValue(name, checkBox.isChecked());
     }
 }

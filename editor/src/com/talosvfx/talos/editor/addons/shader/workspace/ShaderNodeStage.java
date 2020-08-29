@@ -39,4 +39,10 @@ public class ShaderNodeStage extends DynamicNodeStage {
 
         return null;
     }
+
+    @Override
+    public void reset () {
+        super.reset();
+        colorOutput = null;
+    }
 }

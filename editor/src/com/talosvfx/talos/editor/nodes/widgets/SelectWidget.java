@@ -5,9 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.awt.*;
@@ -17,6 +15,7 @@ public class SelectWidget extends AbstractWidget<String> {
     private SelectBox<String> selectBox;
 
     private ObjectMap<String, String> titleMap = new ObjectMap<>();
+    private ObjectMap<String, String> keyMap = new ObjectMap<>();
 
     @Override
     public void init(Skin skin) {
@@ -50,6 +49,7 @@ public class SelectWidget extends AbstractWidget<String> {
             String optionText = option.getText();
             items.add(optionText);
             titleMap.put(optionText, option.getAttribute("value"));
+            keyMap.put(option.getAttribute("value"), optionText);
         }
 
         selectBox.setItems(items);
@@ -61,5 +61,17 @@ public class SelectWidget extends AbstractWidget<String> {
         String name = titleMap.get(title);
 
         return name;
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        String val = jsonValue.asString();
+        selectBox.setSelected(keyMap.get(val));
+    }
+
+    @Override
+    public void write (Json json, String name) {
+        String value = titleMap.get(selectBox.getSelected());
+        json.writeValue(name, value);
     }
 }

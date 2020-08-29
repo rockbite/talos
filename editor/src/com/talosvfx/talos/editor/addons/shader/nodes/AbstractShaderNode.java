@@ -5,13 +5,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
@@ -238,4 +237,29 @@ public abstract class AbstractShaderNode extends NodeWidget {
         }
     }
 
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        super.read(json, jsonValue);
+
+        JsonValue properties = jsonValue.get("properties");
+
+        for(String name: widgetMap.keys()) {
+            JsonValue value = properties.get(name);
+            widgetMap.get(name).read(json, value);
+        }
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+
+        json.writeObjectStart("properties");
+
+        for(String name: widgetMap.keys()) {
+            AbstractWidget widget = widgetMap.get(name);
+            widget.write(json, name);
+        }
+
+        json.writeObjectEnd();
+    }
 }

@@ -527,7 +527,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         try {
             StringWriter stringWriter = new StringWriter();
             Json json = new Json();
-            json .setOutputType(JsonWriter.OutputType.json);
+            json.setOutputType(JsonWriter.OutputType.json);
             json.setWriter(stringWriter);
             json.getWriter().object();
 
