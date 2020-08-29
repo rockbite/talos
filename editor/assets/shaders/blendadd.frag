@@ -12,20 +12,10 @@
  void main()
  {
      vec4 color = texture2D(u_texture, v_texCoords);
-     color.rgb *= color.a;
+     float alpha = color.a * v_color.a;
+     color.rgb *= alpha * v_color.rgb;
 
-     float alpha = color.a;
-
-     color.a = mix((1.0 - color.a) * color.a, color.a, color.a);
-
-     //color.rgb *= v_color.a * v_color.rgb;
-
-     color.a *= v_color.a;
-
-     // maybe color should be affecting more low alpha areas
-     vec3 colorAffected = color.rgb * v_color.a * v_color.rgb;
-     vec3 colorNotAffected = color.rgb * v_color.a;
-     color.rgb = mix(colorAffected, colorNotAffected, alpha);
+     color.a *= alpha;
 
      gl_FragColor = color;
  }
