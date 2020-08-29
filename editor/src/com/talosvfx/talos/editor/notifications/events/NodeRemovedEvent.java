@@ -16,4 +16,8 @@ public class NodeRemovedEvent implements Notifications.Event {
         this.node = node;
         return this;
     }
+
+    public NodeWidget getNode() {
+        return node;
+    }
 }

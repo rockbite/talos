@@ -23,6 +23,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
+    private Stage stageRef;
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -199,6 +200,12 @@ public class ValueWidget extends AbstractWidget<Float> {
         super.setStage(stage);
         if (stage != null) {
             getStage().getRoot().addCaptureListener(stageListener);
+            stageRef = getStage();
+        } else {
+            if(stageRef != null) {
+                stageRef.getRoot().removeCaptureListener(stageListener);
+                stageRef = null;
+            }
         }
     }
 

@@ -3,17 +3,24 @@ package com.talosvfx.talos.editor.addons.shader.workspace;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 
-public class ShaderNodeStage extends DynamicNodeStage {
+public class ShaderNodeStage extends DynamicNodeStage implements Notifications.Observer {
 
     private ColorOutput colorOutput;
 
     public ShaderNodeStage (Skin skin) {
         super(skin);
+
+        Notifications.registerObserver(this);
     }
 
     @Override
@@ -44,5 +51,12 @@ public class ShaderNodeStage extends DynamicNodeStage {
     public void reset () {
         super.reset();
         colorOutput = null;
+    }
+
+    @EventHandler
+    public void onNodeRemoved(NodeRemovedEvent event) {
+       if (event.getNode() == colorOutput) {
+           colorOutput = null;
+       }
     }
 }

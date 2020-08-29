@@ -42,9 +42,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
                 if(NodeWidget.class.isAssignableFrom(clazz)) {
                     NodeWidget node = createNode(clazz, x, y);
-                    node.constructNode(module);
-
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
+                    if(node != null) {
+                        node.constructNode(module);
+                        Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
+                    }
                 }
             }
         });
