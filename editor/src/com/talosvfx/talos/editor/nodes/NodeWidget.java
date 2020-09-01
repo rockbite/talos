@@ -46,6 +46,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     private final ObjectMap<String, Class<? extends AbstractWidget>> widgetClassMap = new ObjectMap<>();
 
     private Table widgetContainer = new Table();
+    private Table headerTable;
 
     public void graphUpdated () {
 
@@ -65,6 +66,14 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     public int getUniqueId() {
         return uniqueId;
+    }
+
+    public void setSelected(boolean selected) {
+        if (selected) {
+            headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", ColorLibrary.BackgroundColor.LIGHT_BLUE));
+        } else {
+            headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", ColorLibrary.BackgroundColor.RED));
+        }
     }
 
     public class Connection {
@@ -98,7 +107,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         mainStack.add(backgroundTable);
         mainStack.add(contentTable);
 
-        Table headerTable = new Table();
+        headerTable = new Table();
         Table bodyTable = new Table();
 
         headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", ColorLibrary.BackgroundColor.RED));
@@ -451,6 +460,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     @Override
     public void read(Json json, JsonValue jsonValue) {
+        if(title == null) return;
+
         title.setText(jsonValue.getString("title", "Empty"));
         setUniqueId(jsonValue.getInt("id"));
         JsonValue position = jsonValue.get("position");

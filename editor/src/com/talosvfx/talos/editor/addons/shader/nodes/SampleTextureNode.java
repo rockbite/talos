@@ -2,9 +2,10 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
@@ -14,6 +15,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 public class SampleTextureNode extends AbstractShaderNode {
 
     private Texture texture;
+    private String texturePath;
 
     public final String INPUT_UV_OFFSET = "offsetUV";
     public final String INPUT_UV_MUL = "mulUV";
@@ -67,6 +69,23 @@ public class SampleTextureNode extends AbstractShaderNode {
     }
 
     @Override
+    protected void readProperties(JsonValue properties) {
+        texturePath = properties.getString("texture", "");
+        FileHandle fileHandle = TalosMain.Instance().ProjectController().findFile(texturePath);
+
+        if(fileHandle != null) {
+            FileActorBinder.FileEvent fileEvent = Pools.obtain(FileActorBinder.FileEvent.class);
+            fileEvent.setFileHandle(fileHandle);
+            shaderBox.fire(fileEvent);
+        }
+    }
+
+    @Override
+    protected void writeProperties(Json json) {
+        json.writeValue("texture", texturePath);
+    }
+
+    @Override
     public void constructNode (XmlReader.Element module) {
         super.constructNode(module);
 
@@ -78,6 +97,7 @@ public class SampleTextureNode extends AbstractShaderNode {
             public void onFileSet (FileHandle fileHandle) {
                 try {
                     texture = new Texture(fileHandle);
+                    texturePath = fileHandle.path();
                     updatePreview();
                     Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(SampleTextureNode.this));
                 } catch (Exception e) {

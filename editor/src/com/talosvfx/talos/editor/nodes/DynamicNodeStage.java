@@ -1,7 +1,8 @@
 package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -54,11 +55,19 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         initListeners();
     }
 
+    public NodeListPopup getNodeListPopup() {
+        return nodeListPopup;
+    }
+
+    public XmlReader.Element getConfigForNodeClass(Class clazz) {
+        return nodeListPopup.getConfigFor(clazz);
+    }
+
     public void showPopup() {
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+        stage.screenToStageCoordinates(vec);
 
-        nodeListPopup.showPopup(TalosMain.Instance().UIStage().getStage(), vec);
+        nodeListPopup.showPopup(stage, vec);
     }
     public NodeWidget createNode (Class<? extends NodeWidget> clazz, float x, float y) {
         return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(clazz), x, y);
@@ -109,6 +118,45 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 if(button == 1 && !event.isCancelled()) {
                     showPopup();
                 }
+            }
+
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+
+                if(keycode == Input.Keys.ENTER) {
+                    stage.getCamera().position.set(0, 0, 0);
+                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
+                }
+
+                if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    //moduleBoardWidget.createGroupFromSelectedWrappers();
+                }
+
+                if(keycode == Input.Keys.U && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    //moduleBoardWidget.ungroupSelectedWrappers();
+                }
+
+                if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    nodeBoard.copySelectedModules();
+                }
+
+                if(keycode == Input.Keys.V && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    nodeBoard.pasteFromClipboard();
+                }
+
+                if(keycode == Input.Keys.A && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    nodeBoard.selectAllNodes();
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().undo();
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().redo();
+                }
+
+                return super.keyDown(event, keycode);
             }
         });
     }

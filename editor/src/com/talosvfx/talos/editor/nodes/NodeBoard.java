@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,12 +18,18 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
+import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
+import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
+import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
@@ -62,6 +69,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         nodes.clear();
         clearChildren();
     }
+
 
     public static class NodeConnection {
         public NodeWidget fromNode;
@@ -160,12 +168,16 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
         NodeWidget node = null;
         try {
+            tmp2.set(x, y);
+            stageToLocalCoordinates(tmp2);
+
             node = ClassReflection.newInstance(clazz);
             node.init(skin, this);
             node.setConfig(config);
-            node.setPosition(x - node.getWidth()/2f, y - node.getHeight()/2f);
 
             addActor(node);
+
+            node.setPosition(tmp2.x - node.getWidth()/2f, tmp2.y - node.getHeight()/2f);
 
             nodes.add(node);
 
@@ -415,13 +427,188 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     }
 
     public void updateSelectionBackgrounds() {
-        //todo: set pRoper header bgs
         for(NodeWidget wrapper : nodes) {
             if(getSelectedNodes().contains(wrapper)) {
-                //wrapper.setBackground("window-blue");
+                wrapper.setSelected(true);
             } else {
-                //wrapper.setBackground("window");
+                wrapper.setSelected(false);
             }
+        }
+    }
+
+    public void selectAllNodes() {
+        ObjectSet<NodeWidget> nodes = new ObjectSet<>();
+        for(NodeWidget node: getNodes()) {
+            nodes.add(node);
+        }
+        setSelectedNodes(nodes);
+    }
+
+    private Array<NodeConnection> getSelectedConnections() {
+        Array<NodeConnection> arr = new Array<>();
+        ObjectSet<NodeWidget> nodes = getSelectedNodes();
+        Array<NodeConnection> connections = nodeConnections;
+        for(NodeConnection connection: connections) {
+            if(nodes.contains(connection.fromNode) && nodes.contains(connection.toNode)) {
+                arr.add(connection);
+            }
+        }
+
+        return arr;
+    }
+
+    public static class ClipboardPayload implements Json.Serializable {
+        Array<NodeConnection> connections;
+        ObjectSet<NodeWidget> nodes;
+        //Array<ModuleWrapperGroup> groups;
+
+        Array<JsonValue> nodeJsonArray = new Array<>();
+        Array<JsonValue> connectionsJsonArray = new Array<>();
+
+        public Vector2 cameraPositionAtCopy = new Vector2();
+
+        public ClipboardPayload() {
+
+        }
+
+        public void set(ObjectSet<NodeWidget> nodes, Array<NodeConnection> connections, Object groups) {
+            this.nodes = nodes;
+            this.connections = connections;
+            //this.groups = groups;
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeArrayStart("nodes");
+            for (NodeWidget node: nodes) {
+                json.writeValue(node);
+            }
+            json.writeArrayEnd();
+
+            json.writeValue("cameraPositionAtCopy", cameraPositionAtCopy);
+
+            json.writeArrayStart("connections");
+            for (NodeBoard.NodeConnection connection: connections) {
+                json.writeObjectStart();
+                json.writeValue("fromNode", connection.fromNode.getUniqueId());
+                json.writeValue("toNode", connection.toNode.getUniqueId());
+                json.writeValue("fromSlot", connection.fromId);
+                json.writeValue("toSlot", connection.toId);
+                json.writeObjectEnd();
+            }
+            json.writeArrayEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            JsonValue nodes = jsonData.get("nodes");
+            nodeJsonArray.clear();
+            connectionsJsonArray.clear();
+            for (JsonValue nodeData: nodes) {
+                nodeJsonArray.add(nodeData);
+            }
+            for (JsonValue connectionData: jsonData.get("connections")) {
+                connectionsJsonArray.add(connectionData);
+            }
+
+            cameraPositionAtCopy = json.readValue("cameraPositionAtCopy", Vector2.class, jsonData);
+        }
+    }
+
+    public void copySelectedModules() {
+        Array<NodeConnection> connections = getSelectedConnections();
+        ObjectSet<NodeWidget> nodes = getSelectedNodes();
+        //Array<ModuleWrapperGroup> groups = getSelectedGroups(); // TODO: add groups
+
+        ClipboardPayload payload = new ClipboardPayload();
+        payload.set(nodes, connections, null);
+        Vector3 camPos = getStage().getCamera().position;
+        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+
+        Json json = new Json();
+        String clipboard = json.toJson(payload);
+        Gdx.app.getClipboard().setContents(clipboard);
+    }
+
+    public void pasteFromClipboard() {
+        String clipboard = Gdx.app.getClipboard().getContents();
+
+        ObjectMap<Integer, NodeWidget> previousNodeIdMap = new ObjectMap<>();
+
+        boolean hasShaderModule = false;
+
+        for (NodeWidget node: getNodes()) {
+            if (node instanceof ColorOutput) hasShaderModule = true;
+        }
+
+        Json json = new Json();
+        try {
+            ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
+
+            Vector3 camPosAtPaste = getStage().getCamera().position;
+            Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+            offset.sub(payload.cameraPositionAtCopy);
+
+            Array<JsonValue> nodeDataArray = payload.nodeJsonArray;
+
+            ObjectSet<NodeWidget> copiedNodes = new ObjectSet<>();
+
+            for(JsonValue nodeData: nodeDataArray) {
+                String className = nodeData.getString("name");
+
+                Class clazz = nodeStage.getNodeListPopup().getNodeClassByName(className);
+
+                if(clazz == null || (clazz.equals(ColorOutput.class) && hasShaderModule)) {
+                    continue;
+                }
+
+                NodeWidget node = createNode(clazz, nodeStage.getNodeListPopup().getConfigFor(clazz), 0, 0);
+                node.constructNode(nodeStage.getNodeListPopup().getModuleByClassName(className));
+                int uniqueId = node.getUniqueId();
+                node.read(json, nodeData);
+                node.setUniqueId(uniqueId);
+
+                node.moveBy(offset.x, offset.y);
+
+                previousNodeIdMap.put(nodeData.getInt("id"), node); // get old Id
+                copiedNodes.add(node);
+            }
+
+
+            // now let's connect the connections
+            for(JsonValue connectionData: payload.connectionsJsonArray) {
+                int fromNodeId = connectionData.getInt("fromNode");
+                int toNodeId = connectionData.getInt("toNode");
+                String fromSlot = connectionData.getString("fromSlot");
+                String toSlot = connectionData.getString("toSlot");
+
+                NodeWidget fromNode = previousNodeIdMap.get(fromNodeId);
+                NodeWidget toNode = previousNodeIdMap.get(toNodeId);
+                if(fromNode == null || toNode == null) {
+                    continue;
+                }
+                makeConnection(fromNode, toNode, fromSlot, toSlot);
+            }
+
+            /*
+            // now add groups
+            for(ModuleWrapperGroup group: payload.groups) {
+                ObjectSet<ModuleWrapper> newWrappers = new ObjectSet<>();
+                for(ModuleWrapper wrapper: group.getModuleWrappers()) {
+                    ModuleWrapper newWrapper = previousNodeIdMap.get(wrapper.getId());
+                    if(newWrapper != null) {
+                        newWrappers.add(newWrapper);
+                    }
+                }
+                ModuleWrapperGroup newGroup = createGroupForWrappers(newWrappers);
+                newGroup.setText(group.getText());
+                newGroup.setColor(group.getColor());
+
+            }*/
+
+            setSelectedNodes(copiedNodes);
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 

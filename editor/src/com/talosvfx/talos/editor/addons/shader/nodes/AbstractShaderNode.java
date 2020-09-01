@@ -247,6 +247,8 @@ public abstract class AbstractShaderNode extends NodeWidget {
             JsonValue value = properties.get(name);
             widgetMap.get(name).read(json, value);
         }
+
+        readProperties(properties);
     }
 
     @Override
@@ -260,6 +262,16 @@ public abstract class AbstractShaderNode extends NodeWidget {
             widget.write(json, name);
         }
 
+        writeProperties(json);
+
         json.writeObjectEnd();
     }
+
+    protected void readProperties(JsonValue properties) {
+
+    }
+    protected void writeProperties(Json json) {
+
+    }
+
 }
