@@ -15,8 +15,6 @@ public class TimeNode extends AbstractShaderNode {
         super.act(delta);
 
         time += delta;
-
-        //time = (float) (time - Math.floor(time));
     }
 
     @Override
@@ -33,11 +31,11 @@ public class TimeNode extends AbstractShaderNode {
 
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
-        shaderBuilder.declareUniform("u_time" + getId(), ShaderBuilder.Type.FLOAT, timeProvider);
+        shaderBuilder.declareUniform("u_time", ShaderBuilder.Type.FLOAT, timeProvider);
     }
 
     @Override
     public String writeOutputCode (String slotId) {
-        return "u_time" + getId();
+        return "u_time";
     }
 }

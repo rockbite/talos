@@ -135,6 +135,9 @@ public class ShaderBuilder {
     }
 
     public void declareUniform(String name, Type type, Object value) {
+        if(declaredUniforms.containsKey(name)) {
+            return;
+        }
         UniformData uniformData = new UniformData();
         uniformData.variableName = name;
         uniformData.type = type;
