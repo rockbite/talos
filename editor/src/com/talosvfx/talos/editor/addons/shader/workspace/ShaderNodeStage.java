@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -58,5 +59,12 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
        if (event.getNode() == colorOutput) {
            colorOutput = null;
        }
+    }
+
+    public String getFragShader() {
+        ShaderBuilder builder = new ShaderBuilder();
+        colorOutput.buildFragmentShader(builder);
+
+        return builder.getFragmentString();
     }
 }

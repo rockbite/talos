@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.shader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.project.IProject;
 
@@ -70,7 +71,7 @@ public class ShaderProject implements IProject {
 
     @Override
     public String exportProject () {
-        return null;
+        return ((ShaderNodeStage)(shaderAddon.nodeStage)).getFragShader();
     }
 
     private static class ProjectData implements Json.Serializable {
