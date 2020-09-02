@@ -16,6 +16,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public EmitterList(Skin skin) {
         super(skin);
 
+        /**
+         * numbers represent render (low render first, high render last)
+         * in the view, high number is on top, and low number is at bottom
+         */
+
         setSortComparator(new Comparator<BasicRow<ParticleEmitterWrapper>>() {
             @Override
             public int compare(BasicRow<ParticleEmitterWrapper> o1, BasicRow<ParticleEmitterWrapper> o2) {
