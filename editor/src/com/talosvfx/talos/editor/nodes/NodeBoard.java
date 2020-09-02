@@ -190,6 +190,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             e.printStackTrace();
         }
 
+        TalosMain.Instance().ProjectController().setDirty();
+
         return node;
     }
 

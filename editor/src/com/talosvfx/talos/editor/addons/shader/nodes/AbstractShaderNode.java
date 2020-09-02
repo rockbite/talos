@@ -245,7 +245,10 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
         for(String name: widgetMap.keys()) {
             JsonValue value = properties.get(name);
-            widgetMap.get(name).read(json, value);
+
+            if (value != null) {
+                widgetMap.get(name).read(json, value);
+            }
         }
 
         readProperties(properties);

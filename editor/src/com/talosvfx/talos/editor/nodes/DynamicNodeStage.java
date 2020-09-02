@@ -123,7 +123,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
 
-                if(keycode == Input.Keys.ENTER) {
+                if(keycode == Input.Keys.F5) {
                     stage.getCamera().position.set(0, 0, 0);
                     ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
                 }
@@ -218,6 +218,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
         }
+
+        stage.setKeyboardFocus(stage.getRoot());
 
     }
 
