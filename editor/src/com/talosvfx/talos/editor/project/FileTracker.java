@@ -41,6 +41,9 @@ public class FileTracker {
 
     public FileHandle findFileByName(String name) {
         final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
+
+        if(tabMaps.get(currentTab) == null) return null;
+
         for(FileHandle handle: tabMaps.get(currentTab).keys()) {
             if(handle.name().equals(name) || handle.nameWithoutExtension().equals(name)) {
                 if(handle.exists()) return handle;

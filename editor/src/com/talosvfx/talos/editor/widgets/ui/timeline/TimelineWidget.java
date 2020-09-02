@@ -12,6 +12,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.simulation.TinyEmitter;
 
+import java.util.Comparator;
+
 public abstract class TimelineWidget<U> extends Table {
 
     TimelineLeft<U> leftList;
@@ -190,5 +192,10 @@ public abstract class TimelineWidget<U> extends Table {
         if(time < 0) return 0;
 
         return time;
+    }
+
+    protected void setSortComparator(Comparator comparator) {
+        leftList.setComparator(comparator);
+        rightList.setComparator(comparator);
     }
 }

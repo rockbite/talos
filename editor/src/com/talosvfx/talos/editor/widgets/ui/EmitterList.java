@@ -4,13 +4,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
+import com.talosvfx.talos.editor.widgets.ui.timeline.ActionRow;
+import com.talosvfx.talos.editor.widgets.ui.timeline.BasicRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
+
+import java.util.Comparator;
 
 public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
     public EmitterList(Skin skin) {
         super(skin);
+
+        /**
+         * numbers represent render (low render first, high render last)
+         * in the view, high number is on top, and low number is at bottom
+         */
+
+        setSortComparator(new Comparator<BasicRow<ParticleEmitterWrapper>>() {
+            @Override
+            public int compare(BasicRow<ParticleEmitterWrapper> o1, BasicRow<ParticleEmitterWrapper> o2) {
+                return o2.getIndex() - o1.getIndex();
+            }
+        });
 
         getActionWidget().getRepeatButton().setChecked(true);
         getActionWidget().getPlayButton().setChecked(true);
@@ -110,7 +126,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             TalosMain.Instance().TalosProject().sortEmitters();
 
             Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-            activeWrappers.reverse();
+            //activeWrappers.reverse();
             setData(activeWrappers);
             setSelected(selectedItem);
         }
@@ -128,7 +144,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
 
         // update all items
-        activeWrappers.reverse();
+        //activeWrappers.reverse();
         setData(activeWrappers);
 
         setSelected(emitter);
@@ -141,7 +157,6 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
         if(emitterWrappers.size > 0) {
-            emitterWrappers.reverse();
             setData(emitterWrappers);
             setSelected(emitterWrappers.first());
 

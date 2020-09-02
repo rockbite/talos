@@ -19,9 +19,11 @@ package com.talosvfx.talos.editor.wrappers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
@@ -106,8 +108,17 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
         final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
         final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
-        setModuleRegion(regionName, textureRegion);
-        dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
+        if (textureRegion != null) {
+            setModuleRegion(regionName, textureRegion);
+            dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
+        } else {
+            TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
+        }
+    }
+
+    @Override
+    public void draw (Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
     }
 
     @Override

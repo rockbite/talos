@@ -19,7 +19,7 @@ public abstract class AbstractList<T extends BasicRow<U>, U> extends Table {
 
     protected boolean rebuildFlag = false;
 
-    private final Comparator<T> itemComparator;
+    private Comparator<T> itemComparator;
 
     public AbstractList(TimelineWidget<U> timeline) {
         setSkin(timeline.getSkin());
@@ -77,7 +77,7 @@ public abstract class AbstractList<T extends BasicRow<U>, U> extends Table {
             addItem(item);
         }
 
-        rebuildFromData();
+        sortAndRebuild();
     }
 
     public void addItem(TimelineItemDataProvider<U> data) {
@@ -137,6 +137,11 @@ public abstract class AbstractList<T extends BasicRow<U>, U> extends Table {
         items.sort(itemComparator);
     }
 
+    public void sortAndRebuild() {
+        sortItems();
+        rebuildFromData();
+    }
+
     @Override
     public void act(float delta) {
         if(rebuildFlag) {
@@ -155,5 +160,9 @@ public abstract class AbstractList<T extends BasicRow<U>, U> extends Table {
         }
 
         return null;
+    }
+
+    public void setComparator (Comparator<T> comparator) {
+        this.itemComparator = comparator;
     }
 }
