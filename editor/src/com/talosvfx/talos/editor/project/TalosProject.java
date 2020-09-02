@@ -18,6 +18,7 @@ package com.talosvfx.talos.editor.project;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -60,6 +61,11 @@ public class TalosProject implements IProject {
 
 	public TalosProject() {
 		projectAssetProvider = new TalosAssetProvider();
+
+		// provide some global default values
+		for(int i = 0; i < 10; i++) {
+			TalosMain.Instance().globalScope.setDynamicValue(i, new Vector3(1f,1f, 1f));
+		}
 
 		projectSerializer = new ProjectSerializer();
 		particleEffectDescriptor = new ParticleEffectDescriptor();
@@ -141,6 +147,13 @@ public class TalosProject implements IProject {
 
 	public void sortEmitters() {
 		activeWrappers.sort(emitterComparator);
+
+		// fix for older projects
+		if (activeWrappers.size > 1 &&
+				activeWrappers.get(0).getEmitter().getSortPosition() == 0 &&
+				activeWrappers.get(1).getEmitter().getSortPosition() == 0) {
+			activeWrappers.reverse();
+		}
 
 		// re-normalize position numbers
 		int index = 0;
