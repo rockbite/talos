@@ -6,30 +6,37 @@
         <module name = "NumberNode" title = "Number" keywords = "number,float">
             <dynamicValue port="output" name="outputValue" type="float" min="-1000" max="1000">X: </dynamicValue>
         </module>
-        <module name = "Vector2Node" title = "Vector2" keywords = "vector2,position">
+        <module name = "Vector2Node" title = "XY to Vector" keywords = "vector2,position">
             <value port="output" name="outputValue" type="vec2">Output</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
         </module>
+        <module name = "VectorToXYNode" title = "Vector To XY" keywords = "vector2,position">
+            <value port="input" name="inputValue" type="vec2">Vector2</value>
+            <group>
+                <dynamicValue port="output" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="output" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+        </module>
         <module name = "ColorNode" title = "Color" keywords = "color">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
-                <value port="output" name="outputR" type="vec4">Red Channel</value>
-                <value port="output" name="outputG" type="vec4">Green Channel</value>
-                <value port="output" name="outputB" type="vec4">Blue Channel</value>
-                <value port="output" name="outputA" type="vec4">Alpha (Transparency)</value>
+                <value port="output" name="outputR" type="float">Red Channel</value>
+                <value port="output" name="outputG" type="float">Green Channel</value>
+                <value port="output" name="outputB" type="float">Blue Channel</value>
+                <value port="output" name="outputA" type="float">Alpha (Transparency)</value>
             </group>
             <color port="input" name="color" type="vec4">Input Color</color>
         </module>
         <module name = "ColorChannelsNode" title = "RGBA Node" keywords = "color">
             <value port="output" name="outputRGBA" type="vec4">RGBA</value>
             <group>
-                <dynamicValue port="input" name="R" type="vec4" max="255" progress="true" step="1">R</dynamicValue>
-                <dynamicValue port="input" name="G" type="vec4" max="255" progress="true" step="1">G</dynamicValue>
-                <dynamicValue port="input" name="B" type="vec4" max="255" progress="true" step="1">B</dynamicValue>
-                <dynamicValue port="input" name="A" type="vec4" max="255" progress="true" step="1">A</dynamicValue>
+                <dynamicValue port="input" name="R" type="float" max="255" progress="true" step="1">R</dynamicValue>
+                <dynamicValue port="input" name="G" type="float" max="255" progress="true" step="1">G</dynamicValue>
+                <dynamicValue port="input" name="B" type="float" max="255" progress="true" step="1">B</dynamicValue>
+                <dynamicValue port="input" name="A" type="float" max="255" progress="true" step="1">A</dynamicValue>
             </group>
         </module>
         <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
@@ -55,18 +62,23 @@
             <value port="output" name="outputUV" type="vec2">UV Coordinates</value>
         </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
-            <value port="output" name="outputValue" type="vec4">Output Value</value>
+            <value port="output" name="outputValue" type="fluid">Output Value</value>
             <select name="operation">
                 <option value = "ADD">Add</option>
                 <option value = "SUB">Subtract</option>
                 <option value = "MUL">Multiply</option>
                 <option value = "DIV">Divide</option>
+                <option value = "POW">Power</option>
             </select>
             <checkbox name="clamp">Clamp Output</checkbox>
             <group>
-                <dynamicValue port="input" name="valueA" type="vec4" max = "999" step="0.1">Value</dynamicValue>
-                <dynamicValue port="input" name="valueB" type="vec4" max = "999" step="0.1">Value</dynamicValue>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value</dynamicValue>
             </group>
+        </module>
+        <module name = "InverseNode" title = "One Minus" keywords = "math">
+            <value port="output" name="outputValue" type="fluid">Output Value</value>
+            <value port="input" name="inputValue" type="fluid">Input Value</value>
         </module>
     </category>
 </modules>

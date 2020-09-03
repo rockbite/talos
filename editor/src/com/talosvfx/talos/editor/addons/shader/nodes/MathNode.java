@@ -14,38 +14,65 @@ public class MathNode extends AbstractShaderNode {
     public final String OUTPUT = "outputValue";
 
     @Override
+    public ShaderBuilder.Type getVarType (String name) {
+
+        if (name.equals(OUTPUT)) {
+            ShaderBuilder.Type maxType = getMaxType(
+                    getTargetVarType(INPUT_A, ShaderBuilder.Type.FLOAT),
+                    getTargetVarType(INPUT_B, ShaderBuilder.Type.FLOAT));
+
+            return maxType;
+        }
+
+        return super.getVarType(name);
+    }
+
+    @Override
     public void prepareDeclarations(ShaderBuilder shaderBuilder) {
         String exprA = getExpression(INPUT_A, null);
         String exprB = getExpression(INPUT_B, null);
+
+        ShaderBuilder.Type outputType = getVarType(OUTPUT);
+
+        if(outputType != getTargetVarType(INPUT_A, ShaderBuilder.Type.FLOAT) || outputType != getTargetVarType(INPUT_B, ShaderBuilder.Type.FLOAT)) {
+            // gotta cast
+            exprA = castTypes(exprA, getTargetVarType(INPUT_A, ShaderBuilder.Type.FLOAT), outputType, CAST_STRATEGY_REPEAT);
+            exprB = castTypes(exprB, getTargetVarType(INPUT_B, ShaderBuilder.Type.FLOAT), outputType, CAST_STRATEGY_REPEAT);
+        }
 
         boolean clamp = (boolean) widgetMap.get(CLAMP).getValue();
 
         String operation = (String) widgetMap.get(OPERATION).getValue();
         String operand = "+";
 
-        if (operation.equals("ADD")) {
-            operand = "+";
-        } else if (operation.equals("SUB")) {
-            operand = "-";
-        } else if (operation.equals("MUL")) {
-            operand = "*";
-        } else if (operation.equals("DIV")) {
-            operand = "/";
+        String expression = "";
+
+        if(operation.equals("POW")) {
+            expression = "pow(" + exprA + ", " + exprB + ")";
+        } else {
+            if (operation.equals("ADD")) {
+                operand = "+";
+            } else if (operation.equals("SUB")) {
+                operand = "-";
+            } else if (operation.equals("MUL")) {
+                operand = "*";
+            } else if (operation.equals("DIV")) {
+                operand = "/";
+            }
+
+            expression = "(" + exprA + ") " + operand + " (" + exprB + ")";
         }
 
-        String expression = "(" + exprA + ") " + operand + " (" + exprB + ")";
 
         if (clamp) {
-            expression = "fract(" + expression +  ")";
+            expression = "clamp(" + expression +  ")";
         }
 
-        expression = "vec4(" + expression + ")";
-
-        shaderBuilder.addLine("vec4 sumVar" + getId() + " = " + expression);
+        shaderBuilder.addLine(outputType.getTypeString() + " mathVar" + getId() + " = " + expression);
     }
 
     @Override
     public String writeOutputCode(String slotId) {
-        return "sumVar" + getId();
+        return "mathVar" + getId();
     }
 }

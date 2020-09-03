@@ -26,6 +26,10 @@ public class UVNode extends AbstractShaderNode {
 
     }
 
+    protected String getPreviewLine(String expression) {
+        return "gl_FragColor = vec4(v_texCoords.x, v_texCoords.y, 0.0, 1.0)";
+    }
+
     @Override
     public String writeOutputCode (String slotId) {
         return "v_texCoords";

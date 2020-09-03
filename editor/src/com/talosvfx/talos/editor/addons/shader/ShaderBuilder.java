@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 
 public class ShaderBuilder {
@@ -11,6 +12,8 @@ public class ShaderBuilder {
     private ObjectMap<String, UniformData> declaredUniforms = new ObjectMap<>();
 
     private ObjectMap<String, String> variableMap = new ObjectMap<>();
+
+    public static final String[] fields = {"r", "g", "b", "a"};
 
     public ShaderBuilder() {
 
@@ -121,6 +124,7 @@ public class ShaderBuilder {
         VEC2("vec2"),
         VEC3("vec3"),
         VEC4("vec4"),
+        FLUID("fluid"),
         TEXTURE("sampler2D");
 
         private String typeString;

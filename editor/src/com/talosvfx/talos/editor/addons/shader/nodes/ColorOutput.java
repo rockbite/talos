@@ -15,9 +15,11 @@ public class ColorOutput extends AbstractShaderNode {
 
     public void buildFragmentShader(ShaderBuilder shaderBuilder) {
         shaderBuilder.reset();
+
+        resetProcessingTree();
         processTree(shaderBuilder);
 
-        String color = inputStrings.get(INPUT_RGBA);
+        String color = getExpression(INPUT_RGBA);
 
         if(color == null) {
             color = "vec4(0.0, 0.0, 0.0, 1.0)";

@@ -64,4 +64,9 @@ public class ColorChannelsNode extends AbstractShaderNode {
     public String writeOutputCode (String slotId) {
         return "rgbVar" + getId();
     }
+
+    @Override
+    protected String getPreviewOutputName () {
+        return OUTPUT_RGBA;
+    }
 }

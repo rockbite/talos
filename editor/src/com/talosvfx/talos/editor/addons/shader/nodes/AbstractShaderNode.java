@@ -22,12 +22,24 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     protected ShaderBox shaderBox;
     protected Cell<ShaderBox> shaderBoxCell;
+    private ObjectIntMap<String> sizeMap = new ObjectIntMap<>();
 
     public abstract void prepareDeclarations(ShaderBuilder shaderBuilder);
 
     public abstract String writeOutputCode(String slotId);
 
     private boolean isInputDynamic = false;
+
+    public static final int CAST_STRATEGY_ZERO = 0;
+    public static final int CAST_STRATEGY_REPEAT = 1;
+
+    private boolean isProcessed = false;
+
+    public AbstractShaderNode() {
+        sizeMap.put(ShaderBuilder.Type.VEC2.getTypeString(), 2);
+        sizeMap.put(ShaderBuilder.Type.VEC3.getTypeString(), 3);
+        sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);
+    }
 
     @Override
     public void init (Skin skin, NodeBoard nodeBoard) {
@@ -41,7 +53,24 @@ public abstract class AbstractShaderNode extends NodeWidget {
         inputStateChanged(isInputDynamic);
     }
 
+    public void resetProcessingTree() {
+        isProcessed = false;
+
+        ObjectMap<String, NodeWidget.Connection> inputs = getInputs();
+
+        for(String id : inputs.keys()) {
+            NodeWidget.Connection connection = inputs.get(id);
+            AbstractShaderNode node = (AbstractShaderNode)connection.targetNode;
+
+            node.resetProcessingTree();
+        }
+    }
+
     public void processTree(ShaderBuilder shaderBuilder) {
+        if(isProcessed) {
+            return;
+        }
+
         inputStrings.clear();
 
         ObjectMap<String, NodeWidget.Connection> inputs = getInputs();
@@ -62,6 +91,8 @@ public abstract class AbstractShaderNode extends NodeWidget {
         }
 
         prepareDeclarations(shaderBuilder);
+
+        isProcessed = true;
     }
 
     protected void inputStateChanged (boolean isInputDynamic) {
@@ -124,7 +155,10 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     protected void updatePreview() {
         previewBuilder.reset();
+
+        resetProcessingTree();
         processTree(previewBuilder);
+
         String val = writeOutputCode(getPreviewOutputName());
         previewBuilder.addLine(getPreviewLine(val));
 
@@ -132,7 +166,11 @@ public abstract class AbstractShaderNode extends NodeWidget {
     }
 
     protected String getPreviewLine(String expression) {
-        return "gl_FragColor = vec4(" + expression + ")";
+        ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
+
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4);
+
+        return expression + ".a = 1.0; gl_FragColor = " + expression;
     }
 
     protected String getPreviewOutputName () {
@@ -149,6 +187,10 @@ public abstract class AbstractShaderNode extends NodeWidget {
         //  check type compatibility
         ShaderBuilder.Type targetType = getTargetVarType(slot);
         ShaderBuilder.Type varType = getVarType(slot);
+
+        if(varType == ShaderBuilder.Type.FLUID) {
+            varType = targetType;
+        }
 
         if(val == null) {
             ShaderBuilder.Type autoType = ShaderBuilder.Type.FLOAT;
@@ -180,19 +222,51 @@ public abstract class AbstractShaderNode extends NodeWidget {
         return val;
     }
 
+    public ShaderBuilder.Type getMaxType(ShaderBuilder.Type a,  ShaderBuilder.Type b) {
+        if(a == b) return a;
+
+        if(a == null) return b;
+        if(b == null) return a;
+
+        int sizeA = sizeMap.get(a.getTypeString(), 0);
+        int sizeB = sizeMap.get(b.getTypeString(), 0);
+        if(a == ShaderBuilder.Type.FLOAT) sizeA = 1;
+        if(b == ShaderBuilder.Type.FLOAT) sizeB = 1;
+
+        if (sizeA > sizeB) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
     public String castTypes(String expression, ShaderBuilder.Type fromType,  ShaderBuilder.Type toType) {
+        return castTypes(expression, fromType, toType, CAST_STRATEGY_ZERO);
+    }
+
+    public String castTypes(String expression, ShaderBuilder.Type fromType,  ShaderBuilder.Type toType, int castStrategy) {
+
+        if (fromType == toType) {
+            return expression;
+        }
+
+        String fillVal = "0.0";
+
+        if(castStrategy == CAST_STRATEGY_REPEAT) {
+            fillVal = expression;
+        }
 
         if(fromType == ShaderBuilder.Type.FLOAT) {
-            expression = toType.getTypeString() + "(" + expression + ")";
+            if (toType == ShaderBuilder.Type.VEC4) {
+                expression = "vec4(" + expression + ", " + fillVal + ", " + fillVal + ", 1.0)";
+            } else {
+                expression = toType.getTypeString() + "(" + expression + ")";
+            }
         } else {
             if(toType == ShaderBuilder.Type.FLOAT) {
                 expression = expression + ".x";
             } else {
-                String[] fields = {"r", "g", "b", "a"};
-                ObjectIntMap<String> sizeMap = new ObjectIntMap<>();
-                sizeMap.put(ShaderBuilder.Type.VEC2.getTypeString(), 2);
-                sizeMap.put(ShaderBuilder.Type.VEC3.getTypeString(), 4);
-                sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);
+                String[] fields = ShaderBuilder.fields;
 
                 String newExpression = toType.getTypeString() + "(";
 
@@ -200,9 +274,18 @@ public abstract class AbstractShaderNode extends NodeWidget {
                     int sizeToPut = sizeMap.get(fromType.getTypeString(), 0);
                     if(i < sizeToPut) {
                         String field = fields[i];
-                        newExpression += "("+expression+")." + field + ",";
+                        String add = "("+expression+")." + field;
+                        newExpression += add + ",";
+
+                        if(castStrategy == CAST_STRATEGY_REPEAT) {
+                            fillVal = add;
+                        }
                     } else {
-                        newExpression += "0.0,";
+                        if(i == 3) {
+                            newExpression += "1.0,";
+                        } else {
+                            newExpression += fillVal + ",";
+                        }
                     }
                 }
                 newExpression = newExpression.substring(0, newExpression.length() - 1) + ")";
@@ -219,21 +302,25 @@ public abstract class AbstractShaderNode extends NodeWidget {
             return ShaderBuilder.Type.FLOAT;
         } else if(typeString.equals("vec2")) {
             return ShaderBuilder.Type.VEC2;
-        } if(typeString.equals("vec3")) {
+        } else if(typeString.equals("vec3")) {
             return ShaderBuilder.Type.VEC3;
-        }if(typeString.equals("vec4")) {
-            return ShaderBuilder.Type.VEC4;
+        } else if(typeString.equals("vec4")) {
+             return ShaderBuilder.Type.VEC4;
         } else {
-            return ShaderBuilder.Type.FLOAT;
+            return ShaderBuilder.Type.FLUID;
         }
     }
 
     protected ShaderBuilder.Type getTargetVarType(String name) {
+        return getTargetVarType(name, null);
+    }
+
+    protected ShaderBuilder.Type getTargetVarType(String name, ShaderBuilder.Type defaultType) {
         if(inputs.get(name) != null && inputs.get(name).targetNode != null) {
             String removeVarName = inputs.get(name).targetSlot;
             return ((AbstractShaderNode)inputs.get(name).targetNode).getVarType(removeVarName);
         } else {
-            return null;
+            return defaultType;
         }
     }
 

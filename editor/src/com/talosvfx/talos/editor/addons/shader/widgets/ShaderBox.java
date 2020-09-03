@@ -33,6 +33,7 @@ public class ShaderBox extends Actor {
             this.shaderProgram = shaderProgram;
         } else {
             this.shaderProgram = null;
+            System.out.println(shaderProgram.getLog());
         }
     }
 
