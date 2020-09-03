@@ -70,8 +70,6 @@ public class NodeListPopup extends VisWindow {
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
 
-        TalosMain.Instance().moduleNames.clear();
-
         classPath = root.getAttribute("classPath");
         parseCategory(tree, null, root);
 
