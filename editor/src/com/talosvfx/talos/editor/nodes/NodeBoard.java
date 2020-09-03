@@ -184,8 +184,6 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             int counter = nodeCounter.getAndIncrement(clazz, 0, 1);
             node.setId(counter);
             node.setUniqueId(globalNodeCounter++);
-
-            tryAndConnectLasCC(node);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
@@ -223,7 +221,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         TalosMain.Instance().ProjectController().setDirty();
     }
 
-    private <T extends AbstractModule> void tryAndConnectLasCC(NodeWidget nodeWidget) {
+    public <T extends AbstractModule> void tryAndConnectLasCC(NodeWidget nodeWidget) {
         if(ccFromNode != null) {
             Class fromClass;
             Slot fromSlotObject;

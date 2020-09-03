@@ -46,6 +46,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                     if(node != null) {
                         node.constructNode(module);
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
+
+                        nodeBoard.tryAndConnectLasCC(node);
                     }
                 }
             }
@@ -205,7 +207,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             }
         }
 
-        nodeBoard.globalNodeCounter = idCounter;
+        nodeBoard.globalNodeCounter = idCounter + 1;
 
         for (JsonValue connectionData: connections) {
             int fromNode = connectionData.getInt("fromNode");

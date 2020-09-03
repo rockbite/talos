@@ -168,9 +168,9 @@ public abstract class AbstractShaderNode extends NodeWidget {
     protected String getPreviewLine(String expression) {
         ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
 
-        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4);
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        return expression + ".a = 1.0; gl_FragColor = " + expression;
+        return "gl_FragColor = " + expression + "; gl_FragColor.a = 1.0;";
     }
 
     protected String getPreviewOutputName () {
@@ -203,7 +203,7 @@ public abstract class AbstractShaderNode extends NodeWidget {
         }
 
         if(targetType != varType) {
-            val = castTypes(val, targetType, varType);
+            val = castTypes(val, targetType, varType, CAST_STRATEGY_REPEAT);
         }
 
         if(val == null) {
@@ -276,15 +276,11 @@ public abstract class AbstractShaderNode extends NodeWidget {
                         String field = fields[i];
                         String add = "("+expression+")." + field;
                         newExpression += add + ",";
-
-                        if(castStrategy == CAST_STRATEGY_REPEAT) {
-                            fillVal = add;
-                        }
                     } else {
                         if(i == 3) {
                             newExpression += "1.0,";
                         } else {
-                            newExpression += fillVal + ",";
+                            newExpression += "0.0,";
                         }
                     }
                 }

@@ -65,7 +65,7 @@ public class MathNode extends AbstractShaderNode {
 
 
         if (clamp) {
-            expression = "clamp(" + expression +  ")";
+            expression = "fract(" + expression +  ")";
         }
 
         shaderBuilder.addLine(outputType.getTypeString() + " mathVar" + getId() + " = " + expression);

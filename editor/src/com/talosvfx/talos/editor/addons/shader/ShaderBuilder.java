@@ -4,13 +4,15 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import java.util.Arrays;
+
 public class ShaderBuilder {
 
-    String mainContent;
+    String mainContent = "";
     ShaderProgram shaderProgramCache;
 
     private ObjectMap<String, UniformData> declaredUniforms = new ObjectMap<>();
-
+    private ObjectMap<String, Method> methodMap = new ObjectMap<>();
     private ObjectMap<String, String> variableMap = new ObjectMap<>();
 
     public static final String[] fields = {"r", "g", "b", "a"};
@@ -49,6 +51,17 @@ public class ShaderBuilder {
         }
 
         finalString += "\n";
+
+        if (methodMap.size > 0) {
+
+            for(String methodName: methodMap.keys()) {
+                Method method = methodMap.get(methodName);
+
+                finalString += method.getSource() + "\n";
+            }
+
+            finalString += "\n";
+        }
 
         finalString += "void main() {\n";
 
@@ -98,13 +111,72 @@ public class ShaderBuilder {
     }
 
     public void addLine (String line) {
-        mainContent += line + ";\n";
+        mainContent += "    " + line + ";\n";
+    }
+
+    public Method addMethod(Type returnType, String name, Argument[] args) {
+        Method method = new Method();
+
+        method.name = name;
+        method.returnType = returnType;
+
+        method.args = Arrays.copyOf(args, args.length);
+
+        methodMap.put(name, method);
+
+        return method;
+    }
+
+    public void addLineToMethod (String methodName, String line) {
+        Method method = methodMap.get(methodName);
+
+        if(method != null) {
+            method.body += line + ";\n";
+        }
     }
 
     public void declareVariable (Type type, String name, String value) {
         if(!variableMap.containsKey(name)) {
             addLine(type.getTypeString() + " " + name + " = " + value);
             variableMap.put(name, value);
+        }
+    }
+
+    public class Method {
+        public Type returnType;
+        public String name;
+        public Argument[] args;
+
+        public String body = "";
+
+        public void addLine(String line) {
+            body += "    " + line + ";\n";
+        }
+
+        public String getSource () {
+            String finalString = "";
+
+            finalString += returnType.typeString + " " + name + "(";
+
+            for(int i = 0; i < args.length; i++) {
+                finalString += args[i].type.typeString + " " + args[i].name;
+                if(i < args.length - 1) {
+                    finalString += ", ";
+                }
+            }
+            finalString += ") {\n" + body + "\n}";
+
+            return finalString;
+        }
+    }
+
+    public static class Argument {
+        public Type type;
+        public String name;
+
+        public Argument(Type type, String name) {
+            this.type = type;
+            this.name = name;
         }
     }
 

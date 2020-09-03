@@ -80,5 +80,13 @@
             <value port="output" name="outputValue" type="fluid">Output Value</value>
             <value port="input" name="inputValue" type="fluid">Input Value</value>
         </module>
+        <module name = "VoronoiNode" title = "Voronoi Noise" keywords = "math,noise,voronoi">
+            <value port="output" name="outputValue" type="float">Output Value</value>
+            <value port="input" name="uv" type="vec2">UV</value>
+            <group>
+                <dynamicValue port="input" name="angleOffset" type="float" max = "10" step="0.1" default="4">Value</dynamicValue>
+                <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Value</dynamicValue>
+            </group>
+        </module>
     </category>
 </modules>

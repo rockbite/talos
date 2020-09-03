@@ -34,6 +34,7 @@ public class ShaderBox extends Actor {
         } else {
             this.shaderProgram = null;
             System.out.println(shaderProgram.getLog());
+            System.out.println(shaderProgram.getFragmentShaderSource());
         }
     }
 
