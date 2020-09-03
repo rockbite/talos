@@ -2,19 +2,27 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
-public abstract class AbstractShaderNode extends NodeWidget {
+public abstract class AbstractShaderNode extends NodeWidget implements Notifications.Observer {
 
     protected ShaderBuilder previewBuilder = new ShaderBuilder();
 
@@ -35,10 +43,53 @@ public abstract class AbstractShaderNode extends NodeWidget {
 
     private boolean isProcessed = false;
 
+    private float previewUpdateCooldown = 0f;
+    private boolean previewUpdateScheduled = false;
+
     public AbstractShaderNode() {
         sizeMap.put(ShaderBuilder.Type.VEC2.getTypeString(), 2);
         sizeMap.put(ShaderBuilder.Type.VEC3.getTypeString(), 3);
         sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);
+
+        Notifications.registerObserver(this);
+    }
+
+    @EventHandler
+    public void onNodeDataModifiedEvent(NodeDataModifiedEvent event) {
+        updatePreviewIfNeeded();
+    }
+
+    @EventHandler
+    public void onNodeRemovedEvent(NodeRemovedEvent event) {
+        updatePreviewIfNeeded();
+    }
+
+    @EventHandler
+    public void onNodeConnectionCreatedEvent(NodeConnectionCreatedEvent event) {
+        updatePreviewIfNeeded();
+    }
+
+    protected void updatePreviewIfNeeded() {
+
+        if(previewUpdateCooldown > 0) {
+            previewUpdateScheduled = true;
+            return;
+        }
+
+        // TODO: only update nodes that are affected by this update (as in are parent of)
+        // TODO: have a time delay to not do this very often
+        if(shaderBox != null && isInputDynamic()) {
+            updatePreview();
+            previewUpdateCooldown = 0.1f;
+        }
+        previewUpdateScheduled = false;
+    }
+
+    @EventHandler
+    public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
+        if(shaderBox != null && isInputDynamic()) {
+            updatePreview();
+        }
     }
 
     @Override
@@ -139,13 +190,19 @@ public abstract class AbstractShaderNode extends NodeWidget {
     public void act (float delta) {
         super.act(delta);
 
-        if(shaderBox != null && isInputDynamic()) {
-            updatePreview();
-        }
-
         if(!isInputDynamic() && isInputDynamic) {
             isInputDynamic = false;
             inputStateChanged(isInputDynamic);
+        }
+
+        previewUpdateCooldown-= delta;
+
+        if(previewUpdateCooldown <= 0) {
+            previewUpdateCooldown = 0;
+
+            if(previewUpdateScheduled) {
+                updatePreviewIfNeeded();
+            }
         }
     }
 

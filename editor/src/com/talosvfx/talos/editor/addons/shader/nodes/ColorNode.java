@@ -38,7 +38,6 @@ public class ColorNode extends AbstractShaderNode {
             @Override
             public void changed (ChangeEvent changeEvent, Actor actor) {
                 color.set(((ColorWidget)(widgetMap.get(INPUT_COLOR))).getValue());
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ColorNode.this));
             }
         });
     }
@@ -77,16 +76,16 @@ public class ColorNode extends AbstractShaderNode {
         return null;
     }
 
-    @Override
-    public void act (float delta) {
-        super.act(delta);
-
-        if(shaderBox != null && shaderBox.isVisible()) {
-            shaderBox.setShader(previewBuilder);
-        }
-    }
-
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
 
+    }
+
+    @Override
+    protected String getPreviewLine(String expression) {
+        ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
+
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
+
+        return "gl_FragColor = " + expression + ";";
     }
 }

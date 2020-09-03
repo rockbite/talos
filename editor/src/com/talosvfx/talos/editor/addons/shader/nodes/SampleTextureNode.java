@@ -99,11 +99,19 @@ public class SampleTextureNode extends AbstractShaderNode {
                     texture = new Texture(fileHandle);
                     texturePath = fileHandle.path();
                     updatePreview();
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(SampleTextureNode.this));
                 } catch (Exception e) {
 
                 }
             }
         });
+    }
+
+    @Override
+    protected String getPreviewLine(String expression) {
+        ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
+
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
+
+        return "gl_FragColor = " + expression + ";";
     }
 }

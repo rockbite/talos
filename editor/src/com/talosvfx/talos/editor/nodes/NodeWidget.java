@@ -7,12 +7,16 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.shader.nodes.Vector2Node;
 import com.talosvfx.talos.editor.nodes.widgets.*;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -420,6 +424,14 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                         addConnection(widget, variableName, false);
                     }
                 }
+
+                // init listener
+                widget.addListener(new ChangeListener() {
+                    @Override
+                    public void changed (ChangeEvent changeEvent, Actor actor) {
+                        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
+                    }
+                });
 
             } catch (ReflectionException exception) {
 

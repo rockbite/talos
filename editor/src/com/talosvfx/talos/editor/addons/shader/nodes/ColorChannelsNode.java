@@ -20,34 +20,6 @@ public class ColorChannelsNode extends AbstractShaderNode {
     @Override
     public void constructNode (XmlReader.Element module) {
         super.constructNode(module);
-
-        widgetMap.get(INPUT_R).addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent changeEvent, Actor actor) {
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ColorChannelsNode.this));
-            }
-        });
-
-        widgetMap.get(INPUT_G).addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent changeEvent, Actor actor) {
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ColorChannelsNode.this));
-            }
-        });
-
-        widgetMap.get(INPUT_B).addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent changeEvent, Actor actor) {
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ColorChannelsNode.this));
-            }
-        });
-
-        widgetMap.get(INPUT_A).addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent changeEvent, Actor actor) {
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ColorChannelsNode.this));
-            }
-        });
     }
 
     @Override

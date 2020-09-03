@@ -12,12 +12,7 @@ public class NumberNode extends AbstractShaderNode {
 
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
-        widgetMap.get(OUTPUT).addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent changeEvent, Actor actor) {
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NumberNode.this));
-            }
-        });
+
     }
 
     @Override
