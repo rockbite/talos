@@ -72,8 +72,8 @@
             </select>
             <checkbox name="clamp">Clamp Output</checkbox>
             <group>
-                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value</dynamicValue>
-                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value</dynamicValue>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value A</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value B</dynamicValue>
             </group>
         </module>
         <module name = "InverseNode" title = "One Minus" keywords = "math">
@@ -84,8 +84,8 @@
             <value port="output" name="outputValue" type="float">Output Value</value>
             <value port="input" name="uv" type="vec2">UV</value>
             <group>
-                <dynamicValue port="input" name="angleOffset" type="float" max = "10" step="0.1" default="4">Value</dynamicValue>
-                <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Value</dynamicValue>
+                <dynamicValue port="input" name="angleOffset" type="float" max = "10" step="0.1" default="4">Angle Offset</dynamicValue>
+                <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Cell Density</dynamicValue>
             </group>
         </module>
     </category>
