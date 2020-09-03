@@ -51,6 +51,9 @@
             </group>
             <checkbox name="wrap">Wrap Coordinates</checkbox>
         </module>
+        <module name = "UVNode" title = "UV Node" keywords = "uv,sample,vertex">
+            <value port="output" name="outputUV" type="vec2">UV Coordinates</value>
+        </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
             <value port="output" name="outputValue" type="vec4">Output Value</value>
             <select name="operation">
