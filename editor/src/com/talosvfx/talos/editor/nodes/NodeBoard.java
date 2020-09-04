@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -73,8 +74,12 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         nodeConnections.clear();
         nodes.clear();
 
+        groups.clear();
+
         mainContainer.clearChildren();
         groupContainer.clearChildren();
+
+
     }
 
 
@@ -226,7 +231,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
         Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(node));
 
-        removeActor(node);
+        mainContainer.removeActor(node);
 
         TalosMain.Instance().ProjectController().setDirty();
     }
@@ -471,10 +476,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public static class ClipboardPayload implements Json.Serializable {
         Array<NodeConnection> connections;
         ObjectSet<NodeWidget> nodes;
-        //Array<ModuleWrapperGroup> groups;
+        Array<NodeGroup> groups;
 
         Array<JsonValue> nodeJsonArray = new Array<>();
         Array<JsonValue> connectionsJsonArray = new Array<>();
+        Array<JsonValue> groupJsonArray = new Array<>();
 
         public Vector2 cameraPositionAtCopy = new Vector2();
 
@@ -482,10 +488,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
         }
 
-        public void set(ObjectSet<NodeWidget> nodes, Array<NodeConnection> connections, Object groups) {
+        public void set(ObjectSet<NodeWidget> nodes, Array<NodeConnection> connections, Array<NodeGroup> groups) {
             this.nodes = nodes;
             this.connections = connections;
-            //this.groups = groups;
+            this.groups = groups;
         }
 
         @Override
@@ -508,6 +514,22 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 json.writeObjectEnd();
             }
             json.writeArrayEnd();
+
+            json.writeArrayStart("groups");
+            for (NodeGroup group: groups) {
+                json.writeObjectStart();
+                json.writeValue("name", group.getText());
+                json.writeValue("color", group.getFrameColor());
+                json.writeArrayStart("nodes");
+
+                for (NodeWidget nodeWidget: group.getNodes()) {
+                    json.writeValue(nodeWidget.getUniqueId());
+                }
+
+                json.writeArrayEnd();
+                json.writeObjectEnd();
+            }
+            json.writeArrayEnd();
         }
 
         @Override
@@ -521,6 +543,9 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             for (JsonValue connectionData: jsonData.get("connections")) {
                 connectionsJsonArray.add(connectionData);
             }
+            for (JsonValue groupData: jsonData.get("groups")) {
+                groupJsonArray.add(groupData);
+            }
 
             cameraPositionAtCopy = json.readValue("cameraPositionAtCopy", Vector2.class, jsonData);
         }
@@ -529,10 +554,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public void copySelectedModules() {
         Array<NodeConnection> connections = getSelectedConnections();
         ObjectSet<NodeWidget> nodes = getSelectedNodes();
-        //Array<ModuleWrapperGroup> groups = getSelectedGroups(); // TODO: add groups
+        Array<NodeGroup> groups = getSelectedGroups();
 
         ClipboardPayload payload = new ClipboardPayload();
-        payload.set(nodes, connections, null);
+        payload.set(nodes, connections, groups);
         Vector3 camPos = getStage().getCamera().position;
         payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
 
@@ -601,21 +626,23 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 makeConnection(fromNode, toNode, fromSlot, toSlot);
             }
 
-            /*
-            // now add groups
-            for(ModuleWrapperGroup group: payload.groups) {
-                ObjectSet<ModuleWrapper> newWrappers = new ObjectSet<>();
-                for(ModuleWrapper wrapper: group.getModuleWrappers()) {
-                    ModuleWrapper newWrapper = previousNodeIdMap.get(wrapper.getId());
-                    if(newWrapper != null) {
-                        newWrappers.add(newWrapper);
-                    }
-                }
-                ModuleWrapperGroup newGroup = createGroupForWrappers(newWrappers);
-                newGroup.setText(group.getText());
-                newGroup.setColor(group.getColor());
+            // now let's add groups
+            ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();
 
-            }*/
+            for(JsonValue groupData: payload.groupJsonArray) {
+                String name = groupData.getString("name");
+                Color color = json.readValue(Color.class, groupData.get("color"));
+                JsonValue childNodeIds = groupData.get("nodes");
+                subNodeList.clear();
+                for (JsonValue idVal : childNodeIds) {
+                    int id = idVal.asInt();
+                    subNodeList.add(previousNodeIdMap.get(id));
+                }
+
+                NodeGroup nodeGroup = createGroupForNodes(subNodeList);
+                nodeGroup.setText(name);
+                nodeGroup.setColor(color);
+            }
 
             setSelectedNodes(copiedNodes);
         } catch (Exception e) {

@@ -13,8 +13,13 @@ public class VectorToXYNode extends AbstractShaderNode {
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
         String inputVal = getExpression(INPUT, null);
 
-        String x = "(" + inputVal + ").x";
-        String y = "(" + inputVal + ").y";
+        String x = widgetMap.get(X).getValue() + "";
+        String y = widgetMap.get(Y).getValue() + "";
+
+        if(inputVal != null && !inputVal.equals("null")) {
+            x = "(" + inputVal + ").x";
+            y = "(" + inputVal + ").y";
+        }
 
         shaderBuilder.declareVariable(ShaderBuilder.Type.FLOAT, "vec2OutX" + getId(), x);
         shaderBuilder.declareVariable(ShaderBuilder.Type.FLOAT, "vec2OutY" + getId(), y);

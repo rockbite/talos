@@ -21,7 +21,6 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
-import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 
 public class NodeGroup extends Group implements Json.Serializable{
 
@@ -47,6 +46,10 @@ public class NodeGroup extends Group implements Json.Serializable{
     PopupMenu settingsPopup;
 
     NodeBoard nodeBoard;
+
+    public NodeGroup() {
+
+    }
 
     public NodeGroup(NodeBoard nodeBoard) {
         this.nodeBoard = nodeBoard;
@@ -138,6 +141,11 @@ public class NodeGroup extends Group implements Json.Serializable{
                 pos.set(tmp);
 
                 super.touchDragged(event, x, y, pointer);
+            }
+
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                event.cancel();
             }
         });
 

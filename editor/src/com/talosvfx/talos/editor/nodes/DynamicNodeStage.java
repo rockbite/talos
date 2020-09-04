@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -112,7 +113,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-                if(button == 0 && !event.isCancelled()) {
+                if(button == 0 && (!event.isCancelled() && !event.isHandled())) {
                     FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
                 }
@@ -182,6 +183,22 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             json.writeObjectEnd();
         }
         json.writeArrayEnd();
+
+        json.writeArrayStart("groups");
+        for (NodeGroup group: nodeBoard.groups) {
+            json.writeObjectStart();
+            json.writeValue("name", group.getText());
+            json.writeValue("color", group.getFrameColor());
+            json.writeArrayStart("nodes");
+
+            for (NodeWidget nodeWidget: group.getNodes()) {
+                json.writeValue(nodeWidget.getUniqueId());
+            }
+
+            json.writeArrayEnd();
+            json.writeObjectEnd();
+        }
+        json.writeArrayEnd();
     }
 
     public void read (Json json, JsonValue root) {
@@ -189,6 +206,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
         JsonValue nodes = root.get("list");
         JsonValue connections = root.get("connections");
+        JsonValue groups = root.get("groups");
 
         int idCounter = 0;
 
@@ -219,6 +237,21 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             NodeWidget toWidget = nodeMap.get(toNode);
 
             nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
+        }
+
+        ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();
+        for (JsonValue groupData: groups) {
+            String name = groupData.getString("name");
+            Color color = json.readValue(Color.class, groupData.get("color"));
+            JsonValue childNodeIds = groupData.get("nodes");
+            subNodeList.clear();
+            for (JsonValue idVal : childNodeIds) {
+                int id = idVal.asInt();
+                subNodeList.add(nodeMap.get(id));
+            }
+            NodeGroup nodeGroup = nodeBoard.createGroupForNodes(subNodeList);
+            nodeGroup.setText(name);
+            nodeGroup.setColor(color);
         }
 
         stage.setKeyboardFocus(stage.getRoot());
