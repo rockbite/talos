@@ -105,8 +105,16 @@
                 <dynamicValue port="input" name="edgeTwo" type="float" max = "1" step="0.001" default="0.5">Edge Two</dynamicValue>
             </group>
         </module>
-
         <module name = "RadialShearNode" title = "Radial Shear" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="vec2">Output Value</value>
+                <value port="input" name="uv" type="vec2">UV</value>
+                <value port="input" name="center" type="vec2">Center</value>
+                <dynamicValue port="input" name="strength" type="float" default="2">Strength</dynamicValue>
+                <value port="input" name="offset" type="vec2">Offset</value>
+            </group>
+        </module>
+        <module name = "TwirlNode" title = "Twirl" keywords = "math">
             <group>
                 <value port="output" name="outputValue" type="vec2">Output Value</value>
                 <value port="input" name="uv" type="vec2">UV</value>
