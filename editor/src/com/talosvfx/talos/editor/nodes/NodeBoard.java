@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -62,12 +63,18 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public Array<NodeConnection> nodeConnections = new Array<>();
     public Array<NodeWidget> nodes = new Array<>();
 
+    public Array<NodeGroup> groups = new Array<>();
+    public Group groupContainer = new Group();
+    public Group mainContainer = new Group();
+
     public void reset () {
         nodeCounter = new ObjectIntMap<>();
         selectedNodes.clear();
         nodeConnections.clear();
         nodes.clear();
-        clearChildren();
+
+        mainContainer.clearChildren();
+        groupContainer.clearChildren();
     }
 
 
@@ -102,6 +109,9 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         });
 
         Notifications.registerObserver(this);
+
+        addActor(groupContainer);
+        addActor(mainContainer);
     }
 
     @Override
@@ -175,7 +185,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             node.init(skin, this);
             node.setConfig(config);
 
-            addActor(node);
+            mainContainer.addActor(node);
 
             node.setPosition(tmp2.x - node.getWidth()/2f, tmp2.y - node.getHeight()/2f);
 
@@ -277,12 +287,13 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     }
 
     public void removeConnection (NodeConnection connection) {
-        Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
-
+        //Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionPreRemovedEvent.class).set(connection));
         nodeConnections.removeValue(connection, true);
 
         connection.fromNode.setSlotInactive(connection.fromId, false);
         connection.toNode.setSlotInactive(connection.toId, true);
+
+        Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
 
         TalosMain.Instance().ProjectController().setDirty();
     }
@@ -666,7 +677,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         affectedNodes.removeValue(node, true);
 
         for(NodeWidget affectedNode: affectedNodes) {
-            affectedNode.graphUpdated();
+            affectedNode.graphUpdated(); //TODO: this is not currently used but should be for more optimal stuff
         }
     }
 
@@ -705,5 +716,69 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         for(NodeWidget.Connection connection: node.outputs.values()) {
             collectNodesNodeAffects(nodeList, connection.targetNode);
         }
+    }
+
+    public NodeGroup createGroupForNodes(ObjectSet<NodeWidget> nodes) {
+        if(nodes == null || nodes.size == 0) return null;
+
+        for(NodeGroup other: groups) {
+            other.removeWrappers(nodes);
+        }
+
+        NodeGroup group = new NodeGroup(this, skin);
+        group.setNodes(nodes);
+        groups.add(group);
+
+        groupContainer.addActor(group);
+
+        TalosMain.Instance().ProjectController().setDirty();
+
+        clearSelection();
+
+        return group;
+    }
+
+    public void createGroupFromSelectedNodes () {
+        createGroupForNodes(getSelectedNodes());
+    }
+
+    public void ungroupSelectedNodes() {
+        ungroupNodes(getSelectedNodes());
+    }
+
+
+    public void ungroupNodes(ObjectSet<NodeWidget> nodes) {
+        if(nodes == null || nodes.size == 0) return;
+
+        for(NodeGroup other: groups) {
+            other.removeWrappers(nodes);
+        }
+
+        TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    public void removeGroup(NodeGroup nodeGroup) {
+        groups.removeValue(nodeGroup, true);
+        nodeGroup.remove();
+    }
+
+    private Array<NodeGroup> getSelectedGroups() {
+        Array<NodeGroup> selectedGroups = new Array<>();
+        ObjectSet<NodeWidget> nodes = getSelectedNodes();
+        for(NodeGroup group: groups) {
+            boolean isFullyContained = true;
+            for(NodeWidget node: group.getNodes()) {
+                if(!nodes.contains(node)) {
+                    isFullyContained = false;
+                    break;
+                }
+            }
+            if(isFullyContained) {
+                //add this group
+                selectedGroups.add(group);
+            }
+        }
+
+        return selectedGroups;
     }
 }

@@ -63,13 +63,12 @@ public class ColorWidget extends AbstractWidget<Color> {
 
     @Override
     public void read (Json json, JsonValue jsonValue) {
-        color.set(jsonValue.asInt());
+        color = json.readValue(Color.class, jsonValue);
         colorButton.setColor(color);
     }
 
     @Override
     public void write (Json json, String name) {
-        int bits = color.toIntBits();
-        json.writeValue(name, bits);
+        json.writeValue(name, color);
     }
 }

@@ -69,6 +69,11 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
         updatePreviewIfNeeded();
     }
 
+    @EventHandler
+    public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
+        updatePreviewIfNeeded();
+    }
+
     protected void updatePreviewIfNeeded() {
 
         if(previewUpdateCooldown > 0) {
@@ -85,13 +90,6 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
         previewUpdateScheduled = false;
     }
 
-    @EventHandler
-    public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
-        if(shaderBox != null && isInputDynamic()) {
-            updatePreview();
-        }
-    }
-
     @Override
     public void init (Skin skin, NodeBoard nodeBoard) {
         super.init(skin, nodeBoard);
@@ -102,6 +100,10 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
         super.constructNode(module);
 
         inputStateChanged(isInputDynamic);
+
+        if(isInputDynamic()) {
+            updatePreviewIfNeeded();
+        }
     }
 
     public void resetProcessingTree() {

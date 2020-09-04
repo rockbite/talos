@@ -131,11 +131,11 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 }
 
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    //moduleBoardWidget.createGroupFromSelectedWrappers();
+                    nodeBoard.createGroupFromSelectedNodes();
                 }
 
                 if(keycode == Input.Keys.U && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    //moduleBoardWidget.ungroupSelectedWrappers();
+                    nodeBoard.ungroupSelectedNodes();
                 }
 
                 if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
