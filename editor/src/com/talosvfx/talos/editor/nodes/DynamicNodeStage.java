@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -97,17 +98,48 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         stage.addListener(new InputListener() {
 
             boolean dragged = false;
+            Vector2 startPos = new Vector2();
+            Vector2 tmp = new Vector2();
+            Rectangle rectangle = new Rectangle();
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 dragged = false;
+
+                if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    selectionRect.setVisible(true);
+                    selectionRect.setSize(0, 0);
+                    startPos.set(x, y);
+                }
+
                 return true;
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
+
                 dragged = true;
+
+                if(selectionRect.isVisible()) {
+                    tmp.set(x, y);
+                    tmp.sub(startPos);
+                    if(tmp.x < 0) {
+                        rectangle.setX(x);
+                    } else {
+                        rectangle.setX(startPos.x);
+                    }
+                    if(tmp.y < 0) {
+                        rectangle.setY(y);
+                    } else {
+                        rectangle.setY(startPos.y);
+                    }
+                    rectangle.setWidth(Math.abs(tmp.x));
+                    rectangle.setHeight(Math.abs(tmp.y));
+
+                    selectionRect.setPosition(rectangle.x, rectangle.y);
+                    selectionRect.setSize(rectangle.getWidth(), rectangle.getHeight());
+                }
             }
 
             @Override
@@ -121,6 +153,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 if(button == 1 && !event.isCancelled()) {
                     showPopup();
                 }
+
+                if(selectionRect.isVisible()) {
+                    nodeBoard.userSelectionApply(rectangle);
+                }
+
+                selectionRect.setVisible(false);
             }
 
             @Override
@@ -240,18 +278,20 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         }
 
         ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();
-        for (JsonValue groupData: groups) {
-            String name = groupData.getString("name");
-            Color color = json.readValue(Color.class, groupData.get("color"));
-            JsonValue childNodeIds = groupData.get("nodes");
-            subNodeList.clear();
-            for (JsonValue idVal : childNodeIds) {
-                int id = idVal.asInt();
-                subNodeList.add(nodeMap.get(id));
+        if(groups != null) {
+            for (JsonValue groupData : groups) {
+                String name = groupData.getString("name");
+                Color color = json.readValue(Color.class, groupData.get("color"));
+                JsonValue childNodeIds = groupData.get("nodes");
+                subNodeList.clear();
+                for (JsonValue idVal : childNodeIds) {
+                    int id = idVal.asInt();
+                    subNodeList.add(nodeMap.get(id));
+                }
+                NodeGroup nodeGroup = nodeBoard.createGroupForNodes(subNodeList);
+                nodeGroup.setText(name);
+                nodeGroup.setColor(color);
             }
-            NodeGroup nodeGroup = nodeBoard.createGroupForNodes(subNodeList);
-            nodeGroup.setText(name);
-            nodeGroup.setColor(color);
         }
 
         stage.setKeyboardFocus(stage.getRoot());

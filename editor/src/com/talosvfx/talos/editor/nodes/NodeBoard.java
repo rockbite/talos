@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Bezier;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -81,7 +79,6 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
 
     }
-
 
     public static class NodeConnection {
         public NodeWidget fromNode;
@@ -808,4 +805,23 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
         return selectedGroups;
     }
+
+    public void userSelectionApply (Rectangle rectangle) {
+        clearSelection();
+        Rectangle moduleRect = new Rectangle();
+        for(int i = 0; i < nodes.size; i++) {
+            NodeWidget node = nodes.get(i);
+            tmp.set(node.getX(), node.getY());
+            tmp.add(mainContainer.getX(), mainContainer.getY());
+            localToStageCoordinates(tmp);
+            moduleRect.set(tmp.x, tmp.y, node.getWidth(), node.getHeight());
+            boolean hit = Intersector.intersectRectangles(rectangle, moduleRect, moduleRect);
+
+            if(hit) {
+                // hit
+                addNodeToSelection(node);
+            }
+        }
+    }
+
 }

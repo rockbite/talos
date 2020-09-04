@@ -23,8 +23,6 @@ public class ShaderAddon implements IAddon {
 
     public DynamicNodeStage nodeStage;
 
-    private ShaderBuilder shaderBuilder;
-
     @Override
     public void init () {
         SHADER_PROJECT = new ShaderProject(this);
@@ -76,7 +74,7 @@ public class ShaderAddon implements IAddon {
 
     @Override
     public void buildMenu (MenuBar menuBar) {
-        Menu menu = new Menu("Shader Editor");
+        Menu menu = new Menu("Shader Graph");
 
         MenuItem newFile = new MenuItem("New Shader");
         menu.addItem(newFile);

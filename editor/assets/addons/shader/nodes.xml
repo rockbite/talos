@@ -88,5 +88,22 @@
                 <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Cell Density</dynamicValue>
             </group>
         </module>
+        <module name = "StepNode" title = "Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <dynamicValue port="input" name="edge" type="float" max = "1" step="0.001" default="0.5">Edge</dynamicValue>
+        </module>
+        <module name = "SmoothStepNode" title = "Smooth Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="edgeOne" type="float" max = "1" step="0.001" default="0.5">Edge One</dynamicValue>
+                <dynamicValue port="input" name="edgeTwo" type="float" max = "1" step="0.001" default="0.5">Edge Two</dynamicValue>
+            </group>
+        </module>
     </category>
 </modules>
