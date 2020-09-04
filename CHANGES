@@ -1,3 +1,8 @@
+[1.1.1]
+- Various Buffixes
+- Shadergraph addon
+- Refactor of node system and node board for future modifications of existing particle graph
+
 [1.1.0]
 - Read only timeline for BVB
 - Read only timeline for Talos

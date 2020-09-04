@@ -12,6 +12,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
+import java.util.ArrayList;
+
 
 public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
@@ -28,6 +30,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     private Vector2 tmp = new Vector2();
 
     private Vector2 scale = new Vector2(1f, 1f);
+
+    private Array<Event> events = new Array<>();
 
     public SkeletonContainer(BvBWorkspace workspace) {
         this.workspace = workspace;
@@ -178,6 +182,16 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         skeleton.setPosition(0, 0);
         skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
 
+        events.clear();
+        for (Animation.Timeline timeline: currentAnimation.getTimelines()) {
+            if(timeline instanceof Animation.EventTimeline) {
+                Animation.EventTimeline eventTimeline = (Animation.EventTimeline) timeline;
+                for (Event event: eventTimeline.getEvents()) {
+                    events.add(event);
+                }
+            }
+        }
+
         animationState.addListener(new AnimationState.AnimationStateAdapter() {
             @Override
             public void event(AnimationState.TrackEntry entry, Event event) {
@@ -189,10 +203,10 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     String startEvent = boundEffect.getStartEvent();
                     String completeEvent = boundEffect.getCompleteEvent();
                     if(startEvent.equals(event.getData().getName())) {
-                        boundEffect.startInstance();
+                        //boundEffect.startInstance();
                     }
                     if(completeEvent.equals(event.getData().getName())) {
-                        boundEffect.completeInstance();
+                       // boundEffect.completeInstance();
                     }
                 }
             }
@@ -211,11 +225,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 for(BoundEffect boundEffect: getBoundEffects()) {
                     String completeEventName = boundEffect.getCompleteEvent();
                     if(completeEventName.equals("")) {
-                        boundEffect.completeInstance();
+                       // boundEffect.completeInstance();
                     }
                     String startEventName = boundEffect.getStartEvent();
                     if(startEventName.equals("")) {
-                        boundEffect.startInstance();
+                        //boundEffect.startInstance();
                     }
                 }
 
@@ -235,6 +249,17 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         }
 
         for(BoundEffect effect: getBoundEffects()) {
+            float animTime = getAnimationState().getTracks().first().getTrackTime();
+            float duration = getCurrentAnimation().getDuration();
+            float innerTime = animTime % duration;
+
+            if(!effect.isContinuous()) {
+                if (innerTime - delta < effect.getTimePosition() && innerTime >= effect.getTimePosition()) {
+                    // time to start
+                    effect.startInstance();
+                }
+            }
+
             effect.update(delta);
         }
     }
@@ -311,7 +336,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     public BoundEffect addEffect(String name, ParticleEffectDescriptor descriptor) {
         BoundEffect boundEffect = new BoundEffect(name, descriptor, this);
-        boundEffect.setForever(true);
+        //boundEffect.setForever(true);
 
         getBoundEffects().add(boundEffect);
         boundEffect.setDrawOrder(getBoundEffects().size-1); // todo this is not going to work well and is not tested
@@ -592,5 +617,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private void effectScopeUpdated() {
         workspace.effectScopeUpdated();
+    }
+
+    public Array<Event> getEvents() {
+        return events;
     }
 }

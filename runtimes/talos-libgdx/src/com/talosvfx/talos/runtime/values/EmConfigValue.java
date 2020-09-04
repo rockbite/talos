@@ -22,6 +22,7 @@ public class EmConfigValue extends Value {
     public boolean continuous = true;
     public boolean aligned = false;
     public boolean additive = true;
+    public boolean isBlendAdd = false;
 
     @Override
     public void set(Value value) {
@@ -33,5 +34,6 @@ public class EmConfigValue extends Value {
         this.continuous = from.continuous;
         this.aligned = from.aligned;
         this.additive = from.additive;
+        this.isBlendAdd = from.isBlendAdd;
     }
 }

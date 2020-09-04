@@ -24,8 +24,9 @@ public class PropertiesPanel extends Table {
         setRound(false);
 
         titleLabel = new Label("", getSkin());
+        titleLabel.setEllipsis(true);
         Table titleContainer = new Table();
-        titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).expandX().left().row();
+        titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left().width(0).row();
         titleContainer.add().expandY();
 
         Stack stack = new Stack();

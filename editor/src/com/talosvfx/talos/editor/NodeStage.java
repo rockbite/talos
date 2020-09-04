@@ -84,7 +84,7 @@ public class NodeStage extends WorkplaceStage {
 
                 wasDragged = false;
 
-                if(button == 2) {
+                if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
@@ -139,7 +139,7 @@ public class NodeStage extends WorkplaceStage {
                     moduleBoardWidget.showPopup();
                 }
 
-                if(button == 2) {
+                if(selectionRect.isVisible()) {
                     moduleBoardWidget.userSelectionApply(rectangle);
                 }
 

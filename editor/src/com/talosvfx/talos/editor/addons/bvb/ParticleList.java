@@ -44,6 +44,12 @@ public class ParticleList extends TimelineWidget<BoundEffect> {
 
                 removeItems(selector);
             }
+
+            @Override
+            protected void onItemSelect (Object identifier) {
+                BoundEffect selectedItem = (BoundEffect) identifier;
+                workspace.effectSelected(selectedItem);
+            }
         });
     }
 

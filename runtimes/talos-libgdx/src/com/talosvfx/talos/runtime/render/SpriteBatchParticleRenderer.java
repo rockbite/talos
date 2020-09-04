@@ -16,9 +16,11 @@
 
 package com.talosvfx.talos.runtime.render;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -29,13 +31,21 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	private Batch batch;
 
 	Color color = new Color(Color.WHITE);
+	private ShaderProgram blendAddShader;
 
 	public SpriteBatchParticleRenderer () {
-
+		initShaders();
 	}
 
 	public SpriteBatchParticleRenderer (Batch batch) {
 		this.batch = batch;
+		initShaders();
+	}
+
+	private void initShaders() {
+		blendAddShader = new ShaderProgram(
+				Gdx.files.internal("shaders/blendadd.vert"),
+				Gdx.files.internal("shaders/blendadd.frag"));
 	}
 
 	public void setBatch (Batch batch) {
@@ -49,13 +59,24 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
 			if(!particleEmitter.isVisible()) continue;
-			if(particleEmitter.isAdditive()) {
-				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+			if(particleEmitter.isBlendAdd()) {
+				batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			} else {
-				batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				if (particleEmitter.isAdditive()) {
+					batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+				} else {
+					batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				}
+			}
+			ShaderProgram prevShader = batch.getShader();
+			if (particleEmitter.isBlendAdd() && prevShader != blendAddShader) {
+				batch.setShader(blendAddShader);
 			}
  			for (int j = 0; j < particleEmitter.getActiveParticleCount(); j++) {
 				renderParticle(batch, particleEmitter.getActiveParticles().get(j), particleEffectInstance.alpha);
+			}
+ 			if(batch.getShader() != prevShader) {
+ 				batch.setShader(prevShader);
 			}
 		}
 

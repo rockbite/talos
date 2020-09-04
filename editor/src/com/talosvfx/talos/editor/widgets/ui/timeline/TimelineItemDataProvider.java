@@ -24,4 +24,6 @@ public interface TimelineItemDataProvider<U> {
     float getTimePosition ();
 
     boolean isItemVisible ();
+
+    void setTimePosition (float time);
 }

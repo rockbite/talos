@@ -1,6 +1,10 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class TimeRow<U> extends BasicRow<U> {
@@ -18,6 +22,36 @@ public class TimeRow<U> extends BasicRow<U> {
         areaWidget.setPosition(0,2);
 
         addActor(areaWidget);
+
+        areaWidget.setTouchable(Touchable.enabled);
+
+        areaWidget.addListener(new InputListener() {
+
+            private Vector2 vec2 = new Vector2();
+            float prevTime;
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                vec2.set(x, y);
+                areaWidget.localToStageCoordinates(vec2);
+                prevTime = timeline.stageToTime(vec2);
+
+                return true;
+            }
+
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                vec2.set(x, y);
+                areaWidget.localToStageCoordinates(vec2);
+                float currTime = timeline.stageToTime(vec2);
+
+                float timeDiff = currTime-prevTime;
+                prevTime= currTime;
+
+                float timePos = dataProviderRef.getTimePosition();
+                dataProviderRef.setTimePosition(timePos + timeDiff); // might be denied
+            }
+        });
     }
 
     public void updateTimeWindow(float timeWindowPosition, float timeWindowSize) {

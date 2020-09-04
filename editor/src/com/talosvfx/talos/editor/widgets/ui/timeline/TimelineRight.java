@@ -1,7 +1,10 @@
 package com.talosvfx.talos.editor.widgets.ui.timeline;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -30,6 +33,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private StringBuilder stringBuilder = new StringBuilder();
     private final String ZERO_STRING = "0";
     private final String TIME_SEPARATOR_STRING = " : ";
+    private Table timeBar;
 
     public TimelineRight(TimelineWidget timeline) {
         super(timeline);
@@ -145,9 +149,27 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         header.add(topPart).height(33).padBottom(1).growX().row();
         header.add(bottomPart).height(16).growX().row();
 
-        Table timeBar = new Table();
+
+        timeBar = new Table();
         timeBar.setBackground(getSkin().getDrawable("timeline-time-bar"));
         topPart.add(timeBar).height(17).padTop(7).growX().expandY().top().row();
+
+        timeBar.setTouchable(Touchable.enabled);
+        timeBar.addListener(new InputListener() {
+
+            private Vector2 vec = new Vector2();
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                vec.set(x, y);
+                event.getTarget().localToStageCoordinates(vec);
+                float time = timeline.stageToTime(vec);
+
+                System.out.println(time);
+
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
 
         return header;
     }
@@ -292,5 +314,13 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         stringBuilder.append(millis);
 
         timeCursorWidget.setLabelValue(stringBuilder.toString());
+    }
+
+    public Actor getTimeBar () {
+        return timeBar;
+    }
+
+    public float getTimeWindowSize () {
+        return timeWindowSize;
     }
 }

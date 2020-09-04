@@ -41,18 +41,7 @@ public class TimeCursor extends Table {
         line.setWidth(1);
         line.setColor(ColorLibrary.BLUE);
 
-        addListener(new ClickListener() {
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                return super.touchDown(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-            }
-        });
+        setTouchable(Touchable.disabled);
 
         addActor(head);
         addActor(line);

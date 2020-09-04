@@ -32,5 +32,6 @@ public interface IEmitter {
     void setVisible(boolean isVisible);
     boolean isVisible();
     boolean isAdditive();
+    boolean isBlendAdd();
     Array<Particle> getActiveParticles();
 }

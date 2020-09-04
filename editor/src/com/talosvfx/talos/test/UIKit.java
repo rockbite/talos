@@ -9,6 +9,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.editor.addons.shader.nodes.AbstractShaderNode;
+import com.talosvfx.talos.editor.nodes.widgets.CheckBoxWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
+import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.widgets.ui.EmitterList;
 
 public class UIKit extends ApplicationAdapter {
@@ -40,15 +47,28 @@ public class UIKit extends ApplicationAdapter {
 
         table = new Table();
 
-        EmitterList emitterList = new EmitterList(skin);
-        table.add().grow().row();
-        table.add(emitterList).height(250).growX().bottom();
+        AbstractShaderNode shaderNode = new AbstractShaderNode() {
+            @Override
+            public void prepareDeclarations(ShaderBuilder shaderBuilder) {
+
+            }
+
+            @Override
+            public String writeOutputCode(String slotId) {
+                return null;
+            }
+        };
+        shaderNode.init(skin, null);
+        XmlReader reader = new XmlReader();
+        XmlReader.Element root = reader.parse(Gdx.files.internal("addons/shader/nodes.xml"));
+        shaderNode.constructNode(root.getChild(0).getChild(0));
+
+        table.add(shaderNode);
 
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         table.setFillParent(true);
         stage.addActor(table);
-
     }
 
 

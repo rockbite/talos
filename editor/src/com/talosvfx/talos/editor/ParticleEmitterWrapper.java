@@ -131,4 +131,9 @@ public class ParticleEmitterWrapper implements TimelineItemDataProvider<Particle
     public boolean isItemVisible () {
         return !isMuted;
     }
+
+    @Override
+    public void setTimePosition (float time) {
+
+    }
 }

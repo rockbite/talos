@@ -1,0 +1,109 @@
+<modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
+    <category name = "general" title="General">
+        <module name = "TimeNode" title = "Timer" keywords = "timer">
+            <value port="output" name="outputValue" type="float">System time value</value>
+        </module>
+        <module name = "NumberNode" title = "Number" keywords = "number,float">
+            <dynamicValue port="output" name="outputValue" type="float" min="-1000" max="1000">X: </dynamicValue>
+        </module>
+        <module name = "Vector2Node" title = "XY to Vector" keywords = "vector2,position">
+            <value port="output" name="outputValue" type="vec2">Output</value>
+            <group>
+                <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+        </module>
+        <module name = "VectorToXYNode" title = "Vector To XY" keywords = "vector2,position">
+            <value port="input" name="inputValue" type="vec2">Vector2</value>
+            <group>
+                <dynamicValue port="output" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="output" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+        </module>
+        <module name = "ColorNode" title = "Color" keywords = "color">
+            <group>
+                <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="output" name="outputR" type="float">Red Channel</value>
+                <value port="output" name="outputG" type="float">Green Channel</value>
+                <value port="output" name="outputB" type="float">Blue Channel</value>
+                <value port="output" name="outputA" type="float">Alpha (Transparency)</value>
+            </group>
+            <color port="input" name="color" type="vec4">Input Color</color>
+        </module>
+        <module name = "ColorChannelsNode" title = "RGBA Node" keywords = "color">
+            <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+            <group>
+                <dynamicValue port="input" name="R" type="float" max="255" progress="true" step="1">R</dynamicValue>
+                <dynamicValue port="input" name="G" type="float" max="255" progress="true" step="1">G</dynamicValue>
+                <dynamicValue port="input" name="B" type="float" max="255" progress="true" step="1">B</dynamicValue>
+                <dynamicValue port="input" name="A" type="float" max="255" progress="true" step="1">A</dynamicValue>
+            </group>
+        </module>
+        <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
+            <value port="input" name="inputColor" type="vec4">Input Color</value>
+        </module>
+        <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
+            <value port="output" name="outputValue" type="vec4">Output Value</value>
+            <dynamicValue port="input" name="frac" type="vec4" max = "1" step="0.001" progress="true" default="0.5">Frac</dynamicValue>
+            <group>
+                <value port="input" name="valueA" type="vec4">Value A</value>
+                <value port="input" name="valueB" type="vec4">Value B</value>
+            </group>
+        </module>
+        <module name = "SampleTextureNode" title = "Texture Sample" keywords = "texture,sample">
+            <group>
+                <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="input" name="offsetUV" type="vec2">UV Offset</value>
+                <value port="input" name="mulUV" type="vec2">UV Mul</value>
+            </group>
+            <checkbox name="wrap">Wrap Coordinates</checkbox>
+        </module>
+        <module name = "UVNode" title = "UV Node" keywords = "uv,sample,vertex">
+            <value port="output" name="outputUV" type="vec2">UV Coordinates</value>
+        </module>
+        <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
+            <value port="output" name="outputValue" type="fluid">Output Value</value>
+            <select name="operation">
+                <option value = "ADD">Add</option>
+                <option value = "SUB">Subtract</option>
+                <option value = "MUL">Multiply</option>
+                <option value = "DIV">Divide</option>
+                <option value = "POW">Power</option>
+            </select>
+            <checkbox name="clamp">Clamp Output</checkbox>
+            <group>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value A</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value B</dynamicValue>
+            </group>
+        </module>
+        <module name = "InverseNode" title = "One Minus" keywords = "math">
+            <value port="output" name="outputValue" type="fluid">Output Value</value>
+            <value port="input" name="inputValue" type="fluid">Input Value</value>
+        </module>
+        <module name = "VoronoiNode" title = "Voronoi Noise" keywords = "math,noise,voronoi">
+            <value port="output" name="outputValue" type="float">Output Value</value>
+            <value port="input" name="uv" type="vec2">UV</value>
+            <group>
+                <dynamicValue port="input" name="angleOffset" type="float" max = "10" step="0.1" default="4">Angle Offset</dynamicValue>
+                <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Cell Density</dynamicValue>
+            </group>
+        </module>
+        <module name = "StepNode" title = "Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <dynamicValue port="input" name="edge" type="float" max = "1" step="0.001" default="0.5">Edge</dynamicValue>
+        </module>
+        <module name = "SmoothStepNode" title = "Smooth Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="edgeOne" type="float" max = "1" step="0.001" default="0.5">Edge One</dynamicValue>
+                <dynamicValue port="input" name="edgeTwo" type="float" max = "1" step="0.001" default="0.5">Edge Two</dynamicValue>
+            </group>
+        </module>
+    </category>
+</modules>

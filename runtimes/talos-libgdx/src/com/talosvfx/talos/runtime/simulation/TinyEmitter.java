@@ -52,6 +52,7 @@ public class TinyEmitter implements IEmitter {
     private boolean isComplete = false;
     public boolean isAdditive = true;
     private boolean isStopped = false;
+    private boolean isBlendAdd = false;
 
     public TinyEmitter(ParticleEmitterDescriptor moduleGraph, ParticleEffectInstance particleEffectInstance) {
         this.emitterGraph = moduleGraph;
@@ -150,6 +151,11 @@ public class TinyEmitter implements IEmitter {
     @Override
     public boolean isAdditive () {
         return isAdditive;
+    }
+
+    @Override
+    public boolean isBlendAdd () {
+        return isBlendAdd;
     }
 
     @Override

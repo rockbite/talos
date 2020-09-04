@@ -950,13 +950,13 @@ public class FilteredTree<T> extends WidgetGroup {
     static public class Node<T> {
         final Actor actor;
         Node<T> parent;
-        final Array<Node<T>> children = new Array<>(0);
+        public final Array<Node<T>> children = new Array<>(0);
         boolean selectable = true;
         boolean expanded;
         Drawable icon;
         float height;
         T object;
-        String name;
+        public String name;
         boolean filtered = false;
         boolean underline = false;
         float yAlpha = 0f;

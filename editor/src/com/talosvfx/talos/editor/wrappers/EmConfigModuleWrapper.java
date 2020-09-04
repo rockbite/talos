@@ -27,6 +27,7 @@ import com.talosvfx.talos.runtime.modules.EmConfigModule;
 public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
     VisCheckBox additiveBox;
+    VisCheckBox blendAddBox;
     VisCheckBox attachedBox;
     VisCheckBox continuousBox;
     VisCheckBox alignedBox;
@@ -38,6 +39,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         addOutputSlot("config", EmConfigModule.OUTPUT);
 
         additiveBox = new VisCheckBox("additive");
+        blendAddBox = new VisCheckBox("blendadd");
         attachedBox = new VisCheckBox("attached");
         continuousBox = new VisCheckBox("continuous");
         alignedBox = new VisCheckBox("aligned");
@@ -45,6 +47,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         Table form = new Table();
 
         form.add(additiveBox).left().padLeft(3);
+        form.row();
+        form.add(blendAddBox).left().padLeft(3);
         form.row();
         form.add(attachedBox).left().padLeft(3);
         form.row();
@@ -58,6 +62,12 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         rightWrapper.add().expandY();
 
         additiveBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                fromUIToData();
+            }
+        });
+        blendAddBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 fromUIToData();
@@ -92,6 +102,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     public void fromUIToData() {
         if(!lockListeners) {
             module.getUserValue().additive = additiveBox.isChecked();
+            module.getUserValue().isBlendAdd = blendAddBox.isChecked();
             module.getUserValue().attached = attachedBox.isChecked();
             module.getUserValue().continuous = continuousBox.isChecked();
             module.getUserValue().aligned = alignedBox.isChecked();
@@ -101,6 +112,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     public void fromDataToUI() {
         lockListeners = true;
         additiveBox.setChecked(module.getUserValue().additive);
+        blendAddBox.setChecked(module.getUserValue().isBlendAdd);
         attachedBox.setChecked(module.getUserValue().attached);
         continuousBox.setChecked(module.getUserValue().continuous);
         alignedBox.setChecked(module.getUserValue().aligned);
@@ -124,6 +136,10 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
     public void setContinuous(boolean attached) {
         continuousBox.setChecked(attached);
+    }
+
+    public void setBlendAdd(boolean blendAdd) {
+        blendAddBox.setChecked(blendAdd);
     }
 
     public void setAdditive(boolean attached) {

@@ -18,24 +18,31 @@ package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
 public class EditableLabel extends Table {
 
-    Table labelTable;
-    Table inputTable;
+    private Table labelTable;
+    private Table inputTable;
 
-    Label label;
-    TextField textField;
+    private Label label;
+    private TextField textField;
 
-    EditableLabelChangeListener listener;
+    private EditableLabelChangeListener listener;
+
+    private Vector2 tmpVec = new Vector2();
+
+    private final InputListener stageListener;
 
     public interface EditableLabelChangeListener {
         public void changed(String newText);
@@ -52,11 +59,11 @@ public class EditableLabel extends Table {
         stack.add(labelTable);
         stack.add(inputTable);
 
-        add(stack).grow();
+        add(stack).expand().grow();
 
         label = new Label(text, getSkin(), "default");
-        labelTable.add(label);
-        labelTable.add().expandX();
+        label.setEllipsis(true);
+        labelTable.add(label).growX().width(0);
 
 
         textField = new TextField(text, getSkin(), "no-bg");
@@ -108,6 +115,19 @@ public class EditableLabel extends Table {
             }
         });
 
+        stageListener = new InputListener() {
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                tmpVec.set(x, y);
+                EditableLabel.this.stageToLocalCoordinates(tmpVec);
+                Actor touchTarget = EditableLabel.this.hit(tmpVec.x, tmpVec.y, false);
+                if (touchTarget == null && getStage() != null) {
+                    getStage().setKeyboardFocus(null);
+                }
+
+                return false;
+            }
+        };
+
         pack();
 
         setStaticMode();
@@ -115,6 +135,14 @@ public class EditableLabel extends Table {
 
     public void setListener(EditableLabelChangeListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    protected void setStage(Stage stage) {
+        super.setStage(stage);
+        if (stage != null) {
+            getStage().getRoot().addCaptureListener(stageListener);
+        }
     }
 
     public void setEditMode() {

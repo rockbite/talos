@@ -23,6 +23,8 @@ public class PropertyPanelContainer extends Table {
         container = new Table();
         fakeContainer = new Table();
         scrollPane = new ScrollPane(fakeContainer);
+        scrollPane.setSmoothScrolling(false);
+        scrollPane.setOverscroll(false, false);
         add(scrollPane).grow();
 
         fakeContainer.add(container).growX().row();
