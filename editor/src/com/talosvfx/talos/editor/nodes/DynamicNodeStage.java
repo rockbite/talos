@@ -44,7 +44,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             @Override
             public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
                 if(NodeWidget.class.isAssignableFrom(clazz)) {
-                    NodeWidget node = createNode(clazz, x, y);
+                    NodeWidget node = createNode(module.getAttribute("name"), x, y);
                     if(node != null) {
                         node.constructNode(module);
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
@@ -73,8 +73,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
         nodeListPopup.showPopup(stage, vec);
     }
-    public NodeWidget createNode (Class<? extends NodeWidget> clazz, float x, float y) {
-        return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(clazz), x, y);
+    public NodeWidget createNode (String nodeName, float x, float y) {
+        Class clazz = nodeListPopup.getNodeClassByName(nodeName);
+        return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), x, y);
     }
 
     protected void initActors() {
@@ -251,12 +252,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         IntMap<NodeWidget> nodeMap = new IntMap<>();
 
         for (JsonValue nodeData: nodes) {
-            String className = nodeData.getString("name");
+            String nodeName = nodeData.getString("name");
 
-            Class clazz = nodeListPopup.getNodeClassByName(className);
+            Class clazz = nodeListPopup.getNodeClassByName(nodeName);
             if(clazz != null) {
-                NodeWidget node = createNode(clazz, 0, 0);
-                node.constructNode(nodeListPopup.getModuleByClassName(className));
+                NodeWidget node = createNode(nodeName, 0, 0);
+                node.constructNode(nodeListPopup.getModuleByName(nodeName));
                 node.read(json, nodeData);
                 idCounter = Math.max(idCounter, node.getUniqueId());
                 nodeMap.put(node.getUniqueId(), node);

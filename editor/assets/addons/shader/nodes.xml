@@ -1,5 +1,30 @@
 <modules classPath="com.talosvfx.talos.editor.addons.shader.nodes">
-    <category name = "general" title="General">
+    <category name="artistic" title="Artistic">
+        <module name = "ColorChannelsNode" title = "Color Mixer" keywords = "color">
+            <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+            <group>
+                <dynamicValue port="input" name="R" type="float" max="255" progress="true" step="1">R</dynamicValue>
+                <dynamicValue port="input" name="G" type="float" max="255" progress="true" step="1">G</dynamicValue>
+                <dynamicValue port="input" name="B" type="float" max="255" progress="true" step="1">B</dynamicValue>
+                <dynamicValue port="input" name="A" type="float" max="255" progress="true" step="1">A</dynamicValue>
+            </group>
+        </module>
+        <module name = "ContrastNode" title = "Contrast" class="GenericMethodNode" forcePreview="false">
+            <value port="output" name="outputValue" type="vec3">Output</value>
+            <value port="input" name="inputValue" type="vec3">Input</value>
+            <dynamicValue port="input" name="contrast" type="float" default="1.0" max="3" step="0.001" progress="true">Contrast</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                     float midpoint = pow(0.5, 2.2);
+                     return (inputValue - midpoint) * contrast + midpoint;
+                ]]>
+            </shader-body>
+        </module>
+    </category>
+    <category name="channel" title="Channel">
+
+    </category>
+    <category name="input" title="Input">
         <module name = "TimeNode" title = "Timer" keywords = "timer">
             <value port="output" name="outputValue" type="float">System time value</value>
         </module>
@@ -13,13 +38,6 @@
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
         </module>
-        <module name = "VectorToXYNode" title = "Vector To XY" keywords = "vector2,position">
-            <value port="input" name="inputValue" type="vec2">Vector2</value>
-            <group>
-                <dynamicValue port="output" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
-                <dynamicValue port="output" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
-            </group>
-        </module>
         <module name = "ColorNode" title = "Color" keywords = "color">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
@@ -29,26 +47,6 @@
                 <value port="output" name="outputA" type="float">Alpha (Transparency)</value>
             </group>
             <color port="input" name="color" type="vec4">Input Color</color>
-        </module>
-        <module name = "ColorChannelsNode" title = "RGBA Node" keywords = "color">
-            <value port="output" name="outputRGBA" type="vec4">RGBA</value>
-            <group>
-                <dynamicValue port="input" name="R" type="float" max="255" progress="true" step="1">R</dynamicValue>
-                <dynamicValue port="input" name="G" type="float" max="255" progress="true" step="1">G</dynamicValue>
-                <dynamicValue port="input" name="B" type="float" max="255" progress="true" step="1">B</dynamicValue>
-                <dynamicValue port="input" name="A" type="float" max="255" progress="true" step="1">A</dynamicValue>
-            </group>
-        </module>
-        <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
-            <value port="input" name="inputColor" type="vec4">Input Color</value>
-        </module>
-        <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
-            <value port="output" name="outputValue" type="vec4">Output Value</value>
-            <dynamicValue port="input" name="frac" type="vec4" max = "1" step="0.001" progress="true" default="0.5">Frac</dynamicValue>
-            <group>
-                <value port="input" name="valueA" type="vec4">Value A</value>
-                <value port="input" name="valueB" type="vec4">Value B</value>
-            </group>
         </module>
         <module name = "SampleTextureNode" title = "Texture Sample" keywords = "texture,sample">
             <group>
@@ -60,6 +58,21 @@
         </module>
         <module name = "UVNode" title = "UV Node" keywords = "uv,sample,vertex">
             <value port="output" name="outputUV" type="vec2">UV Coordinates</value>
+        </module>
+    </category>
+    <category name="master" title="Master">
+        <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
+            <value port="input" name="inputColor" type="vec4">Input Color</value>
+        </module>
+    </category>
+    <category name="math" title="Math">
+        <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
+            <value port="output" name="outputValue" type="vec4">Output Value</value>
+            <dynamicValue port="input" name="frac" type="vec4" max = "1" step="0.001" progress="true" default="0.5">Frac</dynamicValue>
+            <group>
+                <value port="input" name="valueA" type="vec4">Value A</value>
+                <value port="input" name="valueB" type="vec4">Value B</value>
+            </group>
         </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
             <value port="output" name="outputValue" type="fluid">Output Value</value>
@@ -80,6 +93,41 @@
             <value port="output" name="outputValue" type="fluid">Output Value</value>
             <value port="input" name="inputValue" type="fluid">Input Value</value>
         </module>
+        <module name = "StepNode" title = "Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <dynamicValue port="input" name="edge" type="float" max = "1" step="0.001" default="0.5" progress="true">Edge</dynamicValue>
+        </module>
+        <module name = "SmoothStepNode" title = "Smooth Step Node" keywords = "math">
+            <group>
+                <value port="output" name="outputValue" type="fluid">Output Value</value>
+                <value port="input" name="inputValue" type="fluid">Input Value</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="edgeOne" type="float" max = "1" step="0.001" default="0.5" progress="true">Edge One</dynamicValue>
+                <dynamicValue port="input" name="edgeTwo" type="float" max = "1" step="0.001" default="0.5" progress="true">Edge Two</dynamicValue>
+            </group>
+        </module>
+        <module name = "SphereMaskNode" title = "Sphere Mask" keywords = "shape" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="float">Output Value</value>
+                <value port="input" name="uv" type="vec2">UV</value>
+                <value port="input" name="center" type="vec2" default="vec2(0.5, 0.5)">Center</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="radius" type="float" default="0.0" max="1" progress="true">Radius</dynamicValue>
+                <dynamicValue port="input" name="hardness" type="float" default="0.5" max="0.999" progress="true">Hardness</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return 1.0 - clamp((distance(uv, center) - radius) / (1.0 - hardness), 0.0, 1.0);
+                ]]>
+            </shader-body>
+        </module>
+    </category>
+    <category name="procedural" title="Procedural">
         <module name = "VoronoiNode" title = "Voronoi Noise" keywords = "math,noise,voronoi">
             <value port="output" name="outputValue" type="float">Output Value</value>
             <value port="input" name="uv" type="vec2">UV</value>
@@ -88,40 +136,126 @@
                 <dynamicValue port="input" name="cellDensity" type="float" max = "10" step="0.1" default="3">Cell Density</dynamicValue>
             </group>
         </module>
-        <module name = "StepNode" title = "Step Node" keywords = "math">
+        <module name = "RoundedRectangleNode" title = "Rounded Rectangle" keywords = "shape" class="GenericMethodNode">
+            <value port="output" name="outputValue" type="float">Output Value</value>
+            <value port="input" name="uv" type="vec2">UV</value>
             <group>
-                <value port="output" name="outputValue" type="fluid">Output Value</value>
-                <value port="input" name="inputValue" type="fluid">Input Value</value>
+                <dynamicValue port="input" name="width" type="float" default="0.5">Width</dynamicValue>
+                <dynamicValue port="input" name="height" type="float" default="0.5">Height</dynamicValue>
+                <dynamicValue port="input" name="radius" type="float" default="0.1">Radius</dynamicValue>
             </group>
-            <dynamicValue port="input" name="edge" type="float" max = "1" step="0.001" default="0.5">Edge</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    radius = max(min(min(abs(radius * 2.0), abs(width)), abs(height)), 0.0001);
+                    vec2 uv2 = abs(uv * 2.0 - 1.0) - vec2(width, height) + radius;
+                    float d = length(max(vec2(0.0), uv2)) / radius;
+                    return clamp((1.0 - d) / fwidth(d), 0.0, 1.0);
+                ]]>
+            </shader-body>
         </module>
-        <module name = "SmoothStepNode" title = "Smooth Step Node" keywords = "math">
+        <module name = "CheckerboardNode" title = "Checkerboard" keywords = "shape" class="GenericMethodNode">
             <group>
-                <value port="output" name="outputValue" type="fluid">Output Value</value>
-                <value port="input" name="inputValue" type="fluid">Input Value</value>
+                <value port="output" name="outputValue" type="vec3">Output Value</value>
+                <value port="input" name="uv" type="vec2">UV</value>
+                <value port="input" name="colorA" type="vec3" default="vec3(1.0)">Color A</value>
+                <value port="input" name="colorB" type="vec3" default="vec3(0.0)">Color B</value>
+                <value port="input" name="frequency" type="vec2" default="vec2(1.0)">Frequency</value>
             </group>
+            <shader-body>
+                <![CDATA[
+                    uv = (uv.xy + 0.5) * frequency;
+                    vec4 derivatives = vec4(dFdx(uv), dFdy(uv));
+                    vec2 duv_length = sqrt(vec2(dot(derivatives.xz, derivatives.xz), dot(derivatives.yw, derivatives.yw)));
+                    float width = 1.0;
+                    vec2 distance3 = 4.0 * abs(fract(uv + 0.25) - 0.5) - width;
+                    vec2 scale = 0.35 / duv_length.xy;
+                    float freqLimiter = sqrt(clamp(1.1 - max(duv_length.x, duv_length.y), 0.0, 1.0));
+                    vec2 vector_alpha = clamp(distance3 * scale.xy, -1.0, 1.0);
+                    float alpha = clamp(0.5 + 0.5 * vector_alpha.x * vector_alpha.y * freqLimiter, 0.0, 1.0);
+                    return mix(colorA, colorB, vec3(alpha));
+                ]]>
+            </shader-body>
+        </module>
+    </category>
+    <category name="utility" title="Utility">
+        <module name = "VectorToXYNode" title = "Vector Split" keywords = "vector2,position">
+            <value port="input" name="inputValue" type="vec2">Vector2</value>
             <group>
-                <dynamicValue port="input" name="edgeOne" type="float" max = "1" step="0.001" default="0.5">Edge One</dynamicValue>
-                <dynamicValue port="input" name="edgeTwo" type="float" max = "1" step="0.001" default="0.5">Edge Two</dynamicValue>
+                <dynamicValue port="output" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="output" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
         </module>
-        <module name = "RadialShearNode" title = "Radial Shear" keywords = "math">
+    </category>
+    <category name="uv" title="UV">
+        <module name = "RadialShearNode" title = "Radial Shear" keywords = "math" class="GenericMethodNode">
             <group>
                 <value port="output" name="outputValue" type="vec2">Output Value</value>
                 <value port="input" name="uv" type="vec2">UV</value>
-                <value port="input" name="center" type="vec2">Center</value>
-                <dynamicValue port="input" name="strength" type="float" default="2">Strength</dynamicValue>
+                <value port="input" name="center" type="vec2" default="0.5">Center</value>
                 <value port="input" name="offset" type="vec2">Offset</value>
             </group>
+            <dynamicValue port="input" name="strength" type="float" default="5">Strength</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    vec2 delta = uv - center;
+                    float delta2 = dot(delta.xy, delta.xy);
+                    vec2 delta_offset = vec2(delta2 * strength);
+                    return uv + vec2(delta.y, -delta.x) * delta_offset + offset;
+                ]]>
+            </shader-body>
         </module>
-        <module name = "TwirlNode" title = "Twirl" keywords = "math">
+        <module name = "TwirlNode" title = "Twirl" keywords = "math" class="GenericMethodNode">
             <group>
                 <value port="output" name="outputValue" type="vec2">Output Value</value>
                 <value port="input" name="uv" type="vec2">UV</value>
-                <value port="input" name="center" type="vec2">Center</value>
-                <dynamicValue port="input" name="strength" type="float" default="2">Strength</dynamicValue>
+                <value port="input" name="center" type="vec2" default="0.5">Center</value>
                 <value port="input" name="offset" type="vec2">Offset</value>
             </group>
+            <dynamicValue port="input" name="strength" type="float" default="10">Strength</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    vec2 delta = uv - center;
+                    float angle = strength * length(delta);
+                    float x = cos(angle) * delta.x - sin(angle) * delta.y;
+                    float y = sin(angle) * delta.x + cos(angle) * delta.y;
+                    return vec2(x + center.x + offset.x, y + center.y + offset.y);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "RotateNode" title = "Rotate" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec2">Output Value</value>
+                <value port="input" name="uv" type="vec2">UV</value>
+                <value port="input" name="center" type="vec2" default="0.5">Center</value>
+            </group>
+            <dynamicValue port="input" name="rotation" type="float" max="3.14159" step="0.001" progress="true">Rotation</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    uv -= center;
+                    float s = sin(rotation);
+                    float c = cos(rotation);
+                    mat2 rMatrix = mat2(c, -s, s, c);
+                    rMatrix *= 0.5;
+                    rMatrix += 0.5;
+                    rMatrix = rMatrix * 2.0 - 1.0;
+                    uv.xy = uv.xy * rMatrix;
+                    uv += center;
+                    return uv;
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "TilingAndOffset" title = "Tiling and Offset" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec2">Output Value</value>
+                <value port="input" name="uv" type="vec2">UV</value>
+                <value port="input" name="tiling" type="vec2" default="0.5">Tiling</value>
+                <value port="input" name="offset" type="vec2" default="0.5">Offset</value>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return fract(uv * tiling + offset);
+                ]]>
+            </shader-body>
         </module>
     </category>
 </modules>

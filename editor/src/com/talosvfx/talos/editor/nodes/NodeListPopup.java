@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 
@@ -24,12 +23,14 @@ public class NodeListPopup extends VisWindow {
 
     Vector2 createLocation = new Vector2();
 
-    private ObjectMap<String, String> nameToNodeClass = new ObjectMap<>();
+    private ObjectMap<String, String> titleToNodeName = new ObjectMap<>();
     private ObjectMap<Class, XmlReader.Element> registry = new ObjectMap<>();
+    private ObjectMap<String, XmlReader.Element> nameRegistry = new ObjectMap<>();
 
     private String classPath;
 
-    public Class getNodeClassByName (String className) {
+    public Class getNodeClassByName (String name) {
+        String className = getClassNameFromModuleName(name);
         Class nodeClazz = null;
         try {
             nodeClazz = ClassReflection.forName(classPath + "." + className);
@@ -40,8 +41,19 @@ public class NodeListPopup extends VisWindow {
         return nodeClazz;
     }
 
-    public XmlReader.Element getModuleByClassName (String className) {
-        return registry.get(getNodeClassByName(className));
+    public Class getNodeClassByClassName (String className) {
+        Class nodeClazz = null;
+        try {
+            nodeClazz = ClassReflection.forName(classPath + "." + className);
+        } catch (ReflectionException e) {
+            e.printStackTrace();
+        }
+
+        return nodeClazz;
+    }
+
+    public XmlReader.Element getModuleByName (String className) {
+        return registry.get(getNodeClassByClassName(className));
     }
 
     interface NodeListListener {
@@ -107,12 +119,13 @@ public class NodeListPopup extends VisWindow {
             @Override
             public void chosen(FilteredTree.Node node) {
                 if(node.children.size == 0) {
-                    String nodeClazzName = nameToNodeClass.get(node.name);
+                    String nodeName = titleToNodeName.get(node.name);
+                    String className = getClassNameFromModuleName(nodeName);
 
                     if(nodeListListener != null) {
                         try {
-                            Class clazz = ClassReflection.forName(classPath + "." + nodeClazzName);
-                            nodeListListener.chosen(clazz, registry.get(clazz), createLocation.x, createLocation.y);
+                            Class clazz = ClassReflection.forName(classPath + "." + className);
+                            nodeListListener.chosen(clazz, getConfigFor(nodeName), createLocation.x, createLocation.y);
                         } catch (ReflectionException e) {
                             e.printStackTrace();
                         }
@@ -144,7 +157,8 @@ public class NodeListPopup extends VisWindow {
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
             FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("title"), new Label(module.getAttribute("title"), getSkin()));
-            nameToNodeClass.put(module.getAttribute("title"), module.getAttribute("name"));
+
+            titleToNodeName.put(module.getAttribute("title"),module.getAttribute("name"));
 
             registerNode(module);
 
@@ -153,10 +167,27 @@ public class NodeListPopup extends VisWindow {
         }
     }
 
+    public String getClassNameFromModuleName(String name) {
+        XmlReader.Element module = getConfigFor(name);
+        String className = extractClassNameFromXml(module);
+
+        return className;
+    }
+
+    private String extractClassNameFromXml(XmlReader.Element module) {
+        String className = module.getAttribute("name");
+        if (module.hasAttribute("class")) {
+            className = module.getAttribute("class");
+        }
+
+        return className;
+    }
+
     private void registerNode(XmlReader.Element module) {
         try {
-            Class nodeClazz = ClassReflection.forName(classPath + "." + module.getAttribute("name"));
+            Class nodeClazz = ClassReflection.forName(classPath + "." + extractClassNameFromXml(module));
             registry.put(nodeClazz, module);
+            nameRegistry.put(module.getAttribute("name"), module);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
@@ -184,6 +215,10 @@ public class NodeListPopup extends VisWindow {
     public boolean remove () {
         if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
+    }
+
+    public XmlReader.Element getConfigFor (String name) {
+        return nameRegistry.get(name);
     }
 
     public XmlReader.Element getConfigFor (Class clazz) {

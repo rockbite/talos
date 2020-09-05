@@ -39,12 +39,13 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
     }
 
     @Override
-    public NodeWidget createNode (Class<? extends NodeWidget> clazz, float x, float y) {
-        if(!ColorOutput.class.isAssignableFrom(clazz)) {
-            return super.createNode(clazz, x, y);
+    public NodeWidget createNode (String nodeName, float x, float y) {
+
+        if(!nodeName.equals("ColorOutput")) {
+            return super.createNode(nodeName, x, y);
         } else {
             if(colorOutput == null) {
-                NodeWidget node = super.createNode(clazz, x, y);
+                NodeWidget node = super.createNode(nodeName, x, y);
                 colorOutput = (ColorOutput) node;
                 return node;
             }

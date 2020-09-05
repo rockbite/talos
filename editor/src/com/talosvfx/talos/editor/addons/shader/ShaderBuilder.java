@@ -168,6 +168,10 @@ public class ShaderBuilder {
 
             return finalString;
         }
+
+        public void setBody (String body) {
+            this.body = body;
+        }
     }
 
     public static class Argument {

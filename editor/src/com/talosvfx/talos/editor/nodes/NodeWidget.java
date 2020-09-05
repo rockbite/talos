@@ -41,6 +41,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     protected ObjectMap<String, AbstractWidget> widgetMap = new ObjectMap();
 
     protected ObjectMap<String, String> typeMap = new ObjectMap();
+    protected ObjectMap<String, String> defaultsMap = new ObjectMap();
 
     protected ObjectMap<String, Connection> inputs = new ObjectMap();
     protected ObjectMap<String, Connection> outputs = new ObjectMap();
@@ -414,6 +415,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
                 widgetMap.put(variableName, widget);
                 typeMap.put(variableName, row.getAttribute("type", "float"));
+                defaultsMap.put(variableName, row.getAttribute("default", "0.0"));
 
                 // does it have a port?
                 if(row.hasAttribute("port")) {

@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
@@ -19,17 +18,12 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
-import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
-import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
-import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
-import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
-import com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
@@ -587,16 +581,15 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             ObjectSet<NodeWidget> copiedNodes = new ObjectSet<>();
 
             for(JsonValue nodeData: nodeDataArray) {
-                String className = nodeData.getString("name");
-
-                Class clazz = nodeStage.getNodeListPopup().getNodeClassByName(className);
+                String moduleName = nodeData.getString("name");
+                Class clazz = nodeStage.getNodeListPopup().getNodeClassByName(moduleName);
 
                 if(clazz == null || (clazz.equals(ColorOutput.class) && hasShaderModule)) {
                     continue;
                 }
 
                 NodeWidget node = createNode(clazz, nodeStage.getNodeListPopup().getConfigFor(clazz), 0, 0);
-                node.constructNode(nodeStage.getNodeListPopup().getModuleByClassName(className));
+                node.constructNode(nodeStage.getNodeListPopup().getModuleByName(moduleName));
                 int uniqueId = node.getUniqueId();
                 node.read(json, nodeData);
                 node.setUniqueId(uniqueId);
