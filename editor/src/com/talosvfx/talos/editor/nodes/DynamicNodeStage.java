@@ -255,6 +255,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             String nodeName = nodeData.getString("name");
 
             Class clazz = nodeListPopup.getNodeClassByName(nodeName);
+            String nodeClassName = nodeListPopup.getClassNameFromModuleName(nodeName);
             if(clazz != null) {
                 NodeWidget node = createNode(nodeName, 0, 0);
                 node.constructNode(nodeListPopup.getModuleByName(nodeName));

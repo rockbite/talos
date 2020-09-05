@@ -588,7 +588,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                     continue;
                 }
 
-                NodeWidget node = createNode(clazz, nodeStage.getNodeListPopup().getConfigFor(clazz), 0, 0);
+                NodeWidget node = createNode(clazz, nodeStage.getNodeListPopup().getModuleByName(moduleName), 0, 0);
                 node.constructNode(nodeStage.getNodeListPopup().getModuleByName(moduleName));
                 int uniqueId = node.getUniqueId();
                 node.read(json, nodeData);

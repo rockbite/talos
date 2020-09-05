@@ -52,8 +52,8 @@ public class NodeListPopup extends VisWindow {
         return nodeClazz;
     }
 
-    public XmlReader.Element getModuleByName (String className) {
-        return registry.get(getNodeClassByClassName(className));
+    public XmlReader.Element getModuleByName (String name) {
+        return nameRegistry.get(name);
     }
 
     interface NodeListListener {

@@ -52,6 +52,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     private Table widgetContainer = new Table();
     private Table headerTable;
+    private String nodeName;
 
     public void graphUpdated () {
 
@@ -187,6 +188,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     public void setConfig(XmlReader.Element config) {
+        nodeName = config.getAttribute("name");
+
         String titleString = config.getAttribute("title");
         title.setText(titleString);
     }
@@ -463,13 +466,17 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     @Override
     public void write(Json json) {
-        json.writeValue("name", this.getClass().getSimpleName());
+        json.writeValue("name", getNodeName());
         json.writeValue("id", getUniqueId());
         json.writeValue("title", title.getText());
         json.writeObjectStart("position");
         json.writeValue("x", getX() + "");
         json.writeValue("y", getY() + "");
         json.writeObjectEnd();
+    }
+
+    private String getNodeName () {
+        return nodeName;
     }
 
     @Override
