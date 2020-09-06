@@ -8,7 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
@@ -16,8 +18,10 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class ShaderNodeStage extends DynamicNodeStage implements Notifications.Observer {
 
@@ -69,8 +73,55 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
 
     public String getFragShader() {
         ShaderBuilder builder = new ShaderBuilder();
+
+        if(colorOutput == null) return "";
+
         colorOutput.buildFragmentShader(builder);
 
         return builder.getFragmentString();
+    }
+
+    public String getShaderData() {
+        ShaderBuilder builder = new ShaderBuilder();
+
+        if(colorOutput == null) return "";
+
+        colorOutput.buildFragmentShader(builder);
+
+        String fragString = builder.getFragmentString();
+
+        StringWriter writer = new StringWriter();
+        XmlWriter xml = new XmlWriter(writer);
+
+        try {
+            XmlWriter shader = xml.element("shader");
+            XmlWriter uniforms = shader.element("uniforms");
+
+            ObjectMap<String, ShaderBuilder.UniformData> declaredUniforms = builder.getDeclaredUniforms();
+            for(String uniformName: declaredUniforms.keys()) {
+                XmlWriter uniform = uniforms.element("uniform");
+
+                uniform.attribute("name", uniformName);
+                uniform.attribute("type", declaredUniforms.get(uniformName).type.getTypeString());
+                ShaderBuilder.UniformData uniformData = declaredUniforms.get(uniformName);
+
+                if(uniformData.type == ShaderBuilder.Type.TEXTURE) {
+                    uniform.text(uniformData.payload.getValueDescriptor());
+                }
+
+                uniform.pop();
+            }
+            uniforms.pop();
+            XmlWriter code = shader.element("code");
+            code.text("<![CDATA[" + fragString + "]]>");
+            code.pop();
+            shader.pop();
+
+            return writer.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            return "";
+        }
     }
 }

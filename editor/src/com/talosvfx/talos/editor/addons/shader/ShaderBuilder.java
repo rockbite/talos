@@ -17,6 +17,11 @@ public class ShaderBuilder {
 
     public static final String[] fields = {"r", "g", "b", "a"};
 
+    private ObjectMap<String, String> resourceToUniformMap = new ObjectMap<>();
+    private ObjectMap<String, String> uniformToResourceMap = new ObjectMap<>();
+
+    private int resourceCounter = 0;
+
     public ShaderBuilder() {
 
     }
@@ -26,6 +31,11 @@ public class ShaderBuilder {
         shaderProgramCache = null;
         variableMap.clear();
         declaredUniforms.clear();
+
+        resourceToUniformMap.clear();
+        uniformToResourceMap.clear();
+
+        resourceCounter = 0;
     }
 
     public String getFragmentString () {
@@ -187,11 +197,12 @@ public class ShaderBuilder {
     public class UniformData {
         public Type type;
         public String variableName;
-        public Object payload;
+        public ShaderBuilder.IValueProvider payload;
     }
 
-    public interface IValueProvider {
-        float getValue();
+    public interface IValueProvider<T> {
+        T getValue();
+        String getValueDescriptor ();
     }
 
     public enum Type {
@@ -214,7 +225,7 @@ public class ShaderBuilder {
         }
     }
 
-    public void declareUniform(String name, Type type, Object value) {
+    public void declareUniform(String name, Type type, IValueProvider value) {
         if(declaredUniforms.containsKey(name)) {
             return;
         }
@@ -228,5 +239,19 @@ public class ShaderBuilder {
 
     public ObjectMap<String, UniformData> getDeclaredUniforms() {
         return declaredUniforms;
+    }
+
+    public String registerResource(String name) {
+
+        if(resourceToUniformMap.containsKey(name)) {
+            return resourceToUniformMap.get(name);
+        }
+
+        String uniformName = "u_texture" + (resourceCounter++);
+
+        resourceToUniformMap.put(name, uniformName);
+        uniformToResourceMap.put(uniformName, name);
+
+        return uniformName;
     }
 }

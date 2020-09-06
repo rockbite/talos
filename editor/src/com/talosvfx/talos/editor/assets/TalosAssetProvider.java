@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
+import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
 import com.talosvfx.talos.runtime.utils.VectorField;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class TalosAssetProvider extends BaseAssetProvider {
 
 	private TextureAtlas atlas = new TextureAtlas();
 	private ObjectMap<String, VectorField> vectorFields = new ObjectMap<>();
+	private ObjectMap<String, ShaderDescriptor> shaderDescriptorObjectMap = new ObjectMap<>();
 
 	private ObjectMap<String, UnknownHandleToAssetParser> extensionToAssetParser = new ObjectMap<>();
 
@@ -52,15 +54,20 @@ public class TalosAssetProvider extends BaseAssetProvider {
 		atlas.addRegion(name, region);
 	}
 
+
 	public void addVectorField (String name, VectorField vectorField) {
 		vectorFields.put(name, vectorField);
 	}
 
+	public void addShaderDescriptor (String name, ShaderDescriptor shaderDescriptor) {
+		shaderDescriptorObjectMap.put(name, shaderDescriptor);
+	}
 
 	private void registerDefaultHandlers () {
 		setAssetHandler(Sprite.class,this::findSpriteOrLoad);
 		setAssetHandler(TextureRegion.class,this::findRegionOrLoad);
 		setAssetHandler(VectorField.class, this::findVectorOrLoad);
+		setAssetHandler(ShaderDescriptor.class, this::findShaderDescriptorOnLoad);
 	}
 
 	private void registerUnknownHandlerParsers () {
@@ -79,6 +86,11 @@ public class TalosAssetProvider extends BaseAssetProvider {
 			if(handle == null) return;
 			addVectorField(handle.nameWithoutExtension(), new VectorField(handle));
 		});
+		extensionToAssetParser.put("shdr", handle -> {
+			handle = TalosMain.Instance().ProjectController().findFile(handle);
+			if(handle == null) return;
+			addShaderDescriptor(handle.nameWithoutExtension(), new ShaderDescriptor(handle));
+		});
 	}
 
 	private void addDefaultAssets () {
@@ -88,6 +100,20 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	private void addTexture (FileHandle path) {
 		Texture texture = new Texture(path);
 		addToAtlas(path.nameWithoutExtension(), new TextureRegion(texture));
+	}
+
+	private ShaderDescriptor findShaderDescriptorOnLoad (String assetName) {
+		ShaderDescriptor asset = shaderDescriptorObjectMap.get(assetName);
+		if (asset == null) {
+			//Look in all paths, and hopefully load the requested asset, or fail (crash)
+			final FileHandle file = findFileByName(assetName);
+
+			asset = new ShaderDescriptor();
+			if (file != null && file.exists()) {
+				asset.setData(file.readString());
+			}
+		}
+		return asset;
 	}
 
 	private VectorField findVectorOrLoad (String assetName) {
@@ -152,6 +178,15 @@ public class TalosAssetProvider extends BaseAssetProvider {
 			return textureRegion;
 		}
 		return region;
+	}
+
+	private FileHandle findFileByName (String fileName) {
+		String currentProjectPath = TalosMain.Instance().ProjectController().getCurrentProjectPath();
+		if(currentProjectPath == null) {
+			return TalosMain.Instance().ProjectController().findFile(fileName);
+		}
+		FileHandle handle = Gdx.files.absolute(Gdx.files.absolute(currentProjectPath).parent().path() + File.separator + fileName);
+		return TalosMain.Instance().ProjectController().findFile(handle);
 	}
 
 	private FileHandle findFile (String regionName) {

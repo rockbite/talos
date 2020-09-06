@@ -41,12 +41,12 @@ public class ShaderProject implements IProject {
 
     @Override
     public String getExtension () {
-        return ".shader";
+        return ".tsh";
     }
 
     @Override
     public String getExportExtension () {
-        return ".frag";
+        return ".shdr";
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ShaderProject implements IProject {
 
     @Override
     public String exportProject () {
-        return ((ShaderNodeStage)(shaderAddon.nodeStage)).getFragShader();
+        return ((ShaderNodeStage)(shaderAddon.nodeStage)).getShaderData();
     }
 
     private static class ProjectData implements Json.Serializable {

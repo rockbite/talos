@@ -45,8 +45,11 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.widgets.ui.*;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -142,10 +145,18 @@ public class UIStage {
 					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
 					TalosMain.Instance().ProjectController().loadProject(handle);
 				} else {
-					// ask addons if they are interested
-					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
-					if(addon != null) {
-						break;
+					// notify talos first
+					if(TalosMain.Instance().ProjectController().getProject() == ProjectController.TLS) {
+						AssetFileDroppedEvent event = Notifications.obtainEvent(AssetFileDroppedEvent.class);
+						event.setFileHandle(handle);
+						event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
+						Notifications.fireEvent(event);
+					} else {
+						// ask addons if they are interested
+						IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
+						if (addon != null) {
+							break;
+						}
 					}
 				}
 			}

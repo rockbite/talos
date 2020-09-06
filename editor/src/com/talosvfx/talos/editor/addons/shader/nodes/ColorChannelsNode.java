@@ -41,4 +41,13 @@ public class ColorChannelsNode extends AbstractShaderNode {
     protected String getPreviewOutputName () {
         return OUTPUT_RGBA;
     }
+
+    @Override
+    protected String getPreviewLine(String expression) {
+        ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
+
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
+
+        return "gl_FragColor = " + expression + ";";
+    }
 }

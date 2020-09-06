@@ -70,6 +70,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(FromToModule.class);
             registeredModules.add(GlobalScopeModule.class);
             registeredModules.add(FlipbookModule.class);
+            registeredModules.add(ShadedSpriteModule.class);
             registeredModules.add(FakeMotionBlurModule.class);
             registeredModules.add(VectorFieldModule.class);
             registeredModules.add(RadToCartModule.class);

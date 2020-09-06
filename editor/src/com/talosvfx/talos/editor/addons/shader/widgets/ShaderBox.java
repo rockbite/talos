@@ -53,7 +53,7 @@ public class ShaderBox extends Actor {
             int bind = 1;
             for(ShaderBuilder.UniformData data: declaredUniforms.values()) {
                 if(data.type == ShaderBuilder.Type.TEXTURE && data.payload != null) {
-                    Texture texture = (Texture) data.payload;
+                    Texture texture = (Texture) data.payload.getValue();
                     texture.bind(bind);
                     shaderProgram.setUniformi(data.variableName, bind);
                     Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
@@ -61,8 +61,8 @@ public class ShaderBox extends Actor {
                     bind++;
                 }
                 if(data.type == ShaderBuilder.Type.FLOAT && data.payload instanceof ShaderBuilder.IValueProvider) {
-                    ShaderBuilder.IValueProvider provider = (ShaderBuilder.IValueProvider) data.payload;
-                    shaderProgram.setUniformf(data.variableName, provider.getValue());
+                    ShaderBuilder.IValueProvider provider = data.payload;
+                    shaderProgram.setUniformf(data.variableName, (float)provider.getValue());
                 }
             }
 

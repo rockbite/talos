@@ -57,7 +57,10 @@
             <checkbox name="wrap">Wrap Coordinates</checkbox>
         </module>
         <module name = "UVNode" title = "UV Node" keywords = "uv,sample,vertex">
-            <value port="output" name="outputUV" type="vec2">UV Coordinates</value>
+            <value port="output" name="outputValue" type="vec2">UV Coordinates</value>
+        </module>
+        <module name = "VertexColorNode" title = "Vertex Color" keywords = "input">
+            <value port="output" name="outputUV" type="vec4">Vertex Color</value>
         </module>
     </category>
     <category name="master" title="Master">
@@ -248,8 +251,8 @@
             <group>
                 <value port="output" name="outputValue" type="vec2">Output Value</value>
                 <value port="input" name="uv" type="vec2">UV</value>
-                <value port="input" name="tiling" type="vec2" default="0.5">Tiling</value>
-                <value port="input" name="offset" type="vec2" default="0.5">Offset</value>
+                <value port="input" name="tiling" type="vec2" default="vec2(2)">Tiling</value>
+                <value port="input" name="offset" type="vec2" default="0.0">Offset</value>
             </group>
             <shader-body>
                 <![CDATA[

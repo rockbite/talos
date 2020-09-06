@@ -21,10 +21,15 @@ public class TimeNode extends AbstractShaderNode {
     public void constructNode (XmlReader.Element module) {
         super.constructNode(module);
 
-        timeProvider = new ShaderBuilder.IValueProvider() {
+        timeProvider = new ShaderBuilder.IValueProvider<Float>() {
             @Override
-            public float getValue () {
+            public Float getValue () {
                 return time;
+            }
+
+            @Override
+            public String getValueDescriptor () {
+                return "";
             }
         };
     }
