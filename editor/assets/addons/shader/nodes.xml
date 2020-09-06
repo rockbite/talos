@@ -21,9 +21,6 @@
             </shader-body>
         </module>
     </category>
-    <category name="channel" title="Channel">
-
-    </category>
     <category name="input" title="Input">
         <module name = "TimeNode" title = "Timer" keywords = "timer">
             <value port="output" name="outputValue" type="float">System time value</value>
