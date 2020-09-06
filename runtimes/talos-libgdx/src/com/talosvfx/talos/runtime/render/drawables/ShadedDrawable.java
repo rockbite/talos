@@ -63,7 +63,6 @@ public class ShadedDrawable implements ParticleDrawable {
         batch.setColor(color);
         batch.draw(texture, x, y, width/2f, height/2f, width, height,1f, 1f, rotation, 0, 0,1,1, false, false);
         batch.setShader(prevShader);
-        batch.flush();
     }
 
     @Override
