@@ -70,7 +70,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			}
 			ShaderProgram prevShader = batch.getShader();
 			if (particleEmitter.isBlendAdd() && prevShader != blendAddShader) {
-				batch.setShader(blendAddShader);
+				//batch.setShader(blendAddShader); //TODO: let's leave any shader stuff to shader graph, and rest can be baked
 			}
  			for (int j = 0; j < particleEmitter.getActiveParticleCount(); j++) {
 				renderParticle(batch, particleEmitter.getActiveParticles().get(j), particleEffectInstance.alpha);
