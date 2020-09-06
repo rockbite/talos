@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
@@ -69,9 +70,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     public void showPopup() {
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        stage.screenToStageCoordinates(vec);
+        final Vector2 vec2 = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        Stage uiStage = TalosMain.Instance().UIStage().getStage();
+        uiStage.screenToStageCoordinates(vec);
+        stage.screenToStageCoordinates(vec2);
 
-        nodeListPopup.showPopup(stage, vec);
+        nodeListPopup.showPopup(uiStage, vec, vec2);
     }
     public NodeWidget createNode (String nodeName, float x, float y) {
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
@@ -102,6 +106,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             Vector2 startPos = new Vector2();
             Vector2 tmp = new Vector2();
             Rectangle rectangle = new Rectangle();
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, int amount) {
+                TalosMain.Instance().getCameraController().scrolled(amount);
+                return super.scrolled(event, x, y, amount);
+            }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {

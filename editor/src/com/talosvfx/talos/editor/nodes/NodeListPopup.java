@@ -193,7 +193,7 @@ public class NodeListPopup extends VisWindow {
         }
     }
 
-    public void showPopup(Stage stage, Vector2 location) {
+    public void showPopup(Stage stage, Vector2 location, Vector2 createLocation) {
         setPosition(location.x, location.y - getHeight());
         if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
         ActorUtils.keepWithinStage(stage, this);
@@ -208,7 +208,7 @@ public class NodeListPopup extends VisWindow {
             setHeight(200);
         }
 
-        createLocation.set(location);
+        this.createLocation.set(createLocation);
     }
 
     @Override
