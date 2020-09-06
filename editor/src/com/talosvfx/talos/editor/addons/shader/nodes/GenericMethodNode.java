@@ -11,6 +11,7 @@ public class GenericMethodNode extends AbstractShaderNode {
     protected String varName;
 
     private boolean forcePreview = true;
+    private boolean previewTransparency = false;
 
     @Override
     public void constructNode (XmlReader.Element module) {
@@ -22,6 +23,7 @@ public class GenericMethodNode extends AbstractShaderNode {
         methodName = name.substring(0, 1).toLowerCase() + name.substring(1);
 
         forcePreview = module.getBooleanAttribute("forcePreview", true);
+        previewTransparency = module.getBooleanAttribute("previewTransparency", false);
 
         super.constructNode(module);
     }
@@ -89,5 +91,19 @@ public class GenericMethodNode extends AbstractShaderNode {
         } else {
             return super.isInputDynamic();
         }
+    }
+
+    protected String getPreviewLine(String expression) {
+        ShaderBuilder.Type outputType = getVarType(getPreviewOutputName());
+
+        expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
+
+        String result =  "gl_FragColor = " + expression + ";";
+
+        if(!previewTransparency) {
+            result += " gl_FragColor.a = 1.0;";
+        }
+
+        return result;
     }
 }

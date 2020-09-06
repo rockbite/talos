@@ -66,6 +66,11 @@
     <category name="master" title="Master">
         <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
             <value port="input" name="inputColor" type="vec4">Input Color</value>
+            <select name="blending">
+                <option value = "NORMAL">Normal Blending</option>
+                <option value = "ADDITIVE">Additive Blending</option>
+                <option value = "BLEND-ADD">Blend Add (Alpha)</option>
+            </select>
         </module>
     </category>
     <category name="math" title="Math">
@@ -187,6 +192,22 @@
                 <dynamicValue port="output" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
                 <dynamicValue port="output" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
+        </module>
+        <module name = "PremultiplyAlpha" title = "Alpha Pre-Multiply" keywords = "utility" class="GenericMethodNode" previewTransparency="true">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output Color</value>
+                <value port="input" name="inputColor" type="vec4">Input Color</value>
+                <dynamicValue port="input" name="power" type="float" default="1.0" min="1" max="100" step="0.1" progress="true">Alpha Pow</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                     vec4 result = inputColor;
+                     result.rgb *= inputColor.a;
+                     result.a = pow(inputColor.a, power);
+
+                     return result;
+                ]]>
+            </shader-body>
         </module>
     </category>
     <category name="uv" title="UV">

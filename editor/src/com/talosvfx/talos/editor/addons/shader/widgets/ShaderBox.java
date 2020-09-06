@@ -20,9 +20,21 @@ public class ShaderBox extends Actor {
 
     Texture white;
 
+    private Blending blending = Blending.NORMAL;
+
     public ShaderBox() {
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
         this.skin = skin;
+    }
+
+    public void setBlending (Blending blending) {
+        this.blending = blending;
+    }
+
+    public enum Blending {
+        NORMAL,
+        ADDITIVE,
+        BLENDADD
     }
 
     public void setShader(ShaderBuilder shaderBuilder) {
@@ -41,6 +53,16 @@ public class ShaderBox extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         ShaderProgram prevShader = batch.getShader();
+
+        if (blending == Blending.NORMAL) {
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        }
+        if (blending == Blending.ADDITIVE) {
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        }
+        if (blending == Blending.BLENDADD) {
+            batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        }
 
         if(shaderProgram != null && shaderProgram.isCompiled()) {
             batch.setShader(shaderProgram);
@@ -75,5 +97,7 @@ public class ShaderBox extends Actor {
         }
 
         batch.setShader(prevShader);
+
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 }
