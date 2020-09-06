@@ -40,13 +40,22 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     public void init () {
         bgColor.set(0.15f, 0.15f, 0.15f, 1f);
 
+        if(nodeData != null) {
+            loadNodeList();
+        }
+
+        initActors();
+        initListeners();
+    }
+
+    protected void loadNodeList() {
         nodeListPopup = new NodeListPopup(nodeData);
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
             @Override
             public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
-                if(NodeWidget.class.isAssignableFrom(clazz)) {
+                if (NodeWidget.class.isAssignableFrom(clazz)) {
                     NodeWidget node = createNode(module.getAttribute("name"), x, y);
-                    if(node != null) {
+                    if (node != null) {
                         node.constructNode(module);
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
 
@@ -55,9 +64,6 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 }
             }
         });
-
-        initActors();
-        initListeners();
     }
 
     public NodeListPopup getNodeListPopup() {
@@ -75,7 +81,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         uiStage.screenToStageCoordinates(vec);
         stage.screenToStageCoordinates(vec2);
 
-        nodeListPopup.showPopup(uiStage, vec, vec2);
+        if (nodeListPopup != null) {
+            nodeListPopup.showPopup(uiStage, vec, vec2);
+        }
     }
     public NodeWidget createNode (String nodeName, float x, float y) {
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
@@ -312,5 +320,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     public void reset () {
         nodeBoard.reset();
+    }
+
+    public void setData(XmlReader.Element nodeData) {
+        this.nodeData = nodeData;
     }
 }
