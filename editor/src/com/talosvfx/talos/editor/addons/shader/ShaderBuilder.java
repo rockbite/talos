@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.shader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 
 import java.util.Arrays;
 
@@ -12,7 +13,7 @@ public class ShaderBuilder {
     ShaderProgram shaderProgramCache;
 
     private ObjectMap<String, UniformData> declaredUniforms = new ObjectMap<>();
-    private ObjectMap<String, Method> methodMap = new ObjectMap<>();
+    private OrderedMap<String, Method> methodMap = new OrderedMap<>();
     private ObjectMap<String, String> variableMap = new ObjectMap<>();
 
     public static final String[] fields = {"r", "g", "b", "a"};
@@ -124,6 +125,12 @@ public class ShaderBuilder {
         mainContent += "    " + line + ";\n";
     }
 
+    public Method addMethod(Method method) {
+        methodMap.put(method.name, method);
+
+        return method;
+    }
+
     public Method addMethod(Type returnType, String name, Argument[] args) {
         Method method = new Method();
 
@@ -152,12 +159,15 @@ public class ShaderBuilder {
         }
     }
 
-    public class Method {
+    public static class Method {
         public Type returnType;
         public String name;
         public Argument[] args;
 
         public String body = "";
+
+        // override for simple cases
+        public String declaration;
 
         public void addLine(String line) {
             body += "    " + line + ";\n";
@@ -166,15 +176,19 @@ public class ShaderBuilder {
         public String getSource () {
             String finalString = "";
 
-            finalString += returnType.typeString + " " + name + "(";
+            if(declaration != null) {
+                finalString += declaration + " {\n" + body + "\n}";
+            } else {
 
-            for(int i = 0; i < args.length; i++) {
-                finalString += args[i].type.typeString + " " + args[i].name;
-                if(i < args.length - 1) {
-                    finalString += ", ";
+                finalString += returnType.typeString + " " + name + "(";
+                for (int i = 0; i < args.length; i++) {
+                    finalString += args[i].type.typeString + " " + args[i].name;
+                    if (i < args.length - 1) {
+                        finalString += ", ";
+                    }
                 }
+                finalString += ") {\n" + body + "\n}";
             }
-            finalString += ") {\n" + body + "\n}";
 
             return finalString;
         }

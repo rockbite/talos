@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
@@ -10,6 +12,8 @@ public class GenericMethodNode extends AbstractShaderNode {
     protected String shaderBodyString;
     protected String varName;
 
+    protected Array<ShaderBuilder.Method> methods = new Array<>();
+
     private boolean forcePreview = true;
     private boolean previewTransparency = false;
 
@@ -17,6 +21,18 @@ public class GenericMethodNode extends AbstractShaderNode {
     public void constructNode (XmlReader.Element module) {
         XmlReader.Element shaderBody = module.getChildByName("shader-body");
         shaderBodyString = shaderBody.getText();
+
+        methods.clear();
+        if(module.getChildrenByName("method").size > 0) {
+            Array<XmlReader.Element> methodsData = module.getChildrenByName("method");
+            for(XmlReader.Element data: methodsData) {
+                ShaderBuilder.Method method = new ShaderBuilder.Method();
+                method.name = data.getAttribute("name");
+                method.declaration = data.getAttribute("declaration");
+                method.setBody(data.getText());
+                methods.add(method);
+            }
+        }
 
         String name = module.getAttribute("name");
 
@@ -58,6 +74,10 @@ public class GenericMethodNode extends AbstractShaderNode {
             }
         }
 
+        for(ShaderBuilder.Method inline: methods) {
+            shaderBuilder.addMethod(inline);
+        }
+
         varName = methodName + "Var";
 
         ShaderBuilder.Method method = shaderBuilder.addMethod(getVarType("outputValue"), methodName, args);
@@ -67,6 +87,8 @@ public class GenericMethodNode extends AbstractShaderNode {
         String expression = methodName + "(" + methodArgs + ")";
 
         shaderBuilder.declareVariable(getVarType("outputValue"), varName + getId(), expression);
+
+
 
     }
 

@@ -56,7 +56,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.1.0", "Fixed global value defaults and sortingß");
+                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.2.0", "Shader Graph now allows for custom materials for particles");
             }
         });
 

@@ -1,6 +1,6 @@
-[1.1.1]
+[1.2.0]
 - Various Buffixes
-- Shadergraph addon
+- Shadergraph addon (this is a big deal)
 - Refactor of node system and node board for future modifications of existing particle graph
 
 [1.1.0]
