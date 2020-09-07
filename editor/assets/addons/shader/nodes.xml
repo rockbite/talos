@@ -79,6 +79,23 @@
                 <value port="input" name="valueB" type="vec4">Value B</value>
             </group>
         </module>
+        <module name = "RemapNode" title = "Remap" keywords = "math,remap" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output Value</value>
+                <value port="input" name="inputValue" type="vec4">Input Value</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="inMin" type="float" default="-1" min="-999">Input Min</dynamicValue>
+                <dynamicValue port="input" name="inMax" type="float" default="1" min="-999">Input Max</dynamicValue>
+                <dynamicValue port="input" name="outMin" type="float" default="0" min="-999">Output Min</dynamicValue>
+                <dynamicValue port="input" name="outMax" type="float" default="1" min="-999">Output Max</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return outMin + (inputValue - inMin) * (outMax - outMin) / (inMax - inMin);
+                ]]>
+            </shader-body>
+        </module>
         <module name = "MathNode" title = "Math Node" keywords = "math,add,multiply">
             <value port="output" name="outputValue" type="fluid">Output Value</value>
             <select name="operation">
