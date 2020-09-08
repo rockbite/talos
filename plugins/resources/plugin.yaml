@@ -1,0 +1,5 @@
+name: TalosInternal
+version: 0.0.1
+pluginProvider: com.talosvfx.talos.plugins.InternalPluginProvider
+plugins:
+  - com.talosvfx.talos.plugins.TestPlugin

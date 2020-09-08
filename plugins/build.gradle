@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+    }
+}
+
+
+dependencies {
+    implementation project(":editor")
+}
+
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = ["src/"]
+sourceSets.test.java.srcDirs = ["test/"]
+
+
+jar {
+    from ("resources") {
+        include "plugin.yaml"
+    }
+}
+
+task copyInternalPlugins () {
+    doFirst {
+        copy {
+            from project.file("build/libs")
+            into rootProject.file("editor/assets/plugins/")
+        }
+    }
+}
+
+jar.dependsOn classes
+copyInternalPlugins.dependsOn jar
