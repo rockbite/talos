@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.talosvfx.talos.editor.addons.bvb.BvBAddon;
 import com.talosvfx.talos.editor.addons.shader.ShaderAddon;
+import com.talosvfx.talos.editor.addons.treedata.TreeDataAddon;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 
 public class AddonController {
@@ -14,6 +15,7 @@ public class AddonController {
     public AddonController() {
         registerAddon(new BvBAddon());
         registerAddon(new ShaderAddon());
+        registerAddon(new TreeDataAddon());
     }
 
     private void registerAddon(IAddon addon) {
