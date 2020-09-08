@@ -12,7 +12,7 @@ apply plugin: 'nexus'
 
 
 dependencies {
-    implementation project(":runtimes:talos-libgdx")
+    api project(":runtimes:talos-libgdx")
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"

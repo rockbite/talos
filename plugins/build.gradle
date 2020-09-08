@@ -8,7 +8,7 @@ buildscript {
 
 
 dependencies {
-    implementation project(":editor")
+    api project(":editor")
 }
 
 sourceCompatibility = 1.8

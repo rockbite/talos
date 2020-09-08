@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -209,6 +210,30 @@ public class PluginManager {
 
     }
 
+
+    private TalosPlugin findPlugin (String pluginName) {
+        for (TalosPluginProvider pluginProvider : pluginProviders) {
+            ArrayList<TalosPlugin> plugins = pluginProvider.getPlugins();
+            for (TalosPlugin plugin : plugins) {
+                if (plugin.getClass().getName().equalsIgnoreCase(pluginName)) {
+                    return plugin;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Class<? extends NodeWidget> getCustomNodeWidget (String className) {
+        for (TalosPluginProvider pluginProvider : pluginProviders) {
+            Class<? extends NodeWidget> customNodeWidget = pluginProvider.getCustomNodeWidget(className);
+            if (customNodeWidget != null) {
+                return customNodeWidget;
+            }
+        }
+        return null;
+    }
+
+
     public static void main (String[] args) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         new Lwjgl3Application(new ApplicationAdapter() {
@@ -228,18 +253,6 @@ public class PluginManager {
 
             }
         }, config);
-    }
-
-    private TalosPlugin findPlugin (String pluginName) {
-        for (TalosPluginProvider pluginProvider : pluginProviders) {
-            ArrayList<TalosPlugin> plugins = pluginProvider.getPlugins();
-            for (TalosPlugin plugin : plugins) {
-                if (plugin.getClass().getName().equalsIgnoreCase(pluginName)) {
-                    return plugin;
-                }
-            }
-        }
-        return null;
     }
 
 }

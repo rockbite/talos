@@ -12,7 +12,7 @@ apply plugin: 'nexus'
 
 
 dependencies {
-    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation 'com.github.jitpack:gradle-simple:1.0'
 

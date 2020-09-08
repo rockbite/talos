@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.plugins;
 
 
+import com.talosvfx.talos.editor.nodes.NodeWidget;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ public abstract class TalosPluginProvider {
     private PluginDefinition pluginDefinition;
 
     private ArrayList<TalosPlugin> plugins = new ArrayList<>();
+
+    private HashMap<String, Class<? extends NodeWidget>> customNodeWidgets = new HashMap<>();
 
     private boolean initialized;
 
@@ -40,6 +44,10 @@ public abstract class TalosPluginProvider {
         this.pluginDefinition = pluginDefinition;
     }
 
+    public Class<? extends NodeWidget> getCustomNodeWidget (String className) {
+        return customNodeWidgets.get(className);
+    }
+
     public ArrayList<TalosPlugin> getPlugins () {
         return plugins;
     }
@@ -58,6 +66,18 @@ public abstract class TalosPluginProvider {
                 }
             }
         }
+        for (String customNode : pluginDefinition.customNodes) {
+            if (!classes.containsKey(customNode)) {
+                System.out.println("Ignoring custom NodeWidget: " + customNode + " as not found");
+            } else {
+                Class<?> pluginClazz = classes.get(customNode);
+                if (NodeWidget.class.isAssignableFrom(pluginClazz)) {
+                    customNodeWidgets.put(customNode, (Class<? extends NodeWidget>) pluginClazz);
+                } else {
+                    System.out.println("Ignoring custom NodeWidget: " + customNode + " as does not extend " + TalosPlugin.class.getName());
+                }
+            }
+        }
     }
 
     private void loadPlugin (Class<? extends TalosPlugin<?>> talosPluginClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -65,6 +85,5 @@ public abstract class TalosPluginProvider {
         TalosPlugin<?> talosPlugin = constructor.newInstance(this);
         plugins.add(talosPlugin);
     }
-
 
 }
