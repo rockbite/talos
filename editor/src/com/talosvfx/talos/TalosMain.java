@@ -33,6 +33,7 @@ import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
+import com.talosvfx.talos.editor.plugins.PluginManager;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
@@ -112,6 +113,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
+	private PluginManager pluginManager;
+
 	public Cursor pickerCursor;
 	private Cursor currentCursor;
 
@@ -121,6 +124,10 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		pluginManager = new PluginManager();
+		pluginManager.loadInternalPlugins();
+
+
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
@@ -203,6 +210,8 @@ public class TalosMain extends ApplicationAdapter {
 		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
 
 	}
+
+
 
 	public void setCursor(Cursor cursor) {
 		if(currentCursor != cursor) {
@@ -294,5 +303,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	public FileTracker FileTracker() {
 		return fileTracker;
+	}
+
+	public PluginManager PluginManager () {
+		return pluginManager;
 	}
 }

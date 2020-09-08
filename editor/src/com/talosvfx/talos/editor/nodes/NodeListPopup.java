@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 
@@ -31,26 +32,16 @@ public class NodeListPopup extends VisWindow {
 
     public Class getNodeClassByName (String name) {
         String className = getClassNameFromModuleName(name);
-        Class nodeClazz = null;
+
         try {
-            nodeClazz = ClassReflection.forName(classPath + "." + className);
+            return getNodeWidgetClassForName(name);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
 
-        return nodeClazz;
+        return null;
     }
 
-    public Class getNodeClassByClassName (String className) {
-        Class nodeClazz = null;
-        try {
-            nodeClazz = ClassReflection.forName(classPath + "." + className);
-        } catch (ReflectionException e) {
-            e.printStackTrace();
-        }
-
-        return nodeClazz;
-    }
 
     public XmlReader.Element getModuleByName (String name) {
         return nameRegistry.get(name);
@@ -124,7 +115,9 @@ public class NodeListPopup extends VisWindow {
 
                     if(nodeListListener != null) {
                         try {
-                            Class clazz = ClassReflection.forName(classPath + "." + className);
+
+                            Class<? extends NodeWidget> clazz = getNodeWidgetClassForName(className);
+
                             nodeListListener.chosen(clazz, getConfigFor(nodeName), createLocation.x, createLocation.y);
                         } catch (ReflectionException e) {
                             e.printStackTrace();
@@ -183,10 +176,25 @@ public class NodeListPopup extends VisWindow {
         return className;
     }
 
+    private Class<? extends NodeWidget> getNodeWidgetClassForName (String className) throws ReflectionException {
+
+        Class<? extends NodeWidget> nodeClazz;
+
+        Class<? extends NodeWidget> customNodeWidget = TalosMain.Instance().PluginManager().getCustomNodeWidget(className);
+        if (customNodeWidget != null) {
+            nodeClazz = customNodeWidget;
+        } else {
+            nodeClazz = ClassReflection.forName(classPath + "." + className);
+        }
+
+        return nodeClazz;
+    }
+
     private void registerNode(XmlReader.Element module) {
         try {
-            Class nodeClazz = ClassReflection.forName(classPath + "." + extractClassNameFromXml(module));
-            registry.put(nodeClazz, module);
+            String className = extractClassNameFromXml(module);
+
+            registry.put(getNodeWidgetClassForName(className), module);
             nameRegistry.put(module.getAttribute("name"), module);
         } catch (ReflectionException e) {
             e.printStackTrace();

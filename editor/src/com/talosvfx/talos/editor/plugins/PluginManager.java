@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -18,6 +19,7 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -26,10 +28,12 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class PluginManager {
 
-    private ArrayList<TalosPluginProvider> pluginProviders = new ArrayList<>();
 
     private WatchService watchService;
     private HashMap<WatchKey, FileHandle> watching = new HashMap<>();
+
+    private HashMap<String, URLClassLoader> classLoaders = new HashMap<>();
+    private HashMap<String, TalosPluginProvider> nameToPluginProviders = new HashMap<>();
 
     public PluginManager () {
         try {
@@ -41,14 +45,7 @@ public class PluginManager {
         Thread fileWatchingThread = new Thread(new Runnable() {
             @Override
             public void run () {
-                while (true) {
-                    try {
-                        tickFileWatching();
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                tickFileWatching();
             }
         });
 
@@ -62,14 +59,13 @@ public class PluginManager {
             // wait for key to be signalled
             WatchKey key;
             try {
-                key = watchService.take();
+                key = watchService.poll(300, TimeUnit.MILLISECONDS);
             } catch (InterruptedException x) {
                 return;
             }
 
             FileHandle dir = watching.get(key);
             if (dir == null) {
-                System.err.println("WatchKey not recognized!!");
                 continue;
             }
 
@@ -86,7 +82,7 @@ public class PluginManager {
                 System.out.println();
 
                 reloadAllPlugins(dir);
-
+                break;
             }
 
             // reset key and remove from set if directory no longer accessible
@@ -111,7 +107,7 @@ public class PluginManager {
 
         WatchKey register = null;
         try {
-            register = pluginDir.file().toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+            register = pluginDir.file().toPath().register(watchService, new WatchEvent.Kind[]{ENTRY_CREATE, ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
             watching.put(register, pluginDir);
 
         } catch (IOException e) {
@@ -127,6 +123,7 @@ public class PluginManager {
     }
 
     public void reloadAllPlugins (FileHandle pluginDir) {
+        unloadAllPlugins();
 
         FileHandle[] list = pluginDir.list();
 
@@ -137,6 +134,32 @@ public class PluginManager {
         }
 
         addFileTracker(pluginDir);
+    }
+
+    private void unloadAllPlugins () {
+        for (TalosPluginProvider value : nameToPluginProviders.values()) {
+            unloadPluginProvider(value.getPluginDefinition());
+        }
+    }
+
+    private void unloadPluginProvider (PluginDefinition pluginDefinition) {
+        URLClassLoader classLoader = classLoaders.get(pluginDefinition.name);
+        TalosPluginProvider remove = nameToPluginProviders.remove(pluginDefinition.name);
+
+        remove.dispose();
+
+        if (classLoader != null) {
+
+            try {
+                classLoader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            classLoaders.remove(pluginDefinition.name);
+            System.gc();
+        }
     }
 
 
@@ -160,6 +183,9 @@ public class PluginManager {
 
                 URL[] urls = {new URL("jar:file:" + pluginJar.path() + "!/")};
                 URLClassLoader cl = URLClassLoader.newInstance(urls);
+
+
+                classLoaders.put(pluginDefinition.name, cl);
 
 
                 Enumeration<JarEntry> jarEntries = jarFile.entries();
@@ -204,7 +230,7 @@ public class PluginManager {
         talosPluginProvider.setPluginDefinition(pluginDefinition);
         talosPluginProvider.loadPlugins(classes);
 
-        pluginProviders.add(talosPluginProvider);
+        nameToPluginProviders.put(pluginDefinition.name, talosPluginProvider);
 
         talosPluginProvider.init();
 
@@ -212,7 +238,7 @@ public class PluginManager {
 
 
     private TalosPlugin findPlugin (String pluginName) {
-        for (TalosPluginProvider pluginProvider : pluginProviders) {
+        for (TalosPluginProvider pluginProvider : nameToPluginProviders.values()) {
             ArrayList<TalosPlugin> plugins = pluginProvider.getPlugins();
             for (TalosPlugin plugin : plugins) {
                 if (plugin.getClass().getName().equalsIgnoreCase(pluginName)) {
@@ -224,7 +250,7 @@ public class PluginManager {
     }
 
     public Class<? extends NodeWidget> getCustomNodeWidget (String className) {
-        for (TalosPluginProvider pluginProvider : pluginProviders) {
+        for (TalosPluginProvider pluginProvider : nameToPluginProviders.values()) {
             Class<? extends NodeWidget> customNodeWidget = pluginProvider.getCustomNodeWidget(className);
             if (customNodeWidget != null) {
                 return customNodeWidget;

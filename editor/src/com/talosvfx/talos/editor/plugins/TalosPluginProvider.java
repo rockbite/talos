@@ -15,6 +15,7 @@ public abstract class TalosPluginProvider {
     private ArrayList<TalosPlugin> plugins = new ArrayList<>();
 
     private HashMap<String, Class<? extends NodeWidget>> customNodeWidgets = new HashMap<>();
+    private HashMap<String, Class<? extends NodeWidget>> customNodeWidgetsShortNames = new HashMap<>();
 
     private boolean initialized;
 
@@ -44,8 +45,17 @@ public abstract class TalosPluginProvider {
         this.pluginDefinition = pluginDefinition;
     }
 
+    public PluginDefinition getPluginDefinition () {
+        return pluginDefinition;
+    }
+
     public Class<? extends NodeWidget> getCustomNodeWidget (String className) {
-        return customNodeWidgets.get(className);
+        Class<? extends NodeWidget> clazz = customNodeWidgets.get(className);
+        if (clazz == null) {
+            //Check short name
+            clazz = customNodeWidgetsShortNames.get(className);
+        }
+        return clazz;
     }
 
     public ArrayList<TalosPlugin> getPlugins () {
@@ -73,6 +83,7 @@ public abstract class TalosPluginProvider {
                 Class<?> pluginClazz = classes.get(customNode);
                 if (NodeWidget.class.isAssignableFrom(pluginClazz)) {
                     customNodeWidgets.put(customNode, (Class<? extends NodeWidget>) pluginClazz);
+                    customNodeWidgetsShortNames.put(pluginClazz.getSimpleName(), (Class<? extends NodeWidget>) pluginClazz);
                 } else {
                     System.out.println("Ignoring custom NodeWidget: " + customNode + " as does not extend " + TalosPlugin.class.getName());
                 }
@@ -86,4 +97,9 @@ public abstract class TalosPluginProvider {
         plugins.add(talosPlugin);
     }
 
+    public void dispose () {
+        plugins.clear();
+        customNodeWidgets.clear();
+        customNodeWidgetsShortNames.clear();
+    }
 }
