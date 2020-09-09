@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader;
@@ -15,6 +16,10 @@ public class ColorOutput extends AbstractShaderNode {
     public final String BLENDING = "blending";
 
     private ShaderBox.Blending blending = ShaderBox.Blending.NORMAL;
+
+    public ColorOutput (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void constructNode (XmlReader.Element module) {

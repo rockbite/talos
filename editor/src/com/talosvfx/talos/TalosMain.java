@@ -21,12 +21,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
@@ -125,7 +122,7 @@ public class TalosMain extends ApplicationAdapter {
 	@Override
 	public void create () {
 		pluginManager = new PluginManager();
-		pluginManager.loadInternalPlugins();
+		pluginManager.loadPlugins();
 
 
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;

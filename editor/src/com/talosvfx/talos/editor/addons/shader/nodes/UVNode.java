@@ -1,10 +1,15 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class UVNode extends AbstractShaderNode {
 
     public final String OUTPUT_UV = "outputUV";
+
+    public UVNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     protected String getPreviewOutputName () {

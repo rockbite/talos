@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class SmoothStepNode extends AbstractShaderNode {
@@ -10,6 +11,10 @@ public class SmoothStepNode extends AbstractShaderNode {
 
     public final String EDGE_ONE = "edgeOne";
     public final String EDGE_TWO = "edgeTwo";
+
+    public SmoothStepNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public ShaderBuilder.Type getVarType (String name) {

@@ -47,7 +47,7 @@ public class UIKit extends ApplicationAdapter {
 
         table = new Table();
 
-        AbstractShaderNode shaderNode = new AbstractShaderNode() {
+        AbstractShaderNode shaderNode = new AbstractShaderNode(skin) {
             @Override
             public void prepareDeclarations(ShaderBuilder shaderBuilder) {
 

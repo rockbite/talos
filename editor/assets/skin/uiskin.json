@@ -94,7 +94,7 @@
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 		default: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder}
-		resizable: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-resizable}
+		resizable: {titleFont: default-font, titleFontColor: white, background: window-resizable}
 		noborder: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder}
 		dialog: {stageBackground: dialogDim, titleFont: default-font, titleFontColor: white, background: window-noborder},
 		default-nodim: {titleFont: default-font, titleFontColor: white, background: window-noborder},

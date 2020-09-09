@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class VectorToXYNode extends AbstractShaderNode {
@@ -8,6 +9,10 @@ public class VectorToXYNode extends AbstractShaderNode {
     public final String Y = "Y";
 
     public final String INPUT = "inputValue";
+
+    public VectorToXYNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {

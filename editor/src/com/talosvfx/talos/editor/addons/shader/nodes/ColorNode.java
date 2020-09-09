@@ -30,6 +30,10 @@ public class ColorNode extends AbstractShaderNode {
 
     public final String INPUT_COLOR = "color";
 
+    public ColorNode (Skin skin) {
+        super(skin);
+    }
+
     @Override
     public void constructNode (XmlReader.Element module) {
         super.constructNode(module);

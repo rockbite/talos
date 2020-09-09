@@ -116,24 +116,25 @@ public class PluginManager {
 
     }
 
-    public void loadInternalPlugins () {
-        reloadAllPlugins(Gdx.files.internal("plugins/"));
-
-        //Register file watcher for internal (only locally actually, in deployment internal is stuck inside the jar
+    public void loadPlugins () {
+        reloadAllPlugins(Gdx.files.local("plugins/"));
     }
 
     public void reloadAllPlugins (FileHandle pluginDir) {
         unloadAllPlugins();
 
-        FileHandle[] list = pluginDir.list();
+        if (pluginDir.exists()) {
+            FileHandle[] list = pluginDir.list();
 
-        for (FileHandle fileHandle : list) {
-            if (fileHandle.extension().equalsIgnoreCase("jar")) {
-                loadPluginProvider(fileHandle);
+            for (FileHandle fileHandle : list) {
+                if (fileHandle.extension().equalsIgnoreCase("jar")) {
+                    loadPluginProvider(fileHandle);
+                }
             }
+            addFileTracker(pluginDir);
+
         }
 
-        addFileTracker(pluginDir);
     }
 
     private void unloadAllPlugins () {
@@ -267,7 +268,7 @@ public class PluginManager {
             public void create () {
 
                 PluginManager pluginManager = new PluginManager();
-                pluginManager.loadInternalPlugins();
+                pluginManager.loadPlugins();
 
                 TalosPlugin testPlugin = pluginManager.findPlugin("com.talosvfx.talos.plugins.TestPlugin");
 

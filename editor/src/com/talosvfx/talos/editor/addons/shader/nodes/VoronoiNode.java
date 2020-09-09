@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class VoronoiNode extends AbstractShaderNode {
@@ -9,6 +10,10 @@ public class VoronoiNode extends AbstractShaderNode {
     public final String INPUT_CD = "cellDensity";
 
     public final String OUTPUT = "outputValue";
+
+    public VoronoiNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {

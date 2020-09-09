@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class StepNode extends AbstractShaderNode {
@@ -8,6 +9,10 @@ public class StepNode extends AbstractShaderNode {
     public final String OUTPUT = "outputValue";
 
     public final String EDGE = "edge";
+
+    public StepNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public ShaderBuilder.Type getVarType (String name) {

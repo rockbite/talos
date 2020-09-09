@@ -46,7 +46,9 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
     private float previewUpdateCooldown = 0f;
     private boolean previewUpdateScheduled = false;
 
-    public AbstractShaderNode() {
+    public AbstractShaderNode(Skin skin) {
+        super(skin);
+        
         sizeMap.put(ShaderBuilder.Type.VEC2.getTypeString(), 2);
         sizeMap.put(ShaderBuilder.Type.VEC3.getTypeString(), 3);
         sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);

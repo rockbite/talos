@@ -13,7 +13,7 @@ allprojects {
 
     ext {
         appName = "talos"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.9.11-SNAPSHOT'
         visuiVersion = '1.4.2'
     }
 

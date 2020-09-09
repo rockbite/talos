@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
@@ -16,6 +17,10 @@ public class ColorChannelsNode extends AbstractShaderNode {
     public final String INPUT_G = "G";
     public final String INPUT_B = "B";
     public final String INPUT_A = "A";
+
+    public ColorChannelsNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void constructNode (XmlReader.Element module) {

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
@@ -9,6 +10,10 @@ public class TimeNode extends AbstractShaderNode {
     private ShaderBuilder.IValueProvider timeProvider;
 
     private float time = 0;
+
+    public TimeNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void act (float delta) {

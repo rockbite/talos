@@ -20,7 +20,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
+public abstract class NodeWidget extends ResizableWindow implements Json.Serializable {
 
     EditableLabel title;
 
@@ -53,6 +53,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     private Table widgetContainer = new Table();
     private Table headerTable;
     private String nodeName;
+
+    public NodeWidget (Skin skin) {
+        super(skin);
+    }
 
     public void graphUpdated () {
 
@@ -102,7 +106,6 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     public void init(Skin skin, NodeBoard nodeBoard) {
-        super.init(skin);
         initMaps();
         this.nodeBoard = nodeBoard;
 
@@ -134,13 +137,14 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         contentTable.add().height(15).row();
         contentTable.add().growY();
 
-        add(mainStack).width(266).pad(15);
+        add(mainStack).minWidth(266).grow().pad(15);
+        pack();
 
         setModal(false);
         setMovable(true);
-        setResizable(false);
+        setResizable(true);
 
-        addCaptureListener(new InputListener() {
+        addListener(new ClickListener() {
 
             Vector2 tmp = new Vector2();
             Vector2 prev = new Vector2();
@@ -172,7 +176,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 if(nodeBoard != null) {
                     nodeBoard.nodeClickedUp(NodeWidget.this);
                 }
-                event.cancel();
+//                event.cancel();
             }
         });
     }
@@ -184,7 +188,6 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     @Override
     public void invalidateHierarchy() {
         super.invalidateHierarchy();
-        pack();
     }
 
     public void setConfig(XmlReader.Element config) {
@@ -193,18 +196,6 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         String titleString = config.getAttribute("title");
         title.setText(titleString);
     }
-
-    @Override
-    public float getTitlePrefWidth () {
-        if(title == null) return 0;
-        return title.getPrefWidth();
-    }
-
-    @Override
-    public float getDragPadTop () {
-        return 32 + 15;
-    }
-
 
     protected void addConnection(AbstractWidget widget, String variableName, boolean isInput) {
         Table portTable = widget.addPort(isInput);
@@ -462,6 +453,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         }
 
         widgetContainer.add().growY().row();
+        pack();
     }
 
     @Override

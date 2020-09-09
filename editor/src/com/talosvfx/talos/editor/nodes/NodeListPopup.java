@@ -34,7 +34,7 @@ public class NodeListPopup extends VisWindow {
         String className = getClassNameFromModuleName(name);
 
         try {
-            return getNodeWidgetClassForName(name);
+            return getNodeWidgetClassForName(className);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }

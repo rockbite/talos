@@ -318,6 +318,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     }
 
+    public NodeBoard getNodeBoard () {
+        return nodeBoard;
+    }
+
     public void reset () {
         nodeBoard.reset();
     }

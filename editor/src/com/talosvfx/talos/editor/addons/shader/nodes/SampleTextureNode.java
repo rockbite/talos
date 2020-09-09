@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
@@ -27,6 +28,10 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
     public final String WRAP = "wrap";
 
     public final String OUTPUT_RGBA = "outputRGBA";
+
+    public SampleTextureNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     protected String getPreviewOutputName () {

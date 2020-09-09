@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
@@ -16,6 +17,10 @@ public class GenericMethodNode extends AbstractShaderNode {
 
     private boolean forcePreview = true;
     private boolean previewTransparency = false;
+
+    public GenericMethodNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void constructNode (XmlReader.Element module) {

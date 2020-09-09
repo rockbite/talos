@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class MathNode extends AbstractShaderNode {
@@ -11,6 +12,10 @@ public class MathNode extends AbstractShaderNode {
     public final String CLAMP = "clamp";
 
     public final String OUTPUT = "outputValue";
+
+    public MathNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public ShaderBuilder.Type getVarType (String name) {

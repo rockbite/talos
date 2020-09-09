@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
@@ -177,7 +178,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             tmp2.set(x, y);
             stageToLocalCoordinates(tmp2);
 
-            node = ClassReflection.newInstance(clazz);
+            Constructor constructor = ClassReflection.getConstructor(clazz, Skin.class);
+            node = (NodeWidget) constructor.newInstance(skin);
             node.init(skin, this);
             node.setConfig(config);
 
@@ -198,6 +200,16 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
         return node;
     }
+
+    public void addNode (NodeWidget nodeWidget) {
+        tmp2.set(0, 0);
+        stageToLocalCoordinates(tmp2);
+
+        nodes.add(nodeWidget);
+        mainContainer.addActor(nodeWidget);
+        TalosMain.Instance().ProjectController().setDirty();
+    }
+
 
     public void deleteSelectedNodes () {
         try {

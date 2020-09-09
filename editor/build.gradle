@@ -78,6 +78,11 @@ task distLegacyTest(type: Jar) {
 
 dist.dependsOn classes
 
+jar {
+    from ("assets") {
+        include "skin/**"
+    }
+}
 
 
 modifyPom {

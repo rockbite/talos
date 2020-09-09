@@ -35,21 +35,21 @@ public abstract class AbstractWidget<T> extends Table {
         portContainer.clearChildren();
 
         Table portBody = new Table();
+
         Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.add(portBorder).growX().pad(-1f);
 
-        portBody.setSize(15, 15);
-        portContainer.addActor(portBody);
+        float offsetPadding = 20;
 
-
-        if(isInput) {
-            portBody.setX(-24);
+        if (isInput) {
+            portContainer.left();
+            portContainer.add(portBody).size(15, 15).padLeft(-offsetPadding);
         } else {
-            portBody.setX(getWidth() + 9);
+            portContainer.right();
+            portContainer.add(portBody).size(15, 15).padRight(-offsetPadding);
         }
 
-        portBody.setY(getHeight()/2f - portBody.getHeight()/2f);
 
         return portBody;
     }

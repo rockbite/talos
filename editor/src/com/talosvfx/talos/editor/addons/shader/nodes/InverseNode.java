@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 
 public class InverseNode extends AbstractShaderNode {
@@ -7,6 +8,10 @@ public class InverseNode extends AbstractShaderNode {
     public final String INPUT = "inputValue";
 
     public final String OUTPUT = "outputValue";
+
+    public InverseNode (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public ShaderBuilder.Type getVarType (String name) {
