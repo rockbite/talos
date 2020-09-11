@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.plugins;
 
 
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.PluginNodeWidget;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -14,8 +15,8 @@ public abstract class TalosPluginProvider {
 
     private ArrayList<TalosPlugin> plugins = new ArrayList<>();
 
-    private HashMap<String, Class<? extends NodeWidget>> customNodeWidgets = new HashMap<>();
-    private HashMap<String, Class<? extends NodeWidget>> customNodeWidgetsShortNames = new HashMap<>();
+    private HashMap<String, Class<? extends PluginNodeWidget>> customNodeWidgets = new HashMap<>();
+    private HashMap<String, Class<? extends PluginNodeWidget>> customNodeWidgetsShortNames = new HashMap<>();
 
     private boolean initialized;
 
@@ -81,9 +82,9 @@ public abstract class TalosPluginProvider {
                 System.out.println("Ignoring custom NodeWidget: " + customNode + " as not found");
             } else {
                 Class<?> pluginClazz = classes.get(customNode);
-                if (NodeWidget.class.isAssignableFrom(pluginClazz)) {
-                    customNodeWidgets.put(customNode, (Class<? extends NodeWidget>) pluginClazz);
-                    customNodeWidgetsShortNames.put(pluginClazz.getSimpleName(), (Class<? extends NodeWidget>) pluginClazz);
+                if (PluginNodeWidget.class.isAssignableFrom(pluginClazz)) {
+                    customNodeWidgets.put(customNode, (Class<? extends PluginNodeWidget>) pluginClazz);
+                    customNodeWidgetsShortNames.put(pluginClazz.getSimpleName(), (Class<? extends PluginNodeWidget>) pluginClazz);
                 } else {
                     System.out.println("Ignoring custom NodeWidget: " + customNode + " as does not extend " + TalosPlugin.class.getName());
                 }

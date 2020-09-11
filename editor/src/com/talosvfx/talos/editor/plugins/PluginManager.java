@@ -260,26 +260,15 @@ public class PluginManager {
         return null;
     }
 
-
-    public static void main (String[] args) {
-        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        new Lwjgl3Application(new ApplicationAdapter() {
-            @Override
-            public void create () {
-
-                PluginManager pluginManager = new PluginManager();
-                pluginManager.loadPlugins();
-
-                TalosPlugin testPlugin = pluginManager.findPlugin("com.talosvfx.talos.plugins.TestPlugin");
-
-                if (testPlugin != null) {
-                    TalosPluginProvider provider = testPlugin.getProvider();
-                } else {
-                    System.out.println("No plugin found");
-                }
-
+    public <T extends TalosPluginProvider> T getPluginManagerForClass (Class<? extends NodeWidget> clazz) {
+        for (TalosPluginProvider value : nameToPluginProviders.values()) {
+            Class<? extends NodeWidget> customNodeWidget = value.getCustomNodeWidget(clazz.getSimpleName());
+            if (customNodeWidget != null) {
+                return (T) value;
             }
-        }, config);
+        }
+        return null;
     }
+
 
 }

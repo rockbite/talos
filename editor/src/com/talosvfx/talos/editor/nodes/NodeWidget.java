@@ -113,6 +113,8 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
         Table backgroundTable = new Table();
         Table contentTable = new Table();
 
+        contentTable.top();
+
         mainStack.add(backgroundTable);
         mainStack.add(contentTable);
 
@@ -129,13 +131,12 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
         title = new EditableLabel("Node Title", skin);
         headerTable.add(title).expandX().top().left().padLeft(12).height(15);
 
-        contentTable.add(widgetContainer).padLeft(16).padRight(16).grow().top().padTop(32);
+        contentTable.add(widgetContainer).padLeft(16).padRight(16).growX().top().padTop(32);
         contentTable.row();
 
         addAdditionalContent(contentTable);
 
         contentTable.add().height(15).row();
-        contentTable.add().growY();
 
         add(mainStack).minWidth(266).grow().pad(15);
         pack();

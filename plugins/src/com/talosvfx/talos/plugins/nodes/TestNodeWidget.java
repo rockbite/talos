@@ -3,10 +3,17 @@ package com.talosvfx.talos.plugins.nodes;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.PluginNodeWidget;
+import com.talosvfx.talos.plugins.InternalPluginProvider;
 
-public class TestNodeWidget extends NodeWidget {
+public class TestNodeWidget extends PluginNodeWidget<InternalPluginProvider> {
+
+    public TestNodeWidget (Skin skin) {
+        super(skin);
+    }
 
     @Override
     public void constructNode (XmlReader.Element module) {

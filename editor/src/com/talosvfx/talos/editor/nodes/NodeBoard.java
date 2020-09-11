@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.plugins.TalosPluginProvider;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
@@ -172,7 +173,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         }
     }
 
-    public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
+    public <T extends TalosPluginProvider> NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
         NodeWidget node = null;
         try {
             tmp2.set(x, y);
@@ -180,6 +181,14 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
             Constructor constructor = ClassReflection.getConstructor(clazz, Skin.class);
             node = (NodeWidget) constructor.newInstance(skin);
+            if (node instanceof PluginNodeWidget) {
+                T pluginProvider = TalosMain.Instance().PluginManager().getPluginManagerForClass(clazz);
+                if (pluginProvider != null) {
+                    ((PluginNodeWidget<T>) node).injectProvder(pluginProvider);
+                } else {
+                    System.err.println("No provider found for class: " + clazz);
+                }
+            }
             node.init(skin, this);
             node.setConfig(config);
 
