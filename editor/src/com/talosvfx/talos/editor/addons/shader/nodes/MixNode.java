@@ -5,8 +5,9 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.plugins.TalosPluginProvider;
 
-public class MixNode extends AbstractShaderNode {
+public class MixNode extends AbstractShaderNode<TalosPluginProvider> {
 
     public final String INPUT_A = "valueA";
     public final String INPUT_B = "valueB";

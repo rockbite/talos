@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.PluginNodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -20,9 +21,10 @@ import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.plugins.TalosPluginProvider;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
-public abstract class AbstractShaderNode extends NodeWidget implements Notifications.Observer {
+public abstract class AbstractShaderNode<T extends TalosPluginProvider> extends PluginNodeWidget<T> implements Notifications.Observer {
 
     protected ShaderBuilder previewBuilder = new ShaderBuilder();
 
