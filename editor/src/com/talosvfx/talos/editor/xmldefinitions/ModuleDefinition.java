@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.xmldefinitions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleDefinition {
@@ -10,6 +9,15 @@ public class ModuleDefinition {
     private String identifierName;
     private String displayFriendlyIdentifierName;
     private Class objectClazz;
+    private String selectBoxDataSource;
+
+    public void setSelectBoxDataSource (String selectBoxDataSource) {
+        this.selectBoxDataSource = selectBoxDataSource;
+    }
+
+    public String getSelectBoxDataSource () {
+        return selectBoxDataSource;
+    }
 
     public String getDisplayFriendlyIdentifierName () {
         return displayFriendlyIdentifierName;

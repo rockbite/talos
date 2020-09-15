@@ -6,9 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.library.DynamicLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.xmldefinitions.LibraryDefinition;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class SelectWidget extends AbstractWidget<String> {
 
@@ -42,17 +46,35 @@ public class SelectWidget extends AbstractWidget<String> {
 
     @Override
     public void loadFromXML(XmlReader.Element element) {
-        Array<XmlReader.Element> options = element.getChildrenByName("option");
-        Array<String> items = new Array<>();
+        DynamicLibrary dynamicLibrary = TalosMain.Instance().getDynamicLibrary();
 
-        for (XmlReader.Element option: options) {
-            String optionText = option.getText();
-            items.add(optionText);
-            titleMap.put(optionText, option.getAttribute("value"));
-            keyMap.put(option.getAttribute("value"), optionText);
+        if (element.hasAttribute("data-source") && dynamicLibrary.hasLibrary(element.getAttribute("data-source"))) {
+            LibraryDefinition library = dynamicLibrary.getLibrary(element.getAttribute("data-source"));
+
+            Array<String> items = new Array<>();
+
+            for (LibraryDefinition.LibraryItem libraryItem : library.getLibraryItems()) {
+                String optionText = libraryItem.getDisplayName();
+                items.add(optionText);
+                titleMap.put(optionText, libraryItem.getName());
+                keyMap.put(libraryItem.getName(), optionText);
+            }
+
+            selectBox.setItems(items);
+        } else {
+
+            Array<XmlReader.Element> options = element.getChildrenByName("option");
+            Array<String> items = new Array<>();
+
+            for (XmlReader.Element option : options) {
+                String optionText = option.getText();
+                items.add(optionText);
+                titleMap.put(optionText, option.getAttribute("value"));
+                keyMap.put(option.getAttribute("value"), optionText);
+            }
+
+            selectBox.setItems(items);
         }
-
-        selectBox.setItems(items);
     }
 
     @Override

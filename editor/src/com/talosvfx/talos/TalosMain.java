@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
+import com.talosvfx.talos.editor.library.DynamicLibrary;
 import com.talosvfx.talos.editor.plugins.PluginManager;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
@@ -112,6 +113,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private PluginManager pluginManager;
 
+	private DynamicLibrary dynamicLibrary;
+
 	public Cursor pickerCursor;
 	private Cursor currentCursor;
 
@@ -123,6 +126,8 @@ public class TalosMain extends ApplicationAdapter {
 	public void create () {
 		pluginManager = new PluginManager();
 		pluginManager.loadPlugins();
+
+		dynamicLibrary = new DynamicLibrary();
 
 
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
@@ -304,5 +309,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	public PluginManager PluginManager () {
 		return pluginManager;
+	}
+
+	public DynamicLibrary getDynamicLibrary () {
+		return dynamicLibrary;
 	}
 }

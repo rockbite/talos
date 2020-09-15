@@ -184,7 +184,12 @@ public class NodeListPopup extends VisWindow {
         if (customNodeWidget != null) {
             nodeClazz = customNodeWidget;
         } else {
-            nodeClazz = ClassReflection.forName(classPath + "." + className);
+            if (className.contains(".")) {
+                nodeClazz = ClassReflection.forName(className);
+
+            } else {
+                nodeClazz = ClassReflection.forName(classPath + "." + className);
+            }
         }
 
         return nodeClazz;

@@ -98,6 +98,7 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
 
     private void initMaps() {
         widgetClassMap.put("value", LabelWidget.class);
+        widgetClassMap.put("selectbox", SelectWidget.class);
         widgetClassMap.put("select", SelectWidget.class);
         widgetClassMap.put("checkbox", CheckBoxWidget.class);
         widgetClassMap.put("color", ColorWidget.class);
@@ -438,7 +439,10 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
                 XmlReader.Element group = row;
                 for (int i = 0; i < group.getChildCount(); i++) {
                     XmlReader.Element groupRow = group.getChild(i);
-                    if(groupRow.getName().equals("dynamicValue") || groupRow.getName().equals("value")) {
+
+                    Class<? extends AbstractWidget> classForChild = widgetClassMap.get(groupRow.getName());
+
+                    if (classForChild != null) {
                         addRow(groupRow, i, group.getChildCount(), true);
                     }
                 }

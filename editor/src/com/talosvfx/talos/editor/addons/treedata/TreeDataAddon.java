@@ -86,6 +86,7 @@ public class TreeDataAddon implements IAddon {
                         XmlReader.Element root = xmlReader.parse(file);
                         nodeStage.setData(root);
                         nodeStage.init();
+                        TalosMain.Instance().getDynamicLibrary().loadWorkspaceLibraries(root);
                     }
                 });
             }

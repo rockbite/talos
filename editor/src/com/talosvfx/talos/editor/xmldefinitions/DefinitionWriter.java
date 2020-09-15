@@ -29,6 +29,12 @@ public class DefinitionWriter {
 
 
         try {
+
+            //Header
+
+            xmlWriter.element("modules").attribute("classPath", "com.talosvfx.talos.editor.addons.treedata.nodes");
+            xmlWriter.element("category").attribute("name", "general").attribute("title", "General");
+
             for (ModuleDefinition it : modulesToWrite) {
                 writeModule(xmlWriter, it);
             }
@@ -37,6 +43,12 @@ public class DefinitionWriter {
             for (LibraryDefinition libraryDefinition : librariesToWrite) {
                 writeLibrary(xmlWriter, libraryDefinition);
             }
+            xmlWriter.pop();
+
+
+            //Footer
+
+            xmlWriter.pop();
             xmlWriter.pop();
 
             xmlWriter.flush();
@@ -84,24 +96,50 @@ public class DefinitionWriter {
     }
 
     private void writePort (XmlWriter xmlWriter, ModuleDefinition port, boolean input) throws IOException {
-        boolean dynamicValue = isDynamicValue(port);
 
-        if (dynamicValue) {
-            xmlWriter.element("dynamicValue");
-            xmlWriter.attribute("progress", "true");
-        } else {
-            xmlWriter.element("value");
+        writeType(xmlWriter, port);
+
+
+        boolean shouldHavePort = shouldHaveConnectionPort(port);
+
+        if (shouldHavePort) {
+            xmlWriter.attribute("port", input ? "input" : "output");
         }
 
-        //	            <dynamicValue port="input" name="gameDuration" type="float" max = "10" progress="true">gameDuration</dynamicValue>
-
-        xmlWriter.attribute("port", input ? "input" : "output");
         xmlWriter.attribute("name", port.getIdentifierName());
         xmlWriter.attribute("type", port.getObjectClazz().getSimpleName());
         xmlWriter.text(port.getDisplayFriendlyIdentifierName());
 
 
         xmlWriter.pop();
+    }
+
+    private boolean shouldHaveConnectionPort (ModuleDefinition port) {
+        Class objectClazz = port.getObjectClazz();
+
+        if (isBooleanValue(port)) {
+            return false;
+        }
+        return true;
+    }
+
+    private void writeType (XmlWriter xmlWriter, ModuleDefinition port) throws IOException {
+        if (port.getSelectBoxDataSource() != null) {
+            xmlWriter.element("selectbox").attribute("data-source", port.getSelectBoxDataSource());
+        } else if (isDynamicValue(port)) {
+            xmlWriter.element("dynamicValue").attribute("progress", "true");
+        } else if (isBooleanValue(port)) {
+            xmlWriter.element("checkbox");
+        } else {
+            xmlWriter.element("value");
+        }
+    }
+
+    private boolean isBooleanValue (ModuleDefinition port) {
+        if (Boolean.class.isAssignableFrom(port.getObjectClazz())) return true;
+        if (port.getObjectClazz() == boolean.class) return true;
+
+        return false;
     }
 
     private boolean isDynamicValue (ModuleDefinition port) {
