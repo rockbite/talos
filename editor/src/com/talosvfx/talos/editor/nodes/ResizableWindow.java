@@ -25,6 +25,8 @@ public class ResizableWindow extends Window {
 	private final Vector2 tempPos = new Vector2();
 	private final Vector2 tempSize = new Vector2();
 
+	protected float movePad = 32;
+
 	private Consumer<ResizableWindow> sizeChangeConsumer;
 
 	public ResizableWindow (Skin skin) {
@@ -84,6 +86,7 @@ public class ResizableWindow extends Window {
 //						Editor.getInstance().getCursors().revert();
 					}
 				}
+				if (isMovable() && edge == 0 && y <= height && y >= height - movePad && x >= left && x <= right) edge = MOVE;
 			}
 
 			@Override
@@ -94,8 +97,7 @@ public class ResizableWindow extends Window {
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				super.touchDown(event, x, y, pointer, button);
 
-				if (event.isHandled()) return false;
-
+				//if (event.isHandled()) return false;
 
 				if (button == 0) {
 					updateEdge(x, y);
@@ -134,7 +136,7 @@ public class ResizableWindow extends Window {
 				Stage stage = getStage();
 				boolean clampPosition = false && getParent() == stage.getRoot();
 
-				if ((edge & MOVE) != 0) {
+ 				if ((edge & MOVE) != 0) {
 					float amountX = x - startX, amountY = y - startY;
 					windowX += amountX;
 					windowY += amountY;

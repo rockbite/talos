@@ -84,6 +84,10 @@ public class NodeListPopup extends VisWindow {
         createListeners();
     }
 
+    public void addData(XmlReader.Element root) {
+        parseCategory(tree, null, root);
+    }
+
     public boolean contains (float x, float y) {
         return getX() < x && getX() + getWidth() > x && getY() < y && getY() + getHeight() > y;
     }

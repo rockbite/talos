@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class LibraryDefinition {
    //<library>
-    //	<data name=“itemModelList”>
-    //		<item name=“IRONOREEC”>Iron Ore</item>
-    //		<item name=“IRONOREEC”>Iron Ore</item>
+    //	<data name="itemModelList">
+    //		<item name="IRONOREEC">Iron Ore</item>
+    //		<item name="IRONOREEC">Iron Ore</item>
     //	</data>
     //</library>
 

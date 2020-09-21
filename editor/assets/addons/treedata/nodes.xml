@@ -1,0 +1,7 @@
+<modules classPath="com.talosvfx.talos.editor.addons.treedata.nodes">
+    <category name="general" title="General">
+        <module name = "NumberNode" title = "Number" keywords = "number,float">
+            <dynamicValue port="output" name="outputValue" type="number" min="-1000" max="1000">Value: </dynamicValue>
+        </module>
+    </category>
+</modules>

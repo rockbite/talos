@@ -105,7 +105,7 @@ public class GenericMethodNode extends AbstractShaderNode {
     @Override
     protected void inputStateChanged (boolean isInputDynamic) {
         if (forcePreview) {
-            showShaderBox();
+            showShaderBox(false);
         } else {
             super.inputStateChanged(isInputDynamic);
         }

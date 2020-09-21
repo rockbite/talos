@@ -26,26 +26,28 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     protected NodeBoard nodeBoard;
     private Image selectionRect;
 
-    private NodeListPopup nodeListPopup;
+    protected NodeListPopup nodeListPopup;
+
 
     public DynamicNodeStage (Skin skin) {
         super();
         this.skin = skin;
         nodeData = loadData();
+
+        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
+        initActors();
+        initListeners();
     }
 
     protected abstract XmlReader.Element loadData();
 
     @Override
     public void init () {
-        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
+
 
         if(nodeData != null) {
             loadNodeList();
         }
-
-        initActors();
-        initListeners();
     }
 
     protected void loadNodeList() {

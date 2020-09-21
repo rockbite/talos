@@ -153,7 +153,7 @@ public abstract class AbstractShaderNode<T extends TalosPluginProvider> extends 
     }
 
     protected void inputStateChanged (boolean isInputDynamic) {
-        // need to hid shaderbox if no input
+        // need to hide shaderbox if no input
         if(isInputDynamic) {
             showShaderBox();
         } else {
@@ -161,13 +161,22 @@ public abstract class AbstractShaderNode<T extends TalosPluginProvider> extends 
         }
     }
 
-    protected void showShaderBox () {
-        HeightAction<Cell<ShaderBox>> cellHeightAction = new HeightAction<>();
+    protected void showShaderBox (boolean animate) {
+        if(animate) {
+            HeightAction<Cell<ShaderBox>> cellHeightAction = new HeightAction<>();
 
-        cellHeightAction.setDuration(0.1f);
-        cellHeightAction.setTarget(240);
-        cellHeightAction.setTarget(shaderBoxCell);
-        this.addAction(cellHeightAction);
+            cellHeightAction.setDuration(0.1f);
+            cellHeightAction.setTarget(240);
+            cellHeightAction.setTarget(shaderBoxCell);
+            this.addAction(cellHeightAction);
+        } else {
+            shaderBoxCell.height(240);
+            shaderBoxCell.getTable().invalidateHierarchy();
+        }
+    }
+
+    protected void showShaderBox () {
+        showShaderBox(true);
     }
 
     protected void hideShaderBox () {
@@ -184,7 +193,7 @@ public abstract class AbstractShaderNode<T extends TalosPluginProvider> extends 
         shaderBox = new ShaderBox();
         shaderBoxCell = contentTable.add(shaderBox);
 
-        shaderBoxCell.height(0).width(240).padTop(10).row();
+        shaderBoxCell.height(0).width(240).padTop(10).row(); //TODO: this needs proper padding and size handling
     }
 
     @Override
@@ -381,46 +390,6 @@ public abstract class AbstractShaderNode<T extends TalosPluginProvider> extends 
         } else {
             return defaultType;
         }
-    }
-
-    @Override
-    public void read (Json json, JsonValue jsonValue) {
-        super.read(json, jsonValue);
-
-        JsonValue properties = jsonValue.get("properties");
-
-        for(String name: widgetMap.keys()) {
-            JsonValue value = properties.get(name);
-
-            if (value != null) {
-                widgetMap.get(name).read(json, value);
-            }
-        }
-
-        readProperties(properties);
-    }
-
-    @Override
-    public void write (Json json) {
-        super.write(json);
-
-        json.writeObjectStart("properties");
-
-        for(String name: widgetMap.keys()) {
-            AbstractWidget widget = widgetMap.get(name);
-            widget.write(json, name);
-        }
-
-        writeProperties(json);
-
-        json.writeObjectEnd();
-    }
-
-    protected void readProperties(JsonValue properties) {
-
-    }
-    protected void writeProperties(Json json) {
-
     }
 
 }

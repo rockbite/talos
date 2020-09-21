@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.nodes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.shader.nodes.Vector2Node;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
@@ -86,6 +84,10 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
         }
     }
 
+    public ObjectMap<String, Connection> getOutputs() {
+        return outputs;
+    }
+
     public class Connection {
         public String targetSlot;
         public NodeWidget targetNode;
@@ -132,7 +134,7 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
         title = new EditableLabel("Node Title", skin);
         headerTable.add(title).expandX().top().left().padLeft(12).height(15);
 
-        contentTable.add(widgetContainer).padLeft(16).padRight(16).growX().top().padTop(32);
+        contentTable.add(widgetContainer).padLeft(16).padRight(16).growX().top().padTop(32+7);
         contentTable.row();
 
         addAdditionalContent(contentTable);
@@ -144,7 +146,8 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
 
         setModal(false);
         setMovable(true);
-        setResizable(true);
+        setResizable(false); // lets leave it to false for now, till we make things more dynamic
+        movePad = 46;
 
         addListener(new ClickListener() {
 
@@ -190,6 +193,8 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
     @Override
     public void invalidateHierarchy() {
         super.invalidateHierarchy();
+
+        setBounds(getX(), getY(), getMinWidth(), getMinHeight()); // doing this so the size is updated according to any change we do that changes the size. (like animating a preview box or something)
     }
 
     public void setConfig(XmlReader.Element config) {
@@ -404,7 +409,7 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
                     }
                     widgetContainer.add(widget).padTop(padTop).padBottom(1).growX().row();
                 } else {
-                    widgetContainer.add(widget).padTop(10).padBottom(10).growX().row();
+                    widgetContainer.add(widget).padTop(3).padBottom(3).growX().row();
                 }
 
                 String variableName = row.getAttribute("name");
@@ -458,26 +463,16 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
         }
 
         widgetContainer.add().growY().row();
+
         pack();
     }
 
-    @Override
-    public void write(Json json) {
-        json.writeValue("name", getNodeName());
-        json.writeValue("id", getUniqueId());
-        json.writeValue("title", title.getText());
-        json.writeObjectStart("position");
-        json.writeValue("x", getX() + "");
-        json.writeValue("y", getY() + "");
-        json.writeObjectEnd();
-    }
 
-    private String getNodeName () {
-        return nodeName;
-    }
+
+
 
     @Override
-    public void read(Json json, JsonValue jsonValue) {
+    public void read (Json json, JsonValue jsonValue) {
         if(title == null) return;
 
         title.setText(jsonValue.getString("title", "Empty"));
@@ -490,5 +485,50 @@ public abstract class NodeWidget extends ResizableWindow implements Json.Seriali
             setX(0);
             setY(0);
         }
+
+        JsonValue properties = jsonValue.get("properties");
+
+        for(String name: widgetMap.keys()) {
+            JsonValue value = properties.get(name);
+
+            if (value != null) {
+                widgetMap.get(name).read(json, value);
+            }
+        }
+
+        readProperties(properties);
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("name", getNodeName());
+        json.writeValue("id", getUniqueId());
+        json.writeValue("title", title.getText());
+        json.writeObjectStart("position");
+        json.writeValue("x", getX() + "");
+        json.writeValue("y", getY() + "");
+        json.writeObjectEnd();
+
+        json.writeObjectStart("properties");
+
+        for(String name: widgetMap.keys()) {
+            AbstractWidget widget = widgetMap.get(name);
+            widget.write(json, name);
+        }
+
+        writeProperties(json);
+
+        json.writeObjectEnd();
+    }
+
+    protected void readProperties(JsonValue properties) {
+
+    }
+    protected void writeProperties(Json json) {
+
+    }
+
+    private String getNodeName () {
+        return nodeName;
     }
 }

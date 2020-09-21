@@ -118,6 +118,8 @@ public class ValueWidget extends AbstractWidget<Float> {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.isHandled()) return false;
+
                 dragged = false;
                 lastPos = x;
                 return super.touchDown(event, x, y, pointer, button);

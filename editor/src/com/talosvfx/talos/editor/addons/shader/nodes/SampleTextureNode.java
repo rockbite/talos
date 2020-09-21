@@ -40,7 +40,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
 
     @Override
     protected void inputStateChanged (boolean isInputDynamic) {
-        showShaderBox();
+        showShaderBox(false);
     }
 
     @Override
