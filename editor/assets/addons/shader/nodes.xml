@@ -104,12 +104,34 @@
                 <option value = "MUL">Multiply</option>
                 <option value = "DIV">Divide</option>
                 <option value = "POW">Power</option>
+                <option value = "SIN">Sinus</option>
+                <option value = "COS">Cosinus</option>
             </select>
             <checkbox name="clamp">Clamp Output</checkbox>
             <group>
                 <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value A</dynamicValue>
                 <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value B</dynamicValue>
             </group>
+        </module>
+        <module name = "NormalizedSin" title = "Normalized Sinus" keywords = "math" class="GenericMethodNode">
+            <value port="output" name="outputValue" type="float">Output Value</value>
+            <value port="input" name="var" type="vec4">Normalized Input</value>
+            <dynamicValue port="input" name="speed" type="vec4" default="1" step="0.01">Speed</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    return ((sin(var * 3.14159 * speed) + 1.0) / 2.0);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "NormalizedCos" title = "Normalized Cosinus" keywords = "math" class="GenericMethodNode">
+            <value port="output" name="outputValue" type="float">Output Value</value>
+            <value port="input" name="var" type="vec4">Normalized Input</value>
+            <dynamicValue port="input" name="speed" type="vec4" default="1" step="0.01">Speed</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                    return ((cos(var * 3.14159 * speed) + 1.0) / 2.0);
+                ]]>
+            </shader-body>
         </module>
         <module name = "InverseNode" title = "One Minus" keywords = "math">
             <value port="output" name="outputValue" type="fluid">Output Value</value>

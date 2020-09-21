@@ -46,7 +46,11 @@ public class MathNode extends AbstractShaderNode {
 
         String expression = "";
 
-        if(operation.equals("POW")) {
+        if (operation.equals("SIN")) {
+            expression = "sin(" + exprA + ") * (" + exprB + ")";
+        } else if (operation.equals("COS")) {
+            expression = "cos(" + exprA + ") * (" + exprB + ")";
+        } else if(operation.equals("POW")) {
             expression = "pow(" + exprA + ", " + exprB + ")";
         } else {
             if (operation.equals("ADD")) {
