@@ -151,12 +151,11 @@ public class UIStage {
 						event.setFileHandle(handle);
 						event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
 						Notifications.fireEvent(event);
-					} else {
-						// ask addons if they are interested
-						IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
-						if (addon != null) {
-							break;
-						}
+					}
+					// ask addons if they are interested
+					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
+					if (addon != null) {
+						break;
 					}
 				}
 			}
