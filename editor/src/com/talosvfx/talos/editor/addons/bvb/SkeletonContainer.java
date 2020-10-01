@@ -203,10 +203,10 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     String startEvent = boundEffect.getStartEvent();
                     String completeEvent = boundEffect.getCompleteEvent();
                     if(startEvent.equals(event.getData().getName())) {
-                        //boundEffect.startInstance();
+                        boundEffect.startInstance(); // TODO: comment this things when doing it with timers
                     }
                     if(completeEvent.equals(event.getData().getName())) {
-                       // boundEffect.completeInstance();
+                       boundEffect.completeInstance();
                     }
                 }
             }
@@ -225,11 +225,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 for(BoundEffect boundEffect: getBoundEffects()) {
                     String completeEventName = boundEffect.getCompleteEvent();
                     if(completeEventName.equals("")) {
-                       // boundEffect.completeInstance();
+                        boundEffect.completeInstance();
                     }
                     String startEventName = boundEffect.getStartEvent();
                     if(startEventName.equals("")) {
-                        //boundEffect.startInstance();
+                        boundEffect.startInstance();
                     }
                 }
 
@@ -256,7 +256,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             if(!effect.isContinuous()) {
                 if (innerTime - delta < effect.getTimePosition() && innerTime >= effect.getTimePosition()) {
                     // time to start
-                    effect.startInstance();
+                    //effect.startInstance(); // TODO: do this later when all works
                 }
             }
 
