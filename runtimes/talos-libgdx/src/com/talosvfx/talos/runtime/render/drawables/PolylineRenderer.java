@@ -107,7 +107,7 @@ public class PolylineRenderer implements ParticleDrawable {
     private Polyline polyline() {
         if(polylineMap.get(particleRef) == null) {
             Polyline polyline = polylinePool.obtain();
-            polyline.initPoints(interpolationPointCount);
+            polyline.initPoints(interpolationPointCount, particleRef.getX(), particleRef.getY());
             polylineMap.put(particleRef, polyline);
         }
 

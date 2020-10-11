@@ -55,7 +55,11 @@ public class Polyline implements Pool.Poolable {
 
     @Override
     public void reset() {
-
+        for(PointData pointData: points) {
+            pointData.position.set(0, 0);
+            pointData.offset.set(0, 0);
+            pointData.thickness = 0;
+        }
     }
 
     class PointData {
@@ -75,14 +79,19 @@ public class Polyline implements Pool.Poolable {
         this.rotation = rotation;
     }
 
-    public void initPoints(int interpolationPoints) {
-        if(points.size == interpolationPoints + 2) return; // we can reuse this
+    public void initPoints(int interpolationPoints, float x, float y) {
+        if(points.size != interpolationPoints + 2) {
+            points.clear();
+            for(int i = 0; i < interpolationPoints + 2; i++) {
+                points.add(new PointData());
+            }
+            initVertices();
+        } // else we reuse them
 
-        points.clear();
-        for(int i = 0; i < interpolationPoints + 2; i++) {
-            points.add(new PointData());
+        for(int i = 0; i < points.size; i++) {
+            points.get(i).position.set(x, y);
         }
-        initVertices();
+
     }
 
     private void initVertices() {
