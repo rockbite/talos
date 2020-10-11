@@ -170,6 +170,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             currentSkin = skeleton.getData().getSkins().get(1); // never load the default
         }
         skeleton.setSkin(currentSkin);
+        skeleton.setSlotsToSetupPose();
 
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
         animationState = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
@@ -203,10 +204,10 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     String startEvent = boundEffect.getStartEvent();
                     String completeEvent = boundEffect.getCompleteEvent();
                     if(startEvent.equals(event.getData().getName())) {
-                        //boundEffect.startInstance();
+                        boundEffect.startInstance(); // TODO: comment this things when doing it with timers
                     }
                     if(completeEvent.equals(event.getData().getName())) {
-                       // boundEffect.completeInstance();
+                       boundEffect.completeInstance();
                     }
                 }
             }
@@ -225,11 +226,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 for(BoundEffect boundEffect: getBoundEffects()) {
                     String completeEventName = boundEffect.getCompleteEvent();
                     if(completeEventName.equals("")) {
-                       // boundEffect.completeInstance();
+                        boundEffect.completeInstance();
                     }
                     String startEventName = boundEffect.getStartEvent();
                     if(startEventName.equals("")) {
-                        //boundEffect.startInstance();
+                        boundEffect.startInstance();
                     }
                 }
 
@@ -256,7 +257,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             if(!effect.isContinuous()) {
                 if (innerTime - delta < effect.getTimePosition() && innerTime >= effect.getTimePosition()) {
                     // time to start
-                    effect.startInstance();
+                    //effect.startInstance(); // TODO: do this later when all works
                 }
             }
 
@@ -481,6 +482,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
             currentSkin = skeleton.getData().findSkin(currentSkinName);
             skeleton.setSkin(currentSkin);
+            skeleton.setSlotsToSetupPose();
             currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
             animationState.setAnimation(0, currentAnimation, true);
 
@@ -540,6 +542,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             public void valueChanged(String value) {
                 currentSkin = skeleton.getData().findSkin(value);
                 skeleton.setSkin(currentSkin);
+                skeleton.setSlotsToSetupPose();
                 effectScopeUpdated();
             }
         };
