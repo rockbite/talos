@@ -52,7 +52,6 @@ public class CameraController extends InputAdapter {
 		// snapping to one
 		if(camera.zoom < 1 && nextZoom >= 1) nextZoom = 1f;
 		if(camera.zoom > 1 && nextZoom <= 1) nextZoom = 1f;
-		if(Math.abs(nextZoom - 1f) < 0.9) nextZoom = 1f;
 
 		System.out.println(nextZoom);
 
