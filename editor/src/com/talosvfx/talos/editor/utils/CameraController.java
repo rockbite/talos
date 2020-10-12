@@ -53,8 +53,6 @@ public class CameraController extends InputAdapter {
 		if(camera.zoom < 1 && nextZoom >= 1) nextZoom = 1f;
 		if(camera.zoom > 1 && nextZoom <= 1) nextZoom = 1f;
 
-		System.out.println(nextZoom);
-
 		camera.zoom = nextZoom;
 
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 10f);
