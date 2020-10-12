@@ -48,6 +48,14 @@ public class CameraController extends InputAdapter {
 		float currWidth = camera.viewportWidth * camera.zoom;
 		float nextWidth = currWidth * (1f + amount * 0.1f);
 		float nextZoom = nextWidth/camera.viewportWidth;
+
+		// snapping to one
+		if(camera.zoom < 1 && nextZoom >= 1) nextZoom = 1f;
+		if(camera.zoom > 1 && nextZoom <= 1) nextZoom = 1f;
+		if(Math.abs(nextZoom - 1f) < 0.9) nextZoom = 1f;
+
+		System.out.println(nextZoom);
+
 		camera.zoom = nextZoom;
 
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 10f);
