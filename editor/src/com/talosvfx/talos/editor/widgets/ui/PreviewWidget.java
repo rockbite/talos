@@ -290,9 +290,12 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-        batch.end();
-        drawGrid(batch, parentAlpha * 0.5f);
-        batch.begin();
+
+        if (previewController.isGridVisible()) {
+            batch.end();
+            drawGrid(batch, parentAlpha * 0.5f);
+            batch.begin();
+        }
 
         mid.set(0, 0);
 
@@ -384,8 +387,17 @@ public class PreviewWidget extends ViewportWidget {
         return previewController.isBackground();
     }
 
-    public void setImagebIsBackground(boolean isBackground) {
+    public void setImageIsBackground(boolean isBackground) {
         previewController.setIsBackground(isBackground);
+    }
+
+
+    public boolean isGridVisible() {
+        return previewController.isGridVisible();
+    }
+
+    public void setGridVisible(boolean isVisible) {
+        previewController.setGridVisible(isVisible);
     }
 
     public float getBgImageSize() {
@@ -409,7 +421,7 @@ public class PreviewWidget extends ViewportWidget {
         previewImage.setDrawable(null);
         backgroundImagePath = "";
         setBgImageSize(10f);
-        setImagebIsBackground(true);
+        setImageIsBackground(true);
         setCameraZoom(1.4285715f);
         setCameraPos(0, 0);
         unregisterDragPoints();
