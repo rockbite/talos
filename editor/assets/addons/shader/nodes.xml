@@ -20,6 +20,17 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "saturationNode" title = "Saturation" class="GenericMethodNode" forcePreview="false">
+            <value port="output" name="outputValue" type="vec3">Output</value>
+            <value port="input" name="inputValue" type="vec3">Input</value>
+            <dynamicValue port="input" name="saturation" type="float" default="1.0" max="1" step="0.001" progress="true">Saturation</dynamicValue>
+            <shader-body>
+                <![CDATA[
+                      float luma = dot(vec3(inputValue), vec3(0.2126729, 0.7151522, 0.0721750));
+                      return vec3(luma) + vec3(saturation) * (vec3(inputValue) - vec3(luma));
+                ]]>
+            </shader-body>
+        </module>
     </category>
     <category name="input" title="Input">
         <module name = "TimeNode" title = "Timer" keywords = "timer">
