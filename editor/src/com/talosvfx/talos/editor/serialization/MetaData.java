@@ -52,6 +52,7 @@ public class MetaData implements Json.Serializable {
         json.writeValue("previewCamZoom", TalosMain.Instance().UIStage().PreviewWidget().getCameraZoom());
 
         json.writeValue("bgImagePath", TalosMain.Instance().UIStage().PreviewWidget().getBackgroundImagePath());
+        json.writeValue("isGridVisible", TalosMain.Instance().UIStage().PreviewWidget().isGridVisible());
         json.writeValue("bgImageIsInBack", TalosMain.Instance().UIStage().PreviewWidget().isBackgroundImageInBack());
         json.writeValue("bgImageSize", TalosMain.Instance().UIStage().PreviewWidget().getBgImageSize());
         json.writeValue("gridSize", TalosMain.Instance().UIStage().PreviewWidget().getGridSize());
@@ -93,7 +94,8 @@ public class MetaData implements Json.Serializable {
         }
 
         TalosMain.Instance().UIStage().PreviewWidget().setBackgroundImage(jsonData.getString("bgImagePath", null));
-        TalosMain.Instance().UIStage().PreviewWidget().setImagebIsBackground(jsonData.getBoolean("bgImageIsInBack", true));
+        TalosMain.Instance().UIStage().PreviewWidget().setGridVisible(jsonData.getBoolean("isGridVisible", true));
+        TalosMain.Instance().UIStage().PreviewWidget().setImageIsBackground(jsonData.getBoolean("bgImageIsInBack", true));
         TalosMain.Instance().UIStage().PreviewWidget().setBgImageSize(jsonData.getFloat("bgImageSize", 10));
         TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));

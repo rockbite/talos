@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class PreviewImageControllerWidget extends Table {
 
+	CheckBox gridCheckBox;
 	CheckBox backgroundCheckBox;
 	TextField imageSizeField;
 	TextField backgroundSizeField;
@@ -34,6 +35,10 @@ public class PreviewImageControllerWidget extends Table {
 		setBackground(skin.getDrawable("seekbar-background"));
 
 		defaults().pad(5);
+
+		gridCheckBox = new CheckBox("gr", skin);
+		gridCheckBox.setChecked(true);
+		add(gridCheckBox).left();
 
 		backgroundCheckBox = new CheckBox("bg", skin);
 		add(backgroundCheckBox).left();
@@ -88,6 +93,10 @@ public class PreviewImageControllerWidget extends Table {
 		return backgroundCheckBox.isChecked();
 	}
 
+	public boolean isGridVisible() {
+		return gridCheckBox.isChecked();
+	}
+
 	public void removeImage () {
 
 	}
@@ -114,6 +123,10 @@ public class PreviewImageControllerWidget extends Table {
 
 	public void setIsBackground(boolean isBackground) {
 		backgroundCheckBox.setChecked(isBackground);
+	}
+
+	public void setGridVisible(boolean isGridVisible) {
+		gridCheckBox.setChecked(isGridVisible);
 	}
 
 	public void setGridSize(float gridSize) {

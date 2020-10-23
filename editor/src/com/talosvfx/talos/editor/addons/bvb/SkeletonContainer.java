@@ -13,6 +13,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
@@ -33,8 +34,17 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private Array<Event> events = new Array<>();
 
+    private Comparator<String> alphabeticalComparator;
+
     public SkeletonContainer(BvBWorkspace workspace) {
         this.workspace = workspace;
+
+        alphabeticalComparator = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        };
     }
 
     public boolean setSkeleton(FileHandle jsonFileHandle) {
@@ -555,6 +565,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     for(Animation animation : skeleton.getData().getAnimations()) {
                         result.add(animation.getName());
                     }
+
+                    result.sort(alphabeticalComparator);
+
                     return result;
                 }
                 return null;

@@ -2,7 +2,7 @@
 uiskin.png
 size: 2048,1024
 format: RGBA8888
-filter: Nearest,Nearest
+filter: MipMap,Nearest
 repeat: none
 background-fill
   rotate: false

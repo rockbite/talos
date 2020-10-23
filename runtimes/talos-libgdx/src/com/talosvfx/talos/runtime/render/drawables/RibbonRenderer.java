@@ -185,9 +185,14 @@ public class RibbonRenderer implements ParticleDrawable {
         }
 
         public void update(Particle particle, float x, float y) {
+            if(leadLife.get(particle, 0) > particle.alpha) {
+                clean(particle);
+            }
             initIfNull(particle);
 
             float delta = Gdx.graphics.getDeltaTime();
+
+            if(delta > 1f/60f) delta = 1f/60f;
 
             leadPoints.get(particle).set(x, y);
 
