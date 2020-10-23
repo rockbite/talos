@@ -25,7 +25,7 @@ public class TalosLauncher {
 		config.setWindowedMode(1200, 900);
 		config.setTitle("Talos");
 		config.useVsync(false);
-		config.setBackBufferConfig(1,1,1,1,16,16, 16);
+		config.setBackBufferConfig(1,1,1,1,8,8, 16);
 
 		TalosMain talos = new TalosMain();
 
