@@ -144,6 +144,19 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "LerpNode" title = "Lerp" keywords = "lerp" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output Value</value>
+                <value port="input" name="A" type="vec4">A</value>
+                <value port="input" name="B" type="vec4">B</value>
+                <dynamicValue port="input" name="T" type="float" default="0.5" step="0.01" max="1">T</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return mix(A, B, T);
+                ]]>
+            </shader-body>
+        </module>
         <module name = "InverseNode" title = "One Minus" keywords = "math">
             <value port="output" name="outputValue" type="fluid">Output Value</value>
             <value port="input" name="inputValue" type="fluid">Input Value</value>

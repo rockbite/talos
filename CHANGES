@@ -11,7 +11,7 @@
 - Fixed bug with multiple input module not working properly
 
 [1.0.8]
-- Added none patch drawable for particles
+- Added nine patch drawable for particles
 - Particle position is now remembered in project data
 - Distributed mode now distributes random values more smoothly (but slower)
 
