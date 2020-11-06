@@ -491,6 +491,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             String currentAnimationName = jsonData.getString("currAnimation", currentAnimation.getName());
 
             currentSkin = skeleton.getData().findSkin(currentSkinName);
+            if(currentSkin == null) {
+                currentSkin = skeleton.getData().getDefaultSkin();
+            }
             skeleton.setSkin(currentSkin);
             skeleton.setSlotsToSetupPose();
             currentAnimation = skeleton.getData().findAnimation(currentAnimationName);
