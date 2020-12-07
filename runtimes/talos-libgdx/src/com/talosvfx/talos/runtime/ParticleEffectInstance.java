@@ -31,11 +31,6 @@ public class ParticleEffectInstance {
 
     private Array<IEmitter> emitters = new Array<>();
 
-	/**
-	 * Default renderer
-	 */
-	private SpriteBatchParticleRenderer renderer = new SpriteBatchParticleRenderer();
-
     Vector2 position = new Vector2();
 
     ScopePayload scopePayload = new ScopePayload();
@@ -120,11 +115,6 @@ public class ParticleEffectInstance {
 				}
 			}
 		}
-	}
-
-	public void render (Batch batch) {
-    	renderer.setBatch(batch);
-		renderer.render(this);
 	}
 
 	public void render (ParticleRenderer particleRenderer) {

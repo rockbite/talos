@@ -13,12 +13,15 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public class TalosDemo extends ApplicationAdapter {
 
     private Viewport viewport;
     private PolygonSpriteBatch batch;
     private ParticleEffectInstance effect;
+
+    private SpriteBatchParticleRenderer defaultRenderer;
 
     public static void main (String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
@@ -54,6 +57,8 @@ public class TalosDemo extends ApplicationAdapter {
          */
         ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("fire.p"), textureAtlas);
         effect = effectDescriptor.createEffectInstance();
+
+        defaultRenderer = new SpriteBatchParticleRenderer();
     }
 
     @Override
@@ -68,7 +73,10 @@ public class TalosDemo extends ApplicationAdapter {
         batch.setProjectionMatrix(viewport.getCamera().projection);
 
         batch.begin();
-        effect.render(batch);
+
+        defaultRenderer.setBatch(batch);
+        effect.render(defaultRenderer);
+
         batch.end();
     }
 
