@@ -130,7 +130,7 @@ public abstract class AbstractModule implements Json.Serializable {
     public Value fetchOutputSlotValue(int slotId) {
         float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
 
-        if(lastRequester != requester) { // caching mechanism
+        if(lastRequester != requester || (lastRequester == requester && requester == 0f)) { // caching mechanism
             //fetch all local inputs
             fetchAllInputSlotValues();
             // process

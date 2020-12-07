@@ -73,5 +73,9 @@ public class EmConfigModule extends AbstractModule {
         getUserValue().attached = jsonData.getBoolean("attached");
         getUserValue().continuous = jsonData.getBoolean("continuous");
         getUserValue().aligned = jsonData.getBoolean("aligned");
+
+        if(outputValue != null) {
+            outputValue.set(getUserValue());
+        }
     }
 }
