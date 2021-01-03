@@ -5,6 +5,7 @@ Travis
 [![Build Status](https://travis-ci.com/rockbite/talos.svg?branch=master)](https://travis-ci.com/rockbite/talos)
 
 Website: [https://talosvfx.com/](https://talosvfx.com/)
+Discord Server: [https://discord.gg/zjEGT5zEzM](https://discord.gg/zjEGT5zEzM)
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
 
