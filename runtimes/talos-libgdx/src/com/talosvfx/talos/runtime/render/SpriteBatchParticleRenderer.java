@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.runtime.render;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -24,7 +23,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.ParticleEmitterInstance;
+import com.talosvfx.talos.runtime.utils.DefaultShaders;
 
 public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
@@ -44,8 +43,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 	private void initShaders() {
 		blendAddShader = new ShaderProgram(
-				Gdx.files.internal("shaders/blendadd.vert"),
-				Gdx.files.internal("shaders/blendadd.frag"));
+				DefaultShaders.DEFAULT_VERTEX_SHADER,
+				DefaultShaders.BLEND_ADD_FRAGMENT_SHADER);
 	}
 
 	public void setBatch (Batch batch) {
