@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.render.drawables.RibbonRenderer;
+import com.talosvfx.talos.runtime.render.drawables.ShadedDrawable;
+import com.talosvfx.talos.runtime.render.drawables.TextureRegionDrawable;
 import com.talosvfx.talos.runtime.values.DrawableValue;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
@@ -103,7 +105,12 @@ public class RibbonModule extends AbstractModule {
             mainRegion = mainDrawableValue.getDrawable().getTextureRegion();
         }
         if(!ribbonDrawableValue.isEmpty() && ribbonDrawableValue.getDrawable() != null) {
-            ribbonRegion = ribbonDrawableValue.getDrawable().getTextureRegion();
+
+            if(ribbonDrawableValue.getDrawable() instanceof TextureRegionDrawable) {
+                ribbonRegion = ribbonDrawableValue.getDrawable().getTextureRegion();
+            } else if(ribbonDrawableValue.getDrawable() instanceof ShadedDrawable) {
+                renderer.setShadedDrawable((ShadedDrawable) ribbonDrawableValue.getDrawable());
+            }
         }
 
         renderer.setRegions(mainRegion, ribbonRegion);

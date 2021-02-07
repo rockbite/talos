@@ -156,4 +156,17 @@ public class Particle implements Pool.Poolable {
     public IEmitter getEmitter () {
         return emitterReference;
     }
+
+    public void notifyKill() {
+        ParticleModule particleModule = emitterReference.getParticleModule();
+        if(particleModule == null) return;
+        particleModule.updateScopeData(this);
+
+        drawable = particleModule.getDrawable();
+
+        if (drawable != null) {
+            drawable.notifyDispose(this);
+        }
+
+    }
 }

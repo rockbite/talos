@@ -13,7 +13,7 @@ import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.utils.DefaultShaders;
 
-public class ShadedDrawable implements ParticleDrawable {
+public class ShadedDrawable extends ParticleDrawable {
 
     private ShaderProgram shaderProgram;
 
@@ -72,6 +72,27 @@ public class ShadedDrawable implements ParticleDrawable {
     @Override
     public void setCurrentParticle(Particle particle) {
 
+    }
+
+    public ShaderProgram getShaderProgram(Batch batch, Color color, float alpha, float life) {
+        if (shaderProgram == null || !shaderProgram.isCompiled()) return null;
+
+        batch.setShader(shaderProgram);
+
+        shaderProgram.setUniformf("u_time", alpha * life);
+
+        if (textureMap != null) {
+            int bind = 1;
+            for (String uniformName : textureMap.keys()) {
+                Texture texture = textureMap.get(uniformName);
+                texture.bind(bind);
+                shaderProgram.setUniformi(uniformName, bind);
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+                bind++;
+            }
+        }
+
+        return shaderProgram;
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
-public class NinePatchDrawable implements ParticleDrawable {
+public class NinePatchDrawable extends ParticleDrawable {
 
     TextureRegion region;
 

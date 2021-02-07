@@ -23,6 +23,7 @@ public class EmConfigValue extends Value {
     public boolean aligned = false;
     public boolean additive = true;
     public boolean isBlendAdd = false;
+    public boolean immortal = false;
 
     @Override
     public void set(Value value) {
@@ -35,5 +36,6 @@ public class EmConfigValue extends Value {
         this.aligned = from.aligned;
         this.additive = from.additive;
         this.isBlendAdd = from.isBlendAdd;
+        this.immortal = from.immortal;
     }
 }

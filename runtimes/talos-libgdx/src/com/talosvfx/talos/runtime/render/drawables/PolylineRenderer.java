@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
-public class PolylineRenderer implements ParticleDrawable {
+public class PolylineRenderer extends ParticleDrawable {
 
     Particle particleRef;
     int interpolationPointCount;
@@ -46,7 +46,7 @@ public class PolylineRenderer implements ParticleDrawable {
     public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
         Polyline polyline = polyline();
         polyline.set(width, rotation);
-        polyline.draw(batch, region, x, y);
+        polyline.draw(batch, region, x, y, null);
 
         tmpArr.clear();
         for(Particle key: polylineMap.keys()) {

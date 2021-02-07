@@ -20,15 +20,23 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public interface ParticleDrawable {
+public abstract class ParticleDrawable {
 
-    void draw(Batch batch, float x, float y, float width, float height, float rotation);
+    public abstract void draw(Batch batch, float x, float y, float width, float height, float rotation);
 
-    void draw(Batch batch, Particle particle, Color color);
+    public abstract  void draw(Batch batch, Particle particle, Color color);
 
-    float getAspectRatio();
+    public abstract float getAspectRatio();
 
-    void setCurrentParticle(Particle particle);
+    public abstract void setCurrentParticle(Particle particle);
 
-    TextureRegion getTextureRegion();
+    public abstract TextureRegion getTextureRegion();
+
+    public void notifyCreate(Particle particle) {
+
+    }
+
+    public void notifyDispose(Particle particle) {
+
+    }
 }

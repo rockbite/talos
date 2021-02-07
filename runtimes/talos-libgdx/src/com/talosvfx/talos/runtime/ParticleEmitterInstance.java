@@ -42,6 +42,7 @@ public class ParticleEmitterInstance implements IEmitter {
 	boolean paused = false;
 	boolean isContinuous = false;
 	boolean isAttached = false;
+	boolean isImmortal = false;
 
 	public Color tint = new Color(Color.WHITE);
 
@@ -115,6 +116,7 @@ public class ParticleEmitterInstance implements IEmitter {
 		isAttached = emitterModule.isAttached();
 		isAdditive = emitterModule.isAdditive();
 		isBlendAdd = emitterModule.isBlendAdd();
+		isImmortal = emitterModule.isImmortal();
 
 		if(delayTimer > 0) {
 			delayTimer -= delta;
@@ -147,6 +149,10 @@ public class ParticleEmitterInstance implements IEmitter {
 			// let's emmit
 			particlesToEmmit += rate * deltaLeftover;
 
+			if(isImmortal) {
+				particlesToEmmit = Math.max(0, Math.round(rate * duration) - activeParticles.size);
+			}
+
 			int count = (int)particlesToEmmit;
 			for (int i = 0; i < count; i++) {
 				Particle particle = particlePool.obtain();
@@ -165,6 +171,17 @@ public class ParticleEmitterInstance implements IEmitter {
 			if (isContinuous && !isStopped) {
 				// let's repeat
 				restart();
+			} else {
+				// all immortals must die
+				if(isImmortal) {
+					for (int i = activeParticles.size - 1; i >= 0; i--) {
+						Particle particle = activeParticles.get(i);
+						particle.alpha = 1f;
+						particle.notifyKill();
+						particlePool.free(particle);
+						activeParticles.removeIndex(i);
+					}
+				}
 			}
 		}
 
@@ -205,10 +222,35 @@ public class ParticleEmitterInstance implements IEmitter {
 	private void updateParticles(float delta) {
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
 			Particle particle = activeParticles.get(i);
+
 			particle.update(delta);
+
+			if(isImmortal) {
+				// if immortal we don't kill them
+				if (particle.alpha >= 1f) {
+					particle.alpha = particle.alpha - 1f;
+				}
+			}
+
 			if (particle.alpha >= 1f) {
+				particle.notifyKill();
 				particlePool.free(particle);
 				activeParticles.removeIndex(i);
+			}
+		}
+
+		// do some immortality cleaning
+		if(isImmortal) {
+			int particlesToExpect = Math.max(0, Math.round(rate * duration));
+			int particlesToDelete = activeParticles.size - particlesToExpect;
+			if(particlesToDelete > 0) {
+				for (int i = activeParticles.size - 1; i >= particlesToExpect; i--) {
+					Particle particle = activeParticles.get(i);
+					particle.alpha = 1f;
+					particle.notifyKill();
+					particlePool.free(particle);
+					activeParticles.removeIndex(i);
+				}
 			}
 		}
 	}

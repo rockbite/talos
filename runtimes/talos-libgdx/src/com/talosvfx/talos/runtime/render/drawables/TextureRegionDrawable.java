@@ -23,7 +23,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
-public class TextureRegionDrawable implements ParticleDrawable {
+public class TextureRegionDrawable extends ParticleDrawable {
 
     private Sprite region;
 

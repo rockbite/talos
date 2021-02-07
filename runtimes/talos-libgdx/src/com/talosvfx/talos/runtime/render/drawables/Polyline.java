@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -116,7 +117,7 @@ public class Polyline implements Pool.Poolable {
         return points;
     }
 
-    public void draw(Batch batch, TextureRegion region) {
+    public void draw(Batch batch, TextureRegion region, ShaderProgram shaderProgram) {
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;
@@ -137,11 +138,14 @@ public class Polyline implements Pool.Poolable {
             }
 
             // do the actual drawing
+            if(shaderProgram != null) {
+                batch.setShader(shaderProgram);
+            }
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
         }
     }
 
-    public void draw(Batch batch, TextureRegion region, float x, float y) {
+    public void draw(Batch batch, TextureRegion region, float x, float y, ShaderProgram shaderProgram) {
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;
@@ -164,6 +168,9 @@ public class Polyline implements Pool.Poolable {
             }
 
             // do the actual drawing
+            if(shaderProgram != null) {
+                batch.setShader(shaderProgram);
+            }
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
         }
     }

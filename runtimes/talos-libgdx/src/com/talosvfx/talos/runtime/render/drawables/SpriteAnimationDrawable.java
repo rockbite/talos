@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
-public class SpriteAnimationDrawable implements ParticleDrawable {
+public class SpriteAnimationDrawable extends ParticleDrawable {
 
     private TextureRegion region;
 

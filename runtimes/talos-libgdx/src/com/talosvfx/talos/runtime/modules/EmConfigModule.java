@@ -38,6 +38,7 @@ public class EmConfigModule extends AbstractModule {
         userValue.additive = true;
         userValue.isBlendAdd = false;
         userValue.aligned = false;
+        userValue.immortal = false;
     }
 
     @Override
@@ -63,6 +64,7 @@ public class EmConfigModule extends AbstractModule {
         json.writeValue("attached", getUserValue().attached);
         json.writeValue("continuous", getUserValue().continuous);
         json.writeValue("aligned", getUserValue().aligned);
+        json.writeValue("immortal", getUserValue().immortal);
     }
 
     @Override
@@ -73,6 +75,7 @@ public class EmConfigModule extends AbstractModule {
         getUserValue().attached = jsonData.getBoolean("attached");
         getUserValue().continuous = jsonData.getBoolean("continuous");
         getUserValue().aligned = jsonData.getBoolean("aligned");
+        getUserValue().immortal = jsonData.getBoolean("immortal", false);
 
         if(outputValue != null) {
             outputValue.set(getUserValue());

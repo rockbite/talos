@@ -31,6 +31,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     VisCheckBox attachedBox;
     VisCheckBox continuousBox;
     VisCheckBox alignedBox;
+    VisCheckBox immortalBox;
 
     boolean lockListeners = false;
 
@@ -43,6 +44,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         attachedBox = new VisCheckBox("attached");
         continuousBox = new VisCheckBox("continuous");
         alignedBox = new VisCheckBox("aligned");
+        immortalBox = new VisCheckBox("immortal");
 
         Table form = new Table();
 
@@ -55,6 +57,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         form.add(continuousBox).left().padLeft(3);
         form.row();
         form.add(alignedBox).left().padLeft(3);
+        form.row();
+        form.add(immortalBox).left().padLeft(3);
 
         contentWrapper.add(form).left();
         contentWrapper.add().expandX();
@@ -91,6 +95,12 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
                 fromUIToData();
             }
         });
+        immortalBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                fromUIToData();
+            }
+        });
     }
 
     @Override
@@ -106,6 +116,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
             module.getUserValue().attached = attachedBox.isChecked();
             module.getUserValue().continuous = continuousBox.isChecked();
             module.getUserValue().aligned = alignedBox.isChecked();
+            module.getUserValue().immortal = immortalBox.isChecked();
         }
     }
 
@@ -116,6 +127,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         attachedBox.setChecked(module.getUserValue().attached);
         continuousBox.setChecked(module.getUserValue().continuous);
         alignedBox.setChecked(module.getUserValue().aligned);
+        immortalBox.setChecked(module.getUserValue().immortal);
         lockListeners = false;
     }
 
@@ -148,5 +160,9 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
     public void setAligned(boolean attached) {
         alignedBox.setChecked(attached);
+    }
+
+    public void setImmortal(boolean immortal) {
+        immortalBox.setChecked(immortal);
     }
 }

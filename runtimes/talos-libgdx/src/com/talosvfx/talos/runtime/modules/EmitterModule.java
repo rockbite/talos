@@ -141,4 +141,12 @@ public class EmitterModule extends AbstractModule {
         defaultDuration = jsonData.getFloat("duration", 2);
         defaultRate = jsonData.getFloat("rate", 50);
     }
+
+    public boolean isImmortal() {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return false;
+
+        return config.immortal;
+    }
 }
