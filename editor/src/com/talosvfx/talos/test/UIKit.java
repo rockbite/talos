@@ -10,13 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.AbstractShaderNode;
-import com.talosvfx.talos.editor.nodes.widgets.CheckBoxWidget;
-import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
-import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
-import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
-import com.talosvfx.talos.editor.widgets.ui.EmitterList;
 
 public class UIKit extends ApplicationAdapter {
 

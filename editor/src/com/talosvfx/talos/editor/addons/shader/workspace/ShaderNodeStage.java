@@ -1,18 +1,12 @@
 package com.talosvfx.talos.editor.addons.shader.workspace;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -88,7 +82,8 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
 
         colorOutput.buildFragmentShader(builder);
 
-        String fragString = builder.getFragmentString();
+        String methods = builder.generateMethods();
+        String main = builder.getMainContent();
 
         StringWriter writer = new StringWriter();
         XmlWriter xml = new XmlWriter(writer);
@@ -112,9 +107,12 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
                 uniform.pop();
             }
             uniforms.pop();
-            XmlWriter code = shader.element("code");
-            code.text("<![CDATA[" + fragString + "]]>");
-            code.pop();
+            XmlWriter methodsElem = shader.element("methods");
+            methodsElem.text("<![CDATA[" + methods + "]]>");
+            methodsElem.pop();
+            XmlWriter mainElem = shader.element("main");
+            mainElem.text("<![CDATA[" + main + "]]>");
+            mainElem.pop();
             shader.pop();
 
             return writer.toString();

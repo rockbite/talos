@@ -1,13 +1,11 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
-import com.talosvfx.talos.editor.addons.shader.ShaderProject;
-import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
@@ -27,6 +25,8 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
     public final String WRAP = "wrap";
 
     public final String OUTPUT_RGBA = "outputRGBA";
+
+    private static final Color defaultUVOffset = new Color(0, 0, 1, 1);
 
     @Override
     protected String getPreviewOutputName () {
@@ -48,7 +48,29 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
         if(regionName != null) {
             uniformName = shaderBuilder.registerResource(regionName);
             shaderBuilder.declareUniform(uniformName, ShaderBuilder.Type.TEXTURE, this);
+
+
+            shaderBuilder.declareUniform(uniformName + "regionUV", ShaderBuilder.Type.VEC4, new ShaderBuilder.IValueProvider() {
+                @Override
+                public Object getValue () {
+                    return defaultUVOffset;
+                }
+
+                @Override
+                public String getValueDescriptor () {
+                    return regionName;
+                }
+            });
         }
+
+        ShaderBuilder.Argument[] args = new ShaderBuilder.Argument[2];
+        args[0] = new ShaderBuilder.Argument(ShaderBuilder.Type.VEC2, "position");
+        args[1] = new ShaderBuilder.Argument(ShaderBuilder.Type.VEC4, "regionUV");
+        ShaderBuilder.Method applyRegionOffset = shaderBuilder.addMethod(ShaderBuilder.Type.VEC2, "applyRegionOffset", args);
+        applyRegionOffset.addLine("vec2 size = vec2(regionUV.z - regionUV.x, regionUV.w - regionUV.y)");
+        applyRegionOffset.addLine("position = position * size + regionUV.xy");
+        applyRegionOffset.addLine("return position");
+
     }
 
     @Override
@@ -68,6 +90,8 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
 
         if(wrap) {
             sample = "fract(" + sample + ")";
+            // apply region adapting
+            sample = "applyRegionOffset(" + sample + ", " + uniformName + "regionUV" + ")";
         }
 
         if(slotId.equals(OUTPUT_RGBA)) {
@@ -137,7 +161,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
 
         expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        return "gl_FragColor = " + expression + ";";
+        return "return " + expression;
     }
 
     @Override

@@ -1,8 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class TimeNode extends AbstractShaderNode {
 

@@ -1,12 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class ColorChannelsNode extends AbstractShaderNode {
 
@@ -48,6 +43,6 @@ public class ColorChannelsNode extends AbstractShaderNode {
 
         expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        return "gl_FragColor = " + expression + ";";
+        return "return " + expression;
     }
 }

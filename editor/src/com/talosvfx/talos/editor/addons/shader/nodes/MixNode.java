@@ -1,9 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
-import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class MixNode extends AbstractShaderNode {
 

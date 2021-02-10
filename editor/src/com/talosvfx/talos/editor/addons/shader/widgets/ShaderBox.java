@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class ShaderBox extends Actor {
 
@@ -85,6 +85,10 @@ public class ShaderBox extends Actor {
                 if(data.type == ShaderBuilder.Type.FLOAT && data.payload instanceof ShaderBuilder.IValueProvider) {
                     ShaderBuilder.IValueProvider provider = data.payload;
                     shaderProgram.setUniformf(data.variableName, (float)provider.getValue());
+                }
+                if(data.type == ShaderBuilder.Type.VEC4 && data.payload instanceof ShaderBuilder.IValueProvider) {
+                    ShaderBuilder.IValueProvider provider = data.payload;
+                    shaderProgram.setUniformf(data.variableName, (Color) provider.getValue());
                 }
             }
 

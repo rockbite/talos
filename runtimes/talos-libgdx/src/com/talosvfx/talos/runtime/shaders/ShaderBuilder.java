@@ -1,9 +1,9 @@
-package com.talosvfx.talos.editor.addons.shader;
+package com.talosvfx.talos.runtime.shaders;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
 
 import java.util.Arrays;
 
@@ -39,10 +39,8 @@ public class ShaderBuilder {
         resourceCounter = 0;
     }
 
-    public String getFragmentString () {
-
-        String finalString = "";
-        finalString +=
+    public static String DEFAULT_TEMPLATE() {
+        String template =
                 "#ifdef GL_ES\n" +
                 "#define LOWP lowp\n" +
                 "   precision mediump float;\n" +
@@ -50,19 +48,34 @@ public class ShaderBuilder {
                 "   #define LOWP\n" +
                 "#endif\n\n";
 
-        // add declarations here
-        finalString +=
-                "uniform sampler2D u_texture;\n" + //this needs removing
+        template +=
+                "uniform sampler2D u_texture;\n" + //this is baddy
                 "varying LOWP vec4 v_color;\n" +
                 "varying vec2 v_texCoords;\n\n";
 
-        for(UniformData uniformData: declaredUniforms.values()) {
-            String line = "uniform " + uniformData.type.getTypeString() + " " + uniformData.variableName + ";";
-            finalString += line + "\n";
-        }
+        template += "\n\n{CUSTOM_UNIFORMS}\n";
+        template += "\n{CUSTOM_METHODS}\n";
+        template += "\n{SHADER_LOGIC}\n";
 
-        finalString += "\n";
+        template += "void main() {\n";
 
+        template += "gl_FragColor = getFragColor();\n";
+
+        template += "}";
+
+        return template;
+    }
+
+    public String generateFragmentResolve() {
+        String code = "vec4 getFragColor() {\n" +
+                mainContent + "\n" +
+                "}\n";
+
+        return code;
+    }
+
+    public String generateMethods() {
+        String finalString = "";
         if (methodMap.size > 0) {
 
             for(String methodName: methodMap.keys()) {
@@ -74,16 +87,35 @@ public class ShaderBuilder {
             finalString += "\n";
         }
 
-        finalString += "void main() {\n";
+        return finalString;
+    }
 
-        finalString += mainContent;
+    public String generateCustomUniforms() {
+        String uniformString = "";
+        for(UniformData uniformData: declaredUniforms.values()) {
+            String line = "uniform " + uniformData.type.getTypeString() + " " + uniformData.variableName + ";";
+            uniformString += line + "\n";
+        }
 
-        finalString += "}";
+        return uniformString;
+    }
+
+    public String getFragmentString () {
+        return getFragmentString(DEFAULT_TEMPLATE());
+    }
+
+    public String getFragmentString (String template) {
+
+        template = template.replace("{CUSTOM_UNIFORMS}", generateCustomUniforms());
+        template = template.replace("{CUSTOM_METHODS}", generateMethods());
+        template = template.replace("{SHADER_LOGIC}", generateFragmentResolve());
+
+        String finalString = template;
 
         return finalString;
     }
 
-    public String getVertexString() {
+    public static String getVertexString() {
         String result =
                 "attribute vec4 a_position;\n" +
                 "attribute vec4 a_color;\n" +
@@ -112,7 +144,7 @@ public class ShaderBuilder {
         }
 
         String vert = getVertexString();
-        String frag = getFragmentString();
+        String frag = getFragmentString(DEFAULT_TEMPLATE());
 
         ShaderProgram shaderProgram = new ShaderProgram(vert, frag);
         shaderProgram.pedantic = false;
@@ -267,5 +299,30 @@ public class ShaderBuilder {
         uniformToResourceMap.put(uniformName, name);
 
         return uniformName;
+    }
+
+    public String getMainContent() {
+        return mainContent;
+    }
+
+    public static String compileShaderString(ShaderDescriptor shaderDescriptor, String template)  {
+        String logic = shaderDescriptor.getShaderLogic();
+        String methods = shaderDescriptor.getCustomMethods();
+        String uniforms = shaderDescriptor.getCustomUniforms();
+
+        template = template.replace("{CUSTOM_UNIFORMS}", uniforms);
+        template = template.replace("{CUSTOM_METHODS}", methods);
+        template = template.replace("{SHADER_LOGIC}", logic);
+
+        return template;
+    }
+
+
+    public static ShaderProgram compileShader(ShaderDescriptor shaderDescriptor, String template) {
+        String code = compileShaderString(shaderDescriptor, template);
+
+        ShaderProgram shaderProgram = new ShaderProgram(ShaderBuilder.getVertexString(), code);
+
+        return shaderProgram;
     }
 }

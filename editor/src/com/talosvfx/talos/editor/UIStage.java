@@ -533,6 +533,23 @@ public class UIStage {
 		return skin;
 	}
 
+	public void showSaveFileChooser(String extension, FileChooserAdapter listener) {
+		fileChooser.setMode(FileChooser.Mode.SAVE);
+		fileChooser.setMultiSelectionEnabled(false);
+
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(extension);
+			}
+		});
+		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+
+		fileChooser.setListener(listener);
+
+		stage.addActor(fileChooser.fadeIn());
+	}
+
 	public void showFileChooser(String extension, FileChooserAdapter listener) {
 		fileChooser.setMode(FileChooser.Mode.OPEN);
 		fileChooser.setMultiSelectionEnabled(false);

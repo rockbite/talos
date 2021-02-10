@@ -2,21 +2,10 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader;
-import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
-import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 
 public class ColorNode extends AbstractShaderNode {
 
@@ -86,6 +75,6 @@ public class ColorNode extends AbstractShaderNode {
 
         expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        return "gl_FragColor = " + expression + ";";
+        return "return " + expression;
     }
 }

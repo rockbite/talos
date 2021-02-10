@@ -1,9 +1,8 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class GenericMethodNode extends AbstractShaderNode {
 
@@ -120,11 +119,13 @@ public class GenericMethodNode extends AbstractShaderNode {
 
         expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        String result =  "gl_FragColor = " + expression + ";";
+        String result =  "vec4 outputVal = " + expression + ";";
 
         if(!previewTransparency) {
-            result += " gl_FragColor.a = 1.0;";
+            result += "outputVal.a = 1.0;";
         }
+
+        result += "return outputVal;";
 
         return result;
     }

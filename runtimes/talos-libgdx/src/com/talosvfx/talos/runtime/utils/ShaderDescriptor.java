@@ -1,8 +1,10 @@
 package com.talosvfx.talos.runtime.utils;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class ShaderDescriptor {
 
@@ -13,14 +15,26 @@ public class ShaderDescriptor {
     }
 
     public enum Type {
-        FLOAT,
-        VEC2, VEC3, VEC4,
-        TEXTURE
+        FLOAT("float"),
+        VEC2("vec2"), VEC3("vec3"), VEC4("vec4"),
+        TEXTURE("Sampler2D");
+
+        private String typeString;
+
+        Type(String typeString) {
+            this.typeString = typeString;
+        }
+
+        public String getTypeString() {
+            return typeString;
+        }
+
     }
 
     private ObjectMap<String, UniformData> uniformMap = new ObjectMap<>();
 
-    private String fragCode;
+    private String fragResolve;
+    private String customMethods;
 
     public ShaderDescriptor() {
 
@@ -37,9 +51,11 @@ public class ShaderDescriptor {
         XmlReader.Element shader = xmlReader.parse(xmlString);
 
         XmlReader.Element uniforms = shader.getChildByName("uniforms");
-        XmlReader.Element code = shader.getChildByName("code");
+        XmlReader.Element main = shader.getChildByName("main");
+        XmlReader.Element methods = shader.getChildByName("methods");
 
-        fragCode = code.getText();
+        fragResolve = main.getText();
+        customMethods = methods.getText();
 
         for (XmlReader.Element uniformElement: uniforms.getChildrenByName("uniform")) {
             String name = uniformElement.getAttribute("name");
@@ -64,7 +80,28 @@ public class ShaderDescriptor {
         return uniformMap;
     }
 
-    public String getFragCode () {
-        return fragCode;
+    public String getCustomMethods () {
+        return customMethods;
     }
+
+    public String getShaderLogic () {
+        return fragResolve;
+    }
+
+    public String getCustomUniforms () {
+        String uniformString = "";
+        for(UniformData uniformData: uniformMap.values()) {
+            String line = "uniform " + uniformData.type.getTypeString() + " " + uniformData.name + ";";
+            uniformString += line + "\n";
+        }
+
+        return uniformString;
+    }
+
+    public String getFragCode () {
+        String string = ShaderBuilder.compileShaderString(this, ShaderBuilder.DEFAULT_TEMPLATE());
+
+        return string;
+    }
+
 }

@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
@@ -80,7 +82,8 @@ public class ShaderAddon implements IAddon {
         menu.addItem(newFile);
         MenuItem openFile = new MenuItem("Open Shader");
         menu.addItem(openFile);
-
+        MenuItem exportRaw = new MenuItem("Export RAW");
+        menu.addItem(exportRaw);
 
         newFile.addListener(new ClickListener() {
             @Override
@@ -94,6 +97,24 @@ public class ShaderAddon implements IAddon {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 TalosMain.Instance().UIStage().openProjectAction(SHADER_PROJECT);
+            }
+        });
+        exportRaw.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                // export RAW logic
+
+                TalosMain.Instance().UIStage().showSaveFileChooser(".frag", new FileChooserAdapter() {
+                    @Override
+                    public void selected (Array<FileHandle> files) {
+                        String fragShader = ((ShaderNodeStage)(nodeStage)).getFragShader();
+
+                        FileHandle file = files.get(0);
+
+                        file.writeString(fragShader, false);
+                    }
+                });
             }
         });
 

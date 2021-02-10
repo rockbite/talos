@@ -2,11 +2,9 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
 
 public class ColorOutput extends AbstractShaderNode {
 
@@ -54,7 +52,7 @@ public class ColorOutput extends AbstractShaderNode {
             color = "vec4(0.0, 0.0, 0.0, 1.0)";
         }
 
-        shaderBuilder.addLine("gl_FragColor = " + color + "");
+        shaderBuilder.addLine("return " + color);
     }
 
     @Override

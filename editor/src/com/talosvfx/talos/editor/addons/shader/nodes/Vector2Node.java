@@ -1,10 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class Vector2Node extends AbstractShaderNode {
 
@@ -31,6 +27,6 @@ public class Vector2Node extends AbstractShaderNode {
     @Override
     protected String getPreviewLine (String expression) {
         String output = "vec2Val" + getId();
-        return "gl_FragColor = vec4(" + output + ".x, " + output + ".y, 0.0, 1.0)";
+        return "vec4 outputVal = vec4(" + output + ".x, " + output + ".y, 0.0, 1.0); return outputVal;";
     }
 }

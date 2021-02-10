@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class UVNode extends AbstractShaderNode {
 

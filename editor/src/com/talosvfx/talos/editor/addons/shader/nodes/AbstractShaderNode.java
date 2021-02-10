@@ -2,13 +2,11 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.ShaderBuilder;
+import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -229,7 +227,7 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
 
         expression = castTypes(expression, outputType, ShaderBuilder.Type.VEC4, CAST_STRATEGY_REPEAT);
 
-        return "gl_FragColor = " + expression + "; gl_FragColor.a = 1.0;";
+        return "vec4 outputVal = " + expression + "; outputVal.a = 1.0; return outputVal";
     }
 
     protected String getPreviewOutputName () {
