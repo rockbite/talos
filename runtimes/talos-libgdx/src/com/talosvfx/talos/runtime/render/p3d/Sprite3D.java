@@ -107,4 +107,8 @@ public class Sprite3D extends Renderable implements Pool.Poolable {
     public void reset() {
 
     }
+
+    public Sprite getSprite () {
+        return sprite;
+    }
 }
