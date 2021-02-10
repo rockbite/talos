@@ -19,7 +19,9 @@ public class ShadedDrawable extends ParticleDrawable {
 
     private Texture texture;
     private TextureRegion region;
-    private ObjectMap<String, Texture> textureMap;
+    private ObjectMap<String, TextureRegion> textureMap;
+
+    private Color defaultUVOffset = new Color(0, 0, 1, 1);
 
     public ShadedDrawable() {
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -46,18 +48,7 @@ public class ShadedDrawable extends ParticleDrawable {
 
         batch.setShader(shaderProgram);
 
-        shaderProgram.setUniformf("u_time", particle.alpha * particle.life); // TODO this should be exposed as port later on
-
-        if (textureMap != null) {
-            int bind = 1;
-            for (String uniformName : textureMap.keys()) {
-                Texture texture = textureMap.get(uniformName);
-                texture.bind(bind);
-                shaderProgram.setUniformi(uniformName, bind);
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-                bind++;
-            }
-        }
+        shaderProgram = processShaderData(shaderProgram, particle.alpha * particle.life);
 
         batch.setColor(color);
         batch.draw(texture, x - width / 2f, y - height / 2f, width / 2f, height / 2f, width, height, 1f, 1f, rotation, 0, 0, 1, 1, false, false);
@@ -74,23 +65,35 @@ public class ShadedDrawable extends ParticleDrawable {
 
     }
 
+    public ShaderProgram processShaderData(ShaderProgram shaderProgram, float time) {
+        shaderProgram.setUniformf("u_time", time); // TODO this should be exposed as port later on
+
+        if (textureMap != null) {
+            int bind = 1;
+            for (String uniformName : textureMap.keys()) {
+                TextureRegion region = textureMap.get(uniformName);
+                Texture texture = region.getTexture();
+                texture.bind(bind);
+                shaderProgram.setUniformi(uniformName, bind);
+
+                defaultUVOffset.set(region.getU(), region.getV(), region.getU2(), region.getV2());
+
+                shaderProgram.setUniformf(uniformName + "regionUV", defaultUVOffset); // todo: this needs some refactoring maybe
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+                bind++;
+            }
+        }
+
+        return shaderProgram;
+    }
+
     public ShaderProgram getShaderProgram(Batch batch, Color color, float alpha, float life) {
         if (shaderProgram == null || !shaderProgram.isCompiled()) return null;
 
         batch.setShader(shaderProgram);
 
-        shaderProgram.setUniformf("u_time", alpha * life);
-
-        if (textureMap != null) {
-            int bind = 1;
-            for (String uniformName : textureMap.keys()) {
-                Texture texture = textureMap.get(uniformName);
-                texture.bind(bind);
-                shaderProgram.setUniformi(uniformName, bind);
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-                bind++;
-            }
-        }
+        shaderProgram = processShaderData(shaderProgram, alpha * life);
 
         return shaderProgram;
     }
@@ -115,7 +118,7 @@ public class ShadedDrawable extends ParticleDrawable {
         }
     }
 
-    public void setTextures(ObjectMap<String, Texture> textureMap) {
+    public void setTextures(ObjectMap<String, TextureRegion> textureMap) {
         this.textureMap = textureMap;
     }
 }

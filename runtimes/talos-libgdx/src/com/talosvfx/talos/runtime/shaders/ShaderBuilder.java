@@ -310,6 +310,10 @@ public class ShaderBuilder {
         String methods = shaderDescriptor.getCustomMethods();
         String uniforms = shaderDescriptor.getCustomUniforms();
 
+        logic = "vec4 getFragColor() {\n" +
+                logic + "\n" +
+                "}\n";
+
         template = template.replace("{CUSTOM_UNIFORMS}", uniforms);
         template = template.replace("{CUSTOM_METHODS}", methods);
         template = template.replace("{SHADER_LOGIC}", logic);

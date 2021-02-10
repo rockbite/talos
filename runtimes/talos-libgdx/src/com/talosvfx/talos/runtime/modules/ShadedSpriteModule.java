@@ -21,7 +21,7 @@ public class ShadedSpriteModule extends AbstractModule {
     private DrawableValue outputValue;
     public String shdrFileName;
 
-    public ObjectMap<String, Texture> textureMap = new ObjectMap<>();
+    public ObjectMap<String, TextureRegion> textureMap = new ObjectMap<>();
 
     @Override
     protected void defineSlots () {
@@ -76,7 +76,7 @@ public class ShadedSpriteModule extends AbstractModule {
 
                 if (data.type == ShaderDescriptor.Type.TEXTURE) {
                     TextureRegion textureRegion = graph.getEffectDescriptor().getAssetProvider().findAsset(data.payload, TextureRegion.class);
-                    textureMap.put(uniformName, textureRegion.getTexture());
+                    textureMap.put(uniformName, textureRegion);
                 }
             }
 

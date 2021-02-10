@@ -17,12 +17,22 @@ public class ShaderDescriptor {
     public enum Type {
         FLOAT("float"),
         VEC2("vec2"), VEC3("vec3"), VEC4("vec4"),
-        TEXTURE("Sampler2D");
+        TEXTURE("sampler2D");
 
         private String typeString;
 
         Type(String typeString) {
             this.typeString = typeString;
+        }
+
+        public static Type getFor(String type) {
+            if(type.equals("float")) return FLOAT;
+            if(type.equals("vec2")) return VEC2;
+            if(type.equals("vec3")) return VEC3;
+            if(type.equals("vec4")) return VEC4;
+            if(type.equals("sampler2D")) return TEXTURE;
+
+            return FLOAT;
         }
 
         public String getTypeString() {
@@ -69,7 +79,7 @@ public class ShaderDescriptor {
                 uniformData.type = Type.TEXTURE;
                 uniformData.payload = body;
             } else {
-                uniformData.type = Type.FLOAT; //TODO: this we can handle some other time
+                uniformData.type = Type.getFor(type);
             }
 
             uniformMap.put(name, uniformData);
