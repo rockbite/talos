@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -115,6 +116,9 @@ public class TalosMain extends ApplicationAdapter {
 	public Cursor pickerCursor;
 	private Cursor currentCursor;
 
+	private Array<InputProcessor> inputProcessors = new Array<>();
+	private Array<InputProcessor> customInputProcessors = new Array<>();
+
 	public TalosMain () {
 
 	}
@@ -176,12 +180,16 @@ public class TalosMain extends ApplicationAdapter {
 
 		projectController = new ProjectController();
 
+
+		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
+
+		inputMultiplexer = new InputMultiplexer();
+		setInputProcessors();
+
 		uiStage.init();
 		nodeStage.init();
 
 		addonController.initAll();
-
-		inputMultiplexer = new InputMultiplexer(uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -204,6 +212,21 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
+	private void setInputProcessors() {
+		inputMultiplexer.clear();
+		for(InputProcessor processor: inputProcessors) {
+			inputMultiplexer.addProcessor(processor);
+		}
+		for(InputProcessor processor: customInputProcessors) {
+			inputMultiplexer.addProcessor(processor);
+		}
+	}
+
+	public void addCustomInputProcessor(InputProcessor inputProcessor) {
+		customInputProcessors.add(inputProcessor);
+		setInputProcessors();
+	}
+
 	public void setCursor(Cursor cursor) {
 		if(currentCursor != cursor) {
 			if(cursor != null) {
@@ -217,17 +240,23 @@ public class TalosMain extends ApplicationAdapter {
 
 	public void disableNodeStage() {
 		currentWorkplaceStage = null;
-		inputMultiplexer.removeProcessor(nodeStage.getStage());
+		inputProcessors.removeValue(nodeStage.getStage(), true);
 	}
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputProcessors.clear();
+		inputProcessors.add(nodeStage.getStage());
+		inputProcessors.add(currentWorkplaceStage.getStage());
+		setInputProcessors();
 	}
 
 	public void enableNodeStage() {
 		currentWorkplaceStage = nodeStage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputProcessors.clear();
+		inputProcessors.add(uiStage.getStage());
+		inputProcessors.add(currentWorkplaceStage.getStage());
+		setInputProcessors();
 	}
 
 	@Override

@@ -393,7 +393,7 @@ public class UIStage {
 
 
 	private void constructSplitPanes () {
-		previewWidget = new PreviewWidget();
+		previewWidget = new Preview3D(); // how do we swap 2d and 3d
 
 		emitterList = new EmitterList(skin);
 
