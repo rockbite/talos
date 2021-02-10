@@ -1,3 +1,9 @@
+[1.3.0]
+- Ribbon refactor for optimisation - now pools accumulator data
+- Shader graph now can theoretically support texture region's instead of only raw textures
+- Shader graph refactor to support shader templates for custom code
+- Shader graph now has export RAW option to export shader as is, but can also export XML that only contains portions of code
+
 [1.2.0]
 - Various Buffixes
 - Shadergraph addon (this is a big deal)
