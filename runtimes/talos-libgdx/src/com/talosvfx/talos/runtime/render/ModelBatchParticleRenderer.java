@@ -47,7 +47,7 @@ public class ModelBatchParticleRenderer implements ParticleRenderer, RenderableP
         if(!materialMap.containsKey(texture)) {
             Material tmpMaterial = new Material(
                     TextureAttribute.createDiffuse(texture),
-                    new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE, 1f),
+                    new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f),
                     FloatAttribute.createAlphaTest(0.1f)
             );
             materialMap.put(texture, tmpMaterial);

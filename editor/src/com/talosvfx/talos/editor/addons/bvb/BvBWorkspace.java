@@ -45,6 +45,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private float speedMultiplier = 1f;
     private boolean preMultipliedAlpha = false;
+    private boolean showGrid = true;
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
@@ -289,9 +290,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-        batch.end();
-        drawGrid(batch, parentAlpha);
-        batch.begin();
+        if(showGrid) {
+            batch.end();
+            drawGrid(batch, parentAlpha);
+            batch.begin();
+        }
 
         drawVFXBefore(batch, parentAlpha);
         drawSpine(batch, parentAlpha);
@@ -570,6 +573,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         }
         json.writeObjectEnd();
         json.writeValue("pma", preMultipliedAlpha);
+        json.writeValue("showGrid", showGrid);
         json.writeValue("speed", speedMultiplier);
         json.writeValue("worldSize", getWorldWidth());
         json.writeValue("spineScale", getSpineScale());
@@ -594,6 +598,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         skeletonContainer.read(json, jsonData.get("skeleton"));
 
         preMultipliedAlpha = jsonData.getBoolean("pma", false);
+        showGrid = jsonData.getBoolean("showGrid", true);
         speedMultiplier = jsonData.getFloat("speed", 1f);
         setWorldSize(jsonData.getFloat("worldSize", 1280));
         float scl = jsonData.getFloat("spineScale", 1);
@@ -643,6 +648,18 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
         };
 
+        CheckboxWidget showGridWidget = new CheckboxWidget("show/hide grid") {
+            @Override
+            public Boolean getValue() {
+                return showGrid;
+            }
+
+            @Override
+            public void valueChanged(Boolean value) {
+                showGrid = value;
+            }
+        };
+
         FloatPropertyWidget speed = new FloatPropertyWidget("speed multiplier") {
             @Override
             public Float getValue() {
@@ -682,6 +699,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         };
 
 
+        properties.add(showGridWidget);
         properties.add(preMultipliedAlphaWidget);
         properties.add(speed);
         properties.add(worldWidthWidget);
