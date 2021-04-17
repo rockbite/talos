@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -49,7 +50,7 @@ public abstract class ViewportWidget extends Table {
     protected float minZoom = 100f;
 
     protected ShapeRenderer shapeRenderer;
-    private float gridSize;
+    public float gridSize;
     private float worldWidth = 1f;
 
     private Vector3 tmp = new Vector3();
@@ -86,6 +87,7 @@ public abstract class ViewportWidget extends Table {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                if(event.isHandled()) return false;
                 cameraController.touchDown((int)x, (int)y, pointer, button);
                 return !event.isHandled();
             }
@@ -305,5 +307,16 @@ public abstract class ViewportWidget extends Table {
 
     public float getWorldWidth() {
         return worldWidth;
+    }
+
+    public Camera getCamera () {
+        return camera;
+    }
+
+    public Vector2 toContentPosition(Vector2 point) {
+        getWorldFromLocal(tmp.set(point.x, point.y, 0));
+        point.set(tmp.x, tmp.y);
+
+        return point;
     }
 }

@@ -76,7 +76,7 @@ public class ShaderAddon implements IAddon {
 
     @Override
     public void buildMenu (MenuBar menuBar) {
-        Menu menu = new Menu("Shader Graph");
+        Menu menu = new Menu("Shaders");
 
         MenuItem newFile = new MenuItem("New Shader");
         menu.addItem(newFile);

@@ -460,11 +460,23 @@ public class UIStage {
 			verticalPane.setVisible(false);
 		}
 
+		if(bottom == null) {
+			verticalPane.setMaxSplitAmount(1);
+			verticalPane.setSplitAmount(1);
+		} else {
+			verticalPane.setMaxSplitAmount(0.7f);
+			verticalPane.setSplitAmount(0.7f);
+		}
+
 	}
 
 	public void swapToTalosContent() {
 		verticalPane.setVisible(true);
+		bottomPane.setVisible(true);
 		horizontalPane.setVisible(true);
+
+		verticalPane.setMaxSplitAmount(0.7f);
+		verticalPane.setSplitAmount(0.7f);
 
 		leftTable.clearChildren();
 		rightTable.clearChildren();
