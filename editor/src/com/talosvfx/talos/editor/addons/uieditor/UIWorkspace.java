@@ -8,11 +8,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.uieditor.runtime.BackgroundGroup;
+import com.talosvfx.talos.editor.addons.uieditor.runtime.UICanvas;
+import com.talosvfx.talos.editor.addons.uieditor.runtime.anchors.Anchor;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 public class UIWorkspace extends ViewportWidget implements Json.Serializable {
@@ -21,10 +22,7 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
 
     private Stage stage;
 
-    private Image canvasBackground;
-    private Group canvasContainer;
-
-    private Color canvasBg = new Color(0x282728ff);
+    private UICanvas canvasContainer;
 
     private Vector2 tmpVec = new Vector2();
     private Vector3 vec3 = new Vector3();
@@ -59,24 +57,37 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
     }
 
     private void initCanvas () {
-        canvasBackground = new Image(getSkin().getDrawable("white"));
-        canvasBackground.setColor(canvasBg);
-
-        canvasContainer = new Group();
-        canvasBackground.setTouchable(Touchable.enabled);
-        canvasContainer.setTouchable(Touchable.disabled);
-        canvasContainer.setTransform(false);
+        canvasContainer = new UICanvas(getSkin());
+        canvasContainer.setTouchable(Touchable.enabled);
         canvasContainer.setSize(511, 511);
-
-        stage.addActor(canvasBackground);
         stage.addActor(canvasContainer);
 
-        canvasBackground.setPosition(camera.position.x - canvasContainer.getWidth()/2f, camera.position.y - canvasContainer.getHeight()/2f);
-        canvasContainer.setPosition(canvasBackground.getX(), canvasBackground.getY());
+        canvasContainer.setPosition(camera.position.x - canvasContainer.getWidth()/2f, camera.position.y - canvasContainer.getHeight()/2f);
 
-        Table table = new Table();
-        table.setSize(511, 511);
-        canvasContainer.addActor(table);
+        // testing here
+        BackgroundGroup group = new BackgroundGroup();
+        group.setBackground(getSkin().newDrawable("white", Color.MAROON));
+        canvasContainer.addActor(group);
+        Anchor anchor = canvasContainer.getAnchor(group);
+        anchor.anchorTo(canvasContainer);
+        anchor.setAlign(Align.center);
+        anchor.setOffset(0, 0);
+        anchor.setSize(1f, -20, 1f, -20);
+
+        group.setTouchable(Touchable.enabled);
+        group.addListener(new InputListener() {
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                selectElementEvent(event);
+                return true;
+            }
+        });
+    }
+
+    private void selectElementEvent(InputEvent event) {
+        if(event.isHandled()) return;
+        selectActor(event.getTarget());
+        event.handle();
     }
 
     private void addListeners () {
@@ -98,19 +109,26 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
                 }
 
                 if (hitDetected) {
-                    event.handle();
                     return true;
                 }
 
+                Actor target = stage.hit(tmpVec.x, tmpVec.y, true);
                 // we clicked somewhere empty?
+
                 if(!parent) {
                     vec3.set(tmpVec.x, tmpVec.y, 0);
                     camera.project(vec3);
                     parent = stage.touchDown((int)vec3.x, Gdx.graphics.getHeight() - (int)vec3.y, pointer, button);
 
                     if(!parent) {
-                        unSelectAll();
+                        if (target == null) {
+                            unSelectAll();
+                        }
                     }
+                }
+
+                if(target == canvasContainer) {
+                    return false;
                 }
 
                 return parent;
@@ -143,14 +161,27 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
                 camera.project(vec3);
                 stage.touchUp((int)vec3.x, Gdx.graphics.getHeight() - (int)vec3.y, pointer, button);
             }
+
+            @Override
+            public boolean mouseMoved (InputEvent event, float x, float y) {
+                boolean handled = super.mouseMoved(event, x, y);
+
+                tmpVec.set(x, y);
+                toContentPosition(tmpVec);
+
+                for (BoxTransform box: transformArray) {
+                    box.mouseMoved(tmpVec.x,  tmpVec.y);
+                }
+
+                return handled;
+            }
         });
 
-        canvasBackground.addListener(new ClickListener() {
+        canvasContainer.addListener(new InputListener() {
             @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-
-                selectActor(canvasContainer);
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                selectElementEvent(event);
+                return true;
             }
         });
     }
@@ -198,9 +229,6 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
     public void act (float delta) {
         super.act(delta);
         stage.act();
-
-        canvasBackground.setPosition(canvasContainer.getX(), canvasContainer.getY());
-        canvasBackground.setSize(canvasContainer.getWidth(), canvasContainer.getHeight());
     }
 
     @Override
@@ -234,5 +262,9 @@ public class UIWorkspace extends ViewportWidget implements Json.Serializable {
 
     public Stage getMainStage () {
         return stage;
+    }
+
+    public UICanvas getCanvas () {
+        return canvasContainer;
     }
 }

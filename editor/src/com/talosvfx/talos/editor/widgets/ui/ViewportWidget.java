@@ -87,7 +87,6 @@ public abstract class ViewportWidget extends Table {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                if(event.isHandled()) return false;
                 cameraController.touchDown((int)x, (int)y, pointer, button);
                 return !event.isHandled();
             }
