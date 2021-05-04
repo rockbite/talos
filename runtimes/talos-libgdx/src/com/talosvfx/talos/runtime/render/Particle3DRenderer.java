@@ -3,10 +3,13 @@ package com.talosvfx.talos.runtime.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
@@ -15,45 +18,32 @@ import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.drawables.TextureRegionDrawable;
+import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 import com.talosvfx.talos.runtime.render.p3d.Sprite3D;
+import com.talosvfx.talos.runtime.render.p3d.SpriteVertGenerator;
 
-public class ModelBatchParticleRenderer implements ParticleRenderer, RenderableProvider {
+public class Particle3DRenderer implements ParticleRenderer, RenderableProvider {
 
-    private ModelBatch modelBatch;
-    private Environment environment;
     private ParticleEffectInstance particleEffectInstance;
-    private PerspectiveCamera worldCamera;
 
     private ObjectMap<Texture, Material> materialMap = new ObjectMap<>();
 
     private Pool<Sprite3D> sprite3DPool;
 
     private Array<Sprite3D> cleanBuffer = new Array<>();
+    private Simple3DBatch batch;
+
+    private Vector3 pos = new Vector3();
+    private Vector3 rot = new Vector3();
 
 
-    public ModelBatchParticleRenderer() {
-        // test shit
-
-
+    public Particle3DRenderer () {
         sprite3DPool = new Pool<Sprite3D>() {
             @Override
             protected Sprite3D newObject() {
                 return new Sprite3D();
             }
         };
-    }
-
-    public Material getMaterial(Texture texture) {
-        if(!materialMap.containsKey(texture)) {
-            Material tmpMaterial = new Material(
-                    TextureAttribute.createDiffuse(texture),
-                    new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f),
-                    FloatAttribute.createAlphaTest(0.1f)
-            );
-            materialMap.put(texture, tmpMaterial);
-        }
-
-        return materialMap.get(texture);
     }
 
 
@@ -79,21 +69,12 @@ public class ModelBatchParticleRenderer implements ParticleRenderer, RenderableP
             TextureRegionDrawable textureRegionDrawable = (TextureRegionDrawable) drawable;
             Texture texture = textureRegionDrawable.getTextureRegion().getTexture();
 
+            pos.set(particle.getX(), particle.getY(), 0);
+            rot.set(particle.rotation, 0, 0); // xy, yz, zx
+            float[] verts = SpriteVertGenerator.getSprite(pos, rot, particle.color, particle.size.x, particle.size.y);
 
-            // this is the place to create renderables for each particle
-            Sprite3D tmpSprite = sprite3DPool.obtain();
-            cleanBuffer.add(tmpSprite);
-            tmpSprite.getSprite().setRegion(texture);
-            tmpSprite.setMaterial(getMaterial(texture));
-            tmpSprite.setSize(particle.size.x, particle.size.y);
-
-            tmpSprite.setPosition(particle.getX(), particle.getY());
-            modelBatch.render(tmpSprite);
+            batch.render(verts);
         }
-    }
-
-    public void setBatch(ModelBatch batch) {
-        modelBatch = batch;
     }
 
     @Override
@@ -101,8 +82,7 @@ public class ModelBatchParticleRenderer implements ParticleRenderer, RenderableP
 
     }
 
-    public void setWorld(PerspectiveCamera worldCamera, Environment environment) {
-        this.worldCamera = worldCamera;
-        this.environment = environment;
+    public void setBatch (Simple3DBatch batch) {
+        this.batch = batch;
     }
 }

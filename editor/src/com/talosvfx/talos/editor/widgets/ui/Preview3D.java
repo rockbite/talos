@@ -1,36 +1,32 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
-import com.badlogic.gdx.graphics.g3d.particles.batches.ModelInstanceParticleBatch;
-import com.badlogic.gdx.graphics.g3d.particles.batches.PointSpriteParticleBatch;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.ModelBatchParticleRenderer;
+import com.talosvfx.talos.runtime.render.Particle3DRenderer;
+import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 
 public class Preview3D extends PreviewWidget {
 
+    private final ShaderProgram shaderProgram;
     //Controls
     private CameraInputController cameraInputController;
 
-    private ModelBatchParticleRenderer particleRenderer;
+    private Particle3DRenderer particleRenderer;
 
     //Render
     public PerspectiveCamera worldCamera;
@@ -39,6 +35,7 @@ public class Preview3D extends PreviewWidget {
     private ModelInstance xyzInstance, xzPlaneInstance, xyPlaneInstance;
     private Environment environment;
     private ModelBatch modelBatch;
+    private Simple3DBatch simple3DBatch;
 
     public Preview3D() {
         super();
@@ -50,7 +47,7 @@ public class Preview3D extends PreviewWidget {
         environment.add(new DirectionalLight().set(Color.WHITE, 0,0,-1));
 
         worldCamera = new PerspectiveCamera(67, w, h);
-        worldCamera.position.set(10, 10, 10);
+        worldCamera.position.set(0, 0, 10);
         worldCamera.lookAt(0,0,0);
         worldCamera.near = 0.1f;
         worldCamera.far = 300f;
@@ -73,8 +70,11 @@ public class Preview3D extends PreviewWidget {
         setDrawXYZ(true);
         setDrawXZPlane(true);
 
-        particleRenderer = new ModelBatchParticleRenderer();
-        particleRenderer.setWorld(worldCamera, environment);
+        simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked()));
+        shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/3d/vert.glsl"), Gdx.files.internal("shaders/3d/frag.glsl"));
+
+
+        particleRenderer = new Particle3DRenderer();
 
         TalosMain.Instance().addCustomInputProcessor(cameraInputController);
     }
@@ -181,16 +181,21 @@ public class Preview3D extends PreviewWidget {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 
         modelBatch.begin(worldCamera);
-        if(isDrawXYZ) modelBatch.render(xyzInstance);
+        //if(isDrawXYZ) modelBatch.render(xyzInstance);
         if(isDrawXZPlane) modelBatch.render(xzPlaneInstance);
         if(isDrawXYPlane) modelBatch.render(xyPlaneInstance);
 
         //Draw
-        particleRenderer.setBatch(modelBatch);
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        particleEffect.render(particleRenderer);
-
         modelBatch.end();
+
+
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+        simple3DBatch.begin(worldCamera, shaderProgram);
+        particleRenderer.setBatch(simple3DBatch);
+        particleEffect.render(particleRenderer);
+        simple3DBatch.end();
+
+
 
         batch.begin();
     }
