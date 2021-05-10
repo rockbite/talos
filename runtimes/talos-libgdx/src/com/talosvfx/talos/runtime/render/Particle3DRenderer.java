@@ -63,6 +63,7 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
         cleanBuffer.clear();
     }
 
+    Color tempColour = new Color();
     private void processParticle(Particle particle, float alpha) {
         ParticleDrawable drawable = particle.drawable;
         if(drawable instanceof TextureRegionDrawable) {
@@ -71,9 +72,11 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
 
             pos.set(particle.getX(), particle.getY(), 0);
             rot.set(particle.rotation, 0, 0); // xy, yz, zx
-            float[] verts = SpriteVertGenerator.getSprite(pos, rot, particle.color, particle.size.x, particle.size.y);
+            tempColour.set(particle.color);
+            tempColour.a = particle.transparency;
+            float[] verts = SpriteVertGenerator.getSprite(pos, rot, tempColour, particle.size.x, particle.size.y);
 
-            batch.render(verts);
+            batch.render(verts, texture);
         }
     }
 

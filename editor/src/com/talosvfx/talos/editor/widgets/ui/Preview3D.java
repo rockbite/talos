@@ -70,9 +70,8 @@ public class Preview3D extends PreviewWidget {
         setDrawXYZ(true);
         setDrawXZPlane(true);
 
-        simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked()));
+        simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
         shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/3d/vert.glsl"), Gdx.files.internal("shaders/3d/frag.glsl"));
-
 
         particleRenderer = new Particle3DRenderer();
 
@@ -189,11 +188,18 @@ public class Preview3D extends PreviewWidget {
         modelBatch.end();
 
 
+//        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+//        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+
         final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         simple3DBatch.begin(worldCamera, shaderProgram);
         particleRenderer.setBatch(simple3DBatch);
         particleEffect.render(particleRenderer);
         simple3DBatch.end();
+
 
 
 

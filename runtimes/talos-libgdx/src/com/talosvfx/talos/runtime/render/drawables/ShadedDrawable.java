@@ -106,7 +106,7 @@ public class ShadedDrawable extends ParticleDrawable {
     public void setShader(String fragCode) {
         if (fragCode == null) return;
 
-        ShaderProgram.pedantic = false;
+        ShaderProgram.pedantic = true;
 
         shaderProgram = new ShaderProgram(
                 DefaultShaders.DEFAULT_VERTEX_SHADER,
