@@ -246,7 +246,7 @@ public class TalosMain extends ApplicationAdapter {
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
 		inputProcessors.clear();
-		inputProcessors.add(nodeStage.getStage());
+		inputProcessors.add(uiStage.getStage());
 		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
