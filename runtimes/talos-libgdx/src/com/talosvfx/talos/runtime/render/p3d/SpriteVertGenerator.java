@@ -35,8 +35,10 @@ public class SpriteVertGenerator {
 
 
 
-        tempPos.set(position.x - width/2f, position.y - height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set(- width/2f,  - height/2f, 0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+        tempPos.add(position);
 
         // triangle A
         data[idx++] = tempPos.x;
@@ -46,8 +48,11 @@ public class SpriteVertGenerator {
         data[idx++] = 0;
         data[idx++] = 0;
 
-        tempPos.set(position.x - width/2f, position.y + height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set(- width/2f, height/2f, 0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+
+        tempPos.add(position);
 
         data[idx++] = tempPos.x;
         data[idx++] = tempPos.y;
@@ -56,8 +61,11 @@ public class SpriteVertGenerator {
         data[idx++] = 0;
         data[idx++] = 1;
 
-        tempPos.set(position.x + width/2f, position.y - height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set(width/2f, - height/2f, 0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+
+        tempPos.add(position);
 
 
         data[idx++] = tempPos.x;
@@ -69,8 +77,11 @@ public class SpriteVertGenerator {
 
         // triangle B
 
-        tempPos.set(position.x - width/2f, position.y + height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set( - width/2f,  + height/2f, 0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+
+        tempPos.add(position);
 
         data[idx++] = tempPos.x;
         data[idx++] = tempPos.y;
@@ -79,8 +90,11 @@ public class SpriteVertGenerator {
         data[idx++] = 0;
         data[idx++] = 1;
 
-        tempPos.set(position.x + width/2f, position.y + height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set( + width/2f,  height/2f,0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+
+        tempPos.add(position);
 
         data[idx++] = tempPos.x;
         data[idx++] = tempPos.y;
@@ -89,8 +103,11 @@ public class SpriteVertGenerator {
         data[idx++] = 1;
         data[idx++] = 1;
 
-        tempPos.set(position.x + width/2f, position.y - height/2f, position.z);
-        tempPos.rotate(rotation.x, 0, 1, 0);
+        tempPos.set(width/2f,  - height/2f,0);
+        tempPos.rotate(rotation.x, 0, 0, 1);
+        tempPos.rotate(rotation.y, 0, 1, 0);
+
+        tempPos.add(position);
 
         data[idx++] = tempPos.x;
         data[idx++] = tempPos.y;

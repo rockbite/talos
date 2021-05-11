@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 
@@ -41,7 +42,7 @@ public class TextureRegionDrawable extends ParticleDrawable {
 
     @Override
     public void draw(Batch batch, Particle particle, Color color) {
-		float rotation = particle.rotation;
+		Vector3 rotation = particle.rotation;
 		float width = particle.size.x;
 		float height = particle.size.y;
 		float y = particle.getY();
@@ -51,7 +52,7 @@ public class TextureRegionDrawable extends ParticleDrawable {
 
 		region.setColor(color);
 
-		draw(batch, x, y, width, height, rotation);
+		draw(batch, x, y, width, height, rotation.x);
 	}
 
 	@Override

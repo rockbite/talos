@@ -19,6 +19,7 @@ package com.talosvfx.talos.runtime;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
 
@@ -30,7 +31,7 @@ public class Particle implements Pool.Poolable {
     public Vector2 position = new Vector2();
     public float life;
     public float transparency;
-    public float rotation;
+    public Vector3 rotation = new Vector3();
     public Vector2 size = new Vector2();
 
     public Color color = new Color();
@@ -107,9 +108,9 @@ public class Particle implements Pool.Poolable {
         transparency = particleModule.getTransparency();
 
         if(emitterReference.getEmitterModule().isAligned()) {
-            rotation = angle + particleModule.getRotation();
+            rotation.set(angle, angle, angle).add(particleModule.getRotation());
         } else {
-            rotation = particleModule.getRotation();
+            rotation.set(particleModule.getRotation());
         }
 
         drawable = particleModule.getDrawable(); // important to get drawable before size

@@ -19,6 +19,7 @@ package com.talosvfx.talos.runtime.render.drawables;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
@@ -64,13 +65,13 @@ public class PolylineRenderer extends ParticleDrawable {
 
     @Override
     public void draw (Batch batch, Particle particle, Color color) {
-        float rotation = particle.rotation;
+        Vector3 rotation = particle.rotation;
         float width = particle.size.x;
         float height = particle.size.y;
         float y = particle.getY();
         float x = particle.getX();
 
-        draw(batch, x, y, width, height, rotation);
+        draw(batch, x, y, width, height, rotation.x);
     }
 
     @Override

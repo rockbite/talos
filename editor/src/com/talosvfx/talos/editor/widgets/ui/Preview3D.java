@@ -177,7 +177,7 @@ public class Preview3D extends PreviewWidget {
 
         batch.end();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0);
 
         modelBatch.begin(worldCamera);
         //if(isDrawXYZ) modelBatch.render(xyzInstance);
@@ -192,13 +192,15 @@ public class Preview3D extends PreviewWidget {
 //        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         simple3DBatch.begin(worldCamera, shaderProgram);
         particleRenderer.setBatch(simple3DBatch);
         particleEffect.render(particleRenderer);
         simple3DBatch.end();
+
+//        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
 
 

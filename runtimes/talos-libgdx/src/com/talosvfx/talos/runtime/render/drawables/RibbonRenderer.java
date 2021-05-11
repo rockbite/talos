@@ -67,7 +67,7 @@ public class RibbonRenderer extends ParticleDrawable {
 
     @Override
     public void draw(Batch batch, Particle particle, Color color) {
-        float rotation = particle.rotation;
+        float rotation = particle.rotation.x;
         float width = particle.size.x;
         float height = particle.size.y;
         float y = particle.getY();

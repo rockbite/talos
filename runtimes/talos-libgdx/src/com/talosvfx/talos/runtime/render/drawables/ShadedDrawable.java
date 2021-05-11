@@ -38,7 +38,7 @@ public class ShadedDrawable extends ParticleDrawable {
 
         if (shaderProgram == null || !shaderProgram.isCompiled()) return;
 
-        float rotation = particle.rotation;
+        float rotation = particle.rotation.x;
         float width = particle.size.x;
         float height = particle.size.y;
         float y = particle.getY();

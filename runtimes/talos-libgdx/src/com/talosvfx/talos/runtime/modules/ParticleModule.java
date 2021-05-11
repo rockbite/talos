@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.Particle;
@@ -62,6 +63,7 @@ public class ParticleModule extends AbstractModule {
 
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
+    Vector3 tmp3Vec = new Vector3();
     private ParticleDrawable defaultDrawable;
 
     @Override
@@ -133,10 +135,11 @@ public class ParticleModule extends AbstractModule {
         return velocity.getFloat();
     }
 
-    public float getRotation() {
+    public Vector3 getRotation() {
         fetchInputSlotValue(ROTATION);
-        if(rotation.isEmpty()) return 0; // defaults
-        return rotation.getFloat();
+        if(rotation.isEmpty()) return tmp3Vec.setZero(); // defaults
+        final float[] elements = rotation.getElements();
+        return tmp3Vec.set(elements[0], elements[1], elements[2]);
     }
 
     public Vector2 getSize() {
