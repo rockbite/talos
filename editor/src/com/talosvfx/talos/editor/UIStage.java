@@ -24,6 +24,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -49,7 +50,6 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.ProjectController;
-import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.widgets.ui.*;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -68,6 +68,7 @@ public class UIStage {
 
 	private EmitterList emitterList;
 	public PreviewWidget previewWidget;
+	public PreviewImageControllerWidget previewController;
 
 	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
@@ -85,9 +86,14 @@ public class UIStage {
 	private Table bottomTable;
 
 	private Table bottomContainer;
+	private Cell<PreviewWidget> previewWidgetCell;
+	private Table previewWidgetContainer;
 	private MainMenu mainMenu;
 	private VisSplitPane horizontalPane;
 	private VisSplitPane verticalPane;
+
+	private Preview3D innerTertiumActor;
+	private Preview2D innerSecundumActor;
 
 
 	public UIStage (Skin skin) {
@@ -391,9 +397,27 @@ public class UIStage {
 		stage.addActor((batchConvertDialog.fadeIn()));
 	}
 
+	private void buildPreviewController () {
+		previewController = new PreviewImageControllerWidget(TalosMain.Instance().getSkin()) {
+			@Override
+			public void removeImage () {
+				super.removeImage();
+				previewWidget.removePreviewImage();
+			}
+
+			@Override
+			public void gridSizeChanged(float size) {
+				super.gridSizeChanged(size);
+				previewWidget.gridSizeChanged(size);
+			}
+		};
+	}
 
 	private void constructSplitPanes () {
-		previewWidget = new Preview3D(); // how do we swap 2d and 3d
+		buildPreviewController();
+		innerSecundumActor = new Preview2D(previewController);
+		innerTertiumActor = new Preview3D(previewController);
+		previewWidget = innerTertiumActor;
 
 		emitterList = new EmitterList(skin);
 
@@ -426,9 +450,16 @@ public class UIStage {
 		verticalPane.setMinSplitAmount(0.3f);
 		verticalPane.setSplitAmount(0.7f);
 
+		previewWidgetContainer = new Table();
+		previewWidgetCell = previewWidgetContainer.add(previewWidget).expand().grow();
+		previewWidgetCell.setActor(previewWidget);
+
 		leftTable = new Table();
 		leftTable.setSkin(skin);
-		leftTable.add(previewWidget).grow();
+		leftTable.add(previewWidgetContainer).grow();
+		leftTable.row();
+		leftTable.add(previewController).growX();
+
 		rightTable = new Table(); rightTable.setSkin(skin);
 		rightTable.add().grow();
 		horizontalPane = new VisSplitPane(leftTable, rightTable, false);
@@ -469,14 +500,30 @@ public class UIStage {
 		leftTable.clearChildren();
 		rightTable.clearChildren();
 		bottomTable.clearChildren();
+		previewWidgetContainer.clearChildren();
 
-		leftTable.add(previewWidget).grow();
+		previewWidgetCell = previewWidgetContainer.add(previewWidget).expand().grow();
+
+		leftTable.add(previewWidgetContainer).grow();
+		leftTable.row();
+		leftTable.add(previewController).growX();
+
+		previewWidgetCell.setActor(previewWidget);
 		bottomTable.add(bottomPane).expand().grow();
 		TalosMain.Instance().enableNodeStage();
 
 		mainMenu.restore();
 	}
 
+	public void swapDimensions() {
+		if (previewWidget == innerTertiumActor) {
+			previewWidget = innerSecundumActor;
+		} else {
+			previewWidget = innerTertiumActor;
+		}
+
+		previewWidgetCell.setActor(previewWidget);
+	}
 
 	public void initExampleList (PopupMenu examples) {
 		FileHandle list = Gdx.files.internal("samples/list.xml");

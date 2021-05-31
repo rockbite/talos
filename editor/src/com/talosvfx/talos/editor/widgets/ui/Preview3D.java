@@ -37,8 +37,8 @@ public class Preview3D extends PreviewWidget {
     private ModelBatch modelBatch;
     private Simple3DBatch simple3DBatch;
 
-    public Preview3D() {
-        super();
+    public Preview3D(PreviewImageControllerWidget previewImageControllerWidget) {
+        super(previewImageControllerWidget);
         cameraController.scrollOnly = true;
 
         int w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
@@ -118,11 +118,6 @@ public class Preview3D extends PreviewWidget {
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
             }
         });
-    }
-
-    @Override
-    protected Table buildPreviewController() {
-        return new Table();
     }
 
     @Override
@@ -275,6 +270,16 @@ public class Preview3D extends PreviewWidget {
 
     @Override
     public void setGridSize(float gridSize) {
+
+    }
+
+    @Override
+    public void removePreviewImage() {
+
+    }
+
+    @Override
+    public void gridSizeChanged(float size) {
 
     }
 }
