@@ -22,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareLabelButton;
 
 public class PreviewImageControllerWidget extends Table {
 
@@ -30,7 +32,7 @@ public class PreviewImageControllerWidget extends Table {
 	TextField imageSizeField;
 	TextField backgroundSizeField;
 	ImageButton removeBackgroundButton;
-	ImageButton dimensionChangeButton;
+	SquareLabelButton dimensionChangeButton;
 
 	public PreviewImageControllerWidget (Skin skin) {
 		setSkin(skin);
@@ -84,7 +86,7 @@ public class PreviewImageControllerWidget extends Table {
 			}
 		});
 
-		dimensionChangeButton = new ImageButton(skin.getDrawable("ic-scale-del"));
+		dimensionChangeButton = new SquareLabelButton(skin, "2D");
 		dimensionChangeButton.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
@@ -92,7 +94,7 @@ public class PreviewImageControllerWidget extends Table {
 				changeDimension();
 			}
 		});
-		add(dimensionChangeButton).height(40).pad(0);
+		add(dimensionChangeButton).size(30).pad(0);
 	}
 
 	public void setImageWidth (float width) {
@@ -121,6 +123,14 @@ public class PreviewImageControllerWidget extends Table {
 
 	private void changeDimension() {
 		TalosMain.Instance().UIStage().swapDimensions();
+	}
+
+	public void dimensionChanged (boolean isChangedToThreeDimension) {
+		if (isChangedToThreeDimension) {
+			dimensionChangeButton.setText("2D");
+		} else {
+			dimensionChangeButton.setText("3D");
+		}
 	}
 
 	public float getImageWidth () {

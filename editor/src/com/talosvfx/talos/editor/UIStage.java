@@ -518,8 +518,10 @@ public class UIStage {
 	public void swapDimensions() {
 		if (previewWidget == innerTertiumActor) {
 			previewWidget = innerSecundumActor;
+			previewController.dimensionChanged(false);
 		} else {
 			previewWidget = innerTertiumActor;
+			previewController.dimensionChanged(true);
 		}
 
 		previewWidgetCell.setActor(previewWidget);
