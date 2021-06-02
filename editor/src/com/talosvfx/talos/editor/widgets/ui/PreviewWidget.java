@@ -72,7 +72,7 @@ public abstract class PreviewWidget extends ViewportWidget {
     protected FloatCounter cpuTime = new FloatCounter(100);
     protected float fps = 0;
 
-    public PreviewWidget() {
+    public PreviewWidget(PreviewImageControllerWidget previewImageControllerWidget) {
         super();
 
         countLbl = new Label(countStr, TalosMain.Instance().getSkin());
@@ -93,11 +93,7 @@ public abstract class PreviewWidget extends ViewportWidget {
         add(cpuTimeLbl).left().top().padLeft(5).row();
         add(gpuTimeLbl).left().top().padLeft(5).row();
         add().expand();
-        row();
-        add(buildPreviewController()).bottom().left().growX();
     }
-
-    protected abstract Table buildPreviewController();
 
     public abstract void resetToDefaults();
 
@@ -165,4 +161,7 @@ public abstract class PreviewWidget extends ViewportWidget {
     public abstract void setImageIsBackground(boolean bgImageIsInBack);
     public abstract void setBgImageSize(float bgImageSize);
     public abstract void setGridSize(float gridSize);
+
+    public abstract void removePreviewImage();
+    public abstract void gridSizeChanged(float size);
 }

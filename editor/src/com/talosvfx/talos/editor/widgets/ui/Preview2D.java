@@ -35,7 +35,7 @@ public class Preview2D extends PreviewWidget {
     private Color tmpColor = new Color();
     private float gridSize;
 
-    private PreviewImageControllerWidget previewController;
+    private final PreviewImageControllerWidget previewController;
 
     private Image previewImage = new Image();
 
@@ -44,9 +44,10 @@ public class Preview2D extends PreviewWidget {
 
     private String backgroundImagePath = "";
 
-    public Preview2D() {
-        super();
+    public Preview2D(PreviewImageControllerWidget previewController) {
+        super(previewController);
 
+        this.previewController = previewController;
         setWorldSize(10f);
         gridSize = 1f;
 
@@ -128,28 +129,6 @@ public class Preview2D extends PreviewWidget {
                 return super.keyUp(event, keycode);
             }
         });
-    }
-
-    @Override
-    protected Table buildPreviewController() {
-        previewController = new PreviewImageControllerWidget(TalosMain.Instance().getSkin()) {
-            @Override
-            public void removeImage () {
-                super.removeImage();
-                previewImage.setDrawable(null);
-                backgroundImagePath = "";
-            }
-
-            @Override
-            public void gridSizeChanged(float size) {
-                super.gridSizeChanged(size);
-                setWorldSize(10f * size);
-                gridSize = size;
-                resetCamera();
-            }
-        };
-
-        return previewController;
     }
 
     public void fileDrop (float x, float y, String[] paths) {
@@ -339,5 +318,18 @@ public class Preview2D extends PreviewWidget {
         previewController.setGridSize(gridSize);
         setWorldSize(10f * gridSize);
         this.gridSize = gridSize;
+    }
+
+    @Override
+    public void removePreviewImage() {
+        previewImage.setDrawable(null);
+        backgroundImagePath = "";
+    }
+
+    @Override
+    public void gridSizeChanged(float size) {
+        setWorldSize(10f * size);
+        gridSize = size;
+        resetCamera();
     }
 }
