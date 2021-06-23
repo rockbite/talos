@@ -417,4 +417,7 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
 
     }
 
+    public ShaderBox getShaderBox() {
+        return shaderBox;
+    }
 }

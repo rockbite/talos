@@ -490,6 +490,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         final JsonValue parse = jsonReader.parse(handle);
         final JsonValue metaData = parse.get("metadata");
         final JsonValue resourcePaths = metaData.get("resources");
+
         for(JsonValue path: resourcePaths) {
             String name = path.asString();
             String possiblePath = handle.parent() + File.separator + name + ".png"; // this is handling only PNG's which is bad

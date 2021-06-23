@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.shader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -85,6 +87,9 @@ public class ShaderAddon implements IAddon {
         MenuItem exportRaw = new MenuItem("Export RAW");
         menu.addItem(exportRaw);
 
+        MenuItem exportPNG = new MenuItem("Export PNG");
+        menu.addItem(exportPNG);
+
         newFile.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -113,6 +118,26 @@ public class ShaderAddon implements IAddon {
                         FileHandle file = files.get(0);
 
                         file.writeString(fragShader, false);
+                    }
+                });
+            }
+        });
+
+        exportPNG.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                // export RAW logic
+
+                TalosMain.Instance().UIStage().showSaveFileChooser(".png", new FileChooserAdapter() {
+                    @Override
+                    public void selected (Array<FileHandle> files) {
+                        FileHandle file = files.get(0);
+                        Pixmap pixmap = ((ShaderNodeStage)(nodeStage)).exportPixmap();
+                        if(pixmap != null) {
+                            PixmapIO.writePNG(file, pixmap);
+                            pixmap.dispose();
+                        }
                     }
                 });
             }

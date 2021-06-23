@@ -566,4 +566,8 @@ public class UIStage {
 
 		stage.addActor(fileChooser.fadeIn());
 	}
+
+	public void setFileChooserVisibility(boolean visible) {
+		fileChooser.setVisible(visible);
+	}
 }
