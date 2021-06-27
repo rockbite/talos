@@ -162,7 +162,7 @@ public class NumericalValue extends Value {
 		elements[0] = val1;
 		elements[1] = val2;
 		elements[2] = val3;
-		elements[3] = val3;
+		elements[3] = val4;
 	}
 
 	public float getFloat() {
