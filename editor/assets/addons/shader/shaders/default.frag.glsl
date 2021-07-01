@@ -12,5 +12,5 @@ uniform float externalNumber;
 
  void main()
  {
-     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * v_color;
+     gl_FragColor = vec4(1.0 * externalNumber, 1.0, 1.0 * externalNumber, 1.0) * v_color;
  }

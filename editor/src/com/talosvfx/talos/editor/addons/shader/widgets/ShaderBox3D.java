@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,6 +21,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.utils.WavefrontReader;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import org.graalvm.compiler.loop.MathUtil;
 
 public class ShaderBox3D extends ShaderBox {
 
@@ -27,6 +29,8 @@ public class ShaderBox3D extends ShaderBox {
     private final Mesh mesh;
     private ShaderProgram spriteShader;
     public PerspectiveCamera cam;
+
+    private float a = 0;
 
     public ShaderBox3D() {
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, true, false);
@@ -39,7 +43,7 @@ public class ShaderBox3D extends ShaderBox {
         spriteShader = new ShaderProgram(Gdx.files.internal("shaders/ui/default.vert"), Gdx.files.internal("shaders/ui/default.frag"));
 
         // load 2d model here for now
-        FileHandle handle = Gdx.files.internal("addons/shader/models/cube.obj");
+        FileHandle handle = Gdx.files.internal("addons/shader/models/tinyboat.obj");
         WavefrontReader reader = new WavefrontReader();
         reader.parseFile(handle);
 
@@ -61,6 +65,11 @@ public class ShaderBox3D extends ShaderBox {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        a+= Gdx.graphics.getDeltaTime();
+        cam.position.set(MathUtils.cos(a) * 0.3f, MathUtils.sin(a) * 0.3f, 0.3f);
+        cam.lookAt(0,0,0);
+        cam.update();
+
         super.draw(batch, parentAlpha);
     }
 
@@ -75,7 +84,9 @@ public class ShaderBox3D extends ShaderBox {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        Gdx.gl.glFrontFace(GL20.GL_CW);
 
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projTrans", cam.combined);
@@ -83,7 +94,6 @@ public class ShaderBox3D extends ShaderBox {
         mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, mesh.getVertexSize());
         shaderProgram.end();
         frameBuffer.end();
-
         Texture colorBufferTexture = frameBuffer.getColorBufferTexture();
         batch.setShader(spriteShader);
         Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

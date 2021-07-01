@@ -49,38 +49,6 @@ public class WavefrontReader {
             }
         }
 
-        Array<Face> faces2 = new Array<>();
-        /*
-        faces2.add(faces.get(6));
-        faces2.add(faces.get(0));
-        faces2.add(faces.get(2));
-        faces2.add(faces.get(8));
-        faces2.add(faces.get(1));
-        faces2.add(faces.get(7));
-        faces2.add(faces.get(3));
-        faces2.add(faces.get(9));
-        faces2.add(faces.get(4));
-        faces2.add(faces.get(10));
-        faces2.add(faces.get(5));
-        faces2.add(faces.get(11));
-        */
-
-
-        faces2.add(faces.get(6));
-        faces2.add(faces.get(0));
-        faces2.add(faces.get(2));
-        faces2.add(faces.get(8));
-        faces2.add(faces.get(1));
-        faces2.add(faces.get(7));
-        faces2.add(faces.get(3));
-        faces2.add(faces.get(9));
-
-        faces2.add(faces.get(4));
-        faces2.add(faces.get(10));
-
-        faces.clear();
-        faces.addAll(faces2);
-
         VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0));
         int attribCount = 6;
 
@@ -99,10 +67,6 @@ public class WavefrontReader {
                 verts[index++] = 0;
                 verts[index++] = 0;
             }
-        }
-
-        for(int i = 0; i < verts.length; i++) {
-            System.out.println(verts[i]);
         }
 
 
@@ -139,6 +103,8 @@ public class WavefrontReader {
 
         public PointData(String data) {
             String parts[] = data.split("/");
+
+            if(parts[1].equals("")) parts[1] = "0";
 
             vIndex = Integer.parseInt(parts[0]);
             tIndex = Integer.parseInt(parts[1]);
