@@ -1,13 +1,22 @@
 package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 public class WavefrontReader {
 
+    private Mesh mesh;
+
     public WavefrontReader() {
 
+    }
+
+    public Mesh getMesh() {
+        return mesh;
     }
 
 
@@ -36,18 +45,30 @@ public class WavefrontReader {
             }
         }
 
-        float[] verts = new float[faces.size];
+        float[] verts = new float[faces.size * 9];
 
         int index = 0;
         for(int i = 0; i < faces.size; i++) {
             Face face = faces.get(i);
 
             for(int j = 0; j < 3; j++) {
-                verts[index++] = vertices.get(face.points[j].vIndex).x;
-                verts[index++] = vertices.get(face.points[j].vIndex).y;
-                verts[index++] = vertices.get(face.points[j].vIndex).z;
+                verts[index++] = vertices.get(face.points[j].vIndex - 1).x;
+                verts[index++] = vertices.get(face.points[j].vIndex - 1).y;
+                verts[index++] = vertices.get(face.points[j].vIndex - 1).z;
             }
         }
+
+        //VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0));
+        VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position());
+        mesh = new Mesh(false, faces.size * 3, faces.size * 9, vertexAttributes);
+
+        /*short[] indices = new short[faces.size * 9];
+        for (short i = 0; i < faces.size * 9; i++) {
+            indices[i] = i;
+        }*/
+
+        //mesh.setIndices(indices);
+        mesh.setVertices(verts);
     }
 
     private class Face {
