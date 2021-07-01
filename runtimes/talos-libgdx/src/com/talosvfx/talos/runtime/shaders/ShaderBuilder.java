@@ -122,7 +122,7 @@ public class ShaderBuilder {
 
     public static String getVertexString() {
         String result =
-                "attribute vec4 a_position;\n" +
+                "attribute vec3 a_position;\n" +
                 "attribute vec4 a_color;\n" +
                 "attribute vec2 a_texCoord0;\n" +
                 "\n" +
@@ -136,7 +136,7 @@ public class ShaderBuilder {
                 "    v_color = a_color;\n" +
                 "    v_color.a = v_color.a * (256.0/255.0);\n" +
                 "    v_texCoords = a_texCoord0;\n" +
-                "    gl_Position =  u_projTrans * a_position;\n" +
+                "    gl_Position =  u_projTrans * vec4(a_position, 1.0);\n" +
                 "}\n";
 
 
