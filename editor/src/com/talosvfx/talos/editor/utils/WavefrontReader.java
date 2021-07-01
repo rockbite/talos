@@ -1,11 +1,13 @@
 package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+
 
 public class WavefrontReader {
 
@@ -29,6 +31,8 @@ public class WavefrontReader {
         Array<Face> faces = new Array<>();
 
         for(int i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].replace("\r", "");
+
             String[] words = lines[i].split(" ");
 
             if (words.length > 0) {
@@ -45,7 +49,10 @@ public class WavefrontReader {
             }
         }
 
-        float[] verts = new float[faces.size * 9];
+        VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0));
+        int attribCount = 8;
+
+        float[] verts = new float[faces.size * 3 * attribCount];
 
         int index = 0;
         for(int i = 0; i < faces.size; i++) {
@@ -55,19 +62,22 @@ public class WavefrontReader {
                 verts[index++] = vertices.get(face.points[j].vIndex - 1).x;
                 verts[index++] = vertices.get(face.points[j].vIndex - 1).y;
                 verts[index++] = vertices.get(face.points[j].vIndex - 1).z;
+
+                verts[index++] = Color.WHITE_FLOAT_BITS;
+                verts[index++] = 0;
+                verts[index++] = 0;
             }
         }
 
-        //VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0));
-        VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position());
-        mesh = new Mesh(false, faces.size * 3, faces.size * 9, vertexAttributes);
 
-        /*short[] indices = new short[faces.size * 9];
-        for (short i = 0; i < faces.size * 9; i++) {
+        mesh = new Mesh(false, verts.length, faces.size * 3, vertexAttributes);
+
+        /*
+        short[] indices = new short[faces.size * 3];
+        for (short i = 0; i < faces.size * 3; i++) {
             indices[i] = i;
-        }*/
-
-        //mesh.setIndices(indices);
+        }
+        mesh.setIndices(indices);*/
         mesh.setVertices(verts);
     }
 
@@ -75,7 +85,6 @@ public class WavefrontReader {
         public PointData[] points = new PointData[3];
 
         public Face(String point1, String point2, String point3) {
-
             points[0] = parsePoint(point1);
             points[1] = parsePoint(point2);
             points[2] = parsePoint(point3);

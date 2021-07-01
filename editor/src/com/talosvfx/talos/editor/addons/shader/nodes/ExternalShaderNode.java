@@ -36,9 +36,13 @@ public class ExternalShaderNode extends AbstractShaderNode {
     }
 
     @Override
+    protected void updatePreview() {
+
+    }
+
+    @Override
     protected String getPreviewLine (String expression) {
-        String output = "customShaderVal" + getId();
-        return "vec4 outputVal = customShaderVal; return outputVal;";
+        return null;
     }
 
     @Override

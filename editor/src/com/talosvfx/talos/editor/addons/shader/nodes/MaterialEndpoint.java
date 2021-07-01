@@ -39,6 +39,8 @@ public class MaterialEndpoint extends AbstractShaderNode {
                 }
             }
         });
+
+        setClip(false);
     }
 
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
@@ -65,7 +67,8 @@ public class MaterialEndpoint extends AbstractShaderNode {
 
     @Override
     protected void updatePreview () {
-        shaderBox.setShader(previewBuilder);
+        box2d.setShader(previewBuilder);
+        box3d.setShader(previewBuilder);
     }
 
     @Override
