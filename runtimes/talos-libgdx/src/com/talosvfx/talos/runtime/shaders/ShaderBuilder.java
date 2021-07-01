@@ -22,6 +22,7 @@ public class ShaderBuilder {
     private ObjectMap<String, String> uniformToResourceMap = new ObjectMap<>();
 
     private int resourceCounter = 0;
+    private String codeOverride = null;
 
     public ShaderBuilder() {
 
@@ -106,6 +107,10 @@ public class ShaderBuilder {
 
     public String getFragmentString (String template) {
 
+        if(codeOverride != null) {
+            return codeOverride;
+        }
+
         template = template.replace("{CUSTOM_UNIFORMS}", generateCustomUniforms());
         template = template.replace("{CUSTOM_METHODS}", generateMethods());
         template = template.replace("{SHADER_LOGIC}", generateFragmentResolve());
@@ -189,6 +194,10 @@ public class ShaderBuilder {
             addLine(type.getTypeString() + " " + name + " = " + value);
             variableMap.put(name, value);
         }
+    }
+
+    public void setShader (String code) {
+        codeOverride = code;
     }
 
     public static class Method {

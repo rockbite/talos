@@ -88,6 +88,16 @@
                 <option value = "BLEND-ADD">Blend Add (Alpha)</option>
             </select>
         </module>
+        <module name = "ExternalShaderNode" title = "External Shader" keywords = "custom">
+            <value port="output" name="outputShader" type="text">Output Shader</value>
+        </module>
+        <module name = "MaterialEndpoint" title = "Material" keywords = "main">
+            <value port="input" name="inputShader" type="text">Pixel Shader</value>
+            <select name="preview">
+                <option value = "2D">2D Preview</option>
+                <option value = "3D">3D Preview</option>
+            </select>
+        </module>
     </category>
     <category name="math" title="Math">
         <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
@@ -328,6 +338,10 @@
                      return result;
                 ]]>
             </shader-body>
+        </module>
+        <module name = "FloatUniform" title = "Float Uniform" keywords = "uniform" class="UniformNode">
+            <dynamicValue port="input" name="val" type="float" min="0" max="1" progress="true">Val: </dynamicValue>
+            <value port="output" name="out" type="float">out</value>qaq
         </module>
     </category>
     <category name="uv" title="UV">

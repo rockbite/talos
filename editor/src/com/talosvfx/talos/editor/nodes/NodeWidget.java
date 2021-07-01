@@ -50,7 +50,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     private final ObjectMap<String, Class<? extends AbstractWidget>> widgetClassMap = new ObjectMap<>();
 
-    private Table widgetContainer = new Table();
+    protected Table widgetContainer = new Table();
     private Table headerTable;
     private String nodeName;
 
@@ -382,7 +382,11 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         return outputSlots;
     }
 
-    private void addRow(XmlReader.Element row, int index, int count, boolean isGroup) {
+    protected void addRow(XmlReader.Element row, int index, int count, boolean isGroup) {
+        addRow(row, index, count, isGroup, widgetContainer, false);
+    }
+
+    protected void addRow(XmlReader.Element row, int index, int count, boolean isGroup, Table customContainer, boolean skipListener) {
         String tagName = row.getName();
         Class<? extends AbstractWidget> clazz = widgetClassMap.get(tagName);
 
@@ -409,9 +413,9 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                     if(index == 0) {
                         padTop = 10;
                     }
-                    widgetContainer.add(widget).padTop(padTop).padBottom(1).growX().row();
+                    customContainer.add(widget).padTop(padTop).padBottom(1).growX().row();
                 } else {
-                    widgetContainer.add(widget).padTop(10).padBottom(10).growX().row();
+                    customContainer.add(widget).padTop(10).padBottom(10).growX().row();
                 }
 
                 String variableName = row.getAttribute("name");
@@ -431,12 +435,14 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 }
 
                 // init listener
-                widget.addListener(new ChangeListener() {
-                    @Override
-                    public void changed (ChangeEvent changeEvent, Actor actor) {
-                        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
-                    }
-                });
+                if(!skipListener) {
+                    widget.addListener(new ChangeListener() {
+                        @Override
+                        public void changed (ChangeEvent changeEvent, Actor actor) {
+                            Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
+                        }
+                    });
+                }
 
             } catch (ReflectionException exception) {
 

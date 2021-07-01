@@ -295,4 +295,8 @@ public class TalosMain extends ApplicationAdapter {
 	public FileTracker FileTracker() {
 		return fileTracker;
 	}
+
+	public WorkplaceStage getNodeStage () {
+		return currentWorkplaceStage;
+	}
 }
