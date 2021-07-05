@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -56,6 +57,7 @@ public class MaterialEndpoint extends AbstractShaderNode {
         String code = getExpression(INPUT_SHADER);
 
         shaderBuilder.setShader(code);
+        shaderBuilder.setVertOverride(Gdx.files.internal("addons/shader/shaders/default.vert.glsl").readString());
     }
 
     @Override

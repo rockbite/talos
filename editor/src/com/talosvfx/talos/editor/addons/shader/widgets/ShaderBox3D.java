@@ -70,6 +70,8 @@ public class ShaderBox3D extends ShaderBox {
         a+= Gdx.graphics.getDeltaTime();
         cam.position.set(MathUtils.cos(a) * 1f, MathUtils.sin(a) *1f, 1f);
         cam.lookAt(0,0,0);
+        cam.near = 0.01f;
+        cam.far = 100f;
         cam.update();
 
         super.draw(batch, parentAlpha);
@@ -83,11 +85,9 @@ public class ShaderBox3D extends ShaderBox {
 
         frameBuffer.begin();
 
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-        //Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
-        Gdx.gl.glCullFace(GL20.GL_FRONT);
-        Gdx.gl.glFrontFace(GL20.GL_CW);
+        Gdx.gl.glClearColor(0f, 0f, 0.1f, 1f);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
