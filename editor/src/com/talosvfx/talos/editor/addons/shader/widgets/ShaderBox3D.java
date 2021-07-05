@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -15,27 +16,28 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.utils.WavefrontReader;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
-import org.graalvm.compiler.loop.MathUtil;
-
 public class ShaderBox3D extends ShaderBox {
 
     private FrameBuffer frameBuffer;
     private final Mesh mesh;
     private ShaderProgram spriteShader;
     public PerspectiveCamera cam;
+    private TextureRegion region;
 
     private float a = 0;
 
     public ShaderBox3D() {
+        region = new TextureRegion();
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, true, false);
         cam = new PerspectiveCamera(67, 3, 3);
-        cam.position.set(3f, 3f, 3f);
+        cam.position.set(1f, 1f, 1f);
         cam.lookAt(0,0,0);
         cam.near = 0f;
         cam.far = 10f;
@@ -66,7 +68,7 @@ public class ShaderBox3D extends ShaderBox {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         a+= Gdx.graphics.getDeltaTime();
-        cam.position.set(MathUtils.cos(a) * 0.3f, MathUtils.sin(a) * 0.3f, 0.3f);
+        cam.position.set(MathUtils.cos(a) * 1f, MathUtils.sin(a) *1f, 1f);
         cam.lookAt(0,0,0);
         cam.update();
 
@@ -77,27 +79,32 @@ public class ShaderBox3D extends ShaderBox {
     protected void drawCall (Batch batch) {
         batch.end();
 
-        Gdx.gl20.glViewport(0, 0, 512, 512);
+        Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         frameBuffer.begin();
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
+        //Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+        Gdx.gl.glCullFace(GL20.GL_FRONT);
         Gdx.gl.glFrontFace(GL20.GL_CW);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projTrans", cam.combined);
 
-        mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, mesh.getVertexSize());
+        mesh.render(shaderProgram, GL20.GL_TRIANGLES);
         shaderProgram.end();
         frameBuffer.end();
+
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         Texture colorBufferTexture = frameBuffer.getColorBufferTexture();
         batch.setShader(spriteShader);
-        Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
-        batch.draw(colorBufferTexture, getX(), getY(), getWidth(), getHeight());
+        region.setTexture(colorBufferTexture);
+        region.setU(0);region.setV(0);
+        region.setU2(1);region.setV2(1);
+        batch.draw(region, getX(), getY(), getWidth()/2f, getHeight()/2f, getWidth(), getHeight(), 1f, -1f, 0);
     }
 }

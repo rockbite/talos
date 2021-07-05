@@ -13,7 +13,7 @@ public class WavefrontReader {
 
     private Mesh mesh;
 
-    public WavefrontReader() {
+    public WavefrontReader () {
 
     }
 
@@ -28,6 +28,8 @@ public class WavefrontReader {
         String[] lines = data.split("\n");
 
         Array<Vector3> vertices = new Array<>();
+        Array<Vector3> normals = new Array<>();
+
         Array<Face> faces = new Array<>();
 
         for(int i = 0; i < lines.length; i++) {
@@ -45,12 +47,18 @@ public class WavefrontReader {
                 } else if (words[0].equals("f")) {
                     Face face = new Face(words[1], words[2], words[3]);
                     faces.add(face);
+                } else if (words[0].equals("vn")) {
+                    Vector3 vec = new Vector3();
+                    vec.x = Float.parseFloat(words[1]);
+                    vec.y = Float.parseFloat(words[2]);
+                    vec.z = Float.parseFloat(words[3]);
+                    normals.add(vec);
                 }
             }
         }
 
-        VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0));
-        int attribCount = 6;
+        VertexAttributes vertexAttributes = new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0), VertexAttribute.Normal());
+        int attribCount = 9;
 
         float[] verts = new float[faces.size * 3 * attribCount];
 
@@ -66,18 +74,21 @@ public class WavefrontReader {
                 verts[index++] = Color.WHITE_FLOAT_BITS;
                 verts[index++] = 0;
                 verts[index++] = 0;
+
+                verts[index++] = normals.get(face.points[j].nIndex - 1).x;
+                verts[index++] = normals.get(face.points[j].nIndex - 1).y;
+                verts[index++] = normals.get(face.points[j].nIndex - 1).z;
             }
         }
 
 
-        mesh = new Mesh(false, verts.length, faces.size * 3, vertexAttributes);
+        mesh = new Mesh(false, verts.length, 0, vertexAttributes);
 
-        /*
         short[] indices = new short[faces.size * 3];
         for (short i = 0; i < faces.size * 3; i++) {
             indices[i] = i;
         }
-        mesh.setIndices(indices);*/
+
         mesh.setVertices(verts);
     }
 
