@@ -11,11 +11,14 @@ public class TargetModule extends AbstractModule {
     public static final int VELOCITY = 0;
     public static final int FROM = 1;
     public static final int TO = 2;
+    public static final int ALPHA_INPUT = 3;
+
     public static final int TIME = 0;
     public static final int POSITION = 1;
     public static final int VELOCITY_OUT = 2;
     public static final int ANGLE = 3;
 
+    NumericalValue alphaInput;
     NumericalValue velocity;
     NumericalValue from;
     NumericalValue to;
@@ -35,6 +38,7 @@ public class TargetModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
+        alphaInput = createInputSlot(ALPHA_INPUT);
         velocity= createInputSlot(VELOCITY);
         from= createInputSlot(FROM);
         to= createInputSlot(TO);
@@ -47,7 +51,12 @@ public class TargetModule extends AbstractModule {
 
     @Override
     public void processValues() {
-        float alpha = getScope().getFloat(ScopePayload.PARTICLE_ALPHA);
+        float alpha = 0;
+        if(alphaInput.isEmpty()) {
+            alpha = getScope().getFloat(ScopePayload.PARTICLE_ALPHA);
+        } else {
+            alpha = alphaInput.getFloat();
+        }
 
         if(velocity.isEmpty()) velocity.set(defaultVelocity);
         if(from.isEmpty()) from.set(defaultFrom.x, defaultFrom.y);

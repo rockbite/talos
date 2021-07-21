@@ -36,6 +36,7 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
 
     @Override
     protected void configureSlots() {
+        addInputSlot("alpha", TargetModule.ALPHA_INPUT);
         velocityField = addInputSlotWithTextField("velocity: ", TargetModule.VELOCITY);
         Cell fromCell = addInputSlot("from", TargetModule.FROM);
         Cell toCell = addInputSlot("to", TargetModule.TO);
