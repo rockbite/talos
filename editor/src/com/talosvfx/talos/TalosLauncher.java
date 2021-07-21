@@ -26,6 +26,7 @@ public class TalosLauncher {
 		config.setTitle("Talos");
 		config.useVsync(false);
 		config.setBackBufferConfig(1,1,1,1,8,8, 16);
+		config.setWindowIcon("icon/talos-64x64.png");
 
 		TalosMain talos = new TalosMain();
 

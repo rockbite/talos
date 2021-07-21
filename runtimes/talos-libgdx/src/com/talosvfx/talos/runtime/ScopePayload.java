@@ -16,12 +16,11 @@
 
 package com.talosvfx.talos.runtime;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntMap;
 import com.talosvfx.talos.runtime.values.NumericalValue;
-
-import java.awt.*;
 
 public class ScopePayload {
 
@@ -101,7 +100,7 @@ public class ScopePayload {
     }
 
     public void setDynamicValue(int key, Color val) {
-        dynamicValues.get(key).set(val.getRed(), val.getGreen(), val.getBlue());
+        dynamicValues.get(key).set(val.r, val.g, val.b);
     }
 
     public void setDynamicValue(int key, Vector3 val) {

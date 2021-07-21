@@ -42,6 +42,7 @@
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
         <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
         <module name = "Math Operations" wrapper = "MathModuleWrapper">MathModule</module>
+        <module name = "Target Movement" wrapper = "TargetModuleWrapper">TargetModule</module>
     </category>
     <category name = "Adapters">
         <module name = "Beam Position" wrapper = "FromToModuleWrapper">FromToModule</module>
