@@ -79,6 +79,8 @@ public class ShaderBox3D extends ShaderBox {
 
     @Override
     protected void drawCall (Batch batch) {
+        if (shaderProgram== null) return;
+
         batch.end();
 
         Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

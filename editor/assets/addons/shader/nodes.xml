@@ -415,5 +415,17 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "PosterizeNode" title = "Posterize" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+                <value port="input" name="steps" type="vec4" default="4">Steps</value>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return floor(inValue / (1.0 / steps)) * (1.0 / steps);
+                ]]>
+            </shader-body>
+        </module>
     </category>
 </modules>
