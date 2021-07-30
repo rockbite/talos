@@ -427,5 +427,20 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "ClampNode" title = "Clamp" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="min" type="float" max="1" step="0.001" progress="true">Min</dynamicValue>
+                <dynamicValue port="input" name="max" type="float" max="1" step="0.001" progress="true" default="1">Max</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return clamp(inValue, min, max);
+                ]]>
+            </shader-body>
+        </module>
     </category>
 </modules>
