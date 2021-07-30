@@ -13,6 +13,7 @@
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
         <module name = "Position (Vector)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
+        <module name = "Position Split (Vector)" wrapper = "VectorSplitModuleWrapper">VectorSplitModule</module>
     </category>
     <category name = "Color">
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
