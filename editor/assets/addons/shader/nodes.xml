@@ -88,6 +88,16 @@
                 <option value = "BLEND-ADD">Blend Add (Alpha)</option>
             </select>
         </module>
+        <module name = "ExternalShaderNode" title = "External Shader" keywords = "custom">
+            <value port="output" name="outputShader" type="text">Output Shader</value>
+        </module>
+        <module name = "MaterialEndpoint" title = "Material" keywords = "main">
+            <value port="input" name="inputShader" type="text">Pixel Shader</value>
+            <select name="preview">
+                <option value = "2D">2D Preview</option>
+                <option value = "3D">3D Preview</option>
+            </select>
+        </module>
     </category>
     <category name="math" title="Math">
         <module name = "MixNode" title = "Mix Shader" keywords = "math,mix">
@@ -329,6 +339,10 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "FloatUniform" title = "Float Uniform" keywords = "uniform" class="UniformNode">
+            <dynamicValue port="input" name="val" type="float" min="0" max="1" progress="true">Val: </dynamicValue>
+            <value port="output" name="out" type="float">out</value>qaq
+        </module>
     </category>
     <category name="uv" title="UV">
         <module name = "RadialShearNode" title = "Radial Shear" keywords = "math" class="GenericMethodNode">
@@ -398,6 +412,33 @@
             <shader-body>
                 <![CDATA[
                     return fract(uv * tiling + offset);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "PosterizeNode" title = "Posterize" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+                <value port="input" name="steps" type="vec4" default="4">Steps</value>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return floor(inValue / (1.0 / steps)) * (1.0 / steps);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "ClampNode" title = "Clamp" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="min" type="float" max="1" step="0.001" progress="true">Min</dynamicValue>
+                <dynamicValue port="input" name="max" type="float" max="1" step="0.001" progress="true" default="1">Max</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return clamp(inValue, min, max);
                 ]]>
             </shader-body>
         </module>
