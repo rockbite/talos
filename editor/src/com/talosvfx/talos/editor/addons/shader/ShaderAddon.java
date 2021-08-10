@@ -14,6 +14,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.shader.dialogs.ExportSequenceDialog;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
@@ -27,6 +28,8 @@ public class ShaderAddon implements IAddon {
 
     public DynamicNodeStage nodeStage;
 
+    ExportSequenceDialog exportSequenceDialog;
+
     @Override
     public void init () {
         SHADER_PROJECT = new ShaderProject(this);
@@ -38,7 +41,7 @@ public class ShaderAddon implements IAddon {
     }
 
     private void buildUI () {
-
+        exportSequenceDialog = new ExportSequenceDialog((ShaderNodeStage)nodeStage);
     }
 
     @Override
@@ -90,6 +93,9 @@ public class ShaderAddon implements IAddon {
         MenuItem exportPNG = new MenuItem("Export PNG");
         menu.addItem(exportPNG);
 
+        MenuItem exportSequence = new MenuItem("Export Sequence");
+        menu.addItem(exportSequence);
+
         newFile.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -140,6 +146,14 @@ public class ShaderAddon implements IAddon {
                         }
                     }
                 });
+            }
+        });
+
+        exportSequence.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                TalosMain.Instance().UIStage().getStage().addActor(exportSequenceDialog.fadeIn());
             }
         });
 

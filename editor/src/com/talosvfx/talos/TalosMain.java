@@ -248,6 +248,7 @@ public class TalosMain extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		if (currentWorkplaceStage != null) {
+			currentWorkplaceStage.act();
 			currentWorkplaceStage.getStage().act();
 			currentWorkplaceStage.getStage().draw();
 		}

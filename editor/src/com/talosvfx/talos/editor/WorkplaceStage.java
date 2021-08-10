@@ -85,4 +85,8 @@ public abstract class WorkplaceStage {
     public Color getBgColor() {
         return bgColor;
     }
+
+    public void act() {
+
+    }
 }
