@@ -67,6 +67,7 @@
         <module name = "SampleTextureNode" title = "Texture Sample" keywords = "texture,sample">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="input" name="overrideUV" type="vec2">UV</value>
                 <value port="input" name="offsetUV" type="vec2">UV Offset</value>
                 <value port="input" name="mulUV" type="vec2">UV Mul</value>
             </group>
