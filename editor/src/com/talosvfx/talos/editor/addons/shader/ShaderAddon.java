@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.shader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -12,6 +14,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.shader.dialogs.ExportSequenceDialog;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
@@ -25,6 +28,8 @@ public class ShaderAddon implements IAddon {
 
     public DynamicNodeStage nodeStage;
 
+    ExportSequenceDialog exportSequenceDialog;
+
     @Override
     public void init () {
         SHADER_PROJECT = new ShaderProject(this);
@@ -36,7 +41,7 @@ public class ShaderAddon implements IAddon {
     }
 
     private void buildUI () {
-
+        exportSequenceDialog = new ExportSequenceDialog((ShaderNodeStage)nodeStage);
     }
 
     @Override
@@ -85,6 +90,12 @@ public class ShaderAddon implements IAddon {
         MenuItem exportRaw = new MenuItem("Export RAW");
         menu.addItem(exportRaw);
 
+        MenuItem exportPNG = new MenuItem("Export PNG");
+        menu.addItem(exportPNG);
+
+        MenuItem exportSequence = new MenuItem("Export Sequence");
+        menu.addItem(exportSequence);
+
         newFile.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -115,6 +126,34 @@ public class ShaderAddon implements IAddon {
                         file.writeString(fragShader, false);
                     }
                 });
+            }
+        });
+
+        exportPNG.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                // export RAW logic
+
+                TalosMain.Instance().UIStage().showSaveFileChooser(".png", new FileChooserAdapter() {
+                    @Override
+                    public void selected (Array<FileHandle> files) {
+                        FileHandle file = files.get(0);
+                        Pixmap pixmap = ((ShaderNodeStage)(nodeStage)).exportPixmap();
+                        if(pixmap != null) {
+                            PixmapIO.writePNG(file, pixmap);
+                            pixmap.dispose();
+                        }
+                    }
+                });
+            }
+        });
+
+        exportSequence.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                TalosMain.Instance().UIStage().getStage().addActor(exportSequenceDialog.fadeIn());
             }
         });
 
