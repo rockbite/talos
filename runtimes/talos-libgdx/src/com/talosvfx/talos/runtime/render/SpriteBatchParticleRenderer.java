@@ -79,9 +79,32 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			if (particleEmitter.isBlendAdd() && prevShader != blendAddShader) {
 				//batch.setShader(blendAddShader); //TODO: let's leave any shader stuff to shader graph, and rest can be baked
 			}
- 			for (int j = 0; j < particleEmitter.getActiveParticleCount(); j++) {
-				renderParticle(batch, particleEmitter.getActiveParticles().get(j), particleEffectInstance.alpha);
+
+			DrawableModule drawableModule = particleEmitter.getDrawableModule();
+			if (drawableModule != null && drawableModule.getMaterialModule() != null) {
+				MaterialModule materialModule = drawableModule.getMaterialModule();
+
+				if (materialModule instanceof SpriteMaterialModule) {
+					//For now
+					DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
+					ParticleDrawable drawable = drawableValue.getDrawable();
+
+					ParticlePointDataGeneratorModule pointDataGenerator = particleEmitter.getParticleModule().getPointDataGenerator();
+
+					if (pointDataGenerator == null) return;
+
+					Array<ParticlePointData> pointData = pointDataGenerator.pointData;
+					for (int j = 0; j < pointData.size; j++) {
+						ParticlePointData particlePointData = pointData.get(j);
+
+						drawable.draw(batch, particlePointData, particlePointData.color);
+
+					}
+
+				}
 			}
+
+
  			if(batch.getShader() != prevShader) {
  				batch.setShader(prevShader);
 			}
@@ -91,34 +114,10 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	}
 
 	private void renderParticle (Batch batch, Particle particle, float parentAlpha) {
-		color.set(particle.color);
-		color.mul(particle.getEmitter().getTint());
-		color.a = particle.transparency * parentAlpha;
+		color.set(Color.WHITE);
 		batch.setColor(color);
 
-		DrawableModule drawableModule = particle.getEmitter().getDrawableModule();
-		if (drawableModule != null && drawableModule.getMaterialModule() != null) {
-			MaterialModule materialModule = drawableModule.getMaterialModule();
 
-			if (materialModule instanceof SpriteMaterialModule) {
-				//For now
-				DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-				ParticleDrawable drawable = drawableValue.getDrawable();
-
-				ParticlePointDataGeneratorModule pointDataGenerator = particle.getEmitter().getParticleModule().getPointDataGenerator();
-
-				if (pointDataGenerator == null) return;
-
-				Array<ParticlePointData> pointData = pointDataGenerator.pointData;
-				for (int i = 0; i < pointData.size; i++) {
-					ParticlePointData particlePointData = pointData.get(i);
-
-					drawable.draw(batch, particlePointData, particlePointData.color);
-
-				}
-
-			}
-		}
 
 	}
 }
