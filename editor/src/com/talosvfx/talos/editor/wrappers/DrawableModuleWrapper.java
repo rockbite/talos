@@ -17,18 +17,26 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.modules.CurveModule;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
+import com.talosvfx.talos.runtime.modules.DynamicRangeModule;
+import com.talosvfx.talos.runtime.modules.GradientColorModule;
+import com.talosvfx.talos.runtime.modules.MaterialModule;
+import com.talosvfx.talos.runtime.modules.ParticleModule;
+import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
+import com.talosvfx.talos.runtime.modules.StaticValueModule;
+import com.talosvfx.talos.runtime.modules.Vector2Module;
 
-public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
+public class DrawableModuleWrapper extends ModuleWrapper<DrawableModule> {
 
 
-    public ParticleModuleWrapper() {
+    public DrawableModuleWrapper () {
         super();
     }
 
     @Override
-    public void setModule(ParticleModule module) {
+    public void setModule(DrawableModule module) {
         super.setModule(module);
     }
 
@@ -39,30 +47,13 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
     @Override
     protected void configureSlots() {
-
-        addInputSlot("point gen", ParticleModule.POINT_GENERATOR);
-        addSeparator(true);
-
-        addInputSlot("life",  ParticleModule.LIFE);
-
-        addSeparator(true);
-
-        addInputSlot("color",  ParticleModule.COLOR);
-        addInputSlot("transparency",  ParticleModule.TRANSPARENCY);
-
-        addInputSlot("rotation",  ParticleModule.ROTATION);
-        addInputSlot("position",  ParticleModule.POSITION);
+        addInputSlot("material", MaterialModule.MATERIAL_MODULE);
     }
 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == ParticleModule.POINT_GENERATOR) return SingleParticlePointDataGeneratorModule.class;
-        if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
-        if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
-        if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
-        if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
-        if(slot.getIndex() == ParticleModule.POSITION) return Vector2Module.class;
+        if(slot.getIndex() == DrawableModule.MATERIAL_IN) return SpriteMaterialModule.class;
 
         return null;
     }

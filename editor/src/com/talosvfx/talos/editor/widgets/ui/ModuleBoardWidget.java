@@ -450,19 +450,19 @@ public class ModuleBoardWidget extends WidgetGroup {
         TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
-    public ModuleWrapper createModule (Class<? extends AbstractModule> clazz, float x, float y) {
-        final AbstractModule module;
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float x, float y) {
+        final T module;
         try {
             module = ClassReflection.newInstance(clazz);
 
             if (TalosMain.Instance().TalosProject().getCurrentModuleGraph().addModule(module)) {
-                final ModuleWrapper moduleWrapper = createModuleWrapper(module, x, y);
+                final U moduleWrapper = createModuleWrapper(module, x, y);
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
 
                 TalosMain.Instance().ProjectController().setDirty();
 
-                return moduleWrapper;
+                return (U)moduleWrapper;
             } else {
                 System.out.println("Did not create module: " + clazz.getSimpleName());
                 return null;
@@ -472,7 +472,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
-    public <T extends AbstractModule> ModuleWrapper createModuleWrapper (T module, float x, float y) {
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float x, float y) {
         ModuleWrapper<T> moduleWrapper = null;
 
         if (module == null) return null;
@@ -480,7 +480,11 @@ public class ModuleBoardWidget extends WidgetGroup {
         Class<T> moduleClazz = (Class<T>)module.getClass();
 
         try {
-            moduleWrapper = ClassReflection.newInstance(WrapperRegistry.get(moduleClazz));
+            Class<ModuleWrapper<T>> c = WrapperRegistry.get(moduleClazz);
+            if (c == null) {
+                throw new GdxRuntimeException("No wrapper found for clazz " + moduleClazz);
+            }
+            moduleWrapper = ClassReflection.newInstance(c);
             int id = getUniqueIdForModuleWrapper();
             moduleWrapper.setModule(module);
             moduleWrapper.setId(id);
@@ -504,7 +508,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         tryAndConnectLasCC(moduleWrapper);
 
 
-        return moduleWrapper;
+        return (U)moduleWrapper;
     }
 
     private <T extends AbstractModule> void tryAndConnectLasCC(ModuleWrapper<T> moduleWrapper) {

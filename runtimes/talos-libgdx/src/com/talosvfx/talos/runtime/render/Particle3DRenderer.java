@@ -65,19 +65,18 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
 
     Color tempColour = new Color();
     private void processParticle(Particle particle, float alpha) {
-        ParticleDrawable drawable = particle.drawable;
-        if(drawable instanceof TextureRegionDrawable) {
-            TextureRegionDrawable textureRegionDrawable = (TextureRegionDrawable) drawable;
-            Texture texture = textureRegionDrawable.getTextureRegion().getTexture();
-
-            pos.set(particle.getX(), particle.getY(), 0);
-            rot.set(particle.rotation.x, particle.rotation.y, particle.rotation.z); // xy, yz, zx
-            tempColour.set(particle.color);
-            tempColour.a = particle.transparency;
-            float[] verts = SpriteVertGenerator.getSprite(pos, rot, tempColour, particle.size.x, particle.size.y);
-
-            batch.render(verts, texture);
-        }
+//        if(drawable instanceof TextureRegionDrawable) {
+//            TextureRegionDrawable textureRegionDrawable = (TextureRegionDrawable) drawable;
+//            Texture texture = textureRegionDrawable.getTextureRegion().getTexture();
+//
+//            pos.set(particle.getX(), particle.getY(), 0);
+//            rot.set(particle.rotation.x, particle.rotation.y, particle.rotation.z); // xy, yz, zx
+//            tempColour.set(particle.color);
+//            tempColour.a = particle.transparency;
+//            float[] verts = SpriteVertGenerator.getSprite(pos, rot, tempColour, particle.size.x, particle.size.y);
+//
+//            batch.render(verts, texture);
+//        }
     }
 
     @Override

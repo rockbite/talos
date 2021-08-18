@@ -50,6 +50,10 @@ public class ActionRow<U> extends BasicRow<U> {
 
         label.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
+            public void editModeStarted () {
+            }
+
+            @Override
             public void changed(String newText) {
                 onItemNameChange(newText);
             }

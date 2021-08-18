@@ -2,6 +2,11 @@
     <category name = "Main Modules">
         <module name = "Particle" wrapper = "ParticleModuleWrapper">ParticleModule</module>
         <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>
+        <module name = "Drawable" wrapper = "DrawableModuleWrapper">DrawableModule</module>
+    </category>
+    <category name = "PointGenerators">
+        <module name = "Single Point gen" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
+        <module name = "FromTo Point gen" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
     </category>
     <category name = "General Use">
         <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
@@ -27,6 +32,9 @@
         <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
         <module name = "Shaded Sprite" wrapper = "ShadedSpriteModuleWrapper">ShadedSpriteModule</module>
     </category>
+    <category name = "Materials">
+        <module name = "SpriteMaterial" wrapper = "SpriteMaterialModuleWrapper">SpriteMaterialModule</module>
+    </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>
         <module name = "Dynamic Random Range" wrapper = "DynamicRangeModuleWrapper">DynamicRangeModule</module>
@@ -34,6 +42,7 @@
         <module name = "Multi Input" wrapper = "RandomInputModuleWrapper">RandomInputModule</module>
     </category>
     <category name = "Motion and Physics">
+        <module name = "Basic Movement" wrapper = "BasicParticleMovementModuleWrapper">BasicParticleMovementModule</module>
         <module name = "Fake Motion Blur" wrapper = "FakeMotionBlurModuleWrapper">FakeMotionBlurModule</module>
         <module name = "Vector Field" wrapper = "VectorFieldModuleWrapper">VectorFieldModule</module>
         <module name = "Attractor" wrapper = "AttractorModuleWrapper">AttractorModule</module>

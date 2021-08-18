@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
+import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
 
 public class Particle implements Pool.Poolable {
 
@@ -41,8 +42,6 @@ public class Particle implements Pool.Poolable {
     public float seed;
 
     public float durationAtInit;
-
-    public ParticleDrawable drawable;
 
     public Particle() {
         // empty constructor
@@ -66,13 +65,13 @@ public class Particle implements Pool.Poolable {
 
         life = particleModule.getLife(); // really makes more sense like this, for deterministic purposes
 
-        position.set(particleModule.getStartPosition()); // offset
+        position.set(0, 0); // offset
         spawnPosition.set(emitterReference.getEffectPosition());
 
         durationAtInit = emitterReference.getAlpha();
     }
 
-    public void update(float delta) {
+    public void update (ParticleEmitterInstance particleEmitterInstance, float delta) {
         if(alpha == 1f) return;
 
         if(emitterReference == null) return;
@@ -87,45 +86,45 @@ public class Particle implements Pool.Poolable {
         if(alpha > 1f) alpha = 1f;
 
         applyAlpha(alpha, delta);
+
+        ParticlePointDataGeneratorModule pointDataGenerator = particleModule.getPointDataGenerator();
+        if (pointDataGenerator != null) {
+            //set the context free the points, and generate new particle point data
+
+            pointDataGenerator.generateParticlePointData(this, particleEmitterInstance.particlePointDataPool);
+        }
     }
 
-    public void applyAlpha(float alpha, float delta) {
+    public void applyAlpha (float alpha, float delta) {
         ParticleModule particleModule = emitterReference.getParticleModule();
         if(particleModule == null) return;
 
         particleModule.updateScopeData(this);
 
         //update variable values
-        Vector2 target = particleModule.getTarget();
         float angle = 0;
-        if(target == null) {
-            angle = particleModule.getAngle(); // do we take angle or target
-        } else {
-            angle = target.sub(position).angle();
-        }
 
-        float velocity = particleModule.getVelocity();
         transparency = particleModule.getTransparency();
 
-        if(emitterReference.getEmitterModule().isAligned()) {
+
+        if (emitterReference.getEmitterModule().isAligned()) {
             rotation.set(angle, angle, angle).add(particleModule.getRotation());
         } else {
             rotation.set(particleModule.getRotation());
         }
 
-        drawable = particleModule.getDrawable(); // important to get drawable before size
-        emitterReference.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());
 
-        size.set(particleModule.getSize());
-        Vector2 positionOverride = particleModule.getPosition();
+        size.set(1f, 1f);
         color.set(particleModule.getColor());
 
+        Vector2 positionOverride = particleModule.getPosition();
         // perform inner operations
-        if(positionOverride != null) {
-            position.set(positionOverride);
+        if (positionOverride != null) {
+            float dx = positionOverride.x * delta;
+            float dy = positionOverride.y * delta;
+            position.add(dx, dy);
         } else {
-            position.x += MathUtils.cosDeg(angle) * velocity * delta;
-            position.y += MathUtils.sinDeg(angle) * velocity * delta;
+//            position.setZero(); //do nothing
         }
     }
 
@@ -147,7 +146,7 @@ public class Particle implements Pool.Poolable {
 
     @Override
     public void reset() {
-
+        position.setZero();
     }
 
     public float getEmitterAlpha () {
@@ -162,12 +161,5 @@ public class Particle implements Pool.Poolable {
         ParticleModule particleModule = emitterReference.getParticleModule();
         if(particleModule == null) return;
         particleModule.updateScopeData(this);
-
-        drawable = particleModule.getDrawable();
-
-        if (drawable != null) {
-            drawable.notifyDispose(this);
-        }
-
     }
 }

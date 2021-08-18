@@ -28,6 +28,7 @@ public class ParticleEmitterDescriptor {
 
     ParticleModule particleModule;
     EmitterModule emitterModule;
+    DrawableModule drawableModule;
 
     private int sortPosition;
 
@@ -97,6 +98,13 @@ public class ParticleEmitterDescriptor {
                 added = false;
             }
         }
+        if (module instanceof DrawableModule) {
+            if (drawableModule == null) {
+                drawableModule = (DrawableModule)module;
+            } else {
+                added = false;
+            }
+        }
 
         if (added) {
             modules.add(module);
@@ -147,6 +155,10 @@ public class ParticleEmitterDescriptor {
 
     public EmitterModule getEmitterModule() {
         return emitterModule;
+    }
+
+    public DrawableModule getDrawableModule () {
+        return drawableModule;
     }
 
     public Array<AbstractModule> getModules() {

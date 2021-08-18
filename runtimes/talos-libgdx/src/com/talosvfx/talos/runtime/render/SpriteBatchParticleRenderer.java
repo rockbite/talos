@@ -20,10 +20,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
+import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.ParticlePointData;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
+import com.talosvfx.talos.runtime.modules.MaterialModule;
+import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.utils.DefaultShaders;
+import com.talosvfx.talos.runtime.values.DrawableValue;
 
 public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
@@ -88,9 +96,29 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		color.a = particle.transparency * parentAlpha;
 		batch.setColor(color);
 
-		if (particle.drawable != null) {
-			particle.drawable.setCurrentParticle(particle);
-			particle.drawable.draw(batch, particle, color);
+		DrawableModule drawableModule = particle.getEmitter().getDrawableModule();
+		if (drawableModule != null && drawableModule.getMaterialModule() != null) {
+			MaterialModule materialModule = drawableModule.getMaterialModule();
+
+			if (materialModule instanceof SpriteMaterialModule) {
+				//For now
+				DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
+				ParticleDrawable drawable = drawableValue.getDrawable();
+
+				ParticlePointDataGeneratorModule pointDataGenerator = particle.getEmitter().getParticleModule().getPointDataGenerator();
+
+				if (pointDataGenerator == null) return;
+
+				Array<ParticlePointData> pointData = pointDataGenerator.pointData;
+				for (int i = 0; i < pointData.size; i++) {
+					ParticlePointData particlePointData = pointData.get(i);
+
+					drawable.draw(batch, particlePointData, particlePointData.color);
+
+				}
+
+			}
 		}
+
 	}
 }

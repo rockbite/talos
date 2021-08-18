@@ -46,7 +46,7 @@ public class EmitterModule extends AbstractModule {
         duration = createInputSlot(DURATION);
         rate = createInputSlot(RATE);
 
-        config = (EmConfigValue) createInputSlot(CONFIG, new EmConfigValue());
+        config = createInputSlot(CONFIG, new EmConfigValue());
     }
 
     @Override

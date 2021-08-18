@@ -12,6 +12,6 @@ varying vec2 v_texCoords;
 
 
 void main () {
-    vec4 diffuse = texture(u_texture, v_texCoords);
+    vec4 diffuse = texture2D(u_texture, v_texCoords);
     gl_FragColor = vec4(diffuse * v_color);
 }

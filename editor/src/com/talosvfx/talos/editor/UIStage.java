@@ -417,7 +417,7 @@ public class UIStage {
 		buildPreviewController();
 		innerSecundumActor = new Preview2D(previewController);
 		innerTertiumActor = new Preview3D(previewController);
-		previewWidget = innerTertiumActor;
+		previewWidget = innerSecundumActor;
 
 		emitterList = new EmitterList(skin);
 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.runtime.*;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
 
@@ -17,6 +18,7 @@ public class TinyEmitter implements IEmitter {
     private final ParticleEffectInstance parentParticleInstance;
     private ParticleEmitterDescriptor emitterGraph;
     private EmitterModule emitterModule;
+    private DrawableModule drawableModule;
     private ParticleModule particleModule;
     private ScopePayload scopePayload;
 
@@ -84,6 +86,7 @@ public class TinyEmitter implements IEmitter {
     public void init() {
         emitterModule = emitterGraph.getEmitterModule();
         particleModule = emitterGraph.getParticleModule();
+        drawableModule = emitterGraph.getDrawableModule();
         if (emitterModule == null)
             return;
 
@@ -197,6 +200,11 @@ public class TinyEmitter implements IEmitter {
     @Override
     public EmitterModule getEmitterModule () {
         return emitterModule;
+    }
+
+    @Override
+    public DrawableModule getDrawableModule () {
+        return drawableModule;
     }
 
     @Override
@@ -347,7 +355,7 @@ public class TinyEmitter implements IEmitter {
                         miniDelta = time - record.start - pos;
                         pos = time - record.start;
                     }
-                    particle.update(miniDelta);
+                    particle.update(null, miniDelta);
                     ffCount++;
                 }
                 System.out.println("fast forwarded in " + ffCount + " steps");

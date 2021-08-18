@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
 
@@ -108,6 +109,10 @@ public class ParticleEmitterInstance implements IEmitter {
 
 		//update variables to their real values
 		emitterModule.updateScopeData(this);
+
+		if (getDrawableModule() != null) {
+			getDrawableModule().processValues();
+		}
 
 		delay = emitterModule.getDelay();
 		duration = emitterModule.getDuration();
@@ -219,11 +224,22 @@ public class ParticleEmitterInstance implements IEmitter {
 		return activeParticles;
 	}
 
+	public Pool<ParticlePointData> particlePointDataPool = new Pool<ParticlePointData>() {
+		@Override
+		protected ParticlePointData newObject () {
+			return new ParticlePointData();
+		}
+	};
+
 	private void updateParticles(float delta) {
+		if (getParticleModule().getPointDataGenerator() != null) {
+			getParticleModule().getPointDataGenerator().freePoints(particlePointDataPool);
+		}
+
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
 			Particle particle = activeParticles.get(i);
 
-			particle.update(delta);
+			particle.update(this, delta);
 
 			if(isImmortal) {
 				// if immortal we don't kill them
@@ -300,6 +316,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	@Override
 	public EmitterModule getEmitterModule () {
 		return emitterGraph.getEmitterModule();
+	}
+
+	@Override
+	public DrawableModule getDrawableModule () {
+		return emitterGraph.getDrawableModule();
 	}
 
 	@Override

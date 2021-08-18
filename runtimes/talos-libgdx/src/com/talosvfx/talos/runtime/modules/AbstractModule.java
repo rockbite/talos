@@ -149,14 +149,14 @@ public abstract class AbstractModule implements Json.Serializable {
         }
     }
 
-    public Value createInputSlot(int slotId, Value value) {
+    public <T extends Value> T createInputSlot(int slotId, T value) {
         inputSlots.put(slotId, new Slot(this, slotId, true));
         inputSlots.get(slotId).setValue(value);
 
         return value;
     }
 
-    public Value createOutputSlot(int slotId, Value value) {
+    public <T extends Value> T createOutputSlot(int slotId, T value) {
         outputSlots.put(slotId, new Slot(this, slotId, false));
         outputSlots.get(slotId).setValue(value);
 

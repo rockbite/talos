@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
+import com.talosvfx.talos.runtime.ParticlePointData;
 
 public class TextureRegionDrawable extends ParticleDrawable {
 
@@ -53,6 +54,22 @@ public class TextureRegionDrawable extends ParticleDrawable {
 		region.setColor(color);
 
 		draw(batch, x, y, width, height, rotation.x);
+	}
+
+	@Override
+	public void draw (Batch batch, ParticlePointData particlePointData, Color color) {
+
+		float width = 1f;
+		float height = 1f;
+		float x = particlePointData.x;
+		float y = particlePointData.y;
+
+		if(region == null) return;
+
+		region.setColor(color);
+		region.setAlpha(particlePointData.transparency);
+
+		draw(batch, x, y, width, height, 0);
 	}
 
 	@Override

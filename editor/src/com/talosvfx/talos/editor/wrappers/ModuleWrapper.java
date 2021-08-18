@@ -49,7 +49,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     protected IntMap<Image> inputSlotMap = new IntMap<>();
     protected IntMap<Image> outputSlotMap = new IntMap<>();
 
-    private ModuleBoardWidget moduleBoardWidget;
+    protected ModuleBoardWidget moduleBoardWidget;
 
     private int hoveredSlot = -1;
     private boolean hoveredSlotIsInput = false;
@@ -119,9 +119,16 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         cell.setActor(titleLabel);
 
         titleLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+
+            @Override
+            public void editModeStarted () {
+                titleLabel.setText(constructTitle(false));
+            }
+
             @Override
             public void changed(String newText) {
                 titleOverride = newText;
+                setTitleText(constructTitle());
             }
         });
 
@@ -428,23 +435,36 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return null;
     }
 
-    public String constructTitle() {
+    public String constructTitle () {
+        return constructTitle(false);
+    }
+
+    public String constructTitle(boolean appendModule) {
 
         String override = getOverrideTitle();
         if(override != null) {
             return override;
         }
 
+        String moduleName = TalosMain.Instance().moduleNames.get(this.getClass());
+
         if(!titleOverride.equals("")) {
-            return titleOverride;
+            if (appendModule) {
+                return titleOverride  + "\n[" + moduleName + "]";
+            } else {
+                return titleOverride;
+            }
         }
 
-        String name = TalosMain.Instance().moduleNames.get(this.getClass());
 
-        String title = name;
+        String title = moduleName;
 
-        if(lastAttachedWrapper != null) {
+        if (lastAttachedWrapper != null) {
             title = lastAttachedWrapper.getLeftSlotName(lastAttachedTargetSlot);
+
+            if (appendModule) {
+                title += "\n[" + moduleName + "]";
+            }
         }
 
         return title;

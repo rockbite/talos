@@ -14,33 +14,35 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.talosvfx.talos.runtime;
+package com.talosvfx.talos.runtime.modules;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
-public abstract class ParticleDrawable {
+public class MaterialModule extends AbstractModule {
 
-    public abstract void draw(Batch batch, float x, float y, float width, float height, float rotation);
+	public static final int MATERIAL_MODULE = 0;
 
-    public abstract void draw(Batch batch, Particle particle, Color color);
+	public MaterialModule () {
 
-    public void draw (Batch batch, ParticlePointData particlePointData, Color color) {
+	}
 
-    }
+	@Override
+	protected void defineSlots() {
+	}
 
-    public abstract float getAspectRatio();
+	@Override
+	public void processValues() {
 
-    public abstract void setCurrentParticle(Particle particle);
+	}
 
-    public abstract TextureRegion getTextureRegion();
+	@Override
+	public void write (Json json) {
+		super.write(json);
+	}
 
-    public void notifyCreate(Particle particle) {
-
-    }
-
-    public void notifyDispose(Particle particle) {
-
-    }
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
+	}
 }

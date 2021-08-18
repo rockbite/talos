@@ -25,18 +25,29 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
-import com.talosvfx.talos.editor.LegacyImporter;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.serialization.*;
 import com.talosvfx.talos.editor.utils.FileUtils;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
+import com.talosvfx.talos.editor.wrappers.BasicParticleMovementModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.DrawableModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.SingleParticlePointDataGeneratorModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.SpriteMaterialModuleWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.modules.BasicParticleMovementModule;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
+import com.talosvfx.talos.runtime.modules.EmitterModule;
+import com.talosvfx.talos.runtime.modules.MaterialModule;
+import com.talosvfx.talos.runtime.modules.ParticleModule;
 import com.talosvfx.talos.runtime.modules.PolylineModule;
+import com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.modules.TextureModule;
 import com.talosvfx.talos.runtime.modules.VectorFieldModule;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
@@ -55,7 +66,6 @@ public class TalosProject implements IProject {
 	private ParticleEffectInstance particleEffect;
 	private ParticleEffectDescriptor particleEffectDescriptor;
 	private ParticleEmitterWrapper currentEmitterWrapper;
-	private LegacyImporter importer;
 	private TalosAssetProvider projectAssetProvider;
 	private MetaData readMetaData;
 
@@ -73,8 +83,6 @@ public class TalosProject implements IProject {
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
 		particleEffect.setScope(TalosMain.Instance().globalScope);
 		particleEffect.loopable = true;
-
-		importer = new LegacyImporter(TalosMain.Instance().NodeStage());
 
 		emitterComparator = new Comparator<ParticleEmitterWrapper>() {
 			@Override
@@ -175,9 +183,30 @@ public class TalosProject implements IProject {
 		cleanData();
 		projectData = new ProjectData();
 		currentEmitterWrapper = loadEmitter("default_emitter", 0);
-		TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
+		ModuleBoardWidget moduleBoardWidget = TalosMain.Instance().NodeStage().moduleBoardWidget;
+		moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
+
+		//Emitter
+		moduleBoardWidget.createModule(EmitterModule.class, 200, 200);
+
+		//Drawable
+		DrawableModuleWrapper drawableModule = moduleBoardWidget.createModule(DrawableModule.class, 200, 350);
+		SpriteMaterialModuleWrapper materialModule = moduleBoardWidget.createModule(SpriteMaterialModule.class, 0, 350);
+		moduleBoardWidget.makeConnection(materialModule, drawableModule, MaterialModule.MATERIAL_MODULE, DrawableModule.MATERIAL_IN);
+
+		//Particle
+		ParticleModuleWrapper particleModule = moduleBoardWidget.createModule(ParticleModule.class, 200, 0);
+		BasicParticleMovementModuleWrapper basicMovementModule = moduleBoardWidget.createModule(BasicParticleMovementModule.class, 0, -100);
+		moduleBoardWidget.makeConnection(basicMovementModule, particleModule, BasicParticleMovementModule.POSITION, ParticleModule.POSITION);
+
+		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 0);
+		moduleBoardWidget.makeConnection(pointGenerator, particleModule, SingleParticlePointDataGeneratorModule.MODULE, ParticleModule.POINT_GENERATOR);
+
+
+		TalosMain.Instance().ProjectController().setDirty();
+
 	}
 
 	@Override
@@ -335,7 +364,6 @@ public class TalosProject implements IProject {
 
 	public void importFromLegacyFormat(FileHandle fileHandle) {
 		cleanData();
-		importer.read(fileHandle);
 	}
 
 	private void setToExportData (ExportData data, ModuleBoardWidget moduleBoardWidget) {

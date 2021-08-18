@@ -45,8 +45,11 @@ public class EditableLabel extends Table {
     private final InputListener stageListener;
 
     public interface EditableLabelChangeListener {
-        public void changed(String newText);
+        void editModeStarted ();
+        void changed(String newText);
     }
+
+
 
     public EditableLabel(String text, Skin skin) {
         super(skin);
@@ -146,6 +149,7 @@ public class EditableLabel extends Table {
     }
 
     public void setEditMode() {
+        listener.editModeStarted();
         labelTable.setVisible(false);
         inputTable.setVisible(true);
         textField.setWidth(label.getPrefWidth() + 10);
@@ -176,5 +180,9 @@ public class EditableLabel extends Table {
 
     public void setText(String text) {
         label.setText(text);
+    }
+
+    public Label getLabel () {
+        return label;
     }
 }

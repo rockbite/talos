@@ -86,7 +86,7 @@ public class PreviewImageControllerWidget extends Table {
 			}
 		});
 
-		dimensionChangeButton = new SquareLabelButton(skin, "2D");
+		dimensionChangeButton = new SquareLabelButton(skin, "3D");
 		dimensionChangeButton.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
