@@ -73,7 +73,7 @@ public class Preview3D extends PreviewWidget {
         simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
         shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/3d/vert.glsl"), Gdx.files.internal("shaders/3d/frag.glsl"));
 
-        particleRenderer = new Particle3DRenderer();
+        particleRenderer = new Particle3DRenderer(worldCamera);
 
         TalosMain.Instance().addCustomInputProcessor(cameraInputController);
     }

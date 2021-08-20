@@ -34,13 +34,13 @@ public class InterpolationModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
-        alpha = createInputSlot(ALPHA);
+        alpha = createAlphaInputSlot(ALPHA);
 
         output = createOutputSlot(OUTPUT);
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         output.set(currentInterpolation.apply(alpha.getFloat()));
     }
 

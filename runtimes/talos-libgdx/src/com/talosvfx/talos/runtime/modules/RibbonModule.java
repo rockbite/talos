@@ -54,7 +54,7 @@ public class RibbonModule extends AbstractModule {
     public void fetchAllInputSlotValues() {
         super.fetchAllInputSlotValues();
 
-        float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
+        int cachedRequesterID = getScope().getRequesterID();
 
         RibbonRenderer renderer = (RibbonRenderer) outputValue.getDrawable();
 
@@ -63,8 +63,8 @@ public class RibbonModule extends AbstractModule {
 
             float pointAlpha = (float)i/(detail-1);
             if(pointAlpha == 0) pointAlpha = 0.001f;
-            getScope().set(ScopePayload.SECONDARY_SEED, pointAlpha);
-            getScope().set(ScopePayload.REQUESTER_ID, requester + pointAlpha*0.1f);
+            getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, pointAlpha);
+            getScope().setCurrentRequesterID(getScope().newParticleRequester()); //New requester for sub particles
 
             for(Slot inputSlot : inputSlots.values()) {
                 fetchInputSlotValue(inputSlot.getIndex());
@@ -91,11 +91,11 @@ public class RibbonModule extends AbstractModule {
         }
         //renderer.adjustPointData();
 
-        getScope().set(ScopePayload.REQUESTER_ID, requester);
+        getScope().setCurrentRequesterID(cachedRequesterID);
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         RibbonRenderer renderer = (RibbonRenderer) outputValue.getDrawable();
 
         TextureRegion mainRegion = null;

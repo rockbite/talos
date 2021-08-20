@@ -42,7 +42,7 @@ public class VectorFieldModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         if(vectorField == null) return;
         float scaleVal = 1f;
         if(!scale.isEmpty()) {

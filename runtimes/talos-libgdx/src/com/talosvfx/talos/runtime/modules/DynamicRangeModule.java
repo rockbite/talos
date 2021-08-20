@@ -34,14 +34,13 @@ public class DynamicRangeModule extends CurveModule {
     private Random random = new Random();
 
     @Override
-    public void processValues() {
-        processAlphaDefaults();
+    public void processCustomValues () {
 
         // do the random thing first
         float low = calcRandomRange(lowMin, lowMax, 1);
         float high = calcRandomRange(highMin, highMax, 2);
 
-        super.processValues();
+        super.processCustomValues();
 
         float mix = Interpolation.linear.apply(low, high, output.getFloat());
 

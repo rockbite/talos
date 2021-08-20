@@ -26,7 +26,7 @@ public class RadToCartModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         tmp.set(l.getFloat(), 0);
         tmp.rotate(a.getFloat());
 

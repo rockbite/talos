@@ -59,8 +59,9 @@ public class TextureRegionDrawable extends ParticleDrawable {
 	@Override
 	public void draw (Batch batch, ParticlePointData particlePointData, Color color) {
 
-		float width = particlePointData.size.x;
-		float height = particlePointData.size.y;
+		float width = 1f;
+		float height = 1f;
+
 		float x = particlePointData.x;
 		float y = particlePointData.y;
 

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.render.p3d;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -22,9 +23,12 @@ public class Simple3DBatch {
     private int vertsInBuffer;
     private int vertexSize;
 
+    int blendSrc;
+    int blendDst;
+
 
     public Simple3DBatch (int size, VertexAttributes vertexAttributes) {
-        mesh = new Mesh(false, size, size * 3, vertexAttributes);
+        mesh = new Mesh(false, size * 4, size * 6, vertexAttributes);
         maxVertsInMesh = size;
 
         final Iterator<VertexAttribute> iter = vertexAttributes.iterator();
@@ -34,11 +38,17 @@ public class Simple3DBatch {
         vertexBuffer = new float[maxVertsInMesh * vertexSize];
 
 
-        short[] indices = new short[size];
-        for (short i = 0; i < size; i++) {
-            indices[i] = i;
+        int len = size * 6;
+        short[] indices = new short[len];
+        short j = 0;
+        for (int i = 0; i < len; i += 6, j += 4) {
+            indices[i] = j;
+            indices[i + 1] = (short)(j + 1);
+            indices[i + 2] = (short)(j + 2);
+            indices[i + 3] = (short)(j + 2);
+            indices[i + 4] = (short)(j + 3);
+            indices[i + 5] = j;
         }
-
         mesh.setIndices(indices);
     }
 
@@ -92,4 +102,10 @@ public class Simple3DBatch {
         lastTexture = null;
     }
 
+    public void setBlendFunction (int src, int dst) {
+        if (blendSrc != src || blendDst != dst) {
+            flush();
+        }
+        Gdx.gl.glBlendFunc(src, dst);
+    }
 }

@@ -50,7 +50,7 @@ public class TargetModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         float alpha = 0;
         if(alphaInput.isEmpty()) {
             alpha = getScope().getFloat(ScopePayload.PARTICLE_ALPHA);

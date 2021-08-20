@@ -72,7 +72,7 @@ public class RandomInputModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
 
         Value output = outputSlots.get(0).getValue();
         if(output != null) {

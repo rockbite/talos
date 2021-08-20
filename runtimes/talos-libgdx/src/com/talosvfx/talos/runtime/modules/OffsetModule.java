@@ -89,7 +89,7 @@ public class OffsetModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
-        alpha = createInputSlot(ALPHA);
+        alpha = createAlphaInputSlot(ALPHA);
         output = createOutputSlot(OUTPUT);
 
         lowPos = new NumericalValue();
@@ -99,8 +99,7 @@ public class OffsetModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
-        processAlphaDefaults();
+    public void processCustomValues () {
 
         float alpha = this.alpha.getFloat();
 
@@ -175,25 +174,6 @@ public class OffsetModule extends AbstractModule {
         float posY = r4 * MathUtils.sinDeg(alpha) + pos.get(1);
 
         result.set(posX, posY);
-    }
-
-    protected void processAlphaDefaults() {
-        if(alpha.isEmpty()) {
-            // as default we are going to fetch the lifetime or duration depending on context
-            float requester = getScope().getFloat(ScopePayload.REQUESTER_ID);
-            if(requester < 1) {
-                // particle
-                alpha.set(getScope().get(ScopePayload.PARTICLE_ALPHA));
-                alpha.setEmpty(false);
-            } else if(requester > 1) {
-                // emitter
-                alpha.set(getScope().get(ScopePayload.EMITTER_ALPHA));
-                alpha.setEmpty(false);
-            } else {
-                // whaat?
-                alpha.set(0);
-            }
-        }
     }
 
     public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle, Vector2 intersection) {

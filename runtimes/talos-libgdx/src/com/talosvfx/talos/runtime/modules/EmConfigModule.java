@@ -47,7 +47,7 @@ public class EmConfigModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         outputValue.set(userValue);
     }
 

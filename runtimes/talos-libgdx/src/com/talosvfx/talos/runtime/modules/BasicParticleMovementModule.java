@@ -69,7 +69,7 @@ public class BasicParticleMovementModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         // nothing to process, it's all cool as cucumber
 
         float angle = getAngle();
@@ -77,17 +77,6 @@ public class BasicParticleMovementModule extends AbstractModule {
         float vel = getVelocity();
 
         position.set(MathUtils.cosDeg(angle) * vel, MathUtils.sinDeg(angle) * vel);
-    }
-
-    public void updateScopeData(Particle particle) {
-        getScope().set(ScopePayload.EMITTER_ALPHA, particle.getEmitterAlpha());
-        getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
-        getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
-        getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
-        getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
-        getScope().set(ScopePayload.PARTICLE_POSITION, particle.getX(), particle.getY());
-
-        getScope().setParticle(particle);
     }
 
 

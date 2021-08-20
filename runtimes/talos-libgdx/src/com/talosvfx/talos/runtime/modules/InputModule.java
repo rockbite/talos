@@ -33,7 +33,7 @@ public class InputModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         NumericalValue value = getScope().get(scopeKey);
         outputValue.set(value);
     }

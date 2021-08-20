@@ -41,7 +41,7 @@ public class AttractorModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         NumericalValue posNumVal = getScope().get(ScopePayload.PARTICLE_POSITION);
         pos.set(posNumVal.get(0), posNumVal.get(1));
 

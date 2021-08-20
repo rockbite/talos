@@ -50,7 +50,7 @@ public class EmitterModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         // nothing to process
     }
 
@@ -123,7 +123,7 @@ public class EmitterModule extends AbstractModule {
 
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
-        getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
+        getScope().setCurrentRequesterID(ScopePayload.EMITTER_ALPHA);
     }
 
     @Override

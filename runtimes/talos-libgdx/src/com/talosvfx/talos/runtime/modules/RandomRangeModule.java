@@ -51,7 +51,7 @@ public class RandomRangeModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         // what's worse, keeping thousands of long values, or keeping floats but casting 1000 times to long?
         // I'll leave the answer to the reader
         long seed = (long) (getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000);

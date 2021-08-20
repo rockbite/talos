@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticlePointData;
+import com.talosvfx.talos.runtime.ParticlePointGroup;
+import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.values.ModuleValue;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
@@ -38,7 +40,7 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 	}
 
 	@Override
-	public void processValues () {
+	public void processCustomValues () {
 	}
 
 	@Override
@@ -50,7 +52,12 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 	private Vector2 temp2 = new Vector2();
 
 	@Override
-	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool) {
+	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group) {
+
+		int cachedRequestMode = getScope().getRequestMode();
+		int cachedRequesterID = getScope().getRequesterID();
+
+		getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 
 		int numPoints = (int)pointCount.get(0);
 		if (numPoints > 0) {
@@ -62,15 +69,23 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 
 				float alpha = (float)i/numPoints;
 
+
 				temp.interpolate(temp2, alpha, Interpolation.linear);
 
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, alpha);
+				getScope().setCurrentRequesterID(getScope().newParticleRequester());
+
+				obtain.alpha = alpha;
+				obtain.seed = particle.seed;
 				obtain.setFromParticle(particle, temp);
 				obtain.pointDataIndex = i;
 
-				pointData.add(obtain);
+				group.pointDataArray.add(obtain);
 			}
 		}
 
+		getScope().setCurrentRequestMode(cachedRequestMode);
+		getScope().setCurrentRequesterID(cachedRequesterID);
 	}
 
 	public void setDefaults (Vector2 from, Vector2 to) {

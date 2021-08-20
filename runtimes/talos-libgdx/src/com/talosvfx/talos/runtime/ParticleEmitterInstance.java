@@ -231,9 +231,16 @@ public class ParticleEmitterInstance implements IEmitter {
 		}
 	};
 
+	public Pool<ParticlePointGroup> groupPool = new Pool<ParticlePointGroup>() {
+		@Override
+		protected ParticlePointGroup newObject () {
+			return new ParticlePointGroup();
+		}
+	};
+
 	private void updateParticles(float delta) {
 		if (getParticleModule().getPointDataGenerator() != null) {
-			getParticleModule().getPointDataGenerator().freePoints(particlePointDataPool);
+			getParticleModule().getPointDataGenerator().freePoints(particlePointDataPool, groupPool);
 		}
 
 		for (int i = activeParticles.size - 1; i >= 0; i--) {

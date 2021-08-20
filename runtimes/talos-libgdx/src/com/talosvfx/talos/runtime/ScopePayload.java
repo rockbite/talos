@@ -27,18 +27,25 @@ public class ScopePayload {
     public static final int EMITTER_ALPHA = 0;
     public static final int PARTICLE_ALPHA = 1;
     public static final int PARTICLE_SEED = 2;
-    public static final int REQUESTER_ID = 3;
     public static final int EMITTER_ALPHA_AT_P_INIT = 4;
     public static final int DRAWABLE_ASPECT_RATIO = 5;
     public static final int SECONDARY_SEED = 6;
     public static final int TOTAL_TIME = 7;
     public static final int PARTICLE_POSITION = 8;
 
+    public static final int SUB_PARTICLE_ALPHA = 9;
+
+
     private Particle processingParticleRef;
 
     private IntMap<NumericalValue> map = new IntMap<>();
 
     private IntMap<NumericalValue> dynamicValues = new IntMap<>();
+
+    private int currentRequestMode = -1;
+    private int currentRequester = -1;
+    private int freeRequesterID = 100;
+
 
     public ScopePayload() {
         for(int i = 0; i < 10; i++) {
@@ -109,5 +116,28 @@ public class ScopePayload {
 
     public void setDynamicValue(int key, NumericalValue val) {
         dynamicValues.get(key).set(val);
+    }
+
+    public int getRequestMode () {
+        return currentRequestMode;
+    }
+    public void setCurrentRequestMode (int requestMode) {
+        this.currentRequestMode = requestMode;
+    }
+
+    public int getRequesterID () {
+        return currentRequester;
+    }
+
+    public void setCurrentRequesterID (int currentRequester) {
+        this.currentRequester = currentRequester;
+    }
+
+    public int newParticleRequester () {
+        freeRequesterID++;
+        if (freeRequesterID == 0) {
+            freeRequesterID = 100;
+        }
+        return freeRequesterID;
     }
 }

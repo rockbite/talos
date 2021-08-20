@@ -41,6 +41,8 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     protected void configureSlots() {
 
         addInputSlot("point gen", ParticleModule.POINT_GENERATOR);
+        addInputSlot("mesh gen", ParticleModule.MESH_GENERATOR);
+
         addSeparator(true);
 
         addInputSlot("life",  ParticleModule.LIFE);
@@ -52,12 +54,14 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         addInputSlot("rotation",  ParticleModule.ROTATION);
         addInputSlot("position",  ParticleModule.POSITION);
+
     }
 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == ParticleModule.POINT_GENERATOR) return SingleParticlePointDataGeneratorModule.class;
+        if(slot.getIndex() == ParticleModule.MESH_GENERATOR) return QuadMeshGeneratorModule.class;
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
         if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;

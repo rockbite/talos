@@ -26,7 +26,7 @@ public class VectorSplitModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         xOut.set(input.get(0));
         yOut.set(input.get(1));
         zOut.set(input.get(2));

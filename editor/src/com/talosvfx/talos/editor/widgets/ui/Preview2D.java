@@ -20,7 +20,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
+import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.ParticlePointData;
+import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
@@ -51,7 +54,7 @@ public class Preview2D extends PreviewWidget {
         setWorldSize(10f);
         gridSize = 1f;
 
-        spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
+        spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(camera);
         particleRenderer = spriteBatchParticleRenderer;
         shapeRenderer = new ShapeRenderer();
 
@@ -219,6 +222,30 @@ public class Preview2D extends PreviewWidget {
         if (!previewController.isBackground()) {
             previewImage.draw(batch, parentAlpha);
         }
+
+
+        //Debug for points
+//
+//        batch.end();
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//        shapeRenderer.setColor(Color.WHITE);
+//        Gdx.gl.glLineWidth(1f);
+//        Gdx.gl.glEnable(GL20.GL_BLEND);
+//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+//
+//        for (IEmitter emitter : particleEffect.getEmitters()) {
+//
+//            ParticlePointDataGeneratorModule pointDataGenerator = emitter.getParticleModule().getPointDataGenerator();
+//            if (pointDataGenerator != null) {
+//                for (ParticlePointData pointDatum : pointDataGenerator.pointData) {
+//                    shapeRenderer.circle(pointDatum.x, pointDatum.y, 0.2f);
+//                }
+//            }
+//        }
+//
+//        shapeRenderer.end();
+//        batch.begin();
 
         // now for the drag points
         if(dragPoints.size > 0) {

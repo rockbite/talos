@@ -36,7 +36,7 @@ public class MixModule extends AbstractModule {
 
     @Override
     protected void defineSlots() {
-        alpha = createInputSlot(ALPHA);
+        alpha = createAlphaInputSlot(ALPHA);
         val1 = createInputSlot(VAL1);
         val2 = createInputSlot(VAL2);
 
@@ -44,7 +44,7 @@ public class MixModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         int count = Math.max(val1.elementsCount(), val2.elementsCount());
         for(int i = 0; i < count; i++) {
             output.getElements()[i] = Interpolation.linear.apply(val1.getElements()[i], val2.getElements()[i], alpha.getFloat());

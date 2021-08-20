@@ -74,14 +74,15 @@ public class PolylineModule extends AbstractModule {
 
     @Override
     public void fetchAllInputSlotValues() {
-        float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
+        int particleRequesterID = getScope().getRequesterID();
+
         polylineDrawable.setCurrentParticle(getScope().currParticle());
 
         for(int i = 0; i < pointCount; i++) {
 
             float pointAlpha = (float)i/(pointCount-1);
-            getScope().set(ScopePayload.SECONDARY_SEED, pointAlpha);
-            getScope().set(ScopePayload.REQUESTER_ID, requester + pointAlpha*0.1f);
+            getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, pointAlpha);
+            getScope().setCurrentRequesterID(getScope().newParticleRequester()); //Generate new cached id for update of particle
 
             for(Slot inputSlot : inputSlots.values()) {
                 fetchInputSlotValue(inputSlot.getIndex());
@@ -111,11 +112,11 @@ public class PolylineModule extends AbstractModule {
             polylineDrawable.setPointData(i, offset.get(0), offset.get(1), thicknessVal, tmpColor);
             polylineDrawable.setTangents(leftTangent.get(0), leftTangent.get(1), rightTangent.get(0), rightTangent.get(1));
         }
-        getScope().set(ScopePayload.REQUESTER_ID, requester);
+        getScope().setCurrentRequesterID(particleRequesterID);
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         outputValue.setDrawable(polylineDrawable);
     }
 

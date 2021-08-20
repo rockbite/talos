@@ -86,7 +86,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         skeletonContainer = new SkeletonContainer(this);
 
-        talosRenderer = new SpriteBatchParticleRenderer(null);
+        talosRenderer = new SpriteBatchParticleRenderer(camera);
 
         renderer = new SkeletonRenderer();
         renderer.setPremultipliedAlpha(false); // PMA results in correct blending without outlines. (actually should be true, not sure why this ruins scene2d later, probably blend screwup, will check later)

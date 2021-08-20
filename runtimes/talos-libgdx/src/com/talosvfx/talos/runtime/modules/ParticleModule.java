@@ -32,6 +32,7 @@ public class ParticleModule extends AbstractModule {
     public static final int TAG = 1;
 
     public static final int POINT_GENERATOR = 3;
+    public static final int MESH_GENERATOR = 6;
     public static final int LIFE = 4;
     public static final int ROTATION = 7;
     public static final int COLOR = 9;
@@ -40,6 +41,7 @@ public class ParticleModule extends AbstractModule {
 
 
     ModuleValue<ParticlePointDataGeneratorModule> pointGenerator;
+    ModuleValue<MeshGeneratorModule> meshGenerator;
 
     NumericalValue life;
     NumericalValue rotation;
@@ -55,6 +57,7 @@ public class ParticleModule extends AbstractModule {
     @Override
     protected void defineSlots() {
         pointGenerator = createInputSlot(POINT_GENERATOR, new ModuleValue<ParticlePointDataGeneratorModule>());
+        meshGenerator = createInputSlot(MESH_GENERATOR, new ModuleValue<MeshGeneratorModule>());
 
         life = createInputSlot(LIFE);
         rotation = createInputSlot(ROTATION);
@@ -69,7 +72,7 @@ public class ParticleModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         // nothing to process, it's all cool as cucumber
     }
 
@@ -77,9 +80,10 @@ public class ParticleModule extends AbstractModule {
         getScope().set(ScopePayload.EMITTER_ALPHA, particle.getEmitterAlpha());
         getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
-        getScope().set(ScopePayload.REQUESTER_ID, particle.seed);
         getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
         getScope().set(ScopePayload.PARTICLE_POSITION, particle.getX(), particle.getY());
+
+        getScope().setCurrentRequesterID(particle.requesterID);
 
         getScope().setParticle(particle);
     }
@@ -134,5 +138,10 @@ public class ParticleModule extends AbstractModule {
     public ParticlePointDataGeneratorModule getPointDataGenerator () {
         fetchInputSlotValue(POINT_GENERATOR);
         return pointGenerator.getModule();
+    }
+
+    public MeshGeneratorModule getMeshGenerator () {
+        fetchInputSlotValue(MESH_GENERATOR);
+        return meshGenerator.getModule();
     }
 }

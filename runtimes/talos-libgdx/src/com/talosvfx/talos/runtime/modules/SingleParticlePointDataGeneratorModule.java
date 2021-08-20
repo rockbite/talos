@@ -3,6 +3,8 @@ package com.talosvfx.talos.runtime.modules;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticlePointData;
+import com.talosvfx.talos.runtime.ParticlePointGroup;
+import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.values.ModuleValue;
 
 public class SingleParticlePointDataGeneratorModule extends ParticlePointDataGeneratorModule {
@@ -17,7 +19,7 @@ public class SingleParticlePointDataGeneratorModule extends ParticlePointDataGen
 	}
 
 	@Override
-	public void processValues () {
+	public void processCustomValues () {
 	}
 
 	@Override
@@ -26,12 +28,13 @@ public class SingleParticlePointDataGeneratorModule extends ParticlePointDataGen
 	}
 
 	@Override
-	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool) {
+	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group) {
 		ParticlePointData obtain = particlePointDataPool.obtain();
-
+		obtain.alpha = particle.alpha;
+		obtain.seed = particle.seed;
 		obtain.setFromParticle(particle);
 		obtain.pointDataIndex = 0;
+		group.pointDataArray.add(obtain);
 
-		pointData.add(obtain);
 	}
 }

@@ -51,7 +51,7 @@ public class ColorModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
 
         if(r.isEmpty()) r.set(defaultR);
         if(g.isEmpty()) g.set(defaultG);

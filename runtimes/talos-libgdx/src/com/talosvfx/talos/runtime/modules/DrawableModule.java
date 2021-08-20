@@ -39,7 +39,7 @@ public class DrawableModule extends AbstractModule {
 	}
 
 	@Override
-	public void processValues() {
+	public void processCustomValues () {
 		fetchInputSlotValue(MATERIAL_IN);
 		MaterialModule module = materialModule.getModule();
 		outSlot.setModule(module);

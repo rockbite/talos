@@ -8,7 +8,7 @@ public class NANModule extends AbstractModule {
     }
 
     @Override
-    public void processValues () {
+    public void processCustomValues () {
 
     }
 }

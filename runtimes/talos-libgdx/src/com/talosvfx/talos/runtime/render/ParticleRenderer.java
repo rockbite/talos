@@ -16,10 +16,17 @@
 
 package com.talosvfx.talos.runtime.render;
 
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Matrix4;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.modules.MaterialModule;
 
 public interface ParticleRenderer {
 
+    Camera getCamera ();
+
     void render (ParticleEffectInstance particleEffectInstance);
 
+    void render (float[] verts, MaterialModule materialModule);
 }

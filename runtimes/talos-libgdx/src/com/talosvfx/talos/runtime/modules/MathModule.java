@@ -47,7 +47,7 @@ public class MathModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         if(a.isEmpty()) a.set(defaultA);
         if(b.isEmpty()) b.set(defaultB);
 

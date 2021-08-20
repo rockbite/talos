@@ -74,7 +74,7 @@ public class ScriptModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         if (returnScript != null) {
             returnScript.evaulate(input1, input2, input3, input4, input5, output1, output2, output3, output4, output5);
         } else {

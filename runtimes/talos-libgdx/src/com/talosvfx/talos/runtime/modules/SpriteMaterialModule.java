@@ -50,7 +50,7 @@ public class SpriteMaterialModule extends MaterialModule {
 	}
 
 	@Override
-	public void processValues() {
+	public void processCustomValues () {
 	}
 
 	public void setRegion (String regionName, Sprite region) {

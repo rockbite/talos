@@ -25,7 +25,7 @@ public class FakeMotionBlurModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
 
         float currVel = MathUtils.clamp(velocity.getFloat(), velocityMin, velocityMax);
         float normVel = (currVel-velocityMin)/(velocityMax-velocityMin); // 0..1

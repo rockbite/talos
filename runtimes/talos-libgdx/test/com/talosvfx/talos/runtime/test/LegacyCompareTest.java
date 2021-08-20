@@ -166,7 +166,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 		stage = new Stage();
 		((OrthographicCamera)stage.getViewport().getCamera()).zoom = 1f / 64;
 
-		talosRenderer = new SpriteBatchParticleRenderer(stage.getBatch());
+		talosRenderer = new SpriteBatchParticleRenderer(stage.getCamera(), stage.getBatch());
 
 		String mainPath = "C:\\Users\\Tom\\Desktop\\vfx\\";
 

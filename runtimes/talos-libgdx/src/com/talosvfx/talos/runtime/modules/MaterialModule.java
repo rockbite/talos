@@ -32,7 +32,7 @@ public class MaterialModule extends AbstractModule {
 	}
 
 	@Override
-	public void processValues() {
+	public void processCustomValues () {
 
 	}
 

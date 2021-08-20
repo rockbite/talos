@@ -3,24 +3,25 @@ package com.talosvfx.talos.runtime.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
+import com.sun.xml.internal.xsom.impl.parser.SubstGroupBaseTypeRef;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
-import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.drawables.TextureRegionDrawable;
+import com.talosvfx.talos.runtime.ScopePayload;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
+import com.talosvfx.talos.runtime.modules.MaterialModule;
+import com.talosvfx.talos.runtime.modules.MeshGeneratorModule;
+import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 import com.talosvfx.talos.runtime.render.p3d.Sprite3D;
-import com.talosvfx.talos.runtime.render.p3d.SpriteVertGenerator;
+import com.talosvfx.talos.runtime.values.DrawableValue;
 
 public class Particle3DRenderer implements ParticleRenderer, RenderableProvider {
 
@@ -35,9 +36,10 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
 
     private Vector3 pos = new Vector3();
     private Vector3 rot = new Vector3();
+    private PerspectiveCamera worldCamera;
 
-
-    public Particle3DRenderer () {
+    public Particle3DRenderer (PerspectiveCamera worldCamera) {
+        this.worldCamera = worldCamera;
         sprite3DPool = new Pool<Sprite3D>() {
             @Override
             protected Sprite3D newObject() {
@@ -46,21 +48,65 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
         };
     }
 
+    @Override
+    public Camera getCamera () {
+        return worldCamera;
+    }
 
     @Override
     public void render(ParticleEffectInstance particleEffectInstance) {
         this.particleEffectInstance = particleEffectInstance;
 
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+
         for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
             final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
             if(!particleEmitter.isVisible()) continue;
-
-            for (int j = 0; j < particleEmitter.getActiveParticleCount(); j++) {
-                processParticle(particleEmitter.getActiveParticles().get(j), particleEffectInstance.alpha);
+            if(particleEmitter.isBlendAdd()) {
+                batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            } else {
+                if (particleEmitter.isAdditive()) {
+                    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+                } else {
+                    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                }
             }
+
+
+            MeshGeneratorModule meshGenerator = particleEmitter.getParticleModule().getMeshGenerator();
+            if (meshGenerator == null) continue;
+            meshGenerator.setRenderMode(true);
+
+            DrawableModule drawableModule = particleEmitter.getDrawableModule();
+            if (drawableModule == null) continue;
+            if (drawableModule.getMaterialModule() == null) continue;
+            ParticlePointDataGeneratorModule particlePointDataGeneratorModule = particleEmitter.getParticleModule().getPointDataGenerator();
+            if (particlePointDataGeneratorModule == null) continue;
+
+            int cachedMode = particleEmitter.getScope().getRequestMode();
+            int cachedRequesterID = particleEmitter.getScope().getRequesterID();
+
+            particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
+
+            meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+
+            particleEmitter.getScope().setCurrentRequestMode(cachedMode);
+            particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);
         }
-        sprite3DPool.freeAll(cleanBuffer);
-        cleanBuffer.clear();
+
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+
+    }
+
+    @Override
+    public void render (float[] verts, MaterialModule materialModule) {
+        if (materialModule instanceof SpriteMaterialModule) {
+            DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
+            TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+
+            batch.render(verts, textureRegion.getTexture());
+        }
     }
 
     Color tempColour = new Color();

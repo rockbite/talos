@@ -42,7 +42,7 @@ public class Vector2Module extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
 
         if(x.isEmpty()) x.set(defaultX);
         if(y.isEmpty()) y.set(defaultY);

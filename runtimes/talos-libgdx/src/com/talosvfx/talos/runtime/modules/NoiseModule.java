@@ -45,7 +45,7 @@ public class NoiseModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         output.set(noiseFunction(x.getFloat(), y.getFloat()));
     }
 

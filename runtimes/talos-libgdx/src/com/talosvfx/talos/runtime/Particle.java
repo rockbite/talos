@@ -40,6 +40,7 @@ public class Particle implements Pool.Poolable {
     public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
     public float seed;
+    public int requesterID;
 
     public float durationAtInit;
 
@@ -49,6 +50,7 @@ public class Particle implements Pool.Poolable {
 
     public void init(IEmitter emitterReference) {
         this.seed = MathUtils.random();
+        this.requesterID = emitterReference.getScope().newParticleRequester();
         init(emitterReference, seed);
     }
 
@@ -91,7 +93,15 @@ public class Particle implements Pool.Poolable {
         if (pointDataGenerator != null) {
             //set the context free the points, and generate new particle point data
 
-            pointDataGenerator.generateParticlePointData(this, particleEmitterInstance.particlePointDataPool);
+            int cacheMode = emitterReference.getScope().getRequestMode();
+            int cacheRequestID = emitterReference.getScope().getRequesterID();
+
+            emitterReference.getScope().setCurrentRequestMode(ScopePayload.PARTICLE_ALPHA);
+            emitterReference.getScope().setCurrentRequesterID(this.requesterID);
+            pointDataGenerator.generateParticlePointData(this, particleEmitterInstance.particlePointDataPool, particleEmitterInstance.groupPool);
+
+            emitterReference.getScope().setCurrentRequestMode(cacheMode);
+            emitterReference.getScope().setCurrentRequesterID(cacheRequestID);
         }
     }
 
@@ -147,6 +157,7 @@ public class Particle implements Pool.Poolable {
     @Override
     public void reset() {
         position.setZero();
+        requesterID = -1;
     }
 
     public float getEmitterAlpha () {

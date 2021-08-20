@@ -8,6 +8,10 @@
         <module name = "Single Point gen" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
         <module name = "FromTo Point gen" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
     </category>
+    <category name = "MeshGenerators">
+        <module name = "Quad" wrapper = "QuadMeshGeneratorModuleWrapper">QuadMeshGeneratorModule</module>
+        <module name = "Strip" wrapper = "StripMeshGeneratorModuleWrapper">StripMeshGeneratorModule</module>
+    </category>
     <category name = "General Use">
         <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
         <module name = "Global Values" wrapper = "GlobalScopeModuleWrapper">GlobalScopeModule</module>

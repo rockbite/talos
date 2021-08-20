@@ -105,7 +105,7 @@ public class TinyEmitter implements IEmitter {
 
     public void updateSimulation (float delta) {
         emitterModule.getScope().set(ScopePayload.EMITTER_ALPHA, alpha);
-        emitterModule.getScope().set(ScopePayload.REQUESTER_ID, 1.1f);
+        emitterModule.getScope().setCurrentRequesterID(emitterModule.getScope().newParticleRequester());
         duration = emitterModule.getDuration();
         rate = emitterModule.getRate();
 
@@ -174,7 +174,7 @@ public class TinyEmitter implements IEmitter {
         particleModule.getScope().set(ScopePayload.EMITTER_ALPHA, alpha);
         particleModule.getScope().set(ScopePayload.PARTICLE_ALPHA, 0);
         particleModule.getScope().set(ScopePayload.PARTICLE_SEED, seed);
-        particleModule.getScope().set(ScopePayload.REQUESTER_ID, seed);
+        particleModule.getScope().setCurrentRequesterID(particleModule.getScope().newParticleRequester());
         particleModule.getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, alpha);
 
         float life = particleModule.getLife();

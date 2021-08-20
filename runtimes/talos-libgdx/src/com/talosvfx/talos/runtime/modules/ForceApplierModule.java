@@ -25,7 +25,7 @@ public class ForceApplierModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         float particleAlpha = getScope().getFloat(ScopePayload.PARTICLE_ALPHA);
         if(getScope().currParticle() == null) return;
 

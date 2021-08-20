@@ -32,7 +32,7 @@ public class GlobalScopeModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         output.set(getScope().getDynamicValue(key));
     }
 

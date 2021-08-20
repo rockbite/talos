@@ -31,7 +31,7 @@ public class ShadedSpriteModule extends AbstractModule {
     }
 
     @Override
-    public void processValues () {
+    public void processCustomValues () {
         ShadedDrawable drawable = (ShadedDrawable) outputValue.getDrawable();
     }
 

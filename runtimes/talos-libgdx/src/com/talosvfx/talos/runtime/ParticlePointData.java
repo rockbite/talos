@@ -3,34 +3,45 @@ package com.talosvfx.talos.runtime;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.talosvfx.talos.runtime.modules.ParticleModule;
 
 public class ParticlePointData {
 
+	public float alpha;
+	public float seed;
 	public float x, y;
 	public Vector3 rotation = new Vector3();
-	public Vector2 size = new Vector2();
 	public float transparency;
 	public Color color = new Color();
 
 	public int pointDataIndex;
 
 	public void setFromParticle (Particle particle) {
-		this.x = particle.getX();
-		this.y = particle.getY();
-		this.rotation = particle.rotation;
-		this.size.set(particle.size);
-
-		this.color.set(particle.color);
-		this.transparency = particle.transparency;
+		setFromParticle(particle, 0, 0);
 	}
 
 	public void setFromParticle (Particle particle, Vector2 positionOverride) {
-		this.x = positionOverride.x + particle.getX();
-		this.y = positionOverride.y + particle.getY();
-		this.rotation = particle.rotation;
-		this.size.set(particle.size);
+		setFromParticle(particle, positionOverride.x, positionOverride.y);
+	}
 
-		this.color.set(particle.color);
-		this.transparency = particle.transparency;
+	public void setFromParticle (Particle particle, float positionOverrideX, float positionOverrideY) {
+		ParticleModule particleModule = particle.getEmitter().getParticleModule();
+
+		Vector3 rotation = particleModule.getRotation();
+		Color color = particleModule.getColor();
+		float transparency = particleModule.getTransparency();
+
+
+		this.x = positionOverrideX ;
+		this.y = positionOverrideY;
+		this.x += particle.position.x;
+		this.y += particle.position.y;
+
+
+		this.rotation.set(rotation);
+
+		this.color.set(color);
+
+		this.transparency = transparency;
 	}
 }

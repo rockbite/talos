@@ -56,7 +56,7 @@ public class FromToModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         if(from.isEmpty()) from.set(defaultFrom.x, defaultFrom.y);
         if(to.isEmpty()) to.set(defaultTo.x, defaultTo.y);
 

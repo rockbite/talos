@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.runtime.modules;
 
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -30,11 +31,12 @@ public abstract class AbstractModule implements Json.Serializable {
     protected ParticleEmitterDescriptor graph;
 
     protected IntMap<Slot> inputSlots = new IntMap<>();
+    protected IntMap<Slot> alphaSlots = new IntMap<>();
     protected IntMap<Slot> outputSlots = new IntMap<>();
 
     protected int index = -1;
 
-    private float lastRequester;
+    private int lastRequester = -1;
 
     public AbstractModule () {
         init();
@@ -85,11 +87,42 @@ public abstract class AbstractModule implements Json.Serializable {
         return false;
     }
 
+    public void processValues () {
+        processAlphaDefaults();
+        processCustomValues();
+    }
+
+    protected void processAlphaDefaults() {
+        for (IntMap.Entry<Slot> alphaSlot : alphaSlots) {
+            Value alpha = alphaSlot.value.getValue();
+
+            if (alpha.isEmpty()) {
+
+                int requestMode = getScope().getRequestMode();
+
+                if (requestMode == ScopePayload.SUB_PARTICLE_ALPHA) {
+                    NumericalValue value = getScope().get(ScopePayload.SUB_PARTICLE_ALPHA);
+                    alpha.set(value);
+                    alpha.setEmpty(false);
+                } else if (requestMode == ScopePayload.EMITTER_ALPHA) {
+                    alpha.set(getScope().get(ScopePayload.EMITTER_ALPHA));
+                    alpha.setEmpty(false);
+                } else { //We are particle lifetime
+                    alpha.set(getScope().get(ScopePayload.PARTICLE_ALPHA));
+                    alpha.setEmpty(false);
+                }
+
+            }
+        }
+
+
+    }
+
 
     /**
      * Need to keep the output values updated
      */
-    public abstract void processValues();
+    protected abstract void processCustomValues ();
 
 
     public void setIndex(int index) {
@@ -128,13 +161,13 @@ public abstract class AbstractModule implements Json.Serializable {
      * @param slotId
      */
     public Value fetchOutputSlotValue(int slotId) {
-        float requester = getScope().get(ScopePayload.REQUESTER_ID).getFloat();
+        int requester = getScope().getRequesterID();
 
-        if(lastRequester != requester || (lastRequester == requester && requester == 0f)) { // caching mechanism
+        if (lastRequester != requester || (lastRequester == requester && requester == 0f)) { // caching mechanism
             //fetch all local inputs
             fetchAllInputSlotValues();
             // process
-            processValues();
+            this.processValues();
             graph.getEffectDescriptor().getInstanceReference().reportNodeCall();
 
             lastRequester = requester;
@@ -171,6 +204,14 @@ public abstract class AbstractModule implements Json.Serializable {
         return value;
     }
 
+    public NumericalValue createAlphaInputSlot (int slotId) {
+
+        NumericalValue inputSlot = createInputSlot(slotId);
+        alphaSlots.put(slotId, inputSlots.get(slotId));
+
+        return inputSlot;
+    }
+
     public NumericalValue createOutputSlot(int slotId) {
         outputSlots.put(slotId, new Slot(this, slotId, false));
         NumericalValue value = new NumericalValue();
@@ -192,7 +233,7 @@ public abstract class AbstractModule implements Json.Serializable {
     }
 
     public void resetLastRequester() {
-        lastRequester = -1f;
+        lastRequester = -1;
     }
 
     @Override

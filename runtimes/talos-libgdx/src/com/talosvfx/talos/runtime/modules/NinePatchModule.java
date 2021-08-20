@@ -26,7 +26,7 @@ public class NinePatchModule extends AbstractModule {
     }
 
     @Override
-    public void processValues () {
+    public void processCustomValues () {
         NinePatchDrawable patchDrawable = (NinePatchDrawable) outputValue.getDrawable();
 
         TextureRegion region = null;

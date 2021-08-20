@@ -56,7 +56,7 @@ public class FlipbookModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         if(phaseVal.isEmpty()) {
             phaseVal.set(getScope().getFloat(ScopePayload.TOTAL_TIME));
         }

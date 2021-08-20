@@ -36,7 +36,7 @@ public class StaticValueModule extends AbstractModule {
     }
 
     @Override
-    public void processValues() {
+    public void processCustomValues () {
         outputValue.set(staticValue);
     }
 
