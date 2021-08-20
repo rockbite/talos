@@ -2,14 +2,20 @@ package com.talosvfx.talos.runtime.modules;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.ParticlePointData;
 import com.talosvfx.talos.runtime.ParticlePointGroup;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
+import com.talosvfx.talos.runtime.values.DrawableValue;
 import com.talosvfx.talos.runtime.values.ModuleValue;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
@@ -38,12 +44,11 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 	protected void defineSlots () {
 		outModule = new ModuleValue<>();
 		outModule.setModule(this);
+
 		createOutputSlot(MeshGeneratorModule.MODULE, outModule);
 
 		size = createInputSlot(SIZE);
 		size.set(1f, 1f);
-
-
 
 	}
 
@@ -91,6 +96,21 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 //		CameraRight_worldspace = {ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]}
 //		CameraUp_worldspace = {ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]}
+
+		float U = 0;
+		float U2 = 1f;
+		float V = 0f;
+		float V2 = 1f;
+
+		if (materialModule instanceof SpriteMaterialModule) {
+			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
+			ParticleDrawable drawable = drawableValue.getDrawable();
+			TextureRegion textureRegion = drawable.getTextureRegion();
+			U = textureRegion.getU();
+			U2 = textureRegion.getU2();
+			V = textureRegion.getV();
+			V2 = textureRegion.getV2();
+		}
 
 		rightWorldSpace.set(viewValues[0], viewValues[4], viewValues[8]);
 		upWorldSpace.set(viewValues[1], viewValues[5], viewValues[9]);
@@ -179,10 +199,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				//get uvs from material
 
-				float U = 0;
-				float U2 = 1f;
-				float V = 0f;
-				float V2 = 1f;
+
 
 				verts[idx++] = p1.x; // x1
 				verts[idx++] = p1.y; // y1
@@ -221,6 +238,19 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 			}
 		}
 
+	}
+
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
+		this.billboard = jsonData.getBoolean("billboard", billboard);
+
+	}
+
+	@Override
+	public void write (Json json) {
+		super.write(json);
+		json.writeValue("billboard", this.billboard);
 	}
 
 	public void setBillboard (boolean isBillboard) {

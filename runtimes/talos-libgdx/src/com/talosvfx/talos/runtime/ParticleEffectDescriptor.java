@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
@@ -76,7 +77,9 @@ public class ParticleEffectDescriptor {
 
 			IntMap<AbstractModule> idMap = new IntMap<>();
 
-			for (AbstractModule module: emitter.modules) {
+			for (int i = 0; i < emitter.modules.size; i++) {
+				AbstractModule module = emitter.modules.get(i);
+
 				module.setModuleGraph(emitterDescriptor);
 				if (module instanceof ParticleModule) {
 					emitterDescriptor.particleModule = (ParticleModule)module;
@@ -84,11 +87,18 @@ public class ParticleEffectDescriptor {
 				if (module instanceof EmitterModule) {
 					emitterDescriptor.emitterModule = (EmitterModule)module;
 				}
+				if (module instanceof DrawableModule) {
+					emitterDescriptor.drawableModule = (DrawableModule)module;
+				}
 				idMap.put(module.getIndex(), module);
+				System.out.println(module.getIndex() + " " + module);
 				emitterDescriptor.modules.add(module); // I cannot understand how this was working before. This is needed so that it can later reset requesters.
+
 			}
 
-			for (ConnectionData connection : emitter.connections) {
+			for (int i = 0; i < emitter.connections.size; i++) {
+				ConnectionData connection = emitter.connections.get(i);
+
 				final int moduleFromId = connection.moduleFrom;
 				final int moduleToId = connection.moduleTo;
 				final int slotFrom = connection.slotFrom;

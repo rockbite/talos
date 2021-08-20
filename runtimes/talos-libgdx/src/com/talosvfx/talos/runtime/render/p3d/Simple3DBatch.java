@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.render.p3d;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -52,9 +53,13 @@ public class Simple3DBatch {
         mesh.setIndices(indices);
     }
 
+    public Mesh getMesh () {
+        return mesh;
+    }
 
 
-    public void begin (PerspectiveCamera camera, ShaderProgram shaderProgram) {
+
+    public void begin (Camera camera, ShaderProgram shaderProgram) {
         shader = shaderProgram;
 
         shader.begin();

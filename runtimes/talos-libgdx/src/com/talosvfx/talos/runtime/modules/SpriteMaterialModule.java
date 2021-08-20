@@ -19,7 +19,6 @@ package com.talosvfx.talos.runtime.modules;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.render.drawables.TextureRegionDrawable;

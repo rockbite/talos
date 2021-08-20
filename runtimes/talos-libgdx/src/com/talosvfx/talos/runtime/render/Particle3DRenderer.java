@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
-import com.sun.xml.internal.xsom.impl.parser.SubstGroupBaseTypeRef;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
