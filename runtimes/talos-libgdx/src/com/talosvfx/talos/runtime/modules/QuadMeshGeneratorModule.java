@@ -149,9 +149,6 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				this.color.set(color);
 				this.color.a = transparency;
 
-				this.color.set(1f, 1f, 1f, 1f);
-
-
 				float colourBits = this.color.toFloatBits();
 
 				float halfWidth = width / 2f;

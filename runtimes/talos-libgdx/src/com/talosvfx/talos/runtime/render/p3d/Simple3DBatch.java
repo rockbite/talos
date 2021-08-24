@@ -71,7 +71,7 @@ public class Simple3DBatch {
         if (vertsInBuffer > 0) {
             lastTexture.bind(0);
             mesh.setVertices(vertexBuffer);
-            mesh.render(shader, GL20.GL_TRIANGLES, 0, vertsInBuffer);
+            mesh.render(shader, GL20.GL_TRIANGLES, 0, vertsInBuffer * 6);
 
             vertsInBuffer = 0;
 
