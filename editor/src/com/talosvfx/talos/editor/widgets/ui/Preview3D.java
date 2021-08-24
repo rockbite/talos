@@ -200,6 +200,7 @@ public class Preview3D extends PreviewWidget {
 
 
 
+
         batch.begin();
     }
 

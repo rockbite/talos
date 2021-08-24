@@ -30,8 +30,6 @@ public class SingleParticlePointDataGeneratorModule extends ParticlePointDataGen
 	@Override
 	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group) {
 		ParticlePointData obtain = particlePointDataPool.obtain();
-		obtain.alpha = particle.alpha;
-		obtain.seed = particle.seed;
 		obtain.setFromParticle(particle);
 		obtain.pointDataIndex = 0;
 		group.pointDataArray.add(obtain);

@@ -68,9 +68,9 @@ public class TextureRegionDrawable extends ParticleDrawable {
 		if(region == null) return;
 
 		region.setColor(color);
-		region.setAlpha(particlePointData.transparency);
+//		region.setAlpha(particlePointData.transparency);
 
-		draw(batch, x, y, width, height, particlePointData.rotation.x);
+//		draw(batch, x, y, width, height, particlePointData.rotation.x);
 	}
 
 	@Override

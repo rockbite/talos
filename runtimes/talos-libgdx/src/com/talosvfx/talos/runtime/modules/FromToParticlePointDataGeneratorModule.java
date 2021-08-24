@@ -75,8 +75,6 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
-				obtain.alpha = alpha;
-				obtain.seed = particle.seed;
 				obtain.setFromParticle(particle, temp);
 				obtain.pointDataIndex = i;
 

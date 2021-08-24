@@ -7,12 +7,8 @@ import com.talosvfx.talos.runtime.modules.ParticleModule;
 
 public class ParticlePointData {
 
-	public float alpha;
-	public float seed;
+	public Particle reference;
 	public float x, y;
-	public Vector3 rotation = new Vector3();
-	public float transparency;
-	public Color color = new Color();
 
 	public int pointDataIndex;
 
@@ -25,23 +21,10 @@ public class ParticlePointData {
 	}
 
 	public void setFromParticle (Particle particle, float positionOverrideX, float positionOverrideY) {
-		ParticleModule particleModule = particle.getEmitter().getParticleModule();
-
-		Vector3 rotation = particleModule.getRotation();
-		Color color = particleModule.getColor();
-		float transparency = particleModule.getTransparency();
-
-
 		this.x = positionOverrideX ;
 		this.y = positionOverrideY;
 		this.x += particle.position.x;
 		this.y += particle.position.y;
-
-
-		this.rotation.set(rotation);
-
-		this.color.set(color);
-
-		this.transparency = transparency;
+		this.reference = particle;
 	}
 }

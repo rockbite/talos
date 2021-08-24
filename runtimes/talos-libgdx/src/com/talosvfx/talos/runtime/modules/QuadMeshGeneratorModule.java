@@ -1,7 +1,9 @@
 package com.talosvfx.talos.runtime.modules;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Affine2;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleDrawable;
 import com.talosvfx.talos.runtime.ParticlePointData;
 import com.talosvfx.talos.runtime.ParticlePointGroup;
@@ -73,7 +76,6 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 	}
 
 	private Color color = new Color();
-	Affine2 affine2 = new Affine2();
 	Vector3 p1 = new Vector3();
 	Vector3 p2 = new Vector3();
 	Vector3 p3 = new Vector3();
@@ -122,8 +124,9 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 			for (int j = 0; j < pointDataArray.size; j++) {
 				ParticlePointData particlePointData = pointDataArray.get(j);
 
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
-				getScope().set(ScopePayload.PARTICLE_SEED, particlePointData.seed);
+				Particle reference = particlePointData.reference;
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, reference.alpha);
+				getScope().set(ScopePayload.PARTICLE_SEED, reference.seed);
 
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
@@ -137,14 +140,19 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				float x = particlePointData.x;
 				float y = particlePointData.y;
 
-				affine2.idt().rotate(particlePointData.rotation.x);
+				ParticleModule particleModule = particlePointData.reference.getEmitter().getParticleModule();
 
-				Vector3 rotation = particlePointData.rotation;
+				Vector3 rotation = particleModule.getRotation();
+				float transparency = particleModule.getTransparency();
+				Color color = particleModule.getColor();
 
-				color.set(particlePointData.color);
-				color.a = particlePointData.transparency;
+				this.color.set(color);
+				this.color.a = transparency;
 
-				float colourBits = color.toFloatBits();
+				this.color.set(1f, 1f, 1f, 1f);
+
+
+				float colourBits = this.color.toFloatBits();
 
 				float halfWidth = width / 2f;
 				float halfHeight = height / 2f;
@@ -155,6 +163,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				p4.set(-halfWidth, halfHeight, 0);
 
 				//Rotation probably AFTER billboard
+
 
 				if (billboard) {
 
@@ -203,32 +212,36 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				verts[idx++] = p1.x; // x1
 				verts[idx++] = p1.y; // y1
-				if (render3D)
+				if (render3D) {
 					verts[idx++] = p1.z;
+				}
 				verts[idx++] = colourBits;
 				verts[idx++] = U; // u1
 				verts[idx++] = V; // v1
 
 				verts[idx++] = p2.x; // x2
 				verts[idx++] = p2.y; // y2
-				if (render3D)
+				if (render3D) {
 					verts[idx++] = p2.z;
+				}
 				verts[idx++] = colourBits;
 				verts[idx++] = U2; // u2
 				verts[idx++] = V; // v2
 
 				verts[idx++] = p3.x; // x3
 				verts[idx++] = p3.y; // y2
-				if (render3D)
+				if (render3D) {
 					verts[idx++] = p3.z;
+				}
 				verts[idx++] = colourBits;
 				verts[idx++] = U2; // u3
 				verts[idx++] = V2; // v3
 
 				verts[idx++] = p4.x; // x3
 				verts[idx++] = p4.y; // y2
-				if (render3D)
+				if (render3D) {
 					verts[idx++] = p4.z;
+				}
 				verts[idx++] = colourBits;
 				verts[idx++] = U; // u3
 				verts[idx++] = V2; // v3

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticlePointData;
 import com.talosvfx.talos.runtime.ParticlePointGroup;
 import com.talosvfx.talos.runtime.ScopePayload;
@@ -87,16 +88,21 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				ParticlePointData particlePointData = pointData.get(j);
 				ParticlePointData nextParticlePointData = pointData.get(j + 1);
 
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
+				Particle fromReference = particlePointData.reference;
+				Particle toReference = nextParticlePointData.reference;
+
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, fromReference.alpha);
+				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
 				fetchInputSlotValue(THICKNESS);
 				float thicknessValue = thickness.get(0);
 
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, nextParticlePointData.alpha);
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, toReference.alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
 				fetchInputSlotValue(THICKNESS);
+
 				float nextThicknessValue = thickness.get(0);
 
 				float alpha = (float)j / pointData.size;
@@ -110,8 +116,8 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				leftTarget.set(targetVector).rotate(90).scl(nextThicknessValue).add(nextParticlePointData.x, nextParticlePointData.y);
 				rightTarget.set(targetVector).rotate(-90).scl(nextThicknessValue).add(nextParticlePointData.x, nextParticlePointData.y);
 
-				color.set(particlePointData.color);
-				color.a = particlePointData.transparency;
+//				color.set(particlePointData.color);
+//				color.a = particlePointData.transparency;
 
 				float colourBits = color.toFloatBits();
 

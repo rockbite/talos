@@ -31,11 +31,8 @@ public class Particle implements Pool.Poolable {
     public Vector2 spawnPosition = new Vector2();
     public Vector2 position = new Vector2();
     public float life;
-    public float transparency;
     public Vector3 rotation = new Vector3();
     public Vector2 size = new Vector2();
-
-    public Color color = new Color();
 
     public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
@@ -114,9 +111,6 @@ public class Particle implements Pool.Poolable {
         //update variable values
         float angle = 0;
 
-        transparency = particleModule.getTransparency();
-
-
         if (emitterReference.getEmitterModule().isAligned()) {
             rotation.set(angle, angle, angle).add(particleModule.getRotation());
         } else {
@@ -125,7 +119,6 @@ public class Particle implements Pool.Poolable {
 
 
         size.set(1f, 1f);
-        color.set(particleModule.getColor());
 
         Vector2 positionOverride = particleModule.getPosition();
         // perform inner operations

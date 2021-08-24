@@ -41,7 +41,7 @@ import com.talosvfx.talos.runtime.values.DrawableValue;
 
 public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
-	private Batch batch;
+	public Batch batch;
 
 	Color color = new Color(Color.WHITE);
 	private ShaderProgram blendAddShader;

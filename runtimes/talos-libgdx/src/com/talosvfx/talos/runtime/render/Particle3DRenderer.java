@@ -1,8 +1,8 @@
 package com.talosvfx.talos.runtime.render;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.math.Vector3;
@@ -24,6 +24,8 @@ import com.talosvfx.talos.runtime.values.DrawableValue;
 
 public class Particle3DRenderer implements ParticleRenderer, RenderableProvider {
 
+    private final SpriteBatchParticleRenderer render2D;
+    private final PolygonSpriteBatch batch2d;
     private ParticleEffectInstance particleEffectInstance;
 
     private ObjectMap<Texture, Material> materialMap = new ObjectMap<>();
@@ -45,6 +47,9 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
                 return new Sprite3D();
             }
         };
+
+        batch2d = new PolygonSpriteBatch();
+        render2D = new SpriteBatchParticleRenderer(worldCamera, batch2d);
     }
 
     @Override
@@ -88,6 +93,7 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
             particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 
             meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+
 
             particleEmitter.getScope().setCurrentRequestMode(cachedMode);
             particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);

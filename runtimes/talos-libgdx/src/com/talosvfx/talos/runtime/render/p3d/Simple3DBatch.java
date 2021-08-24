@@ -111,6 +111,8 @@ public class Simple3DBatch {
         if (blendSrc != src || blendDst != dst) {
             flush();
         }
-        Gdx.gl.glBlendFunc(src, dst);
+
+
+        Gdx.gl.glBlendFuncSeparate(src, dst, src, dst);
     }
 }
