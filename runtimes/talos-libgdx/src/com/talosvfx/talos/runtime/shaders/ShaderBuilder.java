@@ -22,6 +22,8 @@ public class ShaderBuilder {
     private ObjectMap<String, String> uniformToResourceMap = new ObjectMap<>();
 
     private int resourceCounter = 0;
+    private String codeOverride = null;
+    private String vertShaderOverride = null;
 
     public ShaderBuilder() {
 
@@ -106,6 +108,10 @@ public class ShaderBuilder {
 
     public String getFragmentString (String template) {
 
+        if(codeOverride != null) {
+            return codeOverride;
+        }
+
         template = template.replace("{CUSTOM_UNIFORMS}", generateCustomUniforms());
         template = template.replace("{CUSTOM_METHODS}", generateMethods());
         template = template.replace("{SHADER_LOGIC}", generateFragmentResolve());
@@ -115,27 +121,36 @@ public class ShaderBuilder {
         return finalString;
     }
 
-    public static String getVertexString() {
+    public static String getStaticVertexString() {
         String result =
-                "attribute vec4 a_position;\n" +
-                "attribute vec4 a_color;\n" +
-                "attribute vec2 a_texCoord0;\n" +
-                "\n" +
-                "uniform mat4 u_projTrans;\n" +
-                "\n" +
-                "varying vec4 v_color;\n" +
-                "varying vec2 v_texCoords;\n" +
-                "\n" +
-                "void main()\n" +
-                "{\n" +
-                "    v_color = a_color;\n" +
-                "    v_color.a = v_color.a * (256.0/255.0);\n" +
-                "    v_texCoords = a_texCoord0;\n" +
-                "    gl_Position =  u_projTrans * a_position;\n" +
-                "}\n";
+                "attribute vec3 a_position;\n" +
+                        "attribute vec4 a_color;\n" +
+                        "attribute vec2 a_texCoord0;\n" +
+                        "\n" +
+                        "uniform mat4 u_projTrans;\n" +
+                        "\n" +
+                        "varying vec4 v_color;\n" +
+                        "varying vec2 v_texCoords;\n" +
+                        "\n" +
+                        "void main()\n" +
+                        "{\n" +
+                        "    v_color = a_color;\n" +
+                        "    v_color.a = v_color.a * (256.0/255.0);\n" +
+                        "    v_texCoords = a_texCoord0;\n" +
+                        "    gl_Position =  u_projTrans * vec4(a_position, 1.0);\n" +
+                        "}\n";
 
 
         return result;
+    }
+
+    public String getVertexString() {
+
+        if(vertShaderOverride != null) {
+            return vertShaderOverride;
+        } else {
+            return ShaderBuilder.getStaticVertexString();
+        }
     }
 
     public ShaderProgram getShaderProgram() {
@@ -189,6 +204,14 @@ public class ShaderBuilder {
             addLine(type.getTypeString() + " " + name + " = " + value);
             variableMap.put(name, value);
         }
+    }
+
+    public void setShader (String code) {
+        codeOverride = code;
+    }
+
+    public void setVertOverride(String code) {
+        vertShaderOverride = code;
     }
 
     public static class Method {
@@ -325,7 +348,7 @@ public class ShaderBuilder {
     public static ShaderProgram compileShader(ShaderDescriptor shaderDescriptor, String template) {
         String code = compileShaderString(shaderDescriptor, template);
 
-        ShaderProgram shaderProgram = new ShaderProgram(ShaderBuilder.getVertexString(), code);
+        ShaderProgram shaderProgram = new ShaderProgram(ShaderBuilder.getStaticVertexString(), code);
 
         return shaderProgram;
     }

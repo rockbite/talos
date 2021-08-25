@@ -74,6 +74,10 @@ public class ShaderProject implements IProject {
         return ((ShaderNodeStage)(shaderAddon.nodeStage)).getShaderData();
     }
 
+    public void getNodeStage () {
+
+    }
+
     private static class ProjectData implements Json.Serializable {
 
         public ProjectMetadata projectMetadata;
