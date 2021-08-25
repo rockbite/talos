@@ -8,6 +8,7 @@ import com.talosvfx.talos.runtime.modules.ParticleModule;
 public class ParticlePointData {
 
 	public Particle reference;
+	public float alpha;
 	public float x, y;
 
 	public int pointDataIndex;

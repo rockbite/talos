@@ -77,6 +77,7 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 
 				obtain.setFromParticle(particle, temp);
 				obtain.pointDataIndex = i;
+				obtain.alpha = alpha;
 
 				group.pointDataArray.add(obtain);
 			}

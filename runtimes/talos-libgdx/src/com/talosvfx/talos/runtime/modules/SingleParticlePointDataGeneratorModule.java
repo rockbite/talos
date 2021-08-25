@@ -32,6 +32,7 @@ public class SingleParticlePointDataGeneratorModule extends ParticlePointDataGen
 		ParticlePointData obtain = particlePointDataPool.obtain();
 		obtain.setFromParticle(particle);
 		obtain.pointDataIndex = 0;
+		obtain.alpha = particle.alpha;
 		group.pointDataArray.add(obtain);
 
 	}

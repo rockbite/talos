@@ -16,10 +16,17 @@ import com.talosvfx.talos.runtime.values.NumericalValue;
 public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 	public static final int THICKNESS = 1;
+	public static final int COLOUR = 2;
+	public static final int TRANSPARENCY = 3;
+	public static final int OFFSET = 4;
 
 	ModuleValue<StripMeshGeneratorModule> outModule;
 
 	NumericalValue thickness;
+	NumericalValue colour;
+	NumericalValue transparency;
+	NumericalValue offset;
+
 
 	//x,y,z,colour,u,v
 	private int quadVertexSize3D = 3 + 1 + 2;
@@ -40,6 +47,11 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 		thickness = createInputSlot(THICKNESS);
 		thickness.set(1f);
+
+		offset = createInputSlot(OFFSET);
+		colour = createInputSlot(COLOUR);
+		transparency = createInputSlot(TRANSPARENCY);
+
 	}
 
 	@Override
@@ -47,8 +59,15 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 	}
 
 
-	private Color color = new Color();
+	private Color fromColour = new Color();
+	private Color toColour = new Color();
+	private Color tempColour = new Color();
 
+	private float fromTransparency;
+	private float toTransparency;
+
+	private Vector3 fromOffset = new Vector3();
+	private Vector3 toOffset = new Vector3();
 
 	Vector2 targetVector = new Vector2();
 	Vector2 leftBase = new Vector2();
@@ -91,35 +110,47 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				Particle fromReference = particlePointData.reference;
 				Particle toReference = nextParticlePointData.reference;
 
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, fromReference.alpha);
-				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.alpha);
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
+				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.seed);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
-				fetchInputSlotValue(THICKNESS);
-				float thicknessValue = thickness.get(0);
+				fetchAllInputSlotValues();
+				float fromThicknessValue = thickness.get(0);
+				fromOffset.set(offset.get(0), offset.get(1), offset.get(2));
+				fromColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
+				fromTransparency = transparency.getFloat();
 
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, toReference.alpha);
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, nextParticlePointData.alpha);
+				getScope().set(ScopePayload.PARTICLE_SEED, toReference.seed);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
-				fetchInputSlotValue(THICKNESS);
-
+				fetchAllInputSlotValues();
 				float nextThicknessValue = thickness.get(0);
+				toOffset.set(offset.get(0), offset.get(1), offset.get(2));
+				toColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
+				toTransparency = transparency.getFloat();
 
 				float alpha = (float)j / pointData.size;
 				float nextAlpha = (float)(j + 1) / pointData.size;
 
 				targetVector.set(nextParticlePointData.x, nextParticlePointData.y).sub(particlePointData.x, particlePointData.y).nor();
 
-				leftBase.set(targetVector).rotate(90).scl(thicknessValue).add(particlePointData.x, particlePointData.y);
-				rightBase.set(targetVector).rotate(-90).scl(thicknessValue).add(particlePointData.x, particlePointData.y);
+				leftBase.set(targetVector).rotate(90).scl(fromThicknessValue).add(particlePointData.x, particlePointData.y);
+				rightBase.set(targetVector).rotate(-90).scl(fromThicknessValue).add(particlePointData.x, particlePointData.y);
 
 				leftTarget.set(targetVector).rotate(90).scl(nextThicknessValue).add(nextParticlePointData.x, nextParticlePointData.y);
 				rightTarget.set(targetVector).rotate(-90).scl(nextThicknessValue).add(nextParticlePointData.x, nextParticlePointData.y);
 
-//				color.set(particlePointData.color);
-//				color.a = particlePointData.transparency;
+				leftBase.add(fromOffset.x, fromOffset.y);
+				rightBase.add(fromOffset.x, fromOffset.y);
+				rightTarget.add(toOffset.x, toOffset.y);
+				leftTarget.add(toOffset.x, toOffset.y);
 
-				float colourBits = color.toFloatBits();
+				fromColour.a = fromTransparency;
+				toColour.a = toTransparency;
+
+				float fromColourBits = fromColour.toFloatBits();
+				float toColourBits = toColour.toFloatBits();
 
 				//get uvs from material
 
@@ -134,7 +165,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				verts[idx++] = rightBase.y; // y1
 				if (render3D)
 					verts[idx++] = 0;
-				verts[idx++] = colourBits;
+				verts[idx++] = fromColourBits;
 				verts[idx++] = U; // u1
 				verts[idx++] = V; // v1
 
@@ -142,7 +173,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				verts[idx++] = rightTarget.y; // y2
 				if (render3D)
 					verts[idx++] = 0;
-				verts[idx++] = colourBits;
+				verts[idx++] = toColourBits;
 				verts[idx++] = U2; // u2
 				verts[idx++] = V; // v2
 
@@ -150,7 +181,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				verts[idx++] = leftTarget.y; // y2
 				if (render3D)
 					verts[idx++] = 0;
-				verts[idx++] = colourBits;
+				verts[idx++] = toColourBits;
 				verts[idx++] = U2; // u3
 				verts[idx++] = V2; // v3
 
@@ -158,7 +189,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				verts[idx++] = leftBase.y; // y2
 				if (render3D)
 					verts[idx++] = 0;
-				verts[idx++] = colourBits;
+				verts[idx++] = fromColourBits;
 				verts[idx++] = U; // u3
 				verts[idx++] = V2; // v3
 

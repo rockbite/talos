@@ -125,7 +125,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				ParticlePointData particlePointData = pointDataArray.get(j);
 
 				Particle reference = particlePointData.reference;
-				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, reference.alpha);
+				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, reference.seed);
 
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());

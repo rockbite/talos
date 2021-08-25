@@ -18,8 +18,10 @@ package com.talosvfx.talos.editor.wrappers;
 
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.modules.ColorModule;
 import com.talosvfx.talos.runtime.modules.StaticValueModule;
 import com.talosvfx.talos.runtime.modules.StripMeshGeneratorModule;
+import com.talosvfx.talos.runtime.modules.Vector2Module;
 
 public class StripMeshGeneratorModuleWrapper extends ModuleWrapper<StripMeshGeneratorModule> {
 
@@ -41,12 +43,19 @@ public class StripMeshGeneratorModuleWrapper extends ModuleWrapper<StripMeshGene
     @Override
     protected void configureSlots() {
         addInputSlot("thickness", StripMeshGeneratorModule.THICKNESS);
+        addInputSlot("offset", StripMeshGeneratorModule.OFFSET);
+        addInputSlot("colour", StripMeshGeneratorModule.COLOUR);
+        addInputSlot("transparency", StripMeshGeneratorModule.TRANSPARENCY);
+
         addOutputSlot("strip", StripMeshGeneratorModule.MODULE);
     }
 
     @Override
     public Class<? extends AbstractModule> getSlotsPreferredModule (Slot slot) {
         if (slot.getIndex() == StripMeshGeneratorModule.THICKNESS) return StaticValueModule.class;
+        if (slot.getIndex() == StripMeshGeneratorModule.OFFSET) return Vector2Module.class;
+        if (slot.getIndex() == StripMeshGeneratorModule.COLOUR) return ColorModule.class;
+        if (slot.getIndex() == StripMeshGeneratorModule.TRANSPARENCY) return StaticValueModule.class;
 
         return null;
     }

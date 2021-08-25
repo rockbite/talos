@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.wrappers.BasicParticleMovementModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.DrawableModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper;
+import com.talosvfx.talos.editor.wrappers.QuadMeshGeneratorModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.SingleParticlePointDataGeneratorModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.SpriteMaterialModuleWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -46,6 +47,7 @@ import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
 import com.talosvfx.talos.runtime.modules.PolylineModule;
+import com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule;
 import com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.modules.TextureModule;
@@ -201,9 +203,11 @@ public class TalosProject implements IProject {
 		BasicParticleMovementModuleWrapper basicMovementModule = moduleBoardWidget.createModule(BasicParticleMovementModule.class, 0, -100);
 		moduleBoardWidget.makeConnection(basicMovementModule, particleModule, BasicParticleMovementModule.POSITION, ParticleModule.POSITION);
 
-		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 0);
+		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 60);
 		moduleBoardWidget.makeConnection(pointGenerator, particleModule, SingleParticlePointDataGeneratorModule.MODULE, ParticleModule.POINT_GENERATOR);
 
+		QuadMeshGeneratorModuleWrapper meshGenerator = moduleBoardWidget.createModule(QuadMeshGeneratorModule.class, 0, 0);
+		moduleBoardWidget.makeConnection(meshGenerator, particleModule, QuadMeshGeneratorModule.MODULE, ParticleModule.MESH_GENERATOR);
 
 		TalosMain.Instance().ProjectController().setDirty();
 
