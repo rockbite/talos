@@ -95,10 +95,12 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 	@Override
 	public void render (ParticleRenderer particleRenderer, MaterialModule materialModule, Array<ParticlePointGroup> groupData) {
 
+
 		for (int i = 0; i < groupData.size; i++) {
 			ParticlePointGroup particlePointGroup = groupData.get(i);
 
 			Array<ParticlePointData> pointData = particlePointGroup.pointDataArray;
+
 
 			if (pointData.size < 2)
 				return; //Nothing to render
@@ -110,6 +112,8 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				Particle fromReference = particlePointData.reference;
 				Particle toReference = nextParticlePointData.reference;
 
+				float particleTransparency = fromReference.getEmitter().getParticleModule().getTransparency();
+
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.seed);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
@@ -118,7 +122,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				float fromThicknessValue = thickness.get(0);
 				fromOffset.set(offset.get(0), offset.get(1), offset.get(2));
 				fromColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
-				fromTransparency = transparency.getFloat();
+				fromTransparency = this.transparency.getFloat();
 
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, nextParticlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, toReference.seed);
@@ -128,7 +132,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				float nextThicknessValue = thickness.get(0);
 				toOffset.set(offset.get(0), offset.get(1), offset.get(2));
 				toColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
-				toTransparency = transparency.getFloat();
+				toTransparency = this.transparency.getFloat();
 
 				float alpha = (float)j / pointData.size;
 				float nextAlpha = (float)(j + 1) / pointData.size;
@@ -146,8 +150,8 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				rightTarget.add(toOffset.x, toOffset.y);
 				leftTarget.add(toOffset.x, toOffset.y);
 
-				fromColour.a = fromTransparency;
-				toColour.a = toTransparency;
+				fromColour.a = fromTransparency * particleTransparency;
+				toColour.a = toTransparency * particleTransparency;
 
 				float fromColourBits = fromColour.toFloatBits();
 				float toColourBits = toColour.toFloatBits();
