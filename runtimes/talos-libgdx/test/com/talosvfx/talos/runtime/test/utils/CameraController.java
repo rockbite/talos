@@ -35,14 +35,12 @@ public class CameraController extends InputAdapter {
 	}
 
 	@Override
-	public boolean scrolled (int amount) {
+	public boolean scrolled (float amountX, float amountY) {
 
-		camera.zoom += amount * 0.1f;
+		camera.zoom += amountY * 0.1f;
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 10f);
 
-		return super.scrolled(amount);
-
-
+		return super.scrolled(amountX, amountY);
 	}
 
 	@Override

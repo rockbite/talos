@@ -45,9 +45,9 @@ public abstract class WorkplaceStage {
         stage.addListener(new InputListener() {
 
             @Override
-            public boolean scrolled(InputEvent event, float x, float y, int amount) {
-                TalosMain.Instance().getCameraController().scrolled(amount);
-                return super.scrolled(event, x, y, amount);
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                TalosMain.Instance().getCameraController().scrolled(amountX, amountY);
+                return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
