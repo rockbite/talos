@@ -13,7 +13,8 @@ allprojects {
 
     ext {
         appName = "talos"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.10.0'
+        lwjgl3Version = '3.3.0-SNAPSHOT'
         visuiVersion = '1.4.2'
     }
 
