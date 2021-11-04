@@ -46,11 +46,14 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> implement
 		xField = addInputSlotWithTextField("X: ", 0);
 		yField = addInputSlotWithTextField("Y: ", 1);
 
+		dragPoint = new DragPoint(0, 0);
+
 		xField.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
 				float x = floatFromText(xField);
 				module.setX(x);
+				dragPoint.set(x, dragPoint.position.y);
 			}
 		});
 
@@ -59,10 +62,10 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> implement
 			public void changed (ChangeEvent event, Actor actor) {
 				float y = floatFromText(yField);
 				module.setY(y);
+				dragPoint.set(dragPoint.position.x, y);
 			}
 		});
 
-		dragPoint = new DragPoint(0, 0);
 
 		addOutputSlot("position", 0);
 	}
