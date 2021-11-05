@@ -1,3 +1,7 @@
+[1.4.1]
+- Changed spine runtime version to 4.0
+- Added pivot point functionality
+
 [1.4.0]
 - Shader graph can now save results as PNG
 - TargetModule is an eat way to shoot particles to certain configurable destinations
