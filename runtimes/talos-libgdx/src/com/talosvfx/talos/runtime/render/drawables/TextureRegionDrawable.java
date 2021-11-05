@@ -51,14 +51,14 @@ public class TextureRegionDrawable extends ParticleDrawable {
 
 		region.setColor(color);
 
-		draw(batch, x, y, width, height, rotation);
+		draw(batch, x, y, width, height, rotation, particle.pivot.x, particle.pivot.y);
 	}
 
 	@Override
-	public void draw (Batch batch, float x, float y, float width, float height, float rotation) {
-		region.setPosition(x - width / 2, y - height / 2);
+	public void draw (Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
+		region.setPosition(x - width * originX, y - height * originY);
 		region.setSize(width, height) ;
-		region.setOrigin(width / 2, height / 2);
+		region.setOrigin(width * originX, height * originY);
 		region.setRotation(rotation);
 		region.draw(batch);
 	}

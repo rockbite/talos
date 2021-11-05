@@ -28,14 +28,14 @@ public class NinePatchDrawable extends ParticleDrawable {
         if(region == null) return;
         if(ninePatch != null) {
             ninePatch.setColor(color);
-            draw(batch, x, y, width, height, rotation);
+            draw(batch, x, y, width, height, rotation, particle.pivot.x, particle.pivot.y);
 
         }
     }
 
     @Override
-    public void draw (Batch batch, float x, float y, float width, float height, float rotation) {
-        ninePatch.draw(batch, x-width/2f, y-height/2f, width/2f, height/2f, width, height, 1f, 1f, rotation);
+    public void draw (Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
+        ninePatch.draw(batch, x-width * originX, y-height*originY, width*originX, height*originY, width, height, 1f, 1f, rotation);
     }
 
     @Override

@@ -33,6 +33,8 @@ public class Particle implements Pool.Poolable {
     public float rotation;
     public Vector2 size = new Vector2();
 
+    public Vector2 pivot = new Vector2();
+
     public Color color = new Color();
 
     public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
@@ -111,6 +113,8 @@ public class Particle implements Pool.Poolable {
         } else {
             rotation = particleModule.getRotation();
         }
+
+        pivot.set(particleModule.getPivot());
 
         drawable = particleModule.getDrawable(); // important to get drawable before size
         emitterReference.getScope().set(ScopePayload.DRAWABLE_ASPECT_RATIO, drawable.getAspectRatio());

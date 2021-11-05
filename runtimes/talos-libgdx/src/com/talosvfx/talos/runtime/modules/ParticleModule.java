@@ -45,6 +45,8 @@ public class ParticleModule extends AbstractModule {
     public static final int SIZE = 13;
     public static final int POSITION = 14;
 
+    public static final int PIVOT = 15;
+
 
     DrawableValue drawable;
     NumericalValue offset;
@@ -59,6 +61,8 @@ public class ParticleModule extends AbstractModule {
     NumericalValue mass;
     NumericalValue size;
     NumericalValue position;
+
+    NumericalValue pivot;
 
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
@@ -79,6 +83,7 @@ public class ParticleModule extends AbstractModule {
         mass = createInputSlot(MASS);
         size = createInputSlot(SIZE);
         position = createInputSlot(POSITION);
+        pivot = createInputSlot(PIVOT);
 
         rotation.setFlavour(NumericalValue.Flavour.ANGLE);
         angle.setFlavour(NumericalValue.Flavour.ANGLE);
@@ -137,6 +142,25 @@ public class ParticleModule extends AbstractModule {
         fetchInputSlotValue(ROTATION);
         if(rotation.isEmpty()) return 0; // defaults
         return rotation.getFloat();
+    }
+
+    /**
+     * allowed values are from 0 to 1 where 0.5 is default center
+     * @return
+     */
+    public Vector2 getPivot() {
+        fetchInputSlotValue(PIVOT);
+        if(pivot.isEmpty()) {
+            pivot.set(0.5f, 0.5f);
+        }
+        tmpVec.set(pivot.get(0), pivot.get(1));
+
+        if(tmpVec.x > 1f) tmpVec.x = 1f;
+        if(tmpVec.y> 1f) tmpVec.y = 1f;
+        if(tmpVec.x < 0f) tmpVec.x = 0f;
+        if(tmpVec.y < 0f) tmpVec.y = 0f;
+
+        return tmpVec;
     }
 
     public Vector2 getSize() {
