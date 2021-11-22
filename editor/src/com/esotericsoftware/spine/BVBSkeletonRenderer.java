@@ -69,8 +69,8 @@ public class BVBSkeletonRenderer {
 	private final Color temp5 = new Color();
 	private final Color temp6 = new Color();
 
-	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(PolygonSpriteBatch, Skeleton)} is
-	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(TwoColorPolygonBatch, Skeleton)} is called. Otherwise the
+	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(SpriteBatchParticleRenderer, PolygonSpriteBatch, SkeletonContainer, Skeleton)} is
+	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(SpriteBatchParticleRenderer, TwoColorPolygonBatch, SkeletonContainer, Skeleton)} is called. Otherwise the
 	 * skeleton is rendered without two color tinting and any mesh attachments will throw an exception.
 	 * <p>
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
