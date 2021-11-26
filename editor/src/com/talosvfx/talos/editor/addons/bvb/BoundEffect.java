@@ -57,6 +57,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     private boolean isBehind;
 
     /**
+     * is it rendered within the animation
+     */
+    private boolean isNested;
+
+    /**
      * Draw order of this effect
      */
     private int drawOrder;
@@ -182,6 +187,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         return isBehind;
     }
 
+    public boolean isNested () {
+        return isNested;
+    }
+
     public void removePositionAttachment() {
         positionAttachment = null;
     }
@@ -231,6 +240,18 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
             @Override
             public void valueChanged(Boolean value) {
                 isBehind = value;
+            }
+        };
+
+        CheckboxWidget nested = new CheckboxWidget("is nested") {
+            @Override
+            public Boolean getValue() {
+                return isNested;
+            }
+
+            @Override
+            public void valueChanged(Boolean value) {
+                isNested = value;
             }
         };
 
@@ -301,6 +322,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
         properties.add(effectName);
         properties.add(behind);
+        properties.add(nested);
         properties.add(startEventWidget);
         properties.add(completeEventWidget);
         properties.add(position);
@@ -364,6 +386,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public void write(Json json) {
         json.writeValue("effectName", name);
         json.writeValue("isBehind", isBehind);
+        json.writeValue("isNested", isNested);
         json.writeValue("positionAttachment", positionAttachment);
         json.writeValue("valueAttachments", valueAttachments);
         json.writeValue("startEvent", startEvent);
@@ -405,6 +428,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         setCompleteEvent(jsonData.getString("completeEvent", ""));
 
         isBehind = jsonData.getBoolean("isBehind");
+        isNested = jsonData.getBoolean("isNested");
 
         //setForever(startEvent.equals("") && completeEvent.equals(""));
     }
