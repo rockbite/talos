@@ -1,9 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
@@ -14,7 +11,9 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private String name = "gameObject";
 
     private Array<GameObject> children;
+    private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
     private ObjectSet<IComponent> components = new ObjectSet<>();
+    private ObjectMap<Class, IComponent> componentClasses = new ObjectMap<>();
 
     @Override
     public Array<GameObject> getGameObjects () {
@@ -49,7 +48,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
             IComponent component = json.readValue(IComponent.class, componentJson);
-            components.add(component);
+            addComponent(component);
         }
     }
 
@@ -60,11 +59,27 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         children.add(gameObject);
+        childrenMap.put(gameObject.name, gameObject);
     }
 
     @Override
     public void addComponent (IComponent component) {
         components.add(component);
+        componentClasses.put(component.getClass(), component);
+    }
+
+    @Override
+    public boolean hasGOWithName (String name) {
+        if(children == null) return false;
+
+        if(childrenMap.containsKey(name)) return true;
+        for(GameObject child: children) {
+            if(child.hasGOWithName(name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -104,5 +119,21 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public int getPriority () {
         return 0;
+    }
+
+    public boolean hasComponent(Class clazz) {
+        if(componentClasses.containsKey(clazz)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public <T extends IComponent> T getComponent (Class<? extends T> clazz) {
+        return (T) componentClasses.get(clazz);
+    }
+
+    public void setName (String name) {
+        this.name = name;
     }
 }

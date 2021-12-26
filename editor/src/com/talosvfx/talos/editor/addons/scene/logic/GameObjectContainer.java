@@ -11,4 +11,5 @@ public interface GameObjectContainer {
     void addGameObject(GameObject gameObject);
     void addComponent(IComponent component);
 
+    boolean hasGOWithName (String name);
 }

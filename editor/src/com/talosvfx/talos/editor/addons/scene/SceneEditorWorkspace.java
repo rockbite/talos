@@ -20,23 +20,28 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable {
 
     private static SceneEditorWorkspace instance;
-    private final TemplateListPopup templateListPopup
-            ;
+    private final TemplateListPopup templateListPopup;
+
     private SceneEditorAddon sceneEditorAddon;
     private String projectPath;
 
     private Array<Scene> scenes = new Array<>();
 
     private GameObjectContainer currentContainer;
+    private Array<Gizmo> gizmoList = new Array<>();
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
+
+        GizmoRegister.init();
 
         FileHandle list = Gdx.files.internal("addons/scene/go-templates.xml");
         XmlReader xmlReader = new XmlReader();
@@ -47,8 +52,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             @Override
             public void chosen (XmlReader.Element template, float x, float y) {
                 GameObject gameObject = new GameObject();
+                String nameTemplate = template.getAttribute("nameTemplate", "gameObject");
+                String name = getUniqueGOName(nameTemplate);
+                gameObject.setName(name);
                 initComponentsFromTemplate(gameObject, template);
+
                 currentContainer.addGameObject(gameObject);
+                initGizmos(gameObject);
 
                 //todo: change this to events
                 sceneEditorAddon.hierarchy.loadEntityContainer(currentContainer);
@@ -56,6 +66,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         });
 
         initListeners();
+    }
+
+    private String getUniqueGOName (String nameTemplate) {
+        int number = 0;
+        String name = nameTemplate + number;
+
+        while(currentContainer.hasGOWithName(name)) {
+            number++;
+            name = nameTemplate + number;
+        }
+
+        return name;
     }
 
     private void initComponentsFromTemplate (GameObject gameObject, XmlReader.Element template) {
@@ -154,10 +176,27 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     @Override
+    public void act (float delta) {
+        super.act(delta);
+
+        for(int i = 0; i < gizmoList.size; i++) {
+            Gizmo gizmo = gizmoList.get(i);
+            gizmo.act(delta);
+        }
+    }
+
+    @Override
     public void drawContent (Batch batch, float parentAlpha) {
         batch.end();
         drawGrid(batch, parentAlpha);
         batch.begin();
+
+
+        for(int i = 0; i < gizmoList.size; i++) {
+            Gizmo gizmo = gizmoList.get(i);
+            gizmo.setWoldWidth(getWorldWidth() * camera.zoom);
+            gizmo.draw(batch, parentAlpha);
+        }
     }
 
     public void setAddon (SceneEditorAddon sceneEditorAddon) {
@@ -195,10 +234,42 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void openScene (Scene mainScene) {
         sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
         currentContainer = mainScene;
+
+        // process all game objects
+        removeGizmos();
+        initGizmos(mainScene);
+    }
+
+    private void removeGizmos () {
+        gizmoList.clear();
+    }
+
+    private void initGizmos (GameObject gameObject) {
+        makeGizmosFor(gameObject);
+    }
+
+    private void initGizmos (GameObjectContainer gameObjectContainer) {
+        Array<GameObject> gameObjects = gameObjectContainer.getGameObjects();
+        if(gameObjects != null) {
+            for (GameObject gameObject : gameObjects) {
+                makeGizmosFor(gameObject);
+            }
+        }
+    }
+
+    private void makeGizmosFor (GameObject gameObject) {
+        Iterable<IComponent> components = gameObject.getComponents();
+        for(IComponent component: components) {
+            Gizmo gizmo = GizmoRegister.makeGizmoFor(component);
+            gizmo.setGameObject(gameObject);
+            if(gizmo != null) {
+                gizmoList.add(gizmo);
+            }
+        }
     }
 
     public void selectPropertyHolder (IPropertyHolder propertyHolder) {
-
+        if(propertyHolder == null) return;
         sceneEditorAddon.propertyPanel.showPanel(propertyHolder.getPropertyProviders());
     }
 }

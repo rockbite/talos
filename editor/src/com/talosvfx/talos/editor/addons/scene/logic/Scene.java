@@ -45,6 +45,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     @Override
+    public boolean hasGOWithName (String name) {
+        return root.hasGOWithName(name);
+    }
+
+    @Override
     public String getName () {
         FileHandle fileHandle = Gdx.files.absolute(path);
         return fileHandle.nameWithoutExtension();
