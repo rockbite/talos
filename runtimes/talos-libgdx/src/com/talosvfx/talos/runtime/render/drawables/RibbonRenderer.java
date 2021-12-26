@@ -44,7 +44,7 @@ public class RibbonRenderer extends ParticleDrawable {
     }
 
     @Override
-    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
+    public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
         if(interpolationPointCount < 1) return;
         if(ribbonRegion == null && shadedDrawable == null) return;
 
@@ -73,7 +73,7 @@ public class RibbonRenderer extends ParticleDrawable {
         float y = particle.getY();
         float x = particle.getX();
 
-        draw(batch, x, y, width, height, rotation);
+        draw(batch, x, y, width, height, rotation, particle.pivot.x, particle.pivot.y);
         textureRegionDrawable.draw(batch, particle, color);
     }
 

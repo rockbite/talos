@@ -44,9 +44,9 @@ public class CameraController extends InputAdapter {
 	}
 
 	@Override
-	public boolean scrolled (int amount) {
+	public boolean scrolled (float amountX, float amountY) {
 		float currWidth = camera.viewportWidth * camera.zoom;
-		float nextWidth = currWidth * (1f + amount * 0.1f);
+		float nextWidth = currWidth * (1f + amountY * 0.1f);
 		float nextZoom = nextWidth/camera.viewportWidth;
 
 		// snapping to one

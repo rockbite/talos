@@ -53,14 +53,13 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         addSeparator(true);
 
         addInputSlot("velocity",  ParticleModule.VELOCITY);
-        //addInputSlot("gravity",  ParticleModule.GRAVITY);
         addInputSlot("target",  ParticleModule.TARGET);
         addInputSlot("color",  ParticleModule.COLOR);
         addInputSlot("transparency",  ParticleModule.TRANSPARENCY);
         addInputSlot("angle",  ParticleModule.ANGLE);
-        //addInputSlot("mass",  ParticleModule.MASS);
 
         addInputSlot("rotation",  ParticleModule.ROTATION);
+        addInputSlot("pivot",  ParticleModule.PIVOT);
         addInputSlot("size",  ParticleModule.SIZE);
         addInputSlot("position",  ParticleModule.POSITION);
     }
@@ -74,6 +73,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
         if(slot.getIndex() == ParticleModule.VELOCITY) return DynamicRangeModule.class;
         if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
+        if(slot.getIndex() == ParticleModule.PIVOT) return Vector2Module.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
         if(slot.getIndex() == ParticleModule.ANGLE) return DynamicRangeModule.class;

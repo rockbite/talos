@@ -67,6 +67,7 @@
         <module name = "SampleTextureNode" title = "Texture Sample" keywords = "texture,sample">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="input" name="overrideUV" type="vec2">UV</value>
                 <value port="input" name="offsetUV" type="vec2">UV Offset</value>
                 <value port="input" name="mulUV" type="vec2">UV Mul</value>
             </group>
@@ -425,6 +426,21 @@
             <shader-body>
                 <![CDATA[
                     return floor(inValue / (1.0 / steps)) * (1.0 / steps);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "ClampNode" title = "Clamp" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="min" type="float" max="1" step="0.001" progress="true">Min</dynamicValue>
+                <dynamicValue port="input" name="max" type="float" max="1" step="0.001" progress="true" default="1">Max</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return clamp(inValue, min, max);
                 ]]>
             </shader-body>
         </module>
