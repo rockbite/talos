@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
@@ -73,6 +74,11 @@ public class ExternalShaderNode extends AbstractShaderNode {
         });
 
         shaderBox.setVisible(false);
+
+
+        String defaultText = Gdx.files.internal("addons/shader/shaders/default.frag.glsl").readString();
+        defaultText = processAnnotations(defaultText);
+        codeArea.setText(defaultText);
     }
 
     private String processAnnotations (String data) {
@@ -123,7 +129,7 @@ public class ExternalShaderNode extends AbstractShaderNode {
         node.constructNode(nodeStage.getNodeListPopup().getModuleByName(moduleName));
         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
         nodeStage.getNodeBoard().makeConnection(node, this, "out", uniformName);
-
+        ((UniformNode) node).setValue(0.5f);
         uniformNode.setUniformName(uniformName);
     }
 

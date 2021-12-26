@@ -82,6 +82,7 @@
     <category name="master" title="Master">
         <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
             <value port="input" name="inputColor" type="vec4">Input Color</value>
+            <value port="output" name="outputShader" type="text">Output Shader</value>
             <select name="blending">
                 <option value = "NORMAL">Normal Blending</option>
                 <option value = "ADDITIVE">Additive Blending</option>
@@ -94,8 +95,8 @@
         <module name = "MaterialEndpoint" title = "Material" keywords = "main">
             <value port="input" name="inputShader" type="text">Pixel Shader</value>
             <select name="preview">
-                <option value = "2D">2D Preview</option>
                 <option value = "3D">3D Preview</option>
+                <option value = "2D">2D Preview</option>
             </select>
         </module>
     </category>

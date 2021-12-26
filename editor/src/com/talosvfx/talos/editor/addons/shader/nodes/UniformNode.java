@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.addons.shader.nodes;
 
+import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class UniformNode extends AbstractShaderNode implements ShaderBuilder.IValueProvider<Object> {
@@ -20,6 +22,14 @@ public class UniformNode extends AbstractShaderNode implements ShaderBuilder.IVa
     @Override
     public Object getValue () {
         return widgetMap.get("val").getValue();
+    }
+
+    public void setValue(float value) {
+        AbstractWidget val = widgetMap.get("val");
+        if(val instanceof ValueWidget) {
+            ValueWidget valueWidget = (ValueWidget) val;
+            valueWidget.setValue(value);
+        }
     }
 
     @Override
