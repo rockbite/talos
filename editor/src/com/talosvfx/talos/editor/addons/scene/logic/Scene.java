@@ -4,10 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.io.StringWriter;
 
-public class Scene implements GameObjectContainer, Json.Serializable {
+public class Scene implements GameObjectContainer, Json.Serializable, IPropertyHolder {
 
     public String path;
 
@@ -106,5 +107,10 @@ public class Scene implements GameObjectContainer, Json.Serializable {
             GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
             root.addGameObject(gameObject);
         }
+    }
+
+    @Override
+    public Iterable<IPropertyProvider> getPropertyProviders () {
+        return new Array<>();
     }
 }

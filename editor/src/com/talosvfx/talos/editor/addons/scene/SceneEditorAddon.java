@@ -8,8 +8,10 @@ import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.scene.widgets.BottomPanel;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.project.IProject;
 
@@ -19,6 +21,8 @@ public class SceneEditorAddon implements IAddon {
     public SceneEditorWorkspace workspace;
     public HierarchyWidget hierarchy;
     public ProjectExplorerWidget projectExplorer;
+    private BottomPanel bottomPanel;
+    public PropertyPanel propertyPanel;
 
     @Override
     public void init () {
@@ -59,14 +63,17 @@ public class SceneEditorAddon implements IAddon {
         workspace = SceneEditorWorkspace.getInstance();
         workspace.setAddon(this);
 
+        propertyPanel = new PropertyPanel();
+        bottomPanel = new BottomPanel();
         hierarchy = new HierarchyWidget();
-
         projectExplorer = new ProjectExplorerWidget();
+        bottomPanel.setWidgets(projectExplorer, hierarchy);
     }
 
     @Override
     public void initUIContent () {
-        TalosMain.Instance().UIStage().swapToAddonContent(hierarchy, workspace, projectExplorer);
+
+        TalosMain.Instance().UIStage().swapToAddonContent(propertyPanel, workspace, bottomPanel);
         TalosMain.Instance().disableNodeStage();
 
         // now need to disable some menu tabs
@@ -88,5 +95,10 @@ public class SceneEditorAddon implements IAddon {
     @Override
     public void announceLocalSettings (SettingsDialog settingsDialog) {
         settingsDialog.addPathSetting("Scene Projects Path", "sceneEditorProjectsPath");
+    }
+
+    public static SceneEditorAddon get() {
+        // todo: add some null checks
+        return ((SceneEditorProject)TalosMain.Instance().Project()).sceneEditorAddon;
     }
 }

@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -19,17 +18,9 @@ public class ProjectExplorerWidget extends Table {
 
     public ProjectExplorerWidget() {
 
-        Table leftTable = new Table();
-        Table rightTable = new Table();
-
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
         ScrollPane scrollPane = new ScrollPane(directoryTree);
-        leftTable.add(scrollPane).grow();
-
-        SplitPane splitPane = new SplitPane(leftTable, rightTable, false, TalosMain.Instance().getSkin(), "timeline");
-        splitPane.setSplitAmount(0.3f);
-
-        add(splitPane).grow();
+        add(scrollPane).grow();
 
         fileFilter = new FileFilter() {
             @Override

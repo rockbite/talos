@@ -1,4 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-public interface IComponent {
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+
+public interface IComponent extends IPropertyProvider {
 }

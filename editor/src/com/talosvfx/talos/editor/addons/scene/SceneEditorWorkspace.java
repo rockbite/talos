@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
@@ -194,5 +195,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void openScene (Scene mainScene) {
         sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
         currentContainer = mainScene;
+    }
+
+    public void selectPropertyHolder (IPropertyHolder propertyHolder) {
+
+        sceneEditorAddon.propertyPanel.showPanel(propertyHolder.getPropertyProviders());
     }
 }

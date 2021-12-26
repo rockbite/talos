@@ -11,7 +11,7 @@ import java.io.File;
 
 public class SceneEditorProject implements IProject {
 
-    private SceneEditorAddon sceneEditorAddon;
+    public SceneEditorAddon sceneEditorAddon;
 
     public SceneEditorProject (SceneEditorAddon sceneEditorAddon) {
         this.sceneEditorAddon = sceneEditorAddon;
