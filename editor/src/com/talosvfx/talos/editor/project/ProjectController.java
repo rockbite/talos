@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.widgets.ui.FileTab;
 
 import java.io.File;
@@ -147,6 +148,23 @@ public class ProjectController {
     }
 
     public void newProject (IProject project) {
+        if(project.requiresWorkspaceLocation()) {
+            String fileName = getNewFilename(project);
+            String projectName = fileName.substring(0, fileName.indexOf("."));
+            NewProjectDialog.show(project.getProjectTypeName(), projectName, new NewProjectDialog.NewProjectListener() {
+                @Override
+                public void create (String path, String name) {
+                    createNewProjectTab(project, fileName);
+                    project.createWorkspaceEnvironment(path, name);
+                }
+            });
+        } else {
+            String fileName = getNewFilename(project);
+            createNewProjectTab(project, fileName);
+        }
+    }
+
+    public void createNewProjectTab(IProject project, String fileName) {
         FileTab prevTab = currentTab;
 
         boolean removingUnworthy = false;
@@ -160,7 +178,7 @@ public class ProjectController {
             }
         }
 
-        String newName = getNewFilename(project);
+        String newName = fileName;
         FileTab tab = new FileTab(newName, project);
         tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
         TalosMain.Instance().UIStage().tabbedPane.add(tab);

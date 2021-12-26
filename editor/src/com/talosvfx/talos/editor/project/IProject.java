@@ -24,4 +24,9 @@ public interface IProject {
 
     String exportProject();
 
+    String getProjectTypeName();
+
+    boolean requiresWorkspaceLocation();
+
+    void createWorkspaceEnvironment (String path, String name);
 }

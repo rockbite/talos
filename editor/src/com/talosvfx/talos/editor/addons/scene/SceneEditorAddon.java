@@ -14,8 +14,9 @@ import com.talosvfx.talos.editor.project.IProject;
 public class SceneEditorAddon implements IAddon {
 
     public static SceneEditorProject SE;
-    SceneEditorWorkspace workspace;
-
+    public SceneEditorWorkspace workspace;
+    public HierarchyWidget hierarchy;
+    public ProjectExplorerWidget projectExplorer;
 
     @Override
     public void init () {
@@ -55,11 +56,15 @@ public class SceneEditorAddon implements IAddon {
     private void buildUI () {
         workspace = SceneEditorWorkspace.getInstance();
         workspace.setAddon(this);
+
+        hierarchy = new HierarchyWidget();
+
+        projectExplorer = new ProjectExplorerWidget();
     }
 
     @Override
     public void initUIContent () {
-        TalosMain.Instance().UIStage().swapToAddonContent(null, workspace, null);
+        TalosMain.Instance().UIStage().swapToAddonContent(hierarchy, workspace, projectExplorer);
         TalosMain.Instance().disableNodeStage();
 
         // now need to disable some menu tabs
@@ -80,6 +85,6 @@ public class SceneEditorAddon implements IAddon {
 
     @Override
     public void announceLocalSettings (SettingsDialog settingsDialog) {
-
+        settingsDialog.addPathSetting("Scene Projects Path", "sceneEditorProjectsPath");
     }
 }

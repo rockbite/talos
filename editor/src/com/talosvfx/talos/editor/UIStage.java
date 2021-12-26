@@ -21,6 +21,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -34,6 +35,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
@@ -44,6 +46,7 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
+import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
@@ -72,6 +75,7 @@ public class UIStage {
 	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
 	public SettingsDialog settingsDialog;
+	public NewProjectDialog newProjectDialog;
 
 	ColorPicker colorPicker;
 
@@ -111,6 +115,7 @@ public class UIStage {
 
 		batchConvertDialog = new BatchConvertDialog();
 		settingsDialog = new SettingsDialog();
+		newProjectDialog = new NewProjectDialog();
 
 		FileHandle list = Gdx.files.internal("modules.xml");
 		XmlReader xmlReader = new XmlReader();
@@ -366,6 +371,10 @@ public class UIStage {
 		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
 
 		stage.addActor(fileChooser.fadeIn());
+	}
+
+	public void openDialog(VisWindow dialog) {
+		stage.addActor(dialog.fadeIn());
 	}
 
 

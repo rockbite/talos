@@ -13,6 +13,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
+        setWorldSize(10);
     }
 
     @Override
@@ -27,7 +28,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @Override
     public void drawContent (Batch batch, float parentAlpha) {
-
+        batch.end();
+        drawGrid(batch, parentAlpha);
+        batch.begin();
     }
 
     public void setAddon (SceneEditorAddon sceneEditorAddon) {

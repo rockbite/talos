@@ -1,8 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.IProject;
+
+import java.io.File;
 
 public class SceneEditorProject implements IProject {
 
@@ -65,5 +69,29 @@ public class SceneEditorProject implements IProject {
     @Override
     public String exportProject () {
         return sceneEditorAddon.workspace.writeExport();
+    }
+
+    @Override
+    public String getProjectTypeName () {
+        return "Scene";
+    }
+
+    @Override
+    public boolean requiresWorkspaceLocation () {
+        return true;
+    }
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+        name.replace("/", "");
+        name.replace("\\", "");
+        FileHandle parent = Gdx.files.absolute(path);
+
+        FileHandle projectDir = Gdx.files.absolute(parent.path() + File.separator + name);
+        projectDir.mkdirs();
+
+        // now save the project here
+        FileHandle projectFile = Gdx.files.absolute(projectDir.path() + File.separator + name + SceneEditorAddon.SE.getExtension());
+        TalosMain.Instance().ProjectController().saveProject(projectFile);
     }
 }

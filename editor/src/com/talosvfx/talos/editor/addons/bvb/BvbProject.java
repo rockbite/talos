@@ -98,4 +98,19 @@ public class BvbProject implements IProject {
     public String exportProject() {
         return bvBAddon.workspace.writeExport();
     }
+
+    @Override
+    public String getProjectTypeName () {
+        return "BVB";
+    }
+
+    @Override
+    public boolean requiresWorkspaceLocation () {
+        return false;
+    }
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
+    }
 }

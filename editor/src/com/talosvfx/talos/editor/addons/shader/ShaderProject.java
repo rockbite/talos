@@ -116,4 +116,19 @@ public class ShaderProject implements IProject {
 
         }
     }
+
+    @Override
+    public String getProjectTypeName () {
+        return "Shader Graph";
+    }
+
+    @Override
+    public boolean requiresWorkspaceLocation () {
+        return false;
+    }
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
+    }
 }

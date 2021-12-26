@@ -435,4 +435,19 @@ public class TalosProject implements IProject {
 			return furthestPoint;
 		}
 	}
+
+	@Override
+	public String getProjectTypeName () {
+		return "Talos";
+	}
+
+	@Override
+	public boolean requiresWorkspaceLocation () {
+		return false;
+	}
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
+    }
 }

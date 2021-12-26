@@ -232,8 +232,8 @@ public abstract class ViewportWidget extends Table {
         int countY = MathUtils.ceil(height/gridSize);
 
         float falloff = ((float)(MathUtils.clamp(countX, minCount, maxCount)-minCount))/(maxCount-minCount);
-        float brightAlpha = (1f-falloff*0.95f) * 0.5f * parentAlpha;
-        float dimAlpha = gridColor.a * 0.05f * parentAlpha;
+        float brightAlpha = (1f-falloff*0.95f) * 0.3f * parentAlpha;
+        float dimAlpha = gridColor.a * 0.1f * parentAlpha;
 
         // camera offsets
         x =  x - x % (gridSize*8f);
