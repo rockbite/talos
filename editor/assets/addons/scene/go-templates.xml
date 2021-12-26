@@ -1,0 +1,5 @@
+<entityTemplates componentClassPath="com.talosvfx.talos.editor.addons.scene.logic.components">
+    <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
+        <component className="TransformComponent"></component>
+    </template>
+</entityTemplates>

@@ -56,7 +56,7 @@ public class ProjectController {
                 loading = true;
                 currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
                 String string = projectFileHandle.readString();
-                currentProject.loadProject(string);
+                currentProject.loadProject(projectFileHandle, string);
                 snapshotTracker.reset(string);
                 reportProjectFileInterraction(projectFileHandle);
                 loading = false;
@@ -96,7 +96,7 @@ public class ProjectController {
             loading = true;
             currentProjectPath = pathCache.get(projectFileName);
             String string = fileCache.get(projectFileName);
-            currentProject.loadProject(string);
+            currentProject.loadProject(null, string);
             snapshotTracker.reset(string);
             loading = false;
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class ProjectController {
     private void getProjectFromString(String string) {
         try {
             loading = true;
-            currentProject.loadProject(string);
+            currentProject.loadProject(null, string);
             loading = false;
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);

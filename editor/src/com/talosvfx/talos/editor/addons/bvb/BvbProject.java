@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -12,8 +11,6 @@ import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.FileUtils;
 
-import java.io.File;
-
 public class BvbProject implements IProject {
 
     BvBAddon bvBAddon;
@@ -23,7 +20,7 @@ public class BvbProject implements IProject {
     }
 
     @Override
-    public void loadProject(String data) {
+    public void loadProject (FileHandle projectFileHandle, String data) {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
         bvBAddon.workspace.read(json, jsonValue);

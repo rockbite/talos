@@ -15,7 +15,7 @@ public class ShaderProject implements IProject {
     }
 
     @Override
-    public void loadProject (String data) {
+    public void loadProject (FileHandle projectFileHandle, String data) {
         Json json = new Json();
         ProjectData projectData = json.fromJson(ProjectData.class, data);
         projectData.loadStage(shaderAddon.nodeStage);
