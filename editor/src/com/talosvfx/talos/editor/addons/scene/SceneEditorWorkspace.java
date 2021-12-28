@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,15 +17,19 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+
+import java.io.File;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
 
@@ -41,6 +46,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private ObjectMap<GameObject, Array<Gizmo>> gizmoMap = new ObjectMap<>();
 
     private Array<GameObject> selection = new Array<>();
+    private MainRenderer renderer;
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
@@ -66,6 +72,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         clearListeners();
         initListeners();
         addPanListener();
+
+        renderer = new MainRenderer();
     }
 
     public void createEmpty (Vector2 position) {
@@ -81,7 +89,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
 
-    public void createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
+    public void createSpriteObject (FileHandle importedAsset, Vector2 sceneCords) {
+        GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, null);
+        SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
+
+        component.path = importedAsset.path();
+        component.reloadTexture();
+
+    }
+
+    public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
         GameObject gameObject = new GameObject();
         XmlReader.Element template = templateListPopup.getTemplate(idName);
 
@@ -106,6 +123,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 
         selectGameObject(gameObject);
+
+        return gameObject;
     }
 
     private String getUniqueGOName (String nameTemplate) {
@@ -307,11 +326,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         drawGrid(batch, parentAlpha);
         batch.begin();
 
+        drawMainRenderer(batch, parentAlpha);
 
         for(int i = 0; i < gizmoList.size; i++) {
             Gizmo gizmo = gizmoList.get(i);
             gizmo.setWoldWidth(getWorldWidth() * camera.zoom);
             gizmo.draw(batch, parentAlpha);
+        }
+    }
+
+    private void drawMainRenderer (Batch batch, float parentAlpha) {
+        if(currentContainer instanceof GameObject) {
+            renderer.render(batch, (GameObject) currentContainer);
+        } else if(currentContainer instanceof Scene) {
+            Scene scene = (Scene) currentContainer;
+            renderer.render(batch, scene.root);
         }
     }
 
@@ -336,6 +365,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public void setProjectPath (String path) {
         projectPath = path;
+    }
+
+
+
+    public FileHandle importAsset (FileHandle handle) {
+        FileHandle projectDir = Gdx.files.absolute(projectPath);
+        FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
+        FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
+        handle.copyTo(destination);
+
+        return destination;
+    }
+
+    // if asset is updated externally, do something about it maybe
+    public void updateAsset (FileHandle handle) {
+
     }
 
     public void reloadProjectExplorer() {
@@ -398,14 +443,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         Iterable<IComponent> components = gameObject.getComponents();
         for(IComponent component: components) {
             Gizmo gizmo = GizmoRegister.makeGizmoFor(component);
-            gizmo.setGameObject(gameObject);
-            Array<Gizmo> list = new Array<>();
-            gizmoMap.put(gameObject, list);
-
             if(gizmo != null) {
-                gizmoList.add(gizmo);
-                list.add(gizmo);
+                gizmo.setGameObject(gameObject);
+                Array<Gizmo> list = new Array<>();
+                gizmoMap.put(gameObject, list);
 
+                if (gizmo != null) {
+                    gizmoList.add(gizmo);
+                    list.add(gizmo);
+                }
             }
         }
     }
@@ -544,4 +590,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         Notifications.fireEvent(event);
     }
+
+    public Vector2 getMouseCordsOnScene () {
+        final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        this.screenToLocalCoordinates(vec);
+        Vector2 local = getWorldFromLocal(vec.x, vec.y);
+        return local;
+    }
+
 }

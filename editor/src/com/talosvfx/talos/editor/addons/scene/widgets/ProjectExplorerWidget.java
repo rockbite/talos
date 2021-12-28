@@ -46,6 +46,8 @@ public class ProjectExplorerWidget extends Table {
                 showContextMenu();
             }
         });
+
+        directoryTree.expandAll();
     }
 
     private void showContextMenu () {

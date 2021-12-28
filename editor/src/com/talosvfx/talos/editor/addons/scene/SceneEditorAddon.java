@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.Menu;
@@ -15,6 +16,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 
 public class SceneEditorAddon implements IAddon {
@@ -26,12 +28,16 @@ public class SceneEditorAddon implements IAddon {
     private BottomPanel bottomPanel;
     public PropertyPanel propertyPanel;
 
+    public FileTracker.Tracker assetTracker;
+
     @Override
     public void init () {
         SE = new SceneEditorProject(this);
 
         registerEvents();
         buildUI();
+
+        assetTracker = handle -> workspace.updateAsset(handle);
     }
 
     private void registerEvents () {
@@ -96,6 +102,19 @@ public class SceneEditorAddon implements IAddon {
 
     @Override
     public boolean projectFileDrop (FileHandle handle) {
+        if(handle.extension().equals("png")) {
+            // import it
+            FileHandle importedAsset = workspace.importAsset(handle);
+
+            // track it
+            TalosMain.Instance().FileTracker().trackFile(importedAsset, assetTracker);
+
+            // add new game object to the scene
+            Vector2 sceneCords = workspace.getMouseCordsOnScene();
+            workspace.createSpriteObject(importedAsset, sceneCords);
+
+            return true;
+        }
         return false;
     }
 

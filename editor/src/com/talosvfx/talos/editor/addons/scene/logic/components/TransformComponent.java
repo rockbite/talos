@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
 public class TransformComponent implements IComponent {
     public Vector2 position = new Vector2();
     public float rotation;
-    public Vector2 scale = new Vector2();
+    public Vector2 scale = new Vector2(1, 1);
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {

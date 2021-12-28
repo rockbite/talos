@@ -178,6 +178,8 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     }
 
     private void select (GameObject gameObject) {
+        if(gameObject == null) return;
+
         tree.getSelection().clear();
         tree.getSelection().add(nodeMap.get(gameObject));
         Actor actor = nodeMap.get(gameObject).getActor();

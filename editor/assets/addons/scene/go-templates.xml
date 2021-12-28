@@ -2,4 +2,8 @@
     <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
         <component className="TransformComponent"></component>
     </template>
+    <template name = "sprite" title = "Sprite Object" nameTemplate = "sprite" keywords = "">
+        <component className="TransformComponent"></component>
+        <component className="SpriteRendererComponent"></component>
+    </template>
 </entityTemplates>
