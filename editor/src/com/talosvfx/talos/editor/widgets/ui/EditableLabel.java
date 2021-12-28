@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
@@ -38,11 +39,14 @@ public class EditableLabel extends Table {
     private Label label;
     private TextField textField;
 
+    private Cell<TextField> fieldCell;
+
     private EditableLabelChangeListener listener;
 
     private Vector2 tmpVec = new Vector2();
 
     private final InputListener stageListener;
+    private boolean editMode = false;
 
     public interface EditableLabelChangeListener {
         public void changed(String newText);
@@ -67,7 +71,7 @@ public class EditableLabel extends Table {
 
 
         textField = new TextField(text, getSkin(), "no-bg");
-        inputTable.add(textField);
+        fieldCell = inputTable.add(textField);
         inputTable.add().expandX();
 
         addListener(new ClickListener() {
@@ -146,6 +150,7 @@ public class EditableLabel extends Table {
     }
 
     public void setEditMode() {
+        editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
         textField.setWidth(label.getPrefWidth() + 10);
@@ -158,6 +163,7 @@ public class EditableLabel extends Table {
     }
 
     public void setStaticMode() {
+        editMode = false;
         labelTable.setVisible(true);
         inputTable.setVisible(false);
 
@@ -176,5 +182,14 @@ public class EditableLabel extends Table {
 
     public void setText(String text) {
         label.setText(text);
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setAlignment (int alignment) {
+        label.setAlignment(alignment);
+        textField.setAlignment(alignment);
     }
 }

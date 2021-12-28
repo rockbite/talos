@@ -6,12 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -45,7 +42,13 @@ public class PropertyPanel extends Table implements Notifications.Observer {
         Notifications.registerObserver(this);
     }
 
-
+    @EventHandler
+    public void onGameObjectNameChanged(GameObjectNameChanged event) {
+        PropertiesPanel propertiesPanel = providerPanelMap.get(event.target);
+        if(propertiesPanel != null) {
+            propertiesPanel.updateValues();
+        }
+    }
 
     @EventHandler
     public void onPropertyHolderSelected(PropertyHolderSelected event) {
@@ -53,6 +56,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
     }
 
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
+        providerSet.clear();
         for(IPropertyProvider propertyProvider: propertyProviders) {
             providerSet.put(propertyProvider.getClass(), propertyProvider);
         }

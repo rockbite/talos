@@ -20,6 +20,8 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
 
     protected Rectangle hitBox = new Rectangle();
 
+    protected boolean selected = false;
+
     public void setComponent (T component) {
         this.component = component;
     }
@@ -83,5 +85,9 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
 
     public void touchUp (float x, float y) {
 
+    }
+
+    public void setSelected (boolean selected) {
+        this.selected = selected;
     }
 }

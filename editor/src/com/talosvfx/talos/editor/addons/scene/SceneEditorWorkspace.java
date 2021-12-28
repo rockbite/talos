@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -38,6 +39,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private GameObjectContainer currentContainer;
     private Array<Gizmo> gizmoList = new Array<>();
     private ObjectMap<GameObject, Array<Gizmo>> gizmoMap = new ObjectMap<>();
+
+    private Array<GameObject> selection = new Array<>();
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
@@ -101,12 +104,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         initGizmos(gameObject);
 
         Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
-        selectPropertyHolder(gameObject);
+
+        selectGameObject(gameObject);
     }
 
     private String getUniqueGOName (String nameTemplate) {
+        return getUniqueGOName(nameTemplate, false);
+    }
+
+    private String getUniqueGOName (String nameTemplate, boolean keepOriginal) {
         int number = 0;
-        String name = nameTemplate + number;
+
+        String name = nameTemplate;
+
+        if(!keepOriginal) {
+            name = nameTemplate + number;
+        }
 
         while(currentContainer.hasGOWithName(name)) {
             number++;
@@ -150,6 +163,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
+                touchedGizmo = null;
+
                 Vector2 hitCords = getWorldFromLocal(x, y);
 
                 if (button == 1 && !event.isCancelled()) {
@@ -172,12 +188,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                     touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
 
+                    getStage().setKeyboardFocus(SceneEditorWorkspace.this);
+
                     event.handle();
 
                     return true;
                 } else {
                     touchedGizmo = null;
                 }
+
+                clearSelection();
 
                 return false;
             }
@@ -208,6 +228,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
+
+                if(keycode == Input.Keys.DEL) {
+                    Array<GameObject> deleteList = new Array<>();
+                    deleteList.addAll(selection);
+                    clearSelection();
+                    deleteGameObjects(deleteList);
+                }
+
                 return super.keyDown(event, keycode);
             }
         });
@@ -326,6 +354,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         // process all game objects
         removeGizmos();
         initGizmos(mainScene);
+
+        clearSelection();
     }
 
     private void removeGizmos () {
@@ -384,15 +414,42 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         if(propertyHolder == null) return;
 
         Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
-
-        if(propertyHolder instanceof GameObject) {
-            Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelected.class).setTarget((GameObject) propertyHolder));
-        }
     }
 
 
-    private void selectGameObject (GameObject gameObject) {
+    public void selectGameObject (GameObject gameObject) {
+        if(gameObject == null) return;
+        Array<GameObject> tmp = new Array<>();
+        tmp.add(gameObject);
+
+        setSelection(tmp);
+    }
+
+    public void addToSelection (GameObject gameObject) {
+        selection.add(gameObject);
         selectPropertyHolder(gameObject);
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+    }
+
+    public void setSelection(Array<GameObject> gameObjects) {
+        selection.clear();
+
+        selection.addAll(gameObjects);
+
+        selectPropertyHolder(gameObjects.first());
+
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+    }
+
+    private void clearSelection() {
+        selection.clear();
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+
+        // we select the main container then
+        if(currentContainer instanceof Scene) {
+            Scene scene = (Scene) currentContainer;
+            selectPropertyHolder(scene);
+        }
     }
 
     public void deleteGameObjects (Array<GameObject> gameObjects) {
@@ -447,5 +504,44 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         removeGizmos(target);
 
         TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    @EventHandler
+    public void onGameObjectNameChanged(GameObjectNameChanged event) {
+        TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    @EventHandler
+    public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
+        Array<GameObject> gameObjects = event.get();
+
+        for(Gizmo gizmo: gizmoList) {
+            gizmo.setSelected(false);
+        }
+
+        for(GameObject gameObject: gameObjects) {
+            Array<Gizmo> gizmos = gizmoMap.get(gameObject);
+            for(Gizmo gizmo: gizmos) {
+                gizmo.setSelected(true);
+            }
+        }
+    }
+
+
+    public void changeGOName (GameObject gameObject, String suggestedName) {
+        if(suggestedName.equals(gameObject.getName())) return;
+
+        String finalName = getUniqueGOName(suggestedName, true);
+
+        String oldName = gameObject.getName();
+
+        gameObject.setName(finalName);
+
+        GameObjectNameChanged event = Notifications.obtainEvent(GameObjectNameChanged.class);
+        event.target = gameObject;
+        event.oldName = oldName;
+        event.newName = finalName;
+
+        Notifications.fireEvent(event);
     }
 }

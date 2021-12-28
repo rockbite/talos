@@ -6,6 +6,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 public interface GameObjectContainer {
 
     String getName();
+    void setName(String name);
     Array<GameObject> getGameObjects();
     Iterable<IComponent> getComponents();
     void addGameObject(GameObject gameObject);

@@ -1,7 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -161,10 +163,15 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget labelWidget = new LabelWidget("Name") {
+        EditableLabelWidget labelWidget = new EditableLabelWidget("Name") {
             @Override
             public String getValue () {
                 return name;
+            }
+
+            @Override
+            public void valueChanged (String value) {
+                SceneEditorAddon.get().workspace.changeGOName(GameObject.this, value);
             }
         };
 
@@ -195,7 +202,18 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return (T) componentClasses.get(clazz);
     }
 
+    @Override
     public void setName (String name) {
+        String oldName = this.name;
         this.name = name;
+        if(parent != null) {
+           parent.notifyChildRename(oldName, name);
+        }
+    }
+
+    private void notifyChildRename (String oldName, String name) {
+        GameObject gameObject = childrenMap.get(oldName);
+        childrenMap.remove(oldName);
+        childrenMap.put(name, gameObject);
     }
 }

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,7 +21,13 @@ public class TransformGizmo extends Gizmo<TransformComponent> {
         TextureRegion region = TalosMain.Instance().getSkin().getRegion("ic-target");
         float size = SIZE * worldPerPixel;
 
+        if(selected) {
+            batch.setColor(Color.ORANGE);
+        }
+
         batch.draw(region, getX() - size / 2f, getY() - size / 2f, size, size);
+
+        batch.setColor(Color.WHITE);
     }
 
     @Override

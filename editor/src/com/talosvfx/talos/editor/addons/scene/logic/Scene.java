@@ -3,12 +3,16 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.io.StringWriter;
 
-public class Scene implements GameObjectContainer, Json.Serializable, IPropertyHolder {
+public class Scene implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
 
     public String path;
 
@@ -76,6 +80,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     @Override
+    public void setName (String name) {
+        root.setName(name);
+    }
+
+    @Override
     public void write (Json json) {
         json.writeValue("path", path);
     }
@@ -136,6 +145,38 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
 
     @Override
     public Iterable<IPropertyProvider> getPropertyProviders () {
-        return new Array<>();
+        Array<IPropertyProvider> list = new Array<>();
+
+        list.add(this);
+
+        return list;
+    }
+
+    @Override
+    public Array<PropertyWidget> getListOfProperties () {
+        Array<PropertyWidget> properties = new Array<>();
+
+        LabelWidget labelWidget = new LabelWidget("Name") {
+            @Override
+            public String getValue () {
+                FileHandle file = Gdx.files.absolute(path);
+                String name = file.nameWithoutExtension();
+                return name;
+            }
+        };
+
+        properties.add(labelWidget);
+
+        return properties;
+    }
+
+    @Override
+    public String getPropertyBoxTitle () {
+        return "Scene Properties";
+    }
+
+    @Override
+    public int getPriority () {
+        return 0;
     }
 }
