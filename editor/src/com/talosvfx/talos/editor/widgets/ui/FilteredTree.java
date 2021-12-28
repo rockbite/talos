@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -35,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
@@ -75,9 +77,20 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private ItemListener itemListener;
 
-    public interface ItemListener {
-        void chosen(Node node);
-        void selected(Node node);
+    public static abstract class ItemListener {
+        public void chosen(Node node) {
+
+        }
+        public void selected(Node node) {
+
+        }
+        public void rightClick (Node node) {
+
+        }
+
+        public void delete (Array<FilteredTree.Node> nodes) {
+
+        }
     }
 
     public void setItemListener(ItemListener itemListener) {
@@ -164,6 +177,39 @@ public class FilteredTree<T> extends WidgetGroup {
                 }
                 if (!selection.isEmpty())
                     rangeStart = node;
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                Node node = getNodeAt(y);
+                if(itemListener != null) {
+                    if(button == 1) {
+                        // this is right click
+                        itemListener.rightClick(node);
+                        event.cancel();
+
+                        return true;
+                    }
+                }
+
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public boolean keyDown (InputEvent event, int keycode) {
+                if(itemListener != null) {
+                    if (keycode == Input.Keys.DEL) {
+                        if(!selection.isEmpty()) {
+                            Array<FilteredTree.Node> nodes = new Array<>();
+                            for(Object nodeObject: selection) {
+                                FilteredTree.Node node = (FilteredTree.Node) nodeObject;
+                                nodes.add(node);
+                            }
+                            itemListener.delete(nodes);
+                        }
+                    }
+                }
+                return super.keyDown(event, keycode);
             }
 
             public boolean mouseMoved (InputEvent event, float x, float y) {

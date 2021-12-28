@@ -139,4 +139,8 @@ public class TemplateListPopup extends VisWindow {
         if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
     }
+
+    public XmlReader.Element getTemplate(String name) {
+        return configurationMap.get(name);
+    }
 }

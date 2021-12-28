@@ -8,11 +8,13 @@ import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.BottomPanel;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
 
 public class SceneEditorAddon implements IAddon {
@@ -28,7 +30,16 @@ public class SceneEditorAddon implements IAddon {
     public void init () {
         SE = new SceneEditorProject(this);
 
+        registerEvents();
         buildUI();
+    }
+
+    private void registerEvents () {
+        Notifications.addEventToPool(PropertyHolderSelected.class);
+        Notifications.addEventToPool(GameObjectSelected.class);
+        Notifications.addEventToPool(GameObjectCreated.class);
+        Notifications.addEventToPool(ComponentUpdated.class);
+        Notifications.addEventToPool(GameObjectDeleted.class);
     }
 
     @Override

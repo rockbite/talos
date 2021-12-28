@@ -2,9 +2,13 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 import java.io.File;
@@ -16,7 +20,10 @@ public class ProjectExplorerWidget extends Table {
     private final FileFilter fileFilter;
     private ObjectMap<String, FilteredTree.Node> nodes = new ObjectMap<>();
 
+    private ContextualMenu contextualMenu;
+
     public ProjectExplorerWidget() {
+        contextualMenu = new ContextualMenu();
 
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
         ScrollPane scrollPane = new ScrollPane(directoryTree);
@@ -31,6 +38,55 @@ public class ProjectExplorerWidget extends Table {
                 return true;
             }
         };
+
+        directoryTree.setItemListener(new FilteredTree.ItemListener() {
+            @Override
+            public void rightClick (FilteredTree.Node node) {
+                select(node);
+                showContextMenu();
+            }
+        });
+    }
+
+    private void showContextMenu () {
+        contextualMenu.clearItems();
+        contextualMenu.addItem("Cut", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+
+            }
+        });
+        contextualMenu.addItem("Copy", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+
+            }
+        });
+        contextualMenu.addItem("Paste", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+
+            }
+        });
+        contextualMenu.addSeparator();
+        contextualMenu.addItem("Rename", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+
+            }
+        });
+        contextualMenu.addItem("Delete", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+
+            }
+        });
+        contextualMenu.show(getStage());
+    }
+
+    public void select (FilteredTree.Node node) {
+        directoryTree.getSelection().clear();
+        directoryTree.getSelection().add(node);
     }
 
     public void select (String path) {
@@ -53,6 +109,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void loadDirectoryTree (String path) {
+        nodes.clear();
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
 

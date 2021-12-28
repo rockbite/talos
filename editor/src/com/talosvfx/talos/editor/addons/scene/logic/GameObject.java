@@ -15,6 +15,9 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private ObjectSet<IComponent> components = new ObjectSet<>();
     private ObjectMap<Class, IComponent> componentClasses = new ObjectMap<>();
 
+    private Array<GameObject> tmp = new Array<>();
+    private GameObject parent;
+
     @Override
     public Array<GameObject> getGameObjects () {
         return children;
@@ -39,6 +42,14 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             json.writeValue(component, IComponent.class);
         }
         json.writeArrayEnd();
+
+        if(children != null) {
+            json.writeArrayStart("children");
+            for(GameObject child: children) {
+                json.writeValue(child, GameObject.class);
+            }
+            json.writeArrayEnd();
+        }
     }
 
     @Override
@@ -50,6 +61,14 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             IComponent component = json.readValue(IComponent.class, componentJson);
             addComponent(component);
         }
+
+        JsonValue childrenJson = jsonData.get("children");
+        if(childrenJson != null) {
+            for (JsonValue childJson : childrenJson) {
+                GameObject childObject = json.readValue(GameObject.class, childJson);
+                addGameObject(childObject);
+            }
+        }
     }
 
     @Override
@@ -60,6 +79,49 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
         children.add(gameObject);
         childrenMap.put(gameObject.name, gameObject);
+
+        gameObject.setParent(this);
+    }
+
+    @Override
+    public  Array<GameObject> deleteGameObject (GameObject gameObject) {
+        tmp.clear();
+        if(children == null) {
+            return tmp;
+        }
+
+        String name = gameObject.getName();
+        if(childrenMap.containsKey(name)) {
+            GameObject objectToRemove = childrenMap.get(name);
+            childrenMap.remove(name);
+            children.removeValue(objectToRemove, true);
+            tmp.add(objectToRemove);
+
+            objectToRemove.clearChildren(tmp);
+        }
+
+        if(children.isEmpty()) children = null;
+
+        return tmp;
+    }
+
+    @Override
+    public void clearChildren (Array<GameObject> tmp) {
+        if(children == null) return;
+        tmp.addAll(children);
+
+        children = null;
+        childrenMap.clear();
+    }
+
+    @Override
+    public GameObject getParent () {
+        return parent;
+    }
+
+    @Override
+    public void setParent (GameObject gameObject) {
+        parent = gameObject;
     }
 
     @Override

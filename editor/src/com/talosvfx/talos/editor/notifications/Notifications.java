@@ -56,6 +56,10 @@ public class Notifications {
         addPool(AssetFileDroppedEvent.class);
     }
 
+    public static void addEventToPool(Class<? extends Event> clazz) {
+        getInstance().addPool(clazz);
+    }
+
     private void addPool(Class clazz) {
         if(Event.class.isAssignableFrom(clazz)) {
             Pool<Event> pool = new Pool<Event>() {

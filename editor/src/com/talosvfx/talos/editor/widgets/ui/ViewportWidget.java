@@ -53,6 +53,7 @@ public abstract class ViewportWidget extends Table {
     private float worldWidth = 1f;
 
     private Vector3 tmp = new Vector3();
+    private Vector2 vec2 = new Vector2();
 
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
@@ -275,6 +276,18 @@ public abstract class ViewportWidget extends Table {
         y = Gdx.graphics.getHeight() - y;
 
         out.set(x, y, ssWidth, ssHeight);
+    }
+
+    protected Vector2 getWorldFromLocal (float x, float y) {
+        Vector2 vector2 = localToScreenCoordinates(new Vector2(x, y));
+
+        getViewportBounds(Rectangle.tmp);
+
+        camera.unproject(tmp.set(vector2.x, vector2.y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+
+        vec2.set(tmp.x, tmp.y);
+
+        return vec2;
     }
 
     protected Vector3 getWorldFromLocal (Vector3 vec) {

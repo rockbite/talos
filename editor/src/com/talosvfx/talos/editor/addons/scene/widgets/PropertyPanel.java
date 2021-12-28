@@ -6,18 +6,28 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.util.Comparator;
 
-public class PropertyPanel extends Table {
+public class PropertyPanel extends Table implements Notifications.Observer {
 
     Table container;
     Table fakeContainer;
     ScrollPane scrollPane;
 
-    ObjectMap<Class, IPropertyProvider> providerSet = new ObjectMap<>();
-    Array<PropertiesPanel> panelList = new Array<>();
+    private ObjectMap<Class, IPropertyProvider> providerSet = new ObjectMap<>();
+    private Array<PropertiesPanel> panelList = new Array<>();
+    private ObjectMap<IPropertyProvider, PropertiesPanel> providerPanelMap = new ObjectMap<>();
+    private IPropertyHolder currentPropertyHolder;
 
     public PropertyPanel() {
         setSkin(TalosMain.Instance().getSkin());
@@ -31,13 +41,23 @@ public class PropertyPanel extends Table {
 
         fakeContainer.add(container).growX().row();
         fakeContainer.add().expandY();
+
+        Notifications.registerObserver(this);
     }
 
-    public void showPanel(Iterable<IPropertyProvider> propertyProviders) {
+
+
+    @EventHandler
+    public void onPropertyHolderSelected(PropertyHolderSelected event) {
+        showPanel(event.getTarget(), event.getTarget().getPropertyProviders());
+    }
+
+    public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
         for(IPropertyProvider propertyProvider: propertyProviders) {
             providerSet.put(propertyProvider.getClass(), propertyProvider);
         }
         build();
+        currentPropertyHolder = target;
     }
 
     public void build() {
@@ -57,6 +77,7 @@ public class PropertyPanel extends Table {
         });
 
         panelList.clear();
+        providerPanelMap.clear();
 
         for(IPropertyProvider provider: list) {
             PropertiesPanel panel = new PropertiesPanel(provider, getSkin());
@@ -65,6 +86,8 @@ public class PropertyPanel extends Table {
             container.row();
 
             panelList.add(panel);
+
+            providerPanelMap.put(provider, panel);
         }
     }
 
@@ -72,6 +95,8 @@ public class PropertyPanel extends Table {
         if(propertyProvider == null) return;
         providerSet.remove(propertyProvider.getClass());
         build();
+
+        currentPropertyHolder = null;
     }
 
     public void updateValues() {
@@ -81,7 +106,21 @@ public class PropertyPanel extends Table {
     }
 
     public void cleanPanels() {
+        container.clear();
         providerSet.clear();
         panelList.clear();
+        currentPropertyHolder = null;
+    }
+
+    public void propertyProviderUpdated (IPropertyProvider propertyProvider) {
+        if(providerPanelMap.containsKey(propertyProvider)) {
+            providerPanelMap.get(propertyProvider).updateValues();
+        }
+    }
+
+    public void notifyPropertyHolderRemoved (IPropertyHolder propertyHolder) {
+        if(currentPropertyHolder == propertyHolder) {
+            cleanPanels();
+        }
     }
 }

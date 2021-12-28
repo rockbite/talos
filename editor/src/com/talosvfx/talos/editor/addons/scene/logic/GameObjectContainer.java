@@ -9,7 +9,13 @@ public interface GameObjectContainer {
     Array<GameObject> getGameObjects();
     Iterable<IComponent> getComponents();
     void addGameObject(GameObject gameObject);
+    Array<GameObject> deleteGameObject(GameObject gameObject);
     void addComponent(IComponent component);
 
     boolean hasGOWithName (String name);
+
+    void clearChildren (Array<GameObject> tmp);
+
+    GameObject getParent();
+    void setParent(GameObject gameObject);
 }

@@ -6,25 +6,26 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
-public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
 
     private static SceneEditorWorkspace instance;
     private final TemplateListPopup templateListPopup;
@@ -36,12 +37,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     private GameObjectContainer currentContainer;
     private Array<Gizmo> gizmoList = new Array<>();
+    private ObjectMap<GameObject, Array<Gizmo>> gizmoMap = new ObjectMap<>();
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
 
         GizmoRegister.init();
+
+        Notifications.registerObserver(this);
 
         FileHandle list = Gdx.files.internal("addons/scene/go-templates.xml");
         XmlReader xmlReader = new XmlReader();
@@ -51,21 +55,53 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         templateListPopup.setListener(new TemplateListPopup.ListListener() {
             @Override
             public void chosen (XmlReader.Element template, float x, float y) {
-                GameObject gameObject = new GameObject();
-                String nameTemplate = template.getAttribute("nameTemplate", "gameObject");
-                String name = getUniqueGOName(nameTemplate);
-                gameObject.setName(name);
-                initComponentsFromTemplate(gameObject, template);
-
-                currentContainer.addGameObject(gameObject);
-                initGizmos(gameObject);
-
-                //todo: change this to events
-                sceneEditorAddon.hierarchy.loadEntityContainer(currentContainer);
+                Vector2 pos = new Vector2(x, y);
+                createObjectByTypeName(template.getAttribute("name"), pos, null);
             }
         });
 
+        clearListeners();
         initListeners();
+        addPanListener();
+    }
+
+    public void createEmpty (Vector2 position) {
+        createObjectByTypeName("empty", position, null);
+    }
+
+    public void createEmpty (GameObject parent) {
+        createObjectByTypeName("empty", null, parent);
+    }
+
+    public void createEmpty (Vector2 position, GameObject parent) {
+        createObjectByTypeName("empty", position, parent);
+    }
+
+
+    public void createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
+        GameObject gameObject = new GameObject();
+        XmlReader.Element template = templateListPopup.getTemplate(idName);
+
+        String name = getUniqueGOName(template.getAttribute("nameTemplate", "gameObject"));
+        gameObject.setName(name);
+        initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));
+
+        if(position != null && gameObject.hasComponent(TransformComponent.class)) {
+            // oh boi always special case with this fuckers
+            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+            transformComponent.position.set(position.x, position.y);
+        }
+
+        if(parent == null) {
+            currentContainer.addGameObject(gameObject);
+        } else {
+            parent.addGameObject(gameObject);
+        }
+
+        initGizmos(gameObject);
+
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+        selectPropertyHolder(gameObject);
     }
 
     private String getUniqueGOName (String nameTemplate) {
@@ -97,25 +133,77 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         }
     }
 
+    private Gizmo hitGizmo(float x, float y) {
+        for(Gizmo gizmo: gizmoList) {
+            if(gizmo.hit(x, y)) return gizmo;
+        }
+
+        return null;
+    }
+
     protected void initListeners () {
         addListener(new InputListener() {
 
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
+            Vector2 vec = new Vector2();
+
+            Gizmo touchedGizmo = null;
 
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                Vector2 hitCords = getWorldFromLocal(x, y);
 
                 if (button == 1 && !event.isCancelled()) {
                     final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
                     (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
 
                     Vector2 location = new Vector2(vec);
-                    Vector2 createLocation = new Vector2(vec);
+                    Vector2 createLocation = new Vector2(hitCords);
                     templateListPopup.showPopup(getStage(), location, createLocation);
+
+                    return true;
                 }
+
+                Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
+
+                if (gizmo != null) {
+                    touchedGizmo = gizmo;
+                    GameObject gameObject = touchedGizmo.getGameObject();
+                    selectGameObject(gameObject);
+
+                    touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
+
+                    event.handle();
+
+                    return true;
+                } else {
+                    touchedGizmo = null;
+                }
+
+                return false;
+            }
+
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                super.touchDragged(event, x, y, pointer);
+
+                Vector2 hitCords = getWorldFromLocal(x, y);
+
+                if(touchedGizmo != null) {
+                    touchedGizmo.touchDragged(hitCords.x, hitCords.y);
+                }
+            }
+
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                Vector2 hitCords = getWorldFromLocal(x, y);
+
+                Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
+
+                if(gizmo == touchedGizmo && touchedGizmo != null) {
+                    touchedGizmo.touchUp(hitCords.x, hitCords.y);
+                }
+
+                touchedGizmo = null;
             }
 
             @Override
@@ -242,34 +330,122 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     private void removeGizmos () {
         gizmoList.clear();
+        gizmoMap.clear();
+    }
+
+    private void removeGizmos (GameObject gameObject) {
+        Array<Gizmo> list = gizmoMap.get(gameObject);
+
+        gizmoList.removeAll(list, true);
+        gizmoMap.remove(gameObject);
     }
 
     private void initGizmos (GameObject gameObject) {
         makeGizmosFor(gameObject);
+        Array<GameObject> childObjects = gameObject.getGameObjects();
+        if(childObjects != null) {
+            for (GameObject childObject : childObjects) {
+                makeGizmosFor(childObject);
+                initGizmos(childObject);
+            }
+        }
     }
 
     private void initGizmos (GameObjectContainer gameObjectContainer) {
-        Array<GameObject> gameObjects = gameObjectContainer.getGameObjects();
-        if(gameObjects != null) {
-            for (GameObject gameObject : gameObjects) {
-                makeGizmosFor(gameObject);
+        Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
+        if(childObjects != null) {
+            for (GameObject childObject : childObjects) {
+                makeGizmosFor(childObject);
+                initGizmos(childObject);
             }
         }
     }
 
     private void makeGizmosFor (GameObject gameObject) {
+
+        if(gizmoMap.containsKey(gameObject)) return;
+
         Iterable<IComponent> components = gameObject.getComponents();
         for(IComponent component: components) {
             Gizmo gizmo = GizmoRegister.makeGizmoFor(component);
             gizmo.setGameObject(gameObject);
+            Array<Gizmo> list = new Array<>();
+            gizmoMap.put(gameObject, list);
+
             if(gizmo != null) {
                 gizmoList.add(gizmo);
+                list.add(gizmo);
+
             }
         }
     }
 
     public void selectPropertyHolder (IPropertyHolder propertyHolder) {
         if(propertyHolder == null) return;
-        sceneEditorAddon.propertyPanel.showPanel(propertyHolder.getPropertyProviders());
+
+        Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
+
+        if(propertyHolder instanceof GameObject) {
+            Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelected.class).setTarget((GameObject) propertyHolder));
+        }
+    }
+
+
+    private void selectGameObject (GameObject gameObject) {
+        selectPropertyHolder(gameObject);
+    }
+
+    public void deleteGameObjects (Array<GameObject> gameObjects) {
+        if(currentContainer != null) {
+            for (GameObject gameObject : gameObjects) {
+
+                if(gameObject == null) continue;
+
+                GameObject parent = gameObject.getParent();
+                if(parent != null) {
+
+                    Array<GameObject> deletedObjects = null;
+
+                    if (parent.hasGOWithName(gameObject.getName())) {
+                        deletedObjects = parent.deleteGameObject(gameObject);
+                    }
+
+                    if (deletedObjects != null) {
+                        for (GameObject deletedObject : deletedObjects) {
+                            Notifications.fireEvent(Notifications.obtainEvent(GameObjectDeleted.class).setTarget(deletedObject));
+                        }
+                    }
+
+                } else {
+                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectDeleted.class).setTarget(gameObject));
+                }
+
+            }
+        }
+    }
+
+    @EventHandler
+    public void onGameObjectCreated(GameObjectCreated event) {
+
+        TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    @EventHandler
+    public void onComponentUpdated(ComponentUpdated event) {
+        IComponent component = event.getComponent();
+        sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
+
+        TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    @EventHandler
+    public void onGameObjectDeleted(GameObjectDeleted event) {
+        GameObject target = event.getTarget();
+        sceneEditorAddon.propertyPanel.notifyPropertyHolderRemoved(target);
+
+        // remove gizmos
+        removeGizmos(target);
+
+        TalosMain.Instance().ProjectController().setDirty();
     }
 }

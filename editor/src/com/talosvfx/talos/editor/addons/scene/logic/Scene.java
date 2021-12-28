@@ -40,6 +40,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     @Override
+    public  Array<GameObject> deleteGameObject (GameObject gameObject) {
+        return root.deleteGameObject(gameObject);
+    }
+
+    @Override
     public void addComponent (IComponent component) {
 
     }
@@ -47,6 +52,21 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     @Override
     public boolean hasGOWithName (String name) {
         return root.hasGOWithName(name);
+    }
+
+    @Override
+    public void clearChildren (Array<GameObject> tmp) {
+        root.clearChildren(tmp);
+    }
+
+    @Override
+    public GameObject getParent () {
+        return null;
+    }
+
+    @Override
+    public void setParent (GameObject gameObject) {
+        // do nothing
     }
 
     @Override
