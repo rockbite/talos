@@ -15,6 +15,7 @@ public class TransformGizmo extends Gizmo<TransformComponent> {
     private static final int SIZE = 30; // pixels
 
     private Vector2 prevTouch = new Vector2();
+    private Vector2 vec1 = new Vector2();
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
@@ -45,7 +46,12 @@ public class TransformGizmo extends Gizmo<TransformComponent> {
     public void touchDragged (float x, float y) {
         tmp.set(x, y).sub(prevTouch);
 
-        component.position.add(tmp);
+        // render position
+        gameObject.getPosition(vec1);
+        vec1.add(tmp); // change diff
+        gameObject.toLocal(vec1);
+
+        component.position.set(vec1);
 
         prevTouch.set(x, y);
 

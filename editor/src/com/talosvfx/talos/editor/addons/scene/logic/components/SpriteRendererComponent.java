@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -14,7 +15,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
 
 public class SpriteRendererComponent implements IComponent, Json.Serializable {
 
-    public Texture texture;
+    public TextureRegion texture;
 
     public String path;
 
@@ -46,7 +47,7 @@ public class SpriteRendererComponent implements IComponent, Json.Serializable {
     }
 
     public void reloadTexture () {
-        texture = new Texture(Gdx.files.absolute(path));
+        texture = new TextureRegion(new Texture(Gdx.files.absolute(path))); //todo: maybe make this into atlas?
     }
 
     @Override

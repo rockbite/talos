@@ -1,11 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 public class GameObject implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
@@ -19,6 +20,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private Array<GameObject> tmp = new Array<>();
     private GameObject parent;
+
+    public static Vector2 tmpVec = new Vector2();
 
     @Override
     public Array<GameObject> getGameObjects () {
@@ -215,5 +218,58 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         GameObject gameObject = childrenMap.get(oldName);
         childrenMap.remove(oldName);
         childrenMap.put(name, gameObject);
+    }
+
+    public Vector2 getPosition(Vector2 vector) {
+        vector.set(0, 0);
+        return getPosition(this, vector);
+    }
+
+    public static Vector2 getPosition(GameObject gameObject, Vector2 vector) {
+        if(gameObject.hasComponent(TransformComponent.class)) {
+            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+            vector.add(transform.position);
+            vector.rotateDeg(transform.rotation);
+            vector.scl(transform.scale);
+
+            if(gameObject.parent != null) {
+                getPosition(gameObject.parent, vector);
+            }
+        }
+
+        return vector;
+    }
+
+    public Vector2 toLocal(Vector2 vector) {
+        if(this.parent == null) return vector;
+
+        tmp.clear();
+        tmp = getRootChain(this, tmp);
+
+        for(int i = tmp.size - 1; i >= 0; i--) {
+            GameObject gameObject = tmp.get(i);
+            if(gameObject.hasComponent(TransformComponent.class)) {
+                TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+                vector.scl(1f/transform.scale.x, 1f/transform.scale.y);
+                vector.rotateDeg(-transform.rotation);
+                if(i != 0) {
+                    vector.sub(transform.position);
+                }
+            }
+        }
+
+        return vector;
+    }
+
+    public static Array<GameObject> getRootChain(GameObject currObject, Array<GameObject> chain) {
+        chain.add(currObject);
+
+        if(currObject.parent != null) {
+            return getRootChain(currObject.parent, chain);
+        }
+
+        return chain;
     }
 }

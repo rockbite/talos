@@ -29,7 +29,7 @@ public class TransformComponent implements IComponent {
             }
         };
 
-        FloatPropertyWidget rotationWidget = new FloatPropertyWidget("Rotation: ") {
+        FloatPropertyWidget rotationWidget = new FloatPropertyWidget("Rotation") {
             @Override
             public Float getValue () {
                 return rotation;
