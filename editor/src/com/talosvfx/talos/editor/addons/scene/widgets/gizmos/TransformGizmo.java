@@ -47,11 +47,13 @@ public class TransformGizmo extends Gizmo<TransformComponent> {
         tmp.set(x, y).sub(prevTouch);
 
         // render position
-        gameObject.getPosition(vec1);
+        vec1.set(0, 0);
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        transform.localToWorld(gameObject, vec1);
         vec1.add(tmp); // change diff
-        gameObject.toLocal(vec1);
-
-        component.position.set(vec1);
+        transform.worldToLocal(gameObject, vec1);
+        //vec1 is diff
+        component.position.add(vec1);
 
         prevTouch.set(x, y);
 

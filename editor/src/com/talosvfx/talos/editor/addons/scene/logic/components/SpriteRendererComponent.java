@@ -4,20 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
 
 public class SpriteRendererComponent implements IComponent, Json.Serializable {
 
     public TextureRegion texture;
 
-    public String path;
+    public String path = "";
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -47,7 +45,12 @@ public class SpriteRendererComponent implements IComponent, Json.Serializable {
     }
 
     public void reloadTexture () {
-        texture = new TextureRegion(new Texture(Gdx.files.absolute(path))); //todo: maybe make this into atlas?
+        FileHandle file = Gdx.files.absolute(path);
+        if(file.exists()) {
+            texture = new TextureRegion(new Texture(file));
+        } else {
+            texture = TalosMain.Instance().getSkin().getRegion("vis-red");
+        }
     }
 
     @Override
@@ -59,5 +62,12 @@ public class SpriteRendererComponent implements IComponent, Json.Serializable {
     public void read (Json json, JsonValue jsonData) {
         path = jsonData.getString("path");
         reloadTexture();
+    }
+
+    public TextureRegion getTexture () {
+        if(texture == null) {
+            reloadTexture();
+        }
+        return texture;
     }
 }

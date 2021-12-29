@@ -32,8 +32,13 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
 
     public void act(float delta) {
         super.act(delta);
-        gameObject.getPosition(tmp);
-        setPosition(tmp.x, tmp.y);
+
+        if(gameObject.hasComponent(TransformComponent.class)) {
+            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+            tmp.set(0, 0);
+            transform.localToWorld(gameObject, tmp);
+            setPosition(tmp.x, tmp.y);
+        }
     }
 
     @Override

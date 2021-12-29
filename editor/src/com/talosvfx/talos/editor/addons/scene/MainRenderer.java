@@ -18,11 +18,12 @@ public class MainRenderer {
             SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
             TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
-            gameObject.getPosition(vec);
+            vec.set(0, 0);
+            transformComponent.localToWorld(gameObject, vec);
             Vector2 renderPosition = vec;
 
-            if(spriteRenderer.texture != null) {
-                batch.draw(spriteRenderer.texture,
+            if(spriteRenderer.getTexture() != null) {
+                batch.draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
