@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -132,6 +133,12 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 SceneEditorAddon.get().workspace.createEmpty(gameObject);
+            }
+        });
+        contextualMenu.addItem("Create Sprite", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                SceneEditorAddon.get().workspace.createObjectByTypeName("sprite", new Vector2(), gameObject);
             }
         });
         contextualMenu.show(getStage());

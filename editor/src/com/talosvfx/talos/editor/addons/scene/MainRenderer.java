@@ -10,14 +10,27 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 
 public class MainRenderer {
 
+    private TransformComponent transformComponent = new TransformComponent();
     private Vector2 vec = new Vector2();
+    private Vector2[] points = new Vector2[4];
+
+    private static final int LB = 0;
+    private static final int LT = 1;
+    private static final int RT = 2;
+    private static final int RB = 3;
+
+    public MainRenderer() {
+        for (int i = 0; i < 4; i++) {
+            points[i] = new Vector2();
+        }
+    }
 
     // todo: do fancier logic later
     public void render (Batch batch, GameObject gameObject) {
 
         if(gameObject.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
-            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+            TransformComponent transformComponent = getWorldTransform(gameObject);
 
             vec.set(0, 0);
             transformComponent.localToWorld(gameObject, vec);
@@ -43,5 +56,28 @@ public class MainRenderer {
                 render(batch, child);
             }
         }
+    }
+
+    private TransformComponent getWorldTransform(GameObject gameObject) {
+        getWorldLocAround(gameObject, points[LB], -0.5f, -0.5f);
+        getWorldLocAround(gameObject, points[LT],-0.5f, 0.5f);
+        getWorldLocAround(gameObject, points[RT],0.5f, 0.5f);
+        getWorldLocAround(gameObject, points[RB],0.5f, -0.5f);
+
+        vec.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]); // midpoint
+        transformComponent.position.set(vec);
+        vec.set(points[RT]).sub(points[LB]);
+        transformComponent.scale.set(points[RT].dst(points[LT]), points[RT].dst(points[RB]));
+        vec.set(points[RT]).sub(points[LT]).angleDeg();
+        transformComponent.rotation = vec.angleDeg();
+
+        return transformComponent;
+    }
+
+    private Vector2 getWorldLocAround(GameObject gameObject, Vector2 point, float x, float y) {
+        point.set(x, y);
+        TransformComponent.localToWorld(gameObject, point);
+
+        return point;
     }
 }

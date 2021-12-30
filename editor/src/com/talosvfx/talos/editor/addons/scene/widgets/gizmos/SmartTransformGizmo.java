@@ -286,15 +286,14 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
     private void transformOldToNew () {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 
-        // rotate the rectangle around that pivot point
-        //transform.rotation += nextRotation - prevRotation;
-        //transform.rotation = lowerPrecision(transform.rotation);
-        // set proper scale
+        // bring old next points to local space
+        for(int i = 0; i < 4; i++) {
+            TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
+        }
+
         transform.scale.set(nextPoints[RB].dst(nextPoints[LB]), nextPoints[LB].dst(nextPoints[LT]));
         transform.scale = lowerPrecision(transform.scale);
-        // adjusts centers so they match
         tmp.set(nextPoints[RT]).sub(nextPoints[LB]).scl(0.5f).add(nextPoints[LB]); // this is midpoint
-        transform.position.set(tmp); // it's negative so we sub to add
         transform.position = lowerPrecision(transform.position);
     }
 
@@ -319,7 +318,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
     private void setRectFromPoints (Vector2[] pointArray) {
         for (int i = 0; i < 4; i++) {
             pointArray[i].set(points[i]);
-            TransformComponent.worldToLocal(gameObject.parent, pointArray[i]);
+            //TransformComponent.worldToLocal(gameObject.parent, pointArray[i]);
         }
     }
 }
