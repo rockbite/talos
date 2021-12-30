@@ -141,6 +141,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
+    public GameObject getSelfObject () {
+        return this;
+    }
+
+    @Override
     public void setParent (GameObject gameObject) {
         parent = gameObject;
     }

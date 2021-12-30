@@ -338,12 +338,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     private void drawMainRenderer (Batch batch, float parentAlpha) {
-        if(currentContainer instanceof GameObject) {
-            renderer.render(batch, (GameObject) currentContainer);
-        } else if(currentContainer instanceof Scene) {
-            Scene scene = (Scene) currentContainer;
-            renderer.render(batch, scene.root);
-        }
+        renderer.render(batch, currentContainer.getSelfObject());
     }
 
     public void setAddon (SceneEditorAddon sceneEditorAddon) {
@@ -650,13 +645,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public void repositionGameObject (GameObject parentToMoveTo, GameObject childThatHasMoved) {
         if(parentToMoveTo == null) {
-            if(currentContainer instanceof Scene) {
-                parentToMoveTo = ((Scene)currentContainer).root;
-            } else if (currentContainer instanceof GameObject){
-                parentToMoveTo = (GameObject) currentContainer;
-            } else {
-                return;
-            }
+            parentToMoveTo = currentContainer.getSelfObject();
         }
 
         if(childThatHasMoved.parent != null) {

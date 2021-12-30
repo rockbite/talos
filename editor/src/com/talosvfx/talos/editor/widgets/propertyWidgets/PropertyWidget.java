@@ -9,7 +9,7 @@ import com.talosvfx.talos.TalosMain;
 
 public abstract class PropertyWidget<T> extends Table {
 
-	private Label propertyName;
+	protected Label propertyName;
 	protected Table valueContainer;
 	protected T value;
 
@@ -25,11 +25,20 @@ public abstract class PropertyWidget<T> extends Table {
 
 	protected void build(String name) {
 		if(name != null) {
+
 			propertyName = new Label(name + ":", TalosMain.Instance().getSkin());
-			add(propertyName).left();
 			propertyName.setAlignment(Align.left);
 			valueContainer = new Table();
-			add(valueContainer).right().expandX().minWidth(170);
+
+			if (isFullSize()) {
+				add(propertyName).left().growX();
+				row();
+				add(valueContainer).growX();
+			} else {
+				add(propertyName).left();
+				add(valueContainer).right().expandX().minWidth(170);
+			}
+
 			addToContainer(getSubWidget());
 		} else {
 			add(getSubWidget()).growX();
@@ -53,5 +62,9 @@ public abstract class PropertyWidget<T> extends Table {
 
 	public void valueChanged(T value) {
 		// do no thing
+	}
+
+	protected boolean isFullSize() {
+		return false;
 	}
 }

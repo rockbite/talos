@@ -19,5 +19,6 @@ public interface GameObjectContainer {
     void clearChildren (Array<GameObject> tmp);
 
     GameObject getParent();
+    GameObject getSelfObject();
     void setParent(GameObject gameObject);
 }

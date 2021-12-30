@@ -3,10 +3,10 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.ItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
@@ -18,8 +18,13 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
 
     public GameObject root;
 
-    public Scene() {
+    public Array<String> layers = new Array<>();
 
+    public Scene() {
+        layers.clear();
+        layers.add("Default");
+        layers.add("UI");
+        layers.add("Misc");
     }
 
     public Scene(String path) {
@@ -71,6 +76,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     @Override
     public GameObject getParent () {
         return null;
+    }
+
+    @Override
+    public GameObject getSelfObject () {
+        return root;
     }
 
     @Override
@@ -128,6 +138,12 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
             }
             json.writeArrayEnd();
 
+            json.writeArrayStart("layers");
+            for (String layer : layers) {
+                json.writeValue(layer);
+            }
+            json.writeArrayEnd();
+
             String finalString = stringWriter.toString() + "}";
 
             return finalString;
@@ -151,6 +167,15 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
         for(JsonValue gameObjectJson: gameObjectsJson) {
             GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
             root.addGameObject(gameObject);
+        }
+
+
+        JsonValue layersJson = jsonValue.get("layers");
+        if(layersJson != null) {
+            layers.clear();
+            for (JsonValue layerJson : layersJson) {
+                layers.add(layerJson.asString());
+            }
         }
     }
 
@@ -176,7 +201,29 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
             }
         };
 
+        ItemListWidget itemListWidget = new ItemListWidget("Layers") {
+            @Override
+            public Array<ItemData> getValue () {
+                Array<ItemData> list = new Array<>();
+                for(String layerName: layers) {
+                    list.add(new ItemData(layerName));
+                }
+                return list;
+            }
+
+            @Override
+            public void valueChanged (Array<ItemData> value) {
+                layers.clear();
+                for(ItemData item: value) {
+                    layers.add(item.text);
+                }
+                TalosMain.Instance().ProjectController().setDirty();
+            }
+        };
+        itemListWidget.defaultItemName = "New Layer";
+
         properties.add(labelWidget);
+        properties.add(itemListWidget);
 
         return properties;
     }

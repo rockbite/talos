@@ -290,6 +290,9 @@ public class FilteredTree<T> extends WidgetGroup {
                         float yAlpha = y / getActor().getHeight();
 
                         if (yAlpha > 0.3f && yAlpha < 0.7f) {
+                            if(payloadNode.draggableInLayerOnly) {
+                               return false;
+                            }
                             //We are adding as a child, if we are not draggable, we ignore
                             if (previousSelected != null) {
                                 previousSelected.underline = false;
@@ -390,10 +393,12 @@ public class FilteredTree<T> extends WidgetGroup {
                         }
                     } else {
                         //Always put it as a child
-                        node.insert(0, payloadNode);
-                        node.setExpanded(true);
+                        if(!node.draggableInLayerOnly) {
+                            node.insert(0, payloadNode);
+                            node.setExpanded(true);
 
-                        onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
+                            onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
+                        }
                     }
                 }
 
