@@ -647,4 +647,24 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             openScene(scene);
         }
     }
+
+    public void repositionGameObject (GameObject parentToMoveTo, GameObject childThatHasMoved) {
+        if(parentToMoveTo == null) {
+            if(currentContainer instanceof Scene) {
+                parentToMoveTo = ((Scene)currentContainer).root;
+            } else if (currentContainer instanceof GameObject){
+                parentToMoveTo = (GameObject) currentContainer;
+            } else {
+                return;
+            }
+        }
+
+        if(childThatHasMoved.parent != null) {
+            childThatHasMoved.parent.removeObject(childThatHasMoved);
+        }
+
+        parentToMoveTo.addGameObject(childThatHasMoved);
+
+        TalosMain.Instance().ProjectController().setDirty();
+    }
 }

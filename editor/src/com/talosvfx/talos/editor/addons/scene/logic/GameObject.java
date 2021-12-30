@@ -111,6 +111,22 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
+    public void removeObject (GameObject gameObject) {
+        if(children == null) {
+            return;
+        }
+
+        String name = gameObject.getName();
+        if(childrenMap.containsKey(name)) {
+            GameObject objectToRemove = childrenMap.get(name);
+            childrenMap.remove(name);
+            children.removeValue(objectToRemove, true);
+        }
+
+        if(children.isEmpty()) children = null;
+    }
+
+    @Override
     public void clearChildren (Array<GameObject> tmp) {
         if(children == null) return;
         tmp.addAll(children);

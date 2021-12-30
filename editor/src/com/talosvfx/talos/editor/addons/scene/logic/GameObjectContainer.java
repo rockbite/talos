@@ -11,6 +11,7 @@ public interface GameObjectContainer {
     Iterable<IComponent> getComponents();
     void addGameObject(GameObject gameObject);
     Array<GameObject> deleteGameObject(GameObject gameObject);
+    void removeObject(GameObject gameObject);
     void addComponent(IComponent component);
 
     boolean hasGOWithName (String name);

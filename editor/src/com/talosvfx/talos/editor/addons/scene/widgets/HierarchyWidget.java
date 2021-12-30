@@ -34,6 +34,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
     public HierarchyWidget() {
         tree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
+        tree.draggable = true;
         //tree.getSelection().setMultiple(true);
 
         add(tree).grow().pad(5).padRight(0);
@@ -74,6 +75,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
                 }
                 SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
+            }
+
+            @Override
+            public void onNodeMove (FilteredTree.Node parentToMoveTo, FilteredTree.Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+                if(parentToMoveTo != null) {
+                    GameObject parent = objectMap.get(parentToMoveTo.getName());
+                    GameObject child = objectMap.get(childThatHasMoved.getName());
+                    SceneEditorAddon.get().workspace.repositionGameObject(parent, child);
+                }
             }
         });
 
@@ -207,9 +217,10 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         nodeMap.clear();
 
         FilteredTree.Node parent = new FilteredTree.Node("root", new Label(entityContainer.getName(), TalosMain.Instance().getSkin()));
-        tree.add(parent);
 
         traverseEntityContainer(entityContainer, parent);
+
+        tree.add(parent);
 
         tree.expandAll();
 
@@ -225,6 +236,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             final GameObject gameObject = gameObjects.get(i);
             EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
             FilteredTree.Node newNode = new FilteredTree.Node(gameObject.getName(), editableLabel);
+            newNode.draggable = true;
             node.add(newNode);
 
             editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {

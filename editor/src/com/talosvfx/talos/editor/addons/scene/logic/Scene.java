@@ -49,6 +49,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     @Override
+    public void removeObject (GameObject gameObject) {
+        root.removeObject(gameObject);
+    }
+
+    @Override
     public void addComponent (IComponent component) {
 
     }

@@ -31,7 +31,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
-public class EditableLabel extends Table {
+public class EditableLabel extends Table implements ActorCloneable {
 
     private Table labelTable;
     private Table inputTable;
@@ -191,5 +191,11 @@ public class EditableLabel extends Table {
     public void setAlignment (int alignment) {
         label.setAlignment(alignment);
         textField.setAlignment(alignment);
+    }
+
+    @Override
+    public Actor copyActor (Actor copyFrom) {
+        Label label = new Label(this.label.getText(), getSkin());
+        return label;
     }
 }

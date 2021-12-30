@@ -67,7 +67,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private Skin skin;
 
-    private boolean draggable;
+    public boolean draggable;
     private int autoSelectionIndex = 0;
 
     public FilteredTree (Skin skin) {
@@ -91,6 +91,10 @@ public class FilteredTree<T> extends WidgetGroup {
         public void delete (Array<FilteredTree.Node> nodes) {
 
         }
+
+        public void onNodeMove (Node parentToMoveTo, Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+
+        }
     }
 
     public void setItemListener(ItemListener itemListener) {
@@ -99,6 +103,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     public FilteredTree (Skin skin, String styleName) {
         this(skin.get(styleName, TreeStyle.class));
+        this.skin = skin;
     }
 
     public FilteredTree (TreeStyle style) {
@@ -233,7 +238,7 @@ public class FilteredTree<T> extends WidgetGroup {
     public void add (Node<T> node) {
         insert(rootNodes.size, node);
 
-        if (draggable && node.draggable) {
+        if (draggable) {
             addSource(node);
         }
     }
@@ -241,173 +246,177 @@ public class FilteredTree<T> extends WidgetGroup {
     private Node<T> previousSelected;
 
     private void addSource (final Node<T> node) {
-        node.actor.setUserObject(node);
+        if(node.draggable) {
 
-        DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
-            @Override
-            public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
-                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+            node.actor.setUserObject(node);
 
-                Actor dragging;
+            DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
+                @Override
+                public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                if (node.actor instanceof ActorCloneable) {
-                    dragging = ((ActorCloneable)node.actor).copyActor(node.actor);
-                } else {
-                    dragging = new Label("Dragging label", skin);
+                    Actor dragging;
+
+                    if (node.actor instanceof ActorCloneable) {
+                        dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
+                    } else {
+                        dragging = new Label("Dragging label", skin);
+                    }
+
+                    payload.setDragActor(dragging);
+                    payload.setObject(node);
+
+                    return payload;
                 }
+            };
+            rootDrag.addSource(dragSource);
+            DragAndDrop.Target targetSource = new DragAndDrop.Target(node.actor) {
+                @Override
+                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 
-                payload.setDragActor(dragging);
-                payload.setObject(node);
+                    Actor actor = getActor();
 
-                return payload;
-            }
-        };
-        rootDrag.addSource(dragSource);
-        DragAndDrop.Target targetSource = new DragAndDrop.Target(node.actor) {
-            @Override
-            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                Actor actor = getActor();
-
-                if (actor == source.getActor()) {
-                    return false;
-                }
-
-                Node<T> payloadNode = (Node<T>)payload.getObject();
-                if (payloadNode.draggableInLayerOnly) {
-                    if (payloadNode.getParent() != ((Node<T>)actor.getUserObject()).getParent()) {
+                    if (actor == source.getActor()) {
                         return false;
                     }
 
-
-                    float yAlpha = y/getActor().getHeight();
-
-                    if (yAlpha > 0.3f && yAlpha < 0.7f) {
-                        //We are adding as a child, if we are not draggable, we ignore
-                        if (previousSelected != null) {
-                            previousSelected.underline = false;
-                            previousSelected = ((Node<T>)actor.getUserObject());
+                    Node<T> payloadNode = (Node<T>) payload.getObject();
+                    if (payloadNode.draggableInLayerOnly) {
+                        if (payloadNode.getParent() != ((Node<T>) actor.getUserObject()).getParent()) {
+                            return false;
                         }
-                        return false;
+
+
+                        float yAlpha = y / getActor().getHeight();
+
+                        if (yAlpha > 0.3f && yAlpha < 0.7f) {
+                            //We are adding as a child, if we are not draggable, we ignore
+                            if (previousSelected != null) {
+                                previousSelected.underline = false;
+                                previousSelected = ((Node<T>) actor.getUserObject());
+                            }
+                            return false;
+                        }
                     }
+
+                    if (previousSelected == null) {
+                        previousSelected = ((Node<T>) actor.getUserObject());
+                    } else if (previousSelected != actor.getUserObject()) {
+                        previousSelected.underline = false;
+                        previousSelected = ((Node<T>) actor.getUserObject());
+                    }
+
+                    if (previousSelected != null) {
+                        float yAlpha = y / getActor().getHeight();
+                        previousSelected.yAlpha = yAlpha;
+                        previousSelected.underline = true;
+                    }
+
+                    return true;
                 }
 
-                if (previousSelected == null) {
-                    previousSelected = ((Node<T>)actor.getUserObject());
-                } else if (previousSelected != actor.getUserObject()) {
-                    previousSelected.underline = false;
-                    previousSelected = ((Node<T>)actor.getUserObject());
-                }
+                @Override
+                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    Actor targetActor = getActor();
+                    Object userObject = targetActor.getUserObject();
 
-                if (previousSelected != null) {
-                    float yAlpha = y/getActor().getHeight();
-                    previousSelected.yAlpha = yAlpha;
-                    previousSelected.underline = true;
-                }
+                    Node<T> node = ((Node) userObject);
+                    Node<T> parent = node.getParent();
+                    Node<T> targetNodeToDrop = (Node) payload.getObject();
 
-                return true;
-            }
+                    int indexInParent = -1;
 
-            @Override
-            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-                Object userObject = targetActor.getUserObject();
+                    indexInParent = getIndexInParent(node, parent);
 
-                Node<T> node = ((Node)userObject);
-                Node<T> parent = node.getParent();
-                Node<T> targetNodeToDrop = (Node)payload.getObject();
+                    Node<T> payloadParent = targetNodeToDrop.getParent();
+                    Node<T> payloadNode = targetNodeToDrop;
 
-                int indexInParent = -1;
-
-                indexInParent = getIndexInParent(node, parent);
-
-                Node<T> payloadParent = targetNodeToDrop.getParent();
-                Node<T> payloadNode = targetNodeToDrop;
-
-                boolean sameLayer = payloadParent == node.getParent();
+                    boolean sameLayer = payloadParent == node.getParent();
 
 
-                //Lets check if its valid first before continuing
+                    //Lets check if its valid first before continuing
 
-                float yAlpha = y/getActor().getHeight();
+                    float yAlpha = y / getActor().getHeight();
 
-                int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
+                    int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
 
-                payloadNode.remove();
+                    payloadNode.remove();
 
-                if (yAlpha < 0.3f) {
-                    //Always put it below current
+                    if (yAlpha < 0.3f) {
+                        //Always put it below current
 
-                    if (sameLayer) {
-                        if (indexOfPayloadInParent > indexInParent) {
-                            //We are below it, doesnt change the index of the target
+                        if (sameLayer) {
+                            if (indexOfPayloadInParent > indexInParent) {
+                                //We are below it, doesnt change the index of the target
+                            } else {
+                                //We are above it, removing this node will pop the index of the child back
+                                indexInParent -= 1;
+                            }
                         } else {
-                            //We are above it, removing this node will pop the index of the child back
-                            indexInParent -= 1;
+                            //Always going to be the index of the component
                         }
-                    } else {
-                        //Always going to be the index of the component
-                    }
 
-                    if (parent != null) {
-                        indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
-                        parent.insert(indexInParent, payloadNode);
-                        onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                    } else {
-                        indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
-                        insert(indexInParent, payloadNode);
-                        onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
-                    }
-                } else if (yAlpha > 0.7f) {
-                    //Always put it above
-
-                    if (sameLayer) {
-                        if (indexOfPayloadInParent > indexInParent) {
-                            //We are below it, doesnt change the index of the target
+                        if (parent != null) {
+                            indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
+                            parent.insert(indexInParent, payloadNode);
+                            onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
                         } else {
-                            //We are above it, removing this node will pop the index of the child back
-                            indexInParent -= 1;
+                            indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
+                            insert(indexInParent, payloadNode);
+                            onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
+                        }
+                    } else if (yAlpha > 0.7f) {
+                        //Always put it above
+
+                        if (sameLayer) {
+                            if (indexOfPayloadInParent > indexInParent) {
+                                //We are below it, doesnt change the index of the target
+                            } else {
+                                //We are above it, removing this node will pop the index of the child back
+                                indexInParent -= 1;
+                            }
+                        } else {
+                            //Always going to be the index of the component
+                        }
+
+                        if (parent != null) {
+                            indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
+                            parent.insert(indexInParent, payloadNode);
+                            onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
+                        } else {
+                            indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
+                            insert(indexInParent, payloadNode);
+                            onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
                         }
                     } else {
-                        //Always going to be the index of the component
+                        //Always put it as a child
+                        node.insert(0, payloadNode);
+                        node.setExpanded(true);
+
+                        onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
                     }
+                }
 
-                    if (parent != null) {
-                        indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
-                        parent.insert(indexInParent, payloadNode);
-                        onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                    } else {
-                        indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
-                        insert(indexInParent, payloadNode);
-                        onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
+                @Override
+                public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                    if (previousSelected != null) {
+                        previousSelected.underline = false;
+                        previousSelected = null;
                     }
-                } else {
-                    //Always put it as a child
-                    node.insert(0, payloadNode);
-                    node.setExpanded(true);
-
-                    onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
                 }
-            }
-
-            @Override
-            public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                if (previousSelected != null) {
-                    previousSelected.underline = false;
-                    previousSelected = null;
-                }
-            }
-        };
-        rootDrag.addTarget(targetSource);
+            };
+            rootDrag.addTarget(targetSource);
+        }
         for (Node child : node.children) {
             addSource(child);
         }
     }
 
     protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
-
+        if(itemListener != null) {
+            itemListener.onNodeMove(parentToMoveTo, childThatHasMoved, indexInParent, indexOfPayloadInPayloadBefore);
+        }
     }
-
 
 
     private int getIndexInParent (Node<T> node, Node<T> parent) {
