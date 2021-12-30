@@ -78,14 +78,14 @@ public class MainRenderer {
             Vector2 renderPosition = vec;
 
             if(spriteRenderer.getTexture() != null) {
-                batch.setColor(Color.WHITE);
-
+                batch.setColor(spriteRenderer.color);
                 batch.draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
                         transformComponent.rotation);
+                batch.setColor(Color.WHITE);
             }
         }
     }

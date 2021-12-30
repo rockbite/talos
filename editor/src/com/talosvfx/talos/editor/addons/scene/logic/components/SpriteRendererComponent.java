@@ -92,7 +92,7 @@ public class SpriteRendererComponent implements IComponent, Json.Serializable {
         if(file.exists()) {
             texture = new TextureRegion(new Texture(file));
         } else {
-            texture = TalosMain.Instance().getSkin().getRegion("vis-red");
+            texture = TalosMain.Instance().getSkin().getRegion("white");
         }
     }
 

@@ -386,7 +386,13 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
                     return;
                 }
                 if(closestComponent.orderingInLayer == component.orderingInLayer) {
-                    closestComponent.orderingInLayer-=direction;
+                    if(direction == -1) {
+                        closestComponent.orderingInLayer++;
+                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
+                    } else if(direction == 1) {
+                        component.orderingInLayer++;
+                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+                    }
                 } else {
                     // swap
                     int tmp = component.orderingInLayer;
@@ -394,8 +400,9 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
                     closestComponent.orderingInLayer = tmp;
 
                     Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
                 }
-                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
+
             }
         }
     }
