@@ -39,10 +39,10 @@ public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
                     float x = Float.parseFloat(xField.getText());
                     float y = Float.parseFloat(yField.getText());
                     vec.set(x, y);
-                    valueChanged(vec);
+                    callValueChanged(vec);
                 } catch (NumberFormatException e){
                     vec.set(0, 0);
-                    valueChanged(vec);
+                    callValueChanged(vec);
                 }
             }
         };

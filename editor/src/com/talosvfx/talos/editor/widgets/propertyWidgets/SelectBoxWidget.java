@@ -35,7 +35,7 @@ public abstract class SelectBoxWidget extends PropertyWidget<String> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 String newValue = selectBox.getSelected();
-                valueChanged(newValue);
+                callValueChanged(newValue);
             }
         };
         selectBox.addListener(listener);

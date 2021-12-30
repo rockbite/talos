@@ -269,6 +269,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     TalosMain.Instance().ProjectController().redo();
                 }
 
+                for(Gizmo gizmo: gizmoList) {
+                    if(gizmo.isSelected()) {
+                        gizmo.keyDown(event, keycode);
+                    }
+                }
+
                 return super.keyDown(event, keycode);
             }
         });
@@ -655,5 +661,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         parentToMoveTo.addGameObject(childThatHasMoved);
 
         TalosMain.Instance().ProjectController().setDirty();
+    }
+
+    public Array<String> getLayerList () {
+        if(currentContainer instanceof Scene) {
+            Scene scene = (Scene) currentContainer;
+            return scene.layers;
+        }
+        return new Array<>();
+    }
+
+    public GameObject getRootGO () {
+        return currentContainer.getSelfObject();
     }
 }

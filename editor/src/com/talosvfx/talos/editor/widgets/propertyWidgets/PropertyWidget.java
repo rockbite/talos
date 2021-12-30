@@ -60,6 +60,12 @@ public abstract class PropertyWidget<T> extends Table {
 
 	public abstract void updateWidget(T value);
 
+
+	protected void callValueChanged (T value) {
+		valueChanged(value);
+		TalosMain.Instance().ProjectController().setDirty();
+	}
+
 	public void valueChanged(T value) {
 		// do no thing
 	}

@@ -5,27 +5,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
 
-public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
+public abstract class IntPropertyWidget extends PropertyWidget<Integer> {
 
     private TextField textField;
 
-    public FloatPropertyWidget(String name) {
+    public IntPropertyWidget(String name) {
         super(name);
     }
 
     @Override
     public Actor getSubWidget() {
         textField = new TextField("", TalosMain.Instance().getSkin(), "panel");
-        textField.setTextFieldFilter(new FloatFieldFilter());
+        textField.setTextFieldFilter(new IntFieldFilter());
 
         listener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(textField.getText().isEmpty()) return;
                 try {
-                    callValueChanged(Float.parseFloat(textField.getText()));
+                    callValueChanged(Integer.parseInt(textField.getText()));
                 } catch (NumberFormatException e){
-                    callValueChanged(0f);
+                    callValueChanged(0);
                 }
             }
         };
@@ -34,13 +34,13 @@ public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
     }
 
     @Override
-    public void updateWidget(Float value) {
+    public void updateWidget(Integer value) {
         textField.removeListener(listener);
         textField.setText(value + "");
         textField.addListener(listener);
     }
 
-    public void setValue(float value) {
+    public void setValue(int value) {
         textField.setText(value + "");
         this.value = value;
     }

@@ -32,6 +32,7 @@ public class ColorLibrary {
         DARK_GRAY ("#3a3a3a"),
         BLACK_TRANSPARENT ("#2a2a2add"),
         RED ("#92313a"),
+        // fifty shades of grey :D
 
         LIGHT_BLUE ("#5b86ae"),
 

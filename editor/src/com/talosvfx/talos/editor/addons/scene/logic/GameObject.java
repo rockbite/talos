@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -239,5 +240,19 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         GameObject gameObject = childrenMap.get(oldName);
         childrenMap.remove(oldName);
         childrenMap.put(name, gameObject);
+    }
+
+    public Array<GameObject> getChildrenByComponent (Class<? extends IComponent> clazz, Array<GameObject> list) {
+        if(children == null) return list;
+        for(GameObject gameObject: children) {
+            if(gameObject.hasComponent(clazz)) {
+                list.add(gameObject);
+            }
+            if(gameObject.getGameObjects() != null && gameObject.getGameObjects().size > 0) {
+                gameObject.getChildrenByComponent(clazz, list);
+            }
+        }
+
+        return list;
     }
 }

@@ -1,12 +1,17 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
@@ -319,6 +324,79 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         for (int i = 0; i < 4; i++) {
             pointArray[i].set(points[i]);
             //TransformComponent.worldToLocal(gameObject.parent, pointArray[i]);
+        }
+    }
+
+    @Override
+    public void keyDown (InputEvent event, int keycode) {
+
+        if(keycode == Input.Keys.DOWN && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            moveInLayerOrder(gameObject, -1);
+        }
+
+        if(keycode == Input.Keys.UP && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            moveInLayerOrder(gameObject, 1);
+        }
+
+    }
+
+    private void moveInLayerOrder (GameObject gameObject, int direction) {
+        // direction -1 for down, 1 for up
+        if(gameObject.hasComponent(SpriteRendererComponent.class)) {
+            SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
+            String sortingLayer = component.sortingLayer;
+
+            Array<GameObject> list = SceneEditorAddon.get().workspace.getRootGO().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
+            for(int i = list.size - 1; i >= 0; i--) {
+                if(!list.get(i).getComponent(SpriteRendererComponent.class).sortingLayer.equals(sortingLayer)) {
+                    list.removeIndex(i);
+                }
+            }
+
+            // find closest game object if any that is lower to my index, and swap with it
+            if(list.size > 1) {
+                GameObject closest = list.first();
+                if(list.first() == gameObject) {
+                    closest = list.get(1);
+                }
+                int origDst = component.orderingInLayer - closest.getComponent(SpriteRendererComponent.class).orderingInLayer;
+
+                for(GameObject candidate: list) {
+                    int dst = component.orderingInLayer - candidate.getComponent(SpriteRendererComponent.class).orderingInLayer;
+                    boolean matchesDirection = false;
+                    boolean matchesDirectionEquals = false;
+                    if(direction == -1 && dst >= 0) matchesDirectionEquals = true;
+                    if(direction == 1 && dst <= 0) matchesDirectionEquals = true;
+                    if(direction == -1 && origDst > dst) matchesDirection = true;
+                    if(direction == 1 && origDst < dst) matchesDirection = true;
+
+                    if(matchesDirectionEquals && candidate != gameObject) {
+                        if(matchesDirection) {
+                            origDst = dst;
+                            closest = candidate;
+                        }
+                    }
+                }
+
+                SpriteRendererComponent closestComponent = closest.getComponent(SpriteRendererComponent.class);
+                if(closestComponent.orderingInLayer > component.orderingInLayer && direction == -1) {
+                    return;
+                }
+                if(closestComponent.orderingInLayer < component.orderingInLayer && direction == 1) {
+                    return;
+                }
+                if(closestComponent.orderingInLayer == component.orderingInLayer) {
+                    closestComponent.orderingInLayer-=direction;
+                } else {
+                    // swap
+                    int tmp = component.orderingInLayer;
+                    component.orderingInLayer = closestComponent.orderingInLayer;
+                    closestComponent.orderingInLayer = tmp;
+
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+                }
+                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
+            }
         }
     }
 }

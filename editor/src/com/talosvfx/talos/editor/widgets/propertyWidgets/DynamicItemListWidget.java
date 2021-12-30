@@ -14,13 +14,13 @@ import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 
-public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget.ItemData>> {
+public abstract class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListWidget.ItemData>> {
 
     private FilteredTree<Object> list;
 
     public String defaultItemName = "New Item";
 
-    public ItemListWidget(String name) {
+    public DynamicItemListWidget (String name) {
         super(name);
     }
 
@@ -30,7 +30,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
     }
 
     @Override
-    public Array<ItemListWidget.ItemData> getValue () {
+    public Array<DynamicItemListWidget.ItemData> getValue () {
         return null;
     }
 
@@ -54,7 +54,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
         list.setItemListener(new FilteredTree.ItemListener() {
             @Override
             public void onNodeMove (FilteredTree.Node parentToMoveTo, FilteredTree.Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
-                valueChanged(makeDataArray());
+                callValueChanged(makeDataArray());
             }
 
             @Override
@@ -86,7 +86,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
                     node = addNode(newItemData);
                 }
 
-                valueChanged(makeDataArray());
+                callValueChanged(makeDataArray());
 
                 EditableLabel label = (EditableLabel) node.getActor();
                 label.setEditMode();
@@ -122,7 +122,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
                 selection.add(rootNodes.get(index));
             }
 
-            valueChanged(makeDataArray());
+            callValueChanged(makeDataArray());
         }
     }
 
@@ -142,7 +142,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
             public void changed (String newText) {
-                valueChanged(makeDataArray());
+                callValueChanged(makeDataArray());
             }
         });
         FilteredTree.Node node = new FilteredTree.Node(itemData.id, editableLabel);
@@ -167,7 +167,7 @@ public abstract class ItemListWidget extends PropertyWidget<Array<ItemListWidget
     }
 
     @Override
-    public void updateWidget (Array<ItemListWidget.ItemData> value) {
+    public void updateWidget (Array<DynamicItemListWidget.ItemData> value) {
         list.clearChildren();
         for(ItemData item: value) {
             addNode(item);

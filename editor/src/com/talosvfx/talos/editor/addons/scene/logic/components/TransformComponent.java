@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 public class TransformComponent implements IComponent {
     public Vector2 position = new Vector2();
@@ -21,41 +22,9 @@ public class TransformComponent implements IComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        Vector2PropertyWidget positionWidget = new Vector2PropertyWidget("Position") {
-            @Override
-            public Vector2 getValue () {
-                return position;
-            }
-
-            @Override
-            public void valueChanged (Vector2 value) {
-                position.set(value);
-            }
-        };
-
-        FloatPropertyWidget rotationWidget = new FloatPropertyWidget("Rotation") {
-            @Override
-            public Float getValue () {
-                return rotation;
-            }
-
-            @Override
-            public void valueChanged (Float value) {
-                TransformComponent.this.rotation = value;
-            }
-        };
-
-        Vector2PropertyWidget scaleWidget = new Vector2PropertyWidget("Scale") {
-            @Override
-            public Vector2 getValue () {
-                return scale;
-            }
-
-            @Override
-            public void valueChanged (Vector2 value) {
-                scale.set(value);
-            }
-        };
+        PropertyWidget positionWidget = WidgetFactory.generate(this, "position", "Position");
+        PropertyWidget rotationWidget = WidgetFactory.generate(this, "rotation", "Position");
+        PropertyWidget scaleWidget = WidgetFactory.generate(this, "scale", "Position");
 
         properties.add(positionWidget);
         properties.add(rotationWidget);

@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ItemListWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
@@ -201,7 +201,7 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
             }
         };
 
-        ItemListWidget itemListWidget = new ItemListWidget("Layers") {
+        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers") {
             @Override
             public Array<ItemData> getValue () {
                 Array<ItemData> list = new Array<>();
@@ -217,7 +217,6 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
                 for(ItemData item: value) {
                     layers.add(item.text);
                 }
-                TalosMain.Instance().ProjectController().setDirty();
             }
         };
         itemListWidget.defaultItemName = "New Layer";

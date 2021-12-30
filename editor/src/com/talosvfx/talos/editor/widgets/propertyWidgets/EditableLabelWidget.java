@@ -22,7 +22,7 @@ public abstract class EditableLabelWidget extends PropertyWidget<String> {
         propertyValue.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
             public void changed (String newText) {
-                valueChanged(newText);
+                callValueChanged(newText);
             }
         });
 

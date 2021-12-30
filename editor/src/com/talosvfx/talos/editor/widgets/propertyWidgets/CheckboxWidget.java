@@ -27,7 +27,7 @@ public abstract class CheckboxWidget extends PropertyWidget<Boolean> {
 		listener = new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				valueChanged(checkBox.isChecked());
+				callValueChanged(checkBox.isChecked());
 			}
 		};
 		checkBox.addListener(listener);
