@@ -20,14 +20,14 @@ public class BvbProject implements IProject {
     }
 
     @Override
-    public void loadProject (FileHandle projectFileHandle, String data) {
+    public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
         bvBAddon.workspace.read(json, jsonValue);
     }
 
     @Override
-    public String getProjectString() {
+    public String getProjectString(boolean toMemory) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(bvBAddon.workspace);

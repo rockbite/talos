@@ -4,9 +4,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
 public interface IProject {
-    void loadProject(FileHandle projectFileHandle, String data);
+    void loadProject(FileHandle projectFileHandle, String data, boolean fromMemory);
 
-    String getProjectString();
+    String getProjectString(boolean toMemory);
 
     void resetToNew();
 

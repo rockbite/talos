@@ -94,9 +94,18 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
         path = jsonData.getString("path");
     }
 
-    public void save () {
+    public void save() {
+        FileHandle file = Gdx.files.absolute(path);
+
+        String data = getAsString();
+
+        file.writeString(data, false);
+    }
+
+    public String getAsString () {
         try {
             FileHandle file = Gdx.files.absolute(path);
+            String name = file.nameWithoutExtension();
 
             StringWriter stringWriter = new StringWriter();
             Json json = new Json();
@@ -104,37 +113,34 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
             json.setWriter(stringWriter);
             json.getWriter().object();
 
-            save(json);
+            json.writeValue("name", name);
+            json.writeArrayStart("gameObjects");
+            Array<GameObject> gameObjects = getGameObjects();
+            if(gameObjects != null) {
+                for (GameObject gameObject : gameObjects) {
+                    json.writeValue(gameObject);
+                }
+            }
+            json.writeArrayEnd();
 
             String finalString = stringWriter.toString() + "}";
 
-            file.writeString(finalString, false);
+            return finalString;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
-    }
-
-    public void save(Json json) {
-        FileHandle file = Gdx.files.absolute(path);
-        String name = file.nameWithoutExtension();
-
-        json.writeValue("name", name);
-        json.writeArrayStart("gameObjects");
-        Array<GameObject> gameObjects = getGameObjects();
-        if(gameObjects != null) {
-            for (GameObject gameObject : gameObjects) {
-                json.writeValue(gameObject);
-            }
-        }
-        json.writeArrayEnd();
+        return "";
     }
 
     public void loadFromPath() {
-        Json json = new Json();
         FileHandle dataFile = Gdx.files.absolute(path);
-        JsonValue jsonValue = new JsonReader().parse(dataFile.readString());
+        loadFromJson(dataFile.readString());
+    }
 
+    public void loadFromJson(String data) {
+        JsonValue jsonValue = new JsonReader().parse(data);
+        Json json = new Json();
         JsonValue gameObjectsJson = jsonValue.get("gameObjects");
         root = new GameObject();
         for(JsonValue gameObjectJson: gameObjectsJson) {

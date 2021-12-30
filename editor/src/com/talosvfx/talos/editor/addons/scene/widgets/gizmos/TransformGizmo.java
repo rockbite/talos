@@ -12,56 +12,72 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 
 public class TransformGizmo extends Gizmo<TransformComponent> {
 
-    private static final int SIZE = 30; // pixels
-
     private Vector2 prevTouch = new Vector2();
     private Vector2 vec1 = new Vector2();
+    private boolean wasDragged = false;
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
-        TextureRegion region = TalosMain.Instance().getSkin().getRegion("ic-target");
-        float size = SIZE * worldPerPixel;
+        if(gameObject.hasComponent(TransformComponent.class)) {
+            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+            transform.localToWorld(gameObject, tmp.set(0, 0));
 
-        if(selected) {
-            batch.setColor(Color.ORANGE);
+            // drawing position point
+            if(selected) {
+                drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.ORANGE, 30);
+            } else {
+                drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.WHITE, 30);
+            }
         }
 
-        batch.draw(region, getX() - size / 2f, getY() - size / 2f, size, size);
+
+
+    }
+
+    private void drawPoint(Batch batch, TextureRegion region, Vector2 pos, Color color, int size) {
+        float finalSize = size * worldPerPixel;
+        batch.setColor(color);
+
+        batch.draw(region, pos.x - finalSize / 2f, pos.y - finalSize / 2f, finalSize, finalSize);
 
         batch.setColor(Color.WHITE);
     }
 
     @Override
     void getHitBox (Rectangle rectangle) {
-        float size = SIZE * worldPerPixel;
+        float size = 30 * worldPerPixel;
         rectangle.set(getX() - size / 2f, getY() - size / 2f, size, size);
     }
 
     @Override
     public void touchDown (float x, float y, int button) {
+        wasDragged = false;
         prevTouch.set(x, y);
     }
 
     @Override
     public void touchDragged (float x, float y) {
         tmp.set(x, y).sub(prevTouch);
-
         // render position
-        vec1.set(0, 0);
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        transform.localToWorld(gameObject, vec1);
+        vec1.set(0, 0);
+        transform.localToWorld(gameObject.parent, vec1);
         vec1.add(tmp); // change diff
-        transform.worldToLocal(gameObject, vec1);
+        transform.worldToLocal(gameObject.parent, vec1);
         //vec1 is diff
-        component.position.add(vec1);
+        transform.position.add(vec1);
 
         prevTouch.set(x, y);
 
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component));
+        wasDragged = true;
+
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, true));
     }
 
     @Override
     public void touchUp (float x, float y) {
-
+        if(wasDragged) {
+            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component));
+        }
     }
 }

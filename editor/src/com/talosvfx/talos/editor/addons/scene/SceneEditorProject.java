@@ -18,20 +18,18 @@ public class SceneEditorProject implements IProject {
     }
 
     @Override
-    public void loadProject (FileHandle projectFileHandle, String data) {
+    public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
 
         sceneEditorAddon.workspace.readProjectPath(projectFileHandle, jsonValue);
-        sceneEditorAddon.workspace.read(json, jsonValue);
+
+        sceneEditorAddon.workspace.loadFromData(json, jsonValue, fromMemory);
     }
 
     @Override
-    public String getProjectString () {
-        Json json = new Json();
-        json.setOutputType(JsonWriter.OutputType.json);
-        String data = json.prettyPrint(sceneEditorAddon.workspace);
-        return data;
+    public String getProjectString (boolean toMemory) {
+        return sceneEditorAddon.workspace.saveData(toMemory);
     }
 
     @Override

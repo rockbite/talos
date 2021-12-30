@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 public class GizmoRegister {
@@ -12,8 +13,14 @@ public class GizmoRegister {
 
     public static void init() {
         map.put(TransformComponent.class, TransformGizmo.class);
+        map.put(SpriteRendererComponent.class, SmartTransformGizmo.class);
     }
 
+    /**
+     * todo: this needs pooling later
+     * @param component
+     * @return
+     */
     public static Gizmo makeGizmoFor (IComponent component) {
         if(map.containsKey(component.getClass())) {
             Class clazz = map.get(component.getClass());

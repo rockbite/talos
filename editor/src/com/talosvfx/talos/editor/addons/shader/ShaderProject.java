@@ -15,14 +15,14 @@ public class ShaderProject implements IProject {
     }
 
     @Override
-    public void loadProject (FileHandle projectFileHandle, String data) {
+    public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
         Json json = new Json();
         ProjectData projectData = json.fromJson(ProjectData.class, data);
         projectData.loadStage(shaderAddon.nodeStage);
     }
 
     @Override
-    public String getProjectString () {
+    public String getProjectString (boolean toMemory) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
 

@@ -15,6 +15,7 @@ public class TransformComponent implements IComponent {
     public Vector2 scale = new Vector2(1, 1);
 
     public static Array<GameObject> tmp = new Array<>();
+    public static Vector2 vec = new Vector2();
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -77,9 +78,10 @@ public class TransformComponent implements IComponent {
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 
-            vector.add(transform.position);
-            vector.rotateDeg(transform.rotation);
             vector.scl(transform.scale);
+            vector.rotateDeg(transform.rotation);
+
+            vector.add(transform.position);
 
             if(gameObject.parent != null) {
                 localToWorld(gameObject.parent, vector);
@@ -100,9 +102,10 @@ public class TransformComponent implements IComponent {
             if(item.hasComponent(TransformComponent.class)) {
                 TransformComponent transform = item.getComponent(TransformComponent.class);
 
-                vector.scl(1f/transform.scale.x, 1f/transform.scale.y);
-                vector.rotateDeg(-transform.rotation);
+
                 vector.sub(transform.position);
+                vector.rotateDeg(-transform.rotation);
+                vector.scl(1f/transform.scale.x, 1f/transform.scale.y);
             }
         }
 

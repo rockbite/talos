@@ -73,7 +73,9 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
         worldPerPixel = worldWidth / screenPixels;
     }
 
-    abstract void getHitBox(Rectangle rectangle);
+    void getHitBox(Rectangle rectangle) {
+
+    }
 
     public GameObject getGameObject() {
         return gameObject;

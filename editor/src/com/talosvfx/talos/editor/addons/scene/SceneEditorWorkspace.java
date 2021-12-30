@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 import java.io.File;
+import java.util.UUID;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
 
@@ -48,9 +49,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private Array<GameObject> selection = new Array<>();
     private MainRenderer renderer;
 
+    private String changeVersion = "";
+    private SnapshotService snapshotService;
+
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
+
+        snapshotService = new SnapshotService();
 
         GizmoRegister.init();
 
@@ -238,7 +244,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                 Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
 
-                if(gizmo == touchedGizmo && touchedGizmo != null) {
+                if(touchedGizmo != null) {
                     touchedGizmo.touchUp(hitCords.x, hitCords.y);
                 }
 
@@ -255,6 +261,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     deleteGameObjects(deleteList);
                 }
 
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().undo();
+                }
+
+                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    TalosMain.Instance().ProjectController().redo();
+                }
+
                 return super.keyDown(event, keycode);
             }
         });
@@ -262,16 +276,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @Override
     public void write (Json json) {
+
+        changeVersion = UUID.randomUUID().toString();
+
         if(projectPath != null) {
             json.writeValue("projectPath", projectPath);
             json.writeArrayStart("scenes");
             for(Scene scene: scenes) {
                 json.writeValue(scene);
-
-                // also let's save scene data, although not sure about that
-                scene.save();
             }
             json.writeArrayEnd();
+            json.writeValue("changeVersion", changeVersion);
         }
     }
 
@@ -287,27 +302,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        HierarchyWidget hierarchy = sceneEditorAddon.hierarchy;
+        changeVersion = jsonData.getString("changeVersion", "");
+
         ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
 
         if(projectPath == null || projectPath.isEmpty()) {
             projectPath = jsonData.getString("projectPath", "");
         }
         projectExplorer.loadDirectoryTree(projectPath);
-
-        JsonValue scenesJson = jsonData.get("scenes");
-        scenes.clear();
-        for(JsonValue sceneJson : scenesJson) {
-            Scene scene = json.readValue(Scene.class, sceneJson);
-            addScene(scene);
-            scene.loadFromPath();
-        }
-
-        if(!scenes.isEmpty()) {
-            Scene scene = scenes.first();
-            projectExplorer.select(scene.path);
-            openScene(scene);
-        }
     }
 
     @Override
@@ -445,7 +447,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             Gizmo gizmo = GizmoRegister.makeGizmoFor(component);
             if(gizmo != null) {
                 gizmo.setGameObject(gameObject);
-                Array<Gizmo> list = new Array<>();
+
+                Array<Gizmo> list = gizmoMap.get(gameObject);
+                if(list == null) list = new Array<>();
+
                 gizmoMap.put(gameObject, list);
 
                 if (gizmo != null) {
@@ -538,7 +543,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         IComponent component = event.getComponent();
         sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
 
-        TalosMain.Instance().ProjectController().setDirty();
+        if(!event.wasRapid()) {
+            TalosMain.Instance().ProjectController().setDirty();
+        }
     }
 
     @EventHandler
@@ -598,4 +605,46 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         return local;
     }
 
+    public String saveData (boolean toMemory) {
+        Json json = new Json();
+        json.setOutputType(JsonWriter.OutputType.json);
+        String data = json.prettyPrint(sceneEditorAddon.workspace);
+
+        if(toMemory){
+            for (Scene scene : scenes) {
+                String sceneData = scene.getAsString();
+                String scenePath = scene.path;
+
+                snapshotService.saveSnapshot(changeVersion, scenePath, sceneData);
+            }
+        } else {
+            for (Scene scene : scenes) {
+                scene.save();
+            }
+        }
+
+        return data;
+    }
+
+    public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
+        read(json, jsonData);
+
+        JsonValue scenesJson = jsonData.get("scenes");
+        scenes.clear();
+        for(JsonValue sceneJson : scenesJson) {
+            Scene scene = json.readValue(Scene.class, sceneJson);
+            addScene(scene);
+            if(fromMemory) {
+                scene.loadFromJson(snapshotService.getSnapshot(changeVersion, scene.path));
+            } else {
+                scene.loadFromPath();
+            }
+        }
+        ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
+        if(!scenes.isEmpty()) {
+            Scene scene = scenes.first();
+            projectExplorer.select(scene.path);
+            openScene(scene);
+        }
+    }
 }

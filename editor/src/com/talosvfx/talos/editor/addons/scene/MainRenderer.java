@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -23,13 +24,14 @@ public class MainRenderer {
             Vector2 renderPosition = vec;
 
             if(spriteRenderer.getTexture() != null) {
+                batch.setColor(Color.WHITE);
+
                 batch.draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
-                        transformComponent.rotation + 90,
-                        true);
+                        transformComponent.rotation);
             }
         }
 

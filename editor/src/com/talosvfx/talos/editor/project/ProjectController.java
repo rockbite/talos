@@ -56,7 +56,7 @@ public class ProjectController {
                 loading = true;
                 currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
                 String string = projectFileHandle.readString();
-                currentProject.loadProject(projectFileHandle, string);
+                currentProject.loadProject(projectFileHandle, string, false);
                 snapshotTracker.reset(string);
                 reportProjectFileInterraction(projectFileHandle);
                 loading = false;
@@ -84,7 +84,7 @@ public class ProjectController {
 
     private void saveProjectToCache(String projectFileName) {
         try {
-            fileCache.put(projectFileName, currentProject.getProjectString());
+            fileCache.put(projectFileName, currentProject.getProjectString(true));
             pathCache.put(projectFileName, currentProjectPath);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
@@ -96,7 +96,7 @@ public class ProjectController {
             loading = true;
             currentProjectPath = pathCache.get(projectFileName);
             String string = fileCache.get(projectFileName);
-            currentProject.loadProject(null, string);
+            currentProject.loadProject(null, string, true);
             snapshotTracker.reset(string);
             loading = false;
         } catch (Exception e) {
@@ -104,10 +104,10 @@ public class ProjectController {
         }
     }
 
-    private void getProjectFromString(String string) {
+    private void getProjectFromString(String string, boolean fromMemory) {
         try {
             loading = true;
-            currentProject.loadProject(null, string);
+            currentProject.loadProject(null, string, fromMemory);
             loading = false;
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
@@ -116,7 +116,7 @@ public class ProjectController {
 
     public void saveProject (FileHandle destination) {
         try {
-            String data = currentProject.getProjectString();
+            String data = currentProject.getProjectString(false);
             destination.writeString(data, false);
 
             reportProjectFileInterraction(destination);
@@ -186,7 +186,7 @@ public class ProjectController {
         TalosMain.Instance().FileTracker().addTab(tab);
 
         currentProject.resetToNew();
-        snapshotTracker.reset(currentProject.getProjectString());
+        snapshotTracker.reset(currentProject.getProjectString(true));
         currentProjectPath = null;
 
         if(removingUnworthy) {
@@ -233,12 +233,12 @@ public class ProjectController {
             currentTab.setWorthy();
 
             // also add this as snapshot
-            snapshotTracker.addSnapshot(getProjectString());
+            snapshotTracker.addSnapshot(getProjectString(true));
         }
     }
 
-    private String getProjectString() {
-        return currentProject.getProjectString();
+    private String getProjectString(boolean toMemory) {
+        return currentProject.getProjectString(toMemory);
     }
 
     public void loadFromTab(FileTab tab) {
@@ -365,14 +365,14 @@ public class ProjectController {
     public void undo() {
         boolean changed = snapshotTracker.moveBack();
         if(changed) {
-            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+            getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }
 
     public void redo() {
         boolean changed = snapshotTracker.moveForward();
         if(changed) {
-            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+            getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }
 
