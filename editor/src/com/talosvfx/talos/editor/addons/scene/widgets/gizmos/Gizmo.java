@@ -6,13 +6,14 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
-public abstract class Gizmo<T extends IComponent> extends Actor {
+public abstract class Gizmo extends Actor implements Pool.Poolable {
 
-    protected T component;
+    protected IComponent component;
     protected GameObject gameObject;
 
     Vector2 tmp = new Vector2();
@@ -22,10 +23,6 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
     protected Rectangle hitBox = new Rectangle();
 
     protected boolean selected = false;
-
-    public void setComponent (T component) {
-        this.component = component;
-    }
 
     public void setGameObject(GameObject gameObject) {
         this.gameObject = gameObject;
@@ -103,6 +100,11 @@ public abstract class Gizmo<T extends IComponent> extends Actor {
     }
 
     public void keyDown (InputEvent event, int keycode) {
+
+    }
+
+    @Override
+    public void reset () {
 
     }
 }

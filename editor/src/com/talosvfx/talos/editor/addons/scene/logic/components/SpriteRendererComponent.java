@@ -12,7 +12,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
-public class SpriteRendererComponent implements IComponent, Json.Serializable {
+public class SpriteRendererComponent implements RendererComponent, Json.Serializable {
 
     public TextureRegion texture;
 
@@ -22,8 +22,18 @@ public class SpriteRendererComponent implements IComponent, Json.Serializable {
     public boolean flipX;
     public boolean flipY;
     public RenderMode renderMode = RenderMode.simple;
-    public String sortingLayer;
+    public String sortingLayer = "Default";
     public int orderingInLayer;
+
+    @Override
+    public String getSortingLayer () {
+        return sortingLayer;
+    }
+
+    @Override
+    public void setSortingLayer (String name) {
+        sortingLayer = name;
+    }
 
     public enum RenderMode {
         simple,

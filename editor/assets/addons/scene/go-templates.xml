@@ -1,9 +1,38 @@
-<entityTemplates componentClassPath="com.talosvfx.talos.editor.addons.scene.logic.components">
-    <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
-        <component className="TransformComponent"></component>
-    </template>
-    <template name = "sprite" title = "Sprite Object" nameTemplate = "sprite" keywords = "">
-        <component className="TransformComponent"></component>
-        <component className="SpriteRendererComponent"></component>
-    </template>
+<entityTemplates componentClassPath="com.talosvfx.talos.editor.addons.scene.logic.components" gizmoClassPath="com.talosvfx.talos.editor.addons.scene.widgets.gizmos">
+    <templates>
+        <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+            </components>
+        </template>
+        <template name = "sprite" title = "Sprite Object" nameTemplate = "sprite" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="SpriteRendererComponent"></component>
+            </components>
+        </template>
+        <template name = "camera" title = "Camera" nameTemplate = "Main Camera" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="CameraComponent"></component>
+            </components>
+        </template>
+    </templates>
+    <components>
+        <component className="TransformComponent">
+            <gizmos>
+                <gizmo className="TransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="CameraComponent">
+            <gizmos>
+                <gizmo className="CameraTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="SpriteRendererComponent">
+            <gizmos>
+                <gizmo className="SmartTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+    </components>
 </entityTemplates>

@@ -106,23 +106,27 @@ public abstract class DynamicItemListWidget extends PropertyWidget<Array<Dynamic
     private void deleteSelection () {
         Selection<FilteredTree.Node<Object>> selection = list.getSelection();
         if(selection.size() > 0) {
-            int index = 0;
-            Array<FilteredTree.Node<Object>> rootNodes = list.getRootNodes();
-            for(index = 0; index < rootNodes.size; index++) {
-                if(rootNodes.get(index) == selection.first()) {
-                    break;
+            FilteredTree.Node<Object> item = selection.first();
+            ItemData itemData = (ItemData) item.getObject();
+            if(itemData.canDelete) {
+                int index = 0;
+                Array<FilteredTree.Node<Object>> rootNodes = list.getRootNodes();
+                for (index = 0; index < rootNodes.size; index++) {
+                    if (rootNodes.get(index) == selection.first()) {
+                        break;
+                    }
                 }
-            }
-            list.remove(selection.first());
-            rootNodes = list.getRootNodes();
-            if(rootNodes.size > 0) {
-                selection.clear();
-                index = index - 1;
-                if(index < 0) index = 0;
-                selection.add(rootNodes.get(index));
-            }
+                list.remove(selection.first());
+                rootNodes = list.getRootNodes();
+                if (rootNodes.size > 0) {
+                    selection.clear();
+                    index = index - 1;
+                    if (index < 0) index = 0;
+                    selection.add(rootNodes.get(index));
+                }
 
-            callValueChanged(makeDataArray());
+                callValueChanged(makeDataArray());
+            }
         }
     }
 
@@ -148,6 +152,7 @@ public abstract class DynamicItemListWidget extends PropertyWidget<Array<Dynamic
         FilteredTree.Node node = new FilteredTree.Node(itemData.id, editableLabel);
         node.draggable = true;
         node.draggableInLayerOnly = true;
+        node.setObject(itemData);
 
         return node;
     }
@@ -177,6 +182,8 @@ public abstract class DynamicItemListWidget extends PropertyWidget<Array<Dynamic
     public static class ItemData {
         public String id;
         public String text;
+
+        public boolean canDelete = true;
 
         public ItemData(String id, String text) {
             this.id = id;

@@ -50,7 +50,7 @@ public class TemplateListPopup extends VisWindow {
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
 
         componentClassPath = root.getAttribute("componentClassPath");
-        traverseTree(tree, null, root);
+        traverseTree(tree, null, root.getChildByName("templates"));
 
         add(searchFilteredTree).width(300).row();
         add().growY();

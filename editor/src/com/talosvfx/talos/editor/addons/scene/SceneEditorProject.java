@@ -2,9 +2,12 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.project.IProject;
 
 import java.io.File;
@@ -101,12 +104,14 @@ public class SceneEditorProject implements IProject {
         Scene mainScene = new Scene(projectDir.path() + File.separator + "scenes" + File.separator + "main_scene.scn");
         mainScene.save();
         sceneEditorAddon.workspace.addScene(mainScene);
+        sceneEditorAddon.workspace.openScene(mainScene);
+
+        // now create main camera
+        sceneEditorAddon.workspace.createObjectByTypeName("camera", new Vector2(0, 0), null);
 
         TalosMain.Instance().ProjectController().saveProject(projectFile);
 
         sceneEditorAddon.workspace.reloadProjectExplorer();
         sceneEditorAddon.projectExplorer.select(mainScene.path);
-
-        sceneEditorAddon.workspace.openScene(mainScene);
     }
 }

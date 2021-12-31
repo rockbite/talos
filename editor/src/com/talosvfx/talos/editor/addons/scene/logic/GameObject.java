@@ -4,8 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -223,6 +222,16 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return false;
     }
 
+    public boolean hasComponentType(Class clazz) {
+        for(Class clazzToCheck: componentClasses.keys()) {
+            if(clazz.isAssignableFrom(clazzToCheck)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public <T extends IComponent> T getComponent (Class<? extends T> clazz) {
         return (T) componentClasses.get(clazz);
     }
@@ -245,7 +254,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public Array<GameObject> getChildrenByComponent (Class<? extends IComponent> clazz, Array<GameObject> list) {
         if(children == null) return list;
         for(GameObject gameObject: children) {
-            if(gameObject.hasComponent(clazz)) {
+            if(gameObject.hasComponentType(clazz)) {
                 list.add(gameObject);
             }
             if(gameObject.getGameObjects() != null && gameObject.getGameObjects().size > 0) {
@@ -254,5 +263,15 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         return list;
+    }
+
+    public <T extends IComponent> T getComponentSlow (Class<? extends T> clazz) {
+        for(Class clazzToCheck: componentClasses.keys()) {
+            if(clazz.isAssignableFrom(clazzToCheck)) {
+                return (T) componentClasses.get(clazzToCheck);
+            }
+        }
+
+        return null;
     }
 }

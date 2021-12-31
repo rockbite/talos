@@ -10,7 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
-public class TransformGizmo extends Gizmo<TransformComponent> {
+public class TransformGizmo extends Gizmo {
 
     private Vector2 prevTouch = new Vector2();
     private Vector2 vec1 = new Vector2();
@@ -71,13 +71,16 @@ public class TransformGizmo extends Gizmo<TransformComponent> {
 
         wasDragged = true;
 
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, true));
+
+
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, true));
     }
 
     @Override
     public void touchUp (float x, float y) {
         if(wasDragged) {
-            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component));
+            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform));
         }
     }
 }

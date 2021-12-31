@@ -23,8 +23,8 @@ public class TransformComponent implements IComponent {
         Array<PropertyWidget> properties = new Array<>();
 
         PropertyWidget positionWidget = WidgetFactory.generate(this, "position", "Position");
-        PropertyWidget rotationWidget = WidgetFactory.generate(this, "rotation", "Position");
-        PropertyWidget scaleWidget = WidgetFactory.generate(this, "scale", "Position");
+        PropertyWidget rotationWidget = WidgetFactory.generate(this, "rotation", "Rotation");
+        PropertyWidget scaleWidget = WidgetFactory.generate(this, "scale", "Scale");
 
         properties.add(positionWidget);
         properties.add(rotationWidget);

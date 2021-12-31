@@ -3,10 +3,16 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -18,6 +24,7 @@ import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {
 
@@ -25,10 +32,11 @@ public class SceneEditorAddon implements IAddon {
     public SceneEditorWorkspace workspace;
     public HierarchyWidget hierarchy;
     public ProjectExplorerWidget projectExplorer;
-    private BottomPanel bottomPanel;
     public PropertyPanel propertyPanel;
 
     public FileTracker.Tracker assetTracker;
+    private Table customLayoutTable;
+    public Table workspaceContainer;
 
     @Override
     public void init () {
@@ -47,6 +55,8 @@ public class SceneEditorAddon implements IAddon {
         Notifications.addEventToPool(ComponentUpdated.class);
         Notifications.addEventToPool(GameObjectDeleted.class);
         Notifications.addEventToPool(GameObjectNameChanged.class);
+        Notifications.addEventToPool(LayerListUpdated.class);
+        Notifications.addEventToPool(CameraDataUpdated.class);
     }
 
     @Override
@@ -82,17 +92,48 @@ public class SceneEditorAddon implements IAddon {
         workspace.setAddon(this);
 
         propertyPanel = new PropertyPanel();
-        bottomPanel = new BottomPanel();
         hierarchy = new HierarchyWidget();
         projectExplorer = new ProjectExplorerWidget();
-        bottomPanel.setWidgets(projectExplorer, hierarchy);
+
+        customLayoutTable = new Table();
+        makeLayout(customLayoutTable);
+    }
+
+    private void makeLayout(Table container) {
+        Skin skin = TalosMain.Instance().getSkin();
+
+        Table leftPart = new Table();
+        Table midPart = new Table();
+        workspaceContainer = new Table();
+        SplitPane horizontalPane = new SplitPane(leftPart, propertyPanel, false, skin, "timeline");
+        SplitPane verticalPane = new SplitPane(midPart, projectExplorer, true, skin, "timeline");
+        SplitPane midPane = new SplitPane(hierarchy, workspaceContainer, false, skin, "timeline");
+
+        leftPart.add(verticalPane).grow();
+        midPart.add(midPane).grow();
+
+        horizontalPane.setSplitAmount(0.8f);
+        verticalPane.setSplitAmount(0.72f);
+        midPane.setSplitAmount(0.25f);
+
+        Drawable workspaceBg = ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.RED);
+        Drawable panelBg = ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY);
+
+        workspaceContainer.setBackground(workspaceBg);
+        propertyPanel.setBackground(panelBg);
+        hierarchy.setBackground(panelBg);
+        projectExplorer.setBackground(panelBg);
+
+        workspaceContainer.add(workspace).grow();
+
+        container.add(horizontalPane).grow();
     }
 
     @Override
     public void initUIContent () {
-
-        TalosMain.Instance().UIStage().swapToAddonContent(propertyPanel, workspace, bottomPanel);
+        TalosMain.Instance().UIStage().swapToAddonContent(null, null, null);
         TalosMain.Instance().disableNodeStage();
+        TalosMain.Instance().UIStage().showCustomLayout(customLayoutTable);
 
         // now need to disable some menu tabs
         TalosMain.Instance().UIStage().Menu().disableTalosSpecific();

@@ -18,20 +18,20 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
-public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
+public class SmartTransformGizmo extends Gizmo {
 
     private final Image rect;
     private final Image circle;
     private final NinePatch rectPatch;
     private float prevScale = 1f;
 
-    private Vector2[] points = new Vector2[4];
+    protected Vector2[] points = new Vector2[4];
     private Vector2[] rotationAreas = new Vector2[4];
 
-    private static final int LB = 0;
-    private static final int LT = 1;
-    private static final int RT = 2;
-    private static final int RB = 3;
+    protected static final int LB = 0;
+    protected static final int LT = 1;
+    protected static final int RT = 2;
+    protected static final int RB = 3;
     private int touchedPoint = -1;
     private int touchedRA = -1;
 
@@ -39,13 +39,13 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
     private Vector2 prevDragLocation = new Vector2();
 
 
-    private Vector2 tmp = new Vector2();
+    protected Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
     private Vector2 tmp3 = new Vector2();
     private Vector2 tmp4 = new Vector2();
 
-    private Vector2[] prevPoints = new Vector2[4];
-    private Vector2[] nextPoints = new Vector2[4];
+    protected Vector2[] prevPoints = new Vector2[4];
+    protected Vector2[] nextPoints = new Vector2[4];
     private float prevRotation;
     private float nextRotation;
 
@@ -85,8 +85,6 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         prevScale = worldPerPixel;
 
         if(gameObject.hasComponent(TransformComponent.class)) {
-            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-
             for (int i = 0; i < 4; i++) {
                 drawCircle(points[i], batch);
             }
@@ -94,7 +92,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
 
     }
 
-    private Vector2 getWorldLocAround(Vector2 point, float x, float y) {
+    protected Vector2 getWorldLocAround(Vector2 point, float x, float y) {
         point.set(x, y);
         TransformComponent.localToWorld(gameObject, point);
 
@@ -178,11 +176,11 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         if(touchedPoint >= 0) {
             setNewPointValue(touchedPoint, x, y);
             updatePointsFromComponent();
-            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, false));
+            reportResizeUpdated(true);
         } else if (touchedRA >= 0) {
             applyRotationChange(x, y);
             updateRotationAreas(tmp.x, tmp.y);
+            reportResizeUpdated(true);
         }
 
         prevDragLocation.set(x, y);
@@ -193,12 +191,17 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         if(touchedPoint >= 0) {
             setNewPointValue(touchedPoint, x, y);
             updatePointsFromComponent();
-            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform));
+            reportResizeUpdated(false);
         } else if (touchedRA >= 0) {
             applyRotationChange(x, y);
             updateRotationAreas(tmp.x, tmp.y);
+            reportResizeUpdated(false);
         }
+    }
+
+    protected void reportResizeUpdated(boolean isRapid) {
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
     }
 
     private void applyRotationChange(float x, float y) {
@@ -212,7 +215,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         transform.rotation += angleDiff;
     }
 
-    private void updatePointsFromComponent () {
+    protected void updatePointsFromComponent () {
         getWorldLocAround(points[LB], -0.5f, -0.5f);
         getWorldLocAround(points[LT],-0.5f, 0.5f);
         getWorldLocAround(points[RT],0.5f, 0.5f);
@@ -226,7 +229,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
      * @param x of midpoint
      * @param y of midpoint
      */
-    private void updateRotationAreas (float x, float y) {
+    protected void updateRotationAreas (float x, float y) {
         float radius = 30 * worldPerPixel;
 
         for(int i = 0; i < 4; i++) {
@@ -288,7 +291,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         transformOldToNew();
     }
 
-    private void transformOldToNew () {
+    protected void transformOldToNew () {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 
         // bring old next points to local space
@@ -302,14 +305,14 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
         transform.position = lowerPrecision(transform.position);
     }
 
-    private Vector2 lowerPrecision(Vector2 vec) {
+    protected Vector2 lowerPrecision(Vector2 vec) {
         vec.x = lowerPrecision(vec.x);
         vec.y = lowerPrecision(vec.y);
 
         return vec;
     }
 
-    private float lowerPrecision(float number) {
+    protected float lowerPrecision(float number) {
         number *= 10000;
         number = (int)number;
         number /= 10000;
@@ -323,7 +326,6 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
     private void setRectFromPoints (Vector2[] pointArray) {
         for (int i = 0; i < 4; i++) {
             pointArray[i].set(points[i]);
-            //TransformComponent.worldToLocal(gameObject.parent, pointArray[i]);
         }
     }
 
@@ -340,7 +342,7 @@ public class SmartTransformGizmo extends Gizmo<SpriteRendererComponent> {
 
     }
 
-    private void moveInLayerOrder (GameObject gameObject, int direction) {
+    protected void moveInLayerOrder (GameObject gameObject, int direction) {
         // direction -1 for down, 1 for up
         if(gameObject.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);

@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -92,6 +93,8 @@ public class UIStage {
 	private MainMenu mainMenu;
 	private VisSplitPane horizontalPane;
 	private VisSplitPane verticalPane;
+	private Table mainLayout;
+	private Table customLayout;
 
 
 	public UIStage (Skin skin) {
@@ -109,6 +112,7 @@ public class UIStage {
 		defaults();
 		constructMenu();
 		constructTabPane();
+
 		constructSplitPanes();
 
 		initFileChoosers();
@@ -402,6 +406,14 @@ public class UIStage {
 
 
 	private void constructSplitPanes () {
+
+		Table layoutContainer = new Table();
+		mainLayout = new Table();
+		customLayout = new Table();
+		customLayout.setVisible(false);
+		Stack stack = new Stack(mainLayout, customLayout);
+		layoutContainer.add(stack).grow();
+
 		previewWidget = new PreviewWidget();
 
 		emitterList = new EmitterList(skin);
@@ -447,7 +459,22 @@ public class UIStage {
 		horizontalPane.setSplitAmount(0.3f);
 
 		fullScreenTable.row();
-		fullScreenTable.add(verticalPane).grow();
+		fullScreenTable.add(layoutContainer).grow();
+
+		mainLayout.add(verticalPane).grow();
+	}
+
+	public void showCustomLayout(Table table) {
+		mainLayout.setVisible(false);
+		customLayout.setVisible(true);
+
+		customLayout.clearChildren();
+		customLayout.add(table).grow();
+	}
+
+	public void hideCustomLayout() {
+		mainLayout.setVisible(true);
+		customLayout.setVisible(false);
 	}
 
 	public void swapToAddonContent(Table left, Table right, Table bottom) {
@@ -472,6 +499,7 @@ public class UIStage {
 	}
 
 	public void swapToTalosContent() {
+		hideCustomLayout();
 		verticalPane.setVisible(true);
 		horizontalPane.setVisible(true);
 

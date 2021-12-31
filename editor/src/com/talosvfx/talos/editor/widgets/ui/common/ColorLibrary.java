@@ -30,6 +30,7 @@ public class ColorLibrary {
         PANEL_GRAY ("#4e4d4d"),
         MID_GRAY ("#434343"),
         DARK_GRAY ("#3a3a3a"),
+        SUPER_DARK_GRAY ("#2a2a2a"),
         BLACK_TRANSPARENT ("#2a2a2add"),
         RED ("#92313a"),
         // fifty shades of grey :D

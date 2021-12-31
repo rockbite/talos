@@ -3,8 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
@@ -28,6 +29,7 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     public Scene(String path) {
+        this();
         this.path = path;
 
         root = new GameObject();
@@ -206,7 +208,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
             public Array<ItemData> getValue () {
                 Array<ItemData> list = new Array<>();
                 for(String layerName: layers) {
-                    list.add(new ItemData(layerName));
+                    ItemData itemData = new ItemData(layerName);
+                    if(layerName.equals("Default")) {
+                        itemData.canDelete = false;
+                    }
+                    list.add(itemData);
                 }
                 return list;
             }
@@ -217,6 +223,8 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
                 for(ItemData item: value) {
                     layers.add(item.text);
                 }
+
+                Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
             }
         };
         itemListWidget.defaultItemName = "New Layer";
