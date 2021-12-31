@@ -329,6 +329,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @Override
     public void drawContent (Batch batch, float parentAlpha) {
+        if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         batch.end();
         drawGrid(batch, parentAlpha);
         batch.begin();

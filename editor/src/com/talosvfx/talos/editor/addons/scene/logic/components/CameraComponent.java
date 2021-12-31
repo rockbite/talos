@@ -18,7 +18,7 @@ public class CameraComponent implements IComponent {
 
         PropertyWidget colorWidget = WidgetFactory.generate(this, "backgroundColor", "Background Color");
         PropertyWidget zoomWidget = WidgetFactory.generate(this, "zoom", "Zoom");
-        PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Viewport Size");
+        PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
 
         properties.add(colorWidget);
         properties.add(zoomWidget);

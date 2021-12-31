@@ -6,39 +6,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
 public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 
-    private TextField xField;
-    private TextField yField;
+    private ValueWidget xValue;
+    private ValueWidget yValue;
 
     public Vector2PropertyWidget(String name) {
         super(name);
     }
 
     @Override
-    public Actor getSubWidget() {
-        Table table = new Table();
-
-        xField = new TextField("", TalosMain.Instance().getSkin(), "panel");
-        xField.setTextFieldFilter(new FloatFieldFilter());
-
-        yField = new TextField("", TalosMain.Instance().getSkin(), "panel");
-        yField.setTextFieldFilter(new FloatFieldFilter());
-
+    protected void build (String name) {
         listener = new ChangeListener() {
 
             Vector2 vec = new Vector2();
 
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if(xField.getText().isEmpty()) return;
-                if(yField.getText().isEmpty()) return;
+            public void changed (ChangeEvent event, Actor actor) {
                 try {
-                    float x = Float.parseFloat(xField.getText());
-                    float y = Float.parseFloat(yField.getText());
-                    vec.set(x, y);
+                    vec.set(xValue.getValue(), yValue.getValue());
                     callValueChanged(vec);
                 } catch (NumberFormatException e){
                     vec.set(0, 0);
@@ -46,33 +37,58 @@ public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
                 }
             }
         };
-        xField.addListener(listener);
-        yField.addListener(listener);
 
-        table.add(new Label("x: ", TalosMain.Instance().getSkin())).padRight(4);
-        table.add(xField).width(63);
-        table.add(new Label("y: ", TalosMain.Instance().getSkin())).padRight(4).padLeft(4);
-        table.add(yField).width(63);
+        xValue = new ValueWidget();
+        xValue.init(TalosMain.Instance().getSkin());
+        xValue.setRange(-9999, 9999);
+        xValue.setStep(0.1f);
+        xValue.setValue(0);
+        xValue.setLabel("X");
+        xValue.setType(ValueWidget.Type.TOP);
+        xValue.addListener(listener);
 
-        return table;
+        yValue = new ValueWidget();
+        yValue.init(TalosMain.Instance().getSkin());
+        yValue.setRange(-9999, 9999);
+        yValue.setStep(0.1f);
+        yValue.setValue(0);
+        yValue.setLabel("Y");
+        yValue.setType(ValueWidget.Type.BOTTOM);
+        yValue.addListener(listener);
+
+        Table left = new Table();
+        Table right = new Table();
+
+        Label title = new Label(name, TalosMain.Instance().getSkin());
+        title.setAlignment(Align.left);
+
+        left.add(title).left().expand().pad(2).top();
+        left.row();
+        left.add().growY().expand();
+        right.add(xValue).growX();
+        right.row();
+        right.add(yValue).growX().padTop(1);
+
+        add(left).growY().minWidth(70);
+        add(right).growX();
     }
 
     @Override
     public void updateWidget(Vector2 value) {
-        xField.removeListener(listener);
-        yField.removeListener(listener);
+        xValue.removeListener(listener);
+        yValue.removeListener(listener);
 
-        xField.setText(value.x + "");
-        yField.setText(value.y + "");
+        xValue.setValue(value.x);
+        yValue.setValue(value.y);
 
-        xField.addListener(listener);
-        yField.addListener(listener);
+        xValue.addListener(listener);
+        yValue.addListener(listener);
     }
 
     public void setValue(Vector2 value) {
 
-        xField.setText(value.x + "");
-        yField.setText(value.y + "");
+        xValue.setValue(value.x);
+        yValue.setValue(value.y);
 
         this.value = value;
     }

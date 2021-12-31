@@ -51,7 +51,9 @@ public abstract class PropertyWidget<T> extends Table {
 
 	public abstract T getValue();
 
-	public abstract Actor getSubWidget();
+	public Actor getSubWidget() {
+		return null;
+	}
 
 	public void updateValue() {
 		this.value = getValue();
