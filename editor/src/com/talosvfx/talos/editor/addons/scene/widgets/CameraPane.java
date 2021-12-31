@@ -75,6 +75,8 @@ public class CameraPane extends Actor implements Notifications.Observer {
         setPosition(vec.x - getWidth() + 5, vec.y - 8);
 
         Pools.get(Vector2.class).free(vec);
+
+        cameraPreview.act(delta);
     }
 
     public void setFrom(GameObject cameraObject) {
