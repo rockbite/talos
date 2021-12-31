@@ -62,6 +62,8 @@ public class WidgetFactory {
             }
         };
 
+        widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
+
         return widget;
     }
 
@@ -161,6 +163,8 @@ public class WidgetFactory {
                 }
             }
         };
+
+        widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
 
         return widget;
     }

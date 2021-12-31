@@ -5,14 +5,16 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 public class TransformComponent implements IComponent {
+    @ValueProperty(prefix = {"X", "Y"})
     public Vector2 position = new Vector2();
+
+    @ValueProperty(min = -360, max = 360, step=0.5f, progress = true)
     public float rotation;
+
+    @ValueProperty(prefix = {"W", "H"})
     public Vector2 scale = new Vector2(1, 1);
 
     public static Array<GameObject> tmp = new Array<>();

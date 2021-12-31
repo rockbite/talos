@@ -92,4 +92,17 @@ public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 
         this.value = value;
     }
+
+    public void configureFromAnnotation (ValueProperty annotation) {
+        if(annotation == null) return;
+        xValue.setRange(annotation.min(), annotation.max());
+        xValue.setStep(annotation.step());
+        xValue.setLabel(annotation.prefix()[0]);
+        xValue.setShowProgress(annotation.progress());
+
+        yValue.setRange(annotation.min(), annotation.max());
+        yValue.setStep(annotation.step());
+        yValue.setLabel(annotation.prefix()[1]);
+        yValue.setShowProgress(annotation.progress());
+    }
 }

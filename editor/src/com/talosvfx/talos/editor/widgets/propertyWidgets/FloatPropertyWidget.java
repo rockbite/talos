@@ -58,4 +58,12 @@ public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
         valueWidget.setValue(value);
         this.value = value;
     }
+
+    public void configureFromAnnotation (ValueProperty annotation) {
+        if(annotation == null) return;
+        valueWidget.setRange(annotation.min(), annotation.max());
+        valueWidget.setStep(annotation.step());
+        valueWidget.setLabel(annotation.prefix()[0]);
+        valueWidget.setShowProgress(annotation.progress());
+    }
 }
