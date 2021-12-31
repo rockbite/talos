@@ -10,6 +10,8 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 public class CameraComponent implements IComponent {
 
     public Color backgroundColor = new Color(Color.valueOf("1e3357ff"));
+
+    @ValueProperty(min=0.01f, max=10f, step=0.01f)
     public float zoom = 1f;
 
     @ValueProperty(prefix = {"W", "H"})

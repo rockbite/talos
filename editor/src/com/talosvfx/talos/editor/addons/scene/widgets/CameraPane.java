@@ -14,7 +14,6 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.events.CameraDataUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -27,6 +26,7 @@ public class CameraPane extends Actor implements Notifications.Observer {
     private CameraPreview cameraPreview;
 
     private Vector2 previewSize = new Vector2();
+    private GameObject cameraObject;
 
     public CameraPane () {
         title = new Label("qaqov tolma", TalosMain.Instance().getSkin());
@@ -61,6 +61,11 @@ public class CameraPane extends Actor implements Notifications.Observer {
             return;
         }
         super.act(delta);
+
+        if(cameraObject!= null) {
+            setFrom(cameraObject);
+        }
+
         setSize(previewSize.x + 20, previewSize.y  + 49);
 
         title.setWidth(getWidth() - 40);
@@ -96,11 +101,7 @@ public class CameraPane extends Actor implements Notifications.Observer {
         previewSize.set(width, height);
 
         title.setText(cameraObject.getName());
-    }
 
-    @EventHandler
-    public void onCameraDataUpdated(CameraDataUpdated event) {
-        GameObject gameObject = event.gameObject;
-        setFrom(gameObject);
+        this.cameraObject = cameraObject;
     }
 }

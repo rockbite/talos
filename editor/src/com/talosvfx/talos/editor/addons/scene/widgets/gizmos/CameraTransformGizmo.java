@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.events.CameraDataUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
@@ -67,8 +66,6 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 
         CameraComponent camera = gameObject.getComponent(CameraComponent.class);
         Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(camera, isRapid));
-
-        Notifications.fireEvent(Notifications.obtainEvent(CameraDataUpdated.class).set(gameObject));
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -34,6 +35,8 @@ public class CameraPreview extends Actor {
     private CameraComponent component;
     private GameObject cameraObject;
 
+    private float presumedRotation = 0;
+
     public CameraPreview () {
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 200, 200, false);
         spriteBatch = new SpriteBatch();
@@ -47,6 +50,26 @@ public class CameraPreview extends Actor {
         TransformComponent transform = cameraObject.getComponent(TransformComponent.class);
         viewport.getCamera().position.set(transform.position.x, transform.position.y, 0);
         ((OrthographicCamera)viewport.getCamera()).zoom = component.zoom;
+        OrthographicCamera camera = (OrthographicCamera) viewport.getCamera();
+        float currRotation = getCameraAngle(camera);
+        if(currRotation == 360) currRotation = 0;
+        if(currRotation != presumedRotation) {
+            presumedRotation = currRotation;
+        }
+
+        float nextRotation = transform.rotation;
+
+        // some weird fuckery I had to do because camera just does not have setRotation, fun. sure it does not.
+        if(nextRotation != presumedRotation && Math.abs(nextRotation - presumedRotation) > 0.001f) {
+            float diff = nextRotation - presumedRotation;
+            camera.rotate(diff);
+            presumedRotation = nextRotation;
+        }
+
+    }
+
+    public float getCameraAngle(OrthographicCamera cam) {
+        return ((float) Math.atan2(cam.up.x, cam.up.y) * MathUtils.radiansToDegrees);
     }
 
     @Override
