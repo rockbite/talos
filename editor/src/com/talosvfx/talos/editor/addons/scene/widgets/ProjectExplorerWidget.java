@@ -21,7 +21,7 @@ import java.io.FileFilter;
 public class ProjectExplorerWidget extends Table {
 
     private final FilteredTree<Object> directoryTree;
-    private final FileFilter fileFilter;
+    public static FileFilter fileFilter;
     private ObjectMap<String, FilteredTree.Node> nodes = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
@@ -32,7 +32,7 @@ public class ProjectExplorerWidget extends Table {
 
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
         ScrollPane scrollPane = new ScrollPane(directoryTree);
-        add(scrollPane).grow();
+        add(scrollPane).grow().padTop(3);
 
         fileFilter = new FileFilter() {
             @Override
@@ -260,10 +260,14 @@ public class ProjectExplorerWidget extends Table {
         }
     }
 
-    public class RowWidget extends Table {
+    public static class RowWidget extends Table {
         private final EditableLabel label;
 
         public RowWidget(FileHandle fileHandle) {
+            this(fileHandle, true);
+        }
+
+        public RowWidget(FileHandle fileHandle, boolean editable) {
             Image icon;
             if(fileHandle.isDirectory()) {
                 icon = new Image(TalosMain.Instance().getSkin().getDrawable("ic-folder"));
@@ -272,6 +276,7 @@ public class ProjectExplorerWidget extends Table {
             }
 
             label = new EditableLabel(fileHandle.name(), TalosMain.Instance().getSkin());
+            label.setEditable(editable);
 
             add(icon);
             add(label).growX().padLeft(5).width(250);

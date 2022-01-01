@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
@@ -50,6 +51,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private String changeVersion = "";
     private SnapshotService snapshotService;
 
+    private AssetListPopup assetListPopup;
+
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
@@ -64,6 +67,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         GizmoRegister.init(root);
 
+        assetListPopup = new AssetListPopup();
         templateListPopup = new TemplateListPopup(root);
         templateListPopup.setListener(new TemplateListPopup.ListListener() {
             @Override
@@ -696,5 +700,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public MainRenderer getRenderer () {
         return renderer;
+    }
+
+    public String getProjectPath () {
+        return projectPath;
+    }
+
+    public AssetListPopup getAssetListPopup() {
+        return assetListPopup;
     }
 }

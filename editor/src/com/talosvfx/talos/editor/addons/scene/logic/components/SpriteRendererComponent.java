@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 public class SpriteRendererComponent implements RendererComponent, Json.Serializable {
@@ -45,18 +46,25 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget textureWidget = new LabelWidget("Texture") {
+        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture") {
             @Override
             public String getValue () {
                 FileHandle fileHandle = Gdx.files.absolute(path);
-                return fileHandle.nameWithoutExtension();
+                return fileHandle.path();
+            }
+
+            @Override
+            public void valueChanged (String value) {
+                path = value;
+                reloadTexture();
             }
         };
+
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
-        PropertyWidget orderingInLayerWidget = WidgetFactory.generate(this, "orderingInLayer", "Ordering In Layer");
+        PropertyWidget orderingInLayerWidget = WidgetFactory.generate(this, "orderingInLayer", "Ordering");
 
         SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer") {
             @Override
@@ -100,7 +108,11 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
     public void reloadTexture () {
         FileHandle file = Gdx.files.absolute(path);
         if(file.exists()) {
-            texture = new TextureRegion(new Texture(file));
+            try {
+                texture = new TextureRegion(new Texture(file));
+            } catch (Exception e) {
+                texture = TalosMain.Instance().getSkin().getRegion("white");
+            }
         } else {
             texture = TalosMain.Instance().getSkin().getRegion("white");
         }

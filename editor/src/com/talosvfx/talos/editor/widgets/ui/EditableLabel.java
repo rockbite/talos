@@ -47,6 +47,11 @@ public class EditableLabel extends Table implements ActorCloneable {
 
     private final InputListener stageListener;
     private boolean editMode = false;
+    private boolean editable = true;
+
+    public void setEditable (boolean editable) {
+        this.editable = editable;
+    }
 
     public interface EditableLabelChangeListener {
         public void changed(String newText);
@@ -82,7 +87,7 @@ public class EditableLabel extends Table implements ActorCloneable {
             public void clicked(InputEvent event, float x, float y) {
                 long time = TimeUtils.millis();
 
-                if(time - clickTime < 200) {
+                if(time - clickTime < 200 && editable) {
                     setEditMode();
                 }
 
