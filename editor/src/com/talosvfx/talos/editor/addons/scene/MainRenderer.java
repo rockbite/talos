@@ -88,13 +88,13 @@ public class MainRenderer {
                 batch.setColor(spriteRenderer.color);
 
 
-                if(metadata.borderData !=null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+                if(metadata != null && metadata.borderData !=null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                     Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
                     NinePatch patch = obtainNinePatch(texture, metadata.borderData);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
                     patch.draw(batch,
-                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
-                            0.5f, 0.5f,
+                            renderPosition.x - 0.5f * transformComponent.scale.x, renderPosition.y - 0.5f * transformComponent.scale.y,
+                            0.5f * transformComponent.scale.x, 0.5f * transformComponent.scale.y,
                             transformComponent.scale.x, transformComponent.scale.y,
                             1f, 1f,
                             transformComponent.rotation);
