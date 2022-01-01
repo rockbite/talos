@@ -543,7 +543,11 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public void filter (String filter) {
-        filter(rootNodes, filter.toLowerCase());
+        filter(filter, false);
+    }
+
+    public void filter (String filter, boolean endsWithLogic) {
+        filter(rootNodes, filter.toLowerCase(), endsWithLogic);
         expandAll();
 
         autoSelectionIndex = 0;
@@ -672,9 +676,17 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public void filter (Array<Node<T>> nodes, String filter) {
+        filter(nodes, filter, false);
+    }
+
+    public void filter (Array<Node<T>> nodes, String filter, boolean endsWithLogic) {
         for (int i = 0; i < nodes.size; i++) {
-            if (nodes.get(i).name.toLowerCase().contains(filter)) {
-                filter(nodes.get(i).children, filter);
+            boolean statement = nodes.get(i).name.toLowerCase().contains(filter);
+            if(endsWithLogic) {
+                statement = nodes.get(i).name.toLowerCase().endsWith(filter);
+            }
+            if (statement) {
+                filter(nodes.get(i).children, filter, endsWithLogic);
 
                 nodes.get(i).filtered = false;
                 nodes.get(i).actor.setVisible(true);
@@ -683,11 +695,10 @@ public class FilteredTree<T> extends WidgetGroup {
             } else {
                 nodes.get(i).filtered = true;
                 nodes.get(i).actor.setVisible(false);
-                filter(nodes.get(i).children, filter);
+                filter(nodes.get(i).children, filter, endsWithLogic);
             }
 
         }
-
     }
 
     private void setAllChildrenNotFiltered (Node<T> node) {

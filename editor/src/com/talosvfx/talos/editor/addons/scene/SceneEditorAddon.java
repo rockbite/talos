@@ -37,11 +37,13 @@ public class SceneEditorAddon implements IAddon {
     public Table workspaceContainer;
 
     public AssetImporter assetImporter;
+    public SEAssetProvider assetProvider;
 
     @Override
     public void init () {
         SE = new SceneEditorProject(this);
 
+        assetProvider = new SEAssetProvider();
         assetImporter = new AssetImporter();
 
         registerEvents();

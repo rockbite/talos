@@ -23,8 +23,11 @@ public class AssetSelectWidget extends PropertyWidget<String> {
     private Label nameLabel;
     private String path;
 
-    public AssetSelectWidget (String name) {
+    private String filter;
+
+    public AssetSelectWidget (String name, String extension) {
         super(name);
+        this.filter = extension;
     }
 
     @Override
@@ -50,8 +53,9 @@ public class AssetSelectWidget extends PropertyWidget<String> {
             public void clicked (InputEvent event, float x, float y) {
                 Vector2 pos = new Vector2(button.getWidth()/2f, button.getHeight()/2f);
                 button.localToStageCoordinates(pos);
+
                 AssetListPopup assetListPopup = SceneEditorAddon.get().workspace.getAssetListPopup();
-                assetListPopup.showPopup(getStage(), pos, new FilteredTree.ItemListener() {
+                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener() {
                     @Override
                     public void chosen (FilteredTree.Node node) {
                         String path = (String) node.getObject();

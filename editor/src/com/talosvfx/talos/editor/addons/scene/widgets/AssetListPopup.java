@@ -111,8 +111,7 @@ public class AssetListPopup extends VisWindow {
         });
     }
 
-    public void showPopup(Stage stage, Vector2 location, FilteredTree.ItemListener listener) {
-
+    public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener listener) {
         loadTree();
 
         setPosition(location.x, location.y - getHeight());
@@ -127,6 +126,10 @@ public class AssetListPopup extends VisWindow {
 
         if(getHeight() < 200) {
             setHeight(200);
+        }
+
+        if(filter != null) {
+            tree.filter("." + filter, true);
         }
 
         tree.expandAll();

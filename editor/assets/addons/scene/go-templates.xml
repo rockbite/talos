@@ -11,6 +11,12 @@
                 <component className="SpriteRendererComponent"></component>
             </components>
         </template>
+        <template name = "particle" title = "Particle Effect" nameTemplate = "Particle Effect" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="ParticleComponent"></component>
+            </components>
+        </template>
         <template name = "camera" title = "Camera" nameTemplate = "Main Camera" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
@@ -32,6 +38,11 @@
         <component className="SpriteRendererComponent">
             <gizmos>
                 <gizmo className="SmartTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="ParticleComponent">
+            <gizmos>
+                <gizmo className="TransformGizmo"></gizmo>
             </gizmos>
         </component>
     </components>

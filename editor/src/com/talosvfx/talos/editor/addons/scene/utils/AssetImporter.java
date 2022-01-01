@@ -11,10 +11,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.SpriteImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.TlsImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 
 import java.io.File;
@@ -24,15 +24,20 @@ public class AssetImporter {
     public FileTracker.Tracker assetTracker;
 
     private enum AssetType {
-        SPRITE
+        SPRITE,
+        TLS
     }
 
-    private ObjectMap<AssetType, Class<? extends AMetadata>> metadataClass = new ObjectMap<>();
+    private static ObjectMap<AssetType, Class<? extends AMetadata>> metadataClass;
 
     public AssetImporter() {
         assetTracker = handle -> assetUpdated(handle);
 
-        metadataClass.put(AssetType.SPRITE, SpriteMetadata.class);
+        if(metadataClass == null) {
+            metadataClass = new ObjectMap<>();;
+            metadataClass.put(AssetType.SPRITE, SpriteMetadata.class);
+            metadataClass.put(AssetType.TLS, TlsMetadata.class);
+        }
     }
 
     private void assetUpdated (FileHandle handle) {
@@ -42,7 +47,9 @@ public class AssetImporter {
     public boolean attemptToImport (FileHandle handle) {
         FileHandle importedAsset = null;
         if(handle.extension().equals("png")) {
-            importedAsset = importSprite(handle);
+            importedAsset = SpriteImporter.run(handle);
+        } else if(handle.extension().equals("tls")) {
+            importedAsset = TlsImporter.run(handle);
         }
 
         if(importedAsset != null) {
@@ -56,7 +63,7 @@ public class AssetImporter {
         return importedAsset != null;
     }
 
-    public FileHandle importAssetFile (FileHandle handle) {
+    public static FileHandle importAssetFile (FileHandle handle) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
 
         FileHandle projectDir = Gdx.files.absolute(projectPath);
@@ -65,12 +72,17 @@ public class AssetImporter {
         handle.copyTo(destination);
 
         // create metadata
-        createMetadataFor(destination, AssetType.SPRITE);
+        // todo: refactor this later
+        if(handle.extension().equals("png")) {
+            createMetadataFor(destination, AssetType.SPRITE);
+        } else if(handle.extension().equals("tls")) {
+            createMetadataFor(destination, AssetType.TLS);
+        }
 
         return destination;
     }
 
-    private void createMetadataFor (FileHandle handle, AssetType type) {
+    private static void createMetadataFor (FileHandle handle, AssetType type) {
         Class<? extends AMetadata> clazz = metadataClass.get(type);
 
         try {
@@ -82,64 +94,27 @@ public class AssetImporter {
         }
     }
 
-    private void saveMetadata (FileHandle handle, AMetadata aMetadata) {
+    public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {
         Json json = new Json();
         String data = json.toJson(aMetadata);
         handle.writeString(data, false);
     }
 
-    private FileHandle importSprite(FileHandle fileHandle) {
-        FileHandle importedAsset = importAssetFile(fileHandle);// this is now copied to our assets folder, and metadata created
-
-        boolean was9slice = false;
-
-        if(fileHandle.nameWithoutExtension().endsWith(".9")) {
-            was9slice = true;
-            // it's a nine slice, and needs metadata created accordingly
-            FileHandle metadataHandle = getMetadataHandleFor(importedAsset);
-            metadataHandle = renameAsset(metadataHandle, metadataHandle.nameWithoutExtension().replace(".9", "") + ".meta");
-            importedAsset = renameAsset(importedAsset, importedAsset.nameWithoutExtension().replace(".9", "") + ".png");
-            SpriteMetadata metadata = readMetadata(metadataHandle, SpriteMetadata.class);
-
-            Pixmap pixmap = new Pixmap(importedAsset);
-            int[] splits = ImportUtils.getSplits(pixmap);
-            metadata.borderData = splits;
-
-            saveMetadata(metadataHandle, metadata);
-
-            Pixmap newPixmap = ImportUtils.cropImage(pixmap, 1, 1, pixmap.getWidth() - 1, pixmap.getHeight() - 1);
-            PixmapIO.writePNG(importedAsset, newPixmap);
-
-            pixmap.dispose();
-            newPixmap.dispose();
-        }
-
-        SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-        Vector2 sceneCords = workspace.getMouseCordsOnScene();
-        GameObject gameObject = workspace.createSpriteObject(importedAsset, sceneCords);
-        if(was9slice) {
-            SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
-            component.renderMode = SpriteRendererComponent.RenderMode.sliced;
-        }
-
-        return importedAsset;
-    }
-
-    private FileHandle renameAsset (FileHandle assetHandle, String name) {
+    public static FileHandle renameAsset (FileHandle assetHandle, String name) {
         FileHandle destination = Gdx.files.absolute(assetHandle.parent() + File.separator + name);
         assetHandle.moveTo(destination);
 
         return destination;
     }
 
-    public <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
+    public static <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
         String data = handle.readString();
         Json json = new Json();
         T object = json.fromJson(clazz, data);
         return object;
     }
 
-    private FileHandle getMetadataHandleFor (FileHandle handle) {
+    public static FileHandle getMetadataHandleFor (FileHandle handle) {
         FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
         return metadataHandle;
     }
@@ -148,5 +123,10 @@ public class AssetImporter {
         FileHandle handle = Gdx.files.absolute(assetPath);
         FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
         return metadataHandle;
+    }
+
+    public static FileHandle makeSimilar (FileHandle fileHandle, String extension) {
+        String path = fileHandle.parent().path() + File.separator + fileHandle.nameWithoutExtension() + "." + extension;
+        return Gdx.files.absolute(path);
     }
 }

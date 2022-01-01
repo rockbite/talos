@@ -9,11 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
-public class SpriteRendererComponent implements RendererComponent, Json.Serializable {
+public class SpriteRendererComponent extends RendererComponent {
 
     public TextureRegion texture;
 
@@ -23,18 +22,6 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
     public boolean flipX;
     public boolean flipY;
     public RenderMode renderMode = RenderMode.simple;
-    public String sortingLayer = "Default";
-    public int orderingInLayer;
-
-    @Override
-    public String getSortingLayer () {
-        return sortingLayer;
-    }
-
-    @Override
-    public void setSortingLayer (String name) {
-        sortingLayer = name;
-    }
 
     public enum RenderMode {
         simple,
@@ -46,7 +33,7 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture") {
+        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", "png") {
             @Override
             public String getValue () {
                 FileHandle fileHandle = Gdx.files.absolute(path);
@@ -64,33 +51,15 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
-        PropertyWidget orderingInLayerWidget = WidgetFactory.generate(this, "orderingInLayer", "Ordering");
-
-        SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer") {
-            @Override
-            public Array<String> getOptionsList () {
-                return SceneEditorAddon.get().workspace.getLayerList();
-            }
-
-            @Override
-            public String getValue () {
-                return sortingLayer;
-            }
-
-            @Override
-            public void valueChanged (String value) {
-                sortingLayer = value;
-            }
-        };
-
 
         properties.add(textureWidget);
         properties.add(colorWidget);
         properties.add(flipXWidget);
         properties.add(flipYWidget);
         properties.add(renderModesWidget);
-        properties.add(layerWidget);
-        properties.add(orderingInLayerWidget);
+
+        Array<PropertyWidget> superList = super.getListOfProperties();
+        properties.addAll(superList);
 
         return properties;
     }
@@ -126,8 +95,8 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
         json.writeValue("flipX", flipX);
         json.writeValue("flipY", flipY);
         json.writeValue("renderMode", renderMode);
-        json.writeValue("sortingLayer", sortingLayer);
-        json.writeValue("orderingInLayer", orderingInLayer);
+
+        super.write(json);
 
     }
 
@@ -143,8 +112,8 @@ public class SpriteRendererComponent implements RendererComponent, Json.Serializ
         flipY = jsonData.getBoolean("flipY", false);
         renderMode = json.readValue(RenderMode.class, jsonData.get("renderMode"));
         if(renderMode == null) renderMode = RenderMode.simple;
-        sortingLayer = jsonData.getString("sortingLayer", "Default");
-        orderingInLayer = jsonData.getInt("orderingInLayer", 0);
+
+        super.read(json, jsonData);
     }
 
     public TextureRegion getTexture () {
