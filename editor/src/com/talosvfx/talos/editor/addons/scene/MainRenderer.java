@@ -88,7 +88,7 @@ public class MainRenderer {
                 batch.setColor(spriteRenderer.color);
 
 
-                if(metadata.borderData !=null) {
+                if(metadata.borderData !=null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                     Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
                     NinePatch patch = obtainNinePatch(texture, metadata.borderData);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
