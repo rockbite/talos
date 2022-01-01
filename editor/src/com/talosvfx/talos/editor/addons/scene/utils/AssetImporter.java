@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 
@@ -88,7 +90,11 @@ public class AssetImporter {
 
     private FileHandle importSprite(FileHandle fileHandle) {
         FileHandle importedAsset = importAssetFile(fileHandle);// this is now copied to our assets folder, and metadata created
+
+        boolean was9slice = false;
+
         if(fileHandle.nameWithoutExtension().endsWith(".9")) {
+            was9slice = true;
             // it's a nine slice, and needs metadata created accordingly
             FileHandle metadataHandle = getMetadataHandleFor(importedAsset);
             metadataHandle = renameAsset(metadataHandle, metadataHandle.nameWithoutExtension().replace(".9", "") + ".meta");
@@ -110,7 +116,11 @@ public class AssetImporter {
 
         SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
         Vector2 sceneCords = workspace.getMouseCordsOnScene();
-        workspace.createSpriteObject(importedAsset, sceneCords);
+        GameObject gameObject = workspace.createSpriteObject(importedAsset, sceneCords);
+        if(was9slice) {
+            SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
+            component.renderMode = SpriteRendererComponent.RenderMode.sliced;
+        }
 
         return importedAsset;
     }

@@ -101,13 +101,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
 
-    public void createSpriteObject (FileHandle importedAsset, Vector2 sceneCords) {
+    public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords) {
         GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, null);
         SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
         component.path = importedAsset.path();
         component.reloadTexture();
 
+        return spriteObject;
     }
 
     public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
