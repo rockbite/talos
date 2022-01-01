@@ -19,6 +19,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
@@ -52,6 +54,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private SnapshotService snapshotService;
 
     private AssetListPopup assetListPopup;
+
+    private ObjectMap<String, AMetadata> metadataCache = new ObjectMap<>();
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
@@ -372,17 +376,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public void setProjectPath (String path) {
         projectPath = path;
-    }
-
-
-
-    public FileHandle importAsset (FileHandle handle) {
-        FileHandle projectDir = Gdx.files.absolute(projectPath);
-        FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
-        FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
-        handle.copyTo(destination);
-
-        return destination;
     }
 
     // if asset is updated externally, do something about it maybe
@@ -708,5 +701,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public AssetListPopup getAssetListPopup() {
         return assetListPopup;
+    }
+
+    public <T extends AMetadata> T getMetadata (String assetPath, Class<? extends T> clazz) {
+        if(metadataCache.containsKey(assetPath)) {
+            return (T) metadataCache.get(assetPath);
+        } else {
+            FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(assetPath);
+            T t = SceneEditorAddon.get().assetImporter.readMetadata(metadataHandle, clazz);
+            metadataCache.put(assetPath, t);
+            return t;
+        }
+
     }
 }

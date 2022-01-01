@@ -5,18 +5,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
-import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.events.*;
-import com.talosvfx.talos.editor.addons.scene.widgets.BottomPanel;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
@@ -34,18 +33,19 @@ public class SceneEditorAddon implements IAddon {
     public ProjectExplorerWidget projectExplorer;
     public PropertyPanel propertyPanel;
 
-    public FileTracker.Tracker assetTracker;
     private Table customLayoutTable;
     public Table workspaceContainer;
+
+    public AssetImporter assetImporter;
 
     @Override
     public void init () {
         SE = new SceneEditorProject(this);
 
+        assetImporter = new AssetImporter();
+
         registerEvents();
         buildUI();
-
-        assetTracker = handle -> workspace.updateAsset(handle);
     }
 
     private void registerEvents () {
@@ -142,19 +142,11 @@ public class SceneEditorAddon implements IAddon {
 
     @Override
     public boolean projectFileDrop (FileHandle handle) {
-        if(handle.extension().equals("png")) {
-            // import it
-            FileHandle importedAsset = workspace.importAsset(handle);
 
-            // track it
-            TalosMain.Instance().FileTracker().trackFile(importedAsset, assetTracker);
-
-            // add new game object to the scene
-            Vector2 sceneCords = workspace.getMouseCordsOnScene();
-            workspace.createSpriteObject(importedAsset, sceneCords);
-
+        if (assetImporter.attemptToImport(handle)) {
             return true;
         }
+
         return false;
     }
 

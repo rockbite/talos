@@ -1,14 +1,16 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 import java.util.Comparator;
 
@@ -26,6 +28,8 @@ public class MainRenderer {
     private static final int LT = 1;
     private static final int RT = 2;
     private static final int RB = 3;
+
+    private ObjectMap<Texture, NinePatch> patchCache = new ObjectMap<>();
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -74,20 +78,49 @@ public class MainRenderer {
             SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
+            SpriteMetadata metadata = SceneEditorAddon.get().workspace.getMetadata(spriteRenderer.path, SpriteMetadata.class);
+
             vec.set(0, 0);
             transformComponent.localToWorld(gameObject, vec);
             Vector2 renderPosition = vec;
 
             if(spriteRenderer.getTexture() != null) {
                 batch.setColor(spriteRenderer.color);
-                batch.draw(spriteRenderer.getTexture(),
-                        renderPosition.x - 0.5f, renderPosition.y - 0.5f,
-                        0.5f, 0.5f,
-                        1f, 1f,
-                        transformComponent.scale.x, transformComponent.scale.y,
-                        transformComponent.rotation);
+
+
+                if(metadata.borderData !=null) {
+                    Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
+                    NinePatch patch = obtainNinePatch(texture, metadata.borderData);// todo: this has to be done better
+                    //todo: and this renders wrong so this needs fixing too
+                    patch.draw(batch,
+                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                            0.5f, 0.5f,
+                            transformComponent.scale.x, transformComponent.scale.y,
+                            1f, 1f,
+                            transformComponent.rotation);
+                } else {
+                    batch.draw(spriteRenderer.getTexture(),
+                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                            0.5f, 0.5f,
+                            1f, 1f,
+                            transformComponent.scale.x, transformComponent.scale.y,
+                            transformComponent.rotation);
+                }
+
+
                 batch.setColor(Color.WHITE);
             }
+        }
+    }
+
+    private NinePatch obtainNinePatch (Texture texture, int[] metadata) {
+        if(patchCache.containsKey(texture)) {
+            return patchCache.get(texture);
+        } else {
+            NinePatch patch = new NinePatch(texture, metadata[0], metadata[1], metadata[2], metadata[3]);
+            patch.scale(1/100f, 1/100f); // fix this later
+            patchCache.put(texture, patch);
+            return patch;
         }
     }
 

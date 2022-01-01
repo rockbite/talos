@@ -40,6 +40,7 @@ public class ProjectExplorerWidget extends Table {
 
                 if(pathname.getAbsolutePath().endsWith(".tse")) return false;
                 if(pathname.getName().equals(".DS_Store")) return false;
+                if(pathname.getAbsolutePath().endsWith(".meta")) return false;
 
                 return true;
             }
@@ -193,6 +194,10 @@ public class ProjectExplorerWidget extends Table {
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
         }
+    }
+
+    public void expand() {
+        directoryTree.expandAll();
     }
 
     public void expand(String path) {
