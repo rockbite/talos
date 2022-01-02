@@ -302,6 +302,11 @@ public class SmartTransformGizmo extends Gizmo {
         transform.scale.set(nextPoints[RB].dst(nextPoints[LB]), nextPoints[LB].dst(nextPoints[LT]));
         transform.scale = lowerPrecision(transform.scale);
         tmp.set(nextPoints[RT]).sub(nextPoints[LB]).scl(0.5f).add(nextPoints[LB]); // this is midpoint
+
+        if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            transform.position.set(tmp); // lol, this is a funny story actually
+        }
+
         transform.position = lowerPrecision(transform.position);
     }
 
