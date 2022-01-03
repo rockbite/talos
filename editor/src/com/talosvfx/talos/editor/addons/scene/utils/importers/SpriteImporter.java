@@ -41,15 +41,25 @@ public class SpriteImporter {
             newPixmap.dispose();
         }
 
+        makeInstance(importedAsset, SceneEditorAddon.get().workspace.getRootGO());
+
+        return importedAsset;
+    }
+
+    public static void makeInstance(FileHandle asset, GameObject parent) {
+        if(!AssetImporter.getMetadataHandleFor(asset).exists()) {
+            AssetImporter.createMetadataFor(asset, AssetImporter.AssetType.SPRITE);
+        }
+        SpriteMetadata metadata = AssetImporter.readMetadataFor(asset, SpriteMetadata.class);
+
         SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
         Vector2 sceneCords = workspace.getMouseCordsOnScene();
-        GameObject gameObject = workspace.createSpriteObject(importedAsset, sceneCords);
-        if(was9slice) {
+        GameObject gameObject = workspace.createSpriteObject(asset, sceneCords, parent);
+
+        if(metadata.borderData != null) {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
             component.renderMode = SpriteRendererComponent.RenderMode.sliced;
         }
-
-        return importedAsset;
     }
 
 }

@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
@@ -28,9 +29,11 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
@@ -56,6 +59,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private AssetListPopup assetListPopup;
 
     private ObjectMap<String, AMetadata> metadataCache = new ObjectMap<>();
+
+    private FileTracker fileTracker = new FileTracker();
+    private FileWatching fileWatching = new FileWatching();
+    private float reloadScheduled = -1;
 
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
@@ -102,7 +109,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 
     public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords) {
-        GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, null);
+        return createSpriteObject(importedAsset, sceneCords, null);
+    }
+
+    public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords, GameObject parent) {
+        GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
         SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
         component.path = importedAsset.path();
@@ -262,7 +273,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
 
-                if(keycode == Input.Keys.DEL) {
+                if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
                     Array<GameObject> deleteList = new Array<>();
                     deleteList.addAll(selection);
                     clearSelection();
@@ -333,6 +344,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         for(int i = 0; i < gizmoList.size; i++) {
             Gizmo gizmo = gizmoList.get(i);
             gizmo.act(delta);
+        }
+
+        if(reloadScheduled > 0) {
+            reloadScheduled -= delta;
+            if(reloadScheduled <= 0) {
+                reloadScheduled = -1;
+                System.out.println("QAQ");
+                reloadProjectExplorer();
+            }
         }
     }
 
@@ -648,6 +668,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             projectExplorer.select(scene.path);
             openScene(scene);
         }
+
+        if(!fromMemory) {
+            Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
+        }
     }
 
     public void repositionGameObject (GameObject parentToMoveTo, GameObject childThatHasMoved) {
@@ -717,5 +741,38 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             return null;
         }
 
+    }
+
+    public FileHandle getProjectFolder() {
+        return Gdx.files.absolute(projectPath);
+    }
+
+    public FileHandle getAssetsFolder() {
+        return Gdx.files.absolute(projectPath + File.separator + "assets");
+    }
+
+    @EventHandler
+    public void onProjectOpened(ProjectOpened event) {
+        // setup file tracker
+        try {
+            fileWatching.startWatchingCurrentProject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void onProjectDirectoryContentsChanged(ProjectDirectoryContentsChanged event) {
+        if(event.getChanges().directoryStructureChange()) {
+            boolean nonMeta = false;
+            for(FileHandle added: event.getChanges().added) {
+                if(!added.extension().equals("meta")) {
+                    nonMeta = true;
+                }
+            }
+            if(nonMeta) {
+                reloadScheduled = 0.5f;
+            }
+        }
     }
 }
