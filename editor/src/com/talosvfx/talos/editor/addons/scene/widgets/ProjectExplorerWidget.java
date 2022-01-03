@@ -1,16 +1,20 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
+import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
@@ -27,12 +31,15 @@ public class ProjectExplorerWidget extends Table {
     private ContextualMenu contextualMenu;
     private FilteredTree.Node rootNode;
 
+    private DragAndDrop dragAndDrop;
+
     public ProjectExplorerWidget() {
         contextualMenu = new ContextualMenu();
 
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
         ScrollPane scrollPane = new ScrollPane(directoryTree);
         add(scrollPane).grow().padTop(3);
+        directoryTree.draggable = true;
 
         fileFilter = new FileFilter() {
             @Override
@@ -61,6 +68,8 @@ public class ProjectExplorerWidget extends Table {
         });
 
         directoryTree.expandAll();
+
+        dragAndDrop = new DragAndDrop();
     }
 
     private String getCurrSelectedPath() {
@@ -212,15 +221,46 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void loadDirectoryTree (String path) {
+        dragAndDrop.clear();
+        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                Actor actor = getActor();
+
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor targetActor = getActor();
+                AssetImporter.createAssetInstance((FileHandle) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+            }
+        });
+        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor actor = getActor();
+
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor targetActor = getActor();
+                System.out.println(targetActor);
+            }
+        });
+
+
         nodes.clear();
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
 
         rootNode = new FilteredTree.Node("project",  new Label("Project", TalosMain.Instance().getSkin()));
         rootNode.setObject(path); // project path
-        directoryTree.add(rootNode);
-
         traversePath(root, 0, 10, rootNode);
+        directoryTree.add(rootNode);
 
         rootNode.setExpanded(true);
     }
@@ -235,6 +275,7 @@ public class ProjectExplorerWidget extends Table {
                 EditableLabel label = widget.getLabel();
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
                 newNode.setObject(listItemHandle.path());
+                //newNode.draggable = true; // todo: for later file manipulation
                 node.add(newNode);
                 nodes.put(listItemHandle.path(), newNode);
                 if(listItemHandle.isDirectory()) {
@@ -261,18 +302,39 @@ public class ProjectExplorerWidget extends Table {
                         nodes.put(newHandle.path(), newNode);
                     }
                 });
+
+                if(!listItemHandle.isDirectory()) {
+                    // we let files to be dragged outside this widget
+                    dragAndDrop.addSource(new DragAndDrop.Source(newNode.getActor()) {
+                        @Override
+                        public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                            DragAndDrop.Payload payload = new DragAndDrop.Payload();
+
+                            Actor dragging = ((ActorCloneable) newNode.getActor()).copyActor(newNode.getActor());
+
+                            payload.setDragActor(dragging);
+                            payload.setObject(listItemHandle);
+
+                            return payload;
+                        }
+                    });
+                }
             }
         }
     }
 
-    public static class RowWidget extends Table {
+    public static class RowWidget extends Table implements ActorCloneable<RowWidget> {
         private final EditableLabel label;
+        private final FileHandle fileHandle;
+        private final boolean editable;
 
         public RowWidget(FileHandle fileHandle) {
             this(fileHandle, true);
         }
 
         public RowWidget(FileHandle fileHandle, boolean editable) {
+            this.fileHandle = fileHandle;
+            this.editable = editable;
             Image icon;
             if(fileHandle.isDirectory()) {
                 icon = new Image(TalosMain.Instance().getSkin().getDrawable("ic-folder"));
@@ -289,6 +351,12 @@ public class ProjectExplorerWidget extends Table {
 
         public EditableLabel getLabel() {
             return label;
+        }
+
+        @Override
+        public RowWidget copyActor(RowWidget copyFrom) {
+            RowWidget widget = new RowWidget(fileHandle, editable);
+            return widget;
         }
     }
 }

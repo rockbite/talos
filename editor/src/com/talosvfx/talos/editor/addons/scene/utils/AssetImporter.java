@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.SpriteImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.TlsImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
@@ -23,7 +24,7 @@ public class AssetImporter {
 
     public FileTracker.Tracker assetTracker;
 
-    private enum AssetType {
+    public enum AssetType {
         SPRITE,
         TLS
     }
@@ -44,7 +45,7 @@ public class AssetImporter {
         SceneEditorAddon.get().workspace.updateAsset(handle); //todo: maybe instead worth using events
     }
 
-    public boolean attemptToImport (FileHandle handle) {
+    public static FileHandle attemptToImport (FileHandle handle) {
         FileHandle importedAsset = null;
         if(handle.extension().equals("png")) {
             importedAsset = SpriteImporter.run(handle);
@@ -60,7 +61,7 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().saveProject();
         }
 
-        return importedAsset != null;
+        return importedAsset;
     }
 
     public static FileHandle importAssetFile (FileHandle handle) {
@@ -69,7 +70,10 @@ public class AssetImporter {
         FileHandle projectDir = Gdx.files.absolute(projectPath);
         FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
         FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
-        handle.copyTo(destination);
+
+        if(!handle.path().equals(destination.path())) {
+            handle.copyTo(destination);
+        }
 
         // create metadata
         // todo: refactor this later
@@ -82,7 +86,7 @@ public class AssetImporter {
         return destination;
     }
 
-    private static void createMetadataFor (FileHandle handle, AssetType type) {
+    public static void createMetadataFor (FileHandle handle, AssetType type) {
         Class<? extends AMetadata> clazz = metadataClass.get(type);
 
         try {
@@ -102,9 +106,18 @@ public class AssetImporter {
 
     public static FileHandle renameAsset (FileHandle assetHandle, String name) {
         FileHandle destination = Gdx.files.absolute(assetHandle.parent() + File.separator + name);
-        assetHandle.moveTo(destination);
+
+        assetHandle.file().renameTo(destination.file());
 
         return destination;
+    }
+
+    public static <T extends AMetadata> T readMetadataFor (FileHandle assetHandle, Class<? extends T> clazz) {
+        FileHandle handle = getMetadataHandleFor(assetHandle);
+        String data = handle.readString();
+        Json json = new Json();
+        T object = json.fromJson(clazz, data);
+        return object;
     }
 
     public static <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
@@ -129,4 +142,19 @@ public class AssetImporter {
         String path = fileHandle.parent().path() + File.separator + fileHandle.nameWithoutExtension() + "." + extension;
         return Gdx.files.absolute(path);
     }
+
+
+    public static void createAssetInstance(FileHandle fileHandle, GameObject parent) {
+
+        if(fileHandle.extension().equals("png")) {
+            // check if non imported nine patch
+            if(fileHandle.name().endsWith(".9.png")) {
+                // import it
+                fileHandle = AssetImporter.attemptToImport(fileHandle);
+            }
+            SpriteImporter.makeInstance(fileHandle, parent);
+        }
+
+    }
+
 }

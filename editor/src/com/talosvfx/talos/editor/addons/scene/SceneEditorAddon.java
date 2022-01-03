@@ -58,6 +58,8 @@ public class SceneEditorAddon implements IAddon {
         Notifications.addEventToPool(GameObjectDeleted.class);
         Notifications.addEventToPool(GameObjectNameChanged.class);
         Notifications.addEventToPool(LayerListUpdated.class);
+        Notifications.addEventToPool(ProjectOpened.class);
+        Notifications.addEventToPool(ProjectDirectoryContentsChanged.class);
     }
 
     @Override
@@ -145,7 +147,7 @@ public class SceneEditorAddon implements IAddon {
     @Override
     public boolean projectFileDrop (FileHandle handle) {
 
-        if (assetImporter.attemptToImport(handle)) {
+        if (AssetImporter.attemptToImport(handle) != null) {
             return true;
         }
 
