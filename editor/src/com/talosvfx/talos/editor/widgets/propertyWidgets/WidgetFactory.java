@@ -193,7 +193,7 @@ public class WidgetFactory {
             @Override
             public String getValue() {
                 try {
-                    field.get(parent);
+                    return field.get(parent).toString();
                 } catch (IllegalAccessException e) {
 
                 }
