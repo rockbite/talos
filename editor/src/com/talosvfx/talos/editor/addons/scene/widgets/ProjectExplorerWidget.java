@@ -263,6 +263,8 @@ public class ProjectExplorerWidget extends Table {
         directoryTree.add(rootNode);
 
         rootNode.setExpanded(true);
+
+        rootNode.expandAll();
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {

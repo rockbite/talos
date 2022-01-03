@@ -18,10 +18,7 @@ public class SpriteImporter {
         FileHandle importedAsset = AssetImporter.importAssetFile(fileHandle);
         // this is now copied to our assets folder, and metadata created
 
-        boolean was9slice = false;
-
         if(fileHandle.nameWithoutExtension().endsWith(".9")) {
-            was9slice = true;
             // it's a nine slice, and needs metadata created accordingly
             FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(importedAsset);
             metadataHandle = AssetImporter.renameAsset(metadataHandle, metadataHandle.nameWithoutExtension().replace(".9", "") + ".meta");

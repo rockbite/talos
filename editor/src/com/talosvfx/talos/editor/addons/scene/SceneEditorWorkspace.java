@@ -351,7 +351,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             reloadScheduled -= delta;
             if(reloadScheduled <= 0) {
                 reloadScheduled = -1;
-                System.out.println("QAQ");
                 reloadProjectExplorer();
             }
         }

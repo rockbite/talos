@@ -67,23 +67,33 @@ public class AssetImporter {
     public static FileHandle importAssetFile (FileHandle handle) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
 
-        FileHandle projectDir = Gdx.files.absolute(projectPath);
-        FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
-        FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
+        if (handle.path().startsWith(projectPath)) {
+            FileHandle destination = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name());
+            // todo: refactor this later
+            if (handle.extension().equals("png")) {
+                createMetadataFor(destination, AssetType.SPRITE);
+            } else if (handle.extension().equals("tls")) {
+                createMetadataFor(destination, AssetType.TLS);
+            }
 
-        if(!handle.path().equals(destination.path())) {
+            return handle;
+        } else {
+            FileHandle projectDir = Gdx.files.absolute(projectPath);
+            FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
+            FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
+
             handle.copyTo(destination);
-        }
 
-        // create metadata
-        // todo: refactor this later
-        if(handle.extension().equals("png")) {
-            createMetadataFor(destination, AssetType.SPRITE);
-        } else if(handle.extension().equals("tls")) {
-            createMetadataFor(destination, AssetType.TLS);
-        }
 
+            // create metadata
+            // todo: refactor this later
+            if (handle.extension().equals("png")) {
+                createMetadataFor(destination, AssetType.SPRITE);
+            } else if (handle.extension().equals("tls")) {
+                createMetadataFor(destination, AssetType.TLS);
+            }
         return destination;
+        }
     }
 
     public static void createMetadataFor (FileHandle handle, AssetType type) {
@@ -150,9 +160,10 @@ public class AssetImporter {
             // check if non imported nine patch
             if(fileHandle.name().endsWith(".9.png")) {
                 // import it
-                fileHandle = AssetImporter.attemptToImport(fileHandle);
+                AssetImporter.attemptToImport(fileHandle);
+            } else {
+                SpriteImporter.makeInstance(fileHandle, parent);
             }
-            SpriteImporter.makeInstance(fileHandle, parent);
         }
 
     }
