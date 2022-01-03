@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.TalosMain;
@@ -503,6 +504,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             Scene scene = (Scene) currentContainer;
             selectPropertyHolder(scene);
         }
+
+        Stage stage = TalosMain.Instance().UIStage().getStage();
+        stage.setKeyboardFocus(this);
     }
 
     public void deleteGameObjects (Array<GameObject> gameObjects) {
@@ -640,6 +644,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 scene.loadFromJson(snapshotService.getSnapshot(changeVersion, scene.path));
             } else {
                 scene.loadFromPath();
+                // save it as snapshot
+                snapshotService.saveSnapshot(changeVersion, scene.path, scene.getAsString());
             }
         }
         ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;

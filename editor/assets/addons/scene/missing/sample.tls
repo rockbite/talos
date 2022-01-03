@@ -218,6 +218,26 @@
 				},
 				"filePath": null,
 				"regionName": "white"
+			},
+			{
+				"class": "GradientColorModuleWrapper",
+				"id": 9,
+				"x": -173,
+				"y": -114,
+				"module": {
+					"data": {
+						"class": "GradientColorModule",
+						"index": 9,
+						"points": [
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 0
+							}
+						]
+					}
+				}
 			}
 		],
 		"connections": [
@@ -254,6 +274,11 @@
 				"moduleFrom": 8,
 				"moduleTo": 1,
 				"slotTo": 2
+			},
+			{
+				"moduleFrom": 9,
+				"moduleTo": 1,
+				"slotTo": 9
 			}
 		]
 	}

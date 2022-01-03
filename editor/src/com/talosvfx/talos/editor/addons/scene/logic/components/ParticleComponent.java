@@ -5,15 +5,24 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.project.TalosProject;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+
+import java.io.File;
 
 public class ParticleComponent extends RendererComponent {
 
     public ParticleEffectDescriptor descriptor;
     public String path = "";
+
+    public String linkedTo = "";
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -33,7 +42,44 @@ public class ParticleComponent extends RendererComponent {
             }
         };
 
+        ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
+            @Override
+            public void clicked (ButtonPropertyWidget<String> widget) {
+                String link = widget.getValue();
+                if(link.isEmpty()) {
+                    FileHandle sample = Gdx.files.internal("addons/scene/missing/sample.tls");
+                    FileHandle thisEffect = Gdx.files.absolute(path);
+                    FileHandle destination;
+                    if(thisEffect.exists()) {
+                        destination = AssetImporter.makeSimilar(thisEffect, "tls");
+                    } else {
+                        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+                        destination = Gdx.files.absolute(projectPath + File.separator + "assets/sample.tls");
+
+                        FileHandle texture = Gdx.files.internal("addons/scene/missing/white.png");
+                        FileHandle textureDst = Gdx.files.absolute(projectPath + File.separator + "assets/white.png");
+                        texture.copyTo(textureDst);
+                    }
+                    sample.copyTo(destination);
+
+                    TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+                    TalosMain.Instance().ProjectController().loadProject(sample);
+                }
+            }
+            }) {
+                @Override
+                public String getValue () {
+                    return linkedTo;
+                }
+
+                @Override
+                public void valueChanged (String value) {
+                    linkedTo = value;
+                }
+        };
+
         properties.add(descriptorWidget);
+        properties.add(linkedToWidget);
         properties.addAll(super.getListOfProperties());
 
         return properties;
