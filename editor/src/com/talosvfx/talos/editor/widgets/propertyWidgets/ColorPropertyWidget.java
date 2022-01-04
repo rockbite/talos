@@ -54,6 +54,8 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     @Override
     public void updateWidget(Color value) {
-        box.setColor(value);
+        if(value != null) {
+            box.setColor(value);
+        }
     }
 }

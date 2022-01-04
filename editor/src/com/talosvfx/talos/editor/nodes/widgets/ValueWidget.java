@@ -360,6 +360,5 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     public void setNone() {
         valueLabel.setText("-");
-        value = Float.NaN;
     }
 }

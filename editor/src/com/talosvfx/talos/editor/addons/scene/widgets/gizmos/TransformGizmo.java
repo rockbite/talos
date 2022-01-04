@@ -90,4 +90,9 @@ public class TransformGizmo extends Gizmo {
 
         return tmp;
     }
+
+    @Override
+    public boolean isMultiSelect () {
+        return true;
+    }
 }

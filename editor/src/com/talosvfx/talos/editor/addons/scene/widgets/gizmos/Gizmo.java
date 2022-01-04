@@ -107,4 +107,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     public void reset () {
 
     }
+
+    public boolean isMultiSelect() {
+        return false;
+    }
 }

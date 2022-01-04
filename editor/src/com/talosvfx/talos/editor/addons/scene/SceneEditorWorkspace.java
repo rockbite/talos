@@ -734,10 +734,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             gizmo.setSelected(false);
         }
 
-        for(GameObject gameObject: gameObjects) {
-            Array<Gizmo> gizmos = gizmoMap.get(gameObject);
+        if(gameObjects.size == 1) {
+            Array<Gizmo> gizmos = gizmoMap.get(gameObjects.get(0));
             for(Gizmo gizmo: gizmos) {
                 gizmo.setSelected(true);
+            }
+        } else {
+            for (GameObject gameObject : gameObjects) {
+                Array<Gizmo> gizmos = gizmoMap.get(gameObject);
+                for (Gizmo gizmo : gizmos) {
+                    if(gizmo.isMultiSelect()) {
+                        gizmo.setSelected(true);
+                    }
+                }
             }
         }
 
