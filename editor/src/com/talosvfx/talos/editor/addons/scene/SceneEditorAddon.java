@@ -90,6 +90,11 @@ public class SceneEditorAddon implements IAddon {
         menuBar.addMenu(mainMenu);
     }
 
+    @Override
+    public void dispose () {
+        workspace.dispose();
+    }
+
     private void buildUI () {
         workspace = SceneEditorWorkspace.getInstance();
         workspace.setAddon(this);

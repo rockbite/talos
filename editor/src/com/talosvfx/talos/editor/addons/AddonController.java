@@ -58,4 +58,10 @@ public class AddonController {
 
         return null;
     }
+
+    public void dispose () {
+        for(IAddon addon: activeAddons) {
+            addon.dispose();
+        }
+    }
 }

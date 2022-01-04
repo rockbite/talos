@@ -274,6 +274,7 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
+		addonController.dispose();
 		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
 			currentWorkplaceStage.getStage().dispose();
 		}

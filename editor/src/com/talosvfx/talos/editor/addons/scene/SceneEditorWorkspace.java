@@ -4,12 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -65,6 +69,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private FileWatching fileWatching = new FileWatching();
     private float reloadScheduled = -1;
 
+
+    // selections
+    private Image selectionRect;
+
     public SceneEditorWorkspace() {
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
@@ -94,6 +102,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         addPanListener();
 
         renderer = new MainRenderer();
+
+        Stage stage = TalosMain.Instance().UIStage().getStage();
+        Skin skin = TalosMain.Instance().getSkin();
+        selectionRect = new Image(skin.getDrawable("orange_row"));
+        selectionRect.setSize(0, 0);
+        selectionRect.setVisible(false);
+        stage.addActor(selectionRect);
     }
 
     public void createEmpty (Vector2 position) {
@@ -203,12 +218,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         addListener(new InputListener() {
 
             Vector2 vec = new Vector2();
-
             Gizmo touchedGizmo = null;
+
+            // selection stuff
+            boolean dragged = false;
+            Vector2 startPos = new Vector2();
+            Rectangle rectangle = new Rectangle();
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
+                dragged = false;
                 touchedGizmo = null;
 
                 Vector2 hitCords = getWorldFromLocal(x, y);
@@ -242,7 +262,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo = null;
                 }
 
-                clearSelection();
+                if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    selectionRect.setVisible(true);
+                    selectionRect.setSize(0, 0);
+                    startPos.set(x, y);
+                }
 
                 return false;
             }
@@ -251,16 +275,43 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
 
+                dragged = true;
+
                 Vector2 hitCords = getWorldFromLocal(x, y);
 
                 if(touchedGizmo != null) {
                     touchedGizmo.touchDragged(hitCords.x, hitCords.y);
+                }
+
+                if(selectionRect.isVisible()) {
+                    vec.set(x, y);
+                    vec.sub(startPos);
+                    if(vec.x < 0) {
+                        rectangle.setX(x);
+                    } else {
+                        rectangle.setX(startPos.x);
+                    }
+                    if(vec.y < 0) {
+                        rectangle.setY(y);
+                    } else {
+                        rectangle.setY(startPos.y);
+                    }
+                    rectangle.setWidth(Math.abs(vec.x));
+                    rectangle.setHeight(Math.abs(vec.y));
+
+                    selectionRect.setPosition(rectangle.x, rectangle.y);
+                    selectionRect.setSize(rectangle.getWidth(), rectangle.getHeight());
                 }
             }
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 Vector2 hitCords = getWorldFromLocal(x, y);
+
+                if(button == 0 && (!event.isCancelled() && !event.isHandled())) {
+                    FocusManager.resetFocus(getStage());
+                    clearSelection();
+                }
 
                 Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
 
@@ -269,6 +320,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 }
 
                 touchedGizmo = null;
+
+                if(selectionRect.isVisible()) {
+                    // todo select shit
+                }
+
+                selectionRect.setVisible(false);
             }
 
             @Override
@@ -779,5 +836,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 reloadScheduled = 0.5f;
             }
         }
+    }
+
+    public void dispose () {
+        fileWatching.shutdown();
     }
 }
