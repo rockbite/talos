@@ -82,11 +82,10 @@ public class Preview3D extends PreviewWidget {
     protected void addPanListener() {
         addListener(new InputListener() {
             @Override
-            public boolean scrolled(InputEvent event, float x, float y, int amount) {
+            public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
+                cameraInputController.scrolled(amountX, amountY);
 
-                cameraInputController.scrolled(amount);
-
-                return true;
+                return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override

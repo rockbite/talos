@@ -66,7 +66,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 
-		particleRenderer = new SpriteBatchParticleRenderer(batch);
+		particleRenderer = new SpriteBatchParticleRenderer(orthographicCamera, batch);
 
 		cameraController = new CameraController(orthographicCamera);
 

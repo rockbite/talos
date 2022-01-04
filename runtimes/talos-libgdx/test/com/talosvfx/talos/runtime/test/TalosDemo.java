@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglFrame;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -58,7 +59,7 @@ public class TalosDemo extends ApplicationAdapter {
         ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("fire.p"), textureAtlas);
         effect = effectDescriptor.createEffectInstance();
 
-        defaultRenderer = new SpriteBatchParticleRenderer();
+        defaultRenderer = new SpriteBatchParticleRenderer(viewport.getCamera());
     }
 
     @Override

@@ -122,7 +122,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				float fromThicknessValue = thickness.get(0);
 				fromOffset.set(offset.get(0), offset.get(1), offset.get(2));
 				fromColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
-				fromTransparency = this.transparency.getFloat();
+				fromTransparency = this.transparency.isEmpty() ? 1 : this.transparency.getFloat(); //default
 
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, nextParticlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, toReference.seed);
@@ -132,7 +132,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				float nextThicknessValue = thickness.get(0);
 				toOffset.set(offset.get(0), offset.get(1), offset.get(2));
 				toColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
-				toTransparency = this.transparency.getFloat();
+				toTransparency = this.transparency.isEmpty() ? 1 : this.transparency.getFloat(); //default
 
 				float alpha = (float)j / pointData.size;
 				float nextAlpha = (float)(j + 1) / pointData.size;
