@@ -122,6 +122,19 @@ task distLegacyTest(type: Jar) {
 dist.dependsOn classes
 
 
+task createProperties(dependsOn: processResources) {
+    doLast {
+        new File("$projectDir/assets/talos-version.properties").withWriter { w ->
+            Properties p = new Properties()
+            p['version'] = project.version.toString()
+            p.store w, null
+        }
+    }
+}
+
+classes {
+    dependsOn createProperties
+}
 
 modifyPom {
     project {

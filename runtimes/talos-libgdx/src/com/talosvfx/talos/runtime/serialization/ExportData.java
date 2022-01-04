@@ -28,6 +28,7 @@ public class ExportData {
 
     public static class ExportMetadata {
         public Array<String> resources = new Array<>();
+        public String versionString;
     }
 
     public static class EmitterExportData {

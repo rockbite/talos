@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.TalosVersion;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
@@ -425,6 +426,8 @@ public class TalosProject implements IProject {
 
 			data.emitters.add(emitterData);
 		}
+
+		data.metadata.versionString = TalosVersion.getVersion();
 
 	}
 
