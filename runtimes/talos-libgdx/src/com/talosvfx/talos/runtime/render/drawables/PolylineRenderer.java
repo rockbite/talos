@@ -44,7 +44,7 @@ public class PolylineRenderer extends ParticleDrawable {
     Array<Particle> tmpArr = new Array<>();
 
     @Override
-    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
+    public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
         Polyline polyline = polyline();
         polyline.set(width, rotation);
         polyline.draw(batch, region, x, y, null);
@@ -71,7 +71,7 @@ public class PolylineRenderer extends ParticleDrawable {
         float y = particle.getY();
         float x = particle.getX();
 
-        draw(batch, x, y, width, height, rotation.x);
+        draw(batch, x, y, width, height, rotation.x, particle.pivot.x, particle.pivot.y);
     }
 
     @Override

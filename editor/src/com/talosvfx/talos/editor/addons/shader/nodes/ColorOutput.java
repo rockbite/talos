@@ -10,6 +10,8 @@ public class ColorOutput extends AbstractShaderNode {
 
     public final String INPUT_RGBA = "inputColor";
 
+    public final String OUTPUT = "outputShader";
+
     public final String BLENDING = "blending";
 
     private ShaderBox.Blending blending = ShaderBox.Blending.NORMAL;
@@ -34,6 +36,9 @@ public class ColorOutput extends AbstractShaderNode {
                 shaderBox.setBlending(blending);
             }
         });
+
+
+        buildFragmentShader(previewBuilder);
     }
 
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {
@@ -48,7 +53,7 @@ public class ColorOutput extends AbstractShaderNode {
 
         String color = getExpression(INPUT_RGBA);
 
-        if(color == null) {
+        if(color == null || color.equals("0.0")) {
             color = "vec4(0.0, 0.0, 0.0, 1.0)";
         }
 
@@ -74,6 +79,7 @@ public class ColorOutput extends AbstractShaderNode {
 
     @Override
     public String writeOutputCode(String slotId) {
-        return null;
+        String fragmentString = previewBuilder.getFragmentString();
+        return fragmentString;
     }
 }

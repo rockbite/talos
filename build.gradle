@@ -4,7 +4,7 @@ allprojects {
 
 
     group = "com.talosvfx"
-    version = '1.3.3'
+    version = '1.4.1'
 
     if(project.hasProperty("release")) {
     } else {
@@ -13,8 +13,9 @@ allprojects {
 
     ext {
         appName = "talos"
-        gdxVersion = '1.9.10'
-        visuiVersion = '1.4.2'
+        gdxVersion = '1.10.0'
+        lwjgl3Version = '3.3.0-SNAPSHOT'
+        visuiVersion = '1.5.0'
     }
 
 

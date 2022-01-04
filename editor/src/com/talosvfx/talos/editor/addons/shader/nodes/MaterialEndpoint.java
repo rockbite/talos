@@ -42,6 +42,10 @@ public class MaterialEndpoint extends AbstractShaderNode {
         });
 
         setClip(false);
+
+        box2d.setVisible(false);
+        box3d.setVisible(true);
+        shaderBox = box3d;
     }
 
     public void prepareDeclarations (ShaderBuilder shaderBuilder) {

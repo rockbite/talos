@@ -641,4 +641,21 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public Array<Event> getEvents() {
         return events;
     }
+
+    public BoundEffect findEffect (Skeleton skeleton, Slot slot) {
+        final String boneName = slot.getBone().getData().getName();
+
+        final Skin skin = skeleton.getSkin();
+        final ObjectMap<String, Array<BoundEffect>> entries = boundEffects.get(skin.getName());
+
+        for (Array<BoundEffect> value : entries.values()) {
+            for (int i = 0; i < value.size; i++) {
+                final BoundEffect boundEffect = value.get(i);
+                if (boundEffect.getPositionAttachment().getBoneName().equals(boneName)) {
+                    return boundEffect;
+                }
+            }
+        }
+        return null;
+    }
 }

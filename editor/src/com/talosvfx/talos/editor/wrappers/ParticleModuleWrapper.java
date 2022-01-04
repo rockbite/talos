@@ -54,6 +54,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         addInputSlot("rotation",  ParticleModule.ROTATION);
         addInputSlot("position",  ParticleModule.POSITION);
+        addInputSlot("pivot",  ParticleModule.PIVOT);
 
     }
 
@@ -64,6 +65,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.MESH_GENERATOR) return QuadMeshGeneratorModule.class;
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
         if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
+        if(slot.getIndex() == ParticleModule.PIVOT) return Vector2Module.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
         if(slot.getIndex() == ParticleModule.POSITION) return Vector2Module.class;

@@ -124,7 +124,9 @@ public class TalosProject implements IProject {
 			particleEffectDescriptor.setEffectReference(particleEffect); // important
 			particleEffectDescriptor.addEmitter(graph);
 			particleEffect.init();
-
+			// configure emitter visibility
+			emitterWrapper.isMuted = emitterData.isMuted;
+			particleEffect.getEmitter(emitterWrapper.getGraph()).setVisible(!emitterData.isMuted);
 			// time to load groups here
 			for(GroupData group: emitterData.groups) {
 				ObjectSet<ModuleWrapper> childWrappers = new ObjectSet<>();

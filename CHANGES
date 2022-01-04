@@ -1,3 +1,12 @@
+[1.4.2]
+- Material Modile for 2D/3D preview of shader code output
+- External shader module with annotation support
+- Pixel Shader module now allows pass through output of it's code
+
+[1.4.1]
+- Changed spine runtime version to 4.0
+- Added pivot point functionality
+
 [1.4.0]
 - Shader graph can now save results as PNG
 - TargetModule is an eat way to shoot particles to certain configurable destinations

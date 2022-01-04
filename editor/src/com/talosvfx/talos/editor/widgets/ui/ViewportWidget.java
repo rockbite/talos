@@ -71,15 +71,14 @@ public abstract class ViewportWidget extends Table {
     protected void addPanListener() {
         addListener(new InputListener() {
             @Override
-            public boolean scrolled (InputEvent event, float x, float y, int amount) {
+            public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
                 float currWidth = camera.viewportWidth * camera.zoom;
-                float nextWidth = currWidth * (1f + amount * 0.1f);
+                float nextWidth = currWidth * (1f + amountY * 0.1f);
                 float nextZoom = nextWidth/camera.viewportWidth;
                 camera.zoom = nextZoom;
 
                 camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
                 camera.update();
-                cameraScrolledWithAmount(amount);
 
                 return true;
             }
@@ -116,10 +115,6 @@ public abstract class ViewportWidget extends Table {
     }
 
     Vector2 temp = new Vector2();
-
-    protected void cameraScrolledWithAmount (int amount) {
-
-    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

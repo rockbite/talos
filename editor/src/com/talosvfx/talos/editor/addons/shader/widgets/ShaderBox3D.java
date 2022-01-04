@@ -33,7 +33,11 @@ public class ShaderBox3D extends ShaderBox {
 
     private float a = 0;
 
+    protected Texture white;
+
     public ShaderBox3D() {
+        white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
+
         region = new TextureRegion();
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, true, false);
         cam = new PerspectiveCamera(67, 3, 3);
@@ -79,6 +83,8 @@ public class ShaderBox3D extends ShaderBox {
 
     @Override
     protected void drawCall (Batch batch) {
+        if (shaderProgram== null) return;
+
         batch.end();
 
         Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -93,6 +99,9 @@ public class ShaderBox3D extends ShaderBox {
 
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projTrans", cam.combined);
+
+        white.bind(0);
+        shaderProgram.setUniformi("u_texture", 0);
 
         mesh.render(shaderProgram, GL20.GL_TRIANGLES);
         shaderProgram.end();

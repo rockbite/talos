@@ -40,6 +40,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      * in cases when it starts more often then finishes
      */
     private Array<ParticleEffectInstance> particleEffects;
+    private Array<ParticleEffectInstance> removeList = new Array<>();
 
     /**
      * Particle effect descriptor that knows how to spawn the instances
@@ -51,10 +52,21 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      */
     private Array<AttachmentPoint> valueAttachments;
     private AttachmentPoint positionAttachment;
+
+    /**
+     * is it rendered behind animation or in front
+     */
+    private boolean isStandalone;
+
     /**
      * is it rendered behind animation or in front
      */
     private boolean isBehind;
+
+    /**
+     * is it rendered within the animation
+     */
+    private boolean isNested;
 
     /**
      * Draw order of this effect
@@ -154,7 +166,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         }
 
         // update position for each instance and update effect itself
+        removeList.clear();
         for(ParticleEffectInstance instance: particleEffects) {
+            if(instance.isComplete()) {
+                removeList.add(instance);
+            }
             if (positionAttachment != null) {
                 if(positionAttachment.isStatic()) {
                     instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
@@ -172,6 +188,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
                 instance.update(delta);
             }
         }
+
+        for(ParticleEffectInstance instance: removeList) {
+            particleEffects.removeValue(instance, true);
+        }
     }
 
     public void setBehind(boolean isBehind) {
@@ -180,6 +200,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
     public boolean isBehind() {
         return isBehind;
+    }
+
+    public boolean isNested () {
+        return isNested;
     }
 
     public void removePositionAttachment() {
@@ -194,6 +218,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public void startInstance() {
         if(forever) return;
 
+        if(isStandalone && !particleEffects.isEmpty()) return;
+
         ParticleEffectInstance instance = particleEffectDescriptor.createEffectInstance();
         instance.setScope(scopePayload);
         particleEffects.add(instance);
@@ -201,6 +227,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
     public void completeInstance() {
         if(forever) return;
+        if(isStandalone && particleEffects.size == 1) return;
 
         for(ParticleEffectInstance instance: particleEffects) {
             instance.allowCompletion();
@@ -222,6 +249,18 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
             }
         };
 
+        CheckboxWidget standalone = new CheckboxWidget("standalone") {
+            @Override
+            public Boolean getValue() {
+                return isStandalone;
+            }
+
+            @Override
+            public void valueChanged(Boolean value) {
+                isStandalone = value;
+            }
+        };
+
         CheckboxWidget behind = new CheckboxWidget("is behind") {
             @Override
             public Boolean getValue() {
@@ -231,6 +270,18 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
             @Override
             public void valueChanged(Boolean value) {
                 isBehind = value;
+            }
+        };
+
+        CheckboxWidget nested = new CheckboxWidget("is nested") {
+            @Override
+            public Boolean getValue() {
+                return isNested;
+            }
+
+            @Override
+            public void valueChanged(Boolean value) {
+                isNested = value;
             }
         };
 
@@ -300,7 +351,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         };
 
         properties.add(effectName);
+        properties.add(standalone);
         properties.add(behind);
+        properties.add(nested);
         properties.add(startEventWidget);
         properties.add(completeEventWidget);
         properties.add(position);
@@ -363,7 +416,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     @Override
     public void write(Json json) {
         json.writeValue("effectName", name);
+        json.writeValue("isStandalone", isStandalone);
         json.writeValue("isBehind", isBehind);
+        json.writeValue("isNested", isNested);
         json.writeValue("positionAttachment", positionAttachment);
         json.writeValue("valueAttachments", valueAttachments);
         json.writeValue("startEvent", startEvent);
@@ -404,7 +459,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         setStartEvent(jsonData.getString("startEvent", ""));
         setCompleteEvent(jsonData.getString("completeEvent", ""));
 
+        isStandalone = jsonData.getBoolean("isStandalone", false);
         isBehind = jsonData.getBoolean("isBehind");
+        isNested = jsonData.getBoolean("isNested");
 
         //setForever(startEvent.equals("") && completeEvent.equals(""));
     }

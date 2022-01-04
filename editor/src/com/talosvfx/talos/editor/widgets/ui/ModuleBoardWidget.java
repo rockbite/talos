@@ -162,6 +162,8 @@ public class ModuleBoardWidget extends WidgetGroup {
         for (ModuleWrapperGroup group : getGroups()) {
             groupContainer.addActor(group);
         }
+
+        resetCameraToWorkspace();
     }
 
     public void removeEmitter(ParticleEmitterWrapper wrapper) {

@@ -36,7 +36,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public BvBAddon bvb;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
-    private SkeletonRenderer renderer;
+    private BVBSkeletonRenderer renderer;
 
     private AttachmentPoint movingPoint;
 
@@ -88,7 +88,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         talosRenderer = new SpriteBatchParticleRenderer(camera);
 
-        renderer = new SkeletonRenderer();
+        renderer = new BVBSkeletonRenderer();
         renderer.setPremultipliedAlpha(false); // PMA results in correct blending without outlines. (actually should be true, not sure why this ruins scene2d later, probably blend screwup, will check later)
 
         setCameraPos(0, 0);
@@ -426,7 +426,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         int a3 = batch.getBlendSrcFuncAlpha();
         int a4 = batch.getBlendDstFuncAlpha();
         renderer.setPremultipliedAlpha(preMultipliedAlpha);
-        renderer.draw(batch, skeleton); // Draw the skeleton images.
+        renderer.draw(talosRenderer, batch, skeletonContainer, skeleton); // Draw the skeleton images.
 
         // fixing back the blending because PMA is shit
         batch.setBlendFunctionSeparate(a1, a2, a3, a4);
@@ -438,7 +438,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
-            if(!effect.isBehind()) continue;
+            if(effect.isNested() || !effect.isBehind()) continue;
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
             }
@@ -451,7 +451,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
-            if(effect.isBehind()) continue;
+            if(effect.isNested() || effect.isBehind()) continue;
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
             }

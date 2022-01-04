@@ -22,7 +22,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public abstract class ParticleDrawable {
 
-    public abstract void draw(Batch batch, float x, float y, float width, float height, float rotation);
+    public abstract void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY);
 
     public abstract void draw(Batch batch, Particle particle, Color color);
 

@@ -34,6 +34,10 @@ public class Particle implements Pool.Poolable {
     public Vector3 rotation = new Vector3();
     public Vector2 size = new Vector2();
 
+    public Vector2 pivot = new Vector2();
+
+    public Color color = new Color();
+
     public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
     public float seed;
@@ -117,7 +121,7 @@ public class Particle implements Pool.Poolable {
             rotation.set(particleModule.getRotation());
         }
 
-
+        pivot.set(particleModule.getPivot());
         size.set(1f, 1f);
 
         Vector2 positionOverride = particleModule.getPosition();

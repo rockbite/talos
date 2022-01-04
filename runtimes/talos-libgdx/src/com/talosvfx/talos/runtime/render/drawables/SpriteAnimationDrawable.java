@@ -65,9 +65,9 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
         indexes = new short[2 * 3];
     }
 
-    private void updateVertices(float x, float y, float width, float height, Color color, float u, float v, float u2, float v2, float rotation) {
+    private void updateVertices(float x, float y, float width, float height, Color color, float u, float v, float u2, float v2, float rotation, float originX, float originY) {
         int idx = 0;
-        origin.set(x + width/2f, y + width/2f);
+        origin.set(x + width * originX, y + width * originY);
 
         tmp.set(x, y).rotateAround(origin, rotation);
         vertices[idx++] = tmp.x;
@@ -132,13 +132,13 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
     }
 
     @Override
-    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
+    public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
         if(batch instanceof PolygonSpriteBatch) {
             PolygonSpriteBatch polygonSpriteBatch = (PolygonSpriteBatch) batch;
 
             Frame frame = animation.getKeyFrame(phase, false);
 
-            updateVertices(x-width/2f, y-height/2f, width, height, batch.getColor(), frame.u1, frame.v1, frame.u2, frame.v2, rotation);
+            updateVertices(x-width*originX, y-height*originY, width, height, batch.getColor(), frame.u1, frame.v1, frame.u2, frame.v2, rotation, originX, originY);
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
         }
 
@@ -152,7 +152,7 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
         float y = particle.getY();
         float x = particle.getX();
 
-        draw(batch, x, y, width, height, rotation);
+        draw(batch, x, y, width, height, rotation, particle.pivot.x, particle.pivot.y);
     }
 
     @Override

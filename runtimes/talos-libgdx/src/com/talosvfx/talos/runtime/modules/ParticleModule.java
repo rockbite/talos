@@ -39,6 +39,8 @@ public class ParticleModule extends AbstractModule {
     public static final int TRANSPARENCY = 10;
     public static final int POSITION = 14;
 
+    public static final int PIVOT = 15;
+
 
     ModuleValue<ParticlePointDataGeneratorModule> pointGenerator;
     ModuleValue<MeshGeneratorModule> meshGenerator;
@@ -49,6 +51,7 @@ public class ParticleModule extends AbstractModule {
     NumericalValue transparency;
     NumericalValue position;
 
+    NumericalValue pivot;
 
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
@@ -66,6 +69,7 @@ public class ParticleModule extends AbstractModule {
         position = createInputSlot(POSITION);
         position.set(0f, 0f, 0f, 0f);
 
+        pivot = createInputSlot(PIVOT);
 
         rotation.setFlavour(NumericalValue.Flavour.ANGLE);
 
@@ -105,6 +109,25 @@ public class ParticleModule extends AbstractModule {
         if(rotation.isEmpty()) return tmp3Vec.setZero(); // defaults
         final float[] elements = rotation.getElements();
         return tmp3Vec.set(elements[0], elements[1], elements[2]);
+    }
+
+    /**
+     * allowed values are from 0 to 1 where 0.5 is default center
+     * @return
+     */
+    public Vector2 getPivot() {
+        fetchInputSlotValue(PIVOT);
+        if(pivot.isEmpty()) {
+            pivot.set(0.5f, 0.5f);
+        }
+        tmpVec.set(pivot.get(0), pivot.get(1));
+
+        if(tmpVec.x > 1f) tmpVec.x = 1f;
+        if(tmpVec.y> 1f) tmpVec.y = 1f;
+        if(tmpVec.x < 0f) tmpVec.x = 0f;
+        if(tmpVec.y < 0f) tmpVec.y = 0f;
+
+        return tmpVec;
     }
 
     public Color getColor() {

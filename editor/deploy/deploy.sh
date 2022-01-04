@@ -1,7 +1,7 @@
 outDir="out-win"
 binaryName="Talos"
 extension=".exe"
-version="1.3.3"
+version="1.4.1"
 sourceJar="../build/libs/editor-"$version"-SNAPSHOT.jar"
 mainClass="com.talosvfx.talos.TalosLauncher"
 portableInstall="portable-talos-"$version"-win-x64.zip"

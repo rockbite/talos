@@ -24,11 +24,12 @@ public class ClippedNinePatchDrawable extends BaseDrawable {
     }
 
     public ClippedNinePatchDrawable (TextureAtlas.AtlasRegion region) {
+        int[] splits = region.findValue("split");
         this.patch = new ClippedNinePatch(region,
-                region.splits[0],
-                region.splits[1],
-                region.splits[2],
-                region.splits[3]);
+                splits[0],
+                splits[1],
+                splits[2],
+                splits[3]);
     }
 
     public void setMaskScale (float clipScaleX, float clipScaleY) {

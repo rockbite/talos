@@ -30,7 +30,7 @@ public class ShadedDrawable extends ParticleDrawable {
     }
 
     @Override
-    public void draw(Batch batch, float x, float y, float width, float height, float rotation) {
+    public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ShadedDrawable extends ParticleDrawable {
         shaderProgram = processShaderData(shaderProgram, particle.alpha * particle.life);
 
         batch.setColor(color);
-        batch.draw(texture, x - width / 2f, y - height / 2f, width / 2f, height / 2f, width, height, 1f, 1f, rotation, 0, 0, 1, 1, false, false);
+        batch.draw(texture, x - width * particle.pivot.x, y - height * particle.pivot.y, width * particle.pivot.x, height * particle.pivot.y, width, height, 1f, 1f, rotation, 0, 0, 1, 1, false, false);
         batch.setShader(prevShader);
     }
 
