@@ -72,6 +72,10 @@ public class ParticleEffectDescriptor {
 
 		final ExportData exportData = json.fromJson(ExportData.class, fileHandle.readString());
 
+		if (exportData.metadata.versionString == null) {
+			exportData.metadata.versionString = "1.4.0"; //Default for unknown versions
+		}
+
 		for (ExportData.EmitterExportData emitter : exportData.emitters) {
 			ParticleEmitterDescriptor emitterDescriptor = new ParticleEmitterDescriptor(this);
 
