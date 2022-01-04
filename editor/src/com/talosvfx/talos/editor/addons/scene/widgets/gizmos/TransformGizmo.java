@@ -83,4 +83,11 @@ public class TransformGizmo extends Gizmo {
             Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform));
         }
     }
+
+    public Vector2 getWorldPos() {
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        transform.localToWorld(gameObject, tmp.set(0, 0));
+
+        return tmp;
+    }
 }

@@ -279,6 +279,15 @@ public abstract class ViewportWidget extends Table {
         out.set(x, y, ssWidth, ssHeight);
     }
 
+    protected Vector2 getLocalFromWorld (float x, float y) {
+        getViewportBounds(Rectangle.tmp);
+        camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+        Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, (Rectangle.tmp.height - tmp.y) + Rectangle.tmp.y + 50)); // 50 is top bar height :(((((
+        vec2.set(vector2);
+
+        return vec2;
+    }
+
     protected Vector2 getWorldFromLocal (float x, float y) {
         Vector2 vector2 = localToScreenCoordinates(new Vector2(x, y));
 

@@ -47,7 +47,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
                 GameObject gameObject = objectMap.get(node.getName());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
                 select(gameObject);
-                sceneEditorAddon.workspace.selectGameObject(gameObject);
+                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
             }
 
             @Override
@@ -58,7 +58,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
                 if(!tree.getSelection().contains(node)) {
                     select(gameObject);
-                    sceneEditorAddon.workspace.selectGameObject(gameObject);
+                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
                 }
 
                 showContextMenu(gameObject);
