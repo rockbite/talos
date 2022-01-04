@@ -12,6 +12,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
+import java.util.function.Supplier;
+
 public class SpriteRendererComponent extends RendererComponent {
 
     public TextureRegion texture;
@@ -33,19 +35,19 @@ public class SpriteRendererComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", "png") {
+        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", "png", new Supplier<String>() {
             @Override
-            public String getValue () {
+            public String get() {
                 FileHandle fileHandle = Gdx.files.absolute(path);
                 return fileHandle.path();
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged (String value) {
+            public void report(String value) {
                 path = value;
                 reloadTexture();
             }
-        };
+        });
 
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");

@@ -71,17 +71,7 @@ public class MultiPropertyHolder implements IPropertyHolder {
                     }
                     map.get(i).add(childWidget);
 
-                    PropertyWidget widget = new PropertyWidget() {
-                        @Override
-                        public Object getValue() {
-                            return null;
-                        }
 
-                        @Override
-                        public void updateWidget(Object value) {
-
-                        }
-                    };
 
                 }
 

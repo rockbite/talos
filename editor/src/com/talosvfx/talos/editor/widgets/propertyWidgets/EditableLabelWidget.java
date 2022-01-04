@@ -6,12 +6,14 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
-public abstract class EditableLabelWidget extends PropertyWidget<String> {
+import java.util.function.Supplier;
+
+public class EditableLabelWidget extends PropertyWidget<String> {
 
     private EditableLabel propertyValue;
 
-    public EditableLabelWidget(String name) {
-        super(name);
+    public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged) {
+        super(name, supplier, valueChanged);
     }
 
     @Override

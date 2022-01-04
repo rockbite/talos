@@ -13,25 +13,23 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
+import java.util.function.Supplier;
 
-public abstract class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListWidget.ItemData>> {
+
+public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListWidget.ItemData>> {
 
     private FilteredTree<Object> list;
 
     public String defaultItemName = "New Item";
 
-    public DynamicItemListWidget (String name) {
-        super(name);
+    public DynamicItemListWidget(String name, Supplier<Array<ItemData>> supplier, ValueChanged<Array<ItemData>> valueChanged) {
+        super(name, supplier, valueChanged);
     }
+
 
     @Override
     protected boolean isFullSize () {
         return true;
-    }
-
-    @Override
-    public Array<DynamicItemListWidget.ItemData> getValue () {
-        return null;
     }
 
     @Override

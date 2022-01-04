@@ -6,9 +6,18 @@ import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 
-public abstract class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
+import java.util.function.Supplier;
+
+public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
 
     AttachmentPointBox attachmentPointBox;
+
+    Supplier<Array<Bone>> boneListSuppler;
+
+    public AttachmentPointWidget(Supplier<AttachmentPoint> supplier, Supplier<Array<Bone>> boneListSuppler) {
+        super(supplier, null);
+        this.boneListSuppler = boneListSuppler;
+    }
 
     @Override
     public Actor getSubWidget() {
@@ -16,7 +25,7 @@ public abstract class AttachmentPointWidget extends PropertyWidget<AttachmentPoi
 
         Array<String> boneNameList = new Array<>();
         boneNameList.clear();
-        for(Bone bone: getBoneList()) {
+        for(Bone bone: boneListSuppler.get()) {
             boneNameList.add(bone.getData().getName());
         }
 
@@ -29,5 +38,5 @@ public abstract class AttachmentPointWidget extends PropertyWidget<AttachmentPoi
         attachmentPointBox.setData(value);
     }
 
-    public abstract Array<Bone> getBoneList();
+
 }

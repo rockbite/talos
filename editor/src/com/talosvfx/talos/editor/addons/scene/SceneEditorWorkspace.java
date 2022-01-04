@@ -227,6 +227,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             Rectangle rectangle = new Rectangle();
             boolean upWillClear = true;
 
+            GameObject selectedGameObject;
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
@@ -249,6 +251,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                 Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
 
+                selectedGameObject = null;
+
                 if (gizmo != null) {
                     touchedGizmo = gizmo;
                     GameObject gameObject = touchedGizmo.getGameObject();
@@ -259,9 +263,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                             removeFromSelection(gameObject);
                         } else {
                             addToSelection(gameObject);
+                            selectedGameObject = gameObject;
                         }
                     } else {
                         addToSelection(gameObject);
+                        selectedGameObject = gameObject;
                     }
 
                     Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
@@ -359,7 +365,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     FocusManager.resetFocus(getStage());
                     clearSelection();
                     Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
-
+                } else {
+                    if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                        // deselect all others, if they are selected
+                        if(deselectOthers(selectedGameObject)) {
+                            Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+                        }
+                    }
                 }
 
                 selectionRect.setVisible(false);
@@ -516,6 +528,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         initGizmos(mainScene);
 
         clearSelection();
+
+        selectPropertyHolder(mainScene);
     }
 
     private void removeGizmos () {
@@ -610,6 +624,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         selection.clear();
 
         selection.addAll(gameObjects);
+    }
+
+    private boolean deselectOthers(GameObject exceptThis) {
+        if(selection.size > 1 && selection.contains(exceptThis, true)) {
+            selection.clear();
+            selection.add(exceptThis);
+
+            return true;
+        }
+
+        return false;
     }
 
     private void clearSelection() {

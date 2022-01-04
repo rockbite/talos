@@ -18,6 +18,8 @@ import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
+import java.util.function.Supplier;
+
 public class AssetSelectWidget extends PropertyWidget<String> {
 
     private Label nameLabel;
@@ -25,8 +27,8 @@ public class AssetSelectWidget extends PropertyWidget<String> {
 
     private String filter;
 
-    public AssetSelectWidget (String name, String extension) {
-        super(name);
+    public AssetSelectWidget (String name, String extension, Supplier<String> supplier, ValueChanged<String> valueChanged) {
+        super(name, supplier, valueChanged);
         this.filter = extension;
     }
 

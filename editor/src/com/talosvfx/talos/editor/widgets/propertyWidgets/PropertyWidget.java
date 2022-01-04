@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 
+import java.util.function.Supplier;
+
 public abstract class PropertyWidget<T> extends Table {
 
 	protected Label propertyName;
@@ -15,11 +17,20 @@ public abstract class PropertyWidget<T> extends Table {
 
 	ChangeListener listener;
 
-	public PropertyWidget () {
-		build(null);
+	private Supplier<T> supplier;
+	private ValueChanged<T> valueChanged;
+
+	public interface ValueChanged<T> {
+		void report(T value);
 	}
 
-	public PropertyWidget (String name) {
+	public PropertyWidget (Supplier<T> supplier, ValueChanged<T> valueChanged) {
+		this(null, supplier, valueChanged);
+	}
+
+	public PropertyWidget (String name, Supplier<T> supplier, ValueChanged<T> valueChanged) {
+		this.supplier = supplier;
+		this.valueChanged = valueChanged;
 		build(name);
 	}
 
@@ -49,14 +60,16 @@ public abstract class PropertyWidget<T> extends Table {
 		valueContainer.add(actor).growX().width(0).right();
 	}
 
-	public abstract T getValue();
+	public T getValue() {
+		return supplier.get();
+	}
 
 	public Actor getSubWidget() {
 		return null;
 	}
 
 	public void updateValue() {
-		this.value = getValue();
+		this.value = supplier.get();
 		updateWidget(value);
 	}
 
@@ -69,7 +82,7 @@ public abstract class PropertyWidget<T> extends Table {
 	}
 
 	public void valueChanged(T value) {
-		// do no thing
+		valueChanged.report(value);
 	}
 
 	protected boolean isFullSize() {

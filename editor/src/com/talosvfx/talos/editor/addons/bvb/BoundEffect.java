@@ -23,6 +23,8 @@ import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
+import java.util.function.Supplier;
+
 public class BoundEffect implements Json.Serializable, IPropertyProvider, TimelineItemDataProvider<BoundEffect> {
 
     /**
@@ -33,6 +35,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     /**
      * name of this effect
      */
+    @ValueProperty(readOnly = true)
     String name;
 
     /**
@@ -242,113 +245,75 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget effectName = new LabelWidget("effect name") {
-            @Override
-            public String getValue() {
-               return name;
-            }
-        };
+        PropertyWidget effectName = WidgetFactory.generate(this, "name", "effect name");
+        PropertyWidget standalone = WidgetFactory.generate(this, "isStandalone", "standalone");
+        PropertyWidget behind = WidgetFactory.generate(this, "isBehind", "is behind");
+        PropertyWidget nested = WidgetFactory.generate(this, "isNested", "is nested");
 
-        CheckboxWidget standalone = new CheckboxWidget("standalone") {
+        SelectBoxWidget startEventWidget = new SelectBoxWidget("Start Emitting", new Supplier<String>() {
             @Override
-            public Boolean getValue() {
-                return isStandalone;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                isStandalone = value;
-            }
-        };
-
-        CheckboxWidget behind = new CheckboxWidget("is behind") {
-            @Override
-            public Boolean getValue() {
-                return isBehind;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                isBehind = value;
-            }
-        };
-
-        CheckboxWidget nested = new CheckboxWidget("is nested") {
-            @Override
-            public Boolean getValue() {
-                return isNested;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                isNested = value;
-            }
-        };
-
-        SelectBoxWidget startEventWidget = new SelectBoxWidget("Start Emitting") {
-            @Override
-            public Array<String> getOptionsList() {
-                return getEvents();
-            }
-
-            @Override
-            public String getValue() {
+            public String get() {
                 return startEvent;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged(String value) {
-               setStartEvent(value);
+            public void report(String value) {
+                setStartEvent(value);
             }
-        };
-
-        SelectBoxWidget completeEventWidget = new SelectBoxWidget("Stop Emitting") {
+        }, new Supplier<Array<String>>() {
             @Override
-            public Array<String> getOptionsList() {
+            public Array<String> get() {
                 return getEvents();
             }
+        });
 
+        SelectBoxWidget completeEventWidget = new SelectBoxWidget("Stop Emitting", new Supplier<String>() {
             @Override
-            public String getValue() {
+            public String get() {
                 return completeEvent;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged(String value) {
+            public void report(String value) {
                 setCompleteEvent(value);
             }
-        };
-
-        AttachmentPointWidget position = new AttachmentPointWidget() {
+        }, new Supplier<Array<String>>() {
             @Override
-            public Array<Bone> getBoneList() {
-                return parent.getSkeleton().getBones();
+            public Array<String> get() {
+                return getEvents();
             }
+        });
 
+        AttachmentPointWidget position = new AttachmentPointWidget(new Supplier<AttachmentPoint>() {
             @Override
-            public AttachmentPoint getValue() {
+            public AttachmentPoint get() {
                 return positionAttachment;
             }
-        };
-
-        LabelWidget offset = new LabelWidget("Offset") {
+        }, new Supplier<Array<Bone>>() {
             @Override
-            public String getValue() {
-                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetY(), 3);
-            }
-        };
-
-        GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget() {
-            @Override
-            public Array<Bone> getBoneList() {
+            public Array<Bone> get() {
                 return parent.getSkeleton().getBones();
             }
+        });
 
+        LabelWidget offset = new LabelWidget("Offset", new Supplier<String>() {
             @Override
-            public Array<AttachmentPoint> getValue() {
+            public String get() {
+                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetY(), 3);
+            }
+        });
+
+        GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget(new Supplier<Array<AttachmentPoint>>() {
+            @Override
+            public Array<AttachmentPoint> get() {
                 return valueAttachments;
             }
-        };
+        }, new Supplier<Array<Bone>>() {
+            @Override
+            public Array<Bone> get() {
+                return parent.getSkeleton().getBones();
+            }
+        });
 
         properties.add(effectName);
         properties.add(standalone);

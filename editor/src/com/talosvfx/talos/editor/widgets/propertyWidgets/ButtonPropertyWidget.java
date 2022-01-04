@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
+import java.util.function.Supplier;
+
 public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 
     private T payload;
@@ -20,8 +22,8 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         void clicked(ButtonPropertyWidget<T> widget);
     }
 
-    public ButtonPropertyWidget(String name, String text, ButtonListener btnListener) {
-        super(name);
+    public ButtonPropertyWidget(String name, String text, ButtonListener btnListener, Supplier<T> supplier, ValueChanged<T> valueChanged) {
+        super(name, supplier, valueChanged);
         setButtonText(text);
         this.btnListener = btnListener;
 

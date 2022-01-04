@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 public class ParticleComponent extends RendererComponent {
 
@@ -28,29 +29,29 @@ public class ParticleComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget descriptorWidget = new AssetSelectWidget("Effect", "p") {
+        AssetSelectWidget descriptorWidget = new AssetSelectWidget("Effect", "p", new Supplier<String>() {
             @Override
-            public String getValue () {
+            public String get() {
                 FileHandle fileHandle = Gdx.files.absolute(path);
                 return fileHandle.path();
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged (String value) {
+            public void report(String value) {
                 path = value;
                 reloadDescriptor();
             }
-        };
+        });
 
         ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
-            public void clicked (ButtonPropertyWidget<String> widget) {
+            public void clicked(ButtonPropertyWidget<String> widget) {
                 String link = widget.getValue();
-                if(link.isEmpty()) {
+                if (link.isEmpty()) {
                     FileHandle sample = Gdx.files.internal("addons/scene/missing/sample.tls");
                     FileHandle thisEffect = Gdx.files.absolute(path);
                     FileHandle destination;
-                    if(thisEffect.exists()) {
+                    if (thisEffect.exists()) {
                         destination = AssetImporter.makeSimilar(thisEffect, "tls");
                     } else {
                         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
@@ -66,17 +67,17 @@ public class ParticleComponent extends RendererComponent {
                     TalosMain.Instance().ProjectController().loadProject(sample);
                 }
             }
-            }) {
-                @Override
-                public String getValue () {
-                    return linkedTo;
-                }
-
-                @Override
-                public void valueChanged (String value) {
-                    linkedTo = value;
-                }
-        };
+        }, new Supplier<String>() {
+            @Override
+            public String get() {
+                return linkedTo;
+            }
+        }, new PropertyWidget.ValueChanged<String>() {
+            @Override
+            public void report(String value) {
+                linkedTo = value;
+            }
+        });
 
         properties.add(descriptorWidget);
         properties.add(linkedToWidget);

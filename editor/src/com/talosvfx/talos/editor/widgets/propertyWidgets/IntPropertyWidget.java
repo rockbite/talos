@@ -5,12 +5,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
 
-public abstract class IntPropertyWidget extends PropertyWidget<Integer> {
+import java.util.function.Supplier;
+
+public class IntPropertyWidget extends PropertyWidget<Integer> {
 
     private TextField textField;
 
-    public IntPropertyWidget(String name) {
-        super(name);
+    public IntPropertyWidget(String name, Supplier<Integer> supplier, ValueChanged<Integer> valueChanged) {
+        super(name, supplier, valueChanged);
     }
 
     @Override

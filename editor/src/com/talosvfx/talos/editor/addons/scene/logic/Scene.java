@@ -2,16 +2,15 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.io.StringWriter;
+import java.util.function.Supplier;
 
 public class Scene implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
 
@@ -194,21 +193,21 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget labelWidget = new LabelWidget("Name") {
+        LabelWidget labelWidget = new LabelWidget("Name", new Supplier<String>() {
             @Override
-            public String getValue () {
+            public String get() {
                 FileHandle file = Gdx.files.absolute(path);
                 String name = file.nameWithoutExtension();
                 return name;
             }
-        };
+        });
 
-        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers") {
+        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers", new Supplier<Array<DynamicItemListWidget.ItemData>>() {
             @Override
-            public Array<ItemData> getValue () {
-                Array<ItemData> list = new Array<>();
+            public Array<DynamicItemListWidget.ItemData> get() {
+                Array<DynamicItemListWidget.ItemData> list = new Array<>();
                 for(String layerName: layers) {
-                    ItemData itemData = new ItemData(layerName);
+                    DynamicItemListWidget.ItemData itemData = new DynamicItemListWidget.ItemData(layerName);
                     if(layerName.equals("Default")) {
                         itemData.canDelete = false;
                     }
@@ -216,17 +215,17 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
                 }
                 return list;
             }
-
+        }, new PropertyWidget.ValueChanged<Array<DynamicItemListWidget.ItemData>>() {
             @Override
-            public void valueChanged (Array<ItemData> value) {
+            public void report(Array<DynamicItemListWidget.ItemData> value) {
                 layers.clear();
-                for(ItemData item: value) {
+                for(DynamicItemListWidget.ItemData item: value) {
                     layers.add(item.text);
                 }
 
                 Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
             }
-        };
+        });
         itemListWidget.defaultItemName = "New Layer";
 
         properties.add(labelWidget);

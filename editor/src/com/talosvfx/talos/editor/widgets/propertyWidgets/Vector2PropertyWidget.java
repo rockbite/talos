@@ -11,13 +11,15 @@ import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
-public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
+import java.util.function.Supplier;
+
+public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 
     private ValueWidget xValue;
     private ValueWidget yValue;
 
-    public Vector2PropertyWidget(String name) {
-        super(name);
+    public Vector2PropertyWidget(String name, Supplier<Vector2> supplier, ValueChanged<Vector2> valueChanged) {
+        super(name, supplier, valueChanged);
     }
 
     @Override
@@ -65,9 +67,9 @@ public abstract class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         left.add(title).left().expand().pad(2).top();
         left.row();
         left.add().growY().expand();
-        right.add(xValue).growX();
+        right.add(xValue).growX().maxWidth(250).right().expand();
         right.row();
-        right.add(yValue).growX().padTop(1);
+        right.add(yValue).growX().padTop(1).maxWidth(250).right().expand();
 
         add(left).growY().minWidth(70);
         add(right).growX();

@@ -9,12 +9,14 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
-public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
+import java.util.function.Supplier;
+
+public class FloatPropertyWidget extends PropertyWidget<Float>  {
 
     private ValueWidget valueWidget;
 
-    public FloatPropertyWidget(String name) {
-        super(name);
+    public FloatPropertyWidget(String name, Supplier<Float> supplier, ValueChanged<Float> valueChanged) {
+        super(name, supplier, valueChanged);
     }
 
     @Override
@@ -42,7 +44,7 @@ public abstract class FloatPropertyWidget extends PropertyWidget<Float>  {
 
         add(title).minWidth(70);
 
-        add(valueWidget).growX();
+        add(valueWidget).growX().maxWidth(250).right().expand();
 
         valueWidget.addListener(listener);
     }

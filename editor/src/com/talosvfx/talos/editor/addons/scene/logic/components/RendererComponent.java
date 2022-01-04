@@ -9,6 +9,8 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
+import java.util.function.Supplier;
+
 public abstract class RendererComponent implements Json.Serializable, IComponent {
 
     public String sortingLayer = "Default";
@@ -28,22 +30,22 @@ public abstract class RendererComponent implements Json.Serializable, IComponent
 
         PropertyWidget orderingInLayerWidget = WidgetFactory.generate(this, "orderingInLayer", "Ordering");
 
-        SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer") {
+        SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer", new Supplier<String>() {
             @Override
-            public Array<String> getOptionsList () {
-                return SceneEditorAddon.get().workspace.getLayerList();
-            }
-
-            @Override
-            public String getValue () {
+            public String get() {
                 return sortingLayer;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged (String value) {
+            public void report(String value) {
                 sortingLayer = value;
             }
-        };
+        }, new Supplier<Array<String>>() {
+            @Override
+            public Array<String> get() {
+                return SceneEditorAddon.get().workspace.getLayerList();
+            }
+        });
 
         properties.add(orderingInLayerWidget);
         properties.add(layerWidget);

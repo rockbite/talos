@@ -9,6 +9,8 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
+import java.util.function.Supplier;
+
 public class GameObject implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
 
     private String name = "gameObject";
@@ -187,17 +189,17 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        EditableLabelWidget labelWidget = new EditableLabelWidget("Name") {
+        EditableLabelWidget labelWidget = new EditableLabelWidget("Name", new Supplier<String>() {
             @Override
-            public String getValue () {
+            public String get() {
                 return name;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged (String value) {
+            public void report(String value) {
                 SceneEditorAddon.get().workspace.changeGOName(GameObject.this, value);
             }
-        };
+        });
 
         properties.add(labelWidget);
 

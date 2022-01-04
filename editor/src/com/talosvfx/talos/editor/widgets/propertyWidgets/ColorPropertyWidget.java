@@ -10,12 +10,14 @@ import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class ColorPropertyWidget extends PropertyWidget<Color> {
+import java.util.function.Supplier;
+
+public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     private Image box;
 
-    public ColorPropertyWidget(String name) {
-        super(name);
+    public ColorPropertyWidget(String name, Supplier<Color> supplier, ValueChanged<Color> valueChanged) {
+        super(name, supplier, valueChanged);
     }
 
     @Override

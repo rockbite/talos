@@ -5,12 +5,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 
-public abstract class LabelWidget extends PropertyWidget<String> {
+import java.util.function.Supplier;
+
+public class LabelWidget extends PropertyWidget<String> {
 
 	private Label propertyValue;
 
-	public LabelWidget(String name) {
-		super(name);
+	public LabelWidget(String name, Supplier<String> supplier) {
+		super(name, supplier, null);
 	}
 
 	@Override

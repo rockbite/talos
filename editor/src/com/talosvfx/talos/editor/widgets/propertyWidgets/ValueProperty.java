@@ -10,4 +10,5 @@ public @interface ValueProperty {
     float step() default 0.01f;
     String[] prefix() default "";
     boolean progress() default false;
+    boolean readOnly() default false;
 }
