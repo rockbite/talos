@@ -12,7 +12,20 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
 
     GlobalValueListContainer listContainer;
 
-    Supplier<Array<Bone>> boneListSuppler;
+    public Supplier<Array<Bone>> boneListSuppler;
+
+    public GlobalValuePointsWidget() {
+        super();
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        GlobalValuePointsWidget clone = (GlobalValuePointsWidget) super.clone();
+        clone.boneListSuppler = this.boneListSuppler;
+
+        return clone;
+    }
+
 
     public GlobalValuePointsWidget(Supplier<Array<AttachmentPoint>> supplier, Supplier<Array<Bone>> boneListSuppler) {
         super(supplier, null);

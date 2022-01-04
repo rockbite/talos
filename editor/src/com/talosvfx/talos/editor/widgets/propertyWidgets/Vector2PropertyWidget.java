@@ -18,6 +18,13 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
     private ValueWidget xValue;
     private ValueWidget yValue;
 
+    private ValueProperty annotation;
+    private Label title;
+
+    public Vector2PropertyWidget() {
+        super();
+    }
+
     public Vector2PropertyWidget(String name, Supplier<Vector2> supplier, ValueChanged<Vector2> valueChanged) {
         super(name, supplier, valueChanged);
     }
@@ -31,8 +38,15 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 try {
-                    vec.set(xValue.getValue(), yValue.getValue());
-                    callValueChanged(vec);
+                    if(event.getTarget() instanceof ValueWidget) {
+                        if (event.getTarget() == xValue) {
+                            vec.set(xValue.getValue(), Float.NaN);
+                        }
+                        if (event.getTarget() == yValue) {
+                            vec.set(Float.NaN, yValue.getValue());
+                        }
+                        callValueChanged(vec);
+                    }
                 } catch (NumberFormatException e){
                     vec.set(0, 0);
                     callValueChanged(vec);
@@ -61,7 +75,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         Table left = new Table();
         Table right = new Table();
 
-        Label title = new Label(name, TalosMain.Instance().getSkin());
+        title = new Label(name, TalosMain.Instance().getSkin());
         title.setAlignment(Align.left);
 
         left.add(title).left().expand().pad(2).top();
@@ -80,8 +94,13 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         xValue.removeListener(listener);
         yValue.removeListener(listener);
 
-        xValue.setValue(value.x);
-        yValue.setValue(value.y);
+        if(value == null) {
+            xValue.setNone();
+            yValue.setNone();
+        } else {
+            xValue.setValue(value.x);
+            yValue.setValue(value.y);
+        }
 
         xValue.addListener(listener);
         yValue.addListener(listener);
@@ -106,5 +125,16 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         yValue.setStep(annotation.step());
         yValue.setLabel(annotation.prefix()[1]);
         yValue.setShowProgress(annotation.progress());
+
+        this.annotation = annotation;
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        Vector2PropertyWidget clone = (Vector2PropertyWidget) super.clone();
+        clone.configureFromAnnotation(this.annotation);
+        clone.title.setText(this.title.getText());
+
+        return clone;
     }
 }

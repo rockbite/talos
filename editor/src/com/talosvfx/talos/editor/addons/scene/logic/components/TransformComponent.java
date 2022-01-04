@@ -36,6 +36,11 @@ public class TransformComponent implements IComponent {
     }
 
     @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
+    @Override
     public String getPropertyBoxTitle () {
         return "Transform";
     }

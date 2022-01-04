@@ -32,6 +32,11 @@ public class SpriteRendererComponent extends RendererComponent {
     }
 
     @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
+    @Override
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 

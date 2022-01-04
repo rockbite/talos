@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
@@ -24,6 +25,11 @@ public class ParticleComponent extends RendererComponent {
     public String path = "";
 
     public String linkedTo = "";
+
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {

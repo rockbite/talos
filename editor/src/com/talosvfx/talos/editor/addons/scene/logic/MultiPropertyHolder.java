@@ -1,20 +1,18 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ColorPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+
+import java.util.function.Supplier;
 
 public class MultiPropertyHolder implements IPropertyHolder {
 
     Array<IPropertyHolder> holderArray = new Array<>();
     private ObjectMap<Class<? extends IPropertyProvider>, MultiPropertyProvider>  mainMap;
 
-    public MultiPropertyHolder(Array<IPropertyHolder> holderArray) {
+    public MultiPropertyHolder(Array<? extends IPropertyHolder> holderArray) {
         this.holderArray.addAll(holderArray);
 
         generateLists();
@@ -60,6 +58,8 @@ public class MultiPropertyHolder implements IPropertyHolder {
         private Array<IPropertyProvider> providers = new Array<>();
         private ObjectMap<Integer, Array<PropertyWidget>> map = new ObjectMap<>();
 
+        private Array<PropertyWidget> widgets = new Array<>();
+
         public void initWidgets() {
 
             for(IPropertyProvider provider: providers) {
@@ -70,24 +70,49 @@ public class MultiPropertyHolder implements IPropertyHolder {
                         map.put(i, new Array<>());
                     }
                     map.get(i).add(childWidget);
-
-
-
                 }
+            }
 
+            for(int i = 0; i < map.size; i++) {
+                Array<PropertyWidget> children = map.get(i);
+                PropertyWidget wrapper = children.first().clone();
 
-                /*
-                ColorPropertyWidget widget = new ColorPropertyWidget("qaq") {
+                wrapper.set(new Supplier() {
                     @Override
-                    public Color getValue() {
-                        return providers.first().getListOfProperties();
-                    }
+                    public Object get() {
+                        Object first = children.first().getValue();
+                        boolean ambiguous = false;
+                        for(PropertyWidget child: children) {
+                            Object childValue = child.getValue();
+                            if(first != null && childValue != null) {
+                                if(!childValue.equals(first)) {
+                                    ambiguous = true;
+                                    break;
+                                }
+                            } else {
+                                if(first != childValue) {
+                                    ambiguous = true;
+                                    break;
+                                }
+                            }
+                        }
 
-                    @Override
-                    public void valueChanged(Color value) {
-                        super.valueChanged(value);
+                        if(ambiguous) {
+                            return null;
+                        } else {
+                            return children.first().getValue();
+                        }
                     }
-                };*/
+                }, new PropertyWidget.ValueChanged() {
+                    @Override
+                    public void report(Object value) {
+                        for(PropertyWidget child: children) {
+                            child.report(value);
+                        }
+                    }
+                });
+
+                widgets.add(wrapper);
             }
         }
 
@@ -98,9 +123,7 @@ public class MultiPropertyHolder implements IPropertyHolder {
         @Override
         public Array<PropertyWidget> getListOfProperties() {
 
-
-
-            return null;
+            return widgets;
         }
 
         @Override
@@ -111,6 +134,11 @@ public class MultiPropertyHolder implements IPropertyHolder {
         @Override
         public int getPriority() {
             return providers.first().getPriority();
+        }
+
+        @Override
+        public Class<? extends IPropertyProvider> getType() {
+            return providers.first().getType();
         }
     }
 }

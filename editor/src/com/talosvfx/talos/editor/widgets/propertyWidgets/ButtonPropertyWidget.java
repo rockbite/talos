@@ -22,11 +22,23 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         void clicked(ButtonPropertyWidget<T> widget);
     }
 
+    public ButtonPropertyWidget() {
+        super();
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        ButtonPropertyWidget clone = (ButtonPropertyWidget) super.clone();
+        clone.btnListener = this.btnListener;
+
+        return clone;
+    }
+
+
     public ButtonPropertyWidget(String name, String text, ButtonListener btnListener, Supplier<T> supplier, ValueChanged<T> valueChanged) {
         super(name, supplier, valueChanged);
         setButtonText(text);
         this.btnListener = btnListener;
-
     }
 
     @Override

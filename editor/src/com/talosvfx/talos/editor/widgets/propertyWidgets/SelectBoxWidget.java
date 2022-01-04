@@ -20,11 +20,22 @@ public class SelectBoxWidget extends PropertyWidget<String> {
 
     Supplier<Array<String>> optionListSupplier;
 
+    public SelectBoxWidget() {
+        super();
+    }
+
     public SelectBoxWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Supplier<Array<String>> optionListSupplier) {
         super(name, supplier, valueChanged);
         setOptionListSupplier(optionListSupplier);
     }
 
+    @Override
+    public PropertyWidget clone() {
+        SelectBoxWidget clone = (SelectBoxWidget) super.clone();
+        clone.setOptionListSupplier(this.optionListSupplier);
+
+        return clone;
+    }
 
     @Override
     public Actor getSubWidget() {

@@ -687,6 +687,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         return 0;
     }
 
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
     public SkeletonContainer getSkeletonContainer() {
         return skeletonContainer;
     }

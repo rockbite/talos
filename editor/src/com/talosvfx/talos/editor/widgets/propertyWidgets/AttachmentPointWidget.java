@@ -12,7 +12,19 @@ public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
 
     AttachmentPointBox attachmentPointBox;
 
-    Supplier<Array<Bone>> boneListSuppler;
+    public Supplier<Array<Bone>> boneListSuppler;
+
+    public AttachmentPointWidget() {
+        super();
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        AttachmentPointWidget clone = (AttachmentPointWidget) super.clone();
+        clone.boneListSuppler = this.boneListSuppler;
+
+        return clone;
+    }
 
     public AttachmentPointWidget(Supplier<AttachmentPoint> supplier, Supplier<Array<Bone>> boneListSuppler) {
         super(supplier, null);

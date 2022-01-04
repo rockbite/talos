@@ -14,6 +14,12 @@ import java.util.function.Supplier;
 public class FloatPropertyWidget extends PropertyWidget<Float>  {
 
     private ValueWidget valueWidget;
+    private Label title;
+    private ValueProperty annotation;
+
+    public FloatPropertyWidget() {
+        super();
+    }
 
     public FloatPropertyWidget(String name, Supplier<Float> supplier, ValueChanged<Float> valueChanged) {
         super(name, supplier, valueChanged);
@@ -25,7 +31,9 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 try {
-                    callValueChanged(valueWidget.getValue());
+                    if(event.getTarget() == valueWidget) {
+                        callValueChanged(valueWidget.getValue());
+                    }
                 } catch (NumberFormatException e){
                     callValueChanged(0f);
                 }
@@ -39,7 +47,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
         valueWidget.setValue(0);
         valueWidget.setLabel("");
 
-        Label title = new Label(name, TalosMain.Instance().getSkin());
+        title = new Label(name, TalosMain.Instance().getSkin());
         title.setAlignment(Align.left);
 
         add(title).minWidth(70);
@@ -52,7 +60,11 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
     @Override
     public void updateWidget(Float value) {
         valueWidget.removeListener(listener);
-        valueWidget.setValue(value);
+        if(value == null) {
+            valueWidget.setNone();
+        } else {
+            valueWidget.setValue(value);
+        }
         valueWidget.addListener(listener);
     }
 
@@ -67,5 +79,17 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
         valueWidget.setStep(annotation.step());
         valueWidget.setLabel(annotation.prefix()[0]);
         valueWidget.setShowProgress(annotation.progress());
+
+        this.annotation = annotation;
+    }
+
+
+    @Override
+    public PropertyWidget clone() {
+        FloatPropertyWidget clone = (FloatPropertyWidget) super.clone();
+        clone.configureFromAnnotation(this.annotation);
+        clone.title.setText(this.title.getText());
+
+        return clone;
     }
 }

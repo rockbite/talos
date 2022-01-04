@@ -32,6 +32,10 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         return true;
     }
 
+    public DynamicItemListWidget() {
+        super();
+    }
+
     @Override
     public Actor getSubWidget () {
         Table table = new Table();

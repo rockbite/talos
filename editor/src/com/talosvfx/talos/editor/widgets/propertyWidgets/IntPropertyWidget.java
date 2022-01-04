@@ -11,6 +11,10 @@ public class IntPropertyWidget extends PropertyWidget<Integer> {
 
     private TextField textField;
 
+    public IntPropertyWidget() {
+        super();
+    }
+
     public IntPropertyWidget(String name, Supplier<Integer> supplier, ValueChanged<Integer> valueChanged) {
         super(name, supplier, valueChanged);
     }

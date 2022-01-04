@@ -12,6 +12,10 @@ public class EditableLabelWidget extends PropertyWidget<String> {
 
     private EditableLabel propertyValue;
 
+    public EditableLabelWidget() {
+        super();
+    }
+
     public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged) {
         super(name, supplier, valueChanged);
     }
@@ -33,11 +37,23 @@ public class EditableLabelWidget extends PropertyWidget<String> {
 
     @Override
     public void updateWidget(String value) {
-        propertyValue.setText(value);
+        if(value == null) {
+            propertyValue.setText("-");
+            propertyValue.setEditable(false);
+        } else {
+            propertyValue.setText(value);
+            propertyValue.setEditable(true);
+        }
     }
 
     public void setText(String value) {
         propertyValue.setText(value + "");
         this.value = value;
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        PropertyWidget clone = super.clone();
+        return clone;
     }
 }

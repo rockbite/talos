@@ -41,6 +41,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
+    @Override
     public void write (Json json) {
         json.writeValue("name", name);
 

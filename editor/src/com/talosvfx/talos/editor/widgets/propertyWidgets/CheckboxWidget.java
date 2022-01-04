@@ -11,6 +11,10 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	private CheckBox checkBox;
 
+	public CheckboxWidget() {
+		super();
+	}
+
 	public CheckboxWidget(String name, Supplier<Boolean> supplier, ValueChanged<Boolean> valueChanged) {
 		super(name, supplier, valueChanged);
 	}

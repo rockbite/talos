@@ -99,6 +99,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     Vector2 tmpVec = new Vector2();
     NumericalValue val = new NumericalValue();
 
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
     public BoundEffect() {
         scopePayload = new ScopePayload();
         particleEffects = new Array<>();

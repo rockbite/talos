@@ -613,6 +613,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return 1;
     }
 
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return this.getClass();
+    }
+
     public BoundEffect getEffectByName(String selectedEffect) {
         if(selectedEffect == null) return null;
         for(BoundEffect effect: getBoundEffects()) {

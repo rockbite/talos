@@ -16,10 +16,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.*;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
@@ -266,8 +263,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                             selectedGameObject = gameObject;
                         }
                     } else {
-                        addToSelection(gameObject);
-                        selectedGameObject = gameObject;
+                        if(!selection.contains(gameObject, true)) {
+                            selectGameObject(gameObject);
+                            selectedGameObject = gameObject;
+                        }
                     }
 
                     Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
@@ -373,6 +372,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                         }
                     }
                 }
+
+                getStage().setKeyboardFocus(SceneEditorWorkspace.this);
 
                 selectionRect.setVisible(false);
             }
@@ -752,8 +753,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             if(selection.size == 1) {
                 selectPropertyHolder(gameObjects.first());
             } else {
-                //todo: select multiple, oh this is hard now
-                selectPropertyHolder(gameObjects.first());
+                MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);
+                selectPropertyHolder(multiPropertyHolder);
             }
         }
     }

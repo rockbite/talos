@@ -11,6 +11,10 @@ public class LabelWidget extends PropertyWidget<String> {
 
 	private Label propertyValue;
 
+	public LabelWidget() {
+		super();
+	}
+
 	public LabelWidget(String name, Supplier<String> supplier) {
 		super(name, supplier, null);
 	}
@@ -26,6 +30,10 @@ public class LabelWidget extends PropertyWidget<String> {
 
 	@Override
 	public void updateWidget(String value) {
-		propertyValue.setText(value);
+		if(value == null) {
+			propertyValue.setText("-");
+		} else {
+			propertyValue.setText(value);
+		}
 	}
 }

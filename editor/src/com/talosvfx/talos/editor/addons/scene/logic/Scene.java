@@ -35,6 +35,11 @@ public class Scene implements GameObjectContainer, Json.Serializable, IPropertyH
     }
 
     @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
+    @Override
     public Array<GameObject> getGameObjects () {
         return root.getGameObjects();
     }

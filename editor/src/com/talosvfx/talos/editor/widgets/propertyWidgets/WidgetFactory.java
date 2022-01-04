@@ -64,7 +64,15 @@ public class WidgetFactory {
             @Override
             public void report(Vector2 value) {
                 try {
-                    field.set(parent, value);
+                    Vector2 vec = (Vector2) field.get(parent);
+
+                    if(!Float.isNaN(value.x)) {
+                        vec.x = value.x;
+                    }
+                    if(!Float.isNaN(value.y)) {
+                        vec.y = value.y;
+                    }
+
                 } catch (IllegalAccessException e) {
 
                 }

@@ -27,9 +27,20 @@ public class AssetSelectWidget extends PropertyWidget<String> {
 
     private String filter;
 
+    public AssetSelectWidget() {
+        super();
+    }
+
     public AssetSelectWidget (String name, String extension, Supplier<String> supplier, ValueChanged<String> valueChanged) {
         super(name, supplier, valueChanged);
         this.filter = extension;
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        AssetSelectWidget clone = (AssetSelectWidget) super.clone();
+        clone.filter = filter;
+        return clone;
     }
 
     @Override
@@ -76,6 +87,11 @@ public class AssetSelectWidget extends PropertyWidget<String> {
 
     @Override
     public void updateWidget (String value) {
+        if(value == null) {
+            nameLabel.setText("-");
+            path = null;
+            return;
+        }
         FileHandle handle = Gdx.files.absolute(value);
         if(handle.exists()) {
             nameLabel.setText(handle.name());

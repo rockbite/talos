@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -40,5 +41,10 @@ public class CameraComponent implements IComponent {
     @Override
     public int getPriority () {
         return 2;
+    }
+
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
     }
 }
