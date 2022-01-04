@@ -169,6 +169,9 @@ public abstract class ViewportWidget extends Table {
 
     public abstract void drawContent(Batch batch, float parentAlpha);
 
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
     public float getCameraPosX() {
         return camera.position.x;
     }

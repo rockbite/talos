@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,6 +31,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
+import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -290,13 +292,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo = null;
                 }
 
-                if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(button == 2 || ctrlPressed()) {
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
+
+                    return true;
                 }
 
-                return true;
+                clearSelection();
+                Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+                getStage().setKeyboardFocus(SceneEditorWorkspace.this);
+
+
+                return false;
             }
 
             @Override
@@ -386,13 +395,27 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     deleteList.addAll(selection);
                     clearSelection();
                     deleteGameObjects(deleteList);
+                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
                 }
 
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                if(keycode == Input.Keys.C && ctrlPressed()) {
+                    copySelected();
+                }
+
+                if(keycode == Input.Keys.V && ctrlPressed()) {
+                    pasteFromClipboard();
+                }
+
+                if(keycode == Input.Keys.A && ctrlPressed()) {
+                    selectAll();
+                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+                }
+
+                if(keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     TalosMain.Instance().ProjectController().undo();
                 }
 
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                if(keycode == Input.Keys.Z && ctrlPressed() && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     TalosMain.Instance().ProjectController().redo();
                 }
 
@@ -405,6 +428,58 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 return super.keyDown(event, keycode);
             }
         });
+    }
+
+    private boolean ctrlPressed() {
+        if(TalosMain.Instance().isOsX()) {
+            return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
+        } else {
+            return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
+        }
+    }
+
+    public static class ClipboardPayload {
+        public Array<GameObject> objects = new Array<>();
+        public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
+    }
+
+    private void copySelected () {
+        ClipboardPayload payload = new ClipboardPayload();
+        payload.objects.addAll(selection);
+        Vector3 camPos = getCamera().position;
+        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+
+        Json json = new Json();
+        String clipboard = json.toJson(payload);
+        Gdx.app.getClipboard().setContents(clipboard);
+    }
+
+    private void pasteFromClipboard () {
+        String clipboard = Gdx.app.getClipboard().getContents();
+
+        Json json = new Json();
+
+        try {
+            ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
+            Vector3 camPosAtPaste = getCamera().position;
+            Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+            offset.sub(payload.cameraPositionAtCopy);
+
+            clearSelection();
+            for(GameObject gameObject: payload.objects) {
+                String name = getUniqueGOName(gameObject.getName(), false);
+                gameObject.setName(name);
+                currentContainer.addGameObject(gameObject);
+                TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                transformComponent.position.add(offset);
+                initGizmos(gameObject);
+                Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+                addToSelection(gameObject);
+            }
+            Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
@@ -540,7 +615,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     private void removeGizmos (GameObject gameObject) {
         Array<Gizmo> list = gizmoMap.get(gameObject);
-
+        for(Gizmo gizmo : list) {
+            gizmo.notifyRemove();
+        }
         gizmoList.removeAll(list, true);
         gizmoMap.remove(gameObject);
     }
@@ -625,6 +702,28 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         selection.clear();
 
         selection.addAll(gameObjects);
+    }
+
+    private void selectAll() {
+        selection.clear();
+        Array<GameObject> gameObjects = currentContainer.getGameObjects();
+        if(gameObjects != null) {
+            for(int i = 0; i < gameObjects.size; i++) {
+                selectGameObjectAndChildren(gameObjects.get(i));
+            }
+        }
+    }
+
+    private void selectGameObjectAndChildren(GameObject gameObject) {
+        selection.add(gameObject);
+
+        Array<GameObject> children = gameObject.getGameObjects();
+
+        if(children != null) {
+            for(int i = 0; i < children.size; i++) {
+                selectGameObjectAndChildren(children.get(i));
+            }
+        }
     }
 
     private boolean deselectOthers(GameObject exceptThis) {
@@ -742,9 +841,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         } else {
             for (GameObject gameObject : gameObjects) {
                 Array<Gizmo> gizmos = gizmoMap.get(gameObject);
-                for (Gizmo gizmo : gizmos) {
-                    if(gizmo.isMultiSelect()) {
-                        gizmo.setSelected(true);
+                if(gizmos != null) {
+                    for (Gizmo gizmo : gizmos) {
+                        if (gizmo.isMultiSelect()) {
+                            gizmo.setSelected(true);
+                        }
                     }
                 }
             }

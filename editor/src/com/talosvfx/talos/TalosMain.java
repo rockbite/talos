@@ -119,6 +119,12 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
+	public boolean isOsX() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		boolean isMacOs = osName.startsWith("mac os x");
+		return isMacOs;
+	}
+
 	@Override
 	public void create () {
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;

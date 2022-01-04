@@ -85,4 +85,9 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
             cameraPane.remove();
         }
     }
+
+    @Override
+    public void notifyRemove () {
+        cameraPane.remove();
+    }
 }
