@@ -8,19 +8,22 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.util.Comparator;
 
-public class MainRenderer {
+public class MainRenderer implements Notifications.Observer {
 
     private final Comparator<GameObject> layerComparator;
     private TransformComponent transformComponent = new TransformComponent();
@@ -36,7 +39,7 @@ public class MainRenderer {
     private static final int RB = 3;
 
     private ObjectMap<Texture, NinePatch> patchCache = new ObjectMap<>();
-    private ObjectMap<GameObject, ParticleEffectInstance> particleCache = new ObjectMap<>();
+    private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
 
@@ -44,6 +47,8 @@ public class MainRenderer {
         for (int i = 0; i < 4; i++) {
             points[i] = new Vector2();
         }
+
+        Notifications.registerObserver(this);
 
         talosRenderer = new SpriteBatchParticleRenderer();
 
@@ -162,11 +167,13 @@ public class MainRenderer {
     }
 
     private ParticleEffectInstance obtainParticle (GameObject gameObject, ParticleEffectDescriptor descriptor) {
-        if(particleCache.containsKey(gameObject)) {
-            return particleCache.get(gameObject);
+        ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
+
+        if(particleCache.containsKey(component)) {
+            return particleCache.get(component);
         } else {
             ParticleEffectInstance instance = descriptor.createEffectInstance();
-            particleCache.put(gameObject, instance);
+            particleCache.put(component, instance);
             return instance;
         }
     }
@@ -205,5 +212,12 @@ public class MainRenderer {
         TransformComponent.localToWorld(gameObject, point);
 
         return point;
+    }
+
+    @EventHandler
+    public void onComponentUpdated(ComponentUpdated event) {
+        if(event.getComponent() instanceof ParticleComponent) {
+            particleCache.remove((ParticleComponent)event.getComponent());
+        }
     }
 }

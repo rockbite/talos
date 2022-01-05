@@ -8,21 +8,21 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.ImportUtils;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
-public class SpriteImporter {
+public class SpriteImporter extends AbstractImporter {
 
-    public static FileHandle run(FileHandle fileHandle) {
-        FileHandle importedAsset = AssetImporter.importAssetFile(fileHandle);
+    @Override
+    public FileHandle importAsset (FileHandle fileHandle) {
+        FileHandle importedAsset = importAssetFile(fileHandle);
         // this is now copied to our assets folder, and metadata created
 
         if(fileHandle.nameWithoutExtension().endsWith(".9")) {
             // it's a nine slice, and needs metadata created accordingly
             FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(importedAsset);
-            metadataHandle = AssetImporter.renameAsset(metadataHandle, metadataHandle.nameWithoutExtension().replace(".9", "") + ".meta");
-            importedAsset = AssetImporter.renameAsset(importedAsset, importedAsset.nameWithoutExtension().replace(".9", "") + ".png");
+            metadataHandle = renameAsset(metadataHandle, metadataHandle.nameWithoutExtension().replace(".9", "") + ".meta");
+            importedAsset = renameAsset(importedAsset, importedAsset.nameWithoutExtension().replace(".9", "") + ".png");
             SpriteMetadata metadata = AssetImporter.readMetadata(metadataHandle, SpriteMetadata.class);
 
             Pixmap pixmap = new Pixmap(importedAsset);
@@ -43,9 +43,10 @@ public class SpriteImporter {
         return importedAsset;
     }
 
-    public static void makeInstance(FileHandle asset, GameObject parent) {
+    @Override
+    public void makeInstance(FileHandle asset, GameObject parent) {
         if(!AssetImporter.getMetadataHandleFor(asset).exists()) {
-            AssetImporter.createMetadataFor(asset, AssetImporter.AssetType.SPRITE);
+            createMetadataFor(asset);
         }
         SpriteMetadata metadata = AssetImporter.readMetadataFor(asset, SpriteMetadata.class);
 
@@ -57,6 +58,15 @@ public class SpriteImporter {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
             component.renderMode = SpriteRendererComponent.RenderMode.sliced;
         }
+    }
+
+    @Override
+    public FileHandle createMetadataFor (FileHandle handle) {
+        FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(handle);
+        SpriteMetadata metadata = new SpriteMetadata();
+        AssetImporter.saveMetadata(metadataHandle, metadata);
+
+        return metadataHandle;
     }
 
 }

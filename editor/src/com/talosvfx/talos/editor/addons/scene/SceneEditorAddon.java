@@ -1,7 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
@@ -14,14 +13,12 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.events.*;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 

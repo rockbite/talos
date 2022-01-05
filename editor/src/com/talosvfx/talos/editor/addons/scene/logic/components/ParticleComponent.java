@@ -7,10 +7,12 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.ProjectController;
-import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -58,19 +60,25 @@ public class ParticleComponent extends RendererComponent {
                     FileHandle thisEffect = Gdx.files.absolute(path);
                     FileHandle destination;
                     if (thisEffect.exists()) {
-                        destination = AssetImporter.makeSimilar(thisEffect, "tls");
+                        //destination = AssetImporter.makeSimilar(thisEffect, "tls");
+                        //sample.copyTo(destination);
                     } else {
                         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
-                        destination = Gdx.files.absolute(projectPath + File.separator + "assets/sample.tls");
+                        destination = AssetImporter.attemptToImport(sample);
+                        FileHandle pHandle = AssetImporter.makeSimilar(destination, "p");
 
                         FileHandle texture = Gdx.files.internal("addons/scene/missing/white.png");
                         FileHandle textureDst = Gdx.files.absolute(projectPath + File.separator + "assets/white.png");
                         texture.copyTo(textureDst);
-                    }
-                    sample.copyTo(destination);
 
-                    TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-                    TalosMain.Instance().ProjectController().loadProject(sample);
+                        path = pHandle.path();
+                        linkedTo = destination.path();
+
+                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ParticleComponent.this, false));
+
+                        TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+                        TalosMain.Instance().ProjectController().loadProject(destination);
+                    }
                 }
             }
         }, new Supplier<String>() {
@@ -104,11 +112,18 @@ public class ParticleComponent extends RendererComponent {
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        path = jsonData.getString("path", "");
+        linkedTo = jsonData.getString("linkedTo", "");
+
+        reloadDescriptor();
+
         super.read(json, jsonData);
     }
 
     @Override
     public void write (Json json) {
+        json.writeValue("path", path);
+        json.writeValue("linkedTo", linkedTo);
         super.write(json);
     }
 

@@ -23,7 +23,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
@@ -31,7 +31,6 @@ import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -277,7 +276,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     // also tell all other selected gizmos about this touchdown
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected()) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
                             item.touchDown(hitCords.x, hitCords.y, button);
                         }
                     }
@@ -320,7 +319,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo.touchDragged(hitCords.x, hitCords.y);
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected()) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
                             item.touchDragged(hitCords.x, hitCords.y);
                         }
                     }
@@ -357,7 +356,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo.touchUp(hitCords.x, hitCords.y);
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected()) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
                             item.touchUp(hitCords.x, hitCords.y);
                         }
                     }
@@ -518,10 +517,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             projectPath = jsonData.getString("projectPath", "");
         }
         projectExplorer.loadDirectoryTree(projectPath);
+
+        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
     }
 
     @Override
     public void act (float delta) {
+        if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         super.act(delta);
 
         for(int i = 0; i < gizmoList.size; i++) {
@@ -637,14 +639,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
         if(childObjects != null) {
             for (GameObject childObject : childObjects) {
-                makeGizmosFor(childObject);
                 initGizmos(childObject);
             }
         }
     }
 
     private void makeGizmosFor (GameObject gameObject) {
-
         if(gizmoMap.containsKey(gameObject)) return;
 
         Iterable<IComponent> components = gameObject.getComponents();

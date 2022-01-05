@@ -42,7 +42,6 @@
         </component>
         <component className="ParticleComponent">
             <gizmos>
-                <gizmo className="TransformGizmo"></gizmo>
             </gizmos>
         </component>
     </components>
