@@ -251,8 +251,22 @@ public class SmartTransformGizmo extends Gizmo {
         setRectFromPoints(prevPoints);
         prevRotation = getRotation(prevPoints);
 
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        float aspect = transform.scale.x / transform.scale.y;
+
         // tmp2 contains movement diff
         tmp2.set(x, y).sub(points[touchedPoint]);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            // fix aspect
+            if(tmp2.x > tmp2.y) {
+                tmp2.x = tmp2.y;
+            } else if (tmp2.x <= tmp2.y) {
+                tmp2.y = tmp2.x;
+            }
+            tmp2.y *= aspect;
+        }
+
         // find midpoint
         tmp3.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]);
 
