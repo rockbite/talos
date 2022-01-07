@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -179,5 +180,23 @@ public class AssetImporter {
     public static FileHandle makeSimilar (FileHandle fileHandle, String extension) {
         String path = fileHandle.parent().path() + File.separator + fileHandle.nameWithoutExtension() + "." + extension;
         return Gdx.files.absolute(path);
+    }
+
+    public static FileHandle suggestNewName (String path, String effect, String extension) {
+        FileHandle handle = Gdx.files.absolute(path);
+
+        if(handle.exists() && handle.isDirectory()) {
+            String name = effect + "." + extension;
+            FileHandle newFile = Gdx.files.absolute(handle.path() + File.separator + name);
+            int i = 0;
+            while (newFile.exists()) {
+                name = effect + " " + (i++) + "." + extension;
+                newFile = Gdx.files.absolute(handle.path() + File.separator + name);
+            }
+
+            return newFile;
+        } else {
+            throw new GdxRuntimeException("Path not a directory, path: " + path);
+        }
     }
 }

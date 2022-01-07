@@ -8,6 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.XmlReader;
+import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
@@ -139,18 +142,32 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             }
         });
         contextualMenu.addSeparator();
-        contextualMenu.addItem("Create Empty", new ClickListener() {
+
+        PopupMenu popupMenu = new PopupMenu();
+        ObjectMap<String, XmlReader.Element> confMap = SceneEditorAddon.get().workspace.templateListPopup.getConfMap();
+        for(String key: confMap.keys()) {
+            XmlReader.Element element = confMap.get(key);
+
+            MenuItem item = new MenuItem(element.getAttribute("title"));
+            final String name = element.getAttribute("name");
+            item.addListener(new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject);
+                }
+            });
+            popupMenu.addItem(item);
+        }
+
+        MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                SceneEditorAddon.get().workspace.createEmpty(gameObject);
+                super.clicked(event, x, y);
             }
         });
-        contextualMenu.addItem("Create Sprite", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                SceneEditorAddon.get().workspace.createObjectByTypeName("sprite", new Vector2(), gameObject);
-            }
-        });
+
+        createMenu.setSubMenu(popupMenu);
+
         contextualMenu.show(getStage());
     }
 

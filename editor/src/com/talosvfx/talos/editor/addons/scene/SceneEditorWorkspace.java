@@ -44,7 +44,7 @@ import java.util.UUID;
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
 
     private static SceneEditorWorkspace instance;
-    private final TemplateListPopup templateListPopup;
+    public final TemplateListPopup templateListPopup;
 
     private SceneEditorAddon sceneEditorAddon;
     private String projectPath;

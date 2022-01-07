@@ -34,10 +34,12 @@ public class ContextualMenu {
         popupMenu.clearChildren();
     }
 
-    public void addItem (String text, ClickListener listener) {
+    public MenuItem addItem (String text, ClickListener listener) {
         MenuItem item = new MenuItem(text);
         item.addListener(listener);
         popupMenu.addItem(item);
+
+        return item;
     }
 
     public void addSeparator () {

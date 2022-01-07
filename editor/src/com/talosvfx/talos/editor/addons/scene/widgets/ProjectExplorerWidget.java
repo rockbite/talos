@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -10,9 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.XmlReader;
+import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -156,7 +162,9 @@ public class ProjectExplorerWidget extends Table {
         Array<FileHandle> list = new Array<>();
         Array<FilteredTree.Node<Object>> nodes = directoryTree.getSelection().toArray();
         for (FilteredTree.Node<Object> node: nodes) {
-            list.add((FileHandle) node.getObject());
+            String path = (String) node.getObject();
+            FileHandle handle = Gdx.files.absolute(path);
+            list.add(handle);
         }
 
         showContextMenu(list);
@@ -165,29 +173,6 @@ public class ProjectExplorerWidget extends Table {
     public void showContextMenu (Array<FileHandle> files) {
         contextualMenu.clearItems();
 
-        if(files.size == 1 && files.first().isDirectory()) {
-            contextualMenu.addItem("New Directory", new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    String path = files.first().path();
-                    if (path != null) {
-                        FileHandle handle = Gdx.files.absolute(path);
-                        if (handle.isDirectory()) {
-                            FileHandle newHandle = findAvailableHandleIn(handle, "New Directory");
-                            newHandle.mkdirs();
-                            loadDirectoryTree((String) rootNode.getObject());
-                            FilteredTree.Node newNode = nodes.get(newHandle.path());
-                            expand(newHandle.path());
-                            select(newNode);
-                            RowWidget widget = (RowWidget) newNode.getActor();
-                            EditableLabel label = widget.getLabel();
-                            label.setEditMode();
-                        }
-                    }
-                }
-            });
-            contextualMenu.addSeparator();
-        }
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -224,7 +209,82 @@ public class ProjectExplorerWidget extends Table {
                 deletePath(path);
             }
         });
+
+
+        if(files.size == 1 && files.first().isDirectory()) {
+            contextualMenu.addSeparator();
+
+            PopupMenu popupMenu = new PopupMenu();
+
+            createSubMenuItem(popupMenu, "New Directory", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    String path = files.first().path();
+                    if (path != null) {
+                        FileHandle handle = Gdx.files.absolute(path);
+                        if (handle.isDirectory()) {
+                            FileHandle newHandle = findAvailableHandleIn(handle, "New Directory");
+                            newHandle.mkdirs();
+                            loadDirectoryTree((String) rootNode.getObject());
+                            FilteredTree.Node newNode = nodes.get(newHandle.path());
+                            expand(newHandle.path());
+                            select(newNode);
+                            RowWidget widget = (RowWidget) newNode.getActor();
+                            EditableLabel label = widget.getLabel();
+                            label.setEditMode();
+                            directoryViewWidget.reload();
+                        }
+                    }
+                }
+            });
+
+            createSubMenuItem(popupMenu, "New Scene", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    String path = files.first().path();
+                    FileHandle sceneDestination = AssetImporter.suggestNewName(path, "New Scene", "scn");
+                    Scene mainScene = new Scene(sceneDestination.path());
+                    mainScene.save();
+                    directoryViewWidget.reload();
+                }
+            });
+
+            createSubMenuItem(popupMenu, "Particle Effect", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    String path = files.first().path();
+                    FileHandle tlsDestination = AssetImporter.suggestNewName(path, "New Effect", "tls");
+                    FileHandle exportDestination = AssetImporter.makeSimilar(tlsDestination,"p");
+                    FileHandle metadataHandle = AssetImporter.makeSimilar(tlsDestination,"meta");
+                    FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
+                    FileHandle originalExport = Gdx.files.internal("addons/scene/missing/sample.p");
+                    originalTls.copyTo(tlsDestination);
+                    originalExport.copyTo(exportDestination);
+                    TlsMetadata metadata = new TlsMetadata();
+                    metadata.tlsChecksum = AssetImporter.checkSum(tlsDestination);
+                    AssetImporter.saveMetadata(metadataHandle, metadata);
+                    directoryViewWidget.reload();
+                }
+            });
+
+            MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                }
+            });
+
+            createMenu.setSubMenu(popupMenu);
+        }
+
+
         contextualMenu.show(getStage());
+    }
+
+    private void createSubMenuItem(PopupMenu popupMenu, String name, ClickListener listener) {
+        MenuItem item = new MenuItem(name);
+        item.addListener(listener);
+        popupMenu.addItem(item);
     }
 
     public void select (FilteredTree.Node node) {
@@ -277,6 +337,8 @@ public class ProjectExplorerWidget extends Table {
         rootNode.setExpanded(true);
 
         rootNode.expandAll();
+
+        directoryViewWidget.reload();
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {

@@ -225,6 +225,8 @@ public class DirectoryViewWidget extends Table {
     }
 
     private void rebuild () {
+        if(fileHandle == null || !fileHandle.exists()) return;
+
         dragAndDrop.clear();
         clearChildren();
         items.clear();
@@ -315,6 +317,10 @@ public class DirectoryViewWidget extends Table {
                 rebuild();
             }
         }
+    }
+
+    public void reload () {
+        rebuild();
     }
 
     public class ItemView extends Table implements ActorCloneable<ItemView> {
