@@ -217,6 +217,7 @@ public class ProjectExplorerWidget extends Table {
     public void select (FilteredTree.Node node) {
         directoryTree.getSelection().clear();
         directoryTree.getSelection().add(node);
+        directoryViewWidget.setDirectory((String) node.getObject());
     }
 
     public void select (String path) {
@@ -224,6 +225,12 @@ public class ProjectExplorerWidget extends Table {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
+            directoryViewWidget.setDirectory((String) nodes.get(path).getObject());
+        } else {
+            directoryTree.getSelection().clear();
+            directoryTree.getSelection().add(rootNode);
+            expand(path);
+            directoryViewWidget.setDirectory(path);
         }
     }
 
@@ -244,35 +251,6 @@ public class ProjectExplorerWidget extends Table {
 
     public void loadDirectoryTree (String path) {
         dragAndDrop.clear();
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                Actor actor = getActor();
-
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-                AssetImporter.createAssetInstance((FileHandle) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
-            }
-        });
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor actor = getActor();
-
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-                System.out.println(targetActor);
-            }
-        });
 
         nodes.clear();
         directoryTree.clearChildren();
