@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.TalosVersion;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.CheckboxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
@@ -564,6 +565,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             json.writeObjectEnd();
         }
         json.writeArrayEnd();
+        json.writeField(TalosVersion.getVersion(), "version");
         json.writeObjectEnd();
     }
 
@@ -586,6 +588,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if(selectedEffect != null) {
             json.writeValue("selectedEffect", selectedEffect.name);
         }
+        json.writeValue("version", TalosVersion.getVersion());
     }
 
     @Override

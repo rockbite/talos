@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.shader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosVersion;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.project.IProject;
@@ -87,6 +88,7 @@ public class ShaderProject implements IProject {
 
         @Override
         public void write (Json json) {
+            projectMetadata.version = TalosVersion.getVersion();
             json.writeValue("metadata", projectMetadata);
             json.writeValue("nodes", nodeStage);
         }
@@ -106,14 +108,16 @@ public class ShaderProject implements IProject {
 
     private static class ProjectMetadata implements Json.Serializable {
 
+        private String version;
+
         @Override
         public void write (Json json) {
-
+            json.writeValue("version", version);
         }
 
         @Override
         public void read (Json json, JsonValue jsonValue) {
-
+            version = jsonValue.getString("version");
         }
     }
 }
