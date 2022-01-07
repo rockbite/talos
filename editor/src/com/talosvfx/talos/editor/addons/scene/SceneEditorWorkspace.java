@@ -49,9 +49,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private SceneEditorAddon sceneEditorAddon;
     private String projectPath;
 
-    private Array<Scene> scenes = new Array<>();
-
-    private GameObjectContainer currentContainer;
+    private SavableContainer currentContainer;
     private Array<Gizmo> gizmoList = new Array<>();
     private ObjectMap<GameObject, Array<Gizmo>> gizmoMap = new ObjectMap<>();
 
@@ -69,11 +67,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private FileWatching fileWatching = new FileWatching();
     private float reloadScheduled = -1;
 
+    public Array<String> layers = new Array<>();
+
 
     // selections
     private Image selectionRect;
 
     public SceneEditorWorkspace() {
+
+        layers.clear();
+        layers.add("Default");
+        layers.add("UI");
+        layers.add("Misc");
+
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
 
@@ -452,6 +458,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         }
     }
 
+    public void openScene (FileHandle fileHandle) {
+        Scene scene = new Scene();
+        scene.path = fileHandle.path();
+        scene.loadFromPath();
+        openScene(scene);
+    }
+
     public static class ClipboardPayload {
         public Array<GameObject> objects = new Array<>();
         public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
@@ -503,11 +516,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         if(projectPath != null) {
             json.writeValue("projectPath", projectPath);
-            json.writeArrayStart("scenes");
-            for(Scene scene: scenes) {
-                json.writeValue(scene);
+
+            json.writeArrayStart("layers");
+            for (String layer : layers) {
+                json.writeValue(layer);
             }
             json.writeArrayEnd();
+
+            json.writeValue("currentScene", currentContainer);
+
             json.writeValue("changeVersion", changeVersion);
         }
     }
@@ -532,6 +549,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             projectPath = jsonData.getString("projectPath", "");
         }
         projectExplorer.loadDirectoryTree(projectPath);
+
+        JsonValue layersJson = jsonData.get("layers");
+        if(layersJson != null) {
+            layers.clear();
+            for (JsonValue layerJson : layersJson) {
+                layers.add(layerJson.asString());
+            }
+        }
+
+        String path = jsonData.getString("currentScene", "");
+        FileHandle sceneFileHandle = Gdx.files.absolute(path);
+        if(sceneFileHandle.exists()) {
+            currentContainer.path = sceneFileHandle.path();
+            currentContainer.loadFromPath();
+        }
 
         SceneEditorAddon.get().assetImporter.housekeep(projectPath);
     }
@@ -572,6 +604,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     private void drawMainRenderer (Batch batch, float parentAlpha) {
+        if(currentContainer == null) return;
+
         renderer.render(batch, currentContainer.getSelfObject());
     }
 
@@ -608,11 +642,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         projectExplorer.loadDirectoryTree(projectPath);
     }
 
-    public void addScene (Scene scene) {
-        scenes.add(scene);
-    }
-
-    public void openScene (Scene mainScene) {
+    public void openScene (SavableContainer mainScene) {
+        if(mainScene == null) return;
         sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
         currentContainer = mainScene;
 
@@ -915,14 +946,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         String data = json.prettyPrint(sceneEditorAddon.workspace);
 
         if(toMemory){
-            for (Scene scene : scenes) {
-                String sceneData = scene.getAsString();
-                String scenePath = scene.path;
-
-                snapshotService.saveSnapshot(changeVersion, scenePath, sceneData);
+            if(currentContainer instanceof Scene) {
+                Scene scene = (Scene) currentContainer;
+                snapshotService.saveSnapshot(changeVersion, scene.path, scene.getAsString());
             }
         } else {
-            for (Scene scene : scenes) {
+            if(currentContainer instanceof Scene) {
+                Scene scene = (Scene) currentContainer;
                 scene.save();
             }
         }
@@ -933,25 +963,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
         read(json, jsonData);
 
-        JsonValue scenesJson = jsonData.get("scenes");
-        scenes.clear();
-        for(JsonValue sceneJson : scenesJson) {
-            Scene scene = json.readValue(Scene.class, sceneJson);
-            addScene(scene);
+        String path = jsonData.getString("currentScene", "");
+        FileHandle sceneFileHandle = Gdx.files.absolute(path);
+        if(sceneFileHandle.exists()) {
+            currentContainer.path = sceneFileHandle.path();
             if(fromMemory) {
-                scene.loadFromJson(snapshotService.getSnapshot(changeVersion, scene.path));
+                currentContainer.loadFromJson(snapshotService.getSnapshot(changeVersion, currentContainer.path));
+                currentContainer.loadFromPath();
             } else {
-                scene.loadFromPath();
-                // save it as snapshot
-                snapshotService.saveSnapshot(changeVersion, scene.path, scene.getAsString());
+                currentContainer.loadFromPath();
+                snapshotService.saveSnapshot(changeVersion, currentContainer.path, currentContainer.getAsString());
             }
         }
-        ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
-        if(!scenes.isEmpty()) {
-            Scene scene = scenes.first();
-            projectExplorer.select(scene.path);
-            openScene(scene);
-        }
+
+        openScene(currentContainer);
 
         if(!fromMemory) {
             Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
@@ -973,11 +998,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public Array<String> getLayerList () {
-        if(currentContainer instanceof Scene) {
-            Scene scene = (Scene) currentContainer;
-            return scene.layers;
-        }
-        return new Array<>();
+        return layers;
     }
 
     public GameObject getRootGO () {

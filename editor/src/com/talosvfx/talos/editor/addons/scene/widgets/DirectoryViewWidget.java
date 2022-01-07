@@ -138,6 +138,9 @@ public class DirectoryViewWidget extends Table {
                                 SceneEditorAddon.get().projectExplorer.select(fileAt.fileHandle.path());
                             } else {
                                 // maybe custom open it or something
+                                if(fileAt.fileHandle.extension().equals("scn")) {
+                                    SceneEditorAddon.get().workspace.openScene(fileAt.fileHandle);
+                                }
                             }
                         } else {
                             // go up
