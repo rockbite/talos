@@ -25,6 +25,7 @@ public class ProjectExplorerWidget extends Table {
 
     private final FilteredTree<Object> directoryTree;
     public static FileFilter fileFilter;
+    private final DirectoryViewWidget directoryViewWidget;
     private ObjectMap<String, FilteredTree.Node> nodes = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
@@ -35,9 +36,21 @@ public class ProjectExplorerWidget extends Table {
     public ProjectExplorerWidget() {
         contextualMenu = new ContextualMenu();
 
+        Table container = new Table();
+
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
         ScrollPane scrollPane = new ScrollPane(directoryTree);
-        add(scrollPane).grow().padTop(3);
+
+        directoryViewWidget = new DirectoryViewWidget();
+        ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidget);
+        scrollPaneRight.setScrollingDisabled(true, false);
+
+        SplitPane splitPane = new SplitPane(scrollPane, scrollPaneRight, false, TalosMain.Instance().getSkin(), "timeline");
+        splitPane.setSplitAmount(0.35f);
+
+        container.add(splitPane).grow();
+        add(container).grow().padTop(3);
+
         directoryTree.draggable = true;
 
         fileFilter = new FileFilter() {
@@ -53,6 +66,16 @@ public class ProjectExplorerWidget extends Table {
         };
 
         directoryTree.setItemListener(new FilteredTree.ItemListener() {
+            @Override
+            public void selected (FilteredTree.Node node) {
+                directoryViewWidget.setDirectory((String) node.getObject());
+            }
+
+            @Override
+            public void chosen (FilteredTree.Node node) {
+                directoryViewWidget.setDirectory((String) node.getObject());
+            }
+
             @Override
             public void rightClick (FilteredTree.Node node) {
                 select(node);
@@ -251,7 +274,6 @@ public class ProjectExplorerWidget extends Table {
             }
         });
 
-
         nodes.clear();
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
@@ -271,6 +293,8 @@ public class ProjectExplorerWidget extends Table {
             FileHandle[] list = path.list(fileFilter);
             for(int i = 0; i < list.length; i++) {
                 FileHandle listItemHandle = list[i];
+
+                if(!listItemHandle.isDirectory()) continue;
 
                 RowWidget widget = new RowWidget(listItemHandle);
                 EditableLabel label = widget.getLabel();
@@ -304,6 +328,7 @@ public class ProjectExplorerWidget extends Table {
                     }
                 });
 
+                /*
                 if(!listItemHandle.isDirectory()) {
                     // we let files to be dragged outside this widget
                     dragAndDrop.addSource(new DragAndDrop.Source(newNode.getActor()) {
@@ -319,7 +344,7 @@ public class ProjectExplorerWidget extends Table {
                             return payload;
                         }
                     });
-                }
+                }*/
             }
         }
     }

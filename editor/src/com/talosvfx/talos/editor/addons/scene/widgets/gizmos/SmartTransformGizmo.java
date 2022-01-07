@@ -264,7 +264,7 @@ public class SmartTransformGizmo extends Gizmo {
             } else if (tmp2.x <= tmp2.y) {
                 tmp2.y = tmp2.x;
             }
-            tmp2.y *= aspect;
+            tmp2.x *= aspect;
         }
 
         // find midpoint
