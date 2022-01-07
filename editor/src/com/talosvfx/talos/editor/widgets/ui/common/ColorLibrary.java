@@ -16,6 +16,8 @@ public class ColorLibrary {
     public static Color FONT_WHITE = new Color(Color.valueOf("#cccccc"));
     public static Color FONT_GRAY = new Color(Color.valueOf("#919191"));
 
+    public static Color ORANGE = new Color(Color.valueOf("#fcba03"));
+
     public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
 
     public static String SHAPE_SQUIRCLE = "squircle-6";

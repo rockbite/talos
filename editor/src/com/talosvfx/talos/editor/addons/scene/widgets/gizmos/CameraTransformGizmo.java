@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
@@ -11,14 +13,39 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.addons.scene.widgets.CameraPane;
 import com.talosvfx.talos.editor.addons.scene.widgets.CameraPreview;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class CameraTransformGizmo extends SmartTransformGizmo {
 
     private static CameraPane cameraPane;
 
+    private Color borderColor = new Color();
+
     public CameraTransformGizmo() {
         if(cameraPane == null) {
             cameraPane = new CameraPane();
+        }
+
+        borderColor.set(ColorLibrary.FONT_GRAY);
+        borderColor.a = 0.5f;
+    }
+
+    @Override
+    public void draw (Batch batch, float parentAlpha) {
+        rectPatch.scale(1f/ prevScale, 1f/prevScale);
+        rectPatch.scale(worldPerPixel, worldPerPixel);
+        prevScale = worldPerPixel;
+
+        if(gameObject.hasComponent(TransformComponent.class)) {
+            if(selected) {
+                for (int i = 0; i < 4; i++) {
+                    drawCircle(points[i], batch);
+                }
+            }
+            drawLine(batch, points[LB], points[LT], borderColor);
+            drawLine(batch, points[LT], points[RT], borderColor);
+            drawLine(batch, points[RT], points[RB], borderColor);
+            drawLine(batch, points[RB], points[LB], borderColor);
         }
     }
 

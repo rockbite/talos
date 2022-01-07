@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,13 +18,14 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SmartTransformGizmo extends Gizmo {
 
     private final Image rect;
     private final Image circle;
-    private final NinePatch rectPatch;
-    private float prevScale = 1f;
+    protected final NinePatch rectPatch;
+    protected float prevScale = 1f;
 
     protected Vector2[] points = new Vector2[4];
     private Vector2[] rotationAreas = new Vector2[4];
@@ -88,6 +90,12 @@ public class SmartTransformGizmo extends Gizmo {
             for (int i = 0; i < 4; i++) {
                 drawCircle(points[i], batch);
             }
+
+            // lets draw lines
+            drawLine(batch, points[LB], points[LT], ColorLibrary.ORANGE);
+            drawLine(batch, points[LT], points[RT], ColorLibrary.ORANGE);
+            drawLine(batch, points[RT], points[RB], ColorLibrary.ORANGE);
+            drawLine(batch, points[RB], points[LB], ColorLibrary.ORANGE);
         }
 
     }
@@ -99,7 +107,7 @@ public class SmartTransformGizmo extends Gizmo {
         return point;
     }
 
-    private void drawCircle(Vector2 pos, Batch batch) {
+    protected void drawCircle(Vector2 pos, Batch batch) {
         float size = 20 * worldPerPixel; // pixel
         circle.setSize(size, size);
         circle.setPosition(pos.x - size/2f, pos.y-size/2f);
