@@ -405,6 +405,14 @@ public class ProjectExplorerWidget extends Table {
         }
     }
 
+    public FileHandle getCurrentFolder () {
+        return directoryViewWidget.getCurrentFolder();
+    }
+
+    public void reload () {
+        directoryViewWidget.reload();
+    }
+
     public static class RowWidget extends Table implements ActorCloneable<RowWidget> {
         private final EditableLabel label;
         private final FileHandle fileHandle;

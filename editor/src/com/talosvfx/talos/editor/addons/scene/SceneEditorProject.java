@@ -105,7 +105,7 @@ public class SceneEditorProject implements IProject {
         // create new scene
         Scene mainScene = new Scene(projectDir.path() + File.separator + "scenes" + File.separator + "main_scene.scn");
         mainScene.save();
-        sceneEditorAddon.workspace.openScene(mainScene);
+        sceneEditorAddon.workspace.openSavableContainer(mainScene);
 
         // now create main camera
         sceneEditorAddon.workspace.createObjectByTypeName("camera", new Vector2(0, 0), null);

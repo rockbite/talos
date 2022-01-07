@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -458,11 +459,42 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         }
     }
 
+    public void openPrefab (FileHandle fileHandle) {
+        if(currentContainer != null) {
+            currentContainer.save();
+        }
+        Prefab scene = new Prefab();
+        scene.path = fileHandle.path();
+        scene.loadFromPath();
+        openSavableContainer(scene);
+    }
+
     public void openScene (FileHandle fileHandle) {
+        if(currentContainer != null) {
+            currentContainer.save();
+        }
         Scene scene = new Scene();
         scene.path = fileHandle.path();
         scene.loadFromPath();
-        openScene(scene);
+        openSavableContainer(scene);
+    }
+
+    public void convertToPrefab (GameObject gameObject) {
+        String name = gameObject.getName();
+
+        String path = getProjectPath() + File.separator + "assets";
+        if(SceneEditorAddon.get().projectExplorer.getCurrentFolder() != null) {
+            path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
+        }
+
+        FileHandle handle = AssetImporter.suggestNewName(path, name, "prefab");
+        if(handle != null) {
+            Prefab prefab = new Prefab();
+            prefab.path = handle.path();
+            prefab.root = gameObject;
+            prefab.save();
+            SceneEditorAddon.get().projectExplorer.reload();
+        }
     }
 
     public static class ClipboardPayload {
@@ -523,7 +555,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             }
             json.writeArrayEnd();
 
-            json.writeValue("currentScene", currentContainer);
+            json.writeValue("currentScene", currentContainer.path);
 
             json.writeValue("changeVersion", changeVersion);
         }
@@ -561,8 +593,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         String path = jsonData.getString("currentScene", "");
         FileHandle sceneFileHandle = Gdx.files.absolute(path);
         if(sceneFileHandle.exists()) {
-            currentContainer.path = sceneFileHandle.path();
-            currentContainer.loadFromPath();
+            SavableContainer container;
+            if(sceneFileHandle.extension().equals("prefab")) {
+                container = new Prefab();
+            } else {
+                container = new Scene();
+            }
+            container.path = sceneFileHandle.path();
+            container.loadFromPath();
+            openSavableContainer(container);
         }
 
         SceneEditorAddon.get().assetImporter.housekeep(projectPath);
@@ -642,7 +681,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         projectExplorer.loadDirectoryTree(projectPath);
     }
 
-    public void openScene (SavableContainer mainScene) {
+    public void openSavableContainer (SavableContainer mainScene) {
         if(mainScene == null) return;
         sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
         currentContainer = mainScene;
@@ -654,6 +693,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         clearSelection();
 
         selectPropertyHolder(mainScene);
+
+        if(mainScene instanceof Scene) {
+            bgColor.set(Color.BLACK);
+        } else {
+
+            bgColor.set(Color.valueOf("#241a00"));
+        }
     }
 
     private void removeGizmos () {
@@ -945,16 +991,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(sceneEditorAddon.workspace);
 
+        SavableContainer savableContainer = currentContainer;
         if(toMemory){
-            if(currentContainer instanceof Scene) {
-                Scene scene = (Scene) currentContainer;
-                snapshotService.saveSnapshot(changeVersion, scene.path, scene.getAsString());
-            }
+            snapshotService.saveSnapshot(changeVersion, savableContainer.path, savableContainer.getAsString());
         } else {
-            if(currentContainer instanceof Scene) {
-                Scene scene = (Scene) currentContainer;
-                scene.save();
-            }
+            savableContainer.save();
         }
 
         return data;
@@ -966,17 +1007,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         String path = jsonData.getString("currentScene", "");
         FileHandle sceneFileHandle = Gdx.files.absolute(path);
         if(sceneFileHandle.exists()) {
-            currentContainer.path = sceneFileHandle.path();
-            if(fromMemory) {
-                currentContainer.loadFromJson(snapshotService.getSnapshot(changeVersion, currentContainer.path));
-                currentContainer.loadFromPath();
+            SavableContainer container;
+            if(sceneFileHandle.extension().equals("prefab")) {
+                container = new Prefab();
             } else {
-                currentContainer.loadFromPath();
-                snapshotService.saveSnapshot(changeVersion, currentContainer.path, currentContainer.getAsString());
+                container = new Scene();
             }
-        }
+            container.path = sceneFileHandle.path();
+            if(fromMemory) {
+                container.loadFromJson(snapshotService.getSnapshot(changeVersion, container.path));
+                container.loadFromPath();
+            } else {
+                container.loadFromPath();
+                snapshotService.saveSnapshot(changeVersion, container.path, container.getAsString());
+            }
 
-        openScene(currentContainer);
+            openSavableContainer(container);
+        }
 
         if(!fromMemory) {
             Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));

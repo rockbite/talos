@@ -182,15 +182,15 @@ public class AssetImporter {
         return Gdx.files.absolute(path);
     }
 
-    public static FileHandle suggestNewName (String path, String effect, String extension) {
+    public static FileHandle suggestNewName (String path, String filename, String extension) {
         FileHandle handle = Gdx.files.absolute(path);
 
         if(handle.exists() && handle.isDirectory()) {
-            String name = effect + "." + extension;
+            String name = filename + "." + extension;
             FileHandle newFile = Gdx.files.absolute(handle.path() + File.separator + name);
             int i = 0;
             while (newFile.exists()) {
-                name = effect + " " + (i++) + "." + extension;
+                name = filename + " " + (i++) + "." + extension;
                 newFile = Gdx.files.absolute(handle.path() + File.separator + name);
             }
 

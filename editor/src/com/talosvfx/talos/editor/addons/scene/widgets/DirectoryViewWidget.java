@@ -141,6 +141,9 @@ public class DirectoryViewWidget extends Table {
                                 if(fileAt.fileHandle.extension().equals("scn")) {
                                     SceneEditorAddon.get().workspace.openScene(fileAt.fileHandle);
                                 }
+                                if(fileAt.fileHandle.extension().equals("prefab")) {
+                                    SceneEditorAddon.get().workspace.openPrefab(fileAt.fileHandle);
+                                }
                             }
                         } else {
                             // go up
@@ -324,6 +327,10 @@ public class DirectoryViewWidget extends Table {
 
     public void reload () {
         rebuild();
+    }
+
+    public FileHandle getCurrentFolder () {
+        return fileHandle;
     }
 
     public class ItemView extends Table implements ActorCloneable<ItemView> {

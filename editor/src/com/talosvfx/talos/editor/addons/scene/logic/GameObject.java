@@ -15,6 +15,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private String name = "gameObject";
 
+    private String prefabLink = null;
+
     private Array<GameObject> children;
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
     private ObjectSet<IComponent> components = new ObjectSet<>();

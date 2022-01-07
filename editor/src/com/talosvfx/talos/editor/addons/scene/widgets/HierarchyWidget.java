@@ -95,6 +95,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
     private void showContextMenu (GameObject gameObject) {
         contextualMenu.clearItems();
+        contextualMenu.addItem("Convert to Prefab", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                FilteredTree.Node item = (FilteredTree.Node) tree.getSelection().first();
+                GameObject gameObject = objectMap.get(item.getName());
+                SceneEditorAddon.get().workspace.convertToPrefab(gameObject);
+            }
+        });
+        contextualMenu.addSeparator();
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
