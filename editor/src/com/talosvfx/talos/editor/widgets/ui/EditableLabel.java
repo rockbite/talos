@@ -74,7 +74,6 @@ public class EditableLabel extends Table implements ActorCloneable {
         label.setEllipsis(true);
         labelTable.add(label).growX().width(0);
 
-
         textField = new TextField(text, getSkin(), "no-bg");
         fieldCell = inputTable.add(textField);
         inputTable.add().expandX();
@@ -201,6 +200,9 @@ public class EditableLabel extends Table implements ActorCloneable {
     @Override
     public Actor copyActor (Actor copyFrom) {
         Label label = new Label(this.label.getText(), getSkin());
+        return label;
+    }
+    public Label getLabel() {
         return label;
     }
 }

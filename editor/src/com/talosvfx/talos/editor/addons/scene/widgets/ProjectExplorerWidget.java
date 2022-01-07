@@ -152,29 +152,42 @@ public class ProjectExplorerWidget extends Table {
         handle.delete();
     }
 
-    private void showContextMenu () {
+    public void showContextMenu () {
+        Array<FileHandle> list = new Array<>();
+        Array<FilteredTree.Node<Object>> nodes = directoryTree.getSelection().toArray();
+        for (FilteredTree.Node<Object> node: nodes) {
+            list.add((FileHandle) node.getObject());
+        }
+
+        showContextMenu(list);
+    }
+
+    public void showContextMenu (Array<FileHandle> files) {
         contextualMenu.clearItems();
-        contextualMenu.addItem("New Directory", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                String path = getCurrSelectedPath();
-                if(path != null) {
-                    FileHandle handle = Gdx.files.absolute(path);
-                    if(handle.isDirectory()) {
-                        FileHandle newHandle  = findAvailableHandleIn(handle, "New Directory");
-                        newHandle.mkdirs();
-                        loadDirectoryTree((String) rootNode.getObject());
-                        FilteredTree.Node newNode = nodes.get(newHandle.path());
-                        expand(newHandle.path());
-                        select(newNode);
-                        RowWidget widget = (RowWidget) newNode.getActor();
-                        EditableLabel label = widget.getLabel();
-                        label.setEditMode();
+
+        if(files.size == 1 && files.first().isDirectory()) {
+            contextualMenu.addItem("New Directory", new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    String path = files.first().path();
+                    if (path != null) {
+                        FileHandle handle = Gdx.files.absolute(path);
+                        if (handle.isDirectory()) {
+                            FileHandle newHandle = findAvailableHandleIn(handle, "New Directory");
+                            newHandle.mkdirs();
+                            loadDirectoryTree((String) rootNode.getObject());
+                            FilteredTree.Node newNode = nodes.get(newHandle.path());
+                            expand(newHandle.path());
+                            select(newNode);
+                            RowWidget widget = (RowWidget) newNode.getActor();
+                            EditableLabel label = widget.getLabel();
+                            label.setEditMode();
+                        }
                     }
                 }
-            }
-        });
-        contextualMenu.addSeparator();
+            });
+            contextualMenu.addSeparator();
+        }
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -197,7 +210,7 @@ public class ProjectExplorerWidget extends Table {
         contextualMenu.addItem("Rename", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                String path = getCurrSelectedPath();
+                String path = files.first().path();
                 if(path != null) {
                     RowWidget widget = (RowWidget) nodes.get(path).getActor();
                     widget.label.setEditMode();;
@@ -207,7 +220,7 @@ public class ProjectExplorerWidget extends Table {
         contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                String path = getCurrSelectedPath();
+                String path = files.first().path();
                 deletePath(path);
             }
         });
@@ -298,6 +311,9 @@ public class ProjectExplorerWidget extends Table {
 
                         FileHandle parent = fileHandle.parent();
                         FileHandle newHandle = Gdx.files.absolute(parent.path() + File.separator + newText);
+
+                        if(newHandle.path().equals(fileHandle.path())) return;
+
                         fileHandle.moveTo(newHandle);
 
                         newNode.setObject(newHandle.path());

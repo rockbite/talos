@@ -66,7 +66,6 @@ public class TransformGizmo extends Gizmo {
         transform.worldToLocal(gameObject.parent, vec1);
         //vec1 is diff
         transform.position.add(vec1);
-        System.out.println(transform.position);
 
         prevTouch.set(x, y);
 

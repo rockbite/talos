@@ -111,6 +111,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         addActor(selectionRect);
     }
 
+
     public void createEmpty (Vector2 position) {
         createObjectByTypeName("empty", position, null);
     }
@@ -435,7 +436,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         });
     }
 
-    private boolean ctrlPressed() {
+    public static boolean isRenamePressed(int keycode) {
+        if(TalosMain.Instance().isOsX()) {
+            return keycode == Input.Keys.ENTER;
+        } else {
+            return keycode == Input.Keys.F2;
+        }
+    }
+
+    public static boolean ctrlPressed() {
         if(TalosMain.Instance().isOsX()) {
             return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
         } else {
