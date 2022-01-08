@@ -367,7 +367,7 @@ public class DirectoryViewWidget extends Table {
         public void setFile(FileHandle fileHandle) {
 
             String name = fileHandle.name();
-            int len = 15;
+            int len = 12;
             if(name.length() > len) name = name.substring(0, len-3) + "...";
             label.setText(name);
 
