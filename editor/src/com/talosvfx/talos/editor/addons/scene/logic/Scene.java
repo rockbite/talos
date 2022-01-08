@@ -96,6 +96,7 @@ public class Scene extends SavableContainer implements IPropertyProvider {
     @Override
     protected void writeData (Json json) {
         json.writeValue("name", getName());
+        super.writeData(json);
     }
 
     @Override

@@ -27,6 +27,8 @@ import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
+import java.io.File;
+
 public class DirectoryViewWidget extends Table {
 
     private Array<ItemView> items = new Array<>();
@@ -266,6 +268,33 @@ public class DirectoryViewWidget extends Table {
             }
         });
 
+        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                ItemView fileAt = getFileAt(x, y);
+
+                if(fileAt != null) {
+                    overItem = fileAt;
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                ItemView targetItem = getFileAt(x, y);
+                FileHandle sourceItem = (FileHandle) payload.getObject();
+
+                if(!sourceItem.path().equals(targetItem.fileHandle.path())) {
+                    moveItemTo(sourceItem, targetItem.fileHandle);
+                }
+            }
+        });
+
+
+
         if (fileHandle.isDirectory()) {
             int count = 0;
             for (FileHandle child : fileHandle.list()) {
@@ -309,6 +338,18 @@ public class DirectoryViewWidget extends Table {
             row();
             add().colspan(colCount).expand().grow();
         }
+    }
+
+    private void moveItemTo(FileHandle source, FileHandle target) {
+        if(target.isDirectory()) {
+            String folderName = source.name();
+            String newPath = target.path() + File.separator + folderName;
+
+            FileHandle destination = Gdx.files.absolute(newPath);
+            source.moveTo(destination);
+        }
+
+        SceneEditorAddon.get().workspace.reloadProjectExplorer();
     }
 
     @Override

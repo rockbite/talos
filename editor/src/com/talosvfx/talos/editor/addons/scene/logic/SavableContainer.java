@@ -8,7 +8,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.io.StringWriter;
 
-public class SavableContainer implements GameObjectContainer, Json.Serializable, IPropertyHolder {
+public abstract class SavableContainer implements GameObjectContainer, Json.Serializable, IPropertyHolder {
 
     public String path;
     public GameObject root;
@@ -98,7 +98,14 @@ public class SavableContainer implements GameObjectContainer, Json.Serializable,
     }
 
     protected void writeData (Json json) {
-
+        json.writeArrayStart("gameObjects");
+        Array<GameObject> gameObjects = getGameObjects();
+        if(gameObjects != null) {
+            for (GameObject gameObject : gameObjects) {
+                json.writeValue(gameObject);
+            }
+        }
+        json.writeArrayEnd();
     }
 
     public String getAsString () {
@@ -112,15 +119,6 @@ public class SavableContainer implements GameObjectContainer, Json.Serializable,
             json.getWriter().object();
 
             writeData(json);
-
-            json.writeArrayStart("gameObjects");
-            Array<GameObject> gameObjects = getGameObjects();
-            if(gameObjects != null) {
-                for (GameObject gameObject : gameObjects) {
-                    json.writeValue(gameObject);
-                }
-            }
-            json.writeArrayEnd();
 
             String finalString = stringWriter.toString() + "}";
 
@@ -145,28 +143,12 @@ public class SavableContainer implements GameObjectContainer, Json.Serializable,
 
     public void loadFromPath() {
         FileHandle dataFile = Gdx.files.absolute(path);
-        loadFromJson(dataFile.readString());
-    }
-
-    public void loadFromJson(String data) {
-        JsonValue jsonValue = new JsonReader().parse(data);
-        Json json = new Json();
-        JsonValue gameObjectsJson = jsonValue.get("gameObjects");
-        root = new GameObject();
-        for(JsonValue gameObjectJson: gameObjectsJson) {
-            GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
-            root.addGameObject(gameObject);
-        }
+        load(dataFile.readString());
     }
 
     public void save() {
         FileHandle file = Gdx.files.absolute(path);
         String data = getAsString();
         file.writeString(data, false);
-    }
-
-    @Override
-    public Iterable<IPropertyProvider> getPropertyProviders () {
-        return new Array<>();
     }
 }

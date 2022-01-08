@@ -39,8 +39,6 @@ public class EditableLabel extends Table implements ActorCloneable {
     private Label label;
     private TextField textField;
 
-    private Cell<TextField> fieldCell;
-
     private EditableLabelChangeListener listener;
 
     private Vector2 tmpVec = new Vector2();
@@ -75,8 +73,7 @@ public class EditableLabel extends Table implements ActorCloneable {
         labelTable.add(label).growX().width(0);
 
         textField = new TextField(text, getSkin(), "no-bg");
-        fieldCell = inputTable.add(textField);
-        inputTable.add().expandX();
+        inputTable.add(textField).growX();
 
         addListener(new ClickListener() {
 
@@ -157,7 +154,7 @@ public class EditableLabel extends Table implements ActorCloneable {
         editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        textField.setWidth(label.getPrefWidth() + 10);
+        //textField.setWidth(label.getPrefWidth() + 10);
         textField.setText(label.getText().toString());
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();

@@ -180,6 +180,33 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         return gameObject;
     }
 
+    public GameObject createFromPrefab (Prefab prefab, Vector2 position, GameObject parent) {
+        GameObject gameObject = prefab.root;
+        String name = getUniqueGOName(prefab.name, true);
+        gameObject.setName(name);
+
+        if(position != null && gameObject.hasComponent(TransformComponent.class)) {
+            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+            transformComponent.position.set(position.x, position.y);
+            transformComponent.rotation = 0;
+            transformComponent.scale.set(1, 1);
+        }
+
+        if(parent == null) {
+            currentContainer.addGameObject(gameObject);
+        } else {
+            parent.addGameObject(gameObject);
+        }
+
+        initGizmos(gameObject);
+
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+
+        selectGameObjectExternally(gameObject);
+
+        return gameObject;
+    }
+
     private String getUniqueGOName (String nameTemplate) {
         return getUniqueGOName(nameTemplate, false);
     }
@@ -1015,7 +1042,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             }
             container.path = sceneFileHandle.path();
             if(fromMemory) {
-                container.loadFromJson(snapshotService.getSnapshot(changeVersion, container.path));
+                container.load(snapshotService.getSnapshot(changeVersion, container.path));
                 container.loadFromPath();
             } else {
                 container.loadFromPath();

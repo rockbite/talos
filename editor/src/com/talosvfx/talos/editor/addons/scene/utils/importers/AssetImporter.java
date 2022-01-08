@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
@@ -10,7 +11,9 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -127,6 +130,14 @@ public class AssetImporter {
         }
         if(fileHandle.extension().equals("p")) {
             importerMap.get(AssetType.TLS).makeInstance(fileHandle, parent);
+        }
+
+
+        if(fileHandle.extension().equals("prefab")) {
+            SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
+            Vector2 sceneCords = workspace.getMouseCordsOnScene();
+            Prefab prefab = Prefab.from(fileHandle);
+            GameObject gameObject = workspace.createFromPrefab(prefab, sceneCords, parent);
         }
     }
 
