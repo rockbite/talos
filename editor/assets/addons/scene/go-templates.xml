@@ -23,6 +23,13 @@
                 <component className="CameraComponent"></component>
             </components>
         </template>
+        <template name = "spine" title = "Spine" nameTemplate = "Spine Animation" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="SkeletonComponent"></component>
+                <component className="SpineRendererComponent"></component>
+            </components>
+        </template>
     </templates>
     <components>
         <component className="TransformComponent">
@@ -41,6 +48,14 @@
             </gizmos>
         </component>
         <component className="ParticleComponent">
+            <gizmos>
+            </gizmos>
+        </component>
+        <component className="SkeletonComponent">
+            <gizmos>
+            </gizmos>
+        </component>
+        <component className="SpineRendererComponent">
             <gizmos>
             </gizmos>
         </component>

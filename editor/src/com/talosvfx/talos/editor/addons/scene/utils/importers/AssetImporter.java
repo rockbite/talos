@@ -22,7 +22,6 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
 public class AssetImporter {
@@ -31,7 +30,8 @@ public class AssetImporter {
 
     public enum AssetType {
         SPRITE,
-        TLS
+        TLS,
+        SPINE
     }
 
     private static ObjectMap<AssetType, AbstractImporter> importerMap = new ObjectMap();
@@ -41,6 +41,7 @@ public class AssetImporter {
 
         importerMap.put(AssetType.SPRITE, new SpriteImporter());
         importerMap.put(AssetType.TLS, new TlsImporter());
+        importerMap.put(AssetType.SPINE, new SpineImporter());
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
@@ -50,6 +51,8 @@ public class AssetImporter {
             importer = importerMap.get(AssetType.SPRITE);
         } else if(handle.extension().equals("tls")) {
             importer = importerMap.get(AssetType.TLS);
+        } else if(handle.extension().equals("skel")) {
+            importer = importerMap.get(AssetType.SPINE);
         }
 
         importedAsset = importer.importAsset(handle);
@@ -132,6 +135,9 @@ public class AssetImporter {
             importerMap.get(AssetType.TLS).makeInstance(fileHandle, parent);
         }
 
+        if(fileHandle.extension().equals("skel")) {
+            importerMap.get(AssetType.SPINE).makeInstance(fileHandle, parent);
+        }
 
         if(fileHandle.extension().equals("prefab")) {
             SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;

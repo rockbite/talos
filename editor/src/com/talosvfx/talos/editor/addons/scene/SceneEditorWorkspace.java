@@ -1019,10 +1019,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         String data = json.prettyPrint(sceneEditorAddon.workspace);
 
         SavableContainer savableContainer = currentContainer;
-        if(toMemory){
-            snapshotService.saveSnapshot(changeVersion, savableContainer.path, savableContainer.getAsString());
-        } else {
-            savableContainer.save();
+        if(savableContainer != null) {
+            if (toMemory) {
+                snapshotService.saveSnapshot(changeVersion, savableContainer.path, savableContainer.getAsString());
+            } else {
+                savableContainer.save();
+            }
         }
 
         return data;

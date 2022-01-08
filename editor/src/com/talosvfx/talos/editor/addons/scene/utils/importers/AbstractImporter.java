@@ -12,9 +12,6 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 
 public abstract class AbstractImporter {
 

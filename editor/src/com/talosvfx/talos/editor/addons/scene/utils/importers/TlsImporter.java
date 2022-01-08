@@ -7,8 +7,6 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.project.TalosProject;
 

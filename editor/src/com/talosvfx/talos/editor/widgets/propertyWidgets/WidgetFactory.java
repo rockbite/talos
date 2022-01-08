@@ -32,7 +32,7 @@ public class WidgetFactory {
                 return generateForVector2(parent, field, object, title);
             } else if(field.getType().equals(String.class)) {
                 ValueProperty annotation = field.getAnnotation(ValueProperty.class);
-                if(annotation.readOnly()) {
+                if(annotation != null && annotation.readOnly()) {
                     return generateForStaticString(parent, field, object, title);
                 } else {
                     return generateForString(parent, field, object, title);

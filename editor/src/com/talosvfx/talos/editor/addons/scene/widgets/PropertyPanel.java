@@ -58,6 +58,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
         providerSet.clear();
         for(IPropertyProvider propertyProvider: propertyProviders) {
+            if(propertyProvider.getType() == null) continue;
             providerSet.put(propertyProvider.getType(), propertyProvider);
         }
         build();

@@ -8,12 +8,10 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.esotericsoftware.spine.SkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -42,6 +40,7 @@ public class MainRenderer implements Notifications.Observer {
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
+    private SkeletonRenderer spineRenderer;
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -51,6 +50,7 @@ public class MainRenderer implements Notifications.Observer {
         Notifications.registerObserver(this);
 
         talosRenderer = new SpriteBatchParticleRenderer();
+        spineRenderer = new SkeletonRenderer();
 
         layerComparator = new Comparator<GameObject>() {
             @Override
@@ -97,7 +97,31 @@ public class MainRenderer implements Notifications.Observer {
                 renderSprite(batch, gameObject);
             } else if(gameObject.hasComponent(ParticleComponent.class)) {
                 renderParticle(batch, gameObject);
+            } else if(gameObject.hasComponent(SpineRendererComponent.class)) {
+                renderSpine(batch, gameObject);
             }
+        }
+    }
+
+    private void renderSpine (Batch batch, GameObject gameObject) {
+        SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
+        SkeletonComponent skeletonComponent = gameObject.getComponent(SkeletonComponent.class);
+
+        vec.set(0, 0);
+        transformComponent.localToWorld(gameObject, vec);
+        Vector2 renderPosition = vec;
+
+        if(skeletonComponent.state == null) {
+            skeletonComponent.reloadData();
+        }
+        if(skeletonComponent.state != null) {
+            skeletonComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
+            skeletonComponent.setAtlas(spineRendererComponent.textureAtlas);
+            skeletonComponent.state.update(Gdx.graphics.getDeltaTime());
+            skeletonComponent.state.apply(skeletonComponent.skeleton);
+            skeletonComponent.skeleton.updateWorldTransform();
+
+            spineRenderer.draw(batch, skeletonComponent.skeleton); // Draw the skeleton images.
         }
     }
 
