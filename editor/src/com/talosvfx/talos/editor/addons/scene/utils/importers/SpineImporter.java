@@ -16,22 +16,12 @@ public class SpineImporter extends AbstractImporter{
 
     @Override
     public FileHandle importAsset (FileHandle fileHandle) {
-        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
-        String assetPath = projectPath + File.separator + "assets";
-
         FileHandle importedAsset = importAssetFile(fileHandle); // skel file
 
-        // copy atlas files too
+        // import atlas files too
         FileHandle atlasFile = AssetImporter.makeSimilar(fileHandle, "atlas");
         if(atlasFile.exists()) {
-            FileHandle importedAtlasFile = Gdx.files.absolute(assetPath + File.separator + atlasFile.name());
-            atlasFile.copyTo(importedAtlasFile);
-            String data = importedAtlasFile.readString();
-            String[] lines = data.split("\n");
-            String pngName = lines[0];
-            FileHandle pngFile = Gdx.files.absolute(atlasFile.parent().path() + "/" + pngName);
-            FileHandle importedPngFile = Gdx.files.absolute(assetPath + File.separator + pngFile.name());
-            pngFile.copyTo(importedPngFile);
+            AssetImporter.attemptToImport(atlasFile);
         }
 
         return importedAsset;

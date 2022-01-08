@@ -31,7 +31,8 @@ public class AssetImporter {
     public enum AssetType {
         SPRITE,
         TLS,
-        SPINE
+        SPINE,
+        ATLAS
     }
 
     private static ObjectMap<AssetType, AbstractImporter> importerMap = new ObjectMap();
@@ -42,6 +43,7 @@ public class AssetImporter {
         importerMap.put(AssetType.SPRITE, new SpriteImporter());
         importerMap.put(AssetType.TLS, new TlsImporter());
         importerMap.put(AssetType.SPINE, new SpineImporter());
+        importerMap.put(AssetType.ATLAS, new AtlasImporter());
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
@@ -53,6 +55,8 @@ public class AssetImporter {
             importer = importerMap.get(AssetType.TLS);
         } else if(handle.extension().equals("skel")) {
             importer = importerMap.get(AssetType.SPINE);
+        } else if(handle.extension().equals("atlas")) {
+            importer = importerMap.get(AssetType.ATLAS);
         }
 
         importedAsset = importer.importAsset(handle);

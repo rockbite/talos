@@ -44,7 +44,9 @@ public class SpineRendererComponent extends RendererComponent {
     }
 
     public void reloadAtlas () {
-        textureAtlas = new TextureAtlas(Gdx.files.absolute(path));
+        if(path != null && Gdx.files.absolute(path).exists()) {
+            textureAtlas = new TextureAtlas(Gdx.files.absolute(path));
+        }
     }
 
 
