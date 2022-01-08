@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
+import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
@@ -51,7 +52,7 @@ public class ProjectExplorerWidget extends Table {
         ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidget);
         scrollPaneRight.setScrollingDisabled(true, false);
 
-        SplitPane splitPane = new SplitPane(scrollPane, scrollPaneRight, false, TalosMain.Instance().getSkin(), "timeline");
+        VisSplitPane splitPane = new VisSplitPane(scrollPane, scrollPaneRight, false);
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();

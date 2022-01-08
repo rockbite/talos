@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -110,9 +111,9 @@ public class SceneEditorAddon implements IAddon {
         Table leftPart = new Table();
         Table midPart = new Table();
         workspaceContainer = new Table();
-        SplitPane horizontalPane = new SplitPane(leftPart, propertyPanel, false, skin, "timeline");
-        SplitPane verticalPane = new SplitPane(midPart, projectExplorer, true, skin, "timeline");
-        SplitPane midPane = new SplitPane(hierarchy, workspaceContainer, false, skin, "timeline");
+        VisSplitPane horizontalPane = new VisSplitPane(leftPart, propertyPanel, false);
+        VisSplitPane verticalPane = new VisSplitPane(midPart, projectExplorer, true);
+        VisSplitPane midPane = new VisSplitPane(hierarchy, workspaceContainer, false);
 
         leftPart.add(verticalPane).grow();
         midPart.add(midPane).grow();
