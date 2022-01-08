@@ -391,6 +391,25 @@ public class DirectoryViewWidget extends Table {
             label = new EditableLabel("text", skin);
             label.setAlignment(Align.center);
 
+            label.setListener(new EditableLabel.EditableLabelChangeListener() {
+                @Override
+                public void changed(String newText) {
+                    if(!fileHandle.isDirectory()) {
+                        String extension = fileHandle.extension();
+                        if (!newText.contains(".")) newText += "." + extension;
+                    }
+
+                    FileHandle parent = fileHandle.parent();
+                    FileHandle newHandle = Gdx.files.absolute(parent.path() + File.separator + newText);
+
+                    if(newHandle.path().equals(fileHandle.path())) return;
+
+                    fileHandle.moveTo(newHandle);
+                    fileHandle = newHandle;
+                    setFile(fileHandle);
+                }
+            });
+
             Table iconContainer = new Table();
             iconContainer.add(icon).grow();
 

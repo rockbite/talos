@@ -160,7 +160,7 @@ public class MainRenderer implements Notifications.Observer {
             return patchCache.get(texture);
         } else {
             NinePatch patch = new NinePatch(texture, metadata[0], metadata[1], metadata[2], metadata[3]);
-            patch.scale(1/100f, 1/100f); // fix this later
+            patch.scale(1/225f, 1/225f); // fix this later
             patchCache.put(texture, patch);
             return patch;
         }

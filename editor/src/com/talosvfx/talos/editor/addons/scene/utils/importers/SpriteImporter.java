@@ -1,13 +1,16 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.ImportUtils;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
@@ -57,6 +60,13 @@ public class SpriteImporter extends AbstractImporter {
         if(metadata.borderData != null) {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
             component.renderMode = SpriteRendererComponent.RenderMode.sliced;
+        } else {
+            if(gameObject.hasComponent(TransformComponent.class)) {
+                TransformComponent component = gameObject.getComponent(TransformComponent.class);
+                Texture texture = new Texture(asset);
+                component.scale.x = texture.getWidth() / 225f;
+                component.scale.y = texture.getHeight() / 225f;
+            }
         }
     }
 
