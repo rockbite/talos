@@ -26,11 +26,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
-public class EditableLabel extends Table {
+public class EditableLabel extends Table implements ActorCloneable {
 
     private Table labelTable;
     private Table inputTable;
@@ -43,6 +44,14 @@ public class EditableLabel extends Table {
     private Vector2 tmpVec = new Vector2();
 
     private final InputListener stageListener;
+    private boolean editMode = false;
+    private boolean editable = true;
+
+    private Cell<Label> labelCell;
+
+    public void setEditable (boolean editable) {
+        this.editable = editable;
+    }
 
     public interface EditableLabelChangeListener {
         public void changed(String newText);
@@ -63,12 +72,10 @@ public class EditableLabel extends Table {
 
         label = new Label(text, getSkin(), "default");
         label.setEllipsis(true);
-        labelTable.add(label).growX().width(0);
-
+        labelCell = labelTable.add(label).growX();
 
         textField = new TextField(text, getSkin(), "no-bg");
-        inputTable.add(textField);
-        inputTable.add().expandX();
+        inputTable.add(textField).growX();
 
         addListener(new ClickListener() {
 
@@ -78,7 +85,7 @@ public class EditableLabel extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 long time = TimeUtils.millis();
 
-                if(time - clickTime < 200) {
+                if(time - clickTime < 200 && editable) {
                     setEditMode();
                 }
 
@@ -146,9 +153,10 @@ public class EditableLabel extends Table {
     }
 
     public void setEditMode() {
+        editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        textField.setWidth(label.getPrefWidth() + 10);
+        //textField.setWidth(label.getPrefWidth() + 10);
         textField.setText(label.getText().toString());
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();
@@ -158,6 +166,7 @@ public class EditableLabel extends Table {
     }
 
     public void setStaticMode() {
+        editMode = false;
         labelTable.setVisible(true);
         inputTable.setVisible(false);
 
@@ -176,5 +185,27 @@ public class EditableLabel extends Table {
 
     public void setText(String text) {
         label.setText(text);
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setAlignment (int alignment) {
+        label.setAlignment(alignment);
+        textField.setAlignment(alignment);
+    }
+
+    @Override
+    public Actor copyActor (Actor copyFrom) {
+        Label label = new Label(this.label.getText(), getSkin());
+        return label;
+    }
+    public Label getLabel() {
+        return label;
+    }
+
+    public Cell<Label> getLabelCell() {
+        return labelCell;
     }
 }

@@ -19,10 +19,15 @@ package com.talosvfx.talos;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
+import java.awt.*;
+
 public class TalosLauncher {
 	public static void main (String[] arg) {
+
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(1200, 900);
+		config.setWindowedMode(screenSize.width, screenSize.height);
 		config.setTitle("Talos");
 		config.useVsync(false);
 		config.setBackBufferConfig(1,1,1,1,8,8, 16);

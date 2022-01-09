@@ -85,7 +85,7 @@ public class TalosProject implements IProject {
 	}
 
 
-	public void loadProject (String data) {
+	public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
 		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
 
 		cleanData();
@@ -166,7 +166,7 @@ public class TalosProject implements IProject {
 		particleEffect.sortEmitters();
 	}
 
-	public String getProjectString () {
+	public String getProjectString (boolean toMemory) {
 		projectData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
 		String data = projectSerializer.write(projectData);
 
@@ -437,4 +437,19 @@ public class TalosProject implements IProject {
 			return furthestPoint;
 		}
 	}
+
+	@Override
+	public String getProjectTypeName () {
+		return "Talos";
+	}
+
+	@Override
+	public boolean requiresWorkspaceLocation () {
+		return false;
+	}
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
+    }
 }

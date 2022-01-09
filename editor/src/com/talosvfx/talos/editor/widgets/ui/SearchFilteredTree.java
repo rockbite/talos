@@ -48,7 +48,7 @@ public class SearchFilteredTree<T> extends Table {
         add(searchTable).growX();
         row();
         scrollPane = new ScrollPane(filteredTree, skin, "list");
-        add(scrollPane).growX();
+        add(scrollPane).grow();
 
         textField.addListener(new ChangeListener() {
             @Override

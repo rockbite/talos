@@ -16,6 +16,8 @@ public class ColorLibrary {
     public static Color FONT_WHITE = new Color(Color.valueOf("#cccccc"));
     public static Color FONT_GRAY = new Color(Color.valueOf("#919191"));
 
+    public static Color ORANGE = new Color(Color.valueOf("#fcba03"));
+
     public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
 
     public static String SHAPE_SQUIRCLE = "squircle-6";
@@ -30,8 +32,10 @@ public class ColorLibrary {
         PANEL_GRAY ("#4e4d4d"),
         MID_GRAY ("#434343"),
         DARK_GRAY ("#3a3a3a"),
+        SUPER_DARK_GRAY ("#2a2a2a"),
         BLACK_TRANSPARENT ("#2a2a2add"),
         RED ("#92313a"),
+        // fifty shades of grey :D
 
         LIGHT_BLUE ("#5b86ae"),
 

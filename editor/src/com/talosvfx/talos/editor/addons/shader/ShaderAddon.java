@@ -159,4 +159,9 @@ public class ShaderAddon implements IAddon {
 
         menuBar.addMenu(menu);
     }
+
+    @Override
+    public void dispose () {
+
+    }
 }

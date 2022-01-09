@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.utils.CameraController;
 
 
@@ -53,6 +54,7 @@ public abstract class ViewportWidget extends Table {
     private float worldWidth = 1f;
 
     private Vector3 tmp = new Vector3();
+    private Vector2 vec2 = new Vector2();
 
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
@@ -167,6 +169,9 @@ public abstract class ViewportWidget extends Table {
 
     public abstract void drawContent(Batch batch, float parentAlpha);
 
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
     public float getCameraPosX() {
         return camera.position.x;
     }
@@ -232,8 +237,8 @@ public abstract class ViewportWidget extends Table {
         int countY = MathUtils.ceil(height/gridSize);
 
         float falloff = ((float)(MathUtils.clamp(countX, minCount, maxCount)-minCount))/(maxCount-minCount);
-        float brightAlpha = (1f-falloff*0.95f) * 0.5f * parentAlpha;
-        float dimAlpha = gridColor.a * 0.05f * parentAlpha;
+        float brightAlpha = (1f-falloff*0.95f) * 0.3f * parentAlpha;
+        float dimAlpha = gridColor.a * 0.1f * parentAlpha;
 
         // camera offsets
         x =  x - x % (gridSize*8f);
@@ -275,6 +280,27 @@ public abstract class ViewportWidget extends Table {
         y = Gdx.graphics.getHeight() - y;
 
         out.set(x, y, ssWidth, ssHeight);
+    }
+
+    protected Vector2 getLocalFromWorld (float x, float y) {
+        getViewportBounds(Rectangle.tmp);
+        camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+        Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, (Rectangle.tmp.height - tmp.y) + Rectangle.tmp.y + 50)); // 50 is top bar height :(((((
+        vec2.set(vector2);
+
+        return vec2;
+    }
+
+    protected Vector2 getWorldFromLocal (float x, float y) {
+        Vector2 vector2 = localToScreenCoordinates(new Vector2(x, y));
+
+        getViewportBounds(Rectangle.tmp);
+
+        camera.unproject(tmp.set(vector2.x, vector2.y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+
+        vec2.set(tmp.x, tmp.y);
+
+        return vec2;
     }
 
     protected Vector3 getWorldFromLocal (Vector3 vec) {
