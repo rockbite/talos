@@ -40,14 +40,13 @@ public class SkeletonComponent implements IComponent {
         AssetSelectWidget skelWidget = new AssetSelectWidget("Skeleton Data", "skel", new Supplier<String>() {
             @Override
             public String get() {
-                FileHandle fileHandle = Gdx.files.absolute(path);
-                return fileHandle.path();
+                return path;
             }
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
                 path = value;
-                SpineMetadata spineMetadata = AssetImporter.readMetadataFor(Gdx.files.absolute(path), SpineMetadata.class);
+                SpineMetadata spineMetadata = AssetImporter.readMetadataFor(AssetImporter.get(path), SpineMetadata.class);
                 reloadData(spineMetadata.scale);
             }
         });
@@ -112,7 +111,7 @@ public class SkeletonComponent implements IComponent {
 
     public void reloadData (float scale) {
         if(path != null) {
-            FileHandle fileHandle = Gdx.files.absolute(path);
+            FileHandle fileHandle = AssetImporter.get(path);
             if(fileHandle.exists()) {
                 json = new SkeletonBinary(attachmentLoader);
                 json.setScale(scale);

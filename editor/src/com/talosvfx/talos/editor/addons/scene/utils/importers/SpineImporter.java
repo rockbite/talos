@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
@@ -21,10 +20,10 @@ public class SpineImporter extends AbstractImporter{
         // import atlas files too
         FileHandle atlasFile = AssetImporter.makeSimilar(fileHandle, "atlas");
         if(atlasFile.exists()) {
-            AssetImporter.attemptToImport(atlasFile);
+            FileHandle importedAtlas = AssetImporter.attemptToImport(atlasFile);
 
             SpineMetadata spineMetadata = (SpineMetadata) AssetImporter.readMetadataFor(importedAsset);
-            spineMetadata.atlasPath = atlasFile.path();
+            spineMetadata.atlasPath = AssetImporter.relative(importedAtlas.path());
             AssetImporter.saveMetadata(spineMetadata);
         }
 
@@ -44,8 +43,8 @@ public class SpineImporter extends AbstractImporter{
         SpineMetadata spineMetadata = AssetImporter.readMetadataFor(asset, SpineMetadata.class);
 
         // read this from meta instead later
-        spineRendererComponent.path = asset.parent().path() + "/" + asset.nameWithoutExtension() + ".atlas";
-        skeletonComponent.path = asset.path();
+        spineRendererComponent.path = spineMetadata.atlasPath;
+        skeletonComponent.path = AssetImporter.relative(asset.path());
         spineRendererComponent.reloadAtlas();
         skeletonComponent.setAtlas(spineRendererComponent.textureAtlas);
         skeletonComponent.reloadData(spineMetadata.scale);

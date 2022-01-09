@@ -146,12 +146,14 @@ public class AssetImporter {
     }
 
     public static FileHandle getMetadataHandleFor (FileHandle handle) {
+        handle = get(handle.path());
+
         FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
 
     public static FileHandle getMetadataHandleFor (String assetPath) {
-        FileHandle handle = Gdx.files.absolute(assetPath);
+        FileHandle handle = get(assetPath);
         FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
@@ -277,5 +279,31 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("prefab")) {
             SceneEditorAddon.get().workspace.openPrefab(fileHandle);
         }
+    }
+
+    public static FileHandle get(String path) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(path.startsWith(projectPath)) {
+            return Gdx.files.absolute(path);
+        }
+
+        String fullPath = projectPath + File.separator + path;
+
+        return Gdx.files.absolute(fullPath);
+    }
+
+    public static String relative(String fullPath) {
+        return relative(Gdx.files.absolute(fullPath));
+    }
+
+    public static String relative(FileHandle fileHandle) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+
+        String path = fileHandle.path();
+        if(path.startsWith(projectPath)) {
+            path = path.substring(projectPath.length());
+        }
+
+        return path;
     }
 }

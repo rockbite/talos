@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
@@ -43,8 +44,7 @@ public class SpriteRendererComponent extends RendererComponent {
         AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", "png", new Supplier<String>() {
             @Override
             public String get() {
-                FileHandle fileHandle = Gdx.files.absolute(path);
-                return fileHandle.path();
+                return path;
             }
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
@@ -82,7 +82,7 @@ public class SpriteRendererComponent extends RendererComponent {
     }
 
     public void reloadTexture () {
-        FileHandle file = Gdx.files.absolute(path);
+        FileHandle file = AssetImporter.get(path);
         if(file.exists()) {
             try {
                 texture = new TextureRegion(new Texture(file));

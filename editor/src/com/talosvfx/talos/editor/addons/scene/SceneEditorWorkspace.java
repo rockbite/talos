@@ -140,7 +140,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
         SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
-        component.path = importedAsset.path();
+        component.path = AssetImporter.relative(importedAsset);
         component.reloadTexture();
 
         TextureRegion texture = component.texture;
@@ -175,7 +175,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 
-        selectGameObjectExternally(gameObject);
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run () {
+                selectGameObjectExternally(gameObject);
+            }
+        });
 
         return gameObject;
     }
@@ -582,7 +587,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             }
             json.writeArrayEnd();
 
-            json.writeValue("currentScene", currentContainer.path);
+            json.writeValue("currentScene", AssetImporter.relative(currentContainer.path));
 
             json.writeValue("changeVersion", changeVersion);
         }
@@ -618,7 +623,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         }
 
         String path = jsonData.getString("currentScene", "");
-        FileHandle sceneFileHandle = Gdx.files.absolute(path);
+        FileHandle sceneFileHandle = AssetImporter.get(path);
         if(sceneFileHandle.exists()) {
             SavableContainer container;
             if(sceneFileHandle.extension().equals("prefab")) {
