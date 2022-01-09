@@ -253,9 +253,12 @@ public class ProjectExplorerWidget extends Table {
                 public void clicked (InputEvent event, float x, float y) {
                     String path = files.first().path();
                     FileHandle tlsDestination = AssetImporter.suggestNewName(path, "New Effect", "tls");
+                    FileHandle exportDestination = AssetImporter.makeSimilar(tlsDestination,"p");
                     FileHandle metadataHandle = AssetImporter.makeSimilar(tlsDestination,"meta");
                     FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
+                    FileHandle originalExport = Gdx.files.internal("addons/scene/missing/sample.p");
                     originalTls.copyTo(tlsDestination);
+                    originalExport.copyTo(exportDestination);
                     TlsMetadata metadata = new TlsMetadata();
                     metadata.tlsChecksum = AssetImporter.checkSum(tlsDestination);
                     AssetImporter.saveMetadata(metadataHandle, metadata);

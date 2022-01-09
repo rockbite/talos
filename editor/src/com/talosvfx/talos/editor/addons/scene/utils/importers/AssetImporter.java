@@ -341,6 +341,7 @@ public class AssetImporter {
     public static void moveFile(FileHandle file, FileHandle directory) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
         FileHandle destination = directory.child(file.name());
         FileHandle metaFile = getMetadataHandleFor(file);
@@ -381,7 +382,6 @@ public class AssetImporter {
     public static void deleteFile(FileHandle file) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return;
-        if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
         if(file.isDirectory()) {
             FileHandle[] list = file.list();
