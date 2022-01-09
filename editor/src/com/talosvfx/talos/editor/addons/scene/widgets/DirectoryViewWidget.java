@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -72,6 +73,25 @@ public class DirectoryViewWidget extends Table {
                             item.setToRename();
                         }
                     }
+                }
+
+                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+
+                if(keycode == Input.Keys.X && SceneEditorWorkspace.ctrlPressed()) {
+                    projectExplorer.invokeCut(selected);
+                }
+
+                if(keycode == Input.Keys.C && SceneEditorWorkspace.ctrlPressed()) {
+                    projectExplorer.invokeCopy(selected);
+                }
+
+                if(keycode == Input.Keys.V && SceneEditorWorkspace.ctrlPressed()) {
+                    projectExplorer.invokePaste(getCurrentFolder());
+                }
+
+                if(keycode == Input.Keys.A && SceneEditorWorkspace.ctrlPressed()) {
+                    selectAllFiles();
+                    reportSelectionChanged();
                 }
 
                 return super.keyDown(event, keycode);
@@ -201,6 +221,13 @@ public class DirectoryViewWidget extends Table {
         }
 
         return null;
+    }
+
+    private void selectAllFiles() {
+        selected.clear();
+        for(ItemView view: items) {
+            selected.add(view.fileHandle);
+        }
     }
 
     private void unselectFiles() {

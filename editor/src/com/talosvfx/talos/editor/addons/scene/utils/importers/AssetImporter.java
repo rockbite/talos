@@ -306,4 +306,80 @@ public class AssetImporter {
 
         return path;
     }
+
+    public static void copyFile(FileHandle file, FileHandle directory) {
+        FileHandle destination = directory.child(file.name());
+        FileHandle metaFile = getMetadataHandleFor(file);
+        file.copyTo(destination);
+
+        if(metaFile.exists()) {
+            FileHandle metaDestination = directory.child(metaFile.name());
+            metaFile.copyTo(metaDestination);
+        }
+    }
+
+    public static void moveFile(FileHandle file, FileHandle directory) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return;
+
+        FileHandle destination = directory.child(file.name());
+        FileHandle metaFile = getMetadataHandleFor(file);
+        file.moveTo(destination);
+
+        if(metaFile.exists()) {
+            FileHandle metaDestination = directory.child(metaFile.name());
+            metaFile.moveTo(metaDestination);
+        }
+    }
+
+    public static FileHandle renameFile(FileHandle file, String newName) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return file;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return file;
+
+        if(!file.isDirectory()) {
+            String extension = file.extension();
+            if (!newName.endsWith(extension)) {
+                newName += "." + extension;
+            }
+        }
+
+        FileHandle metaFile = getMetadataHandleFor(file);
+        FileHandle newHandle = file.parent().child(newName);
+
+        if(file.path().equals(newHandle.path())) return file;
+
+        file.moveTo(newHandle);
+
+        if(metaFile.exists()) {
+            FileHandle newMetaFile = getMetadataHandleFor(newHandle);
+            metaFile.moveTo(newMetaFile);
+        }
+
+        return newHandle;
+    }
+
+    public static void deleteFile(FileHandle file) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return;
+
+        if(file.isDirectory()) {
+            FileHandle[] list = file.list();
+            if (list.length > 0) {
+                for (int i = 0; i < list.length; i++) {
+                    deleteFile(list[i]);
+                }
+            }
+        }
+
+        // check for metadata file
+        FileHandle metadataHandle = getMetadataHandleFor(file);
+        if(metadataHandle.exists()) {
+            metadataHandle.delete();
+        }
+
+        file.delete();
+    }
 }
