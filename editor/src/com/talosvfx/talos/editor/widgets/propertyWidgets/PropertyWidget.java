@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 
 import java.util.function.Supplier;
@@ -87,7 +89,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 	protected void callValueChanged (T value) {
 		valueChanged(value);
-		TalosMain.Instance().ProjectController().setDirty();
+		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderEdited.class));
 	}
 
 	public void valueChanged(T value) {

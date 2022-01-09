@@ -22,7 +22,10 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -89,6 +92,7 @@ public class DirectoryViewWidget extends Table {
                     if(fileToContext != null) {
                         if (!selected.contains(fileToContext.fileHandle, true)) {
                             selectFile(fileToContext.fileHandle);
+                            reportSelectionChanged();
                         }
                         SceneEditorAddon.get().projectExplorer.showContextMenu(selected);
                     } else {
@@ -98,7 +102,6 @@ public class DirectoryViewWidget extends Table {
                     }
                 } else if(button == 0) {
                     float diff = TimeUtils.millis() - timeClicked;
-
                     ItemView fileToSelect = getFileAt(x, y);
 
                     if(fileToSelect != null) {
@@ -108,6 +111,7 @@ public class DirectoryViewWidget extends Table {
                             } else {
                                 addToSelection(fileToSelect.fileHandle);
                             }
+                            reportSelectionChanged();
                             selectionStart = items.indexOf(fileToSelect, true);
                         } else {
                             if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -120,15 +124,18 @@ public class DirectoryViewWidget extends Table {
                                     for(int i = min; i <= max; i++) {
                                         addToSelection(items.get(i).fileHandle);
                                     }
+                                    reportSelectionChanged();
                                 }
                             } else {
                                 selectionStart = items.indexOf(fileToSelect, true);
                                 selectFile(fileToSelect.fileHandle);
+                                reportSelectionChanged();
                             }
                         }
                     } else {
                         selectionStart = -1;
                         unselectFiles();
+                        reportSelectionChanged();
                     }
 
                     if(diff < 500 && prevPos.dst(x, y) < 40) {
@@ -136,17 +143,7 @@ public class DirectoryViewWidget extends Table {
                         prevPos.set(0, 0);
                         ItemView fileAt = getFileAt(x, y);
                         if(fileAt != null) {
-                            if(fileAt.fileHandle.isDirectory()) {
-                                SceneEditorAddon.get().projectExplorer.select(fileAt.fileHandle.path());
-                            } else {
-                                // maybe custom open it or something
-                                if(fileAt.fileHandle.extension().equals("scn")) {
-                                    SceneEditorAddon.get().workspace.openScene(fileAt.fileHandle);
-                                }
-                                if(fileAt.fileHandle.extension().equals("prefab")) {
-                                    SceneEditorAddon.get().workspace.openPrefab(fileAt.fileHandle);
-                                }
-                            }
+                            AssetImporter.fileOpen(fileAt.fileHandle);
                         } else {
                             // go up
                             if(fileHandle != null) {
@@ -324,7 +321,7 @@ public class DirectoryViewWidget extends Table {
                     }
                 });
 
-                colCount = (int) (getWidth() / boxWidth);
+                colCount = (int) (getWidth() / (boxWidth + 10)) - 1;
 
                 add(itemView).top().left().width(100).padLeft(10).padTop(10);
                 count++;
@@ -469,6 +466,15 @@ public class DirectoryViewWidget extends Table {
         public ItemView copyActor(ItemView copyFrom) {
             setFile(copyFrom.fileHandle);
             return this;
+        }
+    }
+
+    private void reportSelectionChanged() {
+        if(selected.size > 0) {
+            FileHandle item = selected.first();
+            AMetadata aMetadata = AssetImporter.readMetadataFor(item);
+
+            Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(aMetadata));
         }
     }
 }

@@ -52,6 +52,9 @@ public class PropertyPanel extends Table implements Notifications.Observer {
 
     @EventHandler
     public void onPropertyHolderSelected(PropertyHolderSelected event) {
+        if(event.getTarget() == null) return;
+        if(event.getTarget().getPropertyProviders() == null) return;
+
         showPanel(event.getTarget(), event.getTarget().getPropertyProviders());
     }
 
@@ -127,5 +130,9 @@ public class PropertyPanel extends Table implements Notifications.Observer {
         if(currentPropertyHolder == propertyHolder) {
             cleanPanels();
         }
+    }
+
+    public IPropertyHolder getCurrentHolder () {
+        return currentPropertyHolder;
     }
 }
