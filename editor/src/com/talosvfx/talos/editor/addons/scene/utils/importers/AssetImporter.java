@@ -50,6 +50,7 @@ public class AssetImporter {
         metadataMap.put("p", TlsMetadata.class);
         metadataMap.put("atlas", AtlasMetadata.class);
         metadataMap.put("skel", SpineMetadata.class);
+        metadataMap.put("prefab", PrefabMetadata.class);
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
@@ -117,7 +118,15 @@ public class AssetImporter {
         T t = readMetadata(handle, clazz);
 
         if(t == null) {
-            t = (T) new EmptyMetadata();
+            if(clazz != null) {
+                try {
+                    t = ClassReflection.newInstance(clazz);
+                } catch (ReflectionException e) {
+                    t = (T) new EmptyMetadata();
+                }
+            } else {
+                t = (T) new EmptyMetadata();
+            }
         }
 
         t.setFile(assetHandle);
@@ -137,13 +146,13 @@ public class AssetImporter {
     }
 
     public static FileHandle getMetadataHandleFor (FileHandle handle) {
-        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
+        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
 
     public static FileHandle getMetadataHandleFor (String assetPath) {
         FileHandle handle = Gdx.files.absolute(assetPath);
-        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
+        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
 
@@ -216,6 +225,12 @@ public class AssetImporter {
         }
 
         return "";
+    }
+
+    public static void saveMetadata (AMetadata aMetadata) {
+        FileHandle assetHandle = aMetadata.currentFile;
+        FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
+        saveMetadata(metadataHandle, aMetadata);
     }
 
     public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {

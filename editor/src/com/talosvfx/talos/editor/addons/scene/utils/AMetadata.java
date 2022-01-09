@@ -8,7 +8,11 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 public abstract class AMetadata implements IPropertyProvider, IPropertyHolder {
 
-    public FileHandle currentFile;
+    public transient FileHandle currentFile;
+
+    public AMetadata() {
+
+    }
 
     public void setFile(FileHandle currentFile) {
         this.currentFile = currentFile;

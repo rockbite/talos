@@ -22,6 +22,10 @@ public class SpineImporter extends AbstractImporter{
         FileHandle atlasFile = AssetImporter.makeSimilar(fileHandle, "atlas");
         if(atlasFile.exists()) {
             AssetImporter.attemptToImport(atlasFile);
+
+            SpineMetadata spineMetadata = (SpineMetadata) AssetImporter.readMetadataFor(importedAsset);
+            spineMetadata.atlasPath = atlasFile.path();
+            AssetImporter.saveMetadata(spineMetadata);
         }
 
         return importedAsset;

@@ -39,7 +39,7 @@ public class FilePropertyProvider implements IPropertyProvider {
 
     @Override
     public int getPriority () {
-        return 0;
+        return -2;
     }
 
     @Override
