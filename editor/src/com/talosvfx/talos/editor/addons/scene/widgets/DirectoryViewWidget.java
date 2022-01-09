@@ -51,6 +51,8 @@ public class DirectoryViewWidget extends Table {
 
     private DragAndDrop dragAndDrop;
 
+    private boolean preventDeselect = false;
+
     public DirectoryViewWidget() {
         build();
     }
@@ -116,6 +118,11 @@ public class DirectoryViewWidget extends Table {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
+                if(preventDeselect) {
+                    preventDeselect = false;
+                    return;
+                }
+
                 ItemView fileToContext = getFileAt(x, y);
 
                 if(button == 1) {
@@ -145,7 +152,7 @@ public class DirectoryViewWidget extends Table {
                             selectionStart = items.indexOf(fileToSelect, true);
                         } else {
                             if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                                if(selectionStart > 0) {
+                                if(selectionStart >= 0) {
                                     int aPoint = items.indexOf(fileToSelect, true);
                                     int bPoint = selectionStart;
                                     int min = Math.min(aPoint, bPoint);
@@ -287,7 +294,18 @@ public class DirectoryViewWidget extends Table {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 Actor targetActor = getActor();
-                AssetImporter.createAssetInstance((FileHandle) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+
+                Object object = payload.getObject();
+                if(object instanceof Array) {
+                    Array<FileHandle> array = (Array<FileHandle>) object;
+                    for(FileHandle fileHandle: array) {
+                        AssetImporter.createAssetInstance(fileHandle, SceneEditorAddon.get().workspace.getRootGO());
+                    }
+                } else if(object instanceof FileHandle) {
+                    AssetImporter.createAssetInstance((FileHandle) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+                }
+
+                unselectFiles();
             }
         });
         dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
@@ -321,10 +339,25 @@ public class DirectoryViewWidget extends Table {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 ItemView targetItem = getFileAt(x, y);
-                FileHandle sourceItem = (FileHandle) payload.getObject();
 
-                if(!sourceItem.path().equals(targetItem.fileHandle.path())) {
-                    AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+                if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
+
+                    Object object = payload.getObject();
+                    if (object instanceof Array) {
+                        Array<FileHandle> array = (Array<FileHandle>) object;
+                        for (FileHandle sourceItem : array) {
+                            if (!sourceItem.path().equals(targetItem.fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+                            }
+                        }
+                    } else if (object instanceof FileHandle) {
+                        FileHandle sourceItem = (FileHandle) payload.getObject();
+                        if (!sourceItem.path().equals(targetItem.fileHandle.path())) {
+                            AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+                        }
+                    }
+
+                    unselectFiles();
 
                     SceneEditorAddon.get().workspace.reloadProjectExplorer();
                 }
@@ -352,11 +385,23 @@ public class DirectoryViewWidget extends Table {
                     public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                         DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                        ItemView newVIew = new ItemView();
-                        Actor dragging = ((ActorCloneable) newVIew).copyActor(itemView);
+                        preventDeselect = true;
 
-                        payload.setDragActor(dragging);
-                        payload.setObject(child);
+                        if(!selected.contains(child, true)) {
+                            selected.clear();
+                            selected.add(child);
+                        }
+
+                        if(selected.size == 1) {
+                            ItemView newVIew = new ItemView();
+                            Actor dragging = ((ActorCloneable) newVIew).copyActor(itemView);
+                            payload.setDragActor(dragging);
+                            payload.setObject(child);
+                        } else {
+                            Label dragging = new Label("Multiple selection", TalosMain.Instance().getSkin());
+                            payload.setDragActor(dragging);
+                            payload.setObject(selected);
+                        }
 
                         return payload;
                     }
