@@ -5,9 +5,11 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.util.Locale;
+import java.util.function.Supplier;
 
 public class FilePropertyProvider implements IPropertyProvider {
 
@@ -21,20 +23,29 @@ public class FilePropertyProvider implements IPropertyProvider {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>(fileHandle.name(), "Open", new ButtonPropertyWidget.ButtonListener<String>() {
+        LabelWidget nameWidget = new LabelWidget("Name", new Supplier<String>() {
+            @Override
+            public String get() {
+                return fileHandle.name();
+            }
+        });
+
+        ButtonPropertyWidget<String> actionWidget = new ButtonPropertyWidget<String>("action", "Open", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
             public void clicked (ButtonPropertyWidget<String> widget) {
                 AssetImporter.fileOpen(fileHandle);
             }
         });
-        properties.add(linkedToWidget);
+
+        properties.add(nameWidget);
+        properties.add(actionWidget);
 
         return properties;
     }
 
     @Override
     public String getPropertyBoxTitle () {
-        return fileHandle.nameWithoutExtension();
+        return "File";
     }
 
     @Override

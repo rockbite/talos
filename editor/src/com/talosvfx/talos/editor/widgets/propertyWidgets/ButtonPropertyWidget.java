@@ -30,6 +30,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
     public PropertyWidget clone() {
         ButtonPropertyWidget clone = (ButtonPropertyWidget) super.clone();
         clone.btnListener = this.btnListener;
+        clone.buttonLabel.setText(buttonLabel.getText());
 
         return clone;
     }

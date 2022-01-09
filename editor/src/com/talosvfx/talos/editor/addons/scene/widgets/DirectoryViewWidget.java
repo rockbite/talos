@@ -24,6 +24,8 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -497,11 +499,24 @@ public class DirectoryViewWidget extends Table {
     }
 
     private void reportSelectionChanged() {
-        if(selected.size > 0) {
-            FileHandle item = selected.first();
-            AMetadata aMetadata = AssetImporter.readMetadataFor(item);
+        if(!selected.isEmpty()) {
+            IPropertyHolder holder = null;
+            if (selected.size == 1) {
+                FileHandle item = selected.first();
+                holder = AssetImporter.readMetadataFor(item);
 
-            Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(aMetadata));
+            } else if (selected.size > 1) {
+                Array<AMetadata> list = new Array<AMetadata>();
+                for (FileHandle item : selected) {
+                    AMetadata aMetadata = AssetImporter.readMetadataFor(item);
+                    list.add(aMetadata);
+                }
+                holder = new MultiPropertyHolder(list);
+            }
+
+            if(holder != null) {
+                Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(holder));
+            }
         }
     }
 }

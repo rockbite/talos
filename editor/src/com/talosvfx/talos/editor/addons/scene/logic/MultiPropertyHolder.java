@@ -18,6 +18,10 @@ public class MultiPropertyHolder implements IPropertyHolder {
         generateLists();
     }
 
+    public Array<IPropertyHolder> getHolders() {
+        return holderArray;
+    }
+
     private void generateLists() {
         mainMap = new ObjectMap<>();
 

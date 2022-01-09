@@ -1173,10 +1173,25 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void onPropertyHolderEdited(PropertyHolderEdited event) {
         IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
         if(currentHolder != null) {
-            if(currentHolder instanceof AMetadata) {
-                AssetImporter.saveMetadata((AMetadata) currentHolder);
+            if(currentHolder instanceof MultiPropertyHolder) {
+                Array<IPropertyHolder> holders = ((MultiPropertyHolder) currentHolder).getHolders();
+                boolean setDirty = false;
+                for(IPropertyHolder holder: holders) {
+                    if(holder instanceof AMetadata) {
+                        AssetImporter.saveMetadata((AMetadata) holder);
+                    } else {
+                        setDirty = true;
+                    }
+                }
+                if(setDirty) {
+                    TalosMain.Instance().ProjectController().setDirty();
+                }
             } else {
-                TalosMain.Instance().ProjectController().setDirty();
+                if (currentHolder instanceof AMetadata) {
+                    AssetImporter.saveMetadata((AMetadata) currentHolder);
+                } else {
+                    TalosMain.Instance().ProjectController().setDirty();
+                }
             }
         }
     }
