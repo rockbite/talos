@@ -57,11 +57,10 @@ public class ParticleComponent extends RendererComponent {
                 String link = widget.getValue();
                 if (link.isEmpty()) {
                     FileHandle sample = Gdx.files.internal("addons/scene/missing/sample.tls");
-                    FileHandle thisEffect = Gdx.files.absolute(path);
+                    FileHandle thisEffect = AssetImporter.get(path);
                     FileHandle destination;
-                    if (thisEffect.exists()) {
-                        //destination = AssetImporter.makeSimilar(thisEffect, "tls");
-                        //sample.copyTo(destination);
+                    if (!path.isEmpty() && thisEffect.exists()) {
+                        // idk which scenario is this
                     } else {
                         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
                         destination = AssetImporter.attemptToImport(sample);
@@ -79,6 +78,10 @@ public class ParticleComponent extends RendererComponent {
                         TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
                         TalosMain.Instance().ProjectController().loadProject(destination);
                     }
+                } else {
+                    FileHandle fileHandle = AssetImporter.get(link);
+                    TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+                    TalosMain.Instance().ProjectController().loadProject(fileHandle);
                 }
             }
         }, new Supplier<String>() {
@@ -128,7 +131,7 @@ public class ParticleComponent extends RendererComponent {
     }
 
     public void reloadDescriptor () {
-        FileHandle handle = Gdx.files.absolute(path);
+        FileHandle handle = AssetImporter.get(path);
         if(handle.exists() && handle.extension().equals("p")) {
             try {
                 descriptor = new ParticleEffectDescriptor();

@@ -58,7 +58,8 @@ public class TlsImporter extends AbstractImporter {
         GameObject gameObject = workspace.createObjectByTypeName("particle", sceneCords, parent);
 
         ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
-        component.path = asset.path();
+        component.path = AssetImporter.relative(AssetImporter.makeSimilar(asset, "p").path());
+        component.linkedTo =  AssetImporter.relative(AssetImporter.makeSimilar(asset, "tls").path());
         component.reloadDescriptor();
     }
 
