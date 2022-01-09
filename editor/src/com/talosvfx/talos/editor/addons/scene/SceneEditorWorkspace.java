@@ -1124,6 +1124,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     }
 
+    public void clearMetadata (String assetPath) {
+        if(metadataCache.containsKey(assetPath)) {
+            metadataCache.remove(assetPath);
+        }
+    }
+
+
     public FileHandle getProjectFolder() {
         return Gdx.files.absolute(projectPath);
     }

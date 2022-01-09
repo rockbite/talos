@@ -57,7 +57,7 @@ public class SpineRendererComponent extends RendererComponent {
 
     @Override
     public int getPriority () {
-        return 2;
+        return 3;
     }
 
     @Override

@@ -41,12 +41,14 @@ public class SpineImporter extends AbstractImporter{
         SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
         SkeletonComponent skeletonComponent = gameObject.getComponent(SkeletonComponent.class);
 
+        SpineMetadata spineMetadata = AssetImporter.readMetadataFor(asset, SpineMetadata.class);
+
         // read this from meta instead later
         spineRendererComponent.path = asset.parent().path() + "/" + asset.nameWithoutExtension() + ".atlas";
         skeletonComponent.path = asset.path();
         spineRendererComponent.reloadAtlas();
         skeletonComponent.setAtlas(spineRendererComponent.textureAtlas);
-        skeletonComponent.reloadData();
+        skeletonComponent.reloadData(spineMetadata.scale);
     }
 
     @Override

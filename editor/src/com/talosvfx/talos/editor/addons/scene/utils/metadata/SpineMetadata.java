@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 
 public class SpineMetadata extends AMetadata {
 
-    @ValueProperty(min = 0.01f, max = 2, step = 0.01f)
-    public float scale = 0.03f;
+    @ValueProperty(min = 0.001f, max = 2, step = 0.001f)
+    public float scale = 0.01f;
 
     public String atlasPath;
 

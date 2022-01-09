@@ -64,8 +64,8 @@ public class SpriteImporter extends AbstractImporter {
             if(gameObject.hasComponent(TransformComponent.class)) {
                 TransformComponent component = gameObject.getComponent(TransformComponent.class);
                 Texture texture = new Texture(asset);
-                component.scale.x = texture.getWidth() / 225f;
-                component.scale.y = texture.getHeight() / 225f;
+                component.scale.x = texture.getWidth() / metadata.pixelsPerUnit;
+                component.scale.y = texture.getHeight() / metadata.pixelsPerUnit;
             }
         }
     }

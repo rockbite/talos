@@ -12,6 +12,7 @@ import com.esotericsoftware.spine.SkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -112,7 +113,8 @@ public class MainRenderer implements Notifications.Observer {
         Vector2 renderPosition = vec;
 
         if(skeletonComponent.state == null) {
-            skeletonComponent.reloadData();
+            SpineMetadata metadata = SceneEditorAddon.get().workspace.getMetadata(skeletonComponent.path, SpineMetadata.class);
+            skeletonComponent.reloadData(metadata.scale);
         }
         if(skeletonComponent.state != null) {
             skeletonComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
@@ -158,7 +160,7 @@ public class MainRenderer implements Notifications.Observer {
 
             if(metadata != null && metadata.borderData !=null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                 Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
-                NinePatch patch = obtainNinePatch(texture, metadata.borderData);// todo: this has to be done better
+                NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                 //todo: and this renders wrong so this needs fixing too
                 patch.draw(batch,
                         renderPosition.x - 0.5f * transformComponent.scale.x, renderPosition.y - 0.5f * transformComponent.scale.y,
@@ -179,12 +181,12 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    private NinePatch obtainNinePatch (Texture texture, int[] metadata) {
+    private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
         if(patchCache.containsKey(texture)) {
             return patchCache.get(texture);
         } else {
-            NinePatch patch = new NinePatch(texture, metadata[0], metadata[1], metadata[2], metadata[3]);
-            patch.scale(1/225f, 1/225f); // fix this later
+            NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+            patch.scale(1/metadata.pixelsPerUnit, 1/metadata.pixelsPerUnit); // fix this later
             patchCache.put(texture, patch);
             return patch;
         }

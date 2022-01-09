@@ -232,6 +232,9 @@ public class AssetImporter {
         if(assetHandle != null && assetHandle.exists()) {
             FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
             saveMetadata(metadataHandle, aMetadata);
+
+            SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
+            workspace.clearMetadata(assetHandle.path());
         }
     }
 

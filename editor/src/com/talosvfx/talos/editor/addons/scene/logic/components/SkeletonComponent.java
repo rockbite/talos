@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.editor.addons.scene.utils.SkeletonAttachmentLoader;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
@@ -13,6 +15,7 @@ import java.util.function.Supplier;
 
 public class SkeletonComponent implements IComponent {
 
+    public transient SkeletonBinary json;
     public transient Skeleton skeleton;
     public transient SkeletonData skeletonData;
     public transient AnimationStateData stateData;
@@ -29,7 +32,8 @@ public class SkeletonComponent implements IComponent {
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
-        reloadData();
+        SpineMetadata spineMetadata = AssetImporter.readMetadataFor(Gdx.files.absolute(path), SpineMetadata.class);
+        reloadData(spineMetadata.scale);
 
         Array<PropertyWidget> properties = new Array<>();
 
@@ -43,7 +47,8 @@ public class SkeletonComponent implements IComponent {
             @Override
             public void report(String value) {
                 path = value;
-                reloadData();
+                SpineMetadata spineMetadata = AssetImporter.readMetadataFor(Gdx.files.absolute(path), SpineMetadata.class);
+                reloadData(spineMetadata.scale);
             }
         });
 
@@ -105,12 +110,12 @@ public class SkeletonComponent implements IComponent {
         return properties;
     }
 
-    public void reloadData () {
+    public void reloadData (float scale) {
         if(path != null) {
             FileHandle fileHandle = Gdx.files.absolute(path);
             if(fileHandle.exists()) {
-                SkeletonBinary json = new SkeletonBinary(attachmentLoader);
-                json.setScale(1/100f);
+                json = new SkeletonBinary(attachmentLoader);
+                json.setScale(scale);
                 skeletonData = json.readSkeletonData(fileHandle);
                 skeleton = new Skeleton(skeletonData);
                 stateData = new AnimationStateData(skeletonData);
@@ -127,7 +132,7 @@ public class SkeletonComponent implements IComponent {
 
     @Override
     public int getPriority () {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -139,7 +144,8 @@ public class SkeletonComponent implements IComponent {
         if(attachmentLoader.atlas != textureAtlas) {
             attachmentLoader.setAtlas(textureAtlas);
 
-            reloadData();
+            SpineMetadata spineMetadata = AssetImporter.readMetadataFor(Gdx.files.absolute(path), SpineMetadata.class);
+            reloadData(spineMetadata.scale);
         }
     }
 }
