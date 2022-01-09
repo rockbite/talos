@@ -45,6 +45,7 @@ public class ProjectData {
 			emitterData.name = key.getName();
 			emitterData.sortPosition = key.getEmitter().getSortPosition();
 			emitterData.modules.addAll(moduleWrappers.get(key));
+			emitterData.isMuted = key.isMuted;
 
 			final Array<ModuleBoardWidget.NodeConnection> nodeConns = nodeConnections.get(key);
 			if(nodeConns != null) {
