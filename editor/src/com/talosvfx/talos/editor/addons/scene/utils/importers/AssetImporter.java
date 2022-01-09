@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.project.ProjectController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -289,6 +290,9 @@ public class AssetImporter {
             SceneEditorAddon.get().workspace.openScene(fileHandle);
         } else if(fileHandle.extension().equals("prefab")) {
             SceneEditorAddon.get().workspace.openPrefab(fileHandle);
+        } else if(fileHandle.extension().equals("tls")) {
+            TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+            TalosMain.Instance().ProjectController().loadProject(fileHandle);
         }
     }
 
@@ -337,7 +341,6 @@ public class AssetImporter {
     public static void moveFile(FileHandle file, FileHandle directory) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return;
-        if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
         FileHandle destination = directory.child(file.name());
         FileHandle metaFile = getMetadataHandleFor(file);
@@ -352,7 +355,6 @@ public class AssetImporter {
     public static FileHandle renameFile(FileHandle file, String newName) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return file;
-        if(file.path().equals(projectPath + File.separator + "scenes")) return file;
 
         if(!file.isDirectory()) {
             String extension = file.extension();

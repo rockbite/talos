@@ -512,6 +512,9 @@ public class UIStage {
 		bottomTable.add(bottomPane).expand().grow();
 		TalosMain.Instance().enableNodeStage();
 
+		TalosMain.Instance().UIStage().getStage().setKeyboardFocus(rightTable);
+		hideCustomLayout();
+
 		mainMenu.restore();
 	}
 

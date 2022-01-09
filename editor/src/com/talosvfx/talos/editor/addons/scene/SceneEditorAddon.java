@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {
@@ -153,6 +154,8 @@ public class SceneEditorAddon implements IAddon {
 
     @Override
     public boolean projectFileDrop (FileHandle handle) {
+
+        if(TalosMain.Instance().ProjectController().getProject() != SE) return false;
 
         Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         workspace.screenToLocalCoordinates(vec);
