@@ -95,7 +95,9 @@ public class ProjectExplorerWidget extends Table {
             @Override
             public void delete (Array<FilteredTree.Node> nodes) {
                 String path = (String) nodes.first().getObject();
-                deletePath(path);
+                Array<String> paths = new Array<>();
+                paths.add(path);
+                deletePath(paths);
             }
         });
 
@@ -126,14 +128,18 @@ public class ProjectExplorerWidget extends Table {
         return newHandle;
     }
 
-    private void deletePath(String path) {
-        FileHandle handle = Gdx.files.absolute(path);
-        AssetImporter.deleteFile(handle);
-        FileHandle parent = handle.parent();
-        String rootPath = (String) rootNode.getObject();
+    public void deletePath(Array<String> paths) {
+        FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
+        for(String path: paths) {
+            FileHandle handle = Gdx.files.absolute(path);
+            AssetImporter.deleteFile(handle);
+
+            parent = handle.parent();
+        }
 
         loadDirectoryTree((String) rootNode.getObject());
-        if(!parent.path().equals(rootPath)) {
+
+        if(!parent.path().equals(parent)) {
             expand(parent.path());
             select(parent.path());
         }
@@ -179,8 +185,16 @@ public class ProjectExplorerWidget extends Table {
             public void clicked (InputEvent event, float x, float y) {
                 String path = files.first().path();
                 if(path != null) {
-                    RowWidget widget = (RowWidget) nodes.get(path).getActor();
-                    widget.label.setEditMode();;
+                    FileHandle handle = Gdx.files.absolute(path);
+                    if(handle.isDirectory()) {
+                        if (nodes.get(path) != null) {
+                            RowWidget widget = (RowWidget) nodes.get(path).getActor();
+                            widget.label.setEditMode();
+                        }
+                    } else {
+                        // check if its in the other guy
+                        directoryViewWidget.startRenameFor(handle);
+                    }
                 }
             }
         });
@@ -188,7 +202,11 @@ public class ProjectExplorerWidget extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 String path = files.first().path();
-                deletePath(path);
+                Array<String> paths = new Array<>();
+                for(FileHandle file: files) {
+                    paths.add(file.path());
+                }
+                deletePath(paths);
             }
         });
 
@@ -210,11 +228,10 @@ public class ProjectExplorerWidget extends Table {
                             loadDirectoryTree((String) rootNode.getObject());
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
-                            select(newNode);
+                            select(newNode.getParent());
                             RowWidget widget = (RowWidget) newNode.getActor();
-                            EditableLabel label = widget.getLabel();
-                            label.setEditMode();
                             directoryViewWidget.reload();
+                            directoryViewWidget.startRenameFor(newHandle);
                         }
                     }
                 }
@@ -320,6 +337,7 @@ public class ProjectExplorerWidget extends Table {
 
         rootNode.expandAll();
 
+        directoryViewWidget.setDirectory(root.path());
         directoryViewWidget.reload();
     }
 
@@ -359,12 +377,14 @@ public class ProjectExplorerWidget extends Table {
 
     public void notifyRename(FileHandle old, FileHandle newFile) {
         FilteredTree.Node node = nodes.get(old.path());
-        node.setObject(newFile.path());
-        nodes.remove(old.path());
-        nodes.put(newFile.path(), node);
+        if(node != null) {
+            node.setObject(newFile.path());
+            nodes.remove(old.path());
+            nodes.put(newFile.path(), node);
 
-        RowWidget widget = (RowWidget) node.getActor();
-        widget.set(newFile);
+            RowWidget widget = (RowWidget) node.getActor();
+            widget.set(newFile);
+        }
     }
 
     public FileHandle getCurrentFolder () {
@@ -442,6 +462,10 @@ public class ProjectExplorerWidget extends Table {
         }
 
         filesToManipulate.clear();
-        reload();
+
+        loadDirectoryTree((String) rootNode.getObject());
+
+        expand(destination.path());
+        select(destination.path());
     }
 }

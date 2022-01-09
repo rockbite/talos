@@ -1,6 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
@@ -151,8 +154,25 @@ public class SceneEditorAddon implements IAddon {
     @Override
     public boolean projectFileDrop (FileHandle handle) {
 
-        if (AssetImporter.attemptToImport(handle) != null) {
-            return true;
+        Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        workspace.screenToLocalCoordinates(vec);
+        Actor hit = workspace.hit(vec.x, vec.y, false);
+        if(hit != null) {
+            // workspace is hit
+            if (AssetImporter.attemptToImport(handle, true) != null) {
+                return true;
+            }
+        } else {
+            vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+            projectExplorer.screenToLocalCoordinates(vec);
+            hit = projectExplorer.hit(vec.x, vec.y, false);
+
+            if(hit != null) {
+                // File Explorer is hit
+                if (AssetImporter.attemptToImport(handle, false) != null) {
+                    return true;
+                }
+            }
         }
 
         return false;

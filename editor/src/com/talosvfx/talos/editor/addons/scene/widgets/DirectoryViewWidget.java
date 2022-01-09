@@ -91,6 +91,14 @@ public class DirectoryViewWidget extends Table {
                     projectExplorer.invokePaste(getCurrentFolder());
                 }
 
+                if(keycode == Input.Keys.FORWARD_DEL) {
+                    Array<String> paths = new Array<>();
+                    for(FileHandle file: selected) {
+                        paths.add(file.path());
+                    }
+                    projectExplorer.deletePath(paths);
+                }
+
                 if(keycode == Input.Keys.A && SceneEditorWorkspace.ctrlPressed()) {
                     selectAllFiles();
                     reportSelectionChanged();
@@ -369,7 +377,9 @@ public class DirectoryViewWidget extends Table {
             add().colspan(colCount).expand().grow();
         }
 
-        getStage().setKeyboardFocus(DirectoryViewWidget.this);
+        if(getStage() != null) {
+            getStage().setKeyboardFocus(DirectoryViewWidget.this);
+        }
     }
 
     @Override
@@ -392,6 +402,14 @@ public class DirectoryViewWidget extends Table {
 
     public FileHandle getCurrentFolder () {
         return fileHandle;
+    }
+
+    public void startRenameFor(FileHandle handle) {
+        for(ItemView itemView: items) {
+            if(itemView.fileHandle.path().equals(handle.path())) {
+                itemView.setToRename();
+            }
+        }
     }
 
     public class ItemView extends Table implements ActorCloneable<ItemView> {
@@ -418,7 +436,9 @@ public class DirectoryViewWidget extends Table {
                 public void changed(String newText) {
 
                     FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
-                    SceneEditorAddon.get().projectExplorer.notifyRename(fileHandle, newHandle);
+                    if(newHandle.isDirectory()) {
+                        SceneEditorAddon.get().projectExplorer.notifyRename(fileHandle, newHandle);
+                    }
                     fileHandle = newHandle;
                     setFile(fileHandle);
                 }

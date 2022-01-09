@@ -165,7 +165,7 @@ public class UIStage {
 					// ask addons if they are interested
 					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
 					if (addon != null) {
-						break;
+						continue;
 					}
 				}
 			}

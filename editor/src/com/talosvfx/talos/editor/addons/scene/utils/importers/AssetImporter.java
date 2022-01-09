@@ -54,6 +54,10 @@ public class AssetImporter {
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
+        return attemptToImport(handle, false);
+    }
+
+    public static FileHandle attemptToImport (FileHandle handle, boolean andPlaceIt) {
         FileHandle importedAsset = null;
         AbstractImporter importer = null;
         if(handle.extension().equals("png")) {
@@ -70,10 +74,15 @@ public class AssetImporter {
 
         importedAsset = importer.importAsset(handle, destinationDir);
 
+        if(andPlaceIt) {
+            importer.makeInstance(importedAsset, SceneEditorAddon.get().workspace.getRootGO());
+        }
+
         if(importedAsset != null) {
             String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
             SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
             SceneEditorAddon.get().projectExplorer.expand(importedAsset.path());
+            SceneEditorAddon.get().projectExplorer.select(importedAsset.parent().path());
 
             TalosMain.Instance().ProjectController().saveProject();
         }

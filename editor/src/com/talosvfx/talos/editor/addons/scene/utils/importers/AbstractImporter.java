@@ -42,6 +42,10 @@ public abstract class AbstractImporter {
     public FileHandle renameAsset (FileHandle assetHandle, String name) {
         FileHandle destination = Gdx.files.absolute(assetHandle.parent() + File.separator + name);
 
+        if(destination.exists()) {
+            destination.delete();
+        }
+
         assetHandle.file().renameTo(destination.file());
 
         return destination;

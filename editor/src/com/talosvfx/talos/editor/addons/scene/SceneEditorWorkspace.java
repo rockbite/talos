@@ -1163,7 +1163,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 }
             }
             if(nonMeta) {
-                reloadScheduled = 0.5f;
+                //reloadScheduled = 0.5f;
             }
         }
     }

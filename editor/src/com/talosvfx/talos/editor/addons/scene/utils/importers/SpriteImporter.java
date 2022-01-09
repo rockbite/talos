@@ -38,10 +38,9 @@ public class SpriteImporter extends AbstractImporter {
             PixmapIO.writePNG(importedAsset, newPixmap);
 
             pixmap.dispose();
+
             newPixmap.dispose();
         }
-
-        makeInstance(importedAsset, SceneEditorAddon.get().workspace.getRootGO());
 
         return importedAsset;
     }
