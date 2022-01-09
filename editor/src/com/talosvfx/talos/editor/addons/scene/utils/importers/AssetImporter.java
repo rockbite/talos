@@ -229,8 +229,10 @@ public class AssetImporter {
 
     public static void saveMetadata (AMetadata aMetadata) {
         FileHandle assetHandle = aMetadata.currentFile;
-        FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
-        saveMetadata(metadataHandle, aMetadata);
+        if(assetHandle != null && assetHandle.exists()) {
+            FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
+            saveMetadata(metadataHandle, aMetadata);
+        }
     }
 
     public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {

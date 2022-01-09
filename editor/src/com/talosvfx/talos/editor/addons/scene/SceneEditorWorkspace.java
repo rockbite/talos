@@ -1162,7 +1162,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
         if(currentHolder != null) {
             if(currentHolder instanceof AMetadata) {
-                //todo: save metadata
+                AssetImporter.saveMetadata((AMetadata) currentHolder);
             } else {
                 TalosMain.Instance().ProjectController().setDirty();
             }
