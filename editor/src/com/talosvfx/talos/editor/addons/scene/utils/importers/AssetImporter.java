@@ -15,14 +15,12 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
 import com.talosvfx.talos.editor.project.FileTracker;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
 public class AssetImporter {
@@ -31,16 +29,28 @@ public class AssetImporter {
 
     public enum AssetType {
         SPRITE,
-        TLS
+        TLS,
+        SPINE,
+        ATLAS
     }
 
     private static ObjectMap<AssetType, AbstractImporter> importerMap = new ObjectMap();
+    private static ObjectMap<String, Class<? extends AMetadata>> metadataMap = new ObjectMap();
 
     public AssetImporter() {
         assetTracker = handle -> assetUpdated(handle);
 
         importerMap.put(AssetType.SPRITE, new SpriteImporter());
         importerMap.put(AssetType.TLS, new TlsImporter());
+        importerMap.put(AssetType.SPINE, new SpineImporter());
+        importerMap.put(AssetType.ATLAS, new AtlasImporter());
+
+        metadataMap.put("png", SpriteMetadata.class);
+        metadataMap.put("tls", TlsMetadata.class);
+        metadataMap.put("p", TlsMetadata.class);
+        metadataMap.put("atlas", AtlasMetadata.class);
+        metadataMap.put("skel", SpineMetadata.class);
+        metadataMap.put("prefab", PrefabMetadata.class);
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
@@ -50,6 +60,10 @@ public class AssetImporter {
             importer = importerMap.get(AssetType.SPRITE);
         } else if(handle.extension().equals("tls")) {
             importer = importerMap.get(AssetType.TLS);
+        } else if(handle.extension().equals("skel")) {
+            importer = importerMap.get(AssetType.SPINE);
+        } else if(handle.extension().equals("atlas")) {
+            importer = importerMap.get(AssetType.ATLAS);
         }
 
         importedAsset = importer.importAsset(handle);
@@ -88,29 +102,59 @@ public class AssetImporter {
         }
     }
 
+    public static AMetadata readMetadataFor (FileHandle assetHandle) {
+        if(assetHandle.isDirectory()) {
+            DirectoryMetadata directoryMetadata = new DirectoryMetadata();
+            directoryMetadata.setFile(assetHandle);
+            return directoryMetadata;
+        }
+
+        Class<? extends AMetadata> aClass = metadataMap.get(assetHandle.extension());
+        return readMetadataFor(assetHandle, aClass);
+    }
+
     public static <T extends AMetadata> T readMetadataFor (FileHandle assetHandle, Class<? extends T> clazz) {
         FileHandle handle = getMetadataHandleFor(assetHandle);
-        String data = handle.readString();
-        Json json = new Json();
-        T object = json.fromJson(clazz, data);
-        return object;
+        T t = readMetadata(handle, clazz);
+
+        if(t == null) {
+            if(clazz != null) {
+                try {
+                    t = ClassReflection.newInstance(clazz);
+                } catch (ReflectionException e) {
+                    t = (T) new EmptyMetadata();
+                }
+            } else {
+                t = (T) new EmptyMetadata();
+            }
+        }
+
+        t.setFile(assetHandle);
+
+        return t;
     }
 
     public static <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
-        String data = handle.readString();
-        Json json = new Json();
-        T object = json.fromJson(clazz, data);
-        return object;
+        if(handle.exists()) {
+            String data = handle.readString();
+            Json json = new Json();
+            T object = json.fromJson(clazz, data);
+            return object;
+        }
+
+        return null;
     }
 
     public static FileHandle getMetadataHandleFor (FileHandle handle) {
-        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
+        handle = get(handle.path());
+
+        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
 
     public static FileHandle getMetadataHandleFor (String assetPath) {
-        FileHandle handle = Gdx.files.absolute(assetPath);
-        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.nameWithoutExtension() + ".meta");
+        FileHandle handle = get(assetPath);
+        FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
     }
 
@@ -132,6 +176,9 @@ public class AssetImporter {
             importerMap.get(AssetType.TLS).makeInstance(fileHandle, parent);
         }
 
+        if(fileHandle.extension().equals("skel")) {
+            importerMap.get(AssetType.SPINE).makeInstance(fileHandle, parent);
+        }
 
         if(fileHandle.extension().equals("prefab")) {
             SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
@@ -182,6 +229,17 @@ public class AssetImporter {
         return "";
     }
 
+    public static void saveMetadata (AMetadata aMetadata) {
+        FileHandle assetHandle = aMetadata.currentFile;
+        if(assetHandle != null && assetHandle.exists()) {
+            FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
+            saveMetadata(metadataHandle, aMetadata);
+
+            SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
+            workspace.clearMetadata(assetHandle.path());
+        }
+    }
+
     public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {
         Json json = new Json();
         String data = json.toJson(aMetadata);
@@ -209,5 +267,119 @@ public class AssetImporter {
         } else {
             throw new GdxRuntimeException("Path not a directory, path: " + path);
         }
+    }
+
+    public static void fileOpen (FileHandle fileHandle) {
+        if(fileHandle.isDirectory()) {
+            SceneEditorAddon.get().projectExplorer.select(fileHandle.path());
+            return;
+        }
+        if(fileHandle.extension().equals("scn")) {
+            SceneEditorAddon.get().workspace.openScene(fileHandle);
+        } else if(fileHandle.extension().equals("prefab")) {
+            SceneEditorAddon.get().workspace.openPrefab(fileHandle);
+        }
+    }
+
+    public static FileHandle get(String path) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(path.startsWith(projectPath)) {
+            return Gdx.files.absolute(path);
+        }
+
+        String fullPath = projectPath + File.separator + path;
+
+        return Gdx.files.absolute(fullPath);
+    }
+
+    public static String relative(String fullPath) {
+        return relative(Gdx.files.absolute(fullPath));
+    }
+
+    public static String relative(FileHandle fileHandle) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+
+        String path = fileHandle.path();
+        if(path.startsWith(projectPath)) {
+            path = path.substring(projectPath.length());
+        }
+
+        return path;
+    }
+
+    public static void copyFile(FileHandle file, FileHandle directory) {
+        FileHandle destination = directory.child(file.name());
+        FileHandle metaFile = getMetadataHandleFor(file);
+        file.copyTo(destination);
+
+        if(metaFile.exists()) {
+            FileHandle metaDestination = directory.child(metaFile.name());
+            metaFile.copyTo(metaDestination);
+        }
+    }
+
+    public static void moveFile(FileHandle file, FileHandle directory) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return;
+
+        FileHandle destination = directory.child(file.name());
+        FileHandle metaFile = getMetadataHandleFor(file);
+        file.moveTo(destination);
+
+        if(metaFile.exists()) {
+            FileHandle metaDestination = directory.child(metaFile.name());
+            metaFile.moveTo(metaDestination);
+        }
+    }
+
+    public static FileHandle renameFile(FileHandle file, String newName) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return file;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return file;
+
+        if(!file.isDirectory()) {
+            String extension = file.extension();
+            if (!newName.endsWith(extension)) {
+                newName += "." + extension;
+            }
+        }
+
+        FileHandle metaFile = getMetadataHandleFor(file);
+        FileHandle newHandle = file.parent().child(newName);
+
+        if(file.path().equals(newHandle.path())) return file;
+
+        file.moveTo(newHandle);
+
+        if(metaFile.exists()) {
+            FileHandle newMetaFile = getMetadataHandleFor(newHandle);
+            metaFile.moveTo(newMetaFile);
+        }
+
+        return newHandle;
+    }
+
+    public static void deleteFile(FileHandle file) {
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "assets")) return;
+        if(file.path().equals(projectPath + File.separator + "scenes")) return;
+
+        if(file.isDirectory()) {
+            FileHandle[] list = file.list();
+            if (list.length > 0) {
+                for (int i = 0; i < list.length; i++) {
+                    deleteFile(list[i]);
+                }
+            }
+        }
+
+        // check for metadata file
+        FileHandle metadataHandle = getMetadataHandleFor(file);
+        if(metadataHandle.exists()) {
+            metadataHandle.delete();
+        }
+
+        file.delete();
     }
 }

@@ -40,6 +40,9 @@ public class ProjectExplorerWidget extends Table {
 
     private DragAndDrop dragAndDrop;
 
+    public boolean isCutting = false;
+    public Array<FileHandle> filesToManipulate = new Array<>();
+
     public ProjectExplorerWidget() {
         contextualMenu = new ContextualMenu();
 
@@ -124,39 +127,16 @@ public class ProjectExplorerWidget extends Table {
     }
 
     private void deletePath(String path) {
-        if(path != null) {
-            String rootPath = (String) rootNode.getObject();
-            if(path.equals(rootPath)) return;
-            if(!path.startsWith(rootPath)) return;
-            if(path.equals(rootPath + File.separator + "assets")) return;
-            if(path.equals(rootPath + File.separator + "scenes")) return;
+        FileHandle handle = Gdx.files.absolute(path);
+        AssetImporter.deleteFile(handle);
+        FileHandle parent = handle.parent();
+        String rootPath = (String) rootNode.getObject();
 
-            FileHandle handle = Gdx.files.absolute(path);
-            if(handle.exists()) {
-                FileHandle parent = handle.parent();
-
-                deleteRecursively(handle);
-
-                loadDirectoryTree((String) rootNode.getObject());
-                if(!parent.path().equals(rootPath)) {
-                    expand(parent.path());
-                    select(parent.path());
-                }
-            }
+        loadDirectoryTree((String) rootNode.getObject());
+        if(!parent.path().equals(rootPath)) {
+            expand(parent.path());
+            select(parent.path());
         }
-    }
-
-    private void deleteRecursively(FileHandle handle) {
-        if(handle.isDirectory()) {
-            FileHandle[] list = handle.list();
-            if (list.length > 0) {
-                for (int i = 0; i < list.length; i++) {
-                    deleteRecursively(list[i]);
-                }
-            }
-        }
-
-        handle.delete();
     }
 
     public void showContextMenu () {
@@ -177,19 +157,20 @@ public class ProjectExplorerWidget extends Table {
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                invokeCut(files);
             }
         });
         contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                invokeCopy(files);
             }
         });
         contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                FileHandle destination = files.first();
+                invokePaste(destination);
             }
         });
         contextualMenu.addSeparator();
@@ -367,41 +348,13 @@ public class ProjectExplorerWidget extends Table {
                         String path = (String) newNode.getObject();
                         FileHandle fileHandle = Gdx.files.absolute(path);
 
-                        if(!fileHandle.isDirectory()) {
-                            String extension = fileHandle.extension();
-                            if (!newText.contains(".")) newText += "." + extension;
-                        }
-
-                        FileHandle parent = fileHandle.parent();
-                        FileHandle newHandle = Gdx.files.absolute(parent.path() + File.separator + newText);
-
-                        if(newHandle.path().equals(fileHandle.path())) return;
-
-                        fileHandle.moveTo(newHandle);
+                        FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
 
                         newNode.setObject(newHandle.path());
                         nodes.remove(path);
                         nodes.put(newHandle.path(), newNode);
                     }
                 });
-
-                /*
-                if(!listItemHandle.isDirectory()) {
-                    // we let files to be dragged outside this widget
-                    dragAndDrop.addSource(new DragAndDrop.Source(newNode.getActor()) {
-                        @Override
-                        public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                            DragAndDrop.Payload payload = new DragAndDrop.Payload();
-
-                            Actor dragging = ((ActorCloneable) newNode.getActor()).copyActor(newNode.getActor());
-
-                            payload.setDragActor(dragging);
-                            payload.setObject(listItemHandle);
-
-                            return payload;
-                        }
-                    });
-                }*/
             }
         }
     }
@@ -449,5 +402,32 @@ public class ProjectExplorerWidget extends Table {
             RowWidget widget = new RowWidget(fileHandle, editable);
             return widget;
         }
+    }
+
+
+    public void invokeCut(Array<FileHandle> files) {
+        filesToManipulate.clear();
+        filesToManipulate.addAll(files);
+        isCutting = true;
+    }
+
+    public void invokeCopy(Array<FileHandle> files) {
+        filesToManipulate.clear();
+        filesToManipulate.addAll(files);
+        isCutting = false;
+    }
+
+    public void invokePaste(FileHandle destination) {
+        if(destination.isDirectory()) {
+            for(FileHandle file: filesToManipulate) {
+                if(isCutting) {
+                    AssetImporter.moveFile(file, destination);
+                } else {
+                    AssetImporter.copyFile(file, destination);
+                }
+            }
+        }
+
+        filesToManipulate.clear();
     }
 }

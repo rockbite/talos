@@ -52,7 +52,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
 
         add(title).minWidth(70);
 
-        add(valueWidget).growX().maxWidth(250).right().expand();
+        add(valueWidget).growX().maxWidth(200).right().expand();
 
         valueWidget.addListener(listener);
     }

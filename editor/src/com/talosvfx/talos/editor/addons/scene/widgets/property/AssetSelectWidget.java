@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -74,8 +75,10 @@ public class AssetSelectWidget extends PropertyWidget<String> {
                         String path = (String) node.getObject();
                         if(Gdx.files.absolute(path).isDirectory()) return;
 
-                        updateWidget(path);
-                        callValueChanged(path);
+                        String relative = AssetImporter.relative(Gdx.files.absolute(path));
+
+                        updateWidget(relative);
+                        callValueChanged(relative);
                         assetListPopup.remove();
                     }
                 });
@@ -92,7 +95,7 @@ public class AssetSelectWidget extends PropertyWidget<String> {
             path = null;
             return;
         }
-        FileHandle handle = Gdx.files.absolute(value);
+        FileHandle handle = AssetImporter.get(value);
         if(handle.exists()) {
             nameLabel.setText(handle.name());
         } else {

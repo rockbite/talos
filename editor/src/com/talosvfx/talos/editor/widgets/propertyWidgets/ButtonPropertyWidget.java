@@ -34,6 +34,19 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         return clone;
     }
 
+    public ButtonPropertyWidget(String name, String text, ButtonListener btnListener) {
+        this(name, text, btnListener, new Supplier<T>() {
+            @Override
+            public T get () {
+                return null;
+            }
+        }, new ValueChanged<T>() {
+            @Override
+            public void report (T value) {
+
+            }
+        });
+    }
 
     public ButtonPropertyWidget(String name, String text, ButtonListener btnListener, Supplier<T> supplier, ValueChanged<T> valueChanged) {
         super(name, supplier, valueChanged);
@@ -58,6 +71,9 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 
         buttonLabel = new Label("Edit", skin);
         button = new SquareButton(skin, buttonLabel);
+        button.getStyle().checked = null;
+        button.getStyle().checkedOver = null;
+        button.getStyle().checkedDown = null;
 
         table.add(button).expand().right();
 

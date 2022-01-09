@@ -52,12 +52,16 @@ public class PropertyPanel extends Table implements Notifications.Observer {
 
     @EventHandler
     public void onPropertyHolderSelected(PropertyHolderSelected event) {
+        if(event.getTarget() == null) return;
+        if(event.getTarget().getPropertyProviders() == null) return;
+
         showPanel(event.getTarget(), event.getTarget().getPropertyProviders());
     }
 
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
         providerSet.clear();
         for(IPropertyProvider propertyProvider: propertyProviders) {
+            if(propertyProvider.getType() == null) continue;
             providerSet.put(propertyProvider.getType(), propertyProvider);
         }
         build();
@@ -126,5 +130,9 @@ public class PropertyPanel extends Table implements Notifications.Observer {
         if(currentPropertyHolder == propertyHolder) {
             cleanPanels();
         }
+    }
+
+    public IPropertyHolder getCurrentHolder () {
+        return currentPropertyHolder;
     }
 }
