@@ -14,8 +14,8 @@ import java.io.File;
 public class SpineImporter extends AbstractImporter{
 
     @Override
-    public FileHandle importAsset (FileHandle fileHandle) {
-        FileHandle importedAsset = importAssetFile(fileHandle); // skel file
+    public FileHandle importAsset (FileHandle fileHandle, FileHandle destinationDir) {
+        FileHandle importedAsset = importAssetFile(fileHandle, destinationDir); // skel file
 
         // import atlas files too
         FileHandle atlasFile = AssetImporter.makeSimilar(fileHandle, "atlas");

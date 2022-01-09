@@ -182,6 +182,8 @@ public class DirectoryViewWidget extends Table {
                     timeClicked = TimeUtils.millis();
                     prevPos.set(x, y);
                 }
+
+                getStage().setKeyboardFocus(DirectoryViewWidget.this);
             }
 
             @Override
@@ -314,7 +316,9 @@ public class DirectoryViewWidget extends Table {
                 FileHandle sourceItem = (FileHandle) payload.getObject();
 
                 if(!sourceItem.path().equals(targetItem.fileHandle.path())) {
-                    moveItemTo(sourceItem, targetItem.fileHandle);
+                    AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+
+                    SceneEditorAddon.get().workspace.reloadProjectExplorer();
                 }
             }
         });
@@ -352,7 +356,7 @@ public class DirectoryViewWidget extends Table {
 
                 colCount = (int) (getWidth() / (boxWidth + 10)) - 1;
 
-                add(itemView).top().left().width(100).padLeft(10).padTop(10);
+                add(itemView).top().left().width(120).padLeft(10).padTop(10);
                 count++;
                 if (count >= colCount) {
                     count = 0;
@@ -364,18 +368,8 @@ public class DirectoryViewWidget extends Table {
             row();
             add().colspan(colCount).expand().grow();
         }
-    }
 
-    private void moveItemTo(FileHandle source, FileHandle target) {
-        if(target.isDirectory()) {
-            String folderName = source.name();
-            String newPath = target.path() + File.separator + folderName;
-
-            FileHandle destination = Gdx.files.absolute(newPath);
-            source.moveTo(destination);
-        }
-
-        SceneEditorAddon.get().workspace.reloadProjectExplorer();
+        getStage().setKeyboardFocus(DirectoryViewWidget.this);
     }
 
     @Override
@@ -416,21 +410,15 @@ public class DirectoryViewWidget extends Table {
             icon = new Image();
             label = new EditableLabel("text", skin);
             label.setAlignment(Align.center);
+            label.getLabel().setWrap(true);
+            label.getLabelCell().width(100);
 
             label.setListener(new EditableLabel.EditableLabelChangeListener() {
                 @Override
                 public void changed(String newText) {
-                    if(!fileHandle.isDirectory()) {
-                        String extension = fileHandle.extension();
-                        if (!newText.contains(".")) newText += "." + extension;
-                    }
 
-                    FileHandle parent = fileHandle.parent();
-                    FileHandle newHandle = Gdx.files.absolute(parent.path() + File.separator + newText);
-
-                    if(newHandle.path().equals(fileHandle.path())) return;
-
-                    fileHandle.moveTo(newHandle);
+                    FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
+                    SceneEditorAddon.get().projectExplorer.notifyRename(fileHandle, newHandle);
                     fileHandle = newHandle;
                     setFile(fileHandle);
                 }
@@ -439,9 +427,9 @@ public class DirectoryViewWidget extends Table {
             Table iconContainer = new Table();
             iconContainer.add(icon).grow();
 
-            add(iconContainer).size(70).pad(10);
+            add(iconContainer).size(90).pad(10);
             row();
-            add(label).expandX().width(50).center().pad(5);
+            add(label).width(70).center().pad(5);
 
             setTouchable(Touchable.enabled);
         }
@@ -453,9 +441,9 @@ public class DirectoryViewWidget extends Table {
         public void setFile(FileHandle fileHandle) {
 
             String name = fileHandle.name();
-            int len = 12;
-            if(name.length() > len) name = name.substring(0, len-3) + "...";
             label.setText(name);
+            label.getLabel().setWrap(true);
+            label.getLabel().setEllipsis(true);
 
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));

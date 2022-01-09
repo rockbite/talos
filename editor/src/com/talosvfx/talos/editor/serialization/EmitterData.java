@@ -24,6 +24,7 @@ public class EmitterData {
 
 	public String name;
 	public int sortPosition;
+	public boolean isMuted;
 	public Array<ModuleWrapper> modules = new Array<>();
 	public Array<ConnectionData> connections = new Array<>();
 	public Array<GroupData> groups = new Array();
