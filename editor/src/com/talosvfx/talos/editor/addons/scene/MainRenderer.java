@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -157,19 +159,21 @@ public class MainRenderer implements Notifications.Observer {
         if(spriteRenderer.getTexture() != null) {
             batch.setColor(spriteRenderer.color);
 
-
             if(metadata != null && metadata.borderData !=null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                 Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
                 NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                 //todo: and this renders wrong so this needs fixing too
+                float xSign = transformComponent.scale.x < 0 ? -1: 1;
+                float ySign = transformComponent.scale.y < 0 ? -1: 1;
+
                 patch.draw(batch,
-                        renderPosition.x - 0.5f * transformComponent.scale.x, renderPosition.y - 0.5f * transformComponent.scale.y,
-                        0.5f * transformComponent.scale.x, 0.5f * transformComponent.scale.y,
-                        transformComponent.scale.x, transformComponent.scale.y,
-                        1f, 1f,
+                        renderPosition.x - 0.5f * transformComponent.scale.x * xSign , renderPosition.y - 0.5f * transformComponent.scale.y * ySign,
+                        0.5f * transformComponent.scale.x * xSign, 0.5f * transformComponent.scale.y * ySign,
+                        Math.abs(transformComponent.scale.x), Math.abs(transformComponent.scale.y),
+                        xSign, ySign,
                         transformComponent.rotation);
             } else {
-                batch.draw(spriteRenderer.getTexture(),
+                ((PolygonSpriteBatch)batch).draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
@@ -223,12 +227,20 @@ public class MainRenderer implements Notifications.Observer {
         getWorldLocAround(gameObject, points[RT],0.5f, 0.5f);
         getWorldLocAround(gameObject, points[RB],0.5f, -0.5f);
 
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        float xSign = transform.scale.x < 0 ? -1: 1;
+        float ySign = transform.scale.y < 0 ? -1: 1;
+
         vec.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]); // midpoint
         transformComponent.position.set(vec);
         vec.set(points[RT]).sub(points[LB]);
-        transformComponent.scale.set(points[RT].dst(points[LT]), points[RT].dst(points[RB]));
+        transformComponent.scale.set(points[RT].dst(points[LT]) * xSign, points[RT].dst(points[RB]) * ySign);
         vec.set(points[RT]).sub(points[LT]).angleDeg();
         transformComponent.rotation = vec.angleDeg();
+
+        if(xSign < 0) transformComponent.rotation -= 180;
+        if(ySign < 0) transformComponent.rotation += 0;
+
 
         return transformComponent;
     }

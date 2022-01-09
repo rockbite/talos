@@ -313,15 +313,33 @@ public class SmartTransformGizmo extends Gizmo {
         transformOldToNew();
     }
 
+    private float getPintsAngle(Vector2 p2, Vector2 p1) {
+        return Math.round(tmp3.set(p2).sub(p1).angleDeg());
+    }
+
     protected void transformOldToNew () {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+        float xDiff = getPintsAngle(nextPoints[RT], nextPoints[LT]) - getPintsAngle(prevPoints[RT], prevPoints[LT]);
+        float yDiff = getPintsAngle(nextPoints[LT], nextPoints[LB]) - getPintsAngle(prevPoints[LT], prevPoints[LB]);
 
         // bring old next points to local space
         for(int i = 0; i < 4; i++) {
             TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
         }
 
-        transform.scale.set(nextPoints[RB].dst(nextPoints[LB]), nextPoints[LB].dst(nextPoints[LT]));
+        float xSign = transform.scale.x < 0 ? -1: 1;
+        float ySign = transform.scale.y < 0 ? -1: 1;
+
+        transform.scale.set(nextPoints[RB].dst(nextPoints[LB]) * xSign, nextPoints[LB].dst(nextPoints[LT]) * ySign);
+
+        if(xDiff != 0) {
+            transform.scale.x = transform.scale.x * -1f;
+        }
+        if(yDiff != 0) {
+            transform.scale.y = transform.scale.y * -1f;
+        }
+
         transform.scale = lowerPrecision(transform.scale);
         tmp.set(nextPoints[RT]).sub(nextPoints[LB]).scl(0.5f).add(nextPoints[LB]); // this is midpoint
 
