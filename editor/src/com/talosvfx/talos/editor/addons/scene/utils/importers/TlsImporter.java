@@ -47,7 +47,7 @@ public class TlsImporter extends AbstractImporter {
             FileHandle pHandle = AssetImporter.makeSimilar(asset, "p");
             if(!pHandle.exists()) {
                 // create
-                exportTlsFile(pHandle);
+                exportTlsFile(asset);
             }
 
             asset = pHandle;
