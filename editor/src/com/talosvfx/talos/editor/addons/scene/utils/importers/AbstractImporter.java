@@ -15,11 +15,11 @@ import java.io.File;
 
 public abstract class AbstractImporter {
 
-    public abstract FileHandle importAsset(FileHandle fileHandle);
+    public abstract FileHandle importAsset(FileHandle fileHandle, FileHandle destination);
     public abstract void makeInstance(FileHandle asset, GameObject parent);
 
 
-    public FileHandle importAssetFile (FileHandle handle) {
+    public FileHandle importAssetFile (FileHandle handle, FileHandle destinationDir) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
 
         if (handle.path().startsWith(projectPath)) {
@@ -27,9 +27,7 @@ public abstract class AbstractImporter {
             createMetadataFor(destination);
             return handle;
         } else {
-            FileHandle projectDir = Gdx.files.absolute(projectPath);
-            FileHandle assetsDir = Gdx.files.absolute(projectDir.path() + File.separator + "assets");
-            FileHandle destination = Gdx.files.absolute(assetsDir.path() + File.separator + handle.name());
+            FileHandle destination = destinationDir.child(handle.name());
 
             handle.copyTo(destination);
 

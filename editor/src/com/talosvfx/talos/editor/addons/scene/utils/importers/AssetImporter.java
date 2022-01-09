@@ -66,7 +66,9 @@ public class AssetImporter {
             importer = importerMap.get(AssetType.ATLAS);
         }
 
-        importedAsset = importer.importAsset(handle);
+        FileHandle destinationDir = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
+
+        importedAsset = importer.importAsset(handle, destinationDir);
 
         if(importedAsset != null) {
             String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
@@ -309,11 +311,16 @@ public class AssetImporter {
 
     public static void copyFile(FileHandle file, FileHandle directory) {
         FileHandle destination = directory.child(file.name());
+
+        if(file.parent().path().equals(directory.path())) {
+            // same directory, need to rename
+            destination = suggestNewName(file.parent().path(), file.nameWithoutExtension(), file.extension());
+        }
         FileHandle metaFile = getMetadataHandleFor(file);
         file.copyTo(destination);
 
         if(metaFile.exists()) {
-            FileHandle metaDestination = directory.child(metaFile.name());
+            FileHandle metaDestination = getMetadataHandleFor(destination);
             metaFile.copyTo(metaDestination);
         }
     }

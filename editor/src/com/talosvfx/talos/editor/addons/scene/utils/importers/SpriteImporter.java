@@ -17,8 +17,8 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 public class SpriteImporter extends AbstractImporter {
 
     @Override
-    public FileHandle importAsset (FileHandle fileHandle) {
-        FileHandle importedAsset = importAssetFile(fileHandle);
+    public FileHandle importAsset (FileHandle fileHandle, FileHandle destinationDir) {
+        FileHandle importedAsset = importAssetFile(fileHandle, destinationDir);
         // this is now copied to our assets folder, and metadata created
 
         if(fileHandle.nameWithoutExtension().endsWith(".9")) {

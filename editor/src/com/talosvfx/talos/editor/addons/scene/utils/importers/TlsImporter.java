@@ -22,8 +22,8 @@ public class TlsImporter extends AbstractImporter {
     }
 
     @Override
-    public FileHandle importAsset (FileHandle fileHandle) {
-        FileHandle importedAsset = importAssetFile(fileHandle);
+    public FileHandle importAsset (FileHandle fileHandle, FileHandle destinationDir) {
+        FileHandle importedAsset = importAssetFile(fileHandle, destinationDir);
 
         FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(importedAsset);
         TlsMetadata metadata = AssetImporter.readMetadata(metadataHandle, TlsMetadata.class);

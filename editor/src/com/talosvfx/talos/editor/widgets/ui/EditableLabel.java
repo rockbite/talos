@@ -47,6 +47,8 @@ public class EditableLabel extends Table implements ActorCloneable {
     private boolean editMode = false;
     private boolean editable = true;
 
+    private Cell<Label> labelCell;
+
     public void setEditable (boolean editable) {
         this.editable = editable;
     }
@@ -70,7 +72,7 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         label = new Label(text, getSkin(), "default");
         label.setEllipsis(true);
-        labelTable.add(label).growX().width(0);
+        labelCell = labelTable.add(label).growX();
 
         textField = new TextField(text, getSkin(), "no-bg");
         inputTable.add(textField).growX();
@@ -201,5 +203,9 @@ public class EditableLabel extends Table implements ActorCloneable {
     }
     public Label getLabel() {
         return label;
+    }
+
+    public Cell<Label> getLabelCell() {
+        return labelCell;
     }
 }

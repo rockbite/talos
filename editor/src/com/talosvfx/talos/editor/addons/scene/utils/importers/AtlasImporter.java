@@ -11,8 +11,8 @@ import java.io.File;
 public class AtlasImporter extends AbstractImporter{
 
     @Override
-    public FileHandle importAsset (FileHandle fileHandle) {
-        FileHandle importedAsset = importAssetFile(fileHandle);
+    public FileHandle importAsset (FileHandle fileHandle, FileHandle destinationDir) {
+        FileHandle importedAsset = importAssetFile(fileHandle, destinationDir);
 
         // todo: add support for multiple pages
         String data = fileHandle.readString();

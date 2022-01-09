@@ -350,13 +350,21 @@ public class ProjectExplorerWidget extends Table {
 
                         FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
 
-                        newNode.setObject(newHandle.path());
-                        nodes.remove(path);
-                        nodes.put(newHandle.path(), newNode);
+                        notifyRename(fileHandle, newHandle);
                     }
                 });
             }
         }
+    }
+
+    public void notifyRename(FileHandle old, FileHandle newFile) {
+        FilteredTree.Node node = nodes.get(old.path());
+        node.setObject(newFile.path());
+        nodes.remove(old.path());
+        nodes.put(newFile.path(), node);
+
+        RowWidget widget = (RowWidget) node.getActor();
+        widget.set(newFile);
     }
 
     public FileHandle getCurrentFolder () {
@@ -369,7 +377,7 @@ public class ProjectExplorerWidget extends Table {
 
     public static class RowWidget extends Table implements ActorCloneable<RowWidget> {
         private final EditableLabel label;
-        private final FileHandle fileHandle;
+        private FileHandle fileHandle;
         private final boolean editable;
 
         public RowWidget(FileHandle fileHandle) {
@@ -391,6 +399,11 @@ public class ProjectExplorerWidget extends Table {
 
             add(icon);
             add(label).growX().padLeft(5).width(250);
+        }
+
+        public void set(FileHandle fileHandle) {
+            this.fileHandle = fileHandle;
+            label.setText(fileHandle.name());
         }
 
         public EditableLabel getLabel() {
@@ -429,5 +442,6 @@ public class ProjectExplorerWidget extends Table {
         }
 
         filesToManipulate.clear();
+        reload();
     }
 }
