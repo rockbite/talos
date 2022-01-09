@@ -238,7 +238,7 @@ public class AssetImporter {
             saveMetadata(metadataHandle, aMetadata);
 
             SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-            workspace.clearMetadata(assetHandle.path());
+            workspace.clearMetadata(AssetImporter.relative(assetHandle.path()));
         }
     }
 

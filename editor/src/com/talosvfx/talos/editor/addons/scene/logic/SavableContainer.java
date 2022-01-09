@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.io.StringWriter;
@@ -142,12 +143,12 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     public void loadFromPath() {
-        FileHandle dataFile = Gdx.files.absolute(path);
+        FileHandle dataFile = AssetImporter.get(path);
         load(dataFile.readString());
     }
 
     public void save() {
-        FileHandle file = Gdx.files.absolute(path);
+        FileHandle file = AssetImporter.get(path);
         String data = getAsString();
         file.writeString(data, false);
     }

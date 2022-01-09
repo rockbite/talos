@@ -322,7 +322,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     // also tell all other selected gizmos about this touchdown
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
                             item.touchDown(hitCords.x, hitCords.y, button);
                         }
                     }
@@ -365,7 +365,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo.touchDragged(hitCords.x, hitCords.y);
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
                             item.touchDragged(hitCords.x, hitCords.y);
                         }
                     }
@@ -402,7 +402,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo.touchUp(hitCords.x, hitCords.y);
                     for(int i = 0; i < gizmoList.size; i++) {
                         Gizmo item = gizmoList.get(i);
-                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass())) {
+                        if(item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
                             item.touchUp(hitCords.x, hitCords.y);
                         }
                     }
@@ -1026,7 +1026,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         SavableContainer savableContainer = currentContainer;
         if(savableContainer != null) {
             if (toMemory) {
-                snapshotService.saveSnapshot(changeVersion, savableContainer.path, savableContainer.getAsString());
+                snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(savableContainer.path), savableContainer.getAsString());
             } else {
                 savableContainer.save();
             }
@@ -1039,7 +1039,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         read(json, jsonData);
 
         String path = jsonData.getString("currentScene", "");
-        FileHandle sceneFileHandle = Gdx.files.absolute(path);
+        FileHandle sceneFileHandle = AssetImporter.get(path);
         if(sceneFileHandle.exists()) {
             SavableContainer container;
             if(sceneFileHandle.extension().equals("prefab")) {
@@ -1049,11 +1049,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             }
             container.path = sceneFileHandle.path();
             if(fromMemory) {
-                container.load(snapshotService.getSnapshot(changeVersion, container.path));
-                container.loadFromPath();
+                container.load(snapshotService.getSnapshot(changeVersion, AssetImporter.relative(container.path)));
             } else {
                 container.loadFromPath();
-                snapshotService.saveSnapshot(changeVersion, container.path, container.getAsString());
+                snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
             }
 
             openSavableContainer(container);
