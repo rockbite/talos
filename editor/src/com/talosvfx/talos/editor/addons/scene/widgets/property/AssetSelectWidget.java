@@ -90,7 +90,7 @@ public class AssetSelectWidget extends PropertyWidget<String> {
 
     @Override
     public void updateWidget (String value) {
-        if(value == null) {
+        if(value == null || value.isEmpty()) {
             nameLabel.setText("-");
             path = null;
             return;

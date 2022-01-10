@@ -83,14 +83,14 @@ public class SpriteRendererComponent extends RendererComponent {
 
     public void reloadTexture () {
         FileHandle file = AssetImporter.get(path);
-        if(file.exists()) {
+        if(path.length() > 0 && file.exists()) {
             try {
                 texture = new TextureRegion(new Texture(file));
             } catch (Exception e) {
-                texture = TalosMain.Instance().getSkin().getRegion("white");
+                texture = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
             }
         } else {
-            texture = TalosMain.Instance().getSkin().getRegion("white");
+            texture = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
         }
     }
 

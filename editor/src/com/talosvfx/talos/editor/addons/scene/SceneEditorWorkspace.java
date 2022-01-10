@@ -1122,6 +1122,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 T t = SceneEditorAddon.get().assetImporter.readMetadata(metadataHandle, clazz);
                 metadataCache.put(assetPath, t);
                 return t;
+            } else {
+                T t = SceneEditorAddon.get().assetImporter.createEmptyMetadata(metadataHandle, clazz);
+                metadataCache.put(assetPath, t);
             }
             return null;
         }

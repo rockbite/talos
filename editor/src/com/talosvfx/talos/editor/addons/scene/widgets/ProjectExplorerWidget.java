@@ -88,8 +88,10 @@ public class ProjectExplorerWidget extends Table {
 
             @Override
             public void rightClick (FilteredTree.Node node) {
-                select(node);
-                showContextMenu();
+                if(node != null) {
+                    select(node);
+                    showContextMenu();
+                }
             }
 
             @Override

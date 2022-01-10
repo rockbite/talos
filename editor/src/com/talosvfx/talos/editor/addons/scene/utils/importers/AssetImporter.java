@@ -157,6 +157,17 @@ public class AssetImporter {
         return null;
     }
 
+    public static <T extends AMetadata> T createEmptyMetadata (FileHandle handle, Class<? extends T> clazz) {
+        try {
+            T t = ClassReflection.newInstance(clazz);
+            return t;
+        } catch (ReflectionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public static FileHandle getMetadataHandleFor (FileHandle handle) {
         handle = get(handle.path());
 
