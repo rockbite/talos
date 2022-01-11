@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
+import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
@@ -32,7 +33,7 @@ public class SceneEditorAddon implements IAddon {
     public SceneEditorWorkspace workspace;
     public HierarchyWidget hierarchy;
     public ProjectExplorerWidget projectExplorer;
-    public PropertyPanel propertyPanel;
+    public SEPropertyPanel propertyPanel;
 
     private Table customLayoutTable;
     public Table workspaceContainer;
@@ -62,6 +63,7 @@ public class SceneEditorAddon implements IAddon {
         Notifications.addEventToPool(ProjectOpened.class);
         Notifications.addEventToPool(ProjectDirectoryContentsChanged.class);
         Notifications.addEventToPool(PropertyHolderEdited.class);
+        Notifications.addEventToPool(AssetPathChanged.class);
     }
 
     @Override
@@ -101,7 +103,7 @@ public class SceneEditorAddon implements IAddon {
         workspace = SceneEditorWorkspace.getInstance();
         workspace.setAddon(this);
 
-        propertyPanel = new PropertyPanel();
+        propertyPanel = new SEPropertyPanel();
         hierarchy = new HierarchyWidget();
         projectExplorer = new ProjectExplorerWidget();
 

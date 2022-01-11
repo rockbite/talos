@@ -3,8 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -19,8 +18,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private Array<GameObject> children;
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
-    private ObjectSet<IComponent> components = new ObjectSet<>();
-    private ObjectMap<Class, IComponent> componentClasses = new ObjectMap<>();
+    private ObjectSet<AComponent> components = new ObjectSet<>();
+    private ObjectMap<Class, AComponent> componentClasses = new ObjectMap<>();
 
     private Array<GameObject> tmp = new Array<>();
     public GameObject parent;
@@ -33,7 +32,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
-    public Iterable<IComponent> getComponents () {
+    public Iterable<AComponent> getComponents () {
         return components;
     }
 
@@ -52,8 +51,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         json.writeValue("name", name);
 
         json.writeArrayStart("components");
-        for(IComponent component: components) {
-            json.writeValue(component, IComponent.class);
+        for(AComponent component: components) {
+            json.writeValue(component, AComponent.class);
         }
         json.writeArrayEnd();
 
@@ -72,7 +71,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
-            IComponent component = json.readValue(IComponent.class, componentJson);
+            AComponent component = json.readValue(AComponent.class, componentJson);
             addComponent(component);
         }
 
@@ -160,7 +159,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
-    public void addComponent (IComponent component) {
+    public void addComponent (AComponent component) {
         components.add(component);
         componentClasses.put(component.getClass(), component);
     }
@@ -241,7 +240,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return false;
     }
 
-    public <T extends IComponent> T getComponent (Class<? extends T> clazz) {
+    public <T extends AComponent> T getComponent (Class<? extends T> clazz) {
         return (T) componentClasses.get(clazz);
     }
 
@@ -260,7 +259,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         childrenMap.put(name, gameObject);
     }
 
-    public Array<GameObject> getChildrenByComponent (Class<? extends IComponent> clazz, Array<GameObject> list) {
+    public Array<GameObject> getChildrenByComponent (Class<? extends AComponent> clazz, Array<GameObject> list) {
         if(children == null) return list;
         for(GameObject gameObject: children) {
             if(gameObject.hasComponentType(clazz)) {
@@ -274,7 +273,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return list;
     }
 
-    public <T extends IComponent> T getComponentSlow (Class<? extends T> clazz) {
+    public <T extends AComponent> T getComponentSlow (Class<? extends T> clazz) {
         for(Class clazzToCheck: componentClasses.keys()) {
             if(clazz.isAssignableFrom(clazzToCheck)) {
                 return (T) componentClasses.get(clazzToCheck);

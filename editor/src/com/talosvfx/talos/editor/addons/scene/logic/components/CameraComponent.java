@@ -8,7 +8,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
-public class CameraComponent implements IComponent {
+public class CameraComponent extends AComponent {
 
     public Color backgroundColor = new Color(Color.valueOf("1e3357ff"));
 

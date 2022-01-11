@@ -1,18 +1,18 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 
 public interface GameObjectContainer {
 
     String getName();
     void setName(String name);
     Array<GameObject> getGameObjects();
-    Iterable<IComponent> getComponents();
+    Iterable<AComponent> getComponents();
     void addGameObject(GameObject gameObject);
     Array<GameObject> deleteGameObject(GameObject gameObject);
     void removeObject(GameObject gameObject);
-    void addComponent(IComponent component);
+    void addComponent(AComponent component);
 
     boolean hasGOWithName (String name);
 

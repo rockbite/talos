@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -11,7 +10,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
-public abstract class RendererComponent implements Json.Serializable, IComponent {
+public abstract class RendererComponent extends AComponent implements Json.Serializable {
 
     public String sortingLayer = "Default";
     public int orderingInLayer;

@@ -19,7 +19,9 @@ public class SquareButton extends Button {
 
         label.setAlignment(Align.center);
 
-        iconCell = add(label).center().pad(2).padLeft(5).padRight(5);
+        iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
+
+        getStyle().checked = null;
     }
 
     public SquareButton(Skin skin, Drawable drawable, boolean toggle) {

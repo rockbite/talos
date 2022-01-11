@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -12,12 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
-    protected IComponent component;
+    protected AComponent component;
     protected GameObject gameObject;
 
     Vector2 tmp = new Vector2();

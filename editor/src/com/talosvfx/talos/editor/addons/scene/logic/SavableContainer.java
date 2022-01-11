@@ -3,9 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.io.StringWriter;
 
@@ -49,7 +48,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     @Override
-    public Iterable<IComponent> getComponents () {
+    public Iterable<AComponent> getComponents () {
         return null;
     }
 
@@ -69,7 +68,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     @Override
-    public void addComponent (IComponent component) {
+    public void addComponent (AComponent component) {
 
     }
 

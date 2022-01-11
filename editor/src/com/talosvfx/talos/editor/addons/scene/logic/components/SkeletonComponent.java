@@ -13,7 +13,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SkeletonComponent implements IComponent {
+public class SkeletonComponent extends AComponent {
 
     public transient SkeletonBinary json;
     public transient Skeleton skeleton;
@@ -21,6 +21,7 @@ public class SkeletonComponent implements IComponent {
     public transient AnimationStateData stateData;
     public transient AnimationState state;
     public transient SkeletonAttachmentLoader attachmentLoader = new SkeletonAttachmentLoader();
+    public transient float scale = 1f;
 
     public String path = "";
 
@@ -115,6 +116,7 @@ public class SkeletonComponent implements IComponent {
             if(fileHandle.exists()) {
                 json = new SkeletonBinary(attachmentLoader);
                 json.setScale(scale);
+                this.scale = scale;
                 skeletonData = json.readSkeletonData(fileHandle);
                 skeleton = new Skeleton(skeletonData);
                 stateData = new AnimationStateData(skeletonData);
@@ -146,5 +148,16 @@ public class SkeletonComponent implements IComponent {
             SpineMetadata spineMetadata = AssetImporter.readMetadataFor(Gdx.files.absolute(path), SpineMetadata.class);
             reloadData(spineMetadata.scale);
         }
+    }
+
+    @Override
+    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
+        if(path.equals(oldPath)) {
+            path = newPath;
+            reloadData(scale);
+            return true;
+        }
+
+        return false;
     }
 }

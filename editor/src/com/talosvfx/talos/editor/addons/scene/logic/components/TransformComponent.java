@@ -2,12 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
-public class TransformComponent implements IComponent {
+public class TransformComponent extends AComponent {
     @ValueProperty(prefix = {"X", "Y"})
     public Vector2 position = new Vector2();
 

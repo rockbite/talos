@@ -60,7 +60,7 @@ public class AssetListPopup extends VisWindow {
     }
 
     private void loadTree() {
-        String rootPath = SceneEditorAddon.get().workspace.getProjectPath() + File.separator + "assets";
+        String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
         FileHandle rootHandle = Gdx.files.absolute(rootPath);
         tree.clearChildren();
         FileHandle root = Gdx.files.absolute(rootPath);

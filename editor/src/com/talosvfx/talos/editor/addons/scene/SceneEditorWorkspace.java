@@ -20,7 +20,7 @@ import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -40,6 +40,7 @@ import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
@@ -243,7 +244,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             try {
                 Class clazz = ClassReflection.forName(classPath + "." + className);
                 Object instance = ClassReflection.newInstance(clazz);
-                IComponent component = (IComponent) instance;
+                AComponent component = (AComponent) instance;
                 gameObject.addComponent(component);
             } catch (Exception e) {
 
@@ -771,8 +772,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private void makeGizmosFor (GameObject gameObject) {
         if(gizmoMap.containsKey(gameObject)) return;
 
-        Iterable<IComponent> components = gameObject.getComponents();
-        for(IComponent component: components) {
+        Iterable<AComponent> components = gameObject.getComponents();
+        for(AComponent component: components) {
             Array<Gizmo> gizmos = GizmoRegister.makeGizmosFor(component);
 
             for(Gizmo gizmo: gizmos) {
@@ -925,7 +926,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @EventHandler
     public void onComponentUpdated(ComponentUpdated event) {
-        IComponent component = event.getComponent();
+        AComponent component = event.getComponent();
         sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
 
         if(!event.wasRapid()) {
@@ -1194,6 +1195,38 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 } else {
                     TalosMain.Instance().ProjectController().setDirty();
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onAssetPathChanged(AssetPathChanged event) {
+        Array<AComponent> list = new Array<>();
+        notifyAssetPathChanged(list, currentContainer.getSelfObject(), event);
+
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run () {
+                for(AComponent component: list) {
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+                }
+            }
+        });
+    }
+
+    private void notifyAssetPathChanged (Array<AComponent> list, GameObject gameObject, AssetPathChanged event) {
+        Iterable<AComponent> components = gameObject.getComponents();
+        for(AComponent component: components) {
+            boolean affected = component.notifyAssetPathChanged(event.oldRelativePath, event.newRelativePath);
+            if(affected) {
+                list.add(component);
+            }
+        }
+
+        Array<GameObject> gameObjects = gameObject.getGameObjects();
+        if(gameObjects != null) {
+            for(GameObject child: gameObjects) {
+                notifyAssetPathChanged(list, child, event);
             }
         }
     }

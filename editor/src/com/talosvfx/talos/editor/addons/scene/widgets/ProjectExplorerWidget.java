@@ -467,4 +467,8 @@ public class ProjectExplorerWidget extends Table {
         expand(destination.path());
         select(destination.path());
     }
+
+    public DirectoryViewWidget getDirectoryViewWidget() {
+        return directoryViewWidget;
+    }
 }

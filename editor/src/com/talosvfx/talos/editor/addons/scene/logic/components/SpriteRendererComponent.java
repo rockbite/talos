@@ -129,4 +129,15 @@ public class SpriteRendererComponent extends RendererComponent {
         }
         return texture;
     }
+
+    @Override
+    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
+        if(path.equals(oldPath)) {
+            path = newPath;
+            reloadTexture();
+            return true;
+        }
+
+        return false;
+    }
 }

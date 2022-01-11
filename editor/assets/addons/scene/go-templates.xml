@@ -48,16 +48,12 @@
             </gizmos>
         </component>
         <component className="ParticleComponent">
-            <gizmos>
-            </gizmos>
         </component>
         <component className="SkeletonComponent">
-            <gizmos>
-            </gizmos>
         </component>
         <component className="SpineRendererComponent">
-            <gizmos>
-            </gizmos>
+        </component>
+        <component className="ScriptComponent">
         </component>
     </components>
 </entityTemplates>

@@ -147,4 +147,16 @@ public class ParticleComponent extends RendererComponent {
             descriptor.load(Gdx.files.internal("addons/scene/missing/sample.p"));
         }
     }
+
+    @Override
+    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
+        if(path.equals(oldPath)) {
+            path = newPath;
+            reloadDescriptor();
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -12,10 +12,12 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 
@@ -362,6 +364,11 @@ public class AssetImporter {
             FileHandle metaDestination = directory.child(metaFile.name());
             metaFile.moveTo(metaDestination);
         }
+
+        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+        assetPathChanged.oldRelativePath = relative(file);
+        assetPathChanged.newRelativePath = relative(destination);
+        Notifications.fireEvent(assetPathChanged);
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {
@@ -387,10 +394,19 @@ public class AssetImporter {
             metaFile.moveTo(newMetaFile);
         }
 
+        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+        assetPathChanged.oldRelativePath = relative(file);
+        assetPathChanged.newRelativePath = relative(newHandle);
+        Notifications.fireEvent(assetPathChanged);
+
         return newHandle;
     }
 
     public static void deleteFile(FileHandle file) {
+        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+        assetPathChanged.oldRelativePath = relative(file);
+        assetPathChanged.newRelativePath = "";
+
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return;
 
@@ -410,5 +426,7 @@ public class AssetImporter {
         }
 
         file.delete();
+
+        Notifications.fireEvent(assetPathChanged);
     }
 }

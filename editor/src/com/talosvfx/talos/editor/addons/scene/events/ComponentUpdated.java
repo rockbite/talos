@@ -1,11 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.addons.scene.logic.components.IComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
 public class ComponentUpdated implements Notifications.Event {
 
-    private IComponent component;
+    private AComponent component;
     private boolean rapid;
 
     @Override
@@ -14,17 +14,17 @@ public class ComponentUpdated implements Notifications.Event {
         rapid = false;
     }
 
-    public Notifications.Event set (IComponent component, boolean rapid) {
+    public Notifications.Event set (AComponent component, boolean rapid) {
         this.rapid = rapid;
         this.component = component;
         return this;
     }
 
-    public Notifications.Event set (IComponent component) {
+    public Notifications.Event set (AComponent component) {
         return set(component, false);
     }
 
-    public IComponent getComponent () {
+    public AComponent getComponent () {
         return component;
     }
 
