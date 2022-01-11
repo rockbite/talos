@@ -180,7 +180,7 @@ public class MainRenderer implements Notifications.Observer {
                 float repeatY = transformComponent.scale.y / (spriteRenderer.getTexture().getTexture().getHeight() / metadata.pixelsPerUnit);
                 spriteRenderer.getTexture().setRegion(0, 0, repeatX, repeatY);
 
-                ((PolygonSpriteBatch)batch).draw(spriteRenderer.getTexture(),
+                batch.draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
@@ -190,7 +190,7 @@ public class MainRenderer implements Notifications.Observer {
                 spriteRenderer.getTexture().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
                 spriteRenderer.getTexture().setRegion(0, 0, spriteRenderer.getTexture().getTexture().getWidth(), spriteRenderer.getTexture().getTexture().getHeight());
 
-                ((PolygonSpriteBatch)batch).draw(spriteRenderer.getTexture(),
+                batch.draw(spriteRenderer.getTexture(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,

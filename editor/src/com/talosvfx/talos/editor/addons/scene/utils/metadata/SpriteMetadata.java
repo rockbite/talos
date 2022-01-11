@@ -8,7 +8,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 public class SpriteMetadata extends AMetadata {
 
-    public int[] borderData;
+    public int[] borderData = {0, 0, 0, 0};
 
     public float pixelsPerUnit = 100;
 
