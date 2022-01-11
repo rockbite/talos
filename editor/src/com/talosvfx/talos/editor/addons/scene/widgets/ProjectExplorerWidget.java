@@ -365,6 +365,10 @@ public class ProjectExplorerWidget extends Table {
                         String path = (String) newNode.getObject();
                         FileHandle fileHandle = Gdx.files.absolute(path);
 
+                        if(newText.isEmpty()) {
+                            newText = fileHandle.nameWithoutExtension();
+                        }
+
                         FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
 
                         notifyRename(fileHandle, newHandle);

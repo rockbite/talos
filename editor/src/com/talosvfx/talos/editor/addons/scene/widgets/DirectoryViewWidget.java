@@ -479,7 +479,9 @@ public class DirectoryViewWidget extends Table {
             label.setListener(new EditableLabel.EditableLabelChangeListener() {
                 @Override
                 public void changed(String newText) {
-
+                    if(newText.isEmpty()) {
+                        newText = fileHandle.nameWithoutExtension();
+                    }
                     FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
                     if(newHandle.isDirectory()) {
                         SceneEditorAddon.get().projectExplorer.notifyRename(fileHandle, newHandle);
