@@ -55,6 +55,9 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
             @Override
             public void rightClick (FilteredTree.Node node) {
+                if (node == null) {
+                    return;
+                }
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
 
                 GameObject gameObject = objectMap.get(node.getName());
