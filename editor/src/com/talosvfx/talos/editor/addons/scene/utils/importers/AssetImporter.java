@@ -21,8 +21,10 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
@@ -301,11 +303,22 @@ public class AssetImporter {
         }
         if(fileHandle.extension().equals("scn")) {
             SceneEditorAddon.get().workspace.openScene(fileHandle);
+            return;
         } else if(fileHandle.extension().equals("prefab")) {
             SceneEditorAddon.get().workspace.openPrefab(fileHandle);
+            return;
         } else if(fileHandle.extension().equals("tls")) {
             TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
+            return;
+        }
+
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().open(new File(fileHandle.parent().path()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
