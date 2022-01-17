@@ -1,6 +1,9 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -50,9 +53,15 @@ public class BackgroundImageController implements IPropertyProvider {
             }
         };
 
-        ButtonWid
+        ButtonWidget deleteButton = new ButtonWidget("Delete");
+        deleteButton.updateWidget(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+            }
+        });
 
-        propertyWidgetArrayList.add(scaleWidget, xOffsetWidget, yOffsetWidget);
+        propertyWidgetArrayList.add(scaleWidget, xOffsetWidget, yOffsetWidget, deleteButton);
         return propertyWidgetArrayList;
     }
 

@@ -634,6 +634,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.cleanPanels();
         bvb.properties.showPanel(this);
         bvb.properties.showPanel(skeletonContainer);
+        bvb.properties.showPanel(backgroundImageController);
 
         String selectedEffect = jsonData.getString("selectedEffect", null);
         BoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
