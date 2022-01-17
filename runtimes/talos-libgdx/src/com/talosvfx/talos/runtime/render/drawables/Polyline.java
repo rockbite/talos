@@ -118,6 +118,7 @@ public class Polyline implements Pool.Poolable {
     }
 
     public void draw(Batch batch, TextureRegion region, ShaderProgram shaderProgram) {
+        if(region == null) return;
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;
@@ -146,6 +147,8 @@ public class Polyline implements Pool.Poolable {
     }
 
     public void draw(Batch batch, TextureRegion region, float x, float y, ShaderProgram shaderProgram) {
+        if(region == null) return;
+
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;

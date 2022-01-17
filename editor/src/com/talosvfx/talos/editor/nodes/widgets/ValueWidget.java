@@ -343,7 +343,6 @@ public class ValueWidget extends AbstractWidget<Float> {
         return value;
     }
 
-
     @Override
     public void read (Json json, JsonValue jsonValue) {
         setValue(jsonValue.asFloat());
@@ -357,5 +356,9 @@ public class ValueWidget extends AbstractWidget<Float> {
     public void setType(Type type) {
         this.type = type;
         setBackgrounds();
+    }
+
+    public void setNone() {
+        valueLabel.setText("-");
     }
 }

@@ -22,10 +22,7 @@ import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.CheckboxWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -33,6 +30,7 @@ import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.function.Supplier;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
@@ -40,7 +38,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public BvBAddon bvb;
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
-    private SkeletonRenderer renderer;
+    private BVBSkeletonRenderer renderer;
     private BackgroundImageController backgroundImageController;
 
     private AttachmentPoint movingPoint;
@@ -49,8 +47,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private boolean paused = false;
     private boolean showingTools = false;
 
-    private float speedMultiplier = 1f;
-    private boolean preMultipliedAlpha = false;
+    public float speedMultiplier = 1f;
+    public boolean preMultipliedAlpha = false;
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
@@ -96,7 +94,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         talosRenderer = new SpriteBatchParticleRenderer(null);
 
-        renderer = new SkeletonRenderer();
+        renderer = new BVBSkeletonRenderer();
         renderer.setPremultipliedAlpha(false); // PMA results in correct blending without outlines. (actually should be true, not sure why this ruins scene2d later, probably blend screwup, will check later)
 
         setCameraPos(0, 0);
@@ -448,7 +446,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         int a3 = batch.getBlendSrcFuncAlpha();
         int a4 = batch.getBlendDstFuncAlpha();
         renderer.setPremultipliedAlpha(preMultipliedAlpha);
-        renderer.draw(batch, skeleton); // Draw the skeleton images.
+        renderer.draw(talosRenderer, batch, skeletonContainer, skeleton); // Draw the skeleton images.
 
         // fixing back the blending because PMA is shit
         batch.setBlendFunctionSeparate(a1, a2, a3, a4);
@@ -459,9 +457,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
-        for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
-            if (!effect.isBehind()) continue;
-            for (ParticleEffectInstance particleEffectInstance : effect.getParticleEffects()) {
+        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+            if(effect.isNested() || !effect.isBehind()) continue;
+            for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
             }
         }
@@ -472,9 +470,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
-        for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
-            if (effect.isBehind()) continue;
-            for (ParticleEffectInstance particleEffectInstance : effect.getParticleEffects()) {
+        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+            if(effect.isNested() || effect.isBehind()) continue;
+            for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
             }
         }
@@ -660,56 +658,32 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         Array<PropertyWidget> properties = new Array<>();
 
 
-        CheckboxWidget preMultipliedAlphaWidget = new CheckboxWidget("premultiplied alpha") {
+        PropertyWidget preMultipliedAlphaWidget = WidgetFactory.generate(this, "preMultipliedAlpha", "premultiplied alpha");
+        PropertyWidget speed = WidgetFactory.generate(BvBWorkspace.this, "speedMultiplier", "speed multiplier");
+
+        FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width", new Supplier<Float>() {
             @Override
-            public Boolean getValue() {
-                return preMultipliedAlpha;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                preMultipliedAlpha = value;
-            }
-        };
-
-        FloatPropertyWidget speed = new FloatPropertyWidget("speed multiplier") {
-            @Override
-            public Float getValue() {
-                return speedMultiplier;
-            }
-
-            @Override
-            public void valueChanged(Float value) {
-                speedMultiplier = value;
-            }
-        };
-
-
-        FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width") {
-
-            @Override
-            public Float getValue() {
+            public Float get() {
                 return getWorldWidth();
             }
-
+        }, new PropertyWidget.ValueChanged<Float>() {
             @Override
-            public void valueChanged(Float value) {
+            public void report(Float value) {
                 setWorldSize(value);
             }
-        };
+        });
 
-        spineScaleWidget = new FloatPropertyWidget("spine scale") {
+        spineScaleWidget = new FloatPropertyWidget("spine scale", new Supplier<Float>() {
             @Override
-            public Float getValue() {
+            public Float get() {
                 return getSpineScale();
             }
-
+        }, new PropertyWidget.ValueChanged<Float>() {
             @Override
-            public void valueChanged(Float value) {
+            public void report(Float value) {
                 setSpineScale(value);
             }
-        };
-
+        });
 
         properties.add(preMultipliedAlphaWidget);
         properties.add(speed);
@@ -737,6 +711,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     @Override
     public int getPriority() {
         return 0;
+    }
+
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
     }
 
     public SkeletonContainer getSkeletonContainer() {

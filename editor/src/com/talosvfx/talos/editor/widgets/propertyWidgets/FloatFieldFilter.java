@@ -6,7 +6,7 @@ public class FloatFieldFilter implements TextField.TextFieldFilter {
 
     @Override
     public boolean acceptChar (TextField textField, char c) {
-        if(Character.isDigit(c)) {
+        if(Character.isDigit(c) || c == '-') {
             return true;
         }
         if(c == '.') {

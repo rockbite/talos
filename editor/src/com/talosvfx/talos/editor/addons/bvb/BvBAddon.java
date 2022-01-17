@@ -67,6 +67,11 @@ public class BvBAddon implements IAddon {
         menuBar.addMenu(bvbMenu);
     }
 
+    @Override
+    public void dispose () {
+
+    }
+
     private void buildUI() {
         properties = new PropertyPanelContainer(TalosMain.Instance().UIStage().getSkin());
         workspace = BvBWorkspace.getInstance();

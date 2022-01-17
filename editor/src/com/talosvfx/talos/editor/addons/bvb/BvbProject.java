@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -12,8 +11,6 @@ import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.FileUtils;
 
-import java.io.File;
-
 public class BvbProject implements IProject {
 
     BvBAddon bvBAddon;
@@ -23,14 +20,14 @@ public class BvbProject implements IProject {
     }
 
     @Override
-    public void loadProject(String data) {
+    public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
         bvBAddon.workspace.read(json, jsonValue);
     }
 
     @Override
-    public String getProjectString() {
+    public String getProjectString(boolean toMemory) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(bvBAddon.workspace);
@@ -97,5 +94,20 @@ public class BvbProject implements IProject {
     @Override
     public String exportProject() {
         return bvBAddon.workspace.writeExport();
+    }
+
+    @Override
+    public String getProjectTypeName () {
+        return "BVB";
+    }
+
+    @Override
+    public boolean requiresWorkspaceLocation () {
+        return false;
+    }
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
     }
 }

@@ -122,7 +122,7 @@ public class ParticleModule extends AbstractModule {
 
     public float getLife() {
         fetchInputSlotValue(LIFE);
-        if(life.isEmpty()) return 2; // defaults
+        if(life.isEmpty()) return 1; // defaults
         return life.getFloat();
     }
 

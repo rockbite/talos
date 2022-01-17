@@ -23,6 +23,8 @@ import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
+import java.util.function.Supplier;
+
 public class BoundEffect implements Json.Serializable, IPropertyProvider, TimelineItemDataProvider<BoundEffect> {
 
     /**
@@ -33,6 +35,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     /**
      * name of this effect
      */
+    @ValueProperty(readOnly = true)
     String name;
 
     /**
@@ -40,6 +43,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      * in cases when it starts more often then finishes
      */
     private Array<ParticleEffectInstance> particleEffects;
+    private Array<ParticleEffectInstance> removeList = new Array<>();
 
     /**
      * Particle effect descriptor that knows how to spawn the instances
@@ -51,10 +55,21 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      */
     private Array<AttachmentPoint> valueAttachments;
     private AttachmentPoint positionAttachment;
+
+    /**
+     * is it rendered behind animation or in front
+     */
+    private boolean isStandalone;
+
     /**
      * is it rendered behind animation or in front
      */
     private boolean isBehind;
+
+    /**
+     * is it rendered within the animation
+     */
+    private boolean isNested;
 
     /**
      * Draw order of this effect
@@ -83,6 +98,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
      */
     Vector2 tmpVec = new Vector2();
     NumericalValue val = new NumericalValue();
+
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
 
     public BoundEffect() {
         scopePayload = new ScopePayload();
@@ -154,7 +174,11 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         }
 
         // update position for each instance and update effect itself
+        removeList.clear();
         for(ParticleEffectInstance instance: particleEffects) {
+            if(instance.isComplete()) {
+                removeList.add(instance);
+            }
             if (positionAttachment != null) {
                 if(positionAttachment.isStatic()) {
                     instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
@@ -172,6 +196,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
                 instance.update(delta);
             }
         }
+
+        for(ParticleEffectInstance instance: removeList) {
+            particleEffects.removeValue(instance, true);
+        }
     }
 
     public void setBehind(boolean isBehind) {
@@ -180,6 +208,10 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
     public boolean isBehind() {
         return isBehind;
+    }
+
+    public boolean isNested () {
+        return isNested;
     }
 
     public void removePositionAttachment() {
@@ -194,6 +226,8 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public void startInstance() {
         if(forever) return;
 
+        if(isStandalone && !particleEffects.isEmpty()) return;
+
         ParticleEffectInstance instance = particleEffectDescriptor.createEffectInstance();
         instance.setScope(scopePayload);
         particleEffects.add(instance);
@@ -201,6 +235,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
     public void completeInstance() {
         if(forever) return;
+        if(isStandalone && particleEffects.size == 1) return;
 
         for(ParticleEffectInstance instance: particleEffects) {
             instance.allowCompletion();
@@ -215,92 +250,80 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget effectName = new LabelWidget("effect name") {
-            @Override
-            public String getValue() {
-               return name;
-            }
-        };
+        PropertyWidget effectName = WidgetFactory.generate(this, "name", "effect name");
+        PropertyWidget standalone = WidgetFactory.generate(this, "isStandalone", "standalone");
+        PropertyWidget behind = WidgetFactory.generate(this, "isBehind", "is behind");
+        PropertyWidget nested = WidgetFactory.generate(this, "isNested", "is nested");
 
-        CheckboxWidget behind = new CheckboxWidget("is behind") {
+        SelectBoxWidget startEventWidget = new SelectBoxWidget("Start Emitting", new Supplier<String>() {
             @Override
-            public Boolean getValue() {
-                return isBehind;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                isBehind = value;
-            }
-        };
-
-        SelectBoxWidget startEventWidget = new SelectBoxWidget("Start Emitting") {
-            @Override
-            public Array<String> getOptionsList() {
-                return getEvents();
-            }
-
-            @Override
-            public String getValue() {
+            public String get() {
                 return startEvent;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged(String value) {
-               setStartEvent(value);
+            public void report(String value) {
+                setStartEvent(value);
             }
-        };
-
-        SelectBoxWidget completeEventWidget = new SelectBoxWidget("Stop Emitting") {
+        }, new Supplier<Array<String>>() {
             @Override
-            public Array<String> getOptionsList() {
+            public Array<String> get() {
                 return getEvents();
             }
+        });
 
+        SelectBoxWidget completeEventWidget = new SelectBoxWidget("Stop Emitting", new Supplier<String>() {
             @Override
-            public String getValue() {
+            public String get() {
                 return completeEvent;
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged(String value) {
+            public void report(String value) {
                 setCompleteEvent(value);
             }
-        };
-
-        AttachmentPointWidget position = new AttachmentPointWidget() {
+        }, new Supplier<Array<String>>() {
             @Override
-            public Array<Bone> getBoneList() {
-                return parent.getSkeleton().getBones();
+            public Array<String> get() {
+                return getEvents();
             }
+        });
 
+        AttachmentPointWidget position = new AttachmentPointWidget(new Supplier<AttachmentPoint>() {
             @Override
-            public AttachmentPoint getValue() {
+            public AttachmentPoint get() {
                 return positionAttachment;
             }
-        };
-
-        LabelWidget offset = new LabelWidget("Offset") {
+        }, new Supplier<Array<Bone>>() {
             @Override
-            public String getValue() {
-                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetY(), 3);
-            }
-        };
-
-        GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget() {
-            @Override
-            public Array<Bone> getBoneList() {
+            public Array<Bone> get() {
                 return parent.getSkeleton().getBones();
             }
+        });
 
+        LabelWidget offset = new LabelWidget("Offset", new Supplier<String>() {
             @Override
-            public Array<AttachmentPoint> getValue() {
+            public String get() {
+                return "X: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetX(), 3) + ", Y: " + NumberUtils.roundToDecimalPlaces(positionAttachment.getWorldOffsetY(), 3);
+            }
+        });
+
+        GlobalValuePointsWidget globalValues = new GlobalValuePointsWidget(new Supplier<Array<AttachmentPoint>>() {
+            @Override
+            public Array<AttachmentPoint> get() {
                 return valueAttachments;
             }
-        };
+        }, new Supplier<Array<Bone>>() {
+            @Override
+            public Array<Bone> get() {
+                return parent.getSkeleton().getBones();
+            }
+        });
 
         properties.add(effectName);
+        properties.add(standalone);
         properties.add(behind);
+        properties.add(nested);
         properties.add(startEventWidget);
         properties.add(completeEventWidget);
         properties.add(position);
@@ -363,7 +386,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     @Override
     public void write(Json json) {
         json.writeValue("effectName", name);
+        json.writeValue("isStandalone", isStandalone);
         json.writeValue("isBehind", isBehind);
+        json.writeValue("isNested", isNested);
         json.writeValue("positionAttachment", positionAttachment);
         json.writeValue("valueAttachments", valueAttachments);
         json.writeValue("startEvent", startEvent);
@@ -404,7 +429,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
         setStartEvent(jsonData.getString("startEvent", ""));
         setCompleteEvent(jsonData.getString("completeEvent", ""));
 
+        isStandalone = jsonData.getBoolean("isStandalone", false);
         isBehind = jsonData.getBoolean("isBehind");
+        isNested = jsonData.getBoolean("isNested");
 
         //setForever(startEvent.equals("") && completeEvent.equals(""));
     }

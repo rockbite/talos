@@ -27,7 +27,7 @@ public abstract class AbstractShaderNode extends NodeWidget implements Notificat
     protected ObjectMap<String, String> inputStrings = new ObjectMap<>();
 
     protected ShaderBox shaderBox;
-    protected Cell<ShaderBox> shaderBoxCell;
+    protected Cell shaderBoxCell;
     private ObjectIntMap<String> sizeMap = new ObjectIntMap<>();
 
     public abstract void prepareDeclarations(ShaderBuilder shaderBuilder);

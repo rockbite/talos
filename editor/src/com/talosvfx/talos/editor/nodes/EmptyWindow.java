@@ -32,7 +32,7 @@ public abstract class EmptyWindow extends Table {
         this.resizeBorder = 8;
 
         this.setTouchable(Touchable.enabled);
-        this.setClip(true);
+        this.setClip(false);
 
         this.addCaptureListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
