@@ -42,7 +42,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private BackgroundImageController backgroundImageController;
 
     private AttachmentPoint movingPoint;
-    private Image backgroundImage = new Image();
+    private final Image backgroundImage = new Image();
 
     private boolean paused = false;
     private boolean showingTools = false;
