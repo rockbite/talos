@@ -78,8 +78,8 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
     @Override
     public Class<? extends AbstractModule> getSlotsPreferredModule (Slot slot) {
 
-        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.FROM) return Vector2Module.class;
-        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.TO) return Vector2Module.class;
+        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
         if (slot.getIndex() == FromToParticlePointDataGeneratorModule.POINTS_COUNT) return StaticValueModule.class;
 
         return null;

@@ -48,8 +48,8 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 
 	}
 
-	private Vector2 temp = new Vector2();
-	private Vector2 temp2 = new Vector2();
+	private Vector3 temp = new Vector3();
+	private Vector3 temp2 = new Vector3();
 
 	@Override
 	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group) {
@@ -64,8 +64,8 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 			for (int i = 0; i < numPoints; i++) {
 				ParticlePointData obtain = particlePointDataPool.obtain();
 
-				temp.set(from.get(0), from.get(1));
-				temp2.set(to.get(0), to.get(1));
+				temp.set(from.get(0), from.get(1), from.get(2));
+				temp2.set(to.get(0), to.get(1), to.get(2));
 
 				float alpha = (float)i/numPoints;
 

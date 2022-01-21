@@ -105,7 +105,8 @@ public class MetaData implements Json.Serializable {
         if(particleEffect != null) {
             float pPosX = jsonData.getFloat("particlePositionX", 0);
             float pPosY = jsonData.getFloat("particlePositionY", 0);
-            particleEffect.setPosition(pPosX, pPosY);
+            float pPosZ = jsonData.getFloat("particlePositionZ", 0);
+            particleEffect.setPosition(pPosX, pPosY, pPosZ);
         }
 
         JsonValue resourcePaths = jsonData.get("resourcePaths");

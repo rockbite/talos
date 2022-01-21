@@ -72,6 +72,10 @@ public class ScopePayload {
         map.get(index).set(x, y);
     }
 
+    public void set(int index, float x, float y, float z) {
+        map.get(index).set(x, y, z);
+    }
+
     public void set(int index, Vector2 value) {
         map.get(index).set(value.x, value.y);
     }

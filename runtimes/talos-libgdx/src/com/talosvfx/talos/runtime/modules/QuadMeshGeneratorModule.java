@@ -139,6 +139,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				float x = particlePointData.x;
 				float y = particlePointData.y;
+				float z = particlePointData.z;
 
 				ParticleModule particleModule = particlePointData.reference.getEmitter().getParticleModule();
 
@@ -198,10 +199,10 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 					p4.rotate(rotation.x, 0, 0, 1);
 				}
 
-				p1.add(x, y, 0);
-				p2.add(x, y, 0);
-				p3.add(x, y, 0);
-				p4.add(x, y, 0);
+				p1.add(x, y, z);
+				p2.add(x, y, z);
+				p3.add(x, y, z);
+				p4.add(x, y, z);
 
 				//get uvs from material
 

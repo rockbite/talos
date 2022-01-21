@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
@@ -16,7 +17,7 @@ public interface IEmitter {
     ParticleModule getParticleModule();
     EmitterModule getEmitterModule();
     DrawableModule getDrawableModule();
-    Vector2 getEffectPosition();
+    Vector3 getEffectPosition();
     ScopePayload getScope();
     Color getTint();
 

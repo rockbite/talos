@@ -28,8 +28,8 @@ public class Particle implements Pool.Poolable {
 
     private IEmitter emitterReference;
 
-    public Vector2 spawnPosition = new Vector2();
-    public Vector2 position = new Vector2();
+    public Vector3 spawnPosition = new Vector3();
+    public Vector3 position = new Vector3();
     public float life;
     public Vector3 rotation = new Vector3();
     public Vector2 size = new Vector2();
@@ -68,7 +68,7 @@ public class Particle implements Pool.Poolable {
 
         life = particleModule.getLife(); // really makes more sense like this, for deterministic purposes
 
-        position.set(0, 0); // offset
+        position.set(0, 0, 0); // offset
         spawnPosition.set(emitterReference.getEffectPosition());
 
         durationAtInit = emitterReference.getAlpha();
@@ -124,12 +124,13 @@ public class Particle implements Pool.Poolable {
         pivot.set(particleModule.getPivot());
         size.set(1f, 1f);
 
-        Vector2 positionOverride = particleModule.getPosition();
+        Vector3 positionOverride = particleModule.getPosition();
         // perform inner operations
         if (positionOverride != null) {
             float dx = positionOverride.x * delta;
             float dy = positionOverride.y * delta;
-            position.add(dx, dy);
+            float dz = positionOverride.z * delta;
+            position.add(dx, dy, dz);
         } else {
 //            position.setZero(); //do nothing
         }
@@ -148,6 +149,14 @@ public class Particle implements Pool.Poolable {
             return emitterReference.getEffectPosition().y + position.y;
         } else {
             return spawnPosition.y + position.y;
+        }
+    }
+
+    public float getZ() {
+        if(emitterReference.getEmitterModule().isAttached()) {
+            return emitterReference.getEffectPosition().z + position.z;
+        } else {
+            return spawnPosition.z + position.z;
         }
     }
 

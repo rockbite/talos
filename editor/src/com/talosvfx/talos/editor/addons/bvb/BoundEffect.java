@@ -173,7 +173,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
             }
             if (positionAttachment != null) {
                 if(positionAttachment.isStatic()) {
-                    instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1));
+                    instance.setPosition(positionAttachment.getStaticValue().get(0), positionAttachment.getStaticValue().get(1), positionAttachment.getStaticValue().get(2));
                 } else {
                     Bone bone = parent.getBoneByName(positionAttachment.getBoneName());
                     positionAttachment.setBoneScale(bone.getWorldScaleX());
@@ -182,7 +182,7 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
                     float rotation = bone.getWorldRotationX();
                     tmpVec.rotate(rotation);
                     tmpVec.add(parent.getBonePosX(positionAttachment.getBoneName()), parent.getBonePosY(positionAttachment.getBoneName()));
-                    instance.setPosition(tmpVec.x, tmpVec.y);
+                    instance.setPosition(tmpVec.x, tmpVec.y, instance.getPosition().z);
                 }
 
                 instance.update(delta);

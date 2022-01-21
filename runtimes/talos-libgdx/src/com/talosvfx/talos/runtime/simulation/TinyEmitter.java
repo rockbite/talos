@@ -3,6 +3,7 @@ package com.talosvfx.talos.runtime.simulation;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
@@ -44,7 +45,7 @@ public class TinyEmitter implements IEmitter {
         }
     };
 
-    Vector2 effectPosition = new Vector2();
+    Vector3 effectPosition = new Vector3();
     public Color tint = new Color(Color.WHITE);
 
     private boolean isVisible = true;
@@ -208,7 +209,7 @@ public class TinyEmitter implements IEmitter {
     }
 
     @Override
-    public Vector2 getEffectPosition () {
+    public Vector3 getEffectPosition () {
         return effectPosition;
     }
 

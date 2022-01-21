@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -31,7 +32,7 @@ public class ParticleEffectInstance {
 
     private Array<IEmitter> emitters = new Array<>();
 
-    Vector2 position = new Vector2();
+    Vector3 position = new Vector3();
 
     ScopePayload scopePayload = new ScopePayload();
 
@@ -209,11 +210,11 @@ public class ParticleEffectInstance {
 	}
 
 
-	public void setPosition(float x, float y) {
-		position.set(x, y);
+	public void setPosition(float x, float y, float z) {
+		position.set(x, y, z);
 	}
 
-	public Vector2 getPosition() {
+	public Vector3 getPosition() {
 		return position;
 	}
 

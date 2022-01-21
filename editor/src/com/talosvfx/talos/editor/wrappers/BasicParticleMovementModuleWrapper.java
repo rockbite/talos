@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.BasicParticleMovementModule;
@@ -58,11 +59,11 @@ public class BasicParticleMovementModuleWrapper extends ModuleWrapper<BasicParti
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == BasicParticleMovementModule.OFFSET) return Vector2Module.class;
-        if(slot.getIndex() == BasicParticleMovementModule.TARGET) return Vector2Module.class;
+        if(slot.getIndex() == BasicParticleMovementModule.OFFSET) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == BasicParticleMovementModule.TARGET) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
         if(slot.getIndex() == BasicParticleMovementModule.VELOCITY) return DynamicRangeModule.class;
         if(slot.getIndex() == BasicParticleMovementModule.ANGLE) return DynamicRangeModule.class;
-        if(slot.getIndex() == BasicParticleMovementModule.POSITION) return Vector2Module.class;
+        if(slot.getIndex() == BasicParticleMovementModule.POSITION) TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
 
         return null;
     }

@@ -20,7 +20,8 @@
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
-        <module name = "Position (Vector)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Position (Vector2)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Position (Vector3)" wrapper = "Vector3ModuleWrapper">Vector3Module</module>
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
         <module name = "Position Split (Vector)" wrapper = "VectorSplitModuleWrapper">VectorSplitModule</module>
     </category>

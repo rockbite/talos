@@ -22,7 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareLabelButton;
 
 public class PreviewImageControllerWidget extends Table {

@@ -53,6 +53,9 @@ import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.ui.*;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.modules.Vector2Module;
+import com.talosvfx.talos.runtime.modules.Vector3Module;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -95,6 +98,7 @@ public class UIStage {
 	private Preview3D innerTertiumActor;
 	private Preview2D innerSecundumActor;
 
+	private boolean isIn3DMode;
 
 	public UIStage (Skin skin) {
 		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
@@ -130,6 +134,10 @@ public class UIStage {
 		colorPicker.setHeight(330);
 		colorPicker.setWidth(430);
 		colorPicker.padRight(26);
+	}
+
+	public boolean isIn3DMode () {
+		return isIn3DMode;
 	}
 
 	public Stage getStage () {
@@ -519,9 +527,11 @@ public class UIStage {
 		if (previewWidget == innerTertiumActor) {
 			previewWidget = innerSecundumActor;
 			previewController.dimensionChanged(false);
+			isIn3DMode = false;
 		} else {
 			previewWidget = innerTertiumActor;
 			previewController.dimensionChanged(true);
+			isIn3DMode = true;
 		}
 
 		previewWidgetCell.setActor(previewWidget);
@@ -618,5 +628,13 @@ public class UIStage {
 
 	public void setFileChooserVisibility(boolean visible) {
 		fileChooser.setVisible(visible);
+	}
+
+	public Class<? extends AbstractModule> getPreferred3DVectorClass () {
+		if (isIn3DMode) {
+			return Vector3Module.class;
+		} else {
+			return Vector2Module.class;
+		}
 	}
 }

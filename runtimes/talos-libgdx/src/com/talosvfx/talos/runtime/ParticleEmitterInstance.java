@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.modules.DrawableModule;
@@ -331,7 +332,7 @@ public class ParticleEmitterInstance implements IEmitter {
 	}
 
 	@Override
-	public Vector2 getEffectPosition () {
+	public Vector3 getEffectPosition () {
 		return getEffect().position;
 	}
 

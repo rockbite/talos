@@ -33,7 +33,7 @@ public class Vector3Module extends AbstractModule {
     NumericalValue z;
     NumericalValue output;
 
-    float defaultX, defaultY;
+    float defaultX, defaultY, defaultZ;
 
     @Override
     protected void defineSlots() {
@@ -49,8 +49,9 @@ public class Vector3Module extends AbstractModule {
 
         if(x.isEmpty()) x.set(defaultX);
         if(y.isEmpty()) y.set(defaultY);
+        if(z.isEmpty()) z.set(defaultZ);
 
-        output.set(x, y);
+        output.set(x, y, z);
     }
 
     public void setX(float x) {
@@ -61,6 +62,10 @@ public class Vector3Module extends AbstractModule {
         defaultY = y;
     }
 
+    public void setZ(float z) {
+        defaultZ = z;
+    }
+
     public float getDefaultX() {
         return defaultX;
     }
@@ -69,11 +74,16 @@ public class Vector3Module extends AbstractModule {
         return defaultY;
     }
 
+    public float getDefaultZ() {
+        return defaultZ;
+    }
+
     @Override
     public void write (Json json) {
         super.write(json);
         json.writeValue("x", getDefaultX());
         json.writeValue("y", getDefaultY());
+        json.writeValue("z", getDefaultZ());
     }
 
     @Override
@@ -81,6 +91,7 @@ public class Vector3Module extends AbstractModule {
         super.read(json, jsonData);
         defaultX = jsonData.getFloat("x", 0);
         defaultY = jsonData.getFloat("y", 0);
+        defaultZ = jsonData.getFloat("z", 0);
     }
 
 }

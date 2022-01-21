@@ -102,7 +102,7 @@ public class Preview2D extends PreviewWidget {
 
                 if(moving) {
                     final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-                    particleEffect.setPosition(tmp.x, tmp.y);
+                    particleEffect.setPosition(tmp.x, tmp.y, particleEffect.getPosition().z);
                 } else {
                     getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
                     getWorldFromLocal(tmp2.set(x, y, 0));

@@ -85,7 +85,7 @@ public class ParticleModule extends AbstractModule {
         getScope().set(ScopePayload.PARTICLE_ALPHA, particle.alpha);
         getScope().set(ScopePayload.PARTICLE_SEED, particle.seed);
         getScope().set(ScopePayload.EMITTER_ALPHA_AT_P_INIT, particle.durationAtInit);
-        getScope().set(ScopePayload.PARTICLE_POSITION, particle.getX(), particle.getY());
+        getScope().set(ScopePayload.PARTICLE_POSITION, particle.getX(), particle.getY(), particle.getZ());
 
         getScope().setCurrentRequesterID(particle.requesterID);
 
@@ -137,14 +137,14 @@ public class ParticleModule extends AbstractModule {
         return tmpColor;
     }
 
-    public Vector2 getPosition() {
+    public Vector3 getPosition() {
         fetchInputSlotValue(POSITION);
         if(position.isEmpty()) {
             return null;
         }
-        tmpVec.set(position.get(0), position.get(1));
+        tmp3Vec.set(position.get(0), position.get(1), position.get(2));
 
-        return tmpVec;
+        return tmp3Vec;
     }
 
 
