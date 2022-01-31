@@ -23,6 +23,7 @@ import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 public class Preview3D extends PreviewWidget {
 
     private final ShaderProgram shaderProgram;
+    private final TinyGizmoRenderer tinyGizmoRenderer;
     //Controls
     private CameraInputController cameraInputController;
 
@@ -76,6 +77,8 @@ public class Preview3D extends PreviewWidget {
         particleRenderer = new Particle3DRenderer(worldCamera);
 
         TalosMain.Instance().addCustomInputProcessor(cameraInputController);
+
+        tinyGizmoRenderer = new TinyGizmoRenderer();
     }
 
     @Override
@@ -197,7 +200,7 @@ public class Preview3D extends PreviewWidget {
 //        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
 
-
+        tinyGizmoRenderer.render(worldCamera);
 
 
         batch.begin();

@@ -20,6 +20,8 @@ dependencies {
     implementation "info.debatty:java-string-similarity:1.2.1"
     implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
     implementation "org.yaml:snakeyaml:1.21"
+    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
+    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
 
     //Override LWJGL3 version
     implementation "org.lwjgl:lwjgl:$lwjgl3Version"
@@ -160,7 +162,7 @@ modifyPom {
         developers {
             developer {
                 id "Tom-Ski"
-                name "Tom Wojciechowsk"
+                name "Tom Wojciechowski"
             }
             developer {
                 id "azakhary"

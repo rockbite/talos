@@ -13,7 +13,7 @@ allprojects {
 
     ext {
         appName = "talos"
-        gdxVersion = '1.10.0'
+        gdxVersion = '1.10.1-SNAPSHOT'
         lwjgl3Version = '3.3.0-SNAPSHOT'
         visuiVersion = '1.5.0'
     }
@@ -25,6 +25,7 @@ allprojects {
         jcenter()
         google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
     }
