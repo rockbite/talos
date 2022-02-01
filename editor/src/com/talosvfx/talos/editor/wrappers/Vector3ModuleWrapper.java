@@ -58,8 +58,7 @@ public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implement
 				float x = floatFromText(xField);
 				module.setX(x);
 
-				//todo 3d drag
-//				dragPoint.set(x, dragPoint.position.y);
+				dragPoint.set(x, dragPoint.position.y, dragPoint.position.z);
 			}
 		});
 
@@ -69,8 +68,7 @@ public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implement
 				float y = floatFromText(yField);
 				module.setY(y);
 
-				//todo 3d drag
-//				dragPoint.set(dragPoint.position.x, y);
+				dragPoint.set(dragPoint.position.x, y, dragPoint.position.z);
 			}
 		});
 
@@ -80,8 +78,7 @@ public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implement
 				float z = floatFromText(zField);
 				module.setZ(z);
 
-				//todo 3d drag
-//				dragPoint.set(dragPoint.position.x, y);
+				dragPoint.set(dragPoint.position.x, dragPoint.position.y, z);
 			}
 		});
 
@@ -112,8 +109,7 @@ public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implement
 		yField.setText(module.getDefaultY() + "");
 		zField.setText(module.getDefaultZ() + "");
 
-		//todo 3d drag
-//		dragPoint.set(module.getDefaultX(), module.getDefaultY());
+		dragPoint.set(module.getDefaultX(), module.getDefaultY(), module.getDefaultZ());
 	}
 
 	@Override
@@ -123,12 +119,13 @@ public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implement
 
 	@Override
 	public void dragPointChanged(DragPoint point) {
-		//todo 3d drag
 
-//		module.setX(point.position.x);
-//		module.setY(point.position.y);
-//
-//		xField.setText(module.getDefaultX() + "");
-//		yField.setText(module.getDefaultY() + "");
+		module.setX(point.position.x);
+		module.setY(point.position.y);
+		module.setZ(point.position.z);
+
+		xField.setText(module.getDefaultX() + "");
+		yField.setText(module.getDefaultY() + "");
+		zField.setText(module.getDefaultZ() + "");
 	}
 }

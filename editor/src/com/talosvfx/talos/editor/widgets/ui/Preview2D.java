@@ -65,8 +65,8 @@ public class Preview2D extends PreviewWidget {
             boolean moving = false;
             private Vector3 tmp = new Vector3();
             private Vector3 tmp2 = new Vector3();
-            private Vector2 prevPos = new Vector2();
-            private Vector2 pos = new Vector2();
+            private Vector3 prevPos = new Vector3();
+            private Vector3 pos = new Vector3();
 
             private DragPoint currentlyDragging = null;
 
@@ -74,8 +74,8 @@ public class Preview2D extends PreviewWidget {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 moving = false;
                 getWorldFromLocal(tmp.set(x, y, 0));
-                pos.set(tmp.x, tmp.y);
-                prevPos.set(x, y);
+                pos.set(tmp.x, tmp.y, 0);
+                prevPos.set(x, y, 0);
 
                 //detect drag points
                 for(DragPoint point: dragPoints) {
@@ -98,7 +98,7 @@ public class Preview2D extends PreviewWidget {
                 super.touchDragged(event, x, y, pointer);
 
                 getWorldFromLocal(tmp.set(x, y, 0)); // I can't really explain
-                pos.set(tmp.x, tmp.y);
+                pos.set(tmp.x, tmp.y, 0);
 
                 if(moving) {
                     final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
@@ -113,12 +113,12 @@ public class Preview2D extends PreviewWidget {
                         camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
                     } else {
                         // dragging a point
-                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
+                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
                         dragPointProvider.dragPointChanged(currentlyDragging);
                     }
                 }
 
-                prevPos.set(x, y);
+                prevPos.set(x, y, 0);
             }
 
             @Override

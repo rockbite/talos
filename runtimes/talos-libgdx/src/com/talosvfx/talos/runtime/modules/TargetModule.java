@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.ScopePayload;
@@ -28,13 +29,13 @@ public class TargetModule extends AbstractModule {
     NumericalValue angle;
 
     float defaultVelocity;
-    public Vector2 defaultFrom = new Vector2();
-    public Vector2 defaultTo = new Vector2();
+    public Vector3 defaultFrom = new Vector3();
+    public Vector3 defaultTo = new Vector3();
 
-    private Vector2 fromVecTmp = new Vector2();
-    private Vector2 toVecTmp = new Vector2();
+    private Vector3 fromVecTmp = new Vector3();
+    private Vector3 toVecTmp = new Vector3();
 
-    private Vector2 tmp = new Vector2();
+    private Vector3 tmp = new Vector3();
 
     @Override
     protected void defineSlots() {
@@ -66,22 +67,23 @@ public class TargetModule extends AbstractModule {
         velocityOut.set(velocity);
 
         // now the real calculation begins
-        fromVecTmp.set(from.get(0), from.get(1));
-        toVecTmp.set(to.get(0), to.get(1));
+        fromVecTmp.set(from.get(0), from.get(1), from.get(2));
+        toVecTmp.set(to.get(0), to.get(1), to.get(2));
         toVecTmp.sub(fromVecTmp);
 
         float timeVal = toVecTmp.len()/velocity.getFloat();
         time.set(timeVal);
 
-        float angleVal = toVecTmp.angle();
-        angle.set(angleVal);
+        //Legacy
+//        float angleVal = toVecTmp.angle();
+//        angle.set(angleVal);
 
         tmp.set(toVecTmp).scl(alpha).add(fromVecTmp);
 
         position.set(tmp.x, tmp.y);
     }
 
-    public void setDefaultPositions(Vector2 dFrom, Vector2 dTo) {
+    public void setDefaultPositions(Vector3 dFrom, Vector3 dTo) {
         defaultFrom.set(dFrom);
         defaultTo.set(dTo);
     }

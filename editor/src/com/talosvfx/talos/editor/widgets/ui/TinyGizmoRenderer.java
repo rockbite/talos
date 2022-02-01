@@ -13,16 +13,23 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 public class TinyGizmoRenderer {
 
@@ -31,6 +38,8 @@ public class TinyGizmoRenderer {
 	private final ShaderProgram shaderProgram;
 	private final RigidTransform rigidTransform;
 	private final InputAdapter inputAdapter;
+
+	private final ShapeRenderer shapeRenderer;
 
 	private FloatBuffer vertices;
 	private IntBuffer triangles;
@@ -45,6 +54,9 @@ public class TinyGizmoRenderer {
 
 
 	public TinyGizmoRenderer () {
+
+		shapeRenderer = new ShapeRenderer();
+
 		tinyGizmo = new TinyGizmo();
 
 
@@ -126,12 +138,34 @@ public class TinyGizmoRenderer {
 				return super.touchUp(screenX, screenY, pointer, button);
 			}
 		};
-
-
 	}
 
-	public void render (PerspectiveCamera camera) {
-		final Ray pickRay = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
+	public boolean getInteracted () {
+		return interactGizmo;
+	}
+
+	public InputAdapter getInputAdapter () {
+		return inputAdapter;
+	}
+
+	Vector2 temp = new Vector2();
+	Vector2 vec = new Vector2(0, 0);
+	Vector2 vec2 = new Vector2(0, 0);
+
+	public void render (PerspectiveCamera camera, Preview3D preview3D, Array<DragPoint> dragPoints) {
+		vec.set(0, 0);
+		vec2.set(preview3D.getWidth(), preview3D.getHeight());
+
+		preview3D.localToScreenCoordinates(vec);
+		preview3D.localToScreenCoordinates(vec2);
+		vec.y = Gdx.graphics.getHeight() - vec.y;
+		vec2.y = Gdx.graphics.getHeight() - vec2.y;
+		float w = vec2.x - vec.x;
+		float h = vec2.y - vec.y;
+
+		temp.set(Gdx.input.getX(), Gdx.input.getY());
+
+		final Ray pickRay = camera.getPickRay(temp.x, temp.y, vec.x, vec.y, w, h);
 
 		tinyGizmo.updateWindow(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		tinyGizmo.updateRay(pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
@@ -143,7 +177,54 @@ public class TinyGizmoRenderer {
 		);
 
 		tinyGizmo.update(new GizmoState());
-		interactGizmo = tinyGizmo.transformGizmo("TestGizmo", rigidTransform);
+
+
+		interactGizmo = false;
+		int dragPointIdx = 0;
+		for (DragPoint dragPoint : dragPoints) {
+			RigidTransform rigidTransform = new RigidTransform();
+			rigidTransform.setPosition(dragPoint.position.x, dragPoint.position.y, dragPoint.position.z);
+
+			float cacheX = dragPoint.position.x;
+			float cacheY = dragPoint.position.y;
+			float cacheZ = dragPoint.position.x;
+
+			boolean interacted = tinyGizmo.transformGizmo("DragPoint" + dragPointIdx, rigidTransform);
+
+			final float[] position = rigidTransform.getPosition();
+			float newX = position[0];
+			float newY = position[1];
+			float newZ = position[2];
+
+			if (interacted) {
+				if (!MathUtils.isEqual(cacheX, newX)) {
+					dragPoint.changed = true;
+				}
+				if (!MathUtils.isEqual(cacheY, newY)) {
+					dragPoint.changed = true;
+				}
+				if (!MathUtils.isEqual(cacheZ, newZ)) {
+					dragPoint.changed = true;
+				}
+			}
+
+			if (dragPoint.changed) {
+				dragPoint.position.set(rigidTransform.getPosition());
+				System.out.println(dragPoint.position);
+
+			}
+
+
+			if (interacted) {
+				interactGizmo = true;
+			}
+
+			dragPointIdx++;
+		}
+
+
+
+
 		int[] sizes = new int[2];
 		tinyGizmo.obtainRender(vertices, triangles, sizes);
 
@@ -195,5 +276,17 @@ public class TinyGizmoRenderer {
 		shaderProgram.bind();
 		shaderProgram.setUniformMatrix("u_projTrans", camera.combined);
 		mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+
+//		Plane plane = new Plane(Vector3.Y, new Vector3(0, 0, 0));
+//		Vector3 out = new Vector3();
+//		Intersector.intersectRayPlane(pickRay, plane, out);
+//
+//		shapeRenderer.setProjectionMatrix(camera.combined);
+//		shapeRenderer.setColor(Color.PINK);
+//		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+////		shapeRenderer.line(0, 0, 0, pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
+//		shapeRenderer.line(0, 0, 0, out.x, out.y, out.z);
+//
+//		shapeRenderer.end();
 	}
 }

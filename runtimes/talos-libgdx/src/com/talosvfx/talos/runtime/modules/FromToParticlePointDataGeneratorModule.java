@@ -87,10 +87,9 @@ public class FromToParticlePointDataGeneratorModule extends ParticlePointDataGen
 		getScope().setCurrentRequesterID(cachedRequesterID);
 	}
 
-	public void setDefaults (Vector2 from, Vector2 to) {
-		this.from.set(from.x, from.y);
-		this.to.set(to.x, to.y);
-
+	public void setDefaults (Vector3 from, Vector3 to) {
+		this.from.set(from.x, from.y, from.z);
+		this.to.set(to.x, to.y, to.z);
 	}
 
 	public void setNumPoints (float numPoints) {

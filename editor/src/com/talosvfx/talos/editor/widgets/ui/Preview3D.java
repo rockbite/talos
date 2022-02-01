@@ -38,6 +38,10 @@ public class Preview3D extends PreviewWidget {
     private ModelBatch modelBatch;
     private Simple3DBatch simple3DBatch;
 
+    private IDragPointProvider dragPointProvider;
+    private Array<DragPoint> dragPoints = new Array<>();
+
+
     public Preview3D(PreviewImageControllerWidget previewImageControllerWidget) {
         super(previewImageControllerWidget);
         cameraController.scrollOnly = true;
@@ -85,25 +89,48 @@ public class Preview3D extends PreviewWidget {
     protected void addPanListener() {
         addListener(new InputListener() {
             @Override
-            public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
-                cameraInputController.scrolled(amountX, amountY);
+            public boolean keyDown (InputEvent event, int keycode) {
+                tinyGizmoRenderer.getInputAdapter().keyDown(keycode);
 
+                return super.keyDown(event, keycode);
+            }
+
+            @Override
+            public boolean keyUp (InputEvent event, int keycode) {
+                tinyGizmoRenderer.getInputAdapter().keyUp(keycode);
+                return super.keyUp(event, keycode);
+            }
+
+            @Override
+            public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
+                final boolean interacted = tinyGizmoRenderer.getInteracted();
+                if (interacted) return true;
+                cameraInputController.scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                tinyGizmoRenderer.getInputAdapter().touchDown((int)x, (int)y, pointer, button);
+                final boolean interacted = tinyGizmoRenderer.getInteracted();
+                if (interacted) return true;
                 cameraInputController.touchDown((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
                 return !event.isHandled();
             }
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                tinyGizmoRenderer.getInputAdapter().touchUp((int)x, (int)y, pointer, button);
+                final boolean interacted = tinyGizmoRenderer.getInteracted();
+                if (interacted) return;
                 cameraInputController.touchUp((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                tinyGizmoRenderer.getInputAdapter().touchDragged((int)x, (int)y, pointer);
+                final boolean interacted = tinyGizmoRenderer.getInteracted();
+                if (interacted) return;
                 cameraInputController.touchDragged((int)x, Gdx.graphics.getHeight() - (int)y, pointer);
             }
 
@@ -111,6 +138,7 @@ public class Preview3D extends PreviewWidget {
             public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(Preview3D.this);
+                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(Preview3D.this);
             }
 
             @Override
@@ -118,6 +146,7 @@ public class Preview3D extends PreviewWidget {
                 super.exit(event, x, y, pointer, toActor);
                 if (pointer != -1) return; //Only care about exit/enter from mouse move
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
+                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(null);
             }
         });
     }
@@ -165,7 +194,12 @@ public class Preview3D extends PreviewWidget {
         worldCamera.viewportWidth = getWidth();
         worldCamera.viewportHeight = getHeight();
         worldCamera.update();
-        cameraInputController.update();
+
+
+
+        if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
+            cameraInputController.update();
+        }
     }
 
     @Override
@@ -200,7 +234,13 @@ public class Preview3D extends PreviewWidget {
 //        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
 
-        tinyGizmoRenderer.render(worldCamera);
+        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
+        for (DragPoint dragPoint : dragPoints) {
+            if (dragPoint.changed) {
+                dragPointProvider.dragPointChanged(dragPoint);
+                dragPoint.changed = false;
+            }
+        }
 
 
         batch.begin();
@@ -211,19 +251,25 @@ public class Preview3D extends PreviewWidget {
 
     }
 
-    @Override
-    public void unregisterDragPoints() {
-
-    }
-
-    @Override
     public void registerForDragPoints(IDragPointProvider dragPointProvider) {
-
+        this.dragPointProvider = dragPointProvider;
+        DragPoint[] arr = dragPointProvider.fetchDragPoints();
+        dragPoints.clear();
+        for(int i = 0; i < arr.length; i++) {
+            dragPoints.add(arr[i]);
+        }
     }
 
-    @Override
-    public void unregisterDragPoints(IDragPointProvider dragPointProvider) {
+    public void unregisterDragPoints() {
+        this.dragPointProvider = null;
+        dragPoints.clear();
+    }
 
+    public void unregisterDragPoints(IDragPointProvider dragPointProvider) {
+        if(this.dragPointProvider == dragPointProvider) {
+            this.dragPointProvider = null;
+            dragPoints.clear();
+        }
     }
 
     @Override

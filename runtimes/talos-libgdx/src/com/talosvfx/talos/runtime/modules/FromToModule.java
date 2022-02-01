@@ -17,6 +17,7 @@
 package com.talosvfx.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.values.NumericalValue;
@@ -40,10 +41,10 @@ public class FromToModule extends AbstractModule {
     NumericalValue rotation;
     NumericalValue length;
 
-    Vector2 tmpVec = new Vector2();
+    Vector3 tmpVec = new Vector3();
 
-    public Vector2 defaultFrom = new Vector2();
-    public Vector2 defaultTo = new Vector2();
+    public Vector3 defaultFrom = new Vector3();
+    public Vector3 defaultTo = new Vector3();
 
     @Override
     protected void defineSlots() {
@@ -60,17 +61,19 @@ public class FromToModule extends AbstractModule {
         if(from.isEmpty()) from.set(defaultFrom.x, defaultFrom.y);
         if(to.isEmpty()) to.set(defaultTo.x, defaultTo.y);
 
-        tmpVec.set(to.get(0), to.get(1));
-        tmpVec.sub(from.get(0), from.get(1));
+        tmpVec.set(to.get(0), to.get(1), to.get(2));
+        tmpVec.sub(from.get(0), from.get(1), from.get(2));
 
         position.set(from.get(0) + tmpVec.x/2f, from.get(1) + tmpVec.y/2f);
 
-        rotation.set(tmpVec.angle());
+
+        //Legacy
+//        rotation.set(tmpVec.angle());
 
         length.set(tmpVec.len());
     }
 
-    public void setDefaults(Vector2 dFrom, Vector2 dTo) {
+    public void setDefaults (Vector3 dFrom, Vector3 dTo) {
         defaultFrom.set(dFrom);
         defaultTo.set(dTo);
     }
