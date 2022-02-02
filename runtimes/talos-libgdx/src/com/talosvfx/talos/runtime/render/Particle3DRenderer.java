@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -12,6 +13,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.ParticlePointData;
+import com.talosvfx.talos.runtime.ParticlePointGroup;
 import com.talosvfx.talos.runtime.ScopePayload;
 import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
@@ -39,6 +42,8 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
     private Vector3 rot = new Vector3();
     private PerspectiveCamera worldCamera;
 
+    private ShapeRenderer shapeRenderer;
+
     public Particle3DRenderer (PerspectiveCamera worldCamera) {
         this.worldCamera = worldCamera;
         sprite3DPool = new Pool<Sprite3D>() {
@@ -50,6 +55,8 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
 
         batch2d = new PolygonSpriteBatch();
         render2D = new SpriteBatchParticleRenderer(worldCamera, batch2d);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     @Override
@@ -93,6 +100,18 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
             particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 
             meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+
+            batch.end();
+            shapeRenderer.setProjectionMatrix(worldCamera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            for (ParticlePointGroup pointDatum : particlePointDataGeneratorModule.pointData) {
+                for (ParticlePointData particlePointData : pointDatum.pointDataArray) {
+                    float size = 0.02f;
+                    shapeRenderer.box(particlePointData.x, particlePointData.y, particlePointData.z,size/2f, size/2f, size/2f);
+                }
+            }
+            shapeRenderer.end();
+            batch.begin(worldCamera, batch.getShader());
 
 
             particleEmitter.getScope().setCurrentRequestMode(cachedMode);

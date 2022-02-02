@@ -152,6 +152,7 @@ public abstract class AbstractModule implements Json.Serializable {
             if(result != null) {
                 inputSlot.getValue().set(result);
                 inputSlot.getValue().setEmpty(false);
+                inputSlot.getValue().setAddition(result.isAddition());
             }
         }
     }

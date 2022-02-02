@@ -137,6 +137,13 @@ public class ParticleModule extends AbstractModule {
         return tmpColor;
     }
 
+    public boolean isPositionAddition () {
+        if(position.isEmpty()) {
+            return false;
+        }
+        return position.isAddition();
+    }
+
     public Vector3 getPosition() {
         fetchInputSlotValue(POSITION);
         if(position.isEmpty()) {

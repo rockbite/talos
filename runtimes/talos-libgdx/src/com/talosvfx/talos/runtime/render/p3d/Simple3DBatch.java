@@ -53,6 +53,10 @@ public class Simple3DBatch {
         mesh.setIndices(indices);
     }
 
+    public ShaderProgram getShader () {
+        return shader;
+    }
+
     public Mesh getMesh () {
         return mesh;
     }

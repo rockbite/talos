@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -127,6 +128,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				Particle reference = particlePointData.reference;
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, reference.seed);
+				getScope().set(ScopePayload.PARTICLE_ALPHA, reference.alpha);
 
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 

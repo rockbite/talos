@@ -42,6 +42,7 @@ public class NumericalValue extends Value {
 		return flavour;
 	}
 
+
 	public void configure (int elementCount) {
 		//Depeneding on the values
 

@@ -125,12 +125,18 @@ public class Particle implements Pool.Poolable {
         size.set(1f, 1f);
 
         Vector3 positionOverride = particleModule.getPosition();
+        final boolean positionAddition = particleModule.isPositionAddition();
         // perform inner operations
         if (positionOverride != null) {
-            float dx = positionOverride.x * delta;
-            float dy = positionOverride.y * delta;
-            float dz = positionOverride.z * delta;
-            position.add(dx, dy, dz);
+
+            if (positionAddition) {
+                float dx = positionOverride.x * delta;
+                float dy = positionOverride.y * delta;
+                float dz = positionOverride.z * delta;
+                position.add(dx, dy, dz);
+            } else {
+                position.set(positionOverride);
+            }
         } else {
 //            position.setZero(); //do nothing
         }

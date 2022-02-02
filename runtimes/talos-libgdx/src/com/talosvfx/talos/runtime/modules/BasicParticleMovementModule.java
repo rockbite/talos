@@ -64,6 +64,7 @@ public class BasicParticleMovementModule extends AbstractModule {
         mass = createInputSlot(MASS);
 
         position = createOutputSlot(POSITION);
+        position.setAddition(true);
 
         angle.setFlavour(NumericalValue.Flavour.ANGLE);
     }

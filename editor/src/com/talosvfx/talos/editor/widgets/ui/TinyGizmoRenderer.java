@@ -210,8 +210,6 @@ public class TinyGizmoRenderer {
 
 			if (dragPoint.changed) {
 				dragPoint.position.set(rigidTransform.getPosition());
-				System.out.println(dragPoint.position);
-
 			}
 
 

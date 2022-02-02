@@ -16,18 +16,27 @@
 
 package com.talosvfx.talos.runtime.values;
 
-
 public abstract class Value {
 
-    private boolean isEmpty;
+	private boolean isEmpty;
 
-    public void setEmpty(boolean isEmpty) {
-        this.isEmpty = isEmpty;
-    }
+	private boolean addition;
 
-    public boolean isEmpty() {
-        return isEmpty;
-    }
+	public boolean isAddition () {
+		return addition;
+	}
 
-    public abstract void set(Value value);
+	public void setAddition (boolean addition) {
+		this.addition = addition;
+	}
+
+	public void setEmpty (boolean isEmpty) {
+		this.isEmpty = isEmpty;
+	}
+
+	public boolean isEmpty () {
+		return isEmpty;
+	}
+
+	public abstract void set (Value value);
 }
