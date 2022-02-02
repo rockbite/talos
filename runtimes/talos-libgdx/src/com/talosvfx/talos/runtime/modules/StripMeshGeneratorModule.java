@@ -116,6 +116,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.seed);
+				getScope().set(ScopePayload.PARTICLE_ALPHA, fromReference.alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
 				fetchAllInputSlotValues();
@@ -126,6 +127,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, nextParticlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, toReference.seed);
+				getScope().set(ScopePayload.PARTICLE_ALPHA, fromReference.alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
 				fetchAllInputSlotValues();
