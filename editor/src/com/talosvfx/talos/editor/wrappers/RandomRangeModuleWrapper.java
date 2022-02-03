@@ -97,6 +97,17 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         setData(module.getMin(), module.getMax());
+
+        inputRange.getEqualsButton().setChecked(jsonData.getBoolean("equals", true));
+        inputRange.getMirrorButton().setChecked(jsonData.getBoolean("mirror", false));
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+
+        json.writeValue("mirror", inputRange.getMirrorButton().isChecked());
+        json.writeValue("equals", inputRange.getEqualsButton().isChecked());
     }
 
     public void setData(float min, float max) {
