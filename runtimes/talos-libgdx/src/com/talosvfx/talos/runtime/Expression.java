@@ -80,4 +80,12 @@ public abstract class Expression {
             a.div(b, out);
         }
     };
+
+
+    static public final Expression mod = new Expression() {
+        @Override
+        public void apply(NumericalValue a, NumericalValue b, NumericalValue out) {
+            a.mod(b, out);
+        }
+    };
 }

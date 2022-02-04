@@ -83,6 +83,17 @@ public class NumericalValue extends Value {
 		out.setElementsCount(elementsCount());
 	}
 
+	public void mod (NumericalValue other, NumericalValue out) {
+
+		for (int i = 0; i < currentElementCount; i++) {
+			float d = other.getFloat();
+			if(d==0)d=1;
+			out.elements[i] = elements[i] % d;
+		}
+		out.setElementsCount(elementsCount());
+	}
+
+
 	public void mul (NumericalValue other, NumericalValue out) {
 		for (int i = 0; i < currentElementCount; i++) {
 			out.elements[i] = elements[i] * other.elements[i];

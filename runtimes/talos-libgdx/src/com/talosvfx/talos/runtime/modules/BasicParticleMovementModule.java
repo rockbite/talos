@@ -77,7 +77,7 @@ public class BasicParticleMovementModule extends AbstractModule {
 
         float vel = getVelocity();
 
-        position.set(MathUtils.cosDeg(angle) * vel, MathUtils.sinDeg(angle) * vel);
+        position.set(MathUtils.cosDeg(angle) * vel, MathUtils.sinDeg(angle) * vel, vel);
     }
 
 
