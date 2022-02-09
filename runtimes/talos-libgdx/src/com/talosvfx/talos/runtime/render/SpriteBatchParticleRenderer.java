@@ -93,14 +93,16 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 				//batch.setShader(blendAddShader); //TODO: let's leave any shader stuff to shader graph, and rest can be baked
 			}
 
-			MeshGeneratorModule meshGenerator = particleEmitter.getParticleModule().getMeshGenerator();
+			final DrawableModule drawableModule = particleEmitter.getDrawableModule();
+			if (drawableModule == null) continue;
+
+			MeshGeneratorModule meshGenerator = drawableModule.getMeshGenerator();
 			if (meshGenerator == null) continue;
 			meshGenerator.setRenderMode(false);
 
-			DrawableModule drawableModule = particleEmitter.getDrawableModule();
 			if (drawableModule == null) continue;
 			if (drawableModule.getMaterialModule() == null) continue;
-			ParticlePointDataGeneratorModule particlePointDataGeneratorModule = particleEmitter.getParticleModule().getPointDataGenerator();
+			ParticlePointDataGeneratorModule particlePointDataGeneratorModule = drawableModule.getPointDataGenerator();
 			if (particlePointDataGeneratorModule == null) continue;
 
 			int cachedMode = particleEmitter.getScope().getRequestMode();

@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ScopePayload;
-import com.talosvfx.talos.runtime.values.ModuleValue;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class ParticleModule extends AbstractModule {
@@ -31,25 +30,41 @@ public class ParticleModule extends AbstractModule {
     public static final int ID = 0;
     public static final int TAG = 1;
 
-    public static final int POINT_GENERATOR = 3;
-    public static final int MESH_GENERATOR = 6;
+    public static final int SPAWN_POSITION = 25;
+
+    public static final int INITIAL_VELOCITY = 17;
+    public static final int VELOCITY_OVER_TIME = 18;
+
+    public static final int INITIAL_SPIN_VELOCITY = 19;
+    public static final int SPIN_OVER_TIME = 20;
+
+    public static final int FORCES = 21;
+    public static final int GRAVITY = 22;
+    public static final int DRAG = 26;
+    public static final int POSITION_OVERRIDE = 27;
+    public static final int ROTATION_OVERRIDE = 28;
+
     public static final int LIFE = 4;
-    public static final int ROTATION = 7;
     public static final int COLOR = 9;
     public static final int TRANSPARENCY = 10;
-    public static final int POSITION = 14;
 
     public static final int PIVOT = 15;
 
-
-    ModuleValue<ParticlePointDataGeneratorModule> pointGenerator;
-    ModuleValue<MeshGeneratorModule> meshGenerator;
-
     NumericalValue life;
-    NumericalValue rotation;
     NumericalValue color;
     NumericalValue transparency;
-    NumericalValue position;
+
+    NumericalValue spawnPosition;
+    NumericalValue initialVelocity;
+    NumericalValue velocityOverTime;
+    NumericalValue initialSpinVelocity;
+    NumericalValue spinVelocityOverTime;
+    NumericalValue forces;
+    NumericalValue gravity;
+    NumericalValue drag;
+
+    NumericalValue positionOverride;
+    NumericalValue rotationOverride;
 
     NumericalValue pivot;
 
@@ -57,22 +72,32 @@ public class ParticleModule extends AbstractModule {
     Vector2 tmpVec = new Vector2();
     Vector3 tmp3Vec = new Vector3();
 
+
     @Override
     protected void defineSlots() {
-        pointGenerator = createInputSlot(POINT_GENERATOR, new ModuleValue<ParticlePointDataGeneratorModule>());
-        meshGenerator = createInputSlot(MESH_GENERATOR, new ModuleValue<MeshGeneratorModule>());
-
         life = createInputSlot(LIFE);
-        rotation = createInputSlot(ROTATION);
+
+        spawnPosition = createInputSlot(SPAWN_POSITION);
+
+        positionOverride = createInputSlot(POSITION_OVERRIDE);
+        rotationOverride = createInputSlot(ROTATION_OVERRIDE);
+
+        initialVelocity = createInputSlot(INITIAL_VELOCITY);
+        velocityOverTime = createInputSlot(VELOCITY_OVER_TIME);
+
+        initialSpinVelocity = createInputSlot(INITIAL_SPIN_VELOCITY);
+        spinVelocityOverTime = createInputSlot(SPIN_OVER_TIME);
+
+        forces = createInputSlot(FORCES);
+        gravity = createInputSlot(GRAVITY);
+        drag = createInputSlot(DRAG);
+
+
+
         color = createInputSlot(COLOR);
         transparency = createInputSlot(TRANSPARENCY);
-        position = createInputSlot(POSITION);
-        position.set(0f, 0f, 0f, 0f);
 
         pivot = createInputSlot(PIVOT);
-
-        rotation.setFlavour(NumericalValue.Flavour.ANGLE);
-
     }
 
     @Override
@@ -98,17 +123,115 @@ public class ParticleModule extends AbstractModule {
         return transparency.getFloat();
     }
 
+    public Vector3 getInitialVelocity () {
+        fetchInputSlotValue(INITIAL_VELOCITY);
+        if (initialVelocity.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(initialVelocity.get(0), initialVelocity.get(1), initialVelocity.get(2));
+    }
+
+    public Vector3 getInitialSpinVelocity () {
+        fetchInputSlotValue(INITIAL_SPIN_VELOCITY);
+        if (initialSpinVelocity.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(initialSpinVelocity.get(0), initialSpinVelocity.get(1), initialSpinVelocity.get(2));
+    }
+
+    public Vector3 getForces () {
+        fetchInputSlotValue(FORCES);
+        if (forces.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(forces.get(0), forces.get(1), forces.get(2));
+    }
+
+
+    public boolean hasDrag () {
+        return !drag.isEmpty();
+    }
+
+    public Vector3 getDrag () {
+        fetchInputSlotValue(DRAG);
+        if (drag.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(drag.get(0), drag.get(1), drag.get(2));
+    }
+
+    public Vector3 getGravity () {
+        fetchInputSlotValue(GRAVITY);
+        if (gravity.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(gravity.get(0), gravity.get(1), gravity.get(2));
+    }
+
+    public Vector3 getSpawnPosition () {
+        fetchInputSlotValue(SPAWN_POSITION);
+        if (spawnPosition.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(spawnPosition.get(0), spawnPosition.get(1), spawnPosition.get(2));
+    }
+
+    public Vector3 getVelocityOverTime () {
+        fetchInputSlotValue(VELOCITY_OVER_TIME);
+        if (velocityOverTime.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(velocityOverTime.get(0), velocityOverTime.get(1), velocityOverTime.get(2));
+    }
+
+    public Vector3 getSpinVelocityOverTime () {
+        fetchInputSlotValue(SPIN_OVER_TIME);
+        if (spinVelocityOverTime.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(spinVelocityOverTime.get(0), spinVelocityOverTime.get(1), spinVelocityOverTime.get(2));
+    }
+
+    public boolean hasVelocityOverTime () {
+        fetchInputSlotValue(VELOCITY_OVER_TIME);
+        return !velocityOverTime.isEmpty();
+    }
+
+    public boolean hasSpinVelocityOverTime () {
+        fetchInputSlotValue(SPIN_OVER_TIME);
+        return !spinVelocityOverTime.isEmpty();
+    }
+
     public float getLife() {
         fetchInputSlotValue(LIFE);
         if(life.isEmpty()) return 1; // defaults
         return life.getFloat();
     }
 
-    public Vector3 getRotation() {
-        fetchInputSlotValue(ROTATION);
-        if(rotation.isEmpty()) return tmp3Vec.setZero(); // defaults
-        final float[] elements = rotation.getElements();
-        return tmp3Vec.set(elements[0], elements[1], elements[2]);
+    public boolean hasPositionOverride () {
+        fetchInputSlotValue(POSITION_OVERRIDE);
+        return !positionOverride.isEmpty();
+    }
+
+    public Vector3 getPositionOverride () {
+        fetchInputSlotValue(POSITION_OVERRIDE);
+        if (positionOverride.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(positionOverride.get(0), positionOverride.get(1), positionOverride.get(2));
+    }
+
+    public boolean hasRotationOverride () {
+        fetchInputSlotValue(ROTATION_OVERRIDE);
+        return !rotationOverride.isEmpty();
+    }
+
+    public Vector3 getRotationOverride () {
+        fetchInputSlotValue(ROTATION_OVERRIDE);
+        if (rotationOverride.isEmpty()) {
+            return tmp3Vec.setZero();
+        }
+        return tmp3Vec.set(rotationOverride.get(0), rotationOverride.get(1), rotationOverride.get(2));
     }
 
     /**
@@ -137,23 +260,6 @@ public class ParticleModule extends AbstractModule {
         return tmpColor;
     }
 
-    public boolean isPositionAddition () {
-        if(position.isEmpty()) {
-            return false;
-        }
-        return position.isAddition();
-    }
-
-    public Vector3 getPosition() {
-        fetchInputSlotValue(POSITION);
-        if(position.isEmpty()) {
-            return null;
-        }
-        tmp3Vec.set(position.get(0), position.get(1), position.get(2));
-
-        return tmp3Vec;
-    }
-
 
     @Override
     public void write (Json json) {
@@ -165,13 +271,5 @@ public class ParticleModule extends AbstractModule {
         super.read(json, jsonData);
     }
 
-    public ParticlePointDataGeneratorModule getPointDataGenerator () {
-        fetchInputSlotValue(POINT_GENERATOR);
-        return pointGenerator.getModule();
-    }
 
-    public MeshGeneratorModule getMeshGenerator () {
-        fetchInputSlotValue(MESH_GENERATOR);
-        return meshGenerator.getModule();
-    }
 }

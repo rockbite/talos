@@ -240,8 +240,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	};
 
 	private void updateParticles(float delta) {
-		if (getParticleModule().getPointDataGenerator() != null) {
-			getParticleModule().getPointDataGenerator().freePoints(particlePointDataPool, groupPool);
+		final DrawableModule drawableModule = getDrawableModule();
+		if (drawableModule == null) return;
+
+		if (drawableModule.getPointDataGenerator() != null) {
+			drawableModule.getPointDataGenerator().freePoints(particlePointDataPool, groupPool);
 		}
 
 		for (int i = activeParticles.size - 1; i >= 0; i--) {

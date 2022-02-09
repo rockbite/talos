@@ -145,7 +145,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				ParticleModule particleModule = particlePointData.reference.getEmitter().getParticleModule();
 
-				Vector3 rotation = particleModule.getRotation();
+				Vector3 rotation = reference.rotation;
 				float transparency = particleModule.getTransparency();
 				Color color = particleModule.getColor();
 

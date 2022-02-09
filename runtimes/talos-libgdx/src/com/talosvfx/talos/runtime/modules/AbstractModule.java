@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.runtime.modules;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
@@ -258,4 +259,5 @@ public abstract class AbstractModule implements Json.Serializable {
     public IntMap<Slot> getOutputSlots() {
         return outputSlots;
     }
+
 }

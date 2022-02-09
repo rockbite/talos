@@ -24,6 +24,8 @@ import com.talosvfx.talos.runtime.modules.DynamicRangeModule;
 import com.talosvfx.talos.runtime.modules.GradientColorModule;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
+import com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule;
+import com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.modules.StaticValueModule;
 import com.talosvfx.talos.runtime.modules.Vector2Module;
@@ -48,12 +50,18 @@ public class DrawableModuleWrapper extends ModuleWrapper<DrawableModule> {
     @Override
     protected void configureSlots() {
         addInputSlot("material", MaterialModule.MATERIAL_MODULE);
+
+        addInputSlot("point", DrawableModule.POINT_GENERATOR);
+        addInputSlot("mesh", DrawableModule.MESH_GENERATOR);
+
     }
 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == DrawableModule.MATERIAL_IN) return SpriteMaterialModule.class;
+        if(slot.getIndex() == DrawableModule.POINT_GENERATOR) return SingleParticlePointDataGeneratorModule.class;
+        if(slot.getIndex() == DrawableModule.MESH_GENERATOR) return QuadMeshGeneratorModule.class;
 
         return null;
     }

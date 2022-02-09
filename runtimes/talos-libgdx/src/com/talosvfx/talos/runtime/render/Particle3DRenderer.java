@@ -83,15 +83,16 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
                 }
             }
 
+            final DrawableModule drawableModule = particleEmitter.getDrawableModule();
+            if (drawableModule == null) continue;
 
-            MeshGeneratorModule meshGenerator = particleEmitter.getParticleModule().getMeshGenerator();
+            MeshGeneratorModule meshGenerator = drawableModule.getMeshGenerator();
             if (meshGenerator == null) continue;
             meshGenerator.setRenderMode(true);
 
-            DrawableModule drawableModule = particleEmitter.getDrawableModule();
             if (drawableModule == null) continue;
             if (drawableModule.getMaterialModule() == null) continue;
-            ParticlePointDataGeneratorModule particlePointDataGeneratorModule = particleEmitter.getParticleModule().getPointDataGenerator();
+            ParticlePointDataGeneratorModule particlePointDataGeneratorModule = drawableModule.getPointDataGenerator();
             if (particlePointDataGeneratorModule == null) continue;
 
             int cachedMode = particleEmitter.getScope().getRequestMode();
@@ -107,7 +108,7 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
             for (ParticlePointGroup pointDatum : particlePointDataGeneratorModule.pointData) {
                 for (ParticlePointData particlePointData : pointDatum.pointDataArray) {
                     float size = 0.02f;
-                    shapeRenderer.box(particlePointData.x, particlePointData.y, particlePointData.z,size/2f, size/2f, size/2f);
+                  //  shapeRenderer.box(particlePointData.x, particlePointData.y, particlePointData.z,size/2f, size/2f, size/2f);
                 }
             }
             shapeRenderer.end();

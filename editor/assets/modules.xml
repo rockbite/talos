@@ -2,11 +2,11 @@
     <category name = "Main Modules">
         <module name = "Particle" wrapper = "ParticleModuleWrapper">ParticleModule</module>
         <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>
-        <module name = "Drawable" wrapper = "DrawableModuleWrapper">DrawableModule</module>
+        <module name = "Render" wrapper = "DrawableModuleWrapper">DrawableModule</module>
     </category>
     <category name = "PointGenerators">
-        <module name = "Single Point gen" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
-        <module name = "FromTo Point gen" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
+        <module name = "Single Point" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
+        <module name = "FromTo Point" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
     </category>
     <category name = "MeshGenerators">
         <module name = "Quad" wrapper = "QuadMeshGeneratorModuleWrapper">QuadMeshGeneratorModule</module>

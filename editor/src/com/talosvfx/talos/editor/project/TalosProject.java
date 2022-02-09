@@ -201,16 +201,17 @@ public class TalosProject implements IProject {
 		SpriteMaterialModuleWrapper materialModule = moduleBoardWidget.createModule(SpriteMaterialModule.class, 0, 350);
 		moduleBoardWidget.makeConnection(materialModule, drawableModule, MaterialModule.MATERIAL_MODULE, DrawableModule.MATERIAL_IN);
 
+		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 60);
+		moduleBoardWidget.makeConnection(pointGenerator, drawableModule, SingleParticlePointDataGeneratorModule.MODULE, DrawableModule.POINT_GENERATOR);
+
+		QuadMeshGeneratorModuleWrapper meshGenerator = moduleBoardWidget.createModule(QuadMeshGeneratorModule.class, 0, 0);
+		moduleBoardWidget.makeConnection(meshGenerator, drawableModule, QuadMeshGeneratorModule.MODULE, DrawableModule.MESH_GENERATOR);
+
 		//Particle
 		ParticleModuleWrapper particleModule = moduleBoardWidget.createModule(ParticleModule.class, 200, 0);
 		BasicParticleMovementModuleWrapper basicMovementModule = moduleBoardWidget.createModule(BasicParticleMovementModule.class, 0, -100);
-		moduleBoardWidget.makeConnection(basicMovementModule, particleModule, BasicParticleMovementModule.POSITION, ParticleModule.POSITION);
+		moduleBoardWidget.makeConnection(basicMovementModule, particleModule, BasicParticleMovementModule.POSITION, ParticleModule.INITIAL_VELOCITY);
 
-		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 60);
-		moduleBoardWidget.makeConnection(pointGenerator, particleModule, SingleParticlePointDataGeneratorModule.MODULE, ParticleModule.POINT_GENERATOR);
-
-		QuadMeshGeneratorModuleWrapper meshGenerator = moduleBoardWidget.createModule(QuadMeshGeneratorModule.class, 0, 0);
-		moduleBoardWidget.makeConnection(meshGenerator, particleModule, QuadMeshGeneratorModule.MODULE, ParticleModule.MESH_GENERATOR);
 
 		TalosMain.Instance().ProjectController().setDirty();
 

@@ -41,37 +41,56 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     @Override
     protected void configureSlots() {
 
-        addInputSlot("point gen", ParticleModule.POINT_GENERATOR);
-        addInputSlot("mesh gen", ParticleModule.MESH_GENERATOR);
-
         addSeparator(true);
 
         addInputSlot("life",  ParticleModule.LIFE);
 
         addSeparator(true);
 
+        addInputSlot("shape", ParticleModule.SPAWN_POSITION);
+        addInputSlot("start velocity", ParticleModule.INITIAL_VELOCITY);
+        addInputSlot("start rot velocity", ParticleModule.INITIAL_SPIN_VELOCITY);
+
+
+        addSeparator(true);
+
+
+        addInputSlot("velocity over time", ParticleModule.VELOCITY_OVER_TIME);
+        addInputSlot("rot velocity over time", ParticleModule.SPIN_OVER_TIME);
+        addInputSlot("gravity", ParticleModule.GRAVITY);
+        addInputSlot("forces", ParticleModule.FORCES);
+        addInputSlot("drag", ParticleModule.DRAG);
+
         addInputSlot("color",  ParticleModule.COLOR);
         addInputSlot("transparency",  ParticleModule.TRANSPARENCY);
 
-        addInputSlot("rotation",  ParticleModule.ROTATION);
-        addInputSlot("position",  ParticleModule.POSITION);
         addInputSlot("pivot",  ParticleModule.PIVOT);
+        addInputSlot("position override",  ParticleModule.POSITION_OVERRIDE);
+        addInputSlot("rotation override",  ParticleModule.ROTATION_OVERRIDE);
 
     }
 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == ParticleModule.POINT_GENERATOR) return SingleParticlePointDataGeneratorModule.class;
-        if(slot.getIndex() == ParticleModule.MESH_GENERATOR) return QuadMeshGeneratorModule.class;
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
-        if(slot.getIndex() == ParticleModule.ROTATION) return DynamicRangeModule.class;
-        if(slot.getIndex() == ParticleModule.PIVOT) TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == ParticleModule.PIVOT) TalosMain.Instance().UIStage().getPreferred3DVectorClass();
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
 
         //Mode
-        if(slot.getIndex() == ParticleModule.POSITION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.SPAWN_POSITION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+
+        if(slot.getIndex() == ParticleModule.INITIAL_VELOCITY) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.INITIAL_SPIN_VELOCITY) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.VELOCITY_OVER_TIME) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.SPIN_OVER_TIME) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.DRAG) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.GRAVITY) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.FORCES) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+
+        if(slot.getIndex() == ParticleModule.POSITION_OVERRIDE) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.ROTATION_OVERRIDE) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
 
         return null;
     }

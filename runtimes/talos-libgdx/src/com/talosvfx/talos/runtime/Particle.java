@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
+import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.ParticleModule;
 import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
 
@@ -29,8 +30,14 @@ public class Particle implements Pool.Poolable {
     private IEmitter emitterReference;
 
     public Vector3 spawnPosition = new Vector3();
+
     public Vector3 position = new Vector3();
+    public Vector3 velocity = new Vector3();
+    public Vector3 spinVelocity = new Vector3();
+    public Vector3 acceleration = new Vector3();
+
     public float life;
+
     public Vector3 rotation = new Vector3();
     public Vector2 size = new Vector2();
 
@@ -66,9 +73,14 @@ public class Particle implements Pool.Poolable {
 
         particleModule.updateScopeData(this);
 
+        //Starting values
         life = particleModule.getLife(); // really makes more sense like this, for deterministic purposes
+        position.set(particleModule.getSpawnPosition()); // offset
+        acceleration.set(0, 0, 0);
+        velocity.set(particleModule.getInitialVelocity());
+        spinVelocity.set(particleModule.getInitialSpinVelocity());
 
-        position.set(0, 0, 0); // offset
+
         spawnPosition.set(emitterReference.getEffectPosition());
 
         durationAtInit = emitterReference.getAlpha();
@@ -90,7 +102,10 @@ public class Particle implements Pool.Poolable {
 
         applyAlpha(alpha, delta);
 
-        ParticlePointDataGeneratorModule pointDataGenerator = particleModule.getPointDataGenerator();
+        final DrawableModule drawableModule = emitterReference.getDrawableModule();
+        if (drawableModule == null) return;
+
+        ParticlePointDataGeneratorModule pointDataGenerator = drawableModule.getPointDataGenerator();
         if (pointDataGenerator != null) {
             //set the context free the points, and generate new particle point data
 
@@ -112,34 +127,111 @@ public class Particle implements Pool.Poolable {
 
         particleModule.updateScopeData(this);
 
-        //update variable values
-        float angle = 0;
+        //Step teh particle data
 
-        if (emitterReference.getEmitterModule().isAligned()) {
-            rotation.set(angle, angle, angle).add(particleModule.getRotation());
+        if (particleModule.hasPositionOverride()) {
+            position.set(particleModule.getPositionOverride());
         } else {
-            rotation.set(particleModule.getRotation());
+            final Vector3 drag = particleModule.getDrag();
+            float dragX = drag.x;
+            float dragY = drag.y;
+            float dragZ = drag.z;
+
+            if (particleModule.hasVelocityOverTime()) {
+                //Velocity is driven by velocity over time
+                final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
+                velocity.set(velocityOverTime);
+            } else {
+                //Acceleration mutate by forces
+
+                float ax = acceleration.x;
+                float ay = acceleration.y;
+                float az = acceleration.z;
+
+                final Vector3 forces = particleModule.getForces();
+                float forcesX = forces.x;
+                float forcesY = forces.y;
+                float forcesZ = forces.z;
+                final Vector3 gravity = particleModule.getGravity();
+                float gravityX = gravity.x;
+                float gravityY = gravity.y;
+                float gravityZ = gravity.z;
+
+                ax += forcesX * delta;
+                ay += forcesY * delta;
+                az += forcesZ * delta;
+
+                ax += gravityX * delta;
+                ay += gravityY * delta;
+                az += gravityZ * delta;
+
+                acceleration.set(ax, ay, az);
+
+                float vx = velocity.x;
+                float vy = velocity.y;
+                float vz = velocity.z;
+
+                vx += ax * delta;
+                vy += ay * delta;
+                vz += az * delta;
+
+                if (particleModule.hasDrag()) {
+                    float compoundSize = 1f;//No size info here
+                    float dragComponentX = Math.abs(0.5f * (velocity.x * velocity.x) * dragX * compoundSize);
+                    float dragComponentY = Math.abs(0.5f * (velocity.y * velocity.y) * dragY * compoundSize);
+                    float dragComponentZ = Math.abs(0.5f * (velocity.z * velocity.z) * dragZ * compoundSize);
+
+                    //vx = x
+                    vx = vx - (Math.signum(vx) * (dragComponentX * delta));
+                    vy = vy - (Math.signum(vy) * (dragComponentY * delta));
+                    vz = vz - (Math.signum(vz) * (dragComponentZ * delta));
+
+                }
+
+                velocity.set(vx, vy, vz);
+
+            }
+
+            float posX = position.x;
+            float posY = position.y;
+            float posZ = position.z;
+
+            posX += velocity.x * delta;
+            posY += velocity.y * delta;
+            posZ += velocity.z * delta;
+
+            position.set(posX, posY, posZ);
+
         }
+
+        if (particleModule.hasRotationOverride()) {
+            rotation.set(particleModule.getRotationOverride());
+        } else {
+            if (particleModule.hasSpinVelocityOverTime()) {
+                //Spin velocity is driven by velocity over time
+                final Vector3 spinVelocityOverTime = particleModule.getSpinVelocityOverTime();
+                spinVelocity.set(spinVelocityOverTime);
+            } else {
+                //drag probably
+            }
+
+            rotation.x += spinVelocity.x * delta;
+            rotation.y += spinVelocity.y * delta;
+            rotation.z += spinVelocity.z * delta;
+        }
+
+//        //update variable values
+//        float angle = 0;
+//
+//        if (emitterReference.getEmitterModule().isAligned()) {
+//            rotation.set(angle, angle, angle).add(particleModule.getRotation());
+//        } else {
+//            rotation.set(particleModule.getRotation());
+//        }
 
         pivot.set(particleModule.getPivot());
-        size.set(1f, 1f);
 
-        Vector3 positionOverride = particleModule.getPosition();
-        final boolean positionAddition = particleModule.isPositionAddition();
-        // perform inner operations
-        if (positionOverride != null) {
 
-            if (positionAddition) {
-                float dx = positionOverride.x * delta;
-                float dy = positionOverride.y * delta;
-                float dz = positionOverride.z * delta;
-                position.add(dx, dy, dz);
-            } else {
-                position.set(positionOverride);
-            }
-        } else {
-//            position.setZero(); //do nothing
-        }
     }
 
     public float getX() {
