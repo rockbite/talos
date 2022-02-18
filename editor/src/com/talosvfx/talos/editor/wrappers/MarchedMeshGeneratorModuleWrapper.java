@@ -50,6 +50,7 @@ public class MarchedMeshGeneratorModuleWrapper extends ModuleWrapper<MarchedMesh
         addOutputSlot("marched", MarchedMeshGeneratorModule.MODULE);
 
         scale = new FloatInputWidget("scale", getSkin());
+        scale.setValue(1f);
         scale.setListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {

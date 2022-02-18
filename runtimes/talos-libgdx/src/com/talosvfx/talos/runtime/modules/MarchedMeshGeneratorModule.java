@@ -24,7 +24,7 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 
 	NumericalValue radius;
 
-	float scale;
+	float scale = 0.125f;
 
 	boolean render3D = false;
 
@@ -94,6 +94,11 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 		min.set(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 		max.set(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 
+		ShapeRenderer shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.setColor(Color.WHITE);
+
 		for (int i = 0; i < pointData.size; i++) {
 			ParticlePointGroup particlePointGroup = pointData.get(i);
 
@@ -119,20 +124,14 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 				min.set(Math.min(x - radius, min.x), Math.min(y - radius, min.y), Math.min(z - radius, min.z));
 				max.set(Math.max(x + radius, max.x), Math.max(y + radius, max.y), Math.max(z + radius, max.z));
 
-				ShapeRenderer shapeRenderer = new ShapeRenderer();
-				shapeRenderer.setProjectionMatrix(camera.combined);
-				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
 				shapeRenderer.box(x - radius, y - radius, z + radius, radius * 2, radius * 2, radius * 2);
-				shapeRenderer.end();
-				shapeRenderer.dispose();
 
 			}
 		}
 
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 		shapeRenderer.setColor(Color.RED);
+
 		float boxWidth = Math.abs(max.x - min.x);
 		float boxHeight = Math.abs(max.y - min.y);
 		float boxDepth = Math.abs(max.z - min.z);
@@ -141,18 +140,33 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 
 		shapeRenderer.line(min.x, min.y, min.z + boxDepth, min.x + boxWidth, min.y, min.z + boxDepth);
 		shapeRenderer.line(min.x, min.y + boxHeight, min.z + boxDepth, min.x + boxWidth, min.y + boxHeight, min.z + boxDepth);
+
+		shapeRenderer.setColor(Color.YELLOW);
+
+
+		int nearestMultipleOfMinX = (int)((min.x - (min.x % scale))/scale);
+		int nearestMultipleOfMinY = (int)((min.y - (min.y % scale))/scale);
+		int nearestMultipleOfMinZ = (int)((min.z - (min.z % scale))/scale);
+
+		int nearestMultipleOfMaxX = (int)((max.x - (max.x % scale))/scale);
+		int nearestMultipleOfMaxY = (int)((max.y - (max.y % scale))/scale);
+		int nearestMultipleOfMaxZ = (int)((max.z - (max.z % scale))/scale);
+
+		for (int i = nearestMultipleOfMinX; i <= nearestMultipleOfMaxX; i++) {
+			for (int j = nearestMultipleOfMinY; j <= nearestMultipleOfMaxY; j++) {
+				for (int k = nearestMultipleOfMinZ; k <= nearestMultipleOfMaxZ; k++) {
+					float x = i * scale;
+					float y = j * scale;
+					float z = k * scale;
+					shapeRenderer.box(x - scale/2f, y - scale/2f, z + scale/2f, scale, scale, scale);
+				}
+			}
+		}
+
 		shapeRenderer.end();
+
 		shapeRenderer.dispose();
 
-//		for (int i = 0; i < pointData.size; i++) {
-//			ParticlePointGroup particlePointGroup = pointData.get(i);
-//
-//			Array<ParticlePointData> pointDataArray = particlePointGroup.pointDataArray;
-//			for (int j = 0; j < pointDataArray.size; j++) {
-//				ParticlePointData particlePointData = pointDataArray.get(j);
-//
-//			}
-//		}
 	}
 
 	@Override
@@ -170,5 +184,9 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 
 	public void setScale (float scale) {
 		this.scale = scale;
+	}
+
+	public float getScale () {
+		return scale;
 	}
 }
