@@ -63,6 +63,13 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 	Vector3 upWorldSpace = new Vector3();
 	Vector3 rightWorldSpace = new Vector3();
 
+	Vector3 min = new Vector3();
+	Vector3 max = new Vector3();
+
+	Vector3 temp1 = new Vector3();
+	Vector3 temp2 = new Vector3();
+	Vector3 temp3 = new Vector3();
+
 	@Override
 	public void render (ParticleRenderer particleRenderer, MaterialModule materialModule, Array<ParticlePointGroup> pointData) {
 
@@ -77,9 +84,15 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 		float V = 0f;
 		float V2 = 1f;
 
-
 		rightWorldSpace.set(viewValues[0], viewValues[4], viewValues[8]);
 		upWorldSpace.set(viewValues[1], viewValues[5], viewValues[9]);
+
+		temp1.setZero();
+		temp2.setZero();
+		temp3.setZero();
+
+		min.set(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+		max.set(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 
 		for (int i = 0; i < pointData.size; i++) {
 			ParticlePointGroup particlePointGroup = pointData.get(i);
@@ -99,23 +112,47 @@ public class MarchedMeshGeneratorModule extends MeshGeneratorModule {
 
 				float radius = this.radius.get(0);
 
-				ShapeRenderer shapeRenderer = new ShapeRenderer();
-				shapeRenderer.setProjectionMatrix(camera.combined);
-
 				float x = particlePointData.x;
 				float y = particlePointData.y;
 				float z = particlePointData.z;
 
+				min.set(Math.min(x - radius, min.x), Math.min(y - radius, min.y), Math.min(z - radius, min.z));
+				max.set(Math.max(x + radius, max.x), Math.max(y + radius, max.y), Math.max(z + radius, max.z));
+
+				ShapeRenderer shapeRenderer = new ShapeRenderer();
+				shapeRenderer.setProjectionMatrix(camera.combined);
 				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-				shapeRenderer.box(x, y, z, radius * 2, radius * 2, radius * 2);
+				shapeRenderer.box(x - radius, y - radius, z + radius, radius * 2, radius * 2, radius * 2);
 				shapeRenderer.end();
-
 				shapeRenderer.dispose();
-
 
 			}
 		}
 
+		ShapeRenderer shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.setColor(Color.RED);
+		float boxWidth = Math.abs(max.x - min.x);
+		float boxHeight = Math.abs(max.y - min.y);
+		float boxDepth = Math.abs(max.z - min.z);
+		shapeRenderer.line(min.x, min.y, min.z, min.x + boxWidth, min.y, min.z);
+		shapeRenderer.line(min.x, min.y + boxHeight, min.z, min.x + boxWidth, min.y + boxHeight, min.z);
+
+		shapeRenderer.line(min.x, min.y, min.z + boxDepth, min.x + boxWidth, min.y, min.z + boxDepth);
+		shapeRenderer.line(min.x, min.y + boxHeight, min.z + boxDepth, min.x + boxWidth, min.y + boxHeight, min.z + boxDepth);
+		shapeRenderer.end();
+		shapeRenderer.dispose();
+
+//		for (int i = 0; i < pointData.size; i++) {
+//			ParticlePointGroup particlePointGroup = pointData.get(i);
+//
+//			Array<ParticlePointData> pointDataArray = particlePointGroup.pointDataArray;
+//			for (int j = 0; j < pointDataArray.size; j++) {
+//				ParticlePointData particlePointData = pointDataArray.get(j);
+//
+//			}
+//		}
 	}
 
 	@Override
