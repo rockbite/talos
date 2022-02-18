@@ -11,6 +11,7 @@
     <category name = "MeshGenerators">
         <module name = "Quad" wrapper = "QuadMeshGeneratorModuleWrapper">QuadMeshGeneratorModule</module>
         <module name = "Strip" wrapper = "StripMeshGeneratorModuleWrapper">StripMeshGeneratorModule</module>
+        <module name = "Marched" wrapper = "MarchedMeshGeneratorModuleWrapper">MarchedMeshGeneratorModule</module>
     </category>
     <category name = "General Use">
         <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
