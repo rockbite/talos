@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -26,6 +27,12 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     protected Rectangle hitBox = new Rectangle();
 
     protected boolean selected = false;
+
+    private Image circle;
+
+    public Gizmo() {
+        circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
+    }
 
     public void setGameObject(GameObject gameObject) {
         this.gameObject = gameObject;
@@ -132,6 +139,21 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     }
 
     public void notifyRemove () {
+
+    }
+
+    protected void drawCircle(Vector2 pos, Batch batch) {
+        float size = 20 * worldPerPixel; // pixel
+        circle.setSize(size, size);
+        circle.setPosition(pos.x - size/2f, pos.y-size/2f);
+        circle.draw(batch, 1f);
+    }
+
+    public boolean catchesShift() {
+        return false;
+    }
+
+    public void mouseMoved(float x, float y) {
 
     }
 }

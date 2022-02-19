@@ -30,6 +30,12 @@
                 <component className="SpineRendererComponent"></component>
             </components>
         </template>
+        <template name = "curve" title = "Curve" nameTemplate = "Curve" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="CurveComponent"></component>
+            </components>
+        </template>
     </templates>
     <components>
         <component className="TransformComponent">
@@ -54,6 +60,11 @@
         <component className="SpineRendererComponent">
         </component>
         <component className="ScriptComponent">
+        </component>
+        <component className="CurveComponent">
+            <gizmos>
+                <gizmo className="CurveGizmo"></gizmo>
+            </gizmos>
         </component>
     </components>
 </entityTemplates>

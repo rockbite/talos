@@ -27,6 +27,8 @@ public abstract class PropertyWidget<T> extends Table {
 	private Supplier<T> supplier;
 	private ValueChanged<T> valueChanged;
 
+	private boolean hasName = true;
+
 	public interface ValueChanged<T> {
 		void report(T value);
 	}
@@ -47,7 +49,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 	protected void build(String name) {
 		if(name != null) {
-
+			hasName = true;
 			propertyName = new Label(name + ":", TalosMain.Instance().getSkin());
 			propertyName.setAlignment(Align.left);
 			valueContainer = new Table();
@@ -63,6 +65,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 			addToContainer(getSubWidget());
 		} else {
+			hasName = false;
 			add(getSubWidget()).growX();
 		}
 	}
@@ -97,7 +100,7 @@ public abstract class PropertyWidget<T> extends Table {
 	}
 
 	protected boolean isFullSize() {
-		return false;
+		return !hasName;
 	}
 
 	public PropertyWidget clone()  {

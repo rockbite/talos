@@ -35,6 +35,10 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         return clone;
     }
 
+    public ButtonPropertyWidget(String text, ButtonListener btnListener) {
+        this(null, text, btnListener);
+    }
+
     public ButtonPropertyWidget(String name, String text, ButtonListener btnListener) {
         this(name, text, btnListener, new Supplier<T>() {
             @Override
@@ -76,7 +80,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         button.getStyle().checkedOver = null;
         button.getStyle().checkedDown = null;
 
-        table.add(button).expand().right();
+        table.add(button).expand().right().growX();
 
         button.addListener(new ClickListener() {
             @Override

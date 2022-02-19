@@ -23,11 +23,8 @@ import java.awt.*;
 
 public class TalosLauncher {
 	public static void main (String[] arg) {
-
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(screenSize.width, screenSize.height);
+		config.setMaximized(true);
 		config.setTitle("Talos");
 		config.useVsync(false);
 		config.setBackBufferConfig(1,1,1,1,8,8, 16);

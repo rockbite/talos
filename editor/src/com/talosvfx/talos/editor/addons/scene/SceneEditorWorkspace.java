@@ -275,6 +275,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             GameObject selectedGameObject;
 
             @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+
+                Vector2 hitCords = getWorldFromLocal(x, y);
+                for(int i = 0; i < gizmoList.size; i++) {
+                    Gizmo item = gizmoList.get(i);
+                    if(item.isSelected()) {
+                        item.mouseMoved(hitCords.x, hitCords.y);
+                    }
+                }
+
+                return super.mouseMoved(event, x, y);
+            }
+
+            @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
                 upWillClear = true;
@@ -302,7 +316,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     touchedGizmo = gizmo;
                     GameObject gameObject = touchedGizmo.getGameObject();
                     upWillClear = false;
-                    if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !touchedGizmo.catchesShift()) {
                         // toggling
                         if(selection.contains(gameObject, true)) {
                             removeFromSelection(gameObject);
@@ -860,6 +874,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         }
 
         return false;
+    }
+
+    public void requestSelectionClear() {
+        clearSelection();
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
     }
 
     private void clearSelection() {
