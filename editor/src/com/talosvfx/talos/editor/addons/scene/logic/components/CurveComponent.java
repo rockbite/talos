@@ -47,9 +47,37 @@ public class CurveComponent extends AComponent {
         }
     }
 
-    public void toggleClosed() {
-        isClosed = !isClosed;
+    public void splitSegment(Vector2 point, int segmentIndex) {
+        points.insertRange(segmentIndex * 3 + 2, 3);
+        points.set(segmentIndex * 3 + 2, new Vector2(0, 0));
+        points.set(segmentIndex * 3 + 3, new Vector2(point));
+        points.set(segmentIndex * 3 + 4, new Vector2(0, 0));
 
+        if(automaticControl) {
+            autoSetAllAffectedControlPoints(segmentIndex * 3 + 3);
+        } else {
+            autoSetAnchorControlPoints(segmentIndex * 3 + 3);
+        }
+    }
+
+    public void deleteSegment(int anchorIndex) {
+        int numSegments = getNumSegments();
+        if(numSegments > 2 || (!isClosed && numSegments > 1)) {
+            if (anchorIndex == 0) {
+                if (isClosed) {
+                    points.get(points.size - 1).set(points.get(points.size - 2));
+                }
+                points.removeRange(0, 2);
+            } else if (anchorIndex == points.size - 1 && !isClosed) {
+                points.removeRange(anchorIndex - 2, anchorIndex);
+            } else {
+                points.removeRange(anchorIndex - 1, anchorIndex + 1);
+            }
+        }
+    }
+
+    public void setClosedState(boolean isClosed) {
+        this.isClosed = isClosed;
         if(isClosed) {
             Vector2 tmp = Pools.get(Vector2.class).obtain();
 
@@ -180,15 +208,22 @@ public class CurveComponent extends AComponent {
 
         properties.add(cleanButton);
 
-        ButtonPropertyWidget<String> toggleClosedButton = new ButtonPropertyWidget<String>("Toggle Closed", new ButtonPropertyWidget.ButtonListener() {
+        CheckboxWidget isClosedWidget = new CheckboxWidget("Toggle Closed", new Supplier<Boolean>() {
             @Override
-            public void clicked(ButtonPropertyWidget widget) {
-                toggleClosed();
+            public Boolean get() {
+                return isClosed;
+            }
+        }, new PropertyWidget.ValueChanged<Boolean>() {
+            @Override
+            public void report(Boolean value) {
+                if(isClosed != value) {
+                    setClosedState(value);
+                }
             }
         });
 
         properties.add(cleanButton);
-        properties.add(toggleClosedButton);
+        properties.add(isClosedWidget);
 
         CheckboxWidget autoSetWidget = new CheckboxWidget("Automatic Control", new Supplier<Boolean>() {
             @Override

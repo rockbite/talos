@@ -5,7 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Bezier;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
@@ -20,6 +24,10 @@ public class CurveGizmo extends Gizmo {
     private Vector2 tmp3 = new Vector2();
     private Vector2 tmp4 = new Vector2();
 
+    private int animatingAnchor = -1;
+    private Vector2 ctrlOne = new Vector2();
+    private Vector2 ctrlTwo = new Vector2();
+
     private int touchedPointIndex;
     private Vector2 touchedPointRef;
 
@@ -27,8 +35,10 @@ public class CurveGizmo extends Gizmo {
 
     private Color darkerLine = Color.valueOf("#333333");
 
-    public CurveGizmo() {
+    private Actor animateActor;
 
+    public CurveGizmo() {
+        animateActor = new Actor();
     }
 
     @Override
@@ -45,7 +55,7 @@ public class CurveGizmo extends Gizmo {
 
             if(selected) {
                 for (int i = 0; i < points.size; i++) {
-                    if(!curve.automaticControl || i % 3 == 0) {
+                    if(i % 3 == 0) {
                         drawCircle(toWorld(points.get(i)), batch);
                     }
                 }
@@ -59,14 +69,34 @@ public class CurveGizmo extends Gizmo {
                     if(curve.automaticControl){
                         color = darkerLine;
                     }
-                    drawLine(batch, toWorld(pointsInSegment[1], tmp2), toWorld(pointsInSegment[0], tmp3), color);
-                    drawLine(batch, toWorld(pointsInSegment[2], tmp2), toWorld(pointsInSegment[3], tmp3), color);
+
+                    ctrlOne.set(pointsInSegment[1]);
+                    ctrlTwo.set(pointsInSegment[2]);
+
+                    if(animatingAnchor >= 0) {
+                        if (i * 3 + 2 == animatingAnchor - 1) {
+                            tmp.set(ctrlTwo).sub(curve.points.get(animatingAnchor)).scl(animateActor.getX()).add(curve.points.get(animatingAnchor));
+                            ctrlTwo.set(tmp);
+                        } else if (i * 3 + 1 == animatingAnchor + 1) {
+                            tmp.set(ctrlOne).sub(curve.points.get(animatingAnchor)).scl(animateActor.getX()).add(curve.points.get(animatingAnchor));
+                            ctrlOne.set(tmp);
+                        }
+
+                    }
+
+                    drawLine(batch, toWorld(ctrlOne, tmp2), toWorld(pointsInSegment[0], tmp3), color);
+                    drawLine(batch, toWorld(ctrlTwo, tmp2), toWorld(pointsInSegment[3], tmp3), color);
+
+                    if(!curve.automaticControl) {
+                        drawCircle(toWorld(ctrlOne), batch);
+                        drawCircle(toWorld(ctrlTwo), batch);
+                    }
                 }
 
                 bezier.set(pointsInSegment);
 
                 Vector2 prev = bezier.valueAt(tmp, 0);
-                float step = 1f/40f;
+                float step = 1f/20f;
                 for(float t = step; t <= 1f; t+=step) {
                     Vector2 curr = bezier.valueAt(tmp2, t);
                     if(selectedSegmentIndex == i) {
@@ -75,6 +105,12 @@ public class CurveGizmo extends Gizmo {
                         drawLine(batch, toWorld(prev, tmp3), toWorld(curr, tmp4), Color.RED);
                     }
                     prev.set(curr);
+                }
+                Vector2 curr = bezier.valueAt(tmp2,1f);
+                if(selectedSegmentIndex == i) {
+                    drawLine(batch, toWorld(prev, tmp3), toWorld(curr, tmp4), Color.YELLOW);
+                } else {
+                    drawLine(batch, toWorld(prev, tmp3), toWorld(curr, tmp4), Color.RED);
                 }
             }
         }
@@ -94,6 +130,20 @@ public class CurveGizmo extends Gizmo {
 
         tmp.set(getX(), getY());
         if(isPointHit(tmp, x, y, 30)) return false;
+
+        int touchPoint = getTouchedPoint(x, y);
+
+        if(touchPoint >= 0) {
+            return true;
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            return true;
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            return false;
+        }
 
         return true;
     }
@@ -127,22 +177,56 @@ public class CurveGizmo extends Gizmo {
 
     @Override
     public void touchDown(float x, float y, int button) {
+        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
         int touchedPoint = getTouchedPoint(x, y);
-        if(touchedPoint >= 0) {
-            touchedPointRef = gameObject.getComponent(CurveComponent.class).points.get(touchedPoint);
-            touchedPointIndex = touchedPoint;
-        } else {
-            if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                // adding new points then
-                CurveComponent curve = gameObject.getComponent(CurveComponent.class);
-                curve.addSegment(toLocal(new Vector2(x, y)));
+        if(button == 0) {
+            if (touchedPoint >= 0) {
+                touchedPointRef = gameObject.getComponent(CurveComponent.class).points.get(touchedPoint);
+                touchedPointIndex = touchedPoint;
+            } else {
+                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    // adding new points then
+                    curve.addSegment(toLocal(new Vector2(x, y)));
+                    animateAnchor(curve.points.size - 1);
+                } else if (selectedSegmentIndex >= 0) {
+                    curve.splitSegment(toLocal(new Vector2(x, y)), selectedSegmentIndex);
+                    touchedPointIndex = selectedSegmentIndex * 3 + 3;
+                    touchedPointRef = curve.points.get(touchedPointIndex);
+                    animateAnchor(touchedPointIndex);
+                }
+            }
+        } else if (button == 1) {
+            if(touchedPoint % 3 == 0) {
+                curve.deleteSegment(touchedPoint);
             }
         }
     }
 
+    private void animateAnchor(int anchorIndex) {
+        animatingAnchor = anchorIndex;
+
+        TalosMain.Instance().UIStage().getStage().addActor(animateActor);
+
+        animateActor.clearActions();
+        animateActor.setX(0);
+        animateActor.addAction(Actions.moveTo(1f, 0f, 1f, Interpolation.elasticOut));
+    }
+
+    private float getDistanceToBezier(Bezier<Vector2> bz, Vector2 point) {
+        Vector2 prev = bezier.valueAt(tmp3, 0);
+        float min = 99999;
+        for(float t = 1/10f; t < 1f; t+=1/10f) {
+            Vector2 curr = bezier.valueAt(tmp2, t);
+            float dst = Intersector.distanceSegmentPoint(prev, curr, point);
+            if(min > dst) min = dst;
+            prev.set(curr);
+        }
+        return min;
+    }
+
     @Override
     public void mouseMoved(float x, float y) {
-        float threshold =  worldPerPixel * 15f;
+        float threshold =  worldPerPixel * 10f;
 
         selectedSegmentIndex = -1;
 
@@ -151,12 +235,14 @@ public class CurveGizmo extends Gizmo {
         for(int i = 0; i < curve.getNumSegments(); i++) {
             Vector2[] pointsInSegment = curve.getPointsInSegment(i);
             bezier.set(pointsInSegment);
-            float t = bezier.approximate(local);
-            Vector2 point = bezier.valueAt(tmp2, t);
-            float dst = point.dst(local);
+            float dst = getDistanceToBezier(bezier, local);
             if(dst < threshold) {
                 selectedSegmentIndex = i;
             }
+        }
+
+        if(selectedSegmentIndex >= 0) {
+            // debug info here
         }
     }
 

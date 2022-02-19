@@ -297,17 +297,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                 Vector2 hitCords = getWorldFromLocal(x, y);
 
-                if (button == 1 && !event.isCancelled()) {
-                    final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-                    (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
-
-                    Vector2 location = new Vector2(vec);
-                    Vector2 createLocation = new Vector2(hitCords);
-                    templateListPopup.showPopup(getStage(), location, createLocation);
-
-                    return true;
-                }
-
                 Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
 
                 selectedGameObject = null;
@@ -347,9 +336,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                     event.handle();
 
+                    templateListPopup.remove();
+
                     return true;
                 } else {
                     touchedGizmo = null;
+
+                    if (button == 1 && !event.isCancelled()) {
+                        final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+                        (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+
+                        Vector2 location = new Vector2(vec);
+                        Vector2 createLocation = new Vector2(hitCords);
+                        templateListPopup.showPopup(getStage(), location, createLocation);
+
+                        return true;
+                    }
                 }
 
                 if(button == 2 || ctrlPressed()) {
