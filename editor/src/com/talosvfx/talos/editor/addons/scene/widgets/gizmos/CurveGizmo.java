@@ -187,7 +187,8 @@ public class CurveGizmo extends Gizmo {
                 if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     // adding new points then
                     curve.addSegment(toLocal(new Vector2(x, y)));
-                    animateAnchor(curve.points.size - 1);
+                    touchedPointIndex = curve.points.size - 1;
+                    touchedPointRef = curve.points.get(touchedPointIndex);
                 } else if (selectedSegmentIndex >= 0) {
                     curve.splitSegment(toLocal(new Vector2(x, y)), selectedSegmentIndex);
                     touchedPointIndex = selectedSegmentIndex * 3 + 3;
@@ -213,9 +214,9 @@ public class CurveGizmo extends Gizmo {
     }
 
     private float getDistanceToBezier(Bezier<Vector2> bz, Vector2 point) {
-        Vector2 prev = bezier.valueAt(tmp3, 0);
+        Vector2 prev = bezier.valueAt(tmp3, 0.05f);
         float min = 99999;
-        for(float t = 1/10f; t < 1f; t+=1/10f) {
+        for(float t = 0.05f; t < 0.95f; t+=1/10f) {
             Vector2 curr = bezier.valueAt(tmp2, t);
             float dst = Intersector.distanceSegmentPoint(prev, curr, point);
             if(min > dst) min = dst;
