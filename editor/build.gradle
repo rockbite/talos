@@ -13,6 +13,10 @@ apply plugin: 'nexus'
 
 dependencies {
     api project(":runtimes:talos-libgdx")
+
+    implementation "com.rockbite.bongo:engine"
+    implementation "com.rockbite.bongo:desktop"
+
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
@@ -67,7 +71,6 @@ dependencies {
 
 }
 
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 sourceSets.main.resources.srcDirs = ["assets"]

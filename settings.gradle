@@ -1,3 +1,5 @@
 include 'editor'
 include 'plugins'
 include 'runtimes:talos-libgdx'
+
+includeBuild 'bongo'

@@ -1,7 +1,9 @@
 package com.talosvfx.talos.runtime.render;
 
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
@@ -10,6 +12,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -28,7 +34,7 @@ import com.talosvfx.talos.runtime.values.DrawableValue;
 public class Particle3DRenderer implements ParticleRenderer, RenderableProvider {
 
     private final SpriteBatchParticleRenderer render2D;
-    private final PolygonSpriteBatch batch2d;
+    private final PolygonBatch batch2d;
     private ParticleEffectInstance particleEffectInstance;
 
     private ObjectMap<Texture, Material> materialMap = new ObjectMap<>();
@@ -53,10 +59,15 @@ public class Particle3DRenderer implements ParticleRenderer, RenderableProvider 
             }
         };
 
-        batch2d = new PolygonSpriteBatch();
+        batch2d = new PolygonSpriteBatchMultiTextureMULTIBIND();
         render2D = new SpriteBatchParticleRenderer(worldCamera, batch2d);
 
-        shapeRenderer = new ShapeRenderer();
+        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
+        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
+
+        shapeRenderer = new ShapeRenderer(5000,
+            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
+        );
     }
 
     @Override

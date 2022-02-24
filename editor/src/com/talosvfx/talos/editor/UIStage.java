@@ -42,6 +42,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
@@ -101,7 +102,7 @@ public class UIStage {
 	private boolean isIn3DMode;
 
 	public UIStage (Skin skin) {
-		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
+		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 		this.skin = skin;
 		this.dragAndDrop = new DragAndDrop();
 	}
@@ -128,12 +129,12 @@ public class UIStage {
 		WrapperRegistry.map.clear();
 		moduleListPopup = new ModuleListPopup(root);
 
-		colorPicker = new ColorPicker();
-		colorPicker.padTop(32);
-		colorPicker.padLeft(16);
-		colorPicker.setHeight(330);
-		colorPicker.setWidth(430);
-		colorPicker.padRight(26);
+//		colorPicker = new ColorPicker();
+//		colorPicker.padTop(32);
+//		colorPicker.padLeft(16);
+//		colorPicker.setHeight(330);
+//		colorPicker.setWidth(430);
+//		colorPicker.padRight(26);
 	}
 
 	public boolean isIn3DMode () {

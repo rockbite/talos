@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.utils.CameraController;
 
@@ -19,7 +20,7 @@ public abstract class WorkplaceStage {
     private CameraController cameraController;
 
     public WorkplaceStage() {
-        stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
+        stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
         cameraController = new CameraController(getCamera());
     }
 

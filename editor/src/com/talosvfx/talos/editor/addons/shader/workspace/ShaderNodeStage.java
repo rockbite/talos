@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.shader.workspace;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.shader.nodes.AbstractShaderNode;
 import com.talosvfx.talos.editor.addons.shader.nodes.SampleTextureNode;
@@ -32,7 +34,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
     private ColorOutput colorOutput;
 
     FrameBuffer frameBuffer;
-    SpriteBatch spriteBatch;
+    PolygonBatch spriteBatch;
     Viewport viewport;
 
     class ExportSequencePayload {
@@ -53,7 +55,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
         super(skin);
 
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 240, 240, false);
-        spriteBatch = new SpriteBatch();
+        spriteBatch = new PolygonSpriteBatchMultiTextureMULTIBIND();
         viewport = new FitViewport(240, 240);
         viewport.apply(true);
 

@@ -18,6 +18,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class TalosLauncher {
 	public static void main (String[] arg) {
@@ -29,6 +30,11 @@ public class TalosLauncher {
 		config.setWindowIcon("icon/talos-64x64.png");
 
 		TalosMain talos = new TalosMain();
+
+		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+
+		ShaderProgram.prependVertexCode = "#version 330 core\n";
+		ShaderProgram.prependFragmentCode = "#version 330 core\n";
 
 		new Lwjgl3Application(talos, config);
 	}

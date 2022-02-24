@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.nodes;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -15,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
@@ -83,7 +87,12 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
         this.skin = skin;
-        shapeRenderer = new ShapeRenderer();
+        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
+        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
+
+        shapeRenderer = new ShapeRenderer(5000,
+            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
+        );
 
         this.nodeStage = nodeStage;
 

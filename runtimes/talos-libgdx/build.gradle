@@ -13,6 +13,9 @@ apply plugin: 'nexus'
 
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+    implementation "com.rockbite.bongo:engine"
+
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation 'com.github.jitpack:gradle-simple:1.0'
 
@@ -22,7 +25,6 @@ dependencies {
     testImplementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
 
-sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.test.java.srcDirs = ["test/"]
 

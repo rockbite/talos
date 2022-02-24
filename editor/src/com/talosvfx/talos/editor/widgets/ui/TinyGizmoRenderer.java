@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.widgets.ui;
 import com.asidik.tinygizmo.GizmoState;
 import com.asidik.tinygizmo.RigidTransform;
 import com.asidik.tinygizmo.TinyGizmo;
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -27,6 +28,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -55,7 +59,12 @@ public class TinyGizmoRenderer {
 
 	public TinyGizmoRenderer () {
 
-		shapeRenderer = new ShapeRenderer();
+		String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
+		String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
+
+		shapeRenderer = new ShapeRenderer(5000,
+			SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
+		);
 
 		tinyGizmo = new TinyGizmo();
 

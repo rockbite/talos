@@ -28,6 +28,7 @@ public class Preview3D extends PreviewWidget {
 
     private final ShaderProgram shaderProgram;
     private final TinyGizmoRenderer tinyGizmoRenderer;
+    private final BongoPreview bongoPreview;
     //Controls
     private CameraInputController cameraInputController;
 
@@ -87,6 +88,8 @@ public class Preview3D extends PreviewWidget {
         TalosMain.Instance().addCustomInputProcessor(cameraInputController);
 
         tinyGizmoRenderer = new TinyGizmoRenderer();
+
+        bongoPreview = new BongoPreview();
     }
 
     @Override
@@ -214,13 +217,13 @@ public class Preview3D extends PreviewWidget {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glClearColor(0f, 0f, 0f, 0);
 
-        modelBatch.begin(worldCamera);
-        //if(isDrawXYZ) modelBatch.render(xyzInstance);
-        if(isDrawXZPlane) modelBatch.render(xzPlaneInstance);
-        if(isDrawXYPlane) modelBatch.render(xyPlaneInstance);
-
-        //Draw
-        modelBatch.end();
+//        modelBatch.begin(worldCamera);
+//        //if(isDrawXYZ) modelBatch.render(xyzInstance);
+//        if(isDrawXZPlane) modelBatch.render(xzPlaneInstance);
+//        if(isDrawXYPlane) modelBatch.render(xyPlaneInstance);
+//
+//        //Draw
+//        modelBatch.end();
 
 
 //        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -247,7 +250,10 @@ public class Preview3D extends PreviewWidget {
         }
 
 
+        bongoPreview.render();
+
         batch.begin();
+
     }
 
     @Override

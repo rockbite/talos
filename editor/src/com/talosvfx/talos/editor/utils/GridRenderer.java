@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.editor.utils;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,6 +24,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 
 public class GridRenderer extends Actor {
 
@@ -36,7 +40,12 @@ public class GridRenderer extends Actor {
 	public GridRenderer (Stage stage) {
 		this.stage = stage;
 		camera = (OrthographicCamera)this.stage.getViewport().getCamera();
-		shapeRenderer = new ShapeRenderer();
+		String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
+		String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
+
+		shapeRenderer = new ShapeRenderer(5000,
+			SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
+		);
 	}
 
 	@Override

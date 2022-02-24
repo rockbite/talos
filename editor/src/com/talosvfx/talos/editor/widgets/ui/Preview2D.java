@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -18,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.IEmitter;
@@ -56,7 +60,13 @@ public class Preview2D extends PreviewWidget {
 
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(camera);
         particleRenderer = spriteBatchParticleRenderer;
-        shapeRenderer = new ShapeRenderer();
+        
+        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
+        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
+
+        shapeRenderer = new ShapeRenderer(5000,
+            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
+        );
 
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 
