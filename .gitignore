@@ -86,3 +86,4 @@ runtimes/build/
 editor/deploy/out-win/
 editor/deploy/*.zip
 /editor/assets/talos-version.properties
+/editor/assets/imgui.ini
