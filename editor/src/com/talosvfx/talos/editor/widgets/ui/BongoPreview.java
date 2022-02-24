@@ -26,6 +26,7 @@ public class BongoPreview {
 	private final World world;
 
 	public BongoPreview () {
+		Bongo.DEBUG = false;
 		Bongo.init();
 
 		ShaderProgram.pedantic = false;
