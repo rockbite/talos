@@ -1,0 +1,3 @@
+[submodule "bongo"]
+	path = bongo
+	url = git@github.com:rockbite/bongo.git
