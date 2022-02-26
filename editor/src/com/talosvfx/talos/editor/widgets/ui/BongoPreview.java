@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.widgets.ui;
 import com.artemis.BaseSystem;
 import com.artemis.EntityEdit;
 import com.artemis.World;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.rockbite.bongo.engine.Bongo;
@@ -26,7 +28,7 @@ public class BongoPreview {
 	private final World world;
 
 	public BongoPreview () {
-		Bongo.DEBUG = false;
+		Bongo.DEBUG = true;
 		Bongo.init();
 
 		ShaderProgram.pedantic = false;
@@ -78,4 +80,15 @@ public class BongoPreview {
 		world.process();
 	}
 
+	public Camera getWorldCamera () {
+		return world.getSystem(CameraControllerSystem.class).getCameras().getGameCamera();
+	}
+
+	public InputAdapter getCameraController () {
+		return world.getSystem(CameraControllerSystem.class).getCameraController();
+	}
+
+	public void setCameraController (InputAdapter cameraInputController) {
+		world.getSystem(CameraControllerSystem.class).setCameraController(cameraInputController);
+	}
 }

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.*;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -30,12 +32,12 @@ public class Preview3D extends PreviewWidget {
     private final TinyGizmoRenderer tinyGizmoRenderer;
     private final BongoPreview bongoPreview;
     //Controls
-    private CameraInputController cameraInputController;
+    private InputAdapter cameraInputController;
 
     private Particle3DRenderer particleRenderer;
 
     //Render
-    public PerspectiveCamera worldCamera;
+    public Camera worldCamera;
     private boolean isDrawXYZ, isDrawXZPlane, isDrawXYPlane;
     private Array<Model> models;
     private ModelInstance xyzInstance, xzPlaneInstance, xyPlaneInstance;
@@ -56,15 +58,7 @@ public class Preview3D extends PreviewWidget {
         environment = new Environment();
         environment.add(new DirectionalLight().set(Color.WHITE, 0,0,-1));
 
-        worldCamera = new PerspectiveCamera(67, w, h);
-        worldCamera.position.set(0, 0, 10);
-        worldCamera.lookAt(0,0,0);
-        worldCamera.near = 0.1f;
-        worldCamera.far = 300f;
-        worldCamera.update();
 
-        cameraInputController = new CameraInputController(worldCamera);
-        cameraInputController.translateTarget = false;
 
         models = new Array<Model>();
         ModelBuilder builder = new ModelBuilder();
@@ -83,13 +77,27 @@ public class Preview3D extends PreviewWidget {
         simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
         shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/3d/vert.glsl"), Gdx.files.internal("shaders/3d/frag.glsl"));
 
-        particleRenderer = new Particle3DRenderer(worldCamera);
+//        particleRenderer = new Particle3DRenderer(worldCamera);
 
-        TalosMain.Instance().addCustomInputProcessor(cameraInputController);
 
         tinyGizmoRenderer = new TinyGizmoRenderer();
 
         bongoPreview = new BongoPreview();
+        worldCamera = bongoPreview.getWorldCamera();
+//        worldCamera.position.set(0, 0, 10);
+//        worldCamera.lookAt(0,0,0);
+        worldCamera.near = 0.1f;
+        worldCamera.far = 300f;
+        worldCamera.update();
+
+        cameraInputController = new CameraInputController(worldCamera);
+        if (cameraInputController instanceof CameraInputController) {
+            ((CameraInputController)cameraInputController).translateTarget = false;
+        }
+
+        bongoPreview.setCameraController(cameraInputController);
+
+
     }
 
     @Override
@@ -198,15 +206,15 @@ public class Preview3D extends PreviewWidget {
     public void act(float delta) {
         super.act(delta);
 
-        worldCamera.viewportWidth = getWidth();
-        worldCamera.viewportHeight = getHeight();
-        worldCamera.update();
+//        worldCamera.viewportWidth = getWidth();
+//        worldCamera.viewportHeight = getHeight();
+//        worldCamera.update();
 
 
 
-        if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
-            cameraInputController.update();
-        }
+//        if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
+//            cameraInputController.update();
+//        }
     }
 
     @Override
@@ -232,24 +240,24 @@ public class Preview3D extends PreviewWidget {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        simple3DBatch.begin(worldCamera, shaderProgram);
-        particleRenderer.setBatch(simple3DBatch);
-        particleEffect.render(particleRenderer);
-        simple3DBatch.end();
+//        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//        simple3DBatch.begin(worldCamera, shaderProgram);
+//        particleRenderer.setBatch(simple3DBatch);
+//        particleEffect.render(particleRenderer);
+//        simple3DBatch.end();
 
 //        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
 
-        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
-        for (DragPoint dragPoint : dragPoints) {
-            if (dragPoint.changed) {
-                dragPointProvider.dragPointChanged(dragPoint);
-                dragPoint.changed = false;
-            }
-        }
+//        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
+//        for (DragPoint dragPoint : dragPoints) {
+//            if (dragPoint.changed) {
+//                dragPointProvider.dragPointChanged(dragPoint);
+//                dragPoint.changed = false;
+//            }
+//        }
 
-
+        HdpiUtils.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         bongoPreview.render();
 
         batch.begin();
