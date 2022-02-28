@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -221,6 +222,10 @@ public class Preview3D extends PreviewWidget {
     public void drawContent(Batch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+            switchCamera();
+        }
+
         final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         if (particleEffect != null) {
             bongoPreview.updateParticleInstance(particleEffect);
@@ -228,7 +233,7 @@ public class Preview3D extends PreviewWidget {
 
         batch.end();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 
 //        modelBatch.begin(worldCamera);
 //        //if(isDrawXYZ) modelBatch.render(xyzInstance);
@@ -254,13 +259,7 @@ public class Preview3D extends PreviewWidget {
 //        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
 
-//        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
-//        for (DragPoint dragPoint : dragPoints) {
-//            if (dragPoint.changed) {
-//                dragPointProvider.dragPointChanged(dragPoint);
-//                dragPoint.changed = false;
-//            }
-//        }
+
 
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
 
@@ -269,7 +268,47 @@ public class Preview3D extends PreviewWidget {
 
         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
+        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
+        for (DragPoint dragPoint : dragPoints) {
+            if (dragPoint.changed) {
+                dragPointProvider.dragPointChanged(dragPoint);
+                dragPoint.changed = false;
+            }
+        }
+
         batch.begin();
+
+    }
+
+    boolean isPerspective = true;
+    private void switchCamera () {
+        final Vector3 position = worldCamera.position;
+        final Vector3 direction = worldCamera.direction;
+
+        if (isPerspective) {
+            float aspect = (float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
+            float width = 10f;
+            float height = width * aspect;
+            OrthographicCamera orthographicCamera = new OrthographicCamera(width, height);
+            bongoPreview.setCamera(orthographicCamera);
+        } else {
+            PerspectiveCamera perspectiveCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            bongoPreview.setCamera(perspectiveCamera);
+        }
+
+        isPerspective = !isPerspective;
+
+        worldCamera = bongoPreview.getWorldCamera();
+        worldCamera.near = 0.1f;
+        worldCamera.far = 100f;
+        worldCamera.position.set(position);
+        worldCamera.direction.set(direction);
+        worldCamera.update();
+
+        if (cameraInputController instanceof CameraInputController) {
+            ((CameraInputController)cameraInputController).camera = worldCamera;
+        }
+
 
     }
 

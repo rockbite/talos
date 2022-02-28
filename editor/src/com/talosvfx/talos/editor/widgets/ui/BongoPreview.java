@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.rockbite.bongo.engine.Bongo;
@@ -15,6 +16,7 @@ import com.rockbite.bongo.engine.EngineBuilder;
 import com.rockbite.bongo.engine.components.render.DepthLayer;
 import com.rockbite.bongo.engine.components.render.ShadedLayer;
 import com.rockbite.bongo.engine.components.render.ShadowLayer;
+import com.rockbite.bongo.engine.components.singletons.Cameras;
 import com.rockbite.bongo.engine.gltf.scene.SceneMaterial;
 import com.rockbite.bongo.engine.gltf.scene.SceneModel;
 import com.rockbite.bongo.engine.gltf.scene.SceneModelInstance;
@@ -75,6 +77,12 @@ public class BongoPreview {
 		Particle particle = edit.create(Particle.class);
 	}
 
+	public void setCamera (Camera camera) {
+		final Cameras cameras = world.getSystem(CameraControllerSystem.class).getCameras();
+		cameras.setGameCamera(camera);
+
+	}
+
 	public void updateParticleInstance (ParticleEffectInstance particleEffectInstance) {
 		final Entity entity = world.getEntity(particleEntityID);
 		entity.getComponent(Particle.class).setParticleEffectInstance(particleEffectInstance);
@@ -114,4 +122,6 @@ public class BongoPreview {
 	public void setCameraController (InputAdapter cameraInputController) {
 		world.getSystem(CameraControllerSystem.class).setCameraController(cameraInputController);
 	}
+
+
 }
