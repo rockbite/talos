@@ -87,7 +87,7 @@ public class Preview3D extends PreviewWidget {
 //        worldCamera.position.set(0, 0, 10);
 //        worldCamera.lookAt(0,0,0);
         worldCamera.near = 0.1f;
-        worldCamera.far = 300f;
+        worldCamera.far = 100f;
         worldCamera.update();
 
         cameraInputController = new CameraInputController(worldCamera);
@@ -221,6 +221,11 @@ public class Preview3D extends PreviewWidget {
     public void drawContent(Batch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
 
+        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+        if (particleEffect != null) {
+            bongoPreview.updateParticleInstance(particleEffect);
+        }
+
         batch.end();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glClearColor(0f, 0f, 0f, 0);
@@ -237,8 +242,8 @@ public class Preview3D extends PreviewWidget {
 //        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 //        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//        Gdx.gl.glEnable(GL20.GL_BLEND);
+//        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 //        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
 //        simple3DBatch.begin(worldCamera, shaderProgram);
@@ -257,8 +262,12 @@ public class Preview3D extends PreviewWidget {
 //            }
 //        }
 
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+
         HdpiUtils.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         bongoPreview.render();
+
+        Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
         batch.begin();
 

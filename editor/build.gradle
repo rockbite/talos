@@ -12,10 +12,10 @@ apply plugin: 'nexus'
 
 
 dependencies {
-    api project(":runtimes:talos-libgdx")
 
     implementation "com.rockbite.bongo:engine"
     implementation "com.rockbite.bongo:desktop"
+    implementation "com.rockbite.bongo:talos"
 
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

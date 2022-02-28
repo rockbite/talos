@@ -128,7 +128,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 		public void act (float delta) {
 			long nano = TimeUtils.nanoTime();
 			super.act(delta);
-			particleEffect.setPosition(getX(), getY());
+			particleEffect.setPosition(getX(), getY(), 0);
 			particleEffect.update(Gdx.graphics.getDeltaTime());
 
 			long diff = TimeUtils.nanoTime() - nano;
