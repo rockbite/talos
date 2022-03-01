@@ -13,12 +13,14 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.IEmitter;
@@ -26,6 +28,8 @@ import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.Particle3DRenderer;
 import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
+
+import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
 
 public class Preview3D extends PreviewWidget {
 
@@ -263,7 +267,41 @@ public class Preview3D extends PreviewWidget {
 
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
 
-        HdpiUtils.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Vector2 temp = new Vector2();
+        Vector2 temp2 = new Vector2();
+
+        temp.set(0, 0);
+        temp2.set(getWidth(), getHeight());
+
+        localToScreenCoordinates(temp);
+        localToScreenCoordinates(temp2);
+
+        temp.y = Gdx.graphics.getHeight() - temp.y;
+        temp2.y = Gdx.graphics.getHeight() - temp2.y;
+
+        int width = (int)(temp2.x - temp.x);
+        int height = (int)(temp2.y - temp.y);
+        int x = (int)temp.x;
+        int y = (int)temp.y;
+
+        RenderPassSystem.glViewport.x = x;
+        RenderPassSystem.glViewport.y = y;
+        RenderPassSystem.glViewport.width = width;
+        RenderPassSystem.glViewport.height = height;
+        HdpiUtils.glViewport(
+            RenderPassSystem.glViewport.x,
+            RenderPassSystem.glViewport.y,
+            RenderPassSystem.glViewport.width,
+            RenderPassSystem.glViewport.height
+        );
+
+        if (worldCamera instanceof PerspectiveCamera) {
+            worldCamera.viewportWidth = glViewport.width;
+            worldCamera.viewportHeight = glViewport.height;
+            worldCamera.update();
+        }
+
+
         bongoPreview.render();
 
         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
