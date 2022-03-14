@@ -134,7 +134,7 @@ public class SEPropertyPanel extends PropertyPanel{
                         gameObject.addComponent(scriptComponent);
                         ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
                         FileHandle currentFolder = projectExplorer.getCurrentFolder();
-                        FileHandle handle = AssetImporter.suggestNewName(currentFolder.path(), "New Script", "js");
+                        FileHandle handle = AssetImporter.suggestNewName(currentFolder.path(), "New Script", "ts");
                         handle.writeString("", false);
                         scriptComponent.setScript(handle);
                         projectExplorer.reload();

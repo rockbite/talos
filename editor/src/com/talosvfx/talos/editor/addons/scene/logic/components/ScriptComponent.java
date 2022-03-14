@@ -17,7 +17,7 @@ public class ScriptComponent extends AComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget widget = new AssetSelectWidget("Script", "js", new Supplier<String>() {
+        AssetSelectWidget widget = new AssetSelectWidget("Script", "ts", new Supplier<String>() {
             @Override
             public String get() {
                 return path;
