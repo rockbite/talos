@@ -1,0 +1,136 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+    dependencies {
+        classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
+        classpath 'org.gretty:gretty:3.0.7'
+    }
+}
+
+apply plugin: "gwt"
+apply plugin: "war"
+apply plugin: "org.gretty"
+
+dependencies {
+
+    implementation "com.rockbite.bongo:engine:sources"
+    implementation "com.rockbite.bongo:talos"
+
+    implementation project(":editor")
+
+    api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1"
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1:sources"
+
+    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
+    implementation "com.kotcrab.vis:vis-ui:$visuiVersion:sources"
+    implementation "info.debatty:java-string-similarity:1.2.1"
+    implementation "info.debatty:java-string-similarity:1.2.1:sources"
+    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
+    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1:sources"
+    implementation "org.yaml:snakeyaml:1.21"
+    implementation "org.yaml:snakeyaml:1.21:sources"
+    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
+    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
+
+}
+
+gwt {
+    gwtVersion='2.8.2' // Should match the gwt version used for building the gwt backend
+    maxHeapSize="1G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
+    minHeapSize="1G"
+
+    src = files(file("src/")) // Needs to be in front of "modules" below.
+    modules 'com.talosvfx.talos.GdxDefinition'
+    devModules 'com.talosvfx.talos.GdxDefinitionSuperdev'
+    project.webAppDirName = 'webapp'
+
+    compiler {
+        strict = true;
+        disableCastChecking = true;
+    }
+}
+
+import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
+import org.akhikhl.gretty.AppBeforeIntegrationTestTask
+
+gretty.httpPort = 8080
+gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
+gretty.contextPath = "/"
+gretty.portPropertiesFileName = "TEMP_PORTS.properties"
+
+task startHttpServer () {
+    dependsOn draftCompileGwt
+
+    doFirst {
+        copy {
+            from "webapp"
+            into gretty.resourceBase
+        }
+
+        copy {
+            from "war"
+            into gretty.resourceBase
+        }
+    }
+}
+
+task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+    // The next line allows ports to be reused instead of
+    // needing a process to be manually terminated.
+    file("build/TEMP_PORTS.properties").delete()
+    // Somewhat of a hack; uses Gretty's support for wrapping a task in
+    // a start and then stop of a Jetty server that serves files while
+    // also running the SuperDev code server.
+    integrationTestTask 'superDev'
+
+    interactive false
+}
+
+task superDev (type: GwtSuperDev) {
+    dependsOn startHttpServer
+    doFirst {
+        gwt.modules = gwt.devModules
+    }
+}
+
+task dist(dependsOn: [clean, compileGwt]) {
+    doLast {
+        file("build/dist").mkdirs()
+        copy {
+            from "build/gwt/out"
+            into "build/dist"
+        }
+        copy {
+            from "webapp"
+            into "build/dist"
+        }
+        copy {
+            from "war"
+            into "build/dist"
+        }
+    }
+}
+
+task addSource {
+    doLast {
+        sourceSets.main.compileClasspath += files(project(':editor').sourceSets.main.allJava.srcDirs)
+    }
+}
+
+tasks.compileGwt.dependsOn(addSource)
+tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
+
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+

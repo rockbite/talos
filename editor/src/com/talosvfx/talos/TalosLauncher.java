@@ -16,9 +16,15 @@
 
 package com.talosvfx.talos;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFWDropCallback;
+
+import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosLauncher {
 	public static void main (String[] arg) {
@@ -35,6 +41,49 @@ public class TalosLauncher {
 
 		ShaderProgram.prependVertexCode = "#version 330 core\n";
 		ShaderProgram.prependFragmentCode = "#version 330 core\n";
+
+//		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+//		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
+//			@Override
+//			public void invoke (long window, int count, long names) {
+//
+//				PointerBuffer namebuffer = memPointerBuffer(names, count);
+//				final String[] filesPaths = new String[count];
+//				for (int i = 0; i < count; i++) {
+//					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
+//					filesPaths[i] = pathToObject;
+//				}
+//
+//				Gdx.app.postRunnable(new Runnable() {
+//					@Override
+//					public void run () {
+//						final int x = Gdx.input.getX();
+//						final int y = Gdx.input.getY();
+//
+//						try {
+//							nodeStage.fileDrop(filesPaths, x, y);
+//							uiStage.fileDrop(filesPaths, x, y);
+//						}  catch (Exception e) {
+//							TalosMain.Instance().reportException(e);
+//						}
+//					}
+//				});
+//			}
+//		});
+
+
+//		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
+//			@Override
+//			public void invoke (long window, boolean focused) {
+//				Gdx.app.postRunnable(new Runnable() {
+//					@Override
+//					public void run () {
+//						TalosMain.focused = focused;
+//					}
+//				});
+//			}
+//		});
+//		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
 
 		new Lwjgl3Application(talos, config);
 	}

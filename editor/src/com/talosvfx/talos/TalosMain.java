@@ -17,7 +17,6 @@
 package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -41,13 +40,6 @@ import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWDropCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
-
-import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
-import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosMain extends ApplicationAdapter {
 
@@ -125,35 +117,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
-		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
-			@Override
-			public void invoke (long window, int count, long names) {
-
-				PointerBuffer namebuffer = memPointerBuffer(names, count);
-				final String[] filesPaths = new String[count];
-				for (int i = 0; i < count; i++) {
-					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
-					filesPaths[i] = pathToObject;
-				}
-
-				Gdx.app.postRunnable(new Runnable() {
-					@Override
-					public void run () {
-						final int x = Gdx.input.getX();
-						final int y = Gdx.input.getY();
-
-						try {
-							nodeStage.fileDrop(filesPaths, x, y);
-							uiStage.fileDrop(filesPaths, x, y);
-						}  catch (Exception e) {
-							TalosMain.Instance().reportException(e);
-						}
-					}
-				});
-			}
-		});
-
 
 		TalosMain.instance = this;
 
@@ -197,18 +160,6 @@ public class TalosMain extends ApplicationAdapter {
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 
 
-		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
-			@Override
-			public void invoke (long window, boolean focused) {
-				Gdx.app.postRunnable(new Runnable() {
-					@Override
-					public void run () {
-						TalosMain.focused = focused;
-					}
-				});
-			}
-		});
-		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
 
 	}
 

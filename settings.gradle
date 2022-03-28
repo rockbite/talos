@@ -1,4 +1,5 @@
 include 'editor'
+include 'editor-web'
 include 'plugins'
 include 'runtimes:talos-libgdx'
 
