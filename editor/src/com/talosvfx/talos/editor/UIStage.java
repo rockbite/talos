@@ -38,7 +38,6 @@ import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
@@ -47,6 +46,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
+import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
@@ -74,7 +75,6 @@ public class UIStage {
 	public PreviewWidget previewWidget;
 	public PreviewImageControllerWidget previewController;
 
-	FileChooser fileChooser;
 	BatchConvertDialog batchConvertDialog;
 	public SettingsDialog settingsDialog;
 
@@ -117,8 +117,6 @@ public class UIStage {
 		constructMenu();
 		constructTabPane();
 		constructSplitPanes();
-
-		initFileChoosers();
 
 		batchConvertDialog = new BatchConvertDialog();
 		settingsDialog = new SettingsDialog();
@@ -250,44 +248,13 @@ public class UIStage {
 		moduleListPopup.showPopup(stage, location);
 	}
 
-	private void initFileChoosers() {
-		fileChooser = new FileChooser(FileChooser.Mode.SAVE);
-		fileChooser.setBackground(skin.getDrawable("window-noborder"));
-	}
-
 
 	public void newProjectAction() {
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 	public void openProjectAction(final IProject projectType) {
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Open", projectType);
-		if(defaultLocation.equals("")) {
-			TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
-		}
-		fileChooser.setDirectory(defaultLocation);
-
-		fileChooser.setMode(FileChooser.Mode.OPEN);
-		fileChooser.setMultiSelectionEnabled(false);
-
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(projectType.getExtension());
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected (Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				TalosMain.Instance().ProjectController().setProject(projectType);
-				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(path));
-			}
-		});
-
-		stage.addActor(fileChooser.fadeIn());
+		FileSystemInteraction.instance().openProject(projectType);
 	}
 
 	public void openProjectAction() {
@@ -311,94 +278,29 @@ public class UIStage {
 	}
 
 	public void exportAsAction() {
-		IProject projectType = TalosMain.Instance().ProjectController().getProject();
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
-		fileChooser.setDirectory(defaultLocation);
-
-		final String ext = projectType.getExportExtension();
-
-		fileChooser.setMode(FileChooser.Mode.SAVE);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected(Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(ext)) {
-					if(path.indexOf(".") > 0) {
-						path = path.substring(0, path.indexOf("."));
-					}
-					path += ext;
-				}
-				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().ProjectController().exportProject(handle);
-			}
-		});
-
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().getCurrentExportNameSuggestion());
-
-		stage.addActor(fileChooser.fadeIn());
+		FileSystemInteraction.instance().export();
 	}
 
 	public void saveAsProjectAction() {
-		IProject projectType = TalosMain.Instance().ProjectController().getProject();
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
-		fileChooser.setDirectory(defaultLocation);
-
-		final String ext = projectType.getExtension();
-		fileChooser.setMode(FileChooser.Mode.SAVE);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected(Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(ext)) {
-					if(path.indexOf(".") > 0) {
-						path = path.substring(0, path.indexOf("."));
-					}
-					path += ext;
-				}
-				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().ProjectController().saveProject(handle);
-			}
-		});
-
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
-
-		stage.addActor(fileChooser.fadeIn());
+		FileSystemInteraction.instance().save();
 	}
 
 
 	public void legacyImportAction() {
-		fileChooser.setMode(FileChooser.Mode.OPEN);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileFilter(new FileChooser.DefaultFileFilter(fileChooser));
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected (Array<FileHandle> file) {
-				TalosMain.Instance().TalosProject().importFromLegacyFormat(file.get(0));
-				TalosMain.Instance().ProjectController().unbindFromFile();
-			}
-		});
-
-		stage.addActor(fileChooser.fadeIn());
+//		fileChooser.setMode(FileChooser.Mode.OPEN);
+//		fileChooser.setMultiSelectionEnabled(false);
+//		fileChooser.setFileFilter(new FileChooser.DefaultFileFilter(fileChooser));
+//		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
+//
+//		fileChooser.setListener(new FileChooserAdapter() {
+//			@Override
+//			public void selected (Array<FileHandle> file) {
+//				TalosMain.Instance().TalosProject().importFromLegacyFormat(file.get(0));
+//				TalosMain.Instance().ProjectController().unbindFromFile();
+//			}
+//		});
+//
+//		stage.addActor(fileChooser.fadeIn());
 	}
 
 	public void legacyBatchConvertAction() {
@@ -593,43 +495,14 @@ public class UIStage {
 		return skin;
 	}
 
-	public void showSaveFileChooser(String extension, FileChooserAdapter listener) {
-		fileChooser.setMode(FileChooser.Mode.SAVE);
-		fileChooser.setMultiSelectionEnabled(false);
-
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(extension);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(listener);
-
-		stage.addActor(fileChooser.fadeIn());
+	public void showSaveFileChooser(String extension, FileChooserListener listener) {
+		FileSystemInteraction.instance().showSaveFileChooser(extension, listener);
 	}
 
-	public void showFileChooser(String extension, FileChooserAdapter listener) {
-		fileChooser.setMode(FileChooser.Mode.OPEN);
-		fileChooser.setMultiSelectionEnabled(false);
-
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(extension);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(listener);
-
-		stage.addActor(fileChooser.fadeIn());
+	public void showFileChooser(String extension, FileChooserListener listener) {
+		FileSystemInteraction.instance().showFileChooser(extension, listener);
 	}
 
-	public void setFileChooserVisibility(boolean visible) {
-		fileChooser.setVisible(visible);
-	}
 
 	public Class<? extends AbstractModule> getPreferred3DVectorClass () {
 		if (isIn3DMode) {

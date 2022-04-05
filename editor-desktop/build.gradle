@@ -16,15 +16,16 @@ plugins {
 
 dependencies {
 
-    implementation "com.rockbite.bongo:engine"
-    implementation "com.rockbite.bongo:talos"
+    implementation project(":editor")
+
+    implementation "com.rockbite.bongo:desktop"
 
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
     implementation "info.debatty:java-string-similarity:1.2.1"
-    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
+    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1:sources"
     implementation "org.yaml:snakeyaml:1.21"
     implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
     implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
@@ -72,8 +73,6 @@ dependencies {
     implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows-x86"
 
 }
-
-sourceCompatibility = "1.8"
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 

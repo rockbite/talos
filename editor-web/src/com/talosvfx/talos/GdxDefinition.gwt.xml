@@ -5,7 +5,12 @@
 	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />
 	<inherits name='com.kotcrab.vis.vis-ui' />
 
-	<inherits name='Talos' />
+	<inherits name='bongo' />
+	<inherits name='bongo-gwt' />
+	<inherits name='bongo-talos' />
+	<inherits name='talos-editor' />
+	<inherits name='com.esotericsoftware.spine' />
+
 	<entry-point class='com.talosvfx.talos.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../editor/assets" />

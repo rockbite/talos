@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://www.gwtproject.org/doctype/2.8.0/gwt-module.dtd">
+<module>
+	<source path="com/talosvfx/talos" />
+	<source path="info/debatty/java" />
+
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.nodes.DynamicNodeStage" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.WorkplaceStage" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.nodes.NodeBoard" />
+
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.wrappers" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.serialization" />
+
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.notifications.events" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.notifications.TalosEvent" />
+
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.widgets" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.widgets.ui" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.widgets.ui.common" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.widgets.ui.timeline" />
+
+
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.modules" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.serialization" />
+	
+</module>

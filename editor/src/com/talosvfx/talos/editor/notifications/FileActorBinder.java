@@ -8,14 +8,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pools;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.FileTracker;
 
-public class FileActorBinder implements Notifications.Observer {
+public class FileActorBinder implements Observer {
 
     private static FileActorBinder instance;
+
 
     private Vector2 vec = new Vector2();
     private ObjectMap<Actor, String> extensionMap = new ObjectMap<>();
@@ -39,15 +40,16 @@ public class FileActorBinder implements Notifications.Observer {
         actor.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showFileChooser(extension, new FileChooserAdapter() {
+                TalosMain.Instance().UIStage().showFileChooser(extension, new FileChooserListener() {
                     @Override
                     public void selected (Array<FileHandle> file) {
-                        String path = file.first().file().getAbsolutePath();
-                        FileHandle handle = Gdx.files.absolute(path);
+//                        String path = file.first().file().getAbsolutePath();
+//                        FileHandle handle = Gdx.files.absolute(path);
 
-                        FileEvent fileEvent = Pools.obtain(FileEvent.class);
-                        fileEvent.setFileHandle(handle);
-                        actor.fire(fileEvent);
+                        //todo, this was messed up
+//                        FileEvent fileEvent = Pools.obtain(FileEvent.class);
+//                        fileEvent.setFileHandle(handle);
+//                        actor.fire(fileEvent);
                     }
                 });
             }

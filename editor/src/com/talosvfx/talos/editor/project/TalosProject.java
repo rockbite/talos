@@ -359,17 +359,6 @@ public class TalosProject implements IProject {
 		return projectAssetProvider;
 	}
 
-	public String getLocalPath() {
-		try {
-			return new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
-					.toURI()).getParent();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
-		return "";
-	}
-
 	public void importFromLegacyFormat(FileHandle fileHandle) {
 		cleanData();
 	}

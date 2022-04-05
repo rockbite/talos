@@ -23,13 +23,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
+import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 
 public class SettingsDialog extends VisWindow {
-
-    FileChooser fileChooser;
 
     public static final String ASSET_PATH = "assetPath";
 
@@ -53,9 +51,6 @@ public class SettingsDialog extends VisWindow {
         invalidate();
 
         centerWindow();
-
-        fileChooser = new FileChooser(FileChooser.Mode.OPEN);
-        fileChooser.setBackground(getSkin().getDrawable("window-noborder"));
 
         for(String key: textFieldMap.keys()) {
             textFieldMap.get(key).setText(TalosMain.Instance().Prefs().getString(key));
@@ -104,18 +99,13 @@ public class SettingsDialog extends VisWindow {
     }
 
     private void showFolderSelect(final String id) {
-        fileChooser.setMode(FileChooser.Mode.OPEN);
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setSelectionMode(FileChooser.SelectionMode.DIRECTORIES);
-
-        fileChooser.setListener(new FileChooserAdapter() {
+        FileSystemInteraction.instance().showFolderChooser(new FileChooserListener() {
             @Override
-            public void selected (Array<FileHandle> file) {
-                textFieldMap.get(id).setText(file.get(0).path());
+            public void selected (Array<FileHandle> files) {
+                textFieldMap.get(id).setText(files.get(0).path());
             }
         });
 
-        getStage().addActor(fileChooser.fadeIn());
     }
 
     private void save() {

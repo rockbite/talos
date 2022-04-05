@@ -1,9 +1,9 @@
 package com.talosvfx.talos.editor.notifications.events;
 
 import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class NodeConnectionRemovedEvent implements Notifications.Event {
+public class NodeConnectionRemovedEvent implements TalosEvent {
 
     private NodeBoard.NodeConnection connection;
 

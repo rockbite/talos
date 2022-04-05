@@ -12,16 +12,33 @@ buildscript {
     }
 }
 
+
+apply plugin: "java-library"
 apply plugin: "gwt"
 apply plugin: "war"
 apply plugin: "org.gretty"
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+    gradlePluginPortal()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    google()
+}
+
+
 dependencies {
 
-    implementation "com.rockbite.bongo:engine:sources"
-    implementation "com.rockbite.bongo:talos"
+    implementation project(path: ":editor")
+    implementation project(path: ":editor", configuration: "web")
 
-    implementation project(":editor")
+    implementation "com.rockbite.bongo:engine:1.0-SNAPSHOT"
+    implementation "com.rockbite.bongo:engine:1.0-SNAPSHOT:web"
+    implementation "com.rockbite.bongo:web:1.0-SNAPSHOT"
+    implementation "com.rockbite.bongo:web:1.0-SNAPSHOT:web"
+    implementation "com.rockbite.bongo:talos:1.0-SNAPSHOT"
+    implementation "com.rockbite.bongo:talos:1.0-SNAPSHOT:web"
+
 
     api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
     api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"

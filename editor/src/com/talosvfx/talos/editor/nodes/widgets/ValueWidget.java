@@ -286,7 +286,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         String text = "";
         if (step < 1) {
-            text = String.format("%.3f", value);
+            text = value + ""; //todo format in gwt friendly way
         } else if (step == 1) {
             text = Math.round(value) + "";
         }

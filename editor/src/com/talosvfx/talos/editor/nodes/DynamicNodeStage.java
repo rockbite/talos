@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.WorkplaceStage;
@@ -44,7 +45,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
             @Override
             public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
-                if(NodeWidget.class.isAssignableFrom(clazz)) {
+                if(ClassReflection.isAssignableFrom(NodeWidget.class, clazz)) {
                     NodeWidget node = createNode(module.getAttribute("name"), x, y);
                     if(node != null) {
                         node.constructNode(module);

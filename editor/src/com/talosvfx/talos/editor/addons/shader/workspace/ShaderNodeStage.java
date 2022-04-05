@@ -4,18 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.nodes.AbstractShaderNode;
 import com.talosvfx.talos.editor.addons.shader.nodes.SampleTextureNode;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
@@ -27,9 +24,8 @@ import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 
-public class ShaderNodeStage extends DynamicNodeStage implements Notifications.Observer {
+public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
     private ColorOutput colorOutput;
 
@@ -290,7 +286,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
             frameIndex++;
             if(pixmap != null) {
                 FileHandle file = Gdx.files.absolute(exportSequencePayload.path + File.separator + exportSequencePayload.name + frameIndex + ".png");
-                PixmapIO.writePNG(file, pixmap);
+//                PixmapIO.writePNG(file, pixmap);
                 pixmap.dispose();
             }
         }

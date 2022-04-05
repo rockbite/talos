@@ -1,9 +1,9 @@
 package com.talosvfx.talos.editor.notifications.events;
 
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class NodeCreatedEvent implements Notifications.Event {
+public class NodeCreatedEvent implements TalosEvent {
 
     NodeWidget node;
 

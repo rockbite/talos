@@ -11,11 +11,11 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.shader.dialogs.ExportSequenceDialog;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -116,7 +116,7 @@ public class ShaderAddon implements IAddon {
                 super.clicked(event, x, y);
                 // export RAW logic
 
-                TalosMain.Instance().UIStage().showSaveFileChooser(".frag", new FileChooserAdapter() {
+                TalosMain.Instance().UIStage().showSaveFileChooser(".frag", new FileChooserListener() {
                     @Override
                     public void selected (Array<FileHandle> files) {
                         String fragShader = ((ShaderNodeStage)(nodeStage)).getFragShader();
@@ -135,13 +135,13 @@ public class ShaderAddon implements IAddon {
                 super.clicked(event, x, y);
                 // export RAW logic
 
-                TalosMain.Instance().UIStage().showSaveFileChooser(".png", new FileChooserAdapter() {
+                TalosMain.Instance().UIStage().showSaveFileChooser(".png", new FileChooserListener() {
                     @Override
                     public void selected (Array<FileHandle> files) {
                         FileHandle file = files.get(0);
                         Pixmap pixmap = ((ShaderNodeStage)(nodeStage)).exportPixmap();
                         if(pixmap != null) {
-                            PixmapIO.writePNG(file, pixmap);
+//                            PixmapIO.writePNG(file, pixmap);
                             pixmap.dispose();
                         }
                     }

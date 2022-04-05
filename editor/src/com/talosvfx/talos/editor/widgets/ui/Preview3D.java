@@ -34,7 +34,7 @@ import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
 public class Preview3D extends PreviewWidget {
 
     private final ShaderProgram shaderProgram;
-    private final TinyGizmoRenderer tinyGizmoRenderer;
+//    private final TinyGizmoRenderer tinyGizmoRenderer;
     private final BongoPreview bongoPreview;
     //Controls
     private InputAdapter cameraInputController;
@@ -85,7 +85,7 @@ public class Preview3D extends PreviewWidget {
 //        particleRenderer = new Particle3DRenderer(worldCamera);
 
 
-        tinyGizmoRenderer = new TinyGizmoRenderer();
+//        tinyGizmoRenderer = new TinyGizmoRenderer();
 
         bongoPreview = new BongoPreview();
         worldCamera = bongoPreview.getWorldCamera();
@@ -110,47 +110,47 @@ public class Preview3D extends PreviewWidget {
         addListener(new InputListener() {
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
-                tinyGizmoRenderer.getInputAdapter().keyDown(keycode);
+//                tinyGizmoRenderer.getInputAdapter().keyDown(keycode);
 
                 return super.keyDown(event, keycode);
             }
 
             @Override
             public boolean keyUp (InputEvent event, int keycode) {
-                tinyGizmoRenderer.getInputAdapter().keyUp(keycode);
+//                tinyGizmoRenderer.getInputAdapter().keyUp(keycode);
                 return super.keyUp(event, keycode);
             }
 
             @Override
             public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return true;
+//                final boolean interacted = tinyGizmoRenderer.getInteracted();
+//                if (interacted) return true;
                 cameraInputController.scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tinyGizmoRenderer.getInputAdapter().touchDown((int)x, (int)y, pointer, button);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return true;
+//                tinyGizmoRenderer.getInputAdapter().touchDown((int)x, (int)y, pointer, button);
+//                final boolean interacted = tinyGizmoRenderer.getInteracted();
+//                if (interacted) return true;
                 cameraInputController.touchDown((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
                 return !event.isHandled();
             }
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                tinyGizmoRenderer.getInputAdapter().touchUp((int)x, (int)y, pointer, button);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return;
+//                tinyGizmoRenderer.getInputAdapter().touchUp((int)x, (int)y, pointer, button);
+//                final boolean interacted = tinyGizmoRenderer.getInteracted();
+//                if (interacted) return;
                 cameraInputController.touchUp((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                tinyGizmoRenderer.getInputAdapter().touchDragged((int)x, (int)y, pointer);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return;
+//                tinyGizmoRenderer.getInputAdapter().touchDragged((int)x, (int)y, pointer);
+//                final boolean interacted = tinyGizmoRenderer.getInteracted();
+//                if (interacted) return;
                 cameraInputController.touchDragged((int)x, Gdx.graphics.getHeight() - (int)y, pointer);
             }
 
@@ -306,7 +306,7 @@ public class Preview3D extends PreviewWidget {
 
         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
-        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
+//        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
         for (DragPoint dragPoint : dragPoints) {
             if (dragPoint.changed) {
                 dragPointProvider.dragPointChanged(dragPoint);

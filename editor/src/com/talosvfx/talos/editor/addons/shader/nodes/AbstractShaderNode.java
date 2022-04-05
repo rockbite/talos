@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -20,7 +21,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
-public abstract class AbstractShaderNode extends NodeWidget implements Notifications.Observer {
+public abstract class AbstractShaderNode extends NodeWidget implements Observer {
 
     protected ShaderBuilder previewBuilder = new ShaderBuilder();
 

@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-import java.awt.*;
 
 public class SelectWidget extends AbstractWidget<String> {
 

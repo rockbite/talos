@@ -7,14 +7,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
+import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 
 public class ExportSequenceDialog extends VisWindow {
 
     private final ShaderNodeStage nodeStage;
-    FileChooser fileChooser;
     private TextField fileName;
     private TextField inputPathField;
     private TextField widthField;
@@ -41,9 +40,6 @@ public class ExportSequenceDialog extends VisWindow {
         invalidate();
 
         centerWindow();
-
-        fileChooser = new FileChooser(FileChooser.Mode.OPEN);
-        fileChooser.setBackground(getSkin().getDrawable("window-noborder"));
     }
 
     private Table makeRow(String labelText, Actor field) {
@@ -95,18 +91,12 @@ public class ExportSequenceDialog extends VisWindow {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
 
-                fileChooser.setMode(FileChooser.Mode.OPEN);
-                fileChooser.setMultiSelectionEnabled(false);
-                fileChooser.setSelectionMode(FileChooser.SelectionMode.DIRECTORIES);
-
-                fileChooser.setListener(new FileChooserAdapter() {
+                FileSystemInteraction.instance().showFolderChooser(new FileChooserListener() {
                     @Override
-                    public void selected (Array<FileHandle> file) {
-                        inputPathField.setText(file.get(0).path());
+                    public void selected (Array<FileHandle> files) {
+                        inputPathField.setText(files.get(0).path());
                     }
                 });
-
-                getStage().addActor(fileChooser.fadeIn());
             }
         });
 

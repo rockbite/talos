@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
@@ -31,7 +32,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
-public class NodeBoard extends WidgetGroup implements Notifications.Observer {
+public class NodeBoard extends WidgetGroup implements Observer {
 
     private Skin skin;
 

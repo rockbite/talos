@@ -1,11 +1,9 @@
 package com.talosvfx.talos.editor.notifications.events;
 
-import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
-import com.talosvfx.talos.editor.addons.shader.nodes.ColorNode;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class NodeDataModifiedEvent implements Notifications.Event {
+public class NodeDataModifiedEvent implements TalosEvent {
     private NodeWidget node;
 
     @Override
