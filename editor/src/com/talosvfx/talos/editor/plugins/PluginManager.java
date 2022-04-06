@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -194,12 +195,13 @@ public class PluginManager {
                 System.out.println("Skipping invalid plugin: No plugin.yaml found for : " + pluginJar.name());
             }
 
-        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException | ReflectionException e) {
             e.printStackTrace();
         }
     }
 
-    private void registerPluginsForPluginDefinition (PluginDefinition pluginDefinition, Class<? extends TalosPluginProvider> providerClazz, HashMap<String, Class<?>> classes) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+    private void registerPluginsForPluginDefinition (PluginDefinition pluginDefinition, Class<? extends TalosPluginProvider> providerClazz, HashMap<String, Class<?>> classes) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException,
+        ReflectionException {
         TalosPluginProvider talosPluginProvider = providerClazz.newInstance();
         talosPluginProvider.setPluginDefinition(pluginDefinition);
         talosPluginProvider.loadPlugins(classes);

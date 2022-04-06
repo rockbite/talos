@@ -71,7 +71,7 @@ gwt {
     project.webAppDirName = 'webapp'
 
     compiler {
-        strict = true;
+        strict = false;
         disableCastChecking = true;
     }
 }

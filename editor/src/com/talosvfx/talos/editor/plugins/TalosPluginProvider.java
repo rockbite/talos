@@ -1,10 +1,11 @@
 package com.talosvfx.talos.editor.plugins;
 
 
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Constructor;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -53,13 +54,13 @@ public abstract class TalosPluginProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public void loadPlugins (HashMap<String, Class<?>> classes) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    public void loadPlugins (HashMap<String, Class<?>> classes) throws ReflectionException {
         for (String plugin : pluginDefinition.plugins) {
             if (!classes.containsKey(plugin)) {
                 System.out.println("Ignoring plugin: " + plugin + " as not found");
             } else {
                 Class<?> pluginClazz = classes.get(plugin);
-                if (TalosPlugin.class.isAssignableFrom(pluginClazz)) {
+                if (ClassReflection.isAssignableFrom(TalosPlugin.class, pluginClazz)) {
                     loadPlugin((Class<? extends TalosPlugin<?>>) pluginClazz);
                 } else {
                     System.out.println("Ignoring plugin: " + plugin + " as does not extend " + TalosPlugin.class.getName());
@@ -71,7 +72,7 @@ public abstract class TalosPluginProvider {
                 System.out.println("Ignoring custom NodeWidget: " + customNode + " as not found");
             } else {
                 Class<?> pluginClazz = classes.get(customNode);
-                if (NodeWidget.class.isAssignableFrom(pluginClazz)) {
+                if (ClassReflection.isAssignableFrom(NodeWidget.class, pluginClazz)) {
                     customNodeWidgets.put(customNode, (Class<? extends NodeWidget>) pluginClazz);
                 } else {
                     System.out.println("Ignoring custom NodeWidget: " + customNode + " as does not extend " + TalosPlugin.class.getName());
@@ -80,9 +81,9 @@ public abstract class TalosPluginProvider {
         }
     }
 
-    private void loadPlugin (Class<? extends TalosPlugin<?>> talosPluginClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor<? extends TalosPlugin<?>> constructor = talosPluginClass.getConstructor(getClass());
-        TalosPlugin<?> talosPlugin = constructor.newInstance(this);
+    private void loadPlugin (Class<? extends TalosPlugin<?>> talosPluginClass) throws ReflectionException {
+        final Constructor constructor = ClassReflection.getConstructor(getClass());
+        TalosPlugin<?> talosPlugin = (TalosPlugin<?>)constructor.newInstance(this);
         plugins.add(talosPlugin);
     }
 
