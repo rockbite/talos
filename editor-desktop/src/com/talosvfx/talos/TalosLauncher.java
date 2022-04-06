@@ -37,10 +37,15 @@ public class TalosLauncher {
 
 		TalosMain talos = new TalosMain();
 
-		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+		boolean gl3 = false;
 
-		ShaderProgram.prependVertexCode = "#version 330 core\n";
-		ShaderProgram.prependFragmentCode = "#version 330 core\n";
+		if (gl3) {
+			config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+
+			ShaderProgram.prependVertexCode = "#version 330 core\n";
+			ShaderProgram.prependFragmentCode = "#version 330 core\n";
+		}
+		
 
 //		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
 //		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {

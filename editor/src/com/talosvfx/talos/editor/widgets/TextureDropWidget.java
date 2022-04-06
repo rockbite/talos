@@ -16,12 +16,20 @@
 
 package com.talosvfx.talos.editor.widgets;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.UIStage;
+import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
 public class TextureDropWidget<F extends AbstractModule> extends Table {
@@ -48,6 +56,34 @@ public class TextureDropWidget<F extends AbstractModule> extends Table {
 
         add(stack).size(width);
 
+        stack.setTouchable(Touchable.enabled);
+        stack.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                imageClicked();
+            }
+        });
+    }
+
+    public void imageClicked () {
+        final UIStage uistage = TalosMain.Instance().UIStage();
+        final Stage stage = uistage.getStage();
+
+        uistage.temporaryTextureDialog.setListener(new TemporaryTextureSelectDialog.OnTextureSelected() {
+            @Override
+            public void onSelected (TemporaryTextureSelectDialog.TextureSelection textureSelection) {
+                onTextureSelected(textureSelection);
+            }
+        });
+
+        stage.addActor(uistage.temporaryTextureDialog.fadeIn());
+
+    }
+
+    public void onTextureSelected (TemporaryTextureSelectDialog.TextureSelection textureSelection) {
+        final Texture texture = textureSelection.getTexture();
+        setDrawable(new TextureRegionDrawable(new TextureRegion(texture)));
     }
 
     public void setDrawable(TextureRegionDrawable textureRegionDrawable) {

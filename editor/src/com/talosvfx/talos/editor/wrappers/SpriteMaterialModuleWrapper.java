@@ -21,8 +21,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
@@ -58,7 +60,15 @@ public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<Sprite
 
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
 
-        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin()) {
+            @Override
+            public void onTextureSelected (TemporaryTextureSelectDialog.TextureSelection textureSelection) {
+                super.onTextureSelected(textureSelection);
+                final Texture texture = textureSelection.getTexture();
+                final Sprite sprite = new Sprite(texture);
+                setModuleRegion(textureSelection.getInternalAssetPath(), sprite);
+            }
+        };
 
         addOutputSlot("output", MaterialModule.MATERIAL_MODULE);
 

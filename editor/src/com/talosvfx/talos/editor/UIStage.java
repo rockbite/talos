@@ -46,6 +46,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -77,6 +78,7 @@ public class UIStage {
 
 	BatchConvertDialog batchConvertDialog;
 	public SettingsDialog settingsDialog;
+	public TemporaryTextureSelectDialog temporaryTextureDialog;
 
 	ColorPicker colorPicker;
 
@@ -120,6 +122,7 @@ public class UIStage {
 
 		batchConvertDialog = new BatchConvertDialog();
 		settingsDialog = new SettingsDialog();
+		temporaryTextureDialog = new TemporaryTextureSelectDialog();
 
 		FileHandle list = Gdx.files.internal("modules.xml");
 		XmlReader xmlReader = new XmlReader();
