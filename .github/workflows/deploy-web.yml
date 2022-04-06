@@ -27,4 +27,4 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
 
       - name: Deploy with rsync
-        run: rsync -avz ./editor-web/build/dist/ ${{ secrets.SSH_SERVER_USER }}@${{ secrets.SSH_SERVER }}:/opt/talostemp/
+        run: rsync -avz ./editor-web/build/dist/ ${{ secrets.SSH_SERVER_USER }}@${{ secrets.SSH_SERVER }}:/var/www/editor
