@@ -1,0 +1,7 @@
+name: Deploy
+on: [push]
+jobs:
+  Build-Web:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./gradlew editor-web:dist
