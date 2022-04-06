@@ -119,8 +119,6 @@ public class TalosMain extends ApplicationAdapter {
 	@Override
 	public void create () {
 
-		new GLProfiler(Gdx.graphics).enable();
-
 		TalosMain.instance = this;
 
 		screenshotService = new ScreenshotService();
