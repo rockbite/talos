@@ -10,4 +10,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - run: ./gradlew editor-web:dist
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew editor-web:dist
