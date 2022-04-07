@@ -1,54 +1,49 @@
 package com.talosvfx.talos.runtime.test;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglFrame;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.rockbite.bongo.engine.render.AutoReloadingShaderProgram;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.render.Particle3DRenderer;
+import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 
-public class TalosDemo extends ApplicationAdapter {
+public class Talos3DDemo extends ApplicationAdapter {
 
     private Viewport viewport;
-    private PolygonSpriteBatch batch;
+    private PerspectiveCamera camera;
     private ParticleEffectInstance effect;
 
-    private SpriteBatchParticleRenderer defaultRenderer;
+    private Particle3DRenderer defaultRenderer;
+
+    private AutoReloadingShaderProgram shaderProgram;
 
     public static void main (String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 400;
         config.height = 400;
         config.title = "Talos Demo";
-        LwjglFrame frame = new LwjglFrame(new TalosDemo(), config);
+        LwjglFrame frame = new LwjglFrame(new Talos3DDemo(), config);
     }
 
     @Override
     public void create() {
-        /**
-         * We need a viewport for proper camerawork
-         */
-        viewport = new FitViewport(10f, 10f);
+        camera = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport = new FitViewport(10f, 10f, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 
-        /**
-         * We may need polygon sprite batch to render more complex VFX such us beams
-         */
-        batch = new PolygonSpriteBatch();
 
-        /**
-         * Prepare the texture atlas.
-         * Normally just load Texture Atlas,  but for the sake of demo this will be creating fake atlas from just one texture.
-         */
         TextureRegion textureRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
         TextureAtlas textureAtlas = new TextureAtlas();
         textureAtlas.addRegion("fire", textureRegion);
@@ -59,8 +54,9 @@ public class TalosDemo extends ApplicationAdapter {
         ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("fire.p"), textureAtlas);
         effect = effectDescriptor.createEffectInstance();
 
-        defaultRenderer = new SpriteBatchParticleRenderer(viewport.getCamera());
-        defaultRenderer.setBatch(batch);
+        defaultRenderer = new Particle3DRenderer(camera);
+
+        shaderProgram = new AutoReloadingShaderProgram(ShaderSourceProvider.resolveVertex("core/particle", Files.FileType.Classpath), ShaderSourceProvider.resolveFragment("core/particle", Files.FileType.Classpath));
 
     }
 
@@ -73,11 +69,11 @@ public class TalosDemo extends ApplicationAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(viewport.getCamera().projection);
-
-        batch.begin();
+        final Simple3DBatch batch = defaultRenderer.getBatch();
+        batch.begin(camera, shaderProgram.getShaderProgram());
         effect.render(defaultRenderer);
         batch.end();
+
     }
 
     @Override
