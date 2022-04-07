@@ -40,7 +40,6 @@ public class BongoPreview {
 	private final int particleEntityID;
 
 	public BongoPreview () {
-		Bongo.DEBUG = true;
 		Bongo.init();
 
 		ShaderProgram.pedantic = false;
@@ -60,15 +59,7 @@ public class BongoPreview {
 		};
 
 		world = EngineBuilder.buildWorld(userSystems);
-
-
-		//floor
-		final SceneModelInstance floor = createBox("Floor", Color.WHITE, 20, 1, 20, 0.5f, 0.2f);
-		floor.getTransform().setToTranslation(0, -1f, 0);
-
-		//Box
-		SceneModelInstance box = createBox("Box", Color.RED, 1, 1, 1, 0.0f, 0.4f);
-		box.getTransform().setToTranslation(3, 1f, 0);
+		world.getSystem(EngineDebugSystem.class).setDrawUnitSquare(false);
 
 
 		//Particle

@@ -125,7 +125,7 @@ public class Preview3D extends PreviewWidget {
             public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
 //                final boolean interacted = tinyGizmoRenderer.getInteracted();
 //                if (interacted) return true;
-                cameraInputController.scrolled(amountX, amountY);
+                if (cameraInputController.scrolled(amountX, amountY)) return true;
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
