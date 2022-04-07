@@ -10,10 +10,11 @@ varying vec4 v_color;
 varying vec2 v_texCoords;
 varying float v_texture_index;
 
-void main () {
+void main()
+{
     v_color = a_color;
+    v_color.a = v_color.a * (256.0/255.0);
     v_texCoords = a_texCoord0;
     v_texture_index = texture_index;
-
-    gl_Position = u_projTrans * a_position;
+    gl_Position =  u_projTrans * a_position;
 }

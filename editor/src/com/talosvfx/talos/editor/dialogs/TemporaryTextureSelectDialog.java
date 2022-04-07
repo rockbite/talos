@@ -90,10 +90,15 @@ public class TemporaryTextureSelectDialog extends VisWindow {
 
         Table subTable = new Table();
 
+        String[] inbuilt = new String[] {
+            "fire.png",
+            "spot.png"
+        };
+
         int elementsPerRow = 4;
         int counter = 0;
-        for (int i = 0; i < 10; i++) {
-            final TextureSelection textureSelection = new TextureSelection("icon/icon.png");
+        for (int i = 0; i < inbuilt.length; i++) {
+            final TextureSelection textureSelection = new TextureSelection(inbuilt[i]);
             selection.add(textureSelection);
             textureSelection.addListener(new ClickListener() {
                 @Override

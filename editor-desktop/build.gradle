@@ -20,6 +20,9 @@ dependencies {
 
     implementation "com.rockbite.bongo:desktop"
 
+    implementation "ch.qos.logback:logback-core:1.2.3"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"

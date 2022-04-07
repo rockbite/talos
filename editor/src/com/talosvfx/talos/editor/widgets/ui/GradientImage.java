@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -24,11 +25,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.ShaderSourceProvider;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.runtime.values.ColorPoint;
 
 public class GradientImage extends Actor {
 
-    ShaderProgram shaderProgram;
+    ShaderProgram gradientShader;
 
     Skin skin;
 
@@ -47,8 +51,12 @@ public class GradientImage extends Actor {
     public GradientImage(Skin skin) {
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
         this.skin = skin;
-        shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/ui/gradient.vert"), Gdx.files.internal("shaders/ui/gradient.frag"));
-        //System.out.println(shaderProgram.getLog());
+
+        final FileHandle vertexSource = ShaderSourceProvider.resolveVertex("ui/gradient");
+        final FileHandle fragmentSource = ShaderSourceProvider.resolveFragment("ui/gradient");
+
+        gradientShader = SpriteShaderCompiler.getOrCreateShader("ui/gradient", vertexSource, fragmentSource, new ShaderFlags());
+
     }
 
     public void setPoints(Array<ColorPoint> points) {
@@ -73,20 +81,21 @@ public class GradientImage extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         ShaderProgram prevShader = batch.getShader();
-        batch.setShader(shaderProgram);
 
-        shaderProgram.setUniformi(U_POINT_COUNT, points.size);
+        batch.setShader(gradientShader);
+
+        gradientShader.setUniformi(U_POINT_COUNT, points.size);
 
         for(int i = 0; i < points.size; i++){
             ColorPoint point = points.get(i);
 
             stringBuilder.clear();
             stringBuilder.append(U_ARR_NAME).append(i).append(U_PARAM_COLOR);
-            shaderProgram.setUniformf(stringBuilder.toString(), point.color.r, point.color.g, point.color.b, 1f);
+            gradientShader.setUniformf(stringBuilder.toString(), point.color.r, point.color.g, point.color.b, 1f);
 
             stringBuilder.clear();
             stringBuilder.append(U_ARR_NAME).append(i).append(U_PARAM_ALPHA);
-            shaderProgram.setUniformf(stringBuilder.toString(), point.pos);
+            gradientShader.setUniformf(stringBuilder.toString(), point.pos);
         }
 
         // do the rendering
@@ -94,4 +103,5 @@ public class GradientImage extends Actor {
 
         batch.setShader(prevShader);
     }
+
 }

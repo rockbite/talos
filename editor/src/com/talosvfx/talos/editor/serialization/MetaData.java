@@ -97,7 +97,11 @@ public class MetaData implements Json.Serializable {
         TalosMain.Instance().UIStage().PreviewWidget().setGridVisible(jsonData.getBoolean("isGridVisible", true));
         TalosMain.Instance().UIStage().PreviewWidget().setImageIsBackground(jsonData.getBoolean("bgImageIsInBack", true));
         TalosMain.Instance().UIStage().PreviewWidget().setBgImageSize(jsonData.getFloat("bgImageSize", 10));
-        TalosMain.Instance().UIStage().PreviewWidget().setGridSize(jsonData.getFloat("gridSize", 1));
+        float gridSize = jsonData.getFloat("gridSize", 1);
+        if (gridSize == 0) {
+            gridSize = 1;
+        }
+        TalosMain.Instance().UIStage().PreviewWidget().setGridSize(gridSize);
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
 
         // particle position

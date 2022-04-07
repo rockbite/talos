@@ -33,13 +33,10 @@ import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
 
 public class Preview3D extends PreviewWidget {
 
-    private final ShaderProgram shaderProgram;
 //    private final TinyGizmoRenderer tinyGizmoRenderer;
     private final BongoPreview bongoPreview;
     //Controls
     private InputAdapter cameraInputController;
-
-    private Particle3DRenderer particleRenderer;
 
     //Render
     public Camera worldCamera;
@@ -47,8 +44,6 @@ public class Preview3D extends PreviewWidget {
     private Array<Model> models;
     private ModelInstance xyzInstance, xzPlaneInstance, xyPlaneInstance;
     private Environment environment;
-    private ModelBatch modelBatch;
-    private Simple3DBatch simple3DBatch;
 
     private IDragPointProvider dragPointProvider;
     private Array<DragPoint> dragPoints = new Array<>();
@@ -58,11 +53,8 @@ public class Preview3D extends PreviewWidget {
         super(previewImageControllerWidget);
         cameraController.scrollOnly = true;
 
-        int w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-        modelBatch = new ModelBatch();
         environment = new Environment();
         environment.add(new DirectionalLight().set(Color.WHITE, 0,0,-1));
-
 
 
         models = new Array<Model>();
@@ -78,12 +70,6 @@ public class Preview3D extends PreviewWidget {
 
         setDrawXYZ(true);
         setDrawXZPlane(true);
-
-        simple3DBatch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
-        shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/3d/vert.glsl"), Gdx.files.internal("shaders/3d/frag.glsl"));
-
-//        particleRenderer = new Particle3DRenderer(worldCamera);
-
 
 //        tinyGizmoRenderer = new TinyGizmoRenderer();
 
