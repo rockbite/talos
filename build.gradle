@@ -2,9 +2,6 @@ allprojects {
 
     apply plugin: "java-library"
 
-    if (!project.hasProperty("release")) {
-        version += "-SNAPSHOT"
-    }
 
     ext {
         appName = "talos"
@@ -12,7 +9,16 @@ allprojects {
         freetypeGwtVersion = '1.11.1-SNAPSHOT'
         lwjgl3Version = '3.3.0-SNAPSHOT'
         visuiVersion = '1.5.0'
+
+        isReleaseBuild = {
+            return project.hasProperty("RELEASE")
+        }
     }
+
+    if (isReleaseBuild) {
+        version += "-SNAPSHOT"
+    }
+
 
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"

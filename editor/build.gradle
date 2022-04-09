@@ -19,9 +19,6 @@ dependencies {
 
     implementation libs.tiny.gizmo
 
-//    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
-//    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
-
 }
 
 

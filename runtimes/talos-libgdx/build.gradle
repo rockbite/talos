@@ -14,6 +14,13 @@ sourceSets.test.java.srcDirs = ["test/"]
 
 
 publishing {
+    repositories {
+        maven {
+            def repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            url = isReleaseBuild ? repositoryUrl : snapshotRepositoryUrl
+        }
+    }
     publications {
         maven(MavenPublication) {
             artifactId = 'talos-libgdx'

@@ -1,4 +1,4 @@
-name: Deploy Web
+name: Deploy Desktop
 on:
   push:
     branches:
@@ -18,7 +18,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew editor-web:dist
+        run: ./gradlew editor-desktop:dist
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
@@ -30,4 +30,4 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
 
       - name: Deploy with rsync
-        run: rsync -avz ./editor-web/build/dist/ ${{ secrets.SSH_SERVER_USER }}@${{ secrets.SSH_SERVER }}:/var/www/editor
+        run: rsync -avz ./editor-desktop/build/libs/ ${{ secrets.SSH_SERVER_USER }}@${{ secrets.SSH_SERVER }}:/var/www/editor/editor-binaries
