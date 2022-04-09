@@ -18,41 +18,33 @@ publishing {
         maven(MavenPublication) {
             artifactId = 'talos-libgdx'
             from components.java
+            pom {
+                name = "Talos Libgdx Runtime"
+                description = "Talos runtime for use in LibGDX projects"
+                url = "https://github.com/rockbite/talos"
+                licenses {
+                    license {
+                        name = "The Apache Software License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "Tom-Ski"
+                        name = "Tom Wojciechowski"
+                        email = "tom@asidik.com"
+                    }
+                    developer {
+                        id = "azakhary"
+                        name = "Avetis Zakharyan"
+                    }
+                    scm {
+                        url = "https://github.com/rockbite/talos"
+                        connection = "scm:https://rockbite@github.com/rockbite/talos.git"
+                        developerConnection = "scm:git://github.com/rockbite/talos.git"
+                    }
+                }
+            }
         }
     }
 }
-
-
-//modifyPom {
-//    project {
-//        name "Talos Libgdx Runtime"
-//        description "Talos runtime for use in LibGDX projects"
-//        url "https://github.com/rockbite/talos"
-//        inceptionYear "2019"
-//
-//        scm {
-//            url "https://github.com/rockbite/talos"
-//            connection "scm:https://rockbite@github.com/rockbite/talos.git"
-//            developerConnection "scm:git://github.com/rockbite/talos.git"
-//        }
-//
-//        licenses {
-//            license {
-//                name "The Apache Software License, Version 2.0"
-//                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-//                distribution "repo"
-//            }
-//        }
-//
-//        developers {
-//            developer {
-//                id "Tom-Ski"
-//                name "Tom Wojciechowsk"
-//            }
-//            developer {
-//                id "azakhary"
-//                name "Avetis Zakharyan"
-//            }
-//        }
-//    }
-//}
