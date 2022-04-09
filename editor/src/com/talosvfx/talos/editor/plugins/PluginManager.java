@@ -2,8 +2,6 @@ package com.talosvfx.talos.editor.plugins;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -233,28 +231,6 @@ public class PluginManager {
             }
         }
         return null;
-    }
-
-
-    public static void main (String[] args) {
-        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        new Lwjgl3Application(new ApplicationAdapter() {
-            @Override
-            public void create () {
-
-                PluginManager pluginManager = new PluginManager();
-                pluginManager.loadInternalPlugins();
-
-                TalosPlugin testPlugin = pluginManager.findPlugin("com.talosvfx.talos.plugins.TestPlugin");
-
-                if (testPlugin != null) {
-                    TalosPluginProvider provider = testPlugin.getProvider();
-                } else {
-                    System.out.println("No plugin found");
-                }
-
-            }
-        }, config);
     }
 
 }

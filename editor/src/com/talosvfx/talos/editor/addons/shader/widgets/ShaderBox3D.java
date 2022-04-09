@@ -1,26 +1,15 @@
 package com.talosvfx.talos.editor.addons.shader.widgets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.audio.Wav;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.utils.WavefrontReader;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 public class ShaderBox3D extends ShaderBox {
