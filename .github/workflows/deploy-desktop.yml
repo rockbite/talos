@@ -2,7 +2,7 @@ name: Deploy Desktop
 on:
   push:
     branches:
-      - gwt
+      - talos-3d
 jobs:
   Build-Web:
     runs-on: ubuntu-latest
