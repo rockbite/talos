@@ -12,19 +12,9 @@ buildscript {
     }
 }
 
-
-apply plugin: "java-library"
 apply plugin: "gwt"
 apply plugin: "war"
 apply plugin: "org.gretty"
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    gradlePluginPortal()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    google()
-}
 
 
 dependencies {
@@ -32,32 +22,16 @@ dependencies {
     implementation project(path: ":editor")
     implementation project(path: ":editor", configuration: "web")
 
-    implementation "com.rockbite.bongo:engine:1.0-SNAPSHOT"
-    implementation "com.rockbite.bongo:engine:1.0-SNAPSHOT:web"
-    implementation "com.rockbite.bongo:web:1.0-SNAPSHOT"
-    implementation "com.rockbite.bongo:web:1.0-SNAPSHOT:web"
-    implementation "com.rockbite.bongo:talos:1.0-SNAPSHOT"
-    implementation "com.rockbite.bongo:talos:1.0-SNAPSHOT:web"
+    api variantOf(libs.bongo.engine) { classifier("web") }
+    api variantOf(libs.bongo.talos) { classifier("web") }
+    api libs.bongo.web
+    api variantOf(libs.bongo.web) { classifier("web") }
 
-
-    api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-
-    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1"
-    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1:sources"
-
-    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
-    implementation "com.kotcrab.vis:vis-ui:$visuiVersion:sources"
-    implementation "info.debatty:java-string-similarity:1.2.1"
-    implementation "info.debatty:java-string-similarity:1.2.1:sources"
-    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
-    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1:sources"
-    implementation "org.yaml:snakeyaml:1.21"
-    implementation "org.yaml:snakeyaml:1.21:sources"
-    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
-    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
-
+    implementation variantOf(libs.spine.libgdx) { classifier("sources") }
+    implementation variantOf(libs.snakeyaml) { classifier("sources") }
+    implementation variantOf(libs.visui) { classifier("sources") }
+    implementation variantOf(libs.string.similarity) { classifier("sources") }
+//    implementation variantOf(libs.tiny.gizmo) { classifier("sources") }
 }
 
 gwt {
@@ -148,6 +122,5 @@ tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
 checkGwt.war = file("war")
 
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 

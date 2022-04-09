@@ -6,3 +6,41 @@ include 'editor-web'
 include 'plugins'
 include 'runtimes:talos-libgdx'
 
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+
+            version("bongo", "0.0.1-SNAPSHOT")
+            version("visui", "1.5.0")
+            version("string-similarity", "1.2.1")
+            version("spine-libgdx", "4.0.18.1")
+            version("snakeyaml", "1.21")
+            version("lombok", "1.18.2")
+            version("tiny-gizmo", "0.0.1-SNAPSHOT")
+            version("logback", "1.2.3")
+
+            library("bongo-engine", "com.rockbite.bongo", "engine").versionRef("bongo")
+            library("bongo-talos", "com.rockbite.bongo", "talos").versionRef("bongo")
+            library("bongo-desktop", "com.rockbite.bongo", "desktop").versionRef("bongo")
+            library("bongo-web", "com.rockbite.bongo", "web").versionRef("bongo")
+
+            library("lombok", "org.projectlombok", "lombok").versionRef("lombok")
+
+            library("visui", "com.kotcrab.vis", "vis-ui").versionRef("visui")
+
+            library("string-similarity", "info.debatty", "java-string-similarity").versionRef("string-similarity")
+
+            library("spine-libgdx", "com.esotericsoftware.spine", "spine-libgdx").versionRef("spine-libgdx")
+
+            library("snakeyaml", "org.yaml", "snakeyaml").versionRef("snakeyaml")
+
+            library("tiny-gizmo", "com.asidik", "jtinygizmo").versionRef("tiny-gizmo")
+
+            library("logback-core", "ch.qos.logback", "logback-core").versionRef("logback")
+            library("logback-classic", "ch.qos.logback", "logback-classic").versionRef("logback")
+
+            plugin("lombok", "io.freefair.lombok").version("6.4.1")
+        }
+    }
+}

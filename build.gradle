@@ -2,12 +2,7 @@ allprojects {
 
     apply plugin: "java-library"
 
-
-    group = "com.talosvfx"
-    version = '1.4.1'
-
-    if(project.hasProperty("release")) {
-    } else {
+    if (!project.hasProperty("release")) {
         version += "-SNAPSHOT"
     }
 
@@ -19,6 +14,8 @@ allprojects {
         visuiVersion = '1.5.0'
     }
 
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 
     repositories {
         mavenCentral()

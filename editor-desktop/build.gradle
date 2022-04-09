@@ -1,84 +1,14 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-    }
-}
-
-plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id "io.freefair.lombok" version "6.4.1"
-}
-
-
-
 dependencies {
 
     implementation project(":editor")
 
-    implementation "com.rockbite.bongo:desktop"
+    implementation libs.bongo.desktop
 
-    implementation "ch.qos.logback:logback-core:1.2.3"
-    implementation "ch.qos.logback:logback-classic:1.2.3"
-
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
-    implementation "info.debatty:java-string-similarity:1.2.1"
-    implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1:sources"
-    implementation "org.yaml:snakeyaml:1.21"
-    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT"
-    implementation "com.asidik:jtinygizmo:0.0.1-SNAPSHOT:natives-desktop"
-
-    //Override LWJGL3 version
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux-arm32"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux-arm64"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-macos"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-macos-arm64"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-windows"
-    implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-windows-x86"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux-arm32"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux-arm64"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-macos"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-macos-arm64"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-windows"
-    implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-windows-x86"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux-arm32"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux-arm64"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-macos"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-macos-arm64"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-windows"
-    implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-windows-x86"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux-arm32"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux-arm64"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-macos"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-macos-arm64"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-windows"
-    implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-windows-x86"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux-arm32"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux-arm64"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-macos"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-macos-arm64"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows"
-    implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows-x86"
-
+    implementation libs.logback.core
+    implementation libs.logback.classic
 }
 
 sourceSets.main.java.srcDirs = [ "src/" ]
-
 sourceSets.main.resources.srcDirs = ["assets"]
 
 project.ext.mainClassName = "com.talosvfx.talos.TalosLauncher"
@@ -134,84 +64,3 @@ task distLegacyTest(type: Jar) {
 }
 
 dist.dependsOn classes
-
-
-task createProperties(dependsOn: processResources) {
-    doLast {
-        new File("$projectDir/assets/talos-version.properties").withWriter { w ->
-            Properties p = new Properties()
-            p['version'] = project.version.toString()
-            p.store w, null
-        }
-    }
-}
-
-classes {
-    dependsOn createProperties
-}
-
-//modifyPom {
-//    project {
-//        name "Talos Editor"
-//        description "Talos Editor"
-//        url "https://github.com/rockbite/talos"
-//        inceptionYear "2019"
-//
-//        scm {
-//            url "https://github.com/rockbite/talos"
-//            connection "scm:https://rockbite@github.com/rockbite/talos.git"
-//            developerConnection "scm:git://github.com/rockbite/talos.git"
-//        }
-//
-//        licenses {
-//            license {
-//                name "The Apache Software License, Version 2.0"
-//                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-//                distribution "repo"
-//            }
-//        }
-//
-//        developers {
-//            developer {
-//                id "Tom-Ski"
-//                name "Tom Wojciechowski"
-//            }
-//            developer {
-//                id "azakhary"
-//                name "Avetis Zakharyan"
-//            }
-//        }
-//    }
-//}
-
-task packageSources(type: Jar, dependsOn: classes) {
-//    from sourceSets.main.allJava.srcDirs
-    from delombok
-    from sourceSets.main.resources.srcDirs
-    archiveClassifier = 'web'
-}
-
-configurations {
-    web {
-        canBeConsumed true
-        canBeResolved false
-        extendsFrom implementation, runtimeOnly
-    }
-}
-
-
-artifacts {
-    web(packageSources)
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact packageSources
-            groupId project.group
-            artifactId project.name
-            version project.version
-        }
-    }
-}
