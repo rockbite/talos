@@ -18,8 +18,8 @@ package com.talosvfx.talos.runtime.test;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl.LwjglFrame;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -259,10 +259,9 @@ public class LegacyCompareTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 800;
-		config.height = 600;
-		config.title = "Talos";
-		LwjglFrame frame = new LwjglFrame(new LegacyCompareTest(), config);
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowedMode(800, 600);
+		config.setTitle("Talos");
+		Lwjgl3Application frame = new Lwjgl3Application(new LegacyCompareTest(), config);
 	}
 }

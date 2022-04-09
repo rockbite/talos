@@ -2,8 +2,8 @@ package com.talosvfx.talos.runtime.test;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl.LwjglFrame;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,11 +25,10 @@ public class TalosDemo extends ApplicationAdapter {
     private SpriteBatchParticleRenderer defaultRenderer;
 
     public static void main (String[] arg) {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = 400;
-        config.height = 400;
-        config.title = "Talos Demo";
-        LwjglFrame frame = new LwjglFrame(new TalosDemo(), config);
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+        config.setWindowedMode(400, 400);
+        config.setTitle("Talos demo");
+        Lwjgl3Application application = new Lwjgl3Application(new TalosDemo(), config);
     }
 
     @Override

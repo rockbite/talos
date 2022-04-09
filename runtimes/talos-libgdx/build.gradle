@@ -3,14 +3,10 @@ plugins {
 }
 
 dependencies {
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api libs.bongo.talos
 
-    api "com.rockbite.bongo:talos"
-
-    testImplementation "com.kotcrab.vis:vis-ui:$visuiVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    testImplementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    testImplementation libs.bongo.desktop
+    testImplementation libs.visui
 }
 
 sourceSets.main.java.srcDirs = ["src/"]
@@ -20,20 +16,12 @@ sourceSets.test.java.srcDirs = ["test/"]
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId = 'com.talosvfx'
             artifactId = 'talos-libgdx'
-            version = '0.0.1'
-
             from components.java
         }
     }
 }
 
-//nexus {
-//    sign = true
-//    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-//    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-//}
 
 //modifyPom {
 //    project {
