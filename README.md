@@ -4,7 +4,7 @@ Website: [https://talosvfx.com/](https://talosvfx.com/)
 Discord Server: [https://discord.gg/zjEGT5zEzM](https://discord.gg/zjEGT5zEzM)
 
 Prebuilt binaries:
-[Snapshot download 1.4.1-SNAPSHOT](https://editor.talosvfx.com/editor-binaries/editor-desktop-1.4.1-SNAPSHOT.jar)
+[Snapshot download 1.4.2-SNAPSHOT](https://editor.talosvfx.com/editor-binaries/editor-desktop-1.4.2-SNAPSHOT.jar)
 
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
