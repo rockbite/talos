@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.editor.project;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
@@ -32,7 +33,6 @@ import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.serialization.*;
 import com.talosvfx.talos.editor.utils.FileUtils;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
-import com.talosvfx.talos.editor.wrappers.BasicParticleMovementModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.DrawableModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper;
@@ -42,7 +42,6 @@ import com.talosvfx.talos.editor.wrappers.SpriteMaterialModuleWrapper;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.modules.BasicParticleMovementModule;
 import com.talosvfx.talos.runtime.modules.DrawableModule;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
@@ -187,30 +186,10 @@ public class TalosProject implements IProject {
 	public void resetToNew(){
 		cleanData();
 		projectData = new ProjectData();
-		currentEmitterWrapper = loadEmitter("default_emitter", 0);
-		ModuleBoardWidget moduleBoardWidget = TalosMain.Instance().NodeStage().moduleBoardWidget;
-		moduleBoardWidget.setCurrentEmitter(currentEmitterWrapper);
-
-		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
-
-		//Emitter
-		moduleBoardWidget.createModule(EmitterModule.class, 200, 200);
-
-		//Drawable
-		DrawableModuleWrapper drawableModule = moduleBoardWidget.createModule(DrawableModule.class, 200, 350);
-		SpriteMaterialModuleWrapper materialModule = moduleBoardWidget.createModule(SpriteMaterialModule.class, 0, 350);
-		moduleBoardWidget.makeConnection(materialModule, drawableModule, MaterialModule.MATERIAL_MODULE, DrawableModule.MATERIAL_IN);
-
-		SingleParticlePointDataGeneratorModuleWrapper pointGenerator = moduleBoardWidget.createModule(SingleParticlePointDataGeneratorModule.class, 0, 60);
-		moduleBoardWidget.makeConnection(pointGenerator, drawableModule, SingleParticlePointDataGeneratorModule.MODULE, DrawableModule.POINT_GENERATOR);
-
-		QuadMeshGeneratorModuleWrapper meshGenerator = moduleBoardWidget.createModule(QuadMeshGeneratorModule.class, 0, 0);
-		moduleBoardWidget.makeConnection(meshGenerator, drawableModule, QuadMeshGeneratorModule.MODULE, DrawableModule.MESH_GENERATOR);
-
-		//Particle
-		ParticleModuleWrapper particleModule = moduleBoardWidget.createModule(ParticleModule.class, 200, 0);
-		BasicParticleMovementModuleWrapper basicMovementModule = moduleBoardWidget.createModule(BasicParticleMovementModule.class, 0, -100);
-		moduleBoardWidget.makeConnection(basicMovementModule, particleModule, BasicParticleMovementModule.POSITION, ParticleModule.INITIAL_VELOCITY);
+		TalosMain.Instance().ProjectController().lastDirTrackingDisable();
+		TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+		TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + "new.tls"));
+		TalosMain.Instance().ProjectController().unbindFromFile();
 
 
 		TalosMain.Instance().ProjectController().setDirty();
