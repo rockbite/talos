@@ -11,17 +11,598 @@
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ]
-	]
+	],
+	"previewCamPos": {
+		"x": -0.18775487,
+		"y": 2.8857331
+	},
+	"previewCamZoom": 0.7073479,
+	"bgImagePath": "",
+	"isGridVisible": false,
+	"bgImageIsInBack": false,
+	"bgImageSize": 0,
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0,
+	"resourcePaths": []
 },
 "emitters": [
 	{
-		"name": "emitter",
+		"name": "spark",
+		"modules": [
+			{
+				"class": "DrawableModuleWrapper",
+				"id": 0,
+				"x": -230,
+				"y": 216,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "SpriteMaterialModuleWrapper",
+				"id": 1,
+				"x": -507,
+				"y": 287,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 1,
+						"regionName": "spot.png"
+					}
+				},
+				"filePath": null,
+				"regionName": "fire"
+			},
+			{
+				"class": "SingleParticlePointDataGeneratorModuleWrapper",
+				"id": 2,
+				"x": -490,
+				"y": 212,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule",
+						"index": 2
+					}
+				}
+			},
+			{
+				"class": "QuadMeshGeneratorModuleWrapper",
+				"id": 3,
+				"x": -488,
+				"y": 119,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule",
+						"index": 3,
+						"billboard": true
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 4,
+				"x": -832,
+				"y": 131,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 4,
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			{
+				"class": "ParticleModuleWrapper",
+				"id": 5,
+				"x": -288,
+				"y": -420,
+				"module": {
+					"data": {
+						"class": "ParticleModule",
+						"index": 5
+					}
+				}
+			},
+			{
+				"class": "StaticValueModuleWrapper",
+				"id": 6,
+				"titleOverride": "life",
+				"x": -689,
+				"y": -28,
+				"module": {
+					"data": {
+						"class": "StaticValueModule",
+						"index": 6,
+						"value": 10
+					}
+				}
+			},
+			{
+				"class": "EmitterModuleWrapper",
+				"id": 7,
+				"x": -103,
+				"y": -30,
+				"module": {
+					"data": {
+						"class": "EmitterModule",
+						"index": 7,
+						"delay": 0,
+						"duration": 2,
+						"rate": 20
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 8,
+				"x": -709,
+				"y": -498,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 8,
+						"x": 0,
+						"y": -0.2,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "EmConfigModuleWrapper",
+				"id": 10,
+				"x": -300,
+				"y": -18,
+				"module": {
+					"data": {
+						"class": "EmConfigModule",
+						"index": 10,
+						"additive": true,
+						"isBlendAdd": false,
+						"attached": false,
+						"continuous": true,
+						"aligned": false,
+						"immortal": false
+					}
+				}
+			},
+			{
+				"class": "DynamicRangeModuleWrapper",
+				"id": 14,
+				"x": -1345,
+				"y": 115,
+				"module": {
+					"data": {
+						"class": "DynamicRangeModule",
+						"index": 14,
+						"points": [
+							{
+								"x": 0,
+								"y": 1
+							},
+							{
+								"x": 0.24479207,
+								"y": 0.99654704
+							},
+							{
+								"x": 0.49265584,
+								"y": 0.39399186
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"lowMin": 0,
+						"lowMax": 0,
+						"highMin": 0.05,
+						"highMax": 0.05
+					}
+				},
+				"lowEquals": false,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 15,
+				"x": -785,
+				"y": -766,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 15,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.1903272,
+								"y": 1
+							},
+							{
+								"x": 0.5074809,
+								"y": 1
+							},
+							{
+								"x": 0.64845204,
+								"y": 0.6750597
+							},
+							{
+								"x": 0.7986565,
+								"y": 0.5039673
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "GradientColorModuleWrapper",
+				"id": 16,
+				"x": -852,
+				"y": -904,
+				"module": {
+					"data": {
+						"class": "GradientColorModule",
+						"index": 16,
+						"points": [
+							{
+								"r": 0.98039216,
+								"g": 0,
+								"b": 0.015686275,
+								"pos": 0.24872965
+							},
+							{
+								"r": 0.98039216,
+								"g": 0.5372549,
+								"b": 0,
+								"pos": 0.38243902
+							},
+							{
+								"r": 0.9990663,
+								"g": 0.97422963,
+								"b": 0.82913154,
+								"pos": 0.91727775
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 17,
+				"x": -701,
+				"y": -347,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 17,
+						"x": 1,
+						"y": 1,
+						"z": 1
+					}
+				}
+			},
+			{
+				"class": "NoiseModuleWrapper",
+				"id": 18,
+				"x": -1748.8667,
+				"y": -295.3696,
+				"module": {
+					"data": {
+						"class": "NoiseModule",
+						"index": 18,
+						"frequency": 20
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 19,
+				"x": -1280.8663,
+				"y": -286.3696,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 19,
+						"x": 0,
+						"y": 0,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 20,
+				"x": -1540.6914,
+				"y": -221.3696,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 20,
+						"a": 0,
+						"b": 10,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 22,
+				"x": -2105.727,
+				"y": -223.14185,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 22,
+						"scopeKey": 0
+					}
+				}
+			},
+			{
+				"class": "NoiseModuleWrapper",
+				"id": 23,
+				"x": -1693.7264,
+				"y": -511.14185,
+				"module": {
+					"data": {
+						"class": "NoiseModule",
+						"index": 23,
+						"frequency": 15.1
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 24,
+				"x": -1494.7264,
+				"y": -454.14185,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 24,
+						"a": 0,
+						"b": 10,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 25,
+				"x": -725,
+				"y": -196,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 25,
+						"x": 0,
+						"y": 1,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "DynamicRangeModuleWrapper",
+				"id": 26,
+				"x": -1549,
+				"y": -727,
+				"module": {
+					"data": {
+						"class": "DynamicRangeModule",
+						"index": 26,
+						"points": [
+							{
+								"x": 0,
+								"y": 1
+							},
+							{
+								"x": 0.18332718,
+								"y": 0.29828024
+							},
+							{
+								"x": 0.33230528,
+								"y": 0
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"lowMin": 0,
+						"lowMax": 0,
+						"highMin": 1,
+						"highMax": 1
+					}
+				},
+				"lowEquals": true,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "DynamicRangeModuleWrapper",
+				"id": 27,
+				"x": -2142,
+				"y": -533,
+				"module": {
+					"data": {
+						"class": "DynamicRangeModule",
+						"index": 27,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.12034015,
+								"y": 0.21513
+							},
+							{
+								"x": 0.51140857,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"lowMin": 0,
+						"lowMax": 0,
+						"highMin": 0,
+						"highMax": 20
+					}
+				},
+				"lowEquals": true,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 1
+			},
+			{
+				"moduleFrom": 2,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 3,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 4,
+				"moduleTo": 3,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 6,
+				"moduleTo": 5,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 8,
+				"moduleTo": 5,
+				"slotTo": 22
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 7,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 4
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 4,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 15,
+				"moduleTo": 5,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 16,
+				"moduleTo": 5,
+				"slotTo": 9
+			},
+			{
+				"moduleFrom": 17,
+				"moduleTo": 5,
+				"slotTo": 26
+			},
+			{
+				"moduleFrom": 19,
+				"moduleTo": 5,
+				"slotTo": 21
+			},
+			{
+				"moduleFrom": 18,
+				"moduleTo": 20
+			},
+			{
+				"moduleFrom": 20,
+				"moduleTo": 19
+			},
+			{
+				"moduleFrom": 22,
+				"moduleTo": 18,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 22,
+				"moduleTo": 18
+			},
+			{
+				"moduleFrom": 23,
+				"moduleTo": 24
+			},
+			{
+				"moduleFrom": 24,
+				"moduleTo": 19,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 22,
+				"moduleTo": 23
+			},
+			{
+				"moduleFrom": 22,
+				"moduleTo": 23,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 25,
+				"moduleTo": 5,
+				"slotTo": 25
+			},
+			{
+				"moduleFrom": 26,
+				"moduleTo": 19,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 27,
+				"moduleTo": 20,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 27,
+				"moduleTo": 24,
+				"slotTo": 1
+			}
+		],
+		"groups": [
+			{
+				"text": "GROUP NAME",
+				"modules": [ 22, 24, 18, 26, 20, 23, 19 ],
+				"color": -1.3926823E38
+			}
+		]
+	},
+	{
+		"name": "flames",
+		"sortPosition": 1,
 		"modules": [
 			{
 				"class": "ParticleModuleWrapper",
 				"id": 0,
-				"x": 52,
-				"y": -186,
+				"x": 228,
+				"y": -184,
 				"module": {
 					"data": {
 						"class": "ParticleModule",
@@ -32,8 +613,8 @@
 			{
 				"class": "EmitterModuleWrapper",
 				"id": 1,
-				"x": 24,
-				"y": 111,
+				"x": 151,
+				"y": 280,
 				"module": {
 					"data": {
 						"class": "EmitterModule",
@@ -45,40 +626,28 @@
 				}
 			},
 			{
-				"class": "TextureModuleWrapper",
-				"id": 3,
-				"x": -145,
-				"y": 176,
-				"module": {
-					"data": {
-						"class": "TextureModule",
-						"index": 3,
-						"regionName": "fire"
-					}
-				},
-				"fileName": fire,
-			},
-			{
 				"class": "EmConfigModuleWrapper",
 				"id": 4,
-				"x": 221,
-				"y": 146,
+				"x": -85,
+				"y": 281,
 				"module": {
 					"data": {
 						"class": "EmConfigModule",
 						"index": 4,
 						"additive": true,
+						"isBlendAdd": false,
 						"attached": false,
 						"continuous": true,
-						"aligned": false
+						"aligned": false,
+						"immortal": false
 					}
 				}
 			},
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 5,
-				"x": -934,
-				"y": -218.00003,
+				"x": -1221.6006,
+				"y": -7.874878,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -115,8 +684,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 6,
-				"x": -933,
-				"y": -420.00003,
+				"x": -1227.4937,
+				"y": -448.0253,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -145,8 +714,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 7,
-				"x": -526,
-				"y": -418.00003,
+				"x": -778.7497,
+				"y": -460.2216,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -174,39 +743,13 @@
 				"lowEquals": true,
 				"lowMirror": false,
 				"highEquals": false,
-				"highMirror": true
-			},
-			{
-				"class": "DynamicRangeModuleWrapper",
-				"id": 8,
-				"x": -527,
-				"y": -219.00003,
-				"module": {
-					"data": {
-						"class": "DynamicRangeModule",
-						"index": 8,
-						"points": [
-							{
-								"x": 0,
-								"y": 0.4883676
-							}
-						],
-						"lowMin": 0,
-						"lowMax": 0,
-						"highMin": 5,
-						"highMax": 5
-					}
-				},
-				"lowEquals": true,
-				"lowMirror": false,
-				"highEquals": true,
 				"highMirror": false
 			},
 			{
 				"class": "GradientColorModuleWrapper",
 				"id": 9,
-				"x": -774,
-				"y": 75,
+				"x": -241.4809,
+				"y": -465.5312,
 				"module": {
 					"data": {
 						"class": "GradientColorModule",
@@ -237,8 +780,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 10,
-				"x": -731,
-				"y": 199,
+				"x": -166.4809,
+				"y": -323.5312,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -271,8 +814,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 11,
-				"x": -65,
-				"y": 279,
+				"x": -279,
+				"y": 53,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -301,13 +844,143 @@
 				"lowMirror": false,
 				"highEquals": false,
 				"highMirror": false
+			},
+			{
+				"class": "DrawableModuleWrapper",
+				"id": 12,
+				"x": -90,
+				"y": 507,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 12
+					}
+				}
+			},
+			{
+				"class": "SpriteMaterialModuleWrapper",
+				"id": 13,
+				"x": -551.66797,
+				"y": 543.58154,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 13,
+						"regionName": "fire"
+					}
+				},
+				"filePath": null,
+				"regionName": "fire"
+			},
+			{
+				"class": "SingleParticlePointDataGeneratorModuleWrapper",
+				"id": 14,
+				"x": -556.66797,
+				"y": 476.58154,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule",
+						"index": 14
+					}
+				}
+			},
+			{
+				"class": "QuadMeshGeneratorModuleWrapper",
+				"id": 15,
+				"x": -558.6106,
+				"y": 389.65552,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule",
+						"index": 15,
+						"billboard": true
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 16,
+				"x": -814.6111,
+				"y": 360.65552,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 16,
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 17,
+				"x": -643.6019,
+				"y": -181.87488,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 17,
+						"x": 0,
+						"y": 2,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "DynamicRangeModuleWrapper",
+				"id": 18,
+				"x": -1211.6006,
+				"y": -229.87488,
+				"module": {
+					"data": {
+						"class": "DynamicRangeModule",
+						"index": 18,
+						"points": [
+							{
+								"x": 0,
+								"y": 0.6682311
+							},
+							{
+								"x": 0.19733226,
+								"y": 0.9548697
+							},
+							{
+								"x": 0.7551003,
+								"y": 0.17224689
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						],
+						"lowMin": 0,
+						"lowMax": 0,
+						"highMin": -1,
+						"highMax": 1
+					}
+				},
+				"lowEquals": false,
+				"lowMirror": false,
+				"highEquals": false,
+				"highMirror": false
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 19,
+				"x": -139,
+				"y": -83,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 19,
+						"x": 100,
+						"y": 0,
+						"z": 0
+					}
+				}
 			}
 		],
 		"connections": [
-			{
-				"moduleFrom": 3,
-				"slotTo": 2
-			},
 			{
 				"moduleFrom": 4,
 				"moduleTo": 1,
@@ -326,10 +999,6 @@
 				"slotTo": 11
 			},
 			{
-				"moduleFrom": 8,
-				"slotTo": 5
-			},
-			{
 				"moduleFrom": 9,
 				"slotTo": 9
 			},
@@ -340,13 +1009,71 @@
 			{
 				"moduleFrom": 11,
 				"slotTo": 4
+			},
+			{
+				"moduleFrom": 13,
+				"moduleTo": 12
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 12,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 15,
+				"moduleTo": 12,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 16,
+				"moduleTo": 15,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 5,
+				"moduleTo": 16,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 5,
+				"moduleTo": 16
+			},
+			{
+				"moduleFrom": 6,
+				"slotTo": 28
+			},
+			{
+				"moduleFrom": 7,
+				"slotTo": 19
+			},
+			{
+				"moduleFrom": 17,
+				"slotTo": 18
+			},
+			{
+				"moduleFrom": 18,
+				"moduleTo": 17
+			},
+			{
+				"moduleFrom": 19,
+				"slotTo": 29
 			}
 		],
 		"groups": [
 			{
-				"text": "MOVEMENT",
-				"modules": [ 6, 7, 5, 8 ],
-				"color": -6.820341E37
+				"text": "GROUP NAME",
+				"modules": [ 18, 7, 6, 17, 5 ],
+				"color": -1.3926823E38
+			},
+			{
+				"text": "GROUP NAME",
+				"modules": [ 10, 9 ],
+				"color": -1.3926823E38
+			},
+			{
+				"text": "GROUP NAME",
+				"modules": [ 13, 15, 16, 14 ],
+				"color": -1.3926823E38
 			}
 		]
 	}

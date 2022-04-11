@@ -104,7 +104,9 @@ public abstract class PreviewWidget extends ViewportWidget {
 
         long timeBefore = TimeUtils.nanoTime();
         final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        particleEffect.update(Gdx.graphics.getDeltaTime());
+        if (this instanceof Preview2D) {
+            particleEffect.update(Gdx.graphics.getDeltaTime());
+        }
         cpuTime.put( TimeUtils.timeSinceNanos(timeBefore));
 
         stringBuilder.clear();
