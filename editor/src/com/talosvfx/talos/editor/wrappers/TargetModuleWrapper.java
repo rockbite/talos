@@ -1,21 +1,17 @@
 package com.talosvfx.talos.editor.wrappers;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
 import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
+import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.modules.TargetModule;
 
 public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements IDragPointProvider {
-
-    private VisTextField velocityField;
 
     private DragPoint dragPointFrom;
     private DragPoint dragPointTo;
@@ -28,7 +24,6 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     public void setModule(TargetModule module) {
         super.setModule(module);
-        velocityField.setText(module.getDefaultVelocity() + "");
         if(!lock) {
             module.setDefaultPositions(dragPointFrom.position, dragPointTo.position);
         }
@@ -37,27 +32,15 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     protected void configureSlots() {
         addInputSlot("alpha", TargetModule.ALPHA_INPUT);
-        velocityField = addInputSlotWithTextField("velocity: ", TargetModule.VELOCITY);
         Cell fromCell = addInputSlot("from", TargetModule.FROM);
         Cell toCell = addInputSlot("to", TargetModule.TO);
         fromLabel = getLabelFromCell(fromCell);
         toLabel = getLabelFromCell(toCell);
 
-        velocityField.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                float velocity = floatFromText(velocityField);
-                module.setDefaultVelocity(velocity);
-            }
-        });
-
         dragPointFrom = new DragPoint(0, 0);
         dragPointTo = new DragPoint(0, 0);
 
-        addOutputSlot("time", TargetModule.TIME);
         addOutputSlot("position", TargetModule.POSITION);
-        addOutputSlot("velocity", TargetModule.VELOCITY_OUT);
-        addOutputSlot("angle", TargetModule.ANGLE);
     }
 
     @Override
@@ -82,7 +65,6 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
         lock = true;
         super.read(json, jsonData);
         lock = false;
-        velocityField.setText(module.getDefaultVelocity() + "");
         dragPointFrom.position.set(module.defaultFrom);
         dragPointTo.position.set(module.defaultTo);
     }
@@ -108,8 +90,8 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == FromToModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
-        if(slot.getIndex() == FromToModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == TargetModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == TargetModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
 
         return null;
     }
