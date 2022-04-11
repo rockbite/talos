@@ -47,7 +47,8 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         addSeparator(true);
 
-        addInputSlot("shape", ParticleModule.SPAWN_POSITION);
+        addInputSlot("start pos", ParticleModule.SPAWN_POSITION);
+        addInputSlot("start rot", ParticleModule.SPAWN_ROTATION);
         addInputSlot("start velocity", ParticleModule.INITIAL_VELOCITY);
         addInputSlot("start rot velocity", ParticleModule.INITIAL_SPIN_VELOCITY);
 
@@ -80,6 +81,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         //Mode
         if(slot.getIndex() == ParticleModule.SPAWN_POSITION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.SPAWN_ROTATION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
 
         if(slot.getIndex() == ParticleModule.INITIAL_VELOCITY) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
         if(slot.getIndex() == ParticleModule.INITIAL_SPIN_VELOCITY) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
