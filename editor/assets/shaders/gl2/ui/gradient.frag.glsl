@@ -5,7 +5,8 @@
      #define LOWP
  #endif
 
- #define GRADIENT_POINT_BUFFER 30
+#define GRADIENT_POINT_BUFFER 30
+#define MAX_POINTS 30
 
 uniform sampler2D u_textures[MAX_TEXTURE_UNITS];
 
@@ -32,7 +33,8 @@ vec4 sampleTextureArray (int index, vec2 texCoords) {
  {
      vec4 result = u_gradientPoints[0].color;
      float position = v_texCoords.x;
-     for(int i = 1; i < u_pointCount; i++) {
+     for(int i = 1; i < MAX_POINTS; i++) {
+         if (i >= u_pointCount) break;
          result = mix(result, u_gradientPoints[i].color, smoothstep(u_gradientPoints[i-1].alpha, u_gradientPoints[i].alpha, position));
      }
      gl_FragColor = result + v_color * sampleTextureArray(int(v_texture_index), v_texCoords) * 0.001;

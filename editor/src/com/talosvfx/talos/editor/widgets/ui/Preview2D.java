@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -30,8 +31,12 @@ import com.talosvfx.talos.runtime.ParticlePointData;
 import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Preview2D extends PreviewWidget {
+
+    private static final Logger logger = LoggerFactory.getLogger(Preview2D.class);
 
     private ParticleRenderer particleRenderer;
 
@@ -154,29 +159,34 @@ public class Preview2D extends PreviewWidget {
     }
 
     public void addPreviewImage (String[] paths) {
-        if (paths.length == 1) {
+        if (Gdx.app.getType() == Application.ApplicationType.WebGL) {
+            logger.warn("Preview image not supported");
+        } else {
+            if (paths.length == 1) {
 
-            String resourcePath = paths[0];
-            FileHandle fileHandle = Gdx.files.absolute(resourcePath);
+                String resourcePath = paths[0];
+                FileHandle fileHandle = Gdx.files.absolute(resourcePath);
 
-            final String extension = fileHandle.extension();
+                final String extension = fileHandle.extension();
 
-            if (extension.endsWith("png") || extension.endsWith("jpg")) {
-                fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
-                if(fileHandle != null && fileHandle.exists()) {
-                    final TextureRegion textureRegion = new TextureRegion(new Texture(fileHandle));
+                if (extension.endsWith("png") || extension.endsWith("jpg")) {
+                    fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
+                    if(fileHandle != null && fileHandle.exists()) {
+                        final TextureRegion textureRegion = new TextureRegion(new Texture(fileHandle));
 
-                    if (textureRegion != null) {
-                        previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
-                        previewController.setImageWidth(10);
+                        if (textureRegion != null) {
+                            previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
+                            previewController.setImageWidth(10);
 
-                        backgroundImagePath = fileHandle.path();
+                            backgroundImagePath = fileHandle.path();
 
-                        TalosMain.Instance().ProjectController().setDirty();
+                            TalosMain.Instance().ProjectController().setDirty();
+                        }
                     }
                 }
             }
         }
+
     }
 
     @Override

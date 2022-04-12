@@ -362,25 +362,6 @@ public class ProjectController {
         safeRemoveTab(currentTab);
     }
 
-    public static class RecentsEntry {
-        String path;
-        long time;
-
-        public RecentsEntry() {
-
-        }
-
-        public RecentsEntry(String path, long time) {
-            this.path = path;
-            this.time = time;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return path.equals(((RecentsEntry)obj).path);
-        }
-    }
-
     Comparator<RecentsEntry> recentsEntryComparator = new Comparator<RecentsEntry>() {
         @Override
         public int compare(RecentsEntry o1, RecentsEntry o2) {
@@ -391,23 +372,25 @@ public class ProjectController {
     public void reportProjectFileInterraction(FileHandle handle) {
         Preferences prefs = TalosMain.Instance().Prefs();
         String data = prefs.getString("recents");
-        Array<RecentsEntry> list = new Array<>();
+
+        Recents recents = new Recents();
+
         //read
         Json json = new Json();
         try {
             if (data != null && !data.isEmpty()) {
-                list = json.fromJson(list.getClass(), data);
+                recents = json.fromJson(Recents.class, data);
             }
         } catch( Exception e) {
-
+            e.printStackTrace();
         }
-        RecentsEntry newEntry = new RecentsEntry(handle.path(), TimeUtils.millis());
-        list.removeValue(newEntry, false);
-        list.add(newEntry);
+        RecentsEntry newEntry = new RecentsEntry(handle.path(), (int)TimeUtils.millis());
+        recents.getRecents().removeValue(newEntry, false);
+        recents.getRecents().add(newEntry);
         //sort
-        list.sort(recentsEntryComparator);
+        recents.getRecents().sort(recentsEntryComparator);
         //write
-        String result = json.toJson(list);
+        String result = json.toJson(recents);
         prefs.putString("recents", result);
         prefs.flush();
         updateRecentsList();
