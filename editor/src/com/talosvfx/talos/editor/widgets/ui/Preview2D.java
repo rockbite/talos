@@ -226,7 +226,6 @@ public class Preview2D extends PreviewWidget {
         spriteBatchParticleRenderer.setBatch(batch);
 
         batch.flush();
-        glProfiler.enable();
 
         long timeBefore = TimeUtils.nanoTime();
 
@@ -235,8 +234,6 @@ public class Preview2D extends PreviewWidget {
 
         batch.flush();
         renderTime.put(TimeUtils.timeSinceNanos(timeBefore));
-        trisCount = (int) (glProfiler.getVertexCount().value / 3f);
-        glProfiler.disable();
 
 
         if (!previewController.isBackground()) {

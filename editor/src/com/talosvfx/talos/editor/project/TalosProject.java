@@ -96,7 +96,6 @@ public class TalosProject implements IProject {
 
 
 	public void loadProject (String data) {
-		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
 
 		cleanData();
 

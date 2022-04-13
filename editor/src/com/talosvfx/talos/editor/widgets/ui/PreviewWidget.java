@@ -23,7 +23,6 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -62,9 +61,6 @@ public abstract class PreviewWidget extends ViewportWidget {
     private Label gpuTimeLbl;
     private Label cpuTimeLbl;
 
-    protected GLProfiler glProfiler = new GLProfiler(Gdx.graphics);
-    protected FPSLogger fpsLogger = new FPSLogger();
-    protected PerformanceCounter performanceCounter = new PerformanceCounter("talos");
 
     protected StringBuilder stringBuilder = new StringBuilder();
     protected int trisCount = 0;
@@ -141,10 +137,6 @@ public abstract class PreviewWidget extends ViewportWidget {
     public void drawContent(Batch batch, float parentAlpha) {
 
 
-    }
-
-    public GLProfiler getGLProfiler() {
-        return glProfiler;
     }
 
     public abstract void fileDrop(float x, float y, String[] paths);

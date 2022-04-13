@@ -20,14 +20,11 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
@@ -159,9 +156,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		// final init after all is done
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
-
-
-
 	}
 
 	private void setInputProcessors() {
