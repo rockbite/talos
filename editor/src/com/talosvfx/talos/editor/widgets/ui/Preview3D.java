@@ -75,8 +75,8 @@ public class Preview3D extends PreviewWidget {
 
         bongoPreview = new BongoPreview();
         worldCamera = bongoPreview.getWorldCamera();
-        worldCamera.position.set(2, 1.5f, 2);
-        worldCamera.lookAt(0,1.5f,0);
+        worldCamera.position.set(8, 5, 8);
+        worldCamera.lookAt(0, 2, 0);
         worldCamera.near = 0.1f;
         worldCamera.far = 100f;
         worldCamera.update();
