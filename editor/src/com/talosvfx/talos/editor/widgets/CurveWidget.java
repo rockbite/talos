@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.talosvfx.talos.editor.render.Render;
 
 import java.util.Comparator;
 
@@ -40,7 +41,7 @@ public class CurveWidget extends Actor implements CurveDataProvider {
     private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.4f);
     private Vector2 tmp = new Vector2();
 
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+    final ShapeRenderer shapeRenderer = Render.instance().shapeRenderer();
 
     float width;
     float height;

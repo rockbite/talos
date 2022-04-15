@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
@@ -30,15 +29,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.rockbite.bongo.engine.render.ShaderFlags;
-import com.rockbite.bongo.engine.render.ShaderSourceProvider;
-import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
-import com.talosvfx.talos.runtime.modules.ParticleModule;
+import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
@@ -91,12 +87,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         addActor(groupContainer);
         addActor(moduleContainer);
 
-        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
-        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
-
-        shapeRenderer = new ShapeRenderer(5000,
-            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
-        );
+        shapeRenderer = Render.instance().shapeRenderer();
 
         addListener(new ClickListener() {
 

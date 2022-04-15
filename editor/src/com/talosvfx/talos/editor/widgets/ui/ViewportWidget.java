@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -30,10 +29,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.rockbite.bongo.engine.render.ShaderFlags;
-import com.rockbite.bongo.engine.render.ShaderSourceProvider;
-import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.utils.CameraController;
 
 
@@ -59,12 +56,7 @@ public abstract class ViewportWidget extends Table {
     private Vector3 tmp = new Vector3();
 
     public ViewportWidget() {
-        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
-        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
-
-        shapeRenderer = new ShapeRenderer(5000,
-            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
-        );
+        shapeRenderer = Render.instance().shapeRenderer();
 
         camera = new OrthographicCamera();
         camera.viewportWidth = 10;

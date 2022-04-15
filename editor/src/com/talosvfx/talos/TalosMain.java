@@ -21,7 +21,6 @@ import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -35,6 +34,7 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
@@ -254,6 +254,7 @@ public class TalosMain extends ApplicationAdapter {
 		}
 		pickerCursor.dispose();
 		uiStage.getStage().dispose();
+		Render.instance().dispose();
 	}
 
 	public Skin getSkin() {

@@ -1,7 +1,6 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -11,24 +10,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.rockbite.bongo.engine.render.ShaderFlags;
-import com.rockbite.bongo.engine.render.ShaderSourceProvider;
-import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
-import com.talosvfx.talos.runtime.IEmitter;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.ParticlePointData;
-import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 import org.slf4j.Logger;
@@ -66,12 +58,7 @@ public class Preview2D extends PreviewWidget {
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(camera);
         particleRenderer = spriteBatchParticleRenderer;
         
-        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
-        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
-
-        shapeRenderer = new ShapeRenderer(5000,
-            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
-        );
+        shapeRenderer = Render.instance().shapeRenderer();
 
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 

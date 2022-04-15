@@ -24,9 +24,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.rockbite.bongo.engine.render.ShaderFlags;
 import com.rockbite.bongo.engine.render.ShaderSourceProvider;
-import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
+import com.talosvfx.talos.editor.render.Render;
 
 public class GridRenderer extends Actor {
 
@@ -43,9 +42,7 @@ public class GridRenderer extends Actor {
 		String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
 		String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
 
-		shapeRenderer = new ShapeRenderer(5000,
-			SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
-		);
+		shapeRenderer = Render.instance().shapeRenderer();
 	}
 
 	@Override

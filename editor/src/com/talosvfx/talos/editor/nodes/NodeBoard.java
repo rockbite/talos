@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.nodes;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -16,9 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.rockbite.bongo.engine.render.ShaderFlags;
-import com.rockbite.bongo.engine.render.ShaderSourceProvider;
-import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
@@ -29,6 +25,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
@@ -88,12 +85,8 @@ public class NodeBoard extends WidgetGroup implements Observer {
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
         this.skin = skin;
-        String shapeVertexSource = ShaderSourceProvider.resolveVertex("core/shape", Files.FileType.Classpath).readString();
-        String shapeFragmentSource = ShaderSourceProvider.resolveFragment("core/shape", Files.FileType.Classpath).readString();
 
-        shapeRenderer = new ShapeRenderer(5000,
-            SpriteShaderCompiler.getOrCreateShader("core/shape", shapeVertexSource, shapeFragmentSource, new ShaderFlags())
-        );
+        shapeRenderer = Render.instance().shapeRenderer();
 
         this.nodeStage = nodeStage;
 
