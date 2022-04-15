@@ -149,7 +149,9 @@ public class EditableLabel extends Table {
     }
 
     public void setEditMode() {
-        listener.editModeStarted();
+        if (listener != null) {
+            listener.editModeStarted();
+        }
         labelTable.setVisible(false);
         inputTable.setVisible(true);
         textField.setWidth(label.getPrefWidth() + 10);
