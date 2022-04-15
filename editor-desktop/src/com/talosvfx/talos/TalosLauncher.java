@@ -19,7 +19,10 @@ package com.talosvfx.talos;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.talosvfx.talos.editor.UIStage;
+import com.talosvfx.talos.editor.WorkplaceStage;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
 
@@ -35,7 +38,13 @@ public class TalosLauncher {
 		config.setBackBufferConfig(1,1,1,1,8,8, 16);
 		config.setWindowIcon("icon/talos-64x64.png");
 
-		TalosMain talos = new TalosMain();
+		TalosMain talos = new TalosMain() {
+			@Override
+			public void create () {
+				super.create();
+				afterCreated();
+			}
+		};
 
 		boolean gl3 = false;
 
@@ -47,34 +56,6 @@ public class TalosLauncher {
 		}
 		
 
-//		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
-//		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
-//			@Override
-//			public void invoke (long window, int count, long names) {
-//
-//				PointerBuffer namebuffer = memPointerBuffer(names, count);
-//				final String[] filesPaths = new String[count];
-//				for (int i = 0; i < count; i++) {
-//					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
-//					filesPaths[i] = pathToObject;
-//				}
-//
-//				Gdx.app.postRunnable(new Runnable() {
-//					@Override
-//					public void run () {
-//						final int x = Gdx.input.getX();
-//						final int y = Gdx.input.getY();
-//
-//						try {
-//							nodeStage.fileDrop(filesPaths, x, y);
-//							uiStage.fileDrop(filesPaths, x, y);
-//						}  catch (Exception e) {
-//							TalosMain.Instance().reportException(e);
-//						}
-//					}
-//				});
-//			}
-//		});
 
 
 //		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
@@ -91,5 +72,38 @@ public class TalosLauncher {
 //		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
 
 		new Lwjgl3Application(talos, config);
+	}
+
+	private static void afterCreated () {
+		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
+			@Override
+			public void invoke (long window, int count, long names) {
+
+				PointerBuffer namebuffer = memPointerBuffer(names, count);
+				final String[] filesPaths = new String[count];
+				for (int i = 0; i < count; i++) {
+					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
+					filesPaths[i] = pathToObject;
+				}
+
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						final int x = Gdx.input.getX();
+						final int y = Gdx.input.getY();
+
+						try {
+							final UIStage uiStage = TalosMain.Instance().UIStage();
+							final WorkplaceStage nodeStage = TalosMain.Instance().getNodeStage();
+							nodeStage.fileDrop(filesPaths, x, y);
+							uiStage.fileDrop(filesPaths, x, y);
+						}  catch (Exception e) {
+							TalosMain.Instance().reportException(e);
+						}
+					}
+				});
+			}
+		});
 	}
 }

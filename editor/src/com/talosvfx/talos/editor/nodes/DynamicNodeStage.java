@@ -318,4 +318,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     public NodeBoard getNodeBoard () {
         return nodeBoard;
     }
+
+    @Override
+    public void fileDrop (String[] paths, float x, float y) {
+
+    }
 }

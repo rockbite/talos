@@ -233,6 +233,7 @@ public class NodeStage extends WorkplaceStage {
         moduleBoardWidget.setCurrentEmitter(TalosMain.Instance().TalosProject().getCurrentEmitterWrapper());
     }
 
+    @Override
     public void fileDrop(String[] paths, float x, float y) {
         moduleBoardWidget.fileDrop(paths, x, y);
     }

@@ -90,4 +90,6 @@ public abstract class WorkplaceStage {
     public void act() {
 
     }
+
+    public  abstract void fileDrop(String[] paths, float x, float y);
 }
