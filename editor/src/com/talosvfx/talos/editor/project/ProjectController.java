@@ -399,22 +399,22 @@ public class ProjectController {
     public Array<String> updateRecentsList() {
         Preferences prefs = TalosMain.Instance().Prefs();
         String data = prefs.getString("recents");
+
         Array<String> list = new Array<>();
         //read
 
         try {
             Json json = new Json();
             if (data != null && !data.isEmpty()) {
-                Array<RecentsEntry> rList = new Array<>();
-                rList = json.fromJson(rList.getClass(), data);
-                for (RecentsEntry entry : rList) {
-                    list.add(entry.path);
+                Recents recents = json.fromJson(Recents.class, data);
+                for (RecentsEntry recent : recents.getRecents()) {
+                    list.add(recent.path);
                 }
             }
 
             TalosMain.Instance().UIStage().Menu().updateRecentsList(list);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         return list;
