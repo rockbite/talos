@@ -270,6 +270,11 @@ public class Preview3D extends PreviewWidget {
         int x = (int)temp.x;
         int y = (int)temp.y;
 
+        x = HdpiUtils.toBackBufferX(x);
+        y = HdpiUtils.toBackBufferY(y);
+        width = HdpiUtils.toBackBufferX(width);
+        height = HdpiUtils.toBackBufferY(height);
+
         RenderPassSystem.glViewport.x = x;
         RenderPassSystem.glViewport.y = y;
         RenderPassSystem.glViewport.width = width;
