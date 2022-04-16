@@ -24,9 +24,7 @@
 	"gridSize": 1,
 	"particlePositionX": 0,
 	"particlePositionY": 0,
-	"resourcePaths": [
-		"/Users/avetiszakharyan/work/code/talos/editor/assets/spot.png"
-	]
+	"resourcePaths": []
 },
 "emitters": [
 	{
@@ -596,7 +594,7 @@
 						"regionName": "spot"
 					}
 				},
-				"filePath": "/Users/avetiszakharyan/work/code/talos/editor/assets/spot.png",
+				"filePath": null,
 				"regionName": "spot"
 			},
 			{
