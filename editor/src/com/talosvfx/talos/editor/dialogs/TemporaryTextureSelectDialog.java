@@ -92,7 +92,8 @@ public class TemporaryTextureSelectDialog extends VisWindow {
 
         String[] inbuilt = new String[] {
             "fire.png",
-            "spot.png"
+            "spot.png",
+            "smoke.png"
         };
 
         int elementsPerRow = 4;
