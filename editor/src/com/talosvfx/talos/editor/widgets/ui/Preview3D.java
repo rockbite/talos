@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -209,7 +210,7 @@ public class Preview3D extends PreviewWidget {
     }
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {

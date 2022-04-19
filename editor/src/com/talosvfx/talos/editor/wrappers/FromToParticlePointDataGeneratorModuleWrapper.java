@@ -43,6 +43,9 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
     @Override
     public void setModule(FromToParticlePointDataGeneratorModule module) {
         super.setModule(module);
+
+        numPointsTextField.setText(module.getNumPoints() + "");
+        module.setDefaults(dragPointFrom.position, dragPointTo.position);
     }
 
     @Override
@@ -70,9 +73,7 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
         dragPointFrom = new DragPoint(0, 0);
         dragPointTo = new DragPoint(1, 0);
 
-        if(module != null) {
-            module.setDefaults(dragPointFrom.position, dragPointTo.position);
-        }
+
     }
 
     @Override

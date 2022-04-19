@@ -21,6 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.FloatCounter;
@@ -134,7 +135,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
 
 
     }

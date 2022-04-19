@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -186,7 +187,7 @@ public class Preview2D extends PreviewWidget {
     }
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
         if (previewController.isGridVisible()) {
             batch.end();
@@ -210,7 +211,9 @@ public class Preview2D extends PreviewWidget {
             previewImage.draw(batch, parentAlpha);
         }
 
-        spriteBatchParticleRenderer.setBatch(batch);
+        if (batch instanceof PolygonBatch) {
+            spriteBatchParticleRenderer.setBatch((PolygonBatch)batch);
+        }
 
         batch.flush();
 

@@ -96,6 +96,7 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	private void addDefaultAssets () {
 		addTexture(Gdx.files.internal("fire.png"));
 		addTexture(Gdx.files.internal("spot.png"));
+		addTexture(Gdx.files.internal("smoke.png"));
 	}
 
 	private void addTexture (FileHandle path) {

@@ -7,6 +7,7 @@
     <category name = "PointGenerators">
         <module name = "Single Point" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
         <module name = "FromTo Point" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
+        <module name = "History Point" wrapper = "HistoryParticlePointDataGeneratorModuleWrapper">HistoryParticlePointDataGeneratorModule</module>
     </category>
     <category name = "MeshGenerators">
         <module name = "Quad" wrapper = "QuadMeshGeneratorModuleWrapper">QuadMeshGeneratorModule</module>

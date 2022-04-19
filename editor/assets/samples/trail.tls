@@ -13,10 +13,10 @@
 		[ 0, 0, 0, 0 ]
 	],
 	"previewCamPos": {
-		"x": 4.3623466,
-		"y": 1.6035454
+		"x": 0.8659215,
+		"y": -0.5586592
 	},
-	"previewCamZoom": 0.891,
+	"previewCamZoom": 1,
 	"bgImagePath": "",
 	"isGridVisible": false,
 	"bgImageIsInBack": false,
@@ -24,7 +24,9 @@
 	"gridSize": 1,
 	"particlePositionX": 0,
 	"particlePositionY": 0,
-	"resourcePaths": []
+	"resourcePaths": [
+		"smoke.png"
+	]
 },
 "emitters": [
 	{
@@ -74,8 +76,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 5,
-				"x": -1019,
-				"y": 1,
+				"x": -1025,
+				"y": 75,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -123,8 +125,8 @@
 				"class": "InputModuleWrapper",
 				"id": 7,
 				"titleOverride": "Tells Module Point Index",
-				"x": -1454,
-				"y": 156,
+				"x": -1435,
+				"y": 225,
 				"module": {
 					"data": {
 						"class": "InputModule",
@@ -192,15 +194,11 @@
 						"points": [
 							{
 								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 0.5660777,
-								"y": 0.4977824
+								"y": 1
 							},
 							{
 								"x": 1,
-								"y": 1
+								"y": 0
 							}
 						]
 					}
@@ -209,8 +207,8 @@
 			{
 				"class": "GradientColorModuleWrapper",
 				"id": 12,
-				"x": -893,
-				"y": 229,
+				"x": -922,
+				"y": 259,
 				"module": {
 					"data": {
 						"class": "GradientColorModule",
@@ -302,8 +300,8 @@
 			{
 				"class": "SpriteMaterialModuleWrapper",
 				"id": 17,
-				"x": -177,
-				"y": 800,
+				"x": -200,
+				"y": 765,
 				"module": {
 					"data": {
 						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
@@ -354,6 +352,78 @@
 				}
 			},
 			{
+				"class": "HistoryParticlePointDataGeneratorModuleWrapper",
+				"id": 28,
+				"x": -287,
+				"y": 663,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.HistoryParticlePointDataGeneratorModule",
+						"index": 28,
+						"maxPoints": 60,
+						"minDistance": 0.1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 29,
+				"x": -995,
+				"y": -132,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 29,
+						"scopeKey": 7
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 30,
+				"x": -423,
+				"y": -187,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 30,
+						"a": 2,
+						"b": 4,
+						"mathExpression": "sin"
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 31,
+				"x": -673,
+				"y": -192,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 31,
+						"a": 1,
+						"b": 100,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 32,
+				"x": -423,
+				"y": -335,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 32,
+						"a": 2,
+						"b": 4,
+						"mathExpression": "cos"
+					}
+				}
+			},
+			{
 				"class": "CurveModuleWrapper",
 				"id": 33,
 				"x": -206,
@@ -399,27 +469,27 @@
 			{
 				"class": "InputModuleWrapper",
 				"id": 35,
-				"x": -1274,
-				"y": 389,
+				"x": -1300,
+				"y": 383,
 				"module": {
 					"data": {
 						"class": "InputModule",
 						"index": 35,
-						"scopeKey": 9
+						"scopeKey": 1
 					}
 				}
 			},
 			{
 				"class": "MathModuleWrapper",
 				"id": 36,
-				"x": -795,
-				"y": 388,
+				"x": -772,
+				"y": 390,
 				"module": {
 					"data": {
 						"class": "MathModule",
 						"index": 36,
 						"a": 0,
-						"b": 1,
+						"b": 2,
 						"mathExpression": "multiply"
 					}
 				}
@@ -427,8 +497,8 @@
 			{
 				"class": "Vector3ModuleWrapper",
 				"id": 37,
-				"x": -754,
-				"y": 545,
+				"x": -720,
+				"y": 551,
 				"module": {
 					"data": {
 						"class": "Vector3Module",
@@ -440,77 +510,17 @@
 				}
 			},
 			{
-				"class": "FromToParticlePointDataGeneratorModuleWrapper",
+				"class": "Vector3ModuleWrapper",
 				"id": 38,
-				"x": -251,
-				"y": 660,
+				"x": -129,
+				"y": -249,
 				"module": {
 					"data": {
-						"class": "com.talosvfx.talos.runtime.modules.FromToParticlePointDataGeneratorModule",
+						"class": "Vector3Module",
 						"index": 38,
-						"pointCount": 30,
-						"fromX": 0,
-						"fromY": 0,
-						"fromZ": 0,
-						"toX": 0,
-						"toY": 0,
-						"toZ": 0
-					}
-				}
-			},
-			{
-				"class": "Vector2ModuleWrapper",
-				"id": 39,
-				"x": -532,
-				"y": 747,
-				"module": {
-					"data": {
-						"class": "Vector2Module",
-						"index": 39,
 						"x": 0,
-						"y": 0
-					}
-				}
-			},
-			{
-				"class": "Vector2ModuleWrapper",
-				"id": 40,
-				"x": -520,
-				"y": 644,
-				"module": {
-					"data": {
-						"class": "Vector2Module",
-						"index": 40,
-						"x": 8.463687,
-						"y": 0.19553053
-					}
-				}
-			},
-			{
-				"class": "InputModuleWrapper",
-				"id": 41,
-				"x": -1649,
-				"y": 292,
-				"module": {
-					"data": {
-						"class": "InputModule",
-						"index": 41,
-						"scopeKey": 1
-					}
-				}
-			},
-			{
-				"class": "MathModuleWrapper",
-				"id": 42,
-				"x": -1222,
-				"y": 248,
-				"module": {
-					"data": {
-						"class": "MathModule",
-						"index": 42,
-						"a": 0,
-						"b": 5,
-						"mathExpression": "multiply"
+						"y": 0,
+						"z": 0
 					}
 				}
 			}
@@ -584,6 +594,23 @@
 				"slotTo": 1
 			},
 			{
+				"moduleFrom": 28,
+				"moduleTo": 16,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 29,
+				"moduleTo": 31
+			},
+			{
+				"moduleFrom": 31,
+				"moduleTo": 30
+			},
+			{
+				"moduleFrom": 31,
+				"moduleTo": 32
+			},
+			{
 				"moduleFrom": 33,
 				"slotTo": 10
 			},
@@ -614,39 +641,28 @@
 				"slotTo": 4
 			},
 			{
+				"moduleFrom": 38,
+				"slotTo": 27
+			},
+			{
+				"moduleFrom": 30,
+				"moduleTo": 38
+			},
+			{
+				"moduleFrom": 32,
+				"moduleTo": 38,
+				"slotTo": 1
+			},
+			{
 				"moduleFrom": 10,
 				"moduleTo": 37,
 				"slotTo": 2
-			},
-			{
-				"moduleFrom": 38,
-				"moduleTo": 16,
-				"slotTo": 2
-			},
-			{
-				"moduleFrom": 39,
-				"moduleTo": 38,
-				"slotTo": 1
-			},
-			{
-				"moduleFrom": 40,
-				"moduleTo": 38,
-				"slotTo": 2
-			},
-			{
-				"moduleFrom": 41,
-				"moduleTo": 42
-			},
-			{
-				"moduleFrom": 42,
-				"moduleTo": 36,
-				"slotTo": 1
 			}
 		],
 		"groups": [
 			{
 				"text": "BEAM NOISE",
-				"modules": [ 6, 4, 13, 11, 10 ],
+				"modules": [ 10, 6, 4, 13, 11 ],
 				"color": -1.3926823E38
 			}
 		]

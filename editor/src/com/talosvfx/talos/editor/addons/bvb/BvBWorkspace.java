@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -290,7 +291,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
         if(showGrid) {
             batch.end();
             drawGrid(batch, parentAlpha);
@@ -309,7 +310,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         }
     }
 
-    private void drawTools(Batch batch, float parentAlpha) {
+    private void drawTools(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 
@@ -433,7 +434,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         batch.setBlendFunctionSeparate(a1, a2, a3, a4);
     }
 
-    private void drawVFXBefore(Batch batch, float parentAlpha) {
+    private void drawVFXBefore(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 
@@ -446,7 +447,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         }
     }
 
-    private void drawVFX(Batch batch, float parentAlpha) {
+    private void drawVFX(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         if(skeleton == null) return;
 

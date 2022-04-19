@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
@@ -151,7 +152,9 @@ public abstract class ViewportWidget extends Table {
         batch.setTransformMatrix(emptyTransform);
 
         batch.begin();
-        drawContent(batch, parentAlpha);
+        if (batch instanceof PolygonBatch) {
+            drawContent((PolygonBatch)batch, parentAlpha);
+        }
         batch.end();
 
         HdpiUtils.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -167,7 +170,7 @@ public abstract class ViewportWidget extends Table {
         super.draw(batch, parentAlpha);
     }
 
-    public abstract void drawContent(Batch batch, float parentAlpha);
+    public abstract void drawContent(PolygonBatch batch, float parentAlpha);
 
     public float getCameraPosX() {
         return camera.position.x;
