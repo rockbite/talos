@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.rockbite.bongo.engine.systems.render.EngineDebugSystem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareLabelButton;
 
@@ -28,6 +29,7 @@ public class PreviewImageControllerWidget extends Table {
 
 	CheckBox gridCheckBox;
 	CheckBox backgroundCheckBox;
+	CheckBox axisCheckbox;
 	TextField imageSizeField;
 	TextField backgroundSizeField;
 	ImageButton removeBackgroundButton;
@@ -85,6 +87,24 @@ public class PreviewImageControllerWidget extends Table {
 			}
 		});
 
+		row();
+		axisCheckbox = new CheckBox("axis", skin);
+		axisCheckbox.setChecked(false);
+		add(axisCheckbox).colspan(3).left();
+
+		axisCheckbox.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				final BongoPreview bongoPreview = TalosMain.Instance().UIStage().getInnerTertiumActor().getBongoPreview();
+				final EngineDebugSystem system = bongoPreview.getWorld().getSystem(EngineDebugSystem.class);
+				if (axisCheckbox.isChecked()) {
+					system.setDrawAxis(true);
+				} else {
+					system.setDrawAxis(false);
+				}
+			}
+		});
+
 		dimensionChangeButton = new SquareLabelButton(skin, "3D");
 		dimensionChangeButton.addListener(new ClickListener() {
 			@Override
@@ -93,6 +113,7 @@ public class PreviewImageControllerWidget extends Table {
 				changeDimension();
 			}
 		});
+
 		add(dimensionChangeButton).size(30).pad(0);
 	}
 

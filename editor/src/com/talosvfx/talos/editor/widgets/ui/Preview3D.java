@@ -29,12 +29,15 @@ import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.Particle3DRenderer;
 import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
+import lombok.Getter;
 
 import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
 
 public class Preview3D extends PreviewWidget {
 
 //    private final TinyGizmoRenderer tinyGizmoRenderer;
+
+    @Getter
     private final BongoPreview bongoPreview;
     //Controls
     private InputAdapter cameraInputController;

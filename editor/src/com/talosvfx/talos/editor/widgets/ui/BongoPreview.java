@@ -32,9 +32,11 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.components.Particle;
 import com.talosvfx.talos.runtime.systems.render.ParticleRenderPassSystem;
+import lombok.Getter;
 
 public class BongoPreview {
 
+	@Getter
 	private final World world;
 
 	private final int particleEntityID;
@@ -60,6 +62,7 @@ public class BongoPreview {
 
 		world = EngineBuilder.buildWorld(userSystems);
 		world.getSystem(EngineDebugSystem.class).setDrawUnitSquare(false);
+		world.getSystem(EngineDebugSystem.class).setDrawAxis(false);
 
 
 		//Particle

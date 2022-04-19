@@ -59,6 +59,7 @@ import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.Vector2Module;
 import com.talosvfx.talos.runtime.modules.Vector3Module;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -98,6 +99,7 @@ public class UIStage {
 	private VisSplitPane horizontalPane;
 	private VisSplitPane verticalPane;
 
+	@Getter
 	private Preview3D innerTertiumActor;
 	private Preview2D innerSecundumActor;
 
