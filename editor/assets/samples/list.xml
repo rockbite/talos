@@ -1,6 +1,5 @@
 <samples>
-    <sample name="Empty Start" file="empty.tls" />
-    <sample name="Fire" file="fire.tls" />
+    <sample name="Fire" file="new.tls" />
     <sample name="Trail" file="trail.tls" />
     <sample name="Beam" file="beam.tls" />
     <sample name="Beam UV" file="beamuv.tls" />
