@@ -25,6 +25,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -47,7 +49,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 	private OrthographicCamera orthographicCamera;
 	private ParticleRenderer particleRenderer;
 	private ShapeRenderer shapeRenderer;
-	private SpriteBatch batch;
+	private PolygonSpriteBatch batch;
 
 	private CameraController cameraController;
 
@@ -64,7 +66,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 		orthographicCamera.setToOrtho(false, width, width / aspect);
 		shapeRenderer = new ShapeRenderer();
 
-		batch = new SpriteBatch();
+		batch = new PolygonSpriteBatch();
 
 		particleRenderer = new SpriteBatchParticleRenderer(orthographicCamera, batch);
 

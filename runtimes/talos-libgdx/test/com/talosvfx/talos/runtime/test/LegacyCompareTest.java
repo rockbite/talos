@@ -25,6 +25,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,6 +34,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.talosvfx.talos.runtime.test.utils.TestAssetProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -163,10 +166,10 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
 		uiStage = new Stage();
 
-		stage = new Stage();
+		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
 		((OrthographicCamera)stage.getViewport().getCamera()).zoom = 1f / 64;
 
-		talosRenderer = new SpriteBatchParticleRenderer(stage.getCamera(), stage.getBatch());
+		talosRenderer = new SpriteBatchParticleRenderer(stage.getCamera(), (PolygonBatch)stage.getBatch());
 
 		String mainPath = "C:\\Users\\Tom\\Desktop\\vfx\\";
 
