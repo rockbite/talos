@@ -38,8 +38,10 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -722,10 +724,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             String sceneEditorExportScriptPath = TalosMain.Instance().Prefs().getString("sceneEditorExportScriptPath", null);
             if(sceneEditorExportScriptPath != null) {
                 FileHandle handle = Gdx.files.absolute(sceneEditorExportScriptPath);
+
+                if(!handle.exists()) {
+                    handle = Gdx.files.absolute(projectPath + File.separator + sceneEditorExportScriptPath);
+                }
+
                 if(handle.exists() && !handle.isDirectory()) {
                     Runtime rt = Runtime.getRuntime();
+
                     try {
-                        Process pr = rt.exec("node " + handle.path());
+                        String command = "node " + handle.path() + " \"" + projectPath + "\" \"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
+                        if( TalosMain.Instance().isOsX() ) {
+                            Process pr = rt.exec(new String[]{"bash", "-l", "-c", command});
+                        } else {
+                            Process pr = rt.exec(command);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

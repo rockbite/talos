@@ -15,6 +15,8 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 
+import java.io.File;
+
 public class SettingsDialog extends VisWindow {
 
     private Table exportInlineContainer;
@@ -151,7 +153,12 @@ public class SettingsDialog extends VisWindow {
         } else {
             String path = exportScriptPathField.getText();
             if(path.length() > 0) {
+
                 FileHandle handle = Gdx.files.absolute(path);
+                if(!(new File(path)).isAbsolute()) {
+                    handle = Gdx.files.absolute(Gdx.files.absolute(TalosMain.Instance().ProjectController().getCurrentProjectPath()).parent().path() + File.separator + path);
+                }
+
                 if (!handle.exists()) {
                     try {
                         handle.write(false);
