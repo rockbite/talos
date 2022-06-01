@@ -713,6 +713,26 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public String writeExport () {
+
+        // write rest of files
+        String exportType = TalosMain.Instance().Prefs().getString("exportType", "Default");
+        if(exportType.equals("Default")) {
+            // default behaviour
+        } else if (exportType.equals("Custom Script")) {
+            String sceneEditorExportScriptPath = TalosMain.Instance().Prefs().getString("sceneEditorExportScriptPath", null);
+            if(sceneEditorExportScriptPath != null) {
+                FileHandle handle = Gdx.files.absolute(sceneEditorExportScriptPath);
+                if(handle.exists() && !handle.isDirectory()) {
+                    Runtime rt = Runtime.getRuntime();
+                    try {
+                        Process pr = rt.exec("node " + handle.path());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
         return "";
     }
 

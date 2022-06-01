@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {
@@ -40,6 +41,8 @@ public class SceneEditorAddon implements IAddon {
 
     public AssetImporter assetImporter;
     public SEAssetProvider assetProvider;
+
+    public com.talosvfx.talos.editor.addons.scene.dialogs.SettingsDialog settingsDialog;
 
     @Override
     public void init () {
@@ -74,6 +77,9 @@ public class SceneEditorAddon implements IAddon {
         mainMenu.addItem(newProject);
         MenuItem openProject = new MenuItem("Open Project");
         mainMenu.addItem(openProject);
+        mainMenu.addSeparator();
+        MenuItem projectSettings = new MenuItem("Project Settings");
+        mainMenu.addItem(projectSettings);
 
         newProject.addListener(new ClickListener() {
             @Override
@@ -91,7 +97,22 @@ public class SceneEditorAddon implements IAddon {
             }
         });
 
+        projectSettings.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if(TalosMain.Instance().ProjectController().getProject() == SE) {
+                    showSettingsDialog();
+                }
+            }
+        });
+
         menuBar.addMenu(mainMenu);
+    }
+
+    public void showSettingsDialog() {
+        TalosMain.Instance().UIStage().openDialog(settingsDialog);
+        settingsDialog.initData();
     }
 
     @Override
@@ -109,6 +130,8 @@ public class SceneEditorAddon implements IAddon {
 
         customLayoutTable = new Table();
         makeLayout(customLayoutTable);
+
+        settingsDialog = new com.talosvfx.talos.editor.addons.scene.dialogs.SettingsDialog();
     }
 
     private void makeLayout(Table container) {

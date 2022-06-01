@@ -311,13 +311,24 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
             return;
+        } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().edit(new File(fileHandle.path()));
+                } catch (IOException e) {
+                    try {
+                        Desktop.getDesktop().open(new File(fileHandle.path()));
+                    } catch (IOException e2) {
+                    }
+                }
+            }
+            return;
         }
 
         if (Desktop.isDesktopSupported()) {
             try {
-                Desktop.getDesktop().open(new File(fileHandle.parent().path()));
+                Desktop.getDesktop().open(new File(fileHandle.path()));
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

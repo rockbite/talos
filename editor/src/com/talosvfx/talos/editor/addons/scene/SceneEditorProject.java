@@ -49,7 +49,7 @@ public class SceneEditorProject implements IProject {
 
     @Override
     public String getExportExtension () {
-        return ".scn";
+        return ".se";
     }
 
     @Override
