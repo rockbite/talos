@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.scene.apps.EditorApps;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
@@ -218,5 +219,9 @@ public class SceneEditorAddon implements IAddon {
     public static SceneEditorAddon get() {
         // todo: add some null checks
         return ((SceneEditorProject)TalosMain.Instance().Project()).sceneEditorAddon;
+    }
+
+    public EditorApps Apps() {
+        return EditorApps.getInstance();
     }
 }
