@@ -185,6 +185,13 @@ public class AssetImporter {
         return metadataHandle;
     }
 
+    public static FileHandle getFileFromMetadataHandle (FileHandle metadataHandle) {
+        metadataHandle = get(metadataHandle.path());
+        String fileName = metadataHandle.name().replaceFirst(".meta", "");
+        FileHandle fileHandle = Gdx.files.absolute(metadataHandle.parent().path() + File.separator + fileName);
+        return fileHandle;
+    }
+
     public static void createAssetInstance(FileHandle fileHandle, GameObject parent) {
         if(fileHandle.extension().equals("png")) {
             // check if non imported nine patch

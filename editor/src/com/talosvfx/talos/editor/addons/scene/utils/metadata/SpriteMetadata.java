@@ -36,6 +36,7 @@ public class SpriteMetadata extends AMetadata {
         ButtonPropertyWidget<String> spriteEditor = new ButtonPropertyWidget<String>("Sprite Editor", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
             public void clicked (ButtonPropertyWidget<String> widget) {
+
                 SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
                 sceneEditorAddon.Apps().openSceneEditor(SpriteMetadata.this, new SpriteEditor.SpriteMetadataListener() {
                     @Override

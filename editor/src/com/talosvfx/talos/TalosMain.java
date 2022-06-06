@@ -113,6 +113,7 @@ public class TalosMain extends ApplicationAdapter {
 	private ScreenshotService screenshotService;
 
 	public Cursor pickerCursor;
+	public Cursor moveRulerCursor;
 	private Cursor currentCursor;
 
 	public TalosMain () {
@@ -172,6 +173,7 @@ public class TalosMain extends ApplicationAdapter {
 		VisUI.load(skin);
 
 		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
+		moveRulerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move-ruler1.png")), 8, 8);
 
 		uiStage = new UIStage(skin);
 
