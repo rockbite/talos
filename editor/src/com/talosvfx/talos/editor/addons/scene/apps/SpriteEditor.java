@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
@@ -18,13 +20,27 @@ public class SpriteEditor extends AEditorApp {
     private EditPanel editPanel;
     private Table ninePatchPreview;
     private ShapeRenderer shapeRenderer;
+    private NinePatchDrawable patchDrawable;
+    private Texture texture;
 
     @Override
     protected void initContent() {
         shapeRenderer = new ShapeRenderer();
 
         Table content = new Table();
-        editPanel = new EditPanel(shapeRenderer);
+        editPanel = new EditPanel(shapeRenderer, new EditPanel.EditPanelListener() {
+            @Override
+            public void changed(float left, float right, float top, float bottom) {
+                NinePatch patch = new NinePatch(
+                    texture,
+                    (int) left,
+                    (int) right,
+                    (int) top,
+                    (int) bottom
+                );
+                patchDrawable.setPatch(patch);
+            }
+        });
         Table rightSide = new Table();
         ninePatchPreview = new Table();
 
@@ -50,7 +66,12 @@ public class SpriteEditor extends AEditorApp {
 
     private void saveAndClose() {
         if (listener != null) {
-            listener.changed(10, 10, 10, 20);
+            listener.changed(
+                    (int) editPanel.getLeft(),
+                    (int) editPanel.getRight(),
+                    (int) editPanel.getTop(),
+                    (int) editPanel.getBottom()
+            );
         }
         hide();
     }
@@ -70,22 +91,23 @@ public class SpriteEditor extends AEditorApp {
 
         // get ninepatch
         FileHandle file = AssetImporter.getFileFromMetadataHandle(metadata.currentFile);
+        texture = new Texture(file);
         NinePatch patch = new NinePatch(
-            new Texture(file),
+            texture,
             metadata.borderData[0],
             metadata.borderData[1],
             metadata.borderData[2],
             metadata.borderData[3]
         );
-
+        patchDrawable = new NinePatchDrawable(patch);
         // live
-        editPanel.show(metadata, patch);
+        editPanel.show(metadata, texture);
 
         // preview
         ninePatchPreview.clear();
-        Image vertical = new Image(patch);
-        Image square = new Image(patch);
-        Image horizontal = new Image(patch);
+        Image vertical = new Image(patchDrawable);
+        Image square = new Image(patchDrawable);
+        Image horizontal = new Image(patchDrawable);
         ninePatchPreview.add(vertical).growY().space(20);
         ninePatchPreview.add(square).grow().space(20);
         ninePatchPreview.row();
@@ -96,6 +118,7 @@ public class SpriteEditor extends AEditorApp {
     @Override
     public void hide() {
         listener = null;
+        TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
         super.hide();
     }
 }

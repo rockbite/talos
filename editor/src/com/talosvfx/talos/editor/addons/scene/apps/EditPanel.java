@@ -3,8 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.apps;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
@@ -45,10 +45,13 @@ public class EditPanel extends Container<Image> {
     private SpriteMetadata metadata;
     private int activeSide = 0b0;
 
+    private EditPanelListener editPanelListener;
+
     private ShapeRenderer shapeRenderer;
 
-    public EditPanel (ShapeRenderer shapeRenderer) {
+    public EditPanel(ShapeRenderer shapeRenderer, EditPanelListener editPanelListener) {
         this.shapeRenderer = shapeRenderer;
+        this.editPanelListener = editPanelListener;
         this.bounds = new Rectangle();
         borderColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);
         sliceLineColor = new Color(0.0f, 1.0f, 0.0f, 1.0f);
@@ -73,6 +76,96 @@ public class EditPanel extends Container<Image> {
             }
 
             @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                // set the active side
+                activeSide = 0;
+                tmp.set(x, y);
+                float x1, y1, x2, y2;
+                float dist = 3;
+                float tmpDist;
+                float left = metadata.borderData[0] + leftOffset;
+                float right = metadata.borderData[1] + rightOffset;
+
+                // check left
+                x1 = bounds.x + left * zoom;
+                y1 = bounds.y;
+                x2 = bounds.x + left * zoom;
+                y2 = bounds.y + bounds.height * zoom;
+                tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
+                // scale bounds for check
+                bounds.width *= zoom;
+                bounds.height *= zoom;
+                if (tmpDist <= dist && bounds.contains(tmp) && !isHorizontal(activeSide)) {
+                    activeSide = activeSide | LEFT;
+                }
+                // bring dimensions back
+                bounds.width /= zoom;
+                bounds.height /= zoom;
+
+                // check right
+                x1 = bounds.x + (bounds.width - right) * zoom;
+                y1 = bounds.y;
+                x2 = bounds.x + (bounds.width - right) * zoom;
+                y2 = bounds.y + bounds.height * zoom;
+                tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
+                // scale bounds for check
+                bounds.width *= zoom;
+                bounds.height *= zoom;
+                if (tmpDist <= dist && bounds.contains(tmp) && !isHorizontal(activeSide)) {
+                    activeSide = activeSide | RIGHT;
+                }
+                // bring dimensions back
+                bounds.width /= zoom;
+                bounds.height /= zoom;
+
+                float top = metadata.borderData[2] + topOffset;
+                float bottom = metadata.borderData[3] + bottomOffset;
+
+                // check top
+                x1 = bounds.x;
+                y1 = bounds.y + (bounds.height - top) * zoom;
+                x2 = bounds.x + bounds.width * zoom;
+                y2 = bounds.y + (bounds.height - top) * zoom;
+                tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
+                // scale bounds for check
+                bounds.width *= zoom;
+                bounds.height *= zoom;
+                if (tmpDist <= dist && bounds.contains(tmp) && !isVertical(activeSide)) {
+                    activeSide = activeSide | TOP;
+                }
+                // bring dimensions back
+                bounds.width /= zoom;
+                bounds.height /= zoom;
+
+                // check bottom
+                x1 = bounds.x;
+                y1 = bounds.y + bottom * zoom;
+                x2 = bounds.x + bounds.width * zoom;
+                y2 = bounds.y + bottom * zoom;
+                tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
+                // scale bounds for check
+                bounds.width *= zoom;
+                bounds.height *= zoom;
+                if (tmpDist <= dist && bounds.contains(tmp) && !isVertical(activeSide)) {
+                    activeSide = activeSide | BOTTOM;
+                }
+                // bring dimensions back
+                bounds.width /= zoom;
+                bounds.height /= zoom;
+
+                if (isHorizontal(activeSide) && isVertical(activeSide)) {
+                    TalosMain.Instance().setCursor(TalosMain.Instance().moveAllDirections);
+                } else if (isVertical(activeSide)) {
+                    TalosMain.Instance().setCursor(TalosMain.Instance().moveVerticallyCursor);
+                } else if (isHorizontal(activeSide)) {
+                    TalosMain.Instance().setCursor(TalosMain.Instance().moveHorizontallyCursor);
+                } else {
+                    TalosMain.Instance().setCursor(null);
+                }
+                return super.mouseMoved(event, x, y);
+            }
+
+            @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
                 if (activeSide == 0) { // move image
                     current.set(x, y);
@@ -83,12 +176,44 @@ public class EditPanel extends Container<Image> {
                 } else { // line is selected, move it instead
                     tmp.set(Gdx.input.getX(), Gdx.input.getY());
                     screenToLocalCoordinates(tmp);
-                    if (isLeft(activeSide)) {
+                    if (isHorizontal(activeSide)) {
                         float left = metadata.borderData[0] + leftOffset;
-                        float delta = tmp.x - (bounds.x + left * zoom);
-                        delta /= zoom;
-                        leftOffset += delta;
+                        float right = metadata.borderData[1] + rightOffset;
+                        if (left > bounds.width - right) { // swap active side
+                            activeSide ^= 1 << 0;
+                            activeSide ^= 1 << 1;
+                        }
+                        if (isLeft(activeSide)) {
+                            float delta = tmp.x - (bounds.x + left * zoom);
+                            delta /= zoom;
+                            leftOffset += delta;
+                        } else {
+                            right = bounds.width - (metadata.borderData[1] + rightOffset);
+                            float delta = tmp.x - (bounds.x + right * zoom);
+                            delta /= zoom;
+                            rightOffset -= delta;
+                        }
                     }
+                    if (isVertical(activeSide)) {
+                        float top = metadata.borderData[2] + topOffset;
+                        float bottom = metadata.borderData[3] + bottomOffset;
+                        if (bottom > bounds.height - top) {
+                            activeSide ^= 1 << 2;
+                            activeSide ^= 1 << 3;
+                        }
+                        if (isTop(activeSide)) {
+                            top = bounds.height - (metadata.borderData[2] + topOffset);
+                            float delta = tmp.y - (bounds.y + top * zoom);
+                            delta /= zoom;
+                            topOffset -= delta;
+                        } else {
+                            float delta = tmp.y - (bounds.y + bottom * zoom);
+                            delta /= zoom;
+                            bottomOffset += delta;
+                        }
+                    }
+
+                    editPanelListener.changed(getLeft(), getRight(), getTop(), getBottom());
                 }
 
                 getActor().setPosition(offset.x, offset.y);
@@ -140,11 +265,6 @@ public class EditPanel extends Container<Image> {
         float x1, y1, x2, y2;
         float left = metadata.borderData[0] + leftOffset;
         float right = metadata.borderData[1] + rightOffset;
-        if (left > bounds.width - right) {
-            float tmp = left;
-            left = right;
-            right = tmp;
-        }
 
         // draw left
         x1 = bounds.x + left * zoom;
@@ -162,11 +282,6 @@ public class EditPanel extends Container<Image> {
 
         float top = metadata.borderData[2] + topOffset;
         float bottom = metadata.borderData[3] + bottomOffset;
-        if (bottom > bounds.height - top) {
-            float tmp = bottom;
-            bottom = top;
-            top = tmp;
-        }
 
         // draw top
         x1 = bounds.x;
@@ -190,7 +305,6 @@ public class EditPanel extends Container<Image> {
     @Override
     public void act(float delta) {
         super.act(delta);
-        TalosMain.Instance().setCursor(null);
 
         Image patch = getActor();
         bounds.x = getActor().getX() - getActor().getOriginX() * zoom + getActor().getWidth() / 2f;
@@ -201,96 +315,9 @@ public class EditPanel extends Container<Image> {
         patch.setOrigin(Align.center);
         patch.setScale(zoom);
         patch.setPosition(offset.x, offset.y);
-
-        // set the active side
-        activeSide = 0;
-        tmp.set(Gdx.input.getX(), Gdx.input.getY());
-        screenToLocalCoordinates(tmp);
-        float x1, y1, x2, y2;
-        float dist = 3;
-        float tmpDist;
-        float left = metadata.borderData[0] + leftOffset;
-        float right = metadata.borderData[1] + rightOffset;
-        if (left > bounds.width - right) {
-            float tmp = left;
-            left = right;
-            right = tmp;
-        }
-
-        // check left
-        x1 = bounds.x + left * zoom;
-        y1 = bounds.y;
-        x2 = bounds.x + left * zoom;
-        y2 = bounds.y + bounds.height * zoom;
-        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
-        // scale bounds for check
-        bounds.width *= zoom;
-        bounds.height *= zoom;
-        if (tmpDist <= dist && bounds.contains(tmp)) {
-            activeSide = LEFT;
-        }
-        // bring dimensions back
-        bounds.width /= zoom;
-        bounds.height /= zoom;
-
-        // check right
-        x1 = bounds.x + (bounds.width - right) * zoom;
-        y1 = bounds.y;
-        x2 = bounds.x + (bounds.width - right) * zoom;
-        y2 = bounds.y + bounds.height * zoom;
-        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
-        // scale bounds for check
-        bounds.width *= zoom;
-        bounds.height *= zoom;
-        if (tmpDist <= dist && bounds.contains(tmp)) {
-            activeSide = RIGHT;
-        }
-        // bring dimensions back
-        bounds.width /= zoom;
-        bounds.height /= zoom;
-
-        float top = metadata.borderData[2] + topOffset;
-        float bottom = metadata.borderData[3] + bottomOffset;
-        if (bottom > bounds.height - top) {
-            float tmp = bottom;
-            bottom = top;
-            top = tmp;
-        }
-
-        // check top
-        x1 = bounds.x;
-        y1 = bounds.y + (bounds.height - top) * zoom;
-        x2 = bounds.x + bounds.width * zoom;
-        y2 = bounds.y + (bounds.height - top) * zoom;
-        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
-        // scale bounds for check
-        bounds.width *= zoom;
-        bounds.height *= zoom;
-        if (tmpDist <= dist && bounds.contains(tmp)) {
-            activeSide = TOP;
-        }
-        // bring dimensions back
-        bounds.width /= zoom;
-        bounds.height /= zoom;
-
-        // check bottom
-        x1 = bounds.x;
-        y1 = bounds.y + bottom * zoom;
-        x2 = bounds.x + bounds.width * zoom;
-        y2 = bounds.y + bottom * zoom;
-        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, tmp.x, tmp.y);
-        // scale bounds for check
-        bounds.width *= zoom;
-        bounds.height *= zoom;
-        if (tmpDist <= dist && bounds.contains(tmp)) {
-            activeSide = BOTTOM;
-        }
-        // bring dimensions back
-        bounds.width /= zoom;
-        bounds.height /= zoom;
     }
 
-    public void show(SpriteMetadata metadata, NinePatch patch) {
+    public void show(SpriteMetadata metadata, Texture patch) {
         this.metadata = metadata;
         Image patchImage = new Image(patch);
 
@@ -302,13 +329,14 @@ public class EditPanel extends Container<Image> {
         delta.setZero();
         last.setZero();
         current.setZero();
+        leftOffset = 0;
+        rightOffset = 0;
+        topOffset = 0;
+        bottomOffset = 0;
         setActor(patchImage);
     }
 
     private void drawLine(ShapeRenderer shapeRenderer, float x1, float y1, float x2, float y2, int side) {
-        if (isSame(activeSide, side)) {
-            TalosMain.Instance().setCursor(TalosMain.Instance().moveRulerCursor);
-        }
         if (isSame(activeSide, side) && Gdx.input.isTouched()) {
             shapeRenderer.setColor(activeSliceLineColor);
         } else {
@@ -343,5 +371,27 @@ public class EditPanel extends Container<Image> {
 
     private static boolean isSame(int side1, int side2) {
         return (side1 & side2) != 0;
+    }
+
+    public float getLeft () {
+        return metadata.borderData[0] + leftOffset;
+    }
+
+    public float getRight () {
+        return metadata.borderData[1] + rightOffset;
+    }
+
+    public float getTop () {
+        return metadata.borderData[2] + topOffset;
+    }
+
+    public float getBottom () {
+        return metadata.borderData[3] + bottomOffset;
+    }
+
+    public static class EditPanelListener {
+        public void changed(float left, float right, float top, float bottom) {
+            // do something
+        }
     }
 }
