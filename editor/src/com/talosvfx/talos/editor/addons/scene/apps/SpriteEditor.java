@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -129,6 +130,12 @@ public class SpriteEditor extends AEditorApp {
         // get ninepatch
         FileHandle file = AssetImporter.getFileFromMetadataHandle(metadata.currentFile);
         texture = new Texture(file);
+        // clamp metadata values in case they are invalid
+        metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
+        metadata.borderData[1] = MathUtils.clamp(metadata.borderData[1], 0, texture.getWidth());
+        metadata.borderData[2] = MathUtils.clamp(metadata.borderData[2], 0, texture.getHeight());
+        metadata.borderData[3] = MathUtils.clamp(metadata.borderData[3], 0, texture.getHeight());
+        
         NinePatch patch = new NinePatch(
             texture,
             metadata.borderData[0],
