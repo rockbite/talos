@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.addons.scene.apps;
+package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;

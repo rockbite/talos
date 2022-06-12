@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps;
 
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditor;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 public class EditorApps {
