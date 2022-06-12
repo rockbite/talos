@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -23,6 +24,11 @@ public class SpriteEditor extends AEditorApp {
     private NinePatchDrawable patchDrawable;
     private Texture texture;
 
+    private NumberPanel leftProperty;
+    private NumberPanel rightProperty;
+    private NumberPanel topProperty;
+    private NumberPanel bottomProperty;
+
     @Override
     protected void initContent() {
         shapeRenderer = new ShapeRenderer();
@@ -31,18 +37,20 @@ public class SpriteEditor extends AEditorApp {
         editPanel = new EditPanel(shapeRenderer, new EditPanel.EditPanelListener() {
             @Override
             public void changed(float left, float right, float top, float bottom) {
-                NinePatch patch = new NinePatch(
-                    texture,
-                    (int) left,
-                    (int) right,
-                    (int) top,
-                    (int) bottom
-                );
-                patchDrawable.setPatch(patch);
+                leftProperty.setValue(left);
+                rightProperty.setValue(right);
+                topProperty.setValue(top);
+                bottomProperty.setValue(bottom);
+            }
+
+            @Override
+            public void dragStop(float left, float right, float top, float bottom) {
+                updatePreview();
             }
         });
         Table rightSide = new Table();
         ninePatchPreview = new Table();
+        Table numberControls = new Table();
 
         TextButton saveSpriteMetaData = new TextButton("Save", getSkin());
         saveSpriteMetaData.addListener(new ClickListener() {
@@ -53,10 +61,39 @@ public class SpriteEditor extends AEditorApp {
             }
         });
 
-        // To do: make lines
         rightSide.add(ninePatchPreview).size(175, 175).space(20).right();
         rightSide.row();
-        rightSide.add(saveSpriteMetaData).expand().size(60, 40).bottom().right();
+        rightSide.add(numberControls).expand().right();
+
+        Label leftLabel = new Label("Left: ", getSkin());
+        leftProperty = new NumberPanel();
+        leftProperty.init();
+        numberControls.add(leftLabel).right();
+        numberControls.add(leftProperty).growX().maxWidth(200).right().space(5);
+        numberControls.row();
+
+        Label rightLabel = new Label("Right: ", getSkin());
+        rightProperty = new NumberPanel();
+        rightProperty.init();
+        numberControls.add(rightLabel).right();
+        numberControls.add(rightProperty).growX().maxWidth(200).right().space(5);
+        numberControls.row();
+
+        Label topLabel = new Label("Top: ", getSkin());
+        topProperty = new NumberPanel();
+        topProperty.init();
+        numberControls.add(topLabel).right();
+        numberControls.add(topProperty).growX().maxWidth(200).right().space(5);
+        numberControls.row();
+
+        Label bottomLabel = new Label("Bottom: ", getSkin());
+        bottomProperty = new NumberPanel();
+        bottomProperty.init();
+        numberControls.add(bottomLabel).right();
+        numberControls.add(bottomProperty).growX().maxWidth(200).right().space(5);
+
+        rightSide.row();
+        rightSide.add(saveSpriteMetaData).size(60, 40).bottom().right().padTop(10);
 
         content.pad(15);
         content.add(editPanel).size(370).space(40);
@@ -67,10 +104,10 @@ public class SpriteEditor extends AEditorApp {
     private void saveAndClose() {
         if (listener != null) {
             listener.changed(
-                    (int) editPanel.getLeft(),
-                    (int) editPanel.getRight(),
-                    (int) editPanel.getTop(),
-                    (int) editPanel.getBottom()
+                (int) editPanel.getLeft(),
+                (int) editPanel.getRight(),
+                (int) editPanel.getTop(),
+                (int) editPanel.getBottom()
             );
         }
         hide();
@@ -112,7 +149,153 @@ public class SpriteEditor extends AEditorApp {
         ninePatchPreview.add(square).grow().space(20);
         ninePatchPreview.row();
         ninePatchPreview.add(horizontal).growX().colspan(2).space(20);
+
+        // set limits
+        leftProperty.setRange(0, texture.getWidth());
+        rightProperty.setRange(0, texture.getWidth());
+        topProperty.setRange(0, texture.getHeight());
+        bottomProperty.setRange(0, texture.getHeight());
+
+        // set values
+        leftProperty.setValue(editPanel.getLeft());
+        rightProperty.setValue(editPanel.getRight());
+        topProperty.setValue(editPanel.getTop());
+        bottomProperty.setValue(editPanel.getBottom());
+
+
+        leftProperty.setListener(new NumberPanel.NumberPanelListener() {
+            @Override
+            public void typed(float before, float after) {
+                float left = leftProperty.getValue();
+                float right = rightProperty.getValue();
+                if (left >= texture.getWidth() - right) {
+                    left = texture.getWidth() - right;
+                }
+                leftProperty.setValue(left);
+                editPanel.set(EditPanel.LEFT, left);
+                updatePreview();
+            }
+
+            @Override
+            public void dragged(float before, float after) {
+                float left = leftProperty.getValue();
+                float right = rightProperty.getValue();
+                if (left >= texture.getWidth() - right) {
+                    left = before;
+                }
+                leftProperty.setValue(left);
+                editPanel.set(EditPanel.LEFT, left);
+            }
+
+            @Override
+            public void dragStop() {
+                updatePreview();
+            }
+        });
+        rightProperty.setListener(new NumberPanel.NumberPanelListener() {
+            @Override
+            public void typed(float before, float after) {
+                float left = leftProperty.getValue();
+                float right = rightProperty.getValue();
+                if (right >= texture.getWidth() - left) {
+                    right = texture.getWidth() - left;
+                }
+                rightProperty.setValue(right);
+                editPanel.set(EditPanel.RIGHT, right);
+                updatePreview();
+            }
+
+            @Override
+            public void dragged(float before, float after) {
+                float left = leftProperty.getValue();
+                float right = rightProperty.getValue();
+                if (right >= texture.getWidth() - left) {
+                    right = before;
+                }
+                rightProperty.setValue(right);
+                editPanel.set(EditPanel.RIGHT, right);
+            }
+
+            @Override
+            public void dragStop() {
+                updatePreview();
+            }
+        });
+        topProperty.setListener(new NumberPanel.NumberPanelListener() {
+            @Override
+            public void typed(float before, float after) {
+                float top = topProperty.getValue();
+                float bottom = bottomProperty.getValue();
+                if (top >= texture.getHeight() - bottom) {
+                    top = texture.getHeight() - bottom;
+                }
+                topProperty.setValue(top);
+                editPanel.set(EditPanel.TOP, top);
+                updatePreview();
+            }
+
+            @Override
+            public void dragged(float before, float after) {
+                float top = topProperty.getValue();
+                float bottom = bottomProperty.getValue();
+                if (top >= texture.getHeight() - bottom) {
+                    top = before;
+                }
+                topProperty.setValue(top);
+                editPanel.set(EditPanel.TOP, top);
+            }
+
+            @Override
+            public void dragStop() {
+                updatePreview();
+            }
+        });
+        bottomProperty.setListener(new NumberPanel.NumberPanelListener() {
+            @Override
+            public void typed(float before, float after) {
+                float top = topProperty.getValue();
+                float bottom = bottomProperty.getValue();
+                if (bottom >= texture.getHeight() - top) {
+                    bottom = texture.getHeight() - top;
+                }
+                bottomProperty.setValue(bottom);
+                editPanel.set(EditPanel.BOTTOM, bottom);
+                updatePreview();
+            }
+
+            @Override
+            public void dragged(float before, float after) {
+                float top = topProperty.getValue();
+                float bottom = bottomProperty.getValue();
+                if (bottom >= texture.getHeight() - top) {
+                    bottom = before;
+                }
+                bottomProperty.setValue(bottom);
+                editPanel.set(EditPanel.BOTTOM, bottom);
+            }
+
+            @Override
+            public void dragStop() {
+                updatePreview();
+            }
+        });
+
         return this;
+    }
+
+    private void updatePreview() {
+        float left = editPanel.getLeft();
+        float right = editPanel.getRight();
+        float top = editPanel.getTop();
+        float bottom = editPanel.getBottom();
+        NinePatch patch = new NinePatch(
+                texture,
+                (int) left,
+                (int) right,
+                (int) top,
+                (int) bottom
+        );
+        patchDrawable.setPatch(patch);
     }
 
     @Override

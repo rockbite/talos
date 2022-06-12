@@ -12,10 +12,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
@@ -23,10 +23,10 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line;
 
 public class EditPanel extends Container<Image> {
-    private static final int LEFT = 0b1;
-    private static final int RIGHT = 0b10;
-    private static final int TOP = 0b100;
-    private static final int BOTTOM = 0b1000;
+    public static final int LEFT = 0b1;
+    public static final int RIGHT = 0b10;
+    public static final int TOP = 0b100;
+    public static final int BOTTOM = 0b1000;
 
     private float zoom = 1.0f;
     private Vector2 offset = new Vector2();
@@ -59,7 +59,7 @@ public class EditPanel extends Container<Image> {
 
         clip();
         setTouchable(Touchable.enabled);
-        addCaptureListener(new DragListener() {
+        addCaptureListener(new InputListener() {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -187,11 +187,13 @@ public class EditPanel extends Container<Image> {
                             float delta = tmp.x - (bounds.x + left * zoom);
                             delta /= zoom;
                             leftOffset += delta;
+                            leftOffset = MathUtils.clamp(leftOffset, -metadata.borderData[0], bounds.width - metadata.borderData[0]);
                         } else {
                             right = bounds.width - (metadata.borderData[1] + rightOffset);
                             float delta = tmp.x - (bounds.x + right * zoom);
                             delta /= zoom;
                             rightOffset -= delta;
+                            rightOffset = MathUtils.clamp(rightOffset, -metadata.borderData[1], bounds.width - metadata.borderData[1]);
                         }
                     }
                     if (isVertical(activeSide)) {
@@ -206,10 +208,12 @@ public class EditPanel extends Container<Image> {
                             float delta = tmp.y - (bounds.y + top * zoom);
                             delta /= zoom;
                             topOffset -= delta;
+                            topOffset = MathUtils.clamp(topOffset, -metadata.borderData[2], bounds.height - metadata.borderData[2]);
                         } else {
                             float delta = tmp.y - (bounds.y + bottom * zoom);
                             delta /= zoom;
                             bottomOffset += delta;
+                            bottomOffset = MathUtils.clamp(bottomOffset, -metadata.borderData[3], bounds.height - metadata.borderData[3]);
                         }
                     }
 
@@ -217,6 +221,11 @@ public class EditPanel extends Container<Image> {
                 }
 
                 getActor().setPosition(offset.x, offset.y);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                editPanelListener.dragStop(getLeft(), getRight(), getTop(), getBottom());
             }
 
             @Override
@@ -389,9 +398,21 @@ public class EditPanel extends Container<Image> {
         return metadata.borderData[3] + bottomOffset;
     }
 
-    public static class EditPanelListener {
-        public void changed(float left, float right, float top, float bottom) {
-            // do something
+    public void set(int side, float value) {
+        if (isLeft(side)) {
+            leftOffset = value - metadata.borderData[0];
+        } else if(isRight(side)) {
+            rightOffset = value - metadata.borderData[1];
+        } else if(isTop(side)) {
+            topOffset = value - metadata.borderData[2];
+        } else if(isBottom(side)) {
+            bottomOffset = value - metadata.borderData[3];
         }
+    }
+
+    public static abstract class EditPanelListener {
+        public abstract void changed(float left, float right, float top, float bottom);
+
+        public abstract void dragStop(float left, float righ, float top, float bottom);
     }
 }
