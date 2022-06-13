@@ -5,22 +5,20 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
-
-import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line;
+import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 
 public class EditPanel extends Container<Image> {
     public static final int LEFT = 0b1;
@@ -34,23 +32,31 @@ public class EditPanel extends Container<Image> {
     private Vector2 last = new Vector2();
     private Vector2 delta = new Vector2();
     private Vector2 tmp = new Vector2();
+    private Rectangle bounds;
+
     private Color borderColor;
     private Color sliceLineColor;
     private Color activeSliceLineColor;
-    private Rectangle bounds;
+
+
     private float leftOffset = 0;
     private float rightOffset = 0;
     private float topOffset = 0;
     private float bottomOffset = 0;
     private SpriteMetadata metadata;
+
     private int activeSide = 0b0;
 
     private EditPanelListener editPanelListener;
 
-    private ShapeRenderer shapeRenderer;
+    // Shapes
+    private Image circle;
+    private TextureRegion line;
 
-    public EditPanel(ShapeRenderer shapeRenderer, EditPanelListener editPanelListener) {
-        this.shapeRenderer = shapeRenderer;
+    public EditPanel(EditPanelListener editPanelListener) {
+        circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
+        line = TalosMain.Instance().getSkin().getRegion("white");
+
         this.editPanelListener = editPanelListener;
         this.bounds = new Rectangle();
         borderColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);
@@ -60,6 +66,7 @@ public class EditPanel extends Container<Image> {
         clip();
         setTouchable(Touchable.enabled);
         addCaptureListener(new InputListener() {
+            private boolean isDragging = false;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -167,6 +174,7 @@ public class EditPanel extends Container<Image> {
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                isDragging = true;
                 if (activeSide == 0) { // move image
                     current.set(x, y);
                     delta.set(current.x, current.y);
@@ -225,7 +233,11 @@ public class EditPanel extends Container<Image> {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                editPanelListener.dragStop(getLeft(), getRight(), getTop(), getBottom());
+                super.touchUp(event, x, y, pointer, button);
+                if (editPanelListener != null && isDragging) {
+                    editPanelListener.dragStop(getLeft(), getTop(), getTop(), getBottom());
+                }
+                isDragging = false;
             }
 
             @Override
@@ -247,68 +259,33 @@ public class EditPanel extends Container<Image> {
     public void drawChildren(Batch batch, float parentAlpha) {
         super.drawChildren(batch, parentAlpha);
 
-        batch.end();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-        shapeRenderer.begin(Line);
+
         // draw border
         borderColor.a = parentAlpha;
-        shapeRenderer.setColor(borderColor);
-
-        shapeRenderer.rect(
-                bounds.x, bounds.y,
-                bounds.width * zoom, bounds.height * zoom
-        );
+        drawRect(batch, bounds.x, bounds.y, bounds.width * zoom, bounds.height * zoom, borderColor);
 
         // draw pivot
         borderColor.a = parentAlpha;
-        shapeRenderer.setColor(borderColor);
-        shapeRenderer.circle(bounds.x + bounds.width / 2f * zoom, bounds.y + bounds.height / 2f * zoom,  1 * zoom);
+        drawCircle(
+            batch,
+            bounds.x + bounds.width / 2f * zoom,
+            bounds.y + bounds.height / 2f * zoom,
+            0.5f * zoom,
+            borderColor
+        );
 
         // draw segment lines
         sliceLineColor.a = parentAlpha;
         activeSliceLineColor.a = parentAlpha;
 
-        float x1, y1, x2, y2;
-        float left = metadata.borderData[0] + leftOffset;
-        float right = metadata.borderData[1] + rightOffset;
+        drawSlice(batch, LEFT);
+        drawSlice(batch, RIGHT);
+        drawSlice(batch, TOP);
+        drawSlice(batch, BOTTOM);
 
-        // draw left
-        x1 = bounds.x + left * zoom;
-        y1 = bounds.y;
-        x2 = bounds.x + left * zoom;
-        y2 = bounds.y + bounds.height * zoom;
-        drawLine(shapeRenderer, x1, y1, x2, y2, LEFT);
-
-        // draw right
-        x1 = bounds.x + (bounds.width - right) * zoom;
-        y1 = bounds.y;
-        x2 = bounds.x + (bounds.width - right) * zoom;
-        y2 = bounds.y + bounds.height * zoom;
-        drawLine(shapeRenderer, x1, y1, x2, y2, RIGHT);
-
-        float top = metadata.borderData[2] + topOffset;
-        float bottom = metadata.borderData[3] + bottomOffset;
-
-        // draw top
-        x1 = bounds.x;
-        y1 = bounds.y + (bounds.height - top) * zoom;
-        x2 = bounds.x + bounds.width * zoom;
-        y2 = bounds.y + (bounds.height - top) * zoom;
-        drawLine(shapeRenderer, x1, y1, x2, y2, TOP);
-
-        // draw bottom
-        x1 = bounds.x;
-        y1 = bounds.y + bottom * zoom;
-        x2 = bounds.x + bounds.width * zoom;
-        y2 = bounds.y + bottom * zoom;
-        drawLine(shapeRenderer, x1, y1, x2, y2, BOTTOM);
-
-        shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        batch.begin();
     }
 
     @Override
@@ -345,13 +322,79 @@ public class EditPanel extends Container<Image> {
         setActor(patchImage);
     }
 
-    private void drawLine(ShapeRenderer shapeRenderer, float x1, float y1, float x2, float y2, int side) {
+    private void drawSlice(Batch batch, int side) {
+        Color color;
         if (isSame(activeSide, side) && Gdx.input.isTouched()) {
-            shapeRenderer.setColor(activeSliceLineColor);
+            color = activeSliceLineColor;
         } else {
-            shapeRenderer.setColor(sliceLineColor);
+            color = sliceLineColor;
         }
-        shapeRenderer.line(x1, y1, x2, y2);
+
+        float x1, y1, x2, y2;
+
+        float left = metadata.borderData[0] + leftOffset;
+        float right = metadata.borderData[1] + rightOffset;
+        float top = metadata.borderData[2] + topOffset;
+        float bottom = metadata.borderData[3] + bottomOffset;
+
+        switch (side) {
+            case LEFT:
+                x1 = bounds.x + left * zoom;
+                y1 = bounds.y;
+                x2 = bounds.x + left * zoom;
+                y2 = bounds.y + bounds.height * zoom;
+                break;
+            case RIGHT:
+                x1 = bounds.x + (bounds.width - right) * zoom;
+                y1 = bounds.y;
+                x2 = bounds.x + (bounds.width - right) * zoom;
+                y2 = bounds.y + bounds.height * zoom;
+                break;
+            case TOP:
+                x1 = bounds.x;
+                y1 = bounds.y + (bounds.height - top) * zoom;
+                x2 = bounds.x + bounds.width * zoom;
+                y2 = bounds.y + (bounds.height - top) * zoom;
+                break;
+            case BOTTOM:
+                x1 = bounds.x;
+                y1 = bounds.y + bottom * zoom;
+                x2 = bounds.x + bounds.width * zoom;
+                y2 = bounds.y + bottom * zoom;
+                break;
+            default:
+                return;
+        }
+
+        drawLine(batch, x1, y1, x2, y2, color);
+    }
+
+    private void drawLine(Batch batch, float x1, float y1, float x2, float y2, Color color) {
+        tmp.set(x2, y2).sub(x1, y1);
+        float thickness = 1.5f;
+        float length = tmp.len();
+        float rotation = tmp.angleDeg();
+        tmp.scl(0.5f).add(x1, y1); // center points
+        Color prev = batch.getColor();
+        batch.setColor(color);
+        batch.draw(line, tmp.x - 0.5f * length, tmp.y - 0.5f * thickness, length/2f, thickness/2f, length, thickness, 1f, 1f, rotation);
+        batch.setColor(prev);
+    }
+
+    private void drawRect(Batch batch, float x, float y, float width, float height, Color color) {
+        drawLine(batch, x, y, x, y + height, color);
+        drawLine(batch, x, y + height, x + width, y + height, color);
+        drawLine(batch, x + width, y + height, x + width, y, color);
+        drawLine(batch, x + width, y, x, y, color);
+    }
+
+    private void drawCircle (Batch batch, float x, float y, float radius, Color color) {
+        circle.setSize(radius * 2, radius * 2);
+        circle.setPosition(x - radius, y - radius);
+        Color prev = batch.getColor();
+        batch.setColor(color);
+        circle.draw(batch, color.a);
+        batch.setColor(prev);
     }
 
     private static boolean isLeft(int side) {
@@ -410,9 +453,9 @@ public class EditPanel extends Container<Image> {
         }
     }
 
+
     public static abstract class EditPanelListener {
         public abstract void changed(float left, float right, float top, float bottom);
-
-        public abstract void dragStop(float left, float righ, float top, float bottom);
+        public abstract void dragStop(float left, float right, float top, float bottom);
     }
 }

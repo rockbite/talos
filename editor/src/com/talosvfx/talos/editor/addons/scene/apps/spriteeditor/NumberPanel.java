@@ -28,7 +28,6 @@ public class NumberPanel extends Table {
 
     private boolean isSelected;
     private boolean isHover;
-    private boolean isDragging = false;
 
     private Table content = new Table();
 
@@ -41,6 +40,8 @@ public class NumberPanel extends Table {
 
         editing = new Table();
         main = new Table();
+
+        init();
     }
 
     public void init() {
@@ -70,6 +71,7 @@ public class NumberPanel extends Table {
         addListener(new ClickListener() {
 
             private boolean dragged = false;
+            private boolean isDragging = false;
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -241,9 +243,7 @@ public class NumberPanel extends Table {
 
     public abstract static class NumberPanelListener {
         public abstract void typed(float before, float after);
-
         public abstract void dragged(float before, float after);
-
         public abstract void dragStop();
     }
 }

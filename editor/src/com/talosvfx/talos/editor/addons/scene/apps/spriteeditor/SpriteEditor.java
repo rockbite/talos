@@ -20,23 +20,21 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 public class SpriteEditor extends AEditorApp {
     private SpriteMetadataListener listener;
+
     private EditPanel editPanel;
     private Table ninePatchPreview;
-    private ShapeRenderer shapeRenderer;
-    private NinePatchDrawable patchDrawable;
-    private Texture texture;
-
     private NumberPanel leftProperty;
     private NumberPanel rightProperty;
     private NumberPanel topProperty;
     private NumberPanel bottomProperty;
 
+    private Texture texture;
+    private NinePatchDrawable patchDrawable;
+
     @Override
     protected void initContent() {
-        shapeRenderer = new ShapeRenderer();
-
         Table content = new Table();
-        editPanel = new EditPanel(shapeRenderer, new EditPanel.EditPanelListener() {
+        editPanel = new EditPanel(new EditPanel.EditPanelListener() {
             @Override
             public void changed(float left, float right, float top, float bottom) {
                 leftProperty.setValue(left);
@@ -54,6 +52,15 @@ public class SpriteEditor extends AEditorApp {
         ninePatchPreview = new Table();
         Table numberControls = new Table();
 
+        Label leftLabel = new Label("Left: ", getSkin());
+        leftProperty = new NumberPanel();
+        Label rightLabel = new Label("Right: ", getSkin());
+        rightProperty = new NumberPanel();
+        Label topLabel = new Label("Top: ", getSkin());
+        topProperty = new NumberPanel();
+        Label bottomLabel = new Label("Bottom: ", getSkin());
+        bottomProperty = new NumberPanel();
+
         TextButton saveSpriteMetaData = new TextButton("Save", getSkin());
         saveSpriteMetaData.addListener(new ClickListener() {
             @Override
@@ -67,30 +74,18 @@ public class SpriteEditor extends AEditorApp {
         rightSide.row();
         rightSide.add(numberControls).expand().right();
 
-        Label leftLabel = new Label("Left: ", getSkin());
-        leftProperty = new NumberPanel();
-        leftProperty.init();
         numberControls.add(leftLabel).right();
         numberControls.add(leftProperty).growX().maxWidth(200).right().space(5);
         numberControls.row();
 
-        Label rightLabel = new Label("Right: ", getSkin());
-        rightProperty = new NumberPanel();
-        rightProperty.init();
         numberControls.add(rightLabel).right();
         numberControls.add(rightProperty).growX().maxWidth(200).right().space(5);
         numberControls.row();
 
-        Label topLabel = new Label("Top: ", getSkin());
-        topProperty = new NumberPanel();
-        topProperty.init();
         numberControls.add(topLabel).right();
         numberControls.add(topProperty).growX().maxWidth(200).right().space(5);
         numberControls.row();
 
-        Label bottomLabel = new Label("Bottom: ", getSkin());
-        bottomProperty = new NumberPanel();
-        bottomProperty.init();
         numberControls.add(bottomLabel).right();
         numberControls.add(bottomProperty).growX().maxWidth(200).right().space(5);
 
@@ -101,75 +96,6 @@ public class SpriteEditor extends AEditorApp {
         content.add(editPanel).size(370).space(40);
         content.add(rightSide).size(300, 370);
         add(content).size(740, 400);
-    }
-
-    private void saveAndClose() {
-        if (listener != null) {
-            listener.changed(
-                (int) editPanel.getLeft(),
-                (int) editPanel.getRight(),
-                (int) editPanel.getTop(),
-                (int) editPanel.getBottom()
-            );
-        }
-        hide();
-    }
-
-    @Override
-    public String getTitle() {
-        return "Sprite Editor";
-    }
-
-    public static interface SpriteMetadataListener {
-        void changed(int left, int right, int top, int bottom);
-    }
-
-    public AEditorApp show(SpriteMetadata metadata, SpriteMetadataListener listener) {
-        super.show();
-        this.listener = listener;
-
-        // get ninepatch
-        FileHandle file = AssetImporter.getFileFromMetadataHandle(metadata.currentFile);
-        texture = new Texture(file);
-        // clamp metadata values in case they are invalid
-        metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
-        metadata.borderData[1] = MathUtils.clamp(metadata.borderData[1], 0, texture.getWidth());
-        metadata.borderData[2] = MathUtils.clamp(metadata.borderData[2], 0, texture.getHeight());
-        metadata.borderData[3] = MathUtils.clamp(metadata.borderData[3], 0, texture.getHeight());
-        
-        NinePatch patch = new NinePatch(
-            texture,
-            metadata.borderData[0],
-            metadata.borderData[1],
-            metadata.borderData[2],
-            metadata.borderData[3]
-        );
-        patchDrawable = new NinePatchDrawable(patch);
-        // live
-        editPanel.show(metadata, texture);
-
-        // preview
-        ninePatchPreview.clear();
-        Image vertical = new Image(patchDrawable);
-        Image square = new Image(patchDrawable);
-        Image horizontal = new Image(patchDrawable);
-        ninePatchPreview.add(vertical).growY().space(20);
-        ninePatchPreview.add(square).grow().space(20);
-        ninePatchPreview.row();
-        ninePatchPreview.add(horizontal).growX().colspan(2).space(20);
-
-        // set limits
-        leftProperty.setRange(0, texture.getWidth());
-        rightProperty.setRange(0, texture.getWidth());
-        topProperty.setRange(0, texture.getHeight());
-        bottomProperty.setRange(0, texture.getHeight());
-
-        // set values
-        leftProperty.setValue(editPanel.getLeft());
-        rightProperty.setValue(editPanel.getRight());
-        topProperty.setValue(editPanel.getTop());
-        bottomProperty.setValue(editPanel.getBottom());
-
 
         leftProperty.setListener(new NumberPanel.NumberPanelListener() {
             @Override
@@ -287,6 +213,74 @@ public class SpriteEditor extends AEditorApp {
                 updatePreview();
             }
         });
+    }
+
+    private void saveAndClose() {
+        if (listener != null) {
+            listener.changed(
+                (int) editPanel.getLeft(),
+                (int) editPanel.getRight(),
+                (int) editPanel.getTop(),
+                (int) editPanel.getBottom()
+            );
+        }
+        hide();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Sprite Editor";
+    }
+
+    public static interface SpriteMetadataListener {
+        void changed(int left, int right, int top, int bottom);
+    }
+
+    public AEditorApp show(SpriteMetadata metadata, SpriteMetadataListener listener) {
+        super.show();
+        this.listener = listener;
+
+        // get ninepatch
+        FileHandle file = AssetImporter.getFileFromMetadataHandle(metadata.currentFile);
+        texture = new Texture(file);
+        // clamp metadata values in case they are invalid
+        metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
+        metadata.borderData[1] = MathUtils.clamp(metadata.borderData[1], 0, texture.getWidth());
+        metadata.borderData[2] = MathUtils.clamp(metadata.borderData[2], 0, texture.getHeight());
+        metadata.borderData[3] = MathUtils.clamp(metadata.borderData[3], 0, texture.getHeight());
+        
+        NinePatch patch = new NinePatch(
+            texture,
+            metadata.borderData[0],
+            metadata.borderData[1],
+            metadata.borderData[2],
+            metadata.borderData[3]
+        );
+        patchDrawable = new NinePatchDrawable(patch);
+        // live
+        editPanel.show(metadata, texture);
+
+        // preview
+        ninePatchPreview.clear();
+        Image vertical = new Image(patchDrawable);
+        Image square = new Image(patchDrawable);
+        Image horizontal = new Image(patchDrawable);
+        ninePatchPreview.add(vertical).growY().space(20);
+        ninePatchPreview.add(square).grow().space(20);
+        ninePatchPreview.row();
+        ninePatchPreview.add(horizontal).growX().colspan(2).space(20);
+
+        // set limits
+        leftProperty.setRange(0, texture.getWidth());
+        rightProperty.setRange(0, texture.getWidth());
+        topProperty.setRange(0, texture.getHeight());
+        bottomProperty.setRange(0, texture.getHeight());
+
+        // set values
+        leftProperty.setValue(editPanel.getLeft());
+        rightProperty.setValue(editPanel.getRight());
+        topProperty.setValue(editPanel.getTop());
+        bottomProperty.setValue(editPanel.getBottom());
 
         return this;
     }
