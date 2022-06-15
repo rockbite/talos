@@ -3,10 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
@@ -26,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.StringBuilder;
 import java.security.MessageDigest;
 
 public class AssetImporter {
@@ -276,6 +274,7 @@ public class AssetImporter {
 
     public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {
         Json json = new Json();
+        json.setOutputType(JsonWriter.OutputType.json);
         String data = json.toJson(aMetadata);
         handle.writeString(data, false);
     }

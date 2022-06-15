@@ -11,16 +11,13 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
-import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 
-public class EditPanel extends Container<Image> {
+public class EditPanel extends Table {
     public static final int LEFT = 0b1;
     public static final int RIGHT = 0b10;
     public static final int TOP = 0b100;
@@ -53,6 +50,9 @@ public class EditPanel extends Container<Image> {
     private Image circle;
     private TextureRegion line;
 
+    private Image image;
+    private Texture texture;
+
     public EditPanel(EditPanelListener editPanelListener) {
         circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
         line = TalosMain.Instance().getSkin().getRegion("white");
@@ -78,7 +78,7 @@ public class EditPanel extends Container<Image> {
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
                 zoom += amountY;
                 zoom = MathUtils.clamp(zoom, 0.1f, 100f);
-                getActor().setScale(zoom);
+                image.setScale(zoom);
                 return true;
             }
 
@@ -228,7 +228,7 @@ public class EditPanel extends Container<Image> {
                     editPanelListener.changed(getLeft(), getRight(), getTop(), getBottom());
                 }
 
-                getActor().setPosition(offset.x, offset.y);
+                image.setPosition(offset.x, offset.y);
             }
 
             @Override
@@ -272,7 +272,7 @@ public class EditPanel extends Container<Image> {
             batch,
             bounds.x + bounds.width / 2f * zoom,
             bounds.y + bounds.height / 2f * zoom,
-            0.5f * zoom,
+            5f,
             borderColor
         );
 
@@ -292,26 +292,29 @@ public class EditPanel extends Container<Image> {
     public void act(float delta) {
         super.act(delta);
 
-        Image patch = getActor();
-        bounds.x = getActor().getX() - getActor().getOriginX() * zoom + getActor().getWidth() / 2f;
-        bounds.y = getActor().getY() - getActor().getOriginY() * zoom + getActor().getHeight() / 2f;
-        bounds.width = getActor().getWidth();
-        bounds.height = getActor().getHeight();
+        bounds.x = image.getX() - image.getOriginX() * zoom + texture.getWidth() / 2f;
+        bounds.y = image.getY() - image.getOriginY() * zoom + texture.getHeight() / 2f;
+        bounds.width = texture.getWidth();
+        bounds.height = texture.getHeight();
 
-        patch.setOrigin(Align.center);
-        patch.setScale(zoom);
-        patch.setPosition(offset.x, offset.y);
+        image.setOrigin(Align.center);
+        image.setScale(zoom);
+        image.setPosition(offset.x, offset.y);
     }
 
-    public void show(SpriteMetadata metadata, Texture patch) {
+    public void show(SpriteMetadata metadata, Texture texture) {
         this.metadata = metadata;
-        Image patchImage = new Image(patch);
+        this.texture = texture;
+        this.image = new Image(texture);
 
-        float zoomX = getWidth() / patchImage.getWidth();
-        float zoomY = getHeight() / patchImage.getHeight();
+        float zoomX = getWidth() / texture.getWidth();
+        float zoomY = getHeight() / texture.getHeight();
         zoom = Math.min(zoomX, zoomY);
-
-        offset.set(patchImage.getWidth() / 2f * zoom - patchImage.getWidth() / 2f, patchImage.getHeight() / 2f * zoom  - patchImage.getHeight() / 2f);
+        float longestSide = Math.max(texture.getWidth(), texture.getHeight());
+        offset.set(
+            longestSide / 2f * zoom - texture.getWidth() / 2f,
+            longestSide / 2f * zoom - texture.getHeight() / 2f
+        );
         delta.setZero();
         last.setZero();
         current.setZero();
@@ -319,7 +322,8 @@ public class EditPanel extends Container<Image> {
         rightOffset = 0;
         topOffset = 0;
         bottomOffset = 0;
-        setActor(patchImage);
+        clearChildren();
+        addActor(image);
     }
 
     private void drawSlice(Batch batch, int side) {
