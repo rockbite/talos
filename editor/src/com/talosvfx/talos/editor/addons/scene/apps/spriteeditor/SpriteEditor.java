@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.talosvfx.talos.TalosMain;
@@ -21,7 +18,7 @@ public class SpriteEditor extends AEditorApp {
     private SpriteMetadataListener listener;
 
     private EditPanel editPanel;
-    private Table ninePatchPreview;
+    private NinePatchPreview ninePatchPreview;
     private NumberPanel leftProperty;
     private NumberPanel rightProperty;
     private NumberPanel topProperty;
@@ -48,7 +45,7 @@ public class SpriteEditor extends AEditorApp {
             }
         });
         Table rightSide = new Table();
-        ninePatchPreview = new Table();
+        ninePatchPreview = new NinePatchPreview();
         Table numberControls = new Table();
 
         Label leftLabel = new Label("Left: ", getSkin());
@@ -260,14 +257,7 @@ public class SpriteEditor extends AEditorApp {
         editPanel.show(metadata, texture);
 
         // preview
-        ninePatchPreview.clear();
-        Image vertical = new Image(patchDrawable);
-        Image square = new Image(patchDrawable);
-        Image horizontal = new Image(patchDrawable);
-        ninePatchPreview.add(vertical).growY().space(20);
-        ninePatchPreview.add(square).grow().space(20);
-        ninePatchPreview.row();
-        ninePatchPreview.add(horizontal).growX().colspan(2).space(20);
+        ninePatchPreview.show(patchDrawable);
 
         // set limits
         leftProperty.setRange(0, texture.getWidth());
@@ -304,5 +294,56 @@ public class SpriteEditor extends AEditorApp {
         listener = null;
         TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
         super.hide();
+    }
+
+    private static class NinePatchPreview extends Table {
+        public void show (NinePatchDrawable patchDrawable) {
+            clearChildren();
+            Image vertical = new Image(patchDrawable) {
+                {
+                    float w = NinePatchPreview.this.getWidth() / 4f - 5;
+                    float h = 3 * NinePatchPreview.this.getHeight() / 4f;
+                    float ratio = h / w;
+                    setSize(getWidth(), getHeight() * ratio);
+
+                    float scaleX = w / getWidth();
+                    float scaleY = h / getHeight();
+                    float scale = Math.min(scaleX, scaleY);
+                    setScale(scale, scale);
+                    setPosition(0, NinePatchPreview.this.getWidth() - getHeight() * getScaleY());
+                }
+            };
+            Image square = new Image(patchDrawable) {
+                {
+                    float w = 3 * NinePatchPreview.this.getWidth() / 4f;
+                    float h = 3 * NinePatchPreview.this.getHeight() / 4f;
+                    float ratio = w / h;
+                    setSize(getWidth() * ratio, getHeight());
+
+                    float scaleX = w / getWidth();
+                    float scaleY = h / getHeight();
+                    float scale = Math.min(scaleX, scaleY);
+                    setScale(scale, scale);
+                    setPosition(NinePatchPreview.this.getWidth() - getWidth() * getScaleX(), NinePatchPreview.this.getHeight() - getHeight() * getScaleY());
+                }
+            };
+            Image horizontal = new Image(patchDrawable) {
+                {
+                    float w = NinePatchPreview.this.getWidth();
+                    float h = NinePatchPreview.this.getHeight() / 4f - 5;
+                    float ratio = w / h;
+                    setSize(getWidth() * ratio, getHeight());
+
+                    float scaleX = w / getWidth();
+                    float scaleY = h / getHeight();
+                    float scale = Math.min(scaleX, scaleY);
+                    setScale(scale, scale);
+                }
+            };
+
+            addActor(vertical);
+            addActor(square);
+            addActor(horizontal);
+        }
     }
 }
