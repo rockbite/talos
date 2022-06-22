@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class EditPanel extends Table {
     public static final int LEFT = 0b1;
@@ -54,14 +55,15 @@ public class EditPanel extends Table {
     private Texture texture;
 
     public EditPanel(EditPanelListener editPanelListener) {
+        setBackground(TalosMain.Instance().getSkin().getDrawable("darkBorder"));
         circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
         line = TalosMain.Instance().getSkin().getRegion("white");
 
         this.editPanelListener = editPanelListener;
         this.bounds = new Rectangle();
-        borderColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);
-        sliceLineColor = new Color(0.0f, 1.0f, 0.0f, 1.0f);
-        activeSliceLineColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+        borderColor = new Color(92f/255f, 128f/255f, 188f/255f, 1.0f);
+        sliceLineColor = new Color(224f/255f, 142f/255f, 69f/255f, 1.0f);
+        activeSliceLineColor = new Color(254f/255f, 95f/255f, 85f/255f, 1.0f);
 
         clip();
         setTouchable(Touchable.enabled);
@@ -88,7 +90,7 @@ public class EditPanel extends Table {
                 activeSide = 0;
                 tmp.set(x, y);
                 float x1, y1, x2, y2;
-                float dist = 3;
+                float dist = 10;
                 float tmpDist;
                 float left = metadata.borderData[0] + leftOffset;
                 float right = metadata.borderData[1] + rightOffset;
