@@ -4,7 +4,7 @@ allprojects {
 
 
     group = "com.talosvfx"
-    version = '1.4.1'
+    version = '1.4.2'
 
     if(project.hasProperty("release")) {
     } else {
