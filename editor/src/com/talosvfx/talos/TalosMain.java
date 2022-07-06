@@ -238,12 +238,10 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		if (!focused) {
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			Thread.sleep(16);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		if (currentWorkplaceStage != null) {
