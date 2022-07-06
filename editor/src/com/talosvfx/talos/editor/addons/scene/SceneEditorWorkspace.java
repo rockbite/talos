@@ -45,6 +45,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
+
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
 
     private static SceneEditorWorkspace instance;
@@ -142,6 +144,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords, GameObject parent) {
         GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
         SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
+
+        component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
 
         component.path = AssetImporter.relative(importedAsset);
         component.reloadTexture();

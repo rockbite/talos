@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -19,6 +20,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+
+import java.util.Comparator;
 
 public class SmartTransformGizmo extends Gizmo {
 
@@ -387,6 +390,11 @@ public class SmartTransformGizmo extends Gizmo {
 
     }
 
+    public static int getLatestFreeOrderingIndex (String sortingLayer) {
+        Array<GameObject> list = SceneEditorAddon.get().workspace.getRootGO().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
+        return list.size;
+    }
+
     protected void moveInLayerOrder (GameObject gameObject, int direction) {
         // direction -1 for down, 1 for up
         if(gameObject.hasComponent(SpriteRendererComponent.class)) {
@@ -398,59 +406,50 @@ public class SmartTransformGizmo extends Gizmo {
                 if(!list.get(i).getComponent(SpriteRendererComponent.class).sortingLayer.equals(sortingLayer)) {
                     list.removeIndex(i);
                 }
+                if (list.get(i) == gameObject) {
+                    list.removeIndex(i);
+                }
             }
 
-            // find closest game object if any that is lower to my index, and swap with it
-            if(list.size > 1) {
-                GameObject closest = list.first();
-                if(list.first() == gameObject) {
-                    closest = list.get(1);
+            list.sort(new Comparator<GameObject>() {
+                @Override
+                public int compare (GameObject o1, GameObject o2) {
+                    SpriteRendererComponent o1SpriteRender = o1.getComponent(SpriteRendererComponent.class);
+                    SpriteRendererComponent o2SpriteRender = o2.getComponent(SpriteRendererComponent.class);
+                    return Integer.compare(o1SpriteRender.orderingInLayer, o2SpriteRender.orderingInLayer);
                 }
-                int origDst = component.orderingInLayer - closest.getComponent(SpriteRendererComponent.class).orderingInLayer;
+            });
 
-                for(GameObject candidate: list) {
-                    int dst = component.orderingInLayer - candidate.getComponent(SpriteRendererComponent.class).orderingInLayer;
-                    boolean matchesDirection = false;
-                    boolean matchesDirectionEquals = false;
-                    if(direction == -1 && dst >= 0) matchesDirectionEquals = true;
-                    if(direction == 1 && dst <= 0) matchesDirectionEquals = true;
-                    if(direction == -1 && origDst > dst) matchesDirection = true;
-                    if(direction == 1 && origDst < dst) matchesDirection = true;
+            if (list.size > 0) {
+                int currentOrderInLayer = component.orderingInLayer;
 
-                    if(matchesDirectionEquals && candidate != gameObject) {
-                        if(matchesDirection) {
-                            origDst = dst;
-                            closest = candidate;
-                        }
+                GameObject objectToSwap = null;
+                for (int i = 0; i < list.size; i++) {
+                    GameObject gameObjectToTest = list.get(i);
+                    int otherOrderInLayer = gameObjectToTest.getComponent(SpriteRendererComponent.class).orderingInLayer;
+                    if ((currentOrderInLayer + direction) == otherOrderInLayer) {
+                        objectToSwap = gameObjectToTest;
+                        break;
                     }
                 }
+                if (objectToSwap != null) {
+                    int otherOrder = objectToSwap.getComponent(SpriteRendererComponent.class).orderingInLayer;
+                    int tempSwap = currentOrderInLayer;
 
-                SpriteRendererComponent closestComponent = closest.getComponent(SpriteRendererComponent.class);
-                if(closestComponent.orderingInLayer > component.orderingInLayer && direction == -1) {
-                    return;
-                }
-                if(closestComponent.orderingInLayer < component.orderingInLayer && direction == 1) {
-                    return;
-                }
-                if(closestComponent.orderingInLayer == component.orderingInLayer) {
-                    if(direction == -1) {
-                        closestComponent.orderingInLayer++;
-                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
-                    } else if(direction == 1) {
-                        component.orderingInLayer++;
-                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
-                    }
+                    gameObject.getComponent(SpriteRendererComponent.class).orderingInLayer = otherOrder;
+                    objectToSwap.getComponent(SpriteRendererComponent.class).orderingInLayer = tempSwap;
+
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(objectToSwap.getComponent(SpriteRendererComponent.class), false));
                 } else {
-                    // swap
-                    int tmp = component.orderingInLayer;
-                    component.orderingInLayer = closestComponent.orderingInLayer;
-                    closestComponent.orderingInLayer = tmp;
-
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(closestComponent, false));
+                    //Nothing found, so we can just set it
+                    component.orderingInLayer = MathUtils.clamp(currentOrderInLayer + direction, 0, list.size);
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
                 }
 
+
             }
+
         }
     }
 }
