@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -41,6 +42,11 @@ public class AssetImporter {
 
     private static ObjectMap<AssetType, AbstractImporter> importerMap = new ObjectMap();
     private static ObjectMap<String, Class<? extends AMetadata>> metadataMap = new ObjectMap();
+
+    private static Json json = new Json();
+    static {
+        json.setOutputType(JsonWriter.OutputType.json);
+    }
 
     public AssetImporter() {
         assetTracker = handle -> assetUpdated(handle);
@@ -153,7 +159,6 @@ public class AssetImporter {
     public static <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
         if(handle.exists()) {
             String data = handle.readString();
-            Json json = new Json();
             T object = json.fromJson(clazz, data);
             return object;
         }
@@ -268,7 +273,6 @@ public class AssetImporter {
     }
 
     public static void saveMetadata (FileHandle handle, AMetadata aMetadata) {
-        Json json = new Json();
         String data = json.toJson(aMetadata);
         handle.writeString(data, false);
     }
