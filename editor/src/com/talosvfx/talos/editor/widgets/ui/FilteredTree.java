@@ -347,6 +347,20 @@ public class FilteredTree<T> extends WidgetGroup {
                         Node<T> payloadParent = targetNodeToDrop.getParent();
                         Node<T> payloadNode = targetNodeToDrop;
 
+                        boolean isChild = false;
+                        Node<T> parentNode = node;
+                        while (parentNode.parent != null) {
+                            if (parentNode.parent == payloadNode) {
+                                isChild = true;
+                                break;
+                            }
+                            parentNode = parentNode.parent;
+                        }
+
+                        if(isChild){
+                            continue;
+                        }
+
                         boolean sameLayer = payloadParent == node.getParent();
 
 
