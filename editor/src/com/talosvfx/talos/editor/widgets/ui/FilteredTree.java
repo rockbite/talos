@@ -36,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
@@ -88,6 +89,10 @@ public class FilteredTree<T> extends WidgetGroup {
 
         }
 
+        public void deselect(Node node){
+
+        }
+
         public void delete (Array<FilteredTree.Node> nodes) {
 
         }
@@ -120,7 +125,7 @@ public class FilteredTree<T> extends WidgetGroup {
             }
         };
         selection.setActor(this);
-        selection.setMultiple(false);
+        selection.setMultiple(true);
         selection.setToggle(true);
         setStyle(style);
         initialize();
@@ -176,7 +181,12 @@ public class FilteredTree<T> extends WidgetGroup {
                 }
                 if (!node.isSelectable())
                     return;
-                selection.choose(node);
+                if(selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
+                    selection.remove(node);
+                    itemListener.deselect(node);
+                    return;
+                }
+
                 if(itemListener != null) {
                     itemListener.chosen(node);
                 }
@@ -256,8 +266,9 @@ public class FilteredTree<T> extends WidgetGroup {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
                     Actor dragging;
-
-                    if (node.actor instanceof ActorCloneable) {
+                    if(selection.size()>0){
+                        dragging = new Label("multiple", skin);
+                    }else if (node.actor instanceof ActorCloneable) {
                         dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
                     } else {
                         dragging = new Label("Dragging label", skin);
@@ -325,87 +336,96 @@ public class FilteredTree<T> extends WidgetGroup {
 
                     Node<T> node = ((Node) userObject);
                     Node<T> parent = node.getParent();
-                    Node<T> targetNodeToDrop = (Node) payload.getObject();
 
-                    int indexInParent = -1;
+                    for (Node<T> item : selection.items()) {
+                        Node<T> targetNodeToDrop = item;
 
-                    indexInParent = getIndexInParent(node, parent);
+                        int indexInParent = -1;
 
-                    Node<T> payloadParent = targetNodeToDrop.getParent();
-                    Node<T> payloadNode = targetNodeToDrop;
+                        indexInParent = getIndexInParent(node, parent);
 
-                    Node<T> parentNode = node;
-                    while (parentNode.parent != null) {
-                        if (parentNode.parent == payloadNode) {
-                            return;
+                        Node<T> payloadParent = targetNodeToDrop.getParent();
+                        Node<T> payloadNode = targetNodeToDrop;
+
+                        boolean isChild = false;
+                        Node<T> parentNode = node;
+                        while (parentNode.parent != null) {
+                            if (parentNode.parent == payloadNode) {
+                                isChild = true;
+                                break;
+                            }
+                            parentNode = parentNode.parent;
                         }
-                        parentNode = parentNode.parent;
-                    }
 
-                    boolean sameLayer = payloadParent == node.getParent();
+                        if(isChild){
+                            continue;
+                        }
+
+                        boolean sameLayer = payloadParent == node.getParent();
 
 
-                    //Lets check if its valid first before continuing
+                        //Lets check if its valid first before continuing
 
-                    float yAlpha = y / getActor().getHeight();
+                        float yAlpha = y / getActor().getHeight();
 
-                    int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
+                        int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
 
-                    payloadNode.remove();
+                        payloadNode.remove();
 
-                    if (yAlpha < 0.3f) {
-                        //Always put it below current
+                        if (yAlpha < 0.3f) {
+                            //Always put it below current
 
-                        if (sameLayer) {
-                            if (indexOfPayloadInParent > indexInParent) {
-                                //We are below it, doesnt change the index of the target
+                            if (sameLayer) {
+                                if (indexOfPayloadInParent > indexInParent) {
+                                    //We are below it, doesnt change the index of the target
+                                } else {
+                                    //We are above it, removing this node will pop the index of the child back
+                                    indexInParent -= 1;
+                                }
                             } else {
-                                //We are above it, removing this node will pop the index of the child back
-                                indexInParent -= 1;
+                                //Always going to be the index of the component
+                            }
+
+                            if (parent != null) {
+                                indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
+                                parent.insert(indexInParent, payloadNode);
+                                onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
+                            } else {
+                                indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
+                                insert(indexInParent, payloadNode);
+                                onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
+                            }
+                        } else if (yAlpha > 0.7f) {
+                            //Always put it above
+
+                            if (sameLayer) {
+                                if (indexOfPayloadInParent > indexInParent) {
+                                    //We are below it, doesnt change the index of the target
+                                } else {
+                                    //We are above it, removing this node will pop the index of the child back
+                                    indexInParent -= 1;
+                                }
+                            } else {
+                                //Always going to be the index of the component
+                            }
+
+                            if (parent != null) {
+                                indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
+                                parent.insert(indexInParent, payloadNode);
+                                onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
+                            } else {
+                                indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
+                                insert(indexInParent, payloadNode);
+                                onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
                             }
                         } else {
-                            //Always going to be the index of the component
-                        }
+                            //Always put it as a child
+                            if(!node.draggableInLayerOnly) {
+                                node.insert(0, payloadNode);
+                                node.setExpanded(true);
 
-                        if (parent != null) {
-                            indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
-                            parent.insert(indexInParent, payloadNode);
-                            onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                        } else {
-                            indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
-                            insert(indexInParent, payloadNode);
-                            onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
-                        }
-                    } else if (yAlpha > 0.7f) {
-                        //Always put it above
-
-                        if (sameLayer) {
-                            if (indexOfPayloadInParent > indexInParent) {
-                                //We are below it, doesnt change the index of the target
-                            } else {
-                                //We are above it, removing this node will pop the index of the child back
-                                indexInParent -= 1;
+                                onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
                             }
-                        } else {
-                            //Always going to be the index of the component
-                        }
-
-                        if (parent != null) {
-                            indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
-                            parent.insert(indexInParent, payloadNode);
-                            onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                        } else {
-                            indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
-                            insert(indexInParent, payloadNode);
-                            onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
-                        }
-                    } else {
-                        //Always put it as a child
-                        if(!node.draggableInLayerOnly) {
-                            node.insert(0, payloadNode);
-                            node.setExpanded(true);
-
-                            onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
                         }
                     }
                 }

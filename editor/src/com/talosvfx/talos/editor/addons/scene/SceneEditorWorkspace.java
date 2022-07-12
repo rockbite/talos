@@ -870,14 +870,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         setSelection(tmp);
     }
 
-    private void removeFromSelection (GameObject gameObject) {
+    public void removeFromSelection (GameObject gameObject) {
         selection.removeValue(gameObject, true);
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
     }
 
-    private void addToSelection (GameObject gameObject) {
+    public void addToSelection (GameObject gameObject) {
         if(!selection.contains(gameObject, true)) {
             selection.add(gameObject);
         }
+        Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
     }
 
     private void setSelection(Array<GameObject> gameObjects) {

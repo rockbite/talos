@@ -13,6 +13,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
@@ -49,8 +50,20 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             public void chosen (FilteredTree.Node node) {
                 GameObject gameObject = objectMap.get(node.getName());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                select(gameObject);
-                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+                if(SceneEditorWorkspace.ctrlPressed()){
+                    addToSelection(gameObject);
+                    sceneEditorAddon.workspace.addToSelection(gameObject);
+                }else{
+                    select(gameObject);
+                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+                }
+            }
+
+            @Override
+            public void deselect(FilteredTree.Node node){
+                GameObject gameObject = objectMap.get(node.getName());
+                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+                sceneEditorAddon.workspace.removeFromSelection(gameObject);
             }
 
             @Override
@@ -228,6 +241,17 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         tree.getSelection().clear();
         tree.getSelection().add(nodeMap.get(gameObject));
+        focusKeyboard(gameObject);
+    }
+
+    private void addToSelection (GameObject gameObject) {
+        if(gameObject == null) return;
+
+        tree.getSelection().add(nodeMap.get(gameObject));
+        focusKeyboard(gameObject);
+    }
+
+    private void focusKeyboard(GameObject gameObject){
         Actor actor = nodeMap.get(gameObject).getActor();
         if(actor instanceof EditableLabel) {
             EditableLabel editableLabel = (EditableLabel) actor;
@@ -237,7 +261,6 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         } else {
             getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
         }
-
     }
 
     public void loadEntityContainer(GameObjectContainer entityContainer) {
