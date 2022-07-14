@@ -6,6 +6,6 @@ public class TlsMetadata extends AMetadata {
     public String tlsChecksum = "";
 
     public TlsMetadata() {
-
+        super();
     }
 }

@@ -23,7 +23,7 @@ public class SpriteMetadata extends AMetadata {
     public Texture.TextureFilter filterMode = Texture.TextureFilter.Nearest;
 
     public SpriteMetadata() {
-
+        super();
     }
 
     @Override

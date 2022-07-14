@@ -516,7 +516,8 @@ public class DirectoryViewWidget extends Table {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                if(fileHandle.extension().equals("png")) {
+                String extension = fileHandle.extension();
+                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
                     Texture texture = new Texture(fileHandle);
                     TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
                     icon.setDrawable(drawable);

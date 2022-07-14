@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 public class PrefabMetadata extends AMetadata {
 
     public PrefabMetadata() {
-
+        super();
     }
 
     @Override

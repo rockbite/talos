@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
@@ -17,7 +18,8 @@ import java.util.function.Supplier;
 
 public class SpriteRendererComponent extends RendererComponent {
 
-    public TextureRegion texture;
+    public GameAsset<Texture> texture;
+    TextureRegion textureRegion;
 
     public String path = "";
 
@@ -50,7 +52,7 @@ public class SpriteRendererComponent extends RendererComponent {
             @Override
             public void report(String value) {
                 path = value;
-                reloadTexture();
+                loadTexture();
             }
         });
 
@@ -81,17 +83,29 @@ public class SpriteRendererComponent extends RendererComponent {
         return 2;
     }
 
-    public void reloadTexture () {
-        FileHandle file = AssetImporter.get(path);
-        if(path.length() > 0 && file.exists()) {
-            try {
-                texture = new TextureRegion(new Texture(file));
-            } catch (Exception e) {
-                texture = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
+    GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
+        @Override
+        public void onUpdate () {
+            if (texture.isBroken()) {
+                textureRegion = AssetRepository.getInstance().brokenTextureRegion;
+            } else {
+                textureRegion = new TextureRegion(texture.getResource());
             }
-        } else {
-            texture = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
         }
+    };
+
+    public void loadTexture () {
+        FileHandle file = AssetImporter.get(path);
+
+        if (texture != null) {
+            //Remove from old game asset, it might be the same, but it may also have changed
+            texture.listeners.removeValue(gameAssetUpdateListener, true);
+        }
+
+        texture = AssetRepository.getInstance().getAssetForPath(file, Texture.class);
+        gameAssetUpdateListener.onUpdate();
+
+        texture.listeners.add(gameAssetUpdateListener);
     }
 
     @Override
@@ -110,7 +124,8 @@ public class SpriteRendererComponent extends RendererComponent {
     @Override
     public void read (Json json, JsonValue jsonData) {
         path = jsonData.getString("path");
-        reloadTexture();
+
+        loadTexture();
 
         color = json.readValue(Color.class, jsonData.get("color"));
         if(color == null) color = new Color(Color.WHITE);
@@ -123,18 +138,14 @@ public class SpriteRendererComponent extends RendererComponent {
         super.read(json, jsonData);
     }
 
-    public TextureRegion getTexture () {
-        if(texture == null) {
-            reloadTexture();
-        }
-        return texture;
+    public TextureRegion getTextureRegion () {
+        return textureRegion;
     }
 
     @Override
     public boolean notifyAssetPathChanged (String oldPath, String newPath) {
         if(path.equals(oldPath)) {
             path = newPath;
-            reloadTexture();
             return true;
         }
 

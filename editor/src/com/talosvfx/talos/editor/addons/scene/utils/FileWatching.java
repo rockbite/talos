@@ -155,7 +155,7 @@ public class FileWatching {
                 }
 
                 if(changes.hasChanges()) {
-                    Notifications.fireEvent(Notifications.obtainEvent(ProjectDirectoryContentsChanged.class).set(changes));
+                    //Notifications.fireEvent(Notifications.obtainEvent(ProjectDirectoryContentsChanged.class).set(changes));
                 }
 
                 Thread.sleep(1000);

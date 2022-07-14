@@ -5,6 +5,6 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 public class AtlasMetadata extends AMetadata {
 
     public AtlasMetadata() {
-
+        super();
     }
 }
