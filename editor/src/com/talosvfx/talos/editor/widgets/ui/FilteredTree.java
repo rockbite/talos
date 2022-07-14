@@ -144,12 +144,22 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private void initialize () {
         addListener(clickListener = new ClickListener() {
-            public void clicked (InputEvent event, float x, float y) {
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 Node node = getNodeAt(y);
+                if(itemListener != null) {
+                    if(button == 1) {
+                        // this is right click
+                        itemListener.rightClick(node);
+                        event.cancel();
+
+                        return true;
+                    }
+                }
+
                 if (node == null)
-                    return;
-                if (node != getNodeAt(getTouchDownY()))
-                    return;
+                    return false;
                 if (selection.getMultiple() && selection.hasItems() && UIUtils.shift()) {
                     // Select range (shift).
                     if (rangeStart == null)
@@ -167,7 +177,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
                     selection.fireChangeEvent();
                     FilteredTree.this.rangeStart = rangeStart;
-                    return;
+                    return false;
                 }
                 if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
                     // Toggle expanded.
@@ -176,15 +186,15 @@ public class FilteredTree<T> extends WidgetGroup {
                         rowX -= iconSpacingRight + node.icon.getMinWidth();
                     if (x < rowX) {
                         node.setExpanded(!node.expanded);
-                        return;
+                        return false;
                     }
                 }
                 if (!node.isSelectable())
-                    return;
+                    return false;
                 if(selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
                     selection.remove(node);
                     itemListener.deselect(node);
-                    return;
+                    return false;
                 }
 
                 if(itemListener != null) {
@@ -192,20 +202,6 @@ public class FilteredTree<T> extends WidgetGroup {
                 }
                 if (!selection.isEmpty())
                     rangeStart = node;
-            }
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                Node node = getNodeAt(y);
-                if(itemListener != null) {
-                    if(button == 1) {
-                        // this is right click
-                        itemListener.rightClick(node);
-                        event.cancel();
-
-                        return true;
-                    }
-                }
 
                 return super.touchDown(event, x, y, pointer, button);
             }
