@@ -270,8 +270,12 @@ public class DirectoryViewWidget extends Table {
 
     public void setDirectory(String path) {
         fileHandle = Gdx.files.absolute(path);
-        if(fileHandle == null || !fileHandle.exists()) return;
+        if (fileHandle == null || !fileHandle.exists()) {
+            System.out.println("Error setting dir " + path);
+            return;
+        };
 
+        System.out.println("Setting dir to " + path);
         rebuild();
     }
 
@@ -358,8 +362,6 @@ public class DirectoryViewWidget extends Table {
                     }
 
                     unselectFiles();
-
-                    SceneEditorAddon.get().workspace.reloadProjectExplorer();
                 }
             }
         });

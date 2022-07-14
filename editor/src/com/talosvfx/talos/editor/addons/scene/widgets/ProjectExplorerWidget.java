@@ -295,7 +295,8 @@ public class ProjectExplorerWidget extends Table {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
-            directoryViewWidget.setDirectory((String) nodes.get(path).getObject());
+            String pathToSet = (String)nodes.get(path).getObject();
+            directoryViewWidget.setDirectory(pathToSet);
         } else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(rootNode);

@@ -348,6 +348,7 @@ public class AssetImporter {
     }
 
     public static void moveFile(FileHandle file, FileHandle directory) {
+        FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
 
         //Protected, don't move assets/scenes folders
@@ -356,7 +357,10 @@ public class AssetImporter {
 
         AssetRepository.getInstance().moveFile(file, directory);
 
-        SceneEditorAddon.get().workspace.reloadProjectExplorer();
+
+        SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
+
+        SceneEditorAddon.get().projectExplorer.select(currentFolder.path());
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {
