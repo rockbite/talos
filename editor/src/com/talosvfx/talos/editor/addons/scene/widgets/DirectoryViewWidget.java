@@ -275,7 +275,6 @@ public class DirectoryViewWidget extends Table {
             return;
         };
 
-        System.out.println("Setting dir to " + path);
         rebuild();
     }
 
