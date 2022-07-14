@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.*;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.SkeletonAttachmentLoader;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
@@ -38,7 +39,7 @@ public class SkeletonComponent extends AComponent {
 
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget skelWidget = new AssetSelectWidget("Skeleton Data", "skel", new Supplier<String>() {
+        AssetSelectWidget skelWidget = new AssetSelectWidget("Skeleton Data", GameAssetType.SKELETON, new Supplier<String>() {
             @Override
             public String get() {
                 return path;

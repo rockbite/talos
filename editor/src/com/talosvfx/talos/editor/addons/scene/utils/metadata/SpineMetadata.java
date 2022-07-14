@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.metadata;
 
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -26,7 +27,7 @@ public class SpineMetadata extends AMetadata {
 
         propertyWidgets.add(WidgetFactory.generate(this, "scale", "Scale"));
 
-        AssetSelectWidget atlasWidget = new AssetSelectWidget("Atlas", "atlas", new Supplier<String>() {
+        AssetSelectWidget atlasWidget = new AssetSelectWidget("Atlas", GameAssetType.ATLAS, new Supplier<String>() {
             @Override
             public String get() {
                 return atlasPath;

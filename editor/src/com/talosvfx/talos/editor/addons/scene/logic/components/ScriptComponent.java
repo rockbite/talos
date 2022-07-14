@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -17,7 +18,7 @@ public class ScriptComponent extends AComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget widget = new AssetSelectWidget("Script", "ts", new Supplier<String>() {
+        AssetSelectWidget widget = new AssetSelectWidget("Script", GameAssetType.SCRIPT, new Supplier<String>() {
             @Override
             public String get() {
                 return path;

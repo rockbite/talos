@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
@@ -43,7 +44,7 @@ public class SpriteRendererComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", "png", new Supplier<String>() {
+        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<String>() {
             @Override
             public String get() {
                 return path;

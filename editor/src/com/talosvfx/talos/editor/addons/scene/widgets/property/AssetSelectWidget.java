@@ -10,8 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -26,15 +29,31 @@ public class AssetSelectWidget extends PropertyWidget<String> {
     private Label nameLabel;
     private String path;
 
-    private String filter;
+    private Predicate<FilteredTree.Node<String>> filter;
 
     public AssetSelectWidget() {
         super();
     }
 
-    public AssetSelectWidget (String name, String extension, Supplier<String> supplier, ValueChanged<String> valueChanged) {
+    public AssetSelectWidget (String name, GameAssetType type, Supplier<String> supplier, ValueChanged<String> valueChanged) {
         super(name, supplier, valueChanged);
-        this.filter = extension;
+        this.filter = new Predicate<FilteredTree.Node<String>>() {
+            @Override
+            public boolean evaluate (FilteredTree.Node<String> node) {
+                String object = node.getObject();
+                String[] split = object.split("\\.");
+                if (split.length > 1) {
+                    String extension = split[split.length - 1];
+                    try {
+                        GameAssetType typeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
+                        return typeFromExtension == type;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     @Override

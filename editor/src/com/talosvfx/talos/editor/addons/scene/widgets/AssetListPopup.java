@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
@@ -111,6 +112,31 @@ public class AssetListPopup extends VisWindow {
         });
     }
 
+    public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<String>> filter, FilteredTree.ItemListener listener) {
+        loadTree();
+
+        setPosition(location.x, location.y - getHeight());
+        if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
+        ActorUtils.keepWithinStage(stage, this);
+        stage.addActor(this);
+
+        searchFilteredTree.reset();
+        getStage().setKeyboardFocus(searchFilteredTree.textField);
+        getStage().setScrollFocus(searchFilteredTree.scrollPane);
+        tree.collapseAll();
+
+        if(getHeight() < 200) {
+            setHeight(200);
+        }
+
+        if(filter != null) {
+            tree.filterAll(filter);
+        }
+
+        tree.expandAll();
+
+        tree.setItemListener(listener);
+    }
     public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener listener) {
         loadTree();
 

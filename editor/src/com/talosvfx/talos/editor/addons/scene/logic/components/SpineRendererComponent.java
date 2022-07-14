@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -21,7 +22,7 @@ public class SpineRendererComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget atlasWidget = new AssetSelectWidget("Atlas", "atlas", new Supplier<String>() {
+        AssetSelectWidget atlasWidget = new AssetSelectWidget("Skeleton", GameAssetType.SKELETON, new Supplier<String>() {
             @Override
             public String get() {
                 return path;

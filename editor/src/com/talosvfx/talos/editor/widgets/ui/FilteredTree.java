@@ -36,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import info.debatty.java.stringsimilarity.JaroWinkler;
@@ -707,6 +708,27 @@ public class FilteredTree<T> extends WidgetGroup {
         filter(nodes, filter, false);
     }
 
+
+    public void filterAll (Predicate<Node<T>> predicate) {
+        this.filter(this.rootNodes, predicate);
+    }
+    public void filter (Array<Node<T>> nodes, Predicate<Node<T>> predicate) {
+        for (int i = 0; i < nodes.size; i++) {
+            Node<T> testNode = nodes.get(i);
+
+            if (predicate.evaluate(testNode)) {
+                filter(testNode.children, predicate);
+                testNode.filtered = false;
+                testNode.actor.setVisible(true);
+                setAllParentsNotFiltered(nodes.get(i));
+                setAllChildrenNotFiltered(nodes.get(i));
+            } else {
+                testNode.filtered = true;
+                testNode.actor.setVisible(false);
+                filter(testNode.children, predicate);
+            }
+        }
+    }
     public void filter (Array<Node<T>> nodes, String filter, boolean endsWithLogic) {
         for (int i = 0; i < nodes.size; i++) {
             boolean statement = nodes.get(i).name.toLowerCase().contains(filter);

@@ -54,5 +54,9 @@ public class GameAsset<T> {
 		}
 	}
 
+	public RawAsset getRootRawAsset () {
+		return dependentRawAssets.first();
+	}
+
 
 }

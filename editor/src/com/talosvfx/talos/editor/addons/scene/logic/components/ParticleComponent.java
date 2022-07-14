@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -37,7 +38,7 @@ public class ParticleComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget descriptorWidget = new AssetSelectWidget("Effect", "p", new Supplier<String>() {
+        AssetSelectWidget descriptorWidget = new AssetSelectWidget("Effect", GameAssetType.VFX, new Supplier<String>() {
             @Override
             public String get() {
                 FileHandle fileHandle = Gdx.files.absolute(path);
