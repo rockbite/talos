@@ -131,11 +131,11 @@ public class DirectoryViewWidget extends Table {
                             selectFile(fileToContext.fileHandle);
                             reportSelectionChanged();
                         }
-                        SceneEditorAddon.get().projectExplorer.showContextMenu(selected);
+                        SceneEditorAddon.get().projectExplorer.showContextMenu(selected, true);
                     } else {
                         Array<FileHandle> list = new Array<>();
                         list.add(fileHandle);
-                        SceneEditorAddon.get().projectExplorer.showContextMenu(list);
+                        SceneEditorAddon.get().projectExplorer.showContextMenu(list, true);
                     }
                 } else if(button == 0) {
                     float diff = TimeUtils.millis() - timeClicked;

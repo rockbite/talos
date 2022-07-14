@@ -212,7 +212,9 @@ public class AssetRepository {
 
 	private void collectRawResourceFromDirectory (FileHandle dir, boolean checkGameResources) {
 
-		rawAssetCreated(dir, false);
+		if (!dir.isDirectory()) {
+			rawAssetCreated(dir, false);
+		}
 
 		FileHandle[] list = dir.list();
 		for (FileHandle fileHandle : list) {
@@ -427,6 +429,69 @@ public class AssetRepository {
 		return "Too_Many_File_Attempts";
 	}
 
+	static class MovingDirNode {
+		FileHandle oldHandle;
+		FileHandle newHandle;
+
+		Array<MovingDirNode> children = new Array<>();
+	}
+
+
+	private void updateChildReferences (MovingDirNode parent) {
+		for (MovingDirNode child : parent.children) {
+
+			FileHandle oldHandle = child.oldHandle;
+
+			FileHandle newHandle = parent.newHandle.child(oldHandle.name());
+			child.newHandle = newHandle;
+
+
+			if (!newHandle.isDirectory()) {
+				RawAsset rawAsset = fileHandleRawAssetMap.remove(oldHandle);
+
+				if (rawAsset == null) {
+					System.out.println();
+				}
+				rawAsset.handle = newHandle;
+
+				fileHandleRawAssetMap.put(newHandle, rawAsset);
+
+				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+				assetPathChanged.oldRelativePath = relative(oldHandle);
+				assetPathChanged.newRelativePath = relative(newHandle);
+				Notifications.fireEvent(assetPathChanged);
+
+				for (GameAsset gameAssetReference : rawAsset.gameAssetReferences) {
+					gameAssetReference.setUpdated();
+				}
+
+				if (isRootGameResource(rawAsset)) {
+					GameAsset gameAsset = fileHandleGameAssetObjectMap.remove(oldHandle);
+					fileHandleGameAssetObjectMap.put(newHandle, gameAsset);
+
+					gameAsset.setUpdated();
+				}
+			}
+			updateChildReferences(child);
+
+		}
+	}
+	private void populateChildren (FileHandle fileHandle, MovingDirNode fileNode) {
+		FileHandle[] children = fileHandle.list();
+		for (FileHandle handle : children) {
+			if (handle.extension().equals("meta")) continue;
+
+			MovingDirNode value = new MovingDirNode();
+
+			value.oldHandle = handle;
+			fileNode.children.add(value);
+
+			if (handle.isDirectory()) {
+				populateChildren(handle, value);
+			}
+		}
+	}
+
 	//Could be a rename or a move
 	public void moveFile (FileHandle file, FileHandle destination) {
 
@@ -437,10 +502,14 @@ public class AssetRepository {
 				throw new GdxRuntimeException("Trying to move a directory to a file");
 			}
 
-			//All children raw assets need to be updated, this is a bit time consuming, leaving it for now
+			MovingDirNode rootNode = new MovingDirNode();
+			rootNode.oldHandle = file;
+			rootNode.newHandle = destination;
+			populateChildren(file, rootNode);
 
-			System.out.println("Folder moving/renaming not supported right now");
+			file.moveTo(destination);
 
+			updateChildReferences(rootNode);
 
 		} else {
 			//Moving a file
@@ -455,7 +524,13 @@ public class AssetRepository {
 				oldMeta.moveTo(destination);
 				file.moveTo(destination);
 
+
 				FileHandle newHandle = destination.child(file.name());
+
+				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+				assetPathChanged.oldRelativePath = relative(file);
+				assetPathChanged.newRelativePath = relative(newHandle);
+				Notifications.fireEvent(assetPathChanged);
 
 				fileHandleRawAssetMap.put(newHandle, rawAsset);
 
@@ -513,6 +588,7 @@ public class AssetRepository {
 
 		}
 	}
+
 
 	private boolean isRootGameResource (RawAsset rawAsset) {
 		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());

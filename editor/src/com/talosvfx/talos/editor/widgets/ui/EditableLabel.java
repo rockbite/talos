@@ -116,7 +116,7 @@ public class EditableLabel extends Table implements ActorCloneable {
                 if(!focused) {
                     setStaticMode();
                     if(listener != null) {
-                        listener.changed(label.getText().toString());
+                        //listener.changed(label.getText().toString());
                     }
                 }
             }

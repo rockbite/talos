@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
+import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
@@ -354,9 +355,13 @@ public class AssetImporter {
         if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
         AssetRepository.getInstance().moveFile(file, directory);
+
+        SceneEditorAddon.get().workspace.reloadProjectExplorer();
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {
+        FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
+
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
         if(file.path().equals(projectPath + File.separator + "assets")) return file;
 
@@ -372,6 +377,16 @@ public class AssetImporter {
         if(file.path().equals(newHandle.path())) return file;
 
         AssetRepository.getInstance().moveFile(file, newHandle);
+
+        SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
+
+        if (currentFolder.path().equals(file.path())) {
+            SceneEditorAddon.get().projectExplorer.select(newHandle.path()); //Editing from side window of the dir we are in
+        } else {
+            SceneEditorAddon.get().projectExplorer.select(currentFolder.path());
+        }
+
+
 
         return newHandle;
     }

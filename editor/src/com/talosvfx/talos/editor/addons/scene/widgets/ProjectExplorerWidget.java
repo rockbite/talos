@@ -90,7 +90,7 @@ public class ProjectExplorerWidget extends Table {
             public void rightClick (FilteredTree.Node node) {
                 if(node != null) {
                     select(node);
-                    showContextMenu();
+                    showContextMenu(false);
                 }
             }
 
@@ -147,7 +147,7 @@ public class ProjectExplorerWidget extends Table {
         }
     }
 
-    public void showContextMenu () {
+    public void showContextMenu (boolean directoryView) {
         Array<FileHandle> list = new Array<>();
         Array<FilteredTree.Node<Object>> nodes = directoryTree.getSelection().toArray();
         for (FilteredTree.Node<Object> node: nodes) {
@@ -156,10 +156,10 @@ public class ProjectExplorerWidget extends Table {
             list.add(handle);
         }
 
-        showContextMenu(list);
+        showContextMenu(list, directoryView);
     }
 
-    public void showContextMenu (Array<FileHandle> files) {
+    public void showContextMenu (Array<FileHandle> files, boolean directory) {
         contextualMenu.clearItems();
 
         contextualMenu.addItem("Cut", new ClickListener() {
@@ -189,13 +189,12 @@ public class ProjectExplorerWidget extends Table {
                 if(path != null) {
                     FileHandle handle = Gdx.files.absolute(path);
                     if(handle.isDirectory()) {
-                        if (nodes.get(path) != null) {
+                        if (directory) {
+                            directoryViewWidget.startRenameFor(handle);
+                        } else if (nodes.get(path) != null) {
                             RowWidget widget = (RowWidget) nodes.get(path).getActor();
                             widget.label.setEditMode();
                         }
-                    } else {
-                        // check if its in the other guy
-                        directoryViewWidget.startRenameFor(handle);
                     }
                 }
             }

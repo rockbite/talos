@@ -210,7 +210,7 @@ public class FilteredTree<T> extends WidgetGroup {
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
                 if(itemListener != null) {
-                    if (keycode == Input.Keys.DEL) {
+                    if (keycode == Input.Keys.DEL && false) {//todo removed this feature, editing text messes this up
                         if(!selection.isEmpty()) {
                             Array<FilteredTree.Node> nodes = new Array<>();
                             for(Object nodeObject: selection) {
