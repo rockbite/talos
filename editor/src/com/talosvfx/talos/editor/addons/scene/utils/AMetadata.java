@@ -2,16 +2,22 @@ package com.talosvfx.talos.editor.addons.scene.utils;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
-public abstract class AMetadata implements IPropertyProvider, IPropertyHolder {
+import java.util.UUID;
+
+public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, Json.Serializable {
 
     public transient FileHandle currentFile;
 
-    public AMetadata() {
+    public UUID uuid;
 
+    public AMetadata() {
+        uuid = UUID.randomUUID();
     }
 
     public void setFile(FileHandle currentFile) {
@@ -49,5 +55,15 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder {
         }
 
         return propertyProviders;
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("uuid", uuid.toString());
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        uuid = UUID.fromString(jsonData.getString("uuid"));
     }
 }

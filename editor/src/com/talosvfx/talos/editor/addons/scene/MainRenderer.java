@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonRenderer;
@@ -157,11 +154,11 @@ public class MainRenderer implements Notifications.Observer {
         transformComponent.localToWorld(gameObject, vec);
         Vector2 renderPosition = vec;
 
-        if(spriteRenderer.getTexture() != null) {
+        if(spriteRenderer.getTextureRegion() != null) {
             batch.setColor(spriteRenderer.color);
 
-            if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                Texture texture = spriteRenderer.getTexture().getTexture(); // todo: pelase fix me, i am such a shit
+            if(metadata != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+                Texture texture = spriteRenderer.getTextureRegion().getTexture(); // todo: pelase fix me, i am such a shit
                 NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                 //todo: and this renders wrong so this needs fixing too
                 float xSign = transformComponent.scale.x < 0 ? -1 : 1;
@@ -174,23 +171,23 @@ public class MainRenderer implements Notifications.Observer {
                         xSign, ySign,
                         transformComponent.rotation);
             } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
-                spriteRenderer.getTexture().getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+                spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-                float repeatX = transformComponent.scale.x / (spriteRenderer.getTexture().getTexture().getWidth() / metadata.pixelsPerUnit);
-                float repeatY = transformComponent.scale.y / (spriteRenderer.getTexture().getTexture().getHeight() / metadata.pixelsPerUnit);
-                spriteRenderer.getTexture().setRegion(0, 0, repeatX, repeatY);
+                float repeatX = transformComponent.scale.x / (spriteRenderer.getTextureRegion().getTexture().getWidth() / metadata.pixelsPerUnit);
+                float repeatY = transformComponent.scale.y / (spriteRenderer.getTextureRegion().getTexture().getHeight() / metadata.pixelsPerUnit);
+                spriteRenderer.getTextureRegion().setRegion(0, 0, repeatX, repeatY);
 
-                batch.draw(spriteRenderer.getTexture(),
+                batch.draw(spriteRenderer.getTextureRegion(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
                         transformComponent.rotation);
             } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
-                spriteRenderer.getTexture().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-                spriteRenderer.getTexture().setRegion(0, 0, spriteRenderer.getTexture().getTexture().getWidth(), spriteRenderer.getTexture().getTexture().getHeight());
+                spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+                spriteRenderer.getTextureRegion().setRegion(0, 0, spriteRenderer.getTextureRegion().getTexture().getWidth(), spriteRenderer.getTextureRegion().getTexture().getHeight());
 
-                batch.draw(spriteRenderer.getTexture(),
+                batch.draw(spriteRenderer.getTextureRegion(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,

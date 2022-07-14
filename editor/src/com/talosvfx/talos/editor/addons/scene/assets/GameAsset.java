@@ -1,0 +1,58 @@
+package com.talosvfx.talos.editor.addons.scene.assets;
+
+import com.badlogic.gdx.utils.Array;
+
+/**
+ * GameAsset is a potentially complex resource. It links 1+ {@link RawAsset} together to reference
+ * all assets required for this GameAsset to load
+ */
+public class GameAsset<T> {
+
+
+	public String nameIdentifier;
+	private GameAssetType type;
+
+	Array<RawAsset> dependentRawAssets = new Array<>();
+
+	private T resourcePayload;
+
+	private boolean broken;
+	private Exception brokenReason;
+
+
+	public interface GameAssetUpdateListener {
+		void onUpdate ();
+	}
+
+	public Array<GameAssetUpdateListener> listeners = new Array<>();
+
+	public GameAsset (String nameIdentifier, GameAssetType type) {
+		this.nameIdentifier = nameIdentifier;
+		this.type = type;
+	}
+
+	public void setResourcePayload (T resourcePayload) {
+		this.resourcePayload = resourcePayload;
+	}
+
+	public T getResource () {
+		return this.resourcePayload;
+	}
+
+	public boolean isBroken () {
+		return broken;
+	}
+
+	public void setBroken (Exception e) {
+		this.broken = true;
+		this.brokenReason = e;
+	}
+
+	public void setUpdated () {
+		for (GameAssetUpdateListener listener : listeners) {
+			listener.onUpdate();
+		}
+	}
+
+
+}

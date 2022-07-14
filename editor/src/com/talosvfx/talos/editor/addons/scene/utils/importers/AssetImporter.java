@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
@@ -21,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.utils.FileOpener;
 
 import java.awt.*;
 import java.io.File;
@@ -69,36 +71,22 @@ public class AssetImporter {
     }
 
     public static FileHandle attemptToImport (FileHandle handle, boolean andPlaceIt) {
-        FileHandle importedAsset = null;
-        AbstractImporter importer = null;
-        if(handle.extension().equals("png")) {
-            importer = importerMap.get(AssetType.SPRITE);
-        } else if(handle.extension().equals("tls")) {
-            importer = importerMap.get(AssetType.TLS);
-        } else if(handle.extension().equals("skel")) {
-            importer = importerMap.get(AssetType.SPINE);
-        } else if(handle.extension().equals("atlas")) {
-            importer = importerMap.get(AssetType.ATLAS);
-        }
-
         FileHandle destinationDir = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
 
-        importedAsset = importer.importAsset(handle, destinationDir);
+        AssetRepository.getInstance().copyRawAsset(handle, destinationDir);
 
-        if(andPlaceIt) {
-            importer.makeInstance(importedAsset, SceneEditorAddon.get().workspace.getRootGO());
+        if (andPlaceIt) {
+            System.out.println("Placing needs implementing again");
         }
 
-        if(importedAsset != null) {
-            String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
-            SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
-            SceneEditorAddon.get().projectExplorer.expand(importedAsset.path());
-            SceneEditorAddon.get().projectExplorer.select(importedAsset.parent().path());
+        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
+        SceneEditorAddon.get().projectExplorer.expand(destinationDir.path());
+        SceneEditorAddon.get().projectExplorer.select(destinationDir.path());
 
-            TalosMain.Instance().ProjectController().saveProject();
-        }
+        TalosMain.Instance().ProjectController().saveProject();
 
-        return importedAsset;
+        return handle;
     }
 
     private void assetUpdated (FileHandle handle) {
@@ -317,23 +305,13 @@ public class AssetImporter {
             return;
         } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
             if (Desktop.isDesktopSupported()) {
-                try {
-                    Desktop.getDesktop().edit(new File(fileHandle.path()));
-                } catch (IOException e) {
-                    try {
-                        Desktop.getDesktop().open(new File(fileHandle.path()));
-                    } catch (IOException e2) {
-                    }
-                }
+                FileOpener.open(fileHandle.file());
             }
             return;
         }
 
         if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().open(new File(fileHandle.path()));
-            } catch (IOException e) {
-            }
+            FileOpener.open(fileHandle.file());
         }
     }
 
@@ -364,39 +342,18 @@ public class AssetImporter {
     }
 
     public static void copyFile(FileHandle file, FileHandle directory) {
-        FileHandle destination = directory.child(file.name());
-
-        if(file.parent().path().equals(directory.path())) {
-            // same directory, need to rename
-            destination = suggestNewName(file.parent().path(), file.nameWithoutExtension(), file.extension());
-        }
-        FileHandle metaFile = getMetadataHandleFor(file);
-        file.copyTo(destination);
-
-        if(metaFile.exists()) {
-            FileHandle metaDestination = getMetadataHandleFor(destination);
-            metaFile.copyTo(metaDestination);
-        }
+        //Exchange it for the AssetRepository
+        AssetRepository.getInstance().copyRawAsset(file, directory);
     }
 
     public static void moveFile(FileHandle file, FileHandle directory) {
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+
+        //Protected, don't move assets/scenes folders
         if(file.path().equals(projectPath + File.separator + "assets")) return;
         if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
-        FileHandle destination = directory.child(file.name());
-        FileHandle metaFile = getMetadataHandleFor(file);
-        file.moveTo(destination);
-
-        if(metaFile.exists()) {
-            FileHandle metaDestination = directory.child(metaFile.name());
-            metaFile.moveTo(metaDestination);
-        }
-
-        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-        assetPathChanged.oldRelativePath = relative(file);
-        assetPathChanged.newRelativePath = relative(destination);
-        Notifications.fireEvent(assetPathChanged);
+        AssetRepository.getInstance().moveFile(file, directory);
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {
@@ -410,51 +367,16 @@ public class AssetImporter {
             }
         }
 
-        FileHandle metaFile = getMetadataHandleFor(file);
         FileHandle newHandle = file.parent().child(newName);
 
         if(file.path().equals(newHandle.path())) return file;
 
-        file.moveTo(newHandle);
-
-        if(metaFile.exists()) {
-            FileHandle newMetaFile = getMetadataHandleFor(newHandle);
-            metaFile.moveTo(newMetaFile);
-        }
-
-        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-        assetPathChanged.oldRelativePath = relative(file);
-        assetPathChanged.newRelativePath = relative(newHandle);
-        Notifications.fireEvent(assetPathChanged);
+        AssetRepository.getInstance().moveFile(file, newHandle);
 
         return newHandle;
     }
 
     public static void deleteFile(FileHandle file) {
-        AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-        assetPathChanged.oldRelativePath = relative(file);
-        assetPathChanged.newRelativePath = "";
-
-        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
-        if(file.path().equals(projectPath + File.separator + "assets")) return;
-
-        if(file.isDirectory()) {
-            FileHandle[] list = file.list();
-            if (list.length > 0) {
-                for (int i = 0; i < list.length; i++) {
-                    deleteFile(list[i]);
-                }
-            }
-        }
-
-        // check for metadata file
-        FileHandle metadataHandle = getMetadataHandleFor(file);
-        if(metadataHandle.exists()) {
-            metadataHandle.delete();
-        }
-
-        file.delete();
-
-        Notifications.fireEvent(assetPathChanged);
+        AssetRepository.getInstance().deleteRawAsset(file);
     }
 }

@@ -17,7 +17,7 @@ public class SpineMetadata extends AMetadata {
     public String atlasPath;
 
     public SpineMetadata() {
-
+        super();
     }
 
     @Override

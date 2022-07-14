@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -18,6 +19,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -38,11 +41,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
@@ -78,6 +78,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     // selections
     private Image selectionRect;
+
+    private AssetRepository assetRepository;
 
     public SceneEditorWorkspace() {
 
@@ -148,9 +150,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
 
         component.path = AssetImporter.relative(importedAsset);
-        component.reloadTexture();
+        component.loadTexture();
 
-        TextureRegion texture = component.texture;
+        TextureRegion texture = component.getTextureRegion();
         float aspect = (float)texture.getRegionWidth() / texture.getRegionHeight();
         TransformComponent transformComponent = spriteObject.getComponent(TransformComponent.class);
         transformComponent.scale.x *= aspect;
@@ -659,7 +661,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             openSavableContainer(container);
         }
 
-        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
+//        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
     }
 
     @Override
@@ -1099,9 +1101,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
-        read(json, jsonData);
 
         String path = jsonData.getString("currentScene", "");
+        String projectPath = jsonData.getString("projectPath", "");
+
+        AssetRepository.init();
+        AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath).child("assets"));
+
+        read(json, jsonData);
+
         FileHandle sceneFileHandle = AssetImporter.get(path);
         if(sceneFileHandle.exists()) {
             SavableContainer container;
