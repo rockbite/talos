@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,10 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -35,6 +33,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.io.File;
@@ -347,6 +346,36 @@ public class DirectoryViewWidget extends Table {
                 Actor targetActor = getActor();
             }
         });
+
+        for (ObjectMap.Entry<String, FilteredTree.Node> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
+            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
+                @Override
+                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    return true;
+                }
+
+                @Override
+                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+
+                    Object object = payload.getObject();
+                    if (object instanceof Array) {
+                        Array<FileHandle> array = (Array<FileHandle>) object;
+                        for (FileHandle sourceItem : array) {
+                            if (!sourceItem.path().equals(fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem, fileHandle);
+                            }
+                        }
+                    } else if (object instanceof FileHandle) {
+                        FileHandle sourceItem = (FileHandle) payload.getObject();
+                        if (!sourceItem.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(sourceItem, fileHandle);
+                        }
+                    }
+                    rebuild();
+                }
+            });
+        }
 
         dragAndDrop.addTarget(new DragAndDrop.Target(this) {
             @Override
