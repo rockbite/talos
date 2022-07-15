@@ -121,9 +121,9 @@ public class AssetRepository {
 			}
 		}
 
-		Array<GameAsset> gameAssetsToExport = new Array<>();
+		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
 		for (String identifiersBeingUsedByComponent : identifiersBeingUsedByComponents) {
-			GameAsset gameAsset = identifierGameAssetMap.get(identifiersBeingUsedByComponent);
+			GameAsset<?> gameAsset = identifierGameAssetMap.get(identifiersBeingUsedByComponent);
 			if (gameAsset.isBroken()) {
 				System.out.println("Game asset is broken, not exporting");
 			} else {
