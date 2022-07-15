@@ -356,20 +356,30 @@ public class DirectoryViewWidget extends Table {
 
                 @Override
                 public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                    //Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
+
                     fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
 
                     Object object = payload.getObject();
                     if (object instanceof Array) {
-                        Array<FileHandle> array = (Array<FileHandle>) object;
-                        for (FileHandle sourceItem : array) {
-                            if (!sourceItem.path().equals(fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem, fileHandle);
+                        Array<ItemView> array = (Array<ItemView>) object;
+                        for (ItemView sourceItem : array) {
+                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle);
                             }
                         }
+                    } else if (object instanceof GameAsset) {
+                        System.out.println("this should never happen");
+//                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
+//                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+//                        if (!handle.path().equals(fileHandle.path())) {
+//                            AssetImporter.moveFile(handle, fileHandle);
+//                        }
                     } else if (object instanceof FileHandle) {
-                        FileHandle sourceItem = (FileHandle) payload.getObject();
-                        if (!sourceItem.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(sourceItem, fileHandle);
+                        FileHandle handle = (FileHandle) payload.getObject();
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle);
                         }
                     }
                     rebuild();
@@ -399,16 +409,22 @@ public class DirectoryViewWidget extends Table {
 
                     Object object = payload.getObject();
                     if (object instanceof Array) {
-                        Array<FileHandle> array = (Array<FileHandle>) object;
-                        for (FileHandle sourceItem : array) {
-                            if (!sourceItem.path().equals(targetItem.fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+                        Array<ItemView> array = (Array<ItemView>) object;
+                        for (ItemView sourceItem : array) {
+                            if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle);
                             }
                         }
+                    } else if (object instanceof GameAsset) {
+                        GameAsset sourceItem = (GameAsset) payload.getObject();
+                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+                        if (!handle.path().equals(targetItem.fileHandle.path())) {
+                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                        }
                     } else if (object instanceof FileHandle) {
-                        FileHandle sourceItem = (FileHandle) payload.getObject();
-                        if (!sourceItem.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(sourceItem, targetItem.fileHandle);
+                        FileHandle handle = (FileHandle) payload.getObject();
+                        if (!handle.path().equals(targetItem.fileHandle.path())) {
+                            AssetImporter.moveFile(handle, targetItem.fileHandle);
                         }
                     }
 
