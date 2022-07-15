@@ -109,7 +109,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 			widget.supplier = this.supplier;
 			widget.valueChanged = this.valueChanged;
-			if(widget.propertyName != null) {
+			if (widget.propertyName != null && this.propertyName != null) {
 				widget.propertyName.setText(this.propertyName.getText());
 			}
 			return widget;
