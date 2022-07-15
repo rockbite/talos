@@ -198,6 +198,8 @@ public class FilteredTree<T> extends WidgetGroup {
                     selection.remove(node);
                     itemListener.deselect(node);
                     return false;
+                }else if (selection.contains(node)){
+                    return false;
                 }
 
                 if(itemListener != null) {
@@ -335,6 +337,10 @@ public class FilteredTree<T> extends WidgetGroup {
 
                     Node<T> node = ((Node) userObject);
                     Node<T> parent = node.getParent();
+
+                    if(selection.contains(node)){
+                        return;
+                    }
 
                     for (Node<T> item : selection.items()) {
                         Node<T> targetNodeToDrop = item;
