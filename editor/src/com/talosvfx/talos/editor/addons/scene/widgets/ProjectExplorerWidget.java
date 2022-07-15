@@ -17,6 +17,7 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -83,6 +84,7 @@ public class ProjectExplorerWidget extends Table {
 
             @Override
             public void chosen (FilteredTree.Node node) {
+                select(node);
                 directoryViewWidget.setDirectory((String) node.getObject());
             }
 
@@ -145,6 +147,10 @@ public class ProjectExplorerWidget extends Table {
             expand(parent.path());
             select(parent.path());
         }
+    }
+
+    public  ObjectMap<String, FilteredTree.Node> getNodes(){
+        return nodes;
     }
 
     public void showContextMenu (boolean directoryView) {
@@ -285,9 +291,13 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void select (FilteredTree.Node node) {
-        directoryTree.getSelection().clear();
-        directoryTree.getSelection().add(node);
-        directoryViewWidget.setDirectory((String) node.getObject());
+        if(SceneEditorWorkspace.ctrlPressed()){
+            directoryTree.getSelection().add(node);
+        }else {
+            directoryTree.getSelection().clear();
+            directoryTree.getSelection().add(node);
+            directoryViewWidget.setDirectory((String) node.getObject());
+        }
     }
 
     public void select (String path) {
@@ -352,7 +362,7 @@ public class ProjectExplorerWidget extends Table {
                 EditableLabel label = widget.getLabel();
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
                 newNode.setObject(listItemHandle.path());
-                //newNode.draggable = true; // todo: for later file manipulation
+                newNode.draggable = true;
                 node.add(newNode);
                 nodes.put(listItemHandle.path(), newNode);
                 if(listItemHandle.isDirectory()) {
@@ -427,6 +437,10 @@ public class ProjectExplorerWidget extends Table {
         public void set(FileHandle fileHandle) {
             this.fileHandle = fileHandle;
             label.setText(fileHandle.name());
+        }
+
+        public FileHandle getFileHandle(){
+            return fileHandle;
         }
 
         public EditableLabel getLabel() {
