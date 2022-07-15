@@ -10,7 +10,7 @@ public class GameAsset<T> {
 
 
 	public String nameIdentifier;
-	private GameAssetType type;
+	GameAssetType type;
 
 	Array<RawAsset> dependentRawAssets = new Array<>();
 

@@ -1,6 +1,7 @@
 
 package com.talosvfx.talos.editor.addons.scene.assets;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,11 +10,18 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
@@ -79,6 +87,85 @@ public class AssetRepository {
 			if (assetTypeFromExtension.isRootGameAsset()) {
 				createGameAsset(key, value);
 			}
+		}
+	}
+
+	//Export formats
+	public void exportToFile () { //todo
+		//Go over all entities, go over all components. If component has a game resource, we mark it for export
+
+		FileHandle scenes = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("scenes");
+		ObjectSet<String> identifiersBeingUsedByComponents = new ObjectSet<>();
+		if (scenes.exists()) {
+			for (FileHandle handle : scenes.list()) {
+				JsonValue scene = new JsonReader().parse(handle);
+
+				JsonValue gameObjects = scene.get("gameObjects");
+				if (gameObjects != null) {
+					for (JsonValue gameObject : gameObjects) {
+						//Grab each component
+						if (gameObject.has("components")) {
+							JsonValue components = gameObject.get("components");
+							for (JsonValue component : components) {
+								String componentClazz = component.getString("class");
+								if (componentIsResourceOwner(componentClazz)) {
+									//Lets grab the game resource
+
+									String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
+									identifiersBeingUsedByComponents.add(gameResourceIdentifier);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		Array<GameAsset> gameAssetsToExport = new Array<>();
+		for (String identifiersBeingUsedByComponent : identifiersBeingUsedByComponents) {
+			GameAsset gameAsset = identifierGameAssetMap.get(identifiersBeingUsedByComponent);
+			if (gameAsset.isBroken()) {
+				System.out.println("Game asset is broken, not exporting");
+			} else {
+				gameAssetsToExport.add(gameAsset);
+			}
+		}
+
+		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+
+		for (GameAsset<?> gameAsset : gameAssetsToExport) {
+			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
+			assetExportStructure.identifier = gameAsset.nameIdentifier;
+			assetExportStructure.type = gameAsset.type;
+			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
+			}
+			gameAssetExportStructure.gameAssets.add(assetExportStructure);
+		}
+
+		FileHandle assetRepoExportFile = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assetExport.json");
+		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+
+
+	}
+
+	public static class GameAssetExportStructure {
+		String identifier;
+		GameAssetType type;
+		Array<String> absolutePathsOfRawFiles = new Array<>();
+	}
+	public static class GameAssetsExportStructure {
+		Array<GameAssetExportStructure> gameAssets = new Array<>();
+	}
+
+	private boolean componentIsResourceOwner (String componentClazz) {
+		try {
+			Class aClass = ClassReflection.forName(componentClazz);
+
+			return GameResourceOwner.class.isAssignableFrom(aClass);
+		} catch (ReflectionException e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 

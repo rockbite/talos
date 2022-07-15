@@ -17,7 +17,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SpriteRendererComponent extends RendererComponent {
+public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
 
     public GameAsset<Texture> texture;
     TextureRegion textureRegion;
@@ -28,6 +28,16 @@ public class SpriteRendererComponent extends RendererComponent {
     public boolean flipX;
     public boolean flipY;
     public RenderMode renderMode = RenderMode.simple;
+
+    @Override
+    public GameAsset<Texture> getGameResource () {
+        return texture;
+    }
+
+    @Override
+    public void setGameAsset (GameAsset<Texture> gameAsset) {
+        this.texture = gameAsset;
+    }
 
     public enum RenderMode {
         simple,
@@ -103,7 +113,7 @@ public class SpriteRendererComponent extends RendererComponent {
             texture.listeners.removeValue(gameAssetUpdateListener, true);
         }
 
-        texture = AssetRepository.getInstance().getAssetForPath(file, Texture.class);
+        setGameAsset(AssetRepository.getInstance().getAssetForPath(file, Texture.class));
         gameAssetUpdateListener.onUpdate();
 
         texture.listeners.add(gameAssetUpdateListener);
@@ -112,6 +122,7 @@ public class SpriteRendererComponent extends RendererComponent {
     @Override
     public void write (Json json) {
         json.writeValue("path", path);
+        GameResourceOwner.writeGameAsset(json, this);
 
         json.writeValue("color", color);
         json.writeValue("flipX", flipX);
@@ -125,6 +136,7 @@ public class SpriteRendererComponent extends RendererComponent {
     @Override
     public void read (Json json, JsonValue jsonData) {
         path = jsonData.getString("path");
+        String gameResourceIdentifier = jsonData.getString("gameResource", "");//Don't need to use it, we use path
 
         loadTexture();
 

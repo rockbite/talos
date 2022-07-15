@@ -722,6 +722,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public String writeExport () {
 
+        AssetRepository.getInstance().exportToFile();
+
         // write rest of files
         String exportType = TalosMain.Instance().Prefs().getString("exportType", "Default");
         if(exportType.equals("Default")) {
