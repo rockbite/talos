@@ -305,15 +305,11 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
             return;
         } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
-            if (Desktop.isDesktopSupported()) {
-                FileOpener.open(fileHandle.file());
-            }
+            FileOpener.open(fileHandle.file());
             return;
         }
 
-        if (Desktop.isDesktopSupported()) {
-            FileOpener.open(fileHandle.file());
-        }
+        FileOpener.open(fileHandle.file());
     }
 
     public static FileHandle get(String path) {

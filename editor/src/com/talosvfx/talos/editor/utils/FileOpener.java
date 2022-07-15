@@ -17,21 +17,7 @@ import static org.lwjgl.system.macosx.ObjCRuntime.sel_getUid;
 public class FileOpener {
 
 	public static void open (File file) {
-
-//		if (true) {
-//			openHackMac(file);
-//			return;
-//		}
-
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run () {
-				if (!openDESKTOP(file) && !openSystem(file.getPath()))
-					System.err.println("unable to open file " + System.getProperty("os.name"));
-			}
-		});
-		thread.setName("OpenFile");
-		thread.start();
+		openSystem(file.getPath());
 	}
 	private static void openHackMac (File file) {
 		long objc_msgSend = ObjCRuntime.getLibrary().getFunctionAddress("objc_msgSend");
