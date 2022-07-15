@@ -14,20 +14,22 @@ import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 
 import java.io.File;
 
-public class AssetListPopup extends VisWindow {
+public class AssetListPopup<T> extends VisWindow {
 
     private InputListener stageListener;
-    FilteredTree<String> tree;
-    SearchFilteredTree<String> searchFilteredTree;
+    FilteredTree<GameAsset<T>> tree;
+    SearchFilteredTree<GameAsset<T>> searchFilteredTree;
 
     private ObjectMap<String, XmlReader.Element> configurationMap = new ObjectMap<>();
-    private FilteredTree.Node rootNode;
+    private FilteredTree.Node<GameAsset<T>> rootNode;
 
     public interface ListListener {
         void chosen(XmlReader.Element template, float x, float y);
@@ -66,8 +68,8 @@ public class AssetListPopup extends VisWindow {
         tree.clearChildren();
         FileHandle root = Gdx.files.absolute(rootPath);
 
-        rootNode = new FilteredTree.Node(rootPath,  new Label(rootHandle.name(), TalosMain.Instance().getSkin()));
-        rootNode.setObject(rootPath);
+        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), TalosMain.Instance().getSkin()));
+        rootNode.setObject(null);
         tree.add(rootNode);
 
         traversePath(root, 0, 10, rootNode);
@@ -112,7 +114,7 @@ public class AssetListPopup extends VisWindow {
         });
     }
 
-    public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<String>> filter, FilteredTree.ItemListener listener) {
+    public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<GameAsset<T>>> filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
         loadTree();
 
         setPosition(location.x, location.y - getHeight());
@@ -137,7 +139,7 @@ public class AssetListPopup extends VisWindow {
 
         tree.setItemListener(listener);
     }
-    public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener listener) {
+    public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
         loadTree();
 
         setPosition(location.x, location.y - getHeight());
@@ -170,7 +172,7 @@ public class AssetListPopup extends VisWindow {
         return super.remove();
     }
 
-    private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
+    private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node<GameAsset<T>> node) {
         if(path.isDirectory() && currDepth <= maxDepth) {
             FileHandle[] list = path.list(ProjectExplorerWidget.fileFilter);
             for(int i = 0; i < list.length; i++) {
@@ -178,8 +180,9 @@ public class AssetListPopup extends VisWindow {
 
                 ProjectExplorerWidget.RowWidget widget = new ProjectExplorerWidget.RowWidget(listItemHandle, false);
                 EditableLabel label = widget.getLabel();
-                final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
-                newNode.setObject(listItemHandle.path());
+                final FilteredTree.Node<GameAsset<T>> newNode = new FilteredTree.Node<>(listItemHandle.path(), widget);
+                GameAsset<T> assetForPath = (GameAsset<T>)AssetRepository.getInstance().getAssetForPath(listItemHandle);
+                newNode.setObject(assetForPath);
                 node.add(newNode);
                 if(listItemHandle.isDirectory()) {
                     traversePath(list[i], currDepth++, maxDepth, newNode);

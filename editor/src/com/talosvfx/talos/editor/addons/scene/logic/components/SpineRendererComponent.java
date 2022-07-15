@@ -79,14 +79,5 @@ public class SpineRendererComponent extends RendererComponent {
         reloadAtlas();
     }
 
-    @Override
-    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
-        if(path.equals(oldPath)) {
-            path = newPath;
-            reloadAtlas();
-            return true;
-        }
 
-        return false;
-    }
 }

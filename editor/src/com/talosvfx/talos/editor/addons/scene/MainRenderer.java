@@ -9,9 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonRenderer;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -149,54 +152,62 @@ public class MainRenderer implements Notifications.Observer {
 
     private void renderSprite (Batch batch, GameObject gameObject) {
         SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
-        SpriteMetadata metadata = SceneEditorAddon.get().workspace.getMetadata(spriteRenderer.path, SpriteMetadata.class);
-        vec.set(0, 0);
-        transformComponent.localToWorld(gameObject, vec);
-        Vector2 renderPosition = vec;
+        GameAsset<Texture> gameResource = spriteRenderer.getGameResource();
+        RawAsset rootRawAsset = gameResource.getRootRawAsset();
+        AMetadata metaData = rootRawAsset.metaData;
+        if (metaData instanceof SpriteMetadata) {
+            //It should be
+            SpriteMetadata metadata = (SpriteMetadata)metaData;
 
-        if(spriteRenderer.getTextureRegion() != null) {
-            batch.setColor(spriteRenderer.color);
+            vec.set(0, 0);
+            transformComponent.localToWorld(gameObject, vec);
+            Vector2 renderPosition = vec;
 
-            if(metadata != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                Texture texture = spriteRenderer.getTextureRegion().getTexture(); // todo: pelase fix me, i am such a shit
-                NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
-                //todo: and this renders wrong so this needs fixing too
-                float xSign = transformComponent.scale.x < 0 ? -1 : 1;
-                float ySign = transformComponent.scale.y < 0 ? -1 : 1;
+            if(spriteRenderer.getTextureRegion() != null) {
+                batch.setColor(spriteRenderer.color);
 
-                patch.draw(batch,
+                if(metadata != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+                    Texture texture = spriteRenderer.getTextureRegion().getTexture(); // todo: pelase fix me, i am such a shit
+                    NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
+                    //todo: and this renders wrong so this needs fixing too
+                    float xSign = transformComponent.scale.x < 0 ? -1 : 1;
+                    float ySign = transformComponent.scale.y < 0 ? -1 : 1;
+
+                    patch.draw(batch,
                         renderPosition.x - 0.5f * transformComponent.scale.x * xSign, renderPosition.y - 0.5f * transformComponent.scale.y * ySign,
                         0.5f * transformComponent.scale.x * xSign, 0.5f * transformComponent.scale.y * ySign,
                         Math.abs(transformComponent.scale.x), Math.abs(transformComponent.scale.y),
                         xSign, ySign,
                         transformComponent.rotation);
-            } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
-                spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+                } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
+                    spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-                float repeatX = transformComponent.scale.x / (spriteRenderer.getTextureRegion().getTexture().getWidth() / metadata.pixelsPerUnit);
-                float repeatY = transformComponent.scale.y / (spriteRenderer.getTextureRegion().getTexture().getHeight() / metadata.pixelsPerUnit);
-                spriteRenderer.getTextureRegion().setRegion(0, 0, repeatX, repeatY);
+                    float repeatX = transformComponent.scale.x / (spriteRenderer.getTextureRegion().getTexture().getWidth() / metadata.pixelsPerUnit);
+                    float repeatY = transformComponent.scale.y / (spriteRenderer.getTextureRegion().getTexture().getHeight() / metadata.pixelsPerUnit);
+                    spriteRenderer.getTextureRegion().setRegion(0, 0, repeatX, repeatY);
 
-                batch.draw(spriteRenderer.getTextureRegion(),
+                    batch.draw(spriteRenderer.getTextureRegion(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
                         transformComponent.rotation);
-            } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
-                spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-                spriteRenderer.getTextureRegion().setRegion(0, 0, spriteRenderer.getTextureRegion().getTexture().getWidth(), spriteRenderer.getTextureRegion().getTexture().getHeight());
+                } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
+                    spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+                    spriteRenderer.getTextureRegion().setRegion(0, 0, spriteRenderer.getTextureRegion().getTexture().getWidth(), spriteRenderer.getTextureRegion().getTexture().getHeight());
 
-                batch.draw(spriteRenderer.getTextureRegion(),
+                    batch.draw(spriteRenderer.getTextureRegion(),
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
                         transformComponent.rotation);
+                }
+
+                batch.setColor(Color.WHITE);
             }
-
-            batch.setColor(Color.WHITE);
         }
+
     }
 
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {

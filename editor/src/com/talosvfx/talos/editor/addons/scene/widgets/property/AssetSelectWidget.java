@@ -15,43 +15,31 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.function.Supplier;
 
-public class AssetSelectWidget extends PropertyWidget<String> {
+public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
 
     private Label nameLabel;
-    private String path;
+    private GameAsset<T> gameAsset;
 
-    private Predicate<FilteredTree.Node<String>> filter;
+    private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
     public AssetSelectWidget() {
         super();
     }
 
-    public AssetSelectWidget (String name, GameAssetType type, Supplier<String> supplier, ValueChanged<String> valueChanged) {
+    public AssetSelectWidget (String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
         super(name, supplier, valueChanged);
-        this.filter = new Predicate<FilteredTree.Node<String>>() {
+        this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {
             @Override
-            public boolean evaluate (FilteredTree.Node<String> node) {
-                String object = node.getObject();
-                String[] split = object.split("\\.");
-                if (split.length > 1) {
-                    String extension = split[split.length - 1];
-                    try {
-                        GameAssetType typeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
-                        return typeFromExtension == type;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }
-                return false;
+            public boolean evaluate (FilteredTree.Node<GameAsset<T>> node) {
+                if (node.getObject() == null) return false;
+                return node.getObject().type == type;
             }
         };
     }
@@ -64,8 +52,8 @@ public class AssetSelectWidget extends PropertyWidget<String> {
     }
 
     @Override
-    public String getValue () {
-        return path;
+    public GameAsset<T> getValue () {
+        return gameAsset;
     }
 
     @Override
@@ -88,16 +76,18 @@ public class AssetSelectWidget extends PropertyWidget<String> {
                 button.localToStageCoordinates(pos);
 
                 AssetListPopup assetListPopup = SceneEditorAddon.get().workspace.getAssetListPopup();
-                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener() {
+                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
+
                     @Override
-                    public void chosen (FilteredTree.Node node) {
-                        String path = (String) node.getObject();
-                        if(Gdx.files.absolute(path).isDirectory()) return;
+                    public void chosen (FilteredTree.Node<GameAsset<T>> node) {
+                        GameAsset<T> gameAsset = node.getObject();
 
-                        String relative = AssetImporter.relative(Gdx.files.absolute(path));
+                        if (gameAsset.isBroken()) {
+                            return;
+                        }
 
-                        updateWidget(relative);
-                        callValueChanged(relative);
+                        updateWidget(gameAsset);
+                        callValueChanged(gameAsset);
                         assetListPopup.remove();
                     }
                 });
@@ -108,18 +98,14 @@ public class AssetSelectWidget extends PropertyWidget<String> {
     }
 
     @Override
-    public void updateWidget (String value) {
-        if(value == null || value.isEmpty()) {
-            nameLabel.setText("-");
-            path = null;
+    public void updateWidget (GameAsset<T> value) {
+        if(value == null) {
+            nameLabel.setText("No Asset");
+            gameAsset = null;
             return;
         }
-        FileHandle handle = AssetImporter.get(value);
-        if(handle.exists()) {
-            nameLabel.setText(handle.name());
-        } else {
-            nameLabel.setText("n/a");
-        }
-        path = value;
+
+        this.gameAsset = value;
+        this.nameLabel.setText(value.getRootRawAsset().handle.name());
     }
 }

@@ -75,7 +75,7 @@ public class ProjectExplorerWidget extends Table {
             }
         };
 
-        directoryTree.setItemListener(new FilteredTree.ItemListener() {
+        directoryTree.setItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void selected (FilteredTree.Node node) {
                 directoryViewWidget.setDirectory((String) node.getObject());
@@ -95,7 +95,7 @@ public class ProjectExplorerWidget extends Table {
             }
 
             @Override
-            public void delete (Array<FilteredTree.Node> nodes) {
+            public void delete (Array<FilteredTree.Node<Object>> nodes) {
                 String path = (String) nodes.first().getObject();
                 Array<String> paths = new Array<>();
                 paths.add(path);

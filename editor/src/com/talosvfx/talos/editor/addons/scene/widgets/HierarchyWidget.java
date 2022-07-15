@@ -45,7 +45,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         contextualMenu = new ContextualMenu();
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.setItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void chosen (FilteredTree.Node node) {
                 GameObject gameObject = objectMap.get(node.getName());
@@ -84,7 +84,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             }
 
             @Override
-            public void delete (Array<FilteredTree.Node> nodes) {
+            public void delete (Array<FilteredTree.Node<Object>> nodes) {
                 Array<GameObject> gameObjects = new Array<>();
                 for(FilteredTree.Node node: nodes) {
                     if(objectMap.containsKey(node.getName())) {

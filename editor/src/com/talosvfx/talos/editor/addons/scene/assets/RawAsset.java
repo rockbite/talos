@@ -9,8 +9,8 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
  */
 public class RawAsset {
 
-	FileHandle handle;
-	AMetadata metaData;
+	public FileHandle handle;
+	public AMetadata metaData;
 
 	Array<GameAsset> gameAssetReferences = new Array<>();
 

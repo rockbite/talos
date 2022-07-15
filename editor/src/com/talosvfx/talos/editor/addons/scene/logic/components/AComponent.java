@@ -9,8 +9,4 @@ public abstract class AComponent implements IPropertyProvider {
         return getClass();
     }
 
-    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
-        // do nothing
-        return false;
-    }
 }

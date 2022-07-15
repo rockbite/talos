@@ -149,6 +149,7 @@ public class AssetRepository {
 
 	}
 
+
 	public static class GameAssetExportStructure {
 		String identifier;
 		GameAssetType type;
@@ -376,23 +377,32 @@ public class AssetRepository {
 		}
 	}
 
-	public <T> GameAsset<T> getAssetForPath (FileHandle file, Class<T> resourceClass) {
+	public GameAsset<?> getAssetForPath (FileHandle file) {
+		if (fileHandleGameAssetObjectMap.containsKey(file)) {
+			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
+			if (!gameAsset.isBroken()) {
+				return gameAsset;
+			}
+		}
+		return null;
+	}
+	public <T> GameAsset<T> getAssetForPath (FileHandle file, GameAssetType assetType) {
 		String nameWithoutExtension = file.nameWithoutExtension();
 
 		if (identifierGameAssetMap.containsKey(nameWithoutExtension)) {
-			GameAsset gameAsset = identifierGameAssetMap.get(nameWithoutExtension);
+			GameAsset<?> gameAsset = identifierGameAssetMap.get(nameWithoutExtension);
 			if (!gameAsset.isBroken()) {
-				if (gameAsset.getResource().getClass().isAssignableFrom(resourceClass)) {
+				if (gameAsset.type == assetType) {
 					return identifierGameAssetMap.get(nameWithoutExtension);
 				}
 			}
 		}
 
 		if (fileHandleGameAssetObjectMap.containsKey(file)) {
-			GameAsset gameAsset = fileHandleGameAssetObjectMap.get(file);
+			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
 			if (!gameAsset.isBroken()) {
-				if (gameAsset.getResource().getClass().isAssignableFrom(resourceClass)) {
-					return gameAsset;
+				if (gameAsset.type == assetType) {
+					return (GameAsset<T>)gameAsset;
 				}
 			}
 		}
@@ -401,6 +411,17 @@ public class AssetRepository {
 		tGameAsset.setBroken(new Exception("Broken asset"));
 		return tGameAsset;
 	}
+
+	public <T> GameAsset<T> getAssetForIdentifier (String gameResourceIdentifier, GameAssetType type) {
+		GameAsset<?> gameAsset = identifierGameAssetMap.get(gameResourceIdentifier);
+		if (gameAsset != null && gameAsset.type == type) {
+			return (GameAsset<T>)gameAsset;
+		}
+		GameAsset<?> tGameAsset = new GameAsset<>(gameResourceIdentifier, GameAssetType.SPRITE);
+		tGameAsset.setBroken(new Exception("Broken asset"));
+		return (GameAsset<T>)tGameAsset;
+	}
+
 
 	private <T> GameAsset<T> getDefaultGameAsset (Class<T> resourceClass) {
 		System.out.println("Getting default game asset for " + resourceClass);

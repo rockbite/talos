@@ -38,6 +38,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
@@ -79,26 +80,27 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private ItemListener itemListener;
 
-    public static abstract class ItemListener {
-        public void chosen(Node node) {
+
+    public static abstract class ItemListener<T> {
+        public void chosen(Node<T> node) {
 
         }
-        public void selected(Node node) {
+        public void selected(Node<T> node) {
 
         }
-        public void rightClick (Node node) {
-
-        }
-
-        public void deselect(Node node){
+        public void rightClick (Node<T> node) {
 
         }
 
-        public void delete (Array<FilteredTree.Node> nodes) {
+        public void deselect(Node<T> node){
 
         }
 
-        public void onNodeMove (Node parentToMoveTo, Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+        public void delete (Array<FilteredTree.Node<T>> nodes) {
+
+        }
+
+        public void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
 
         }
     }

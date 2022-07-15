@@ -149,15 +149,5 @@ public class ParticleComponent extends RendererComponent {
         }
     }
 
-    @Override
-    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
-        if(path.equals(oldPath)) {
-            path = newPath;
-            reloadDescriptor();
 
-            return true;
-        }
-
-        return false;
-    }
 }

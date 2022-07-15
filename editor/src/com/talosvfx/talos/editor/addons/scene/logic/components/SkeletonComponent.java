@@ -151,14 +151,4 @@ public class SkeletonComponent extends AComponent {
         }
     }
 
-    @Override
-    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
-        if(path.equals(oldPath)) {
-            path = newPath;
-            reloadData(scale);
-            return true;
-        }
-
-        return false;
-    }
 }

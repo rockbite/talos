@@ -1,7 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,7 +9,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
@@ -19,10 +16,9 @@ import java.util.function.Supplier;
 
 public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
 
-    public GameAsset<Texture> texture;
+    public GameAsset<Texture> gameAsset;
     TextureRegion textureRegion;
 
-    public String path = "";
 
     public Color color = new Color(Color.WHITE);
     public boolean flipX;
@@ -31,12 +27,21 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public GameAsset<Texture> getGameResource () {
-        return texture;
+        return gameAsset;
     }
 
     @Override
-    public void setGameAsset (GameAsset<Texture> gameAsset) {
-        this.texture = gameAsset;
+    public void setGameAsset (GameAsset<Texture> newGameAsset) {
+        if (this.gameAsset != null) {
+            //Remove from old game asset, it might be the same, but it may also have changed
+            this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+        }
+
+        this.gameAsset = newGameAsset;
+        this.gameAsset.listeners.add(gameAssetUpdateListener);
+
+        gameAssetUpdateListener.onUpdate();
+
     }
 
     public enum RenderMode {
@@ -54,16 +59,15 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<String>() {
+        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
             @Override
-            public String get() {
-                return path;
+            public GameAsset<Texture> get() {
+                return gameAsset;
             }
-        }, new PropertyWidget.ValueChanged<String>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<Texture>>() {
             @Override
-            public void report(String value) {
-                path = value;
-                loadTexture();
+            public void report(GameAsset<Texture> value) {
+                setGameAsset(value);
             }
         });
 
@@ -97,31 +101,21 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
         @Override
         public void onUpdate () {
-            if (texture.isBroken()) {
+            if (gameAsset.isBroken()) {
                 textureRegion = AssetRepository.getInstance().brokenTextureRegion;
             } else {
-                textureRegion = new TextureRegion(texture.getResource());
+                textureRegion = new TextureRegion(gameAsset.getResource());
             }
         }
     };
 
-    public void loadTexture () {
-        FileHandle file = AssetImporter.get(path);
-
-        if (texture != null) {
-            //Remove from old game asset, it might be the same, but it may also have changed
-            texture.listeners.removeValue(gameAssetUpdateListener, true);
-        }
-
-        setGameAsset(AssetRepository.getInstance().getAssetForPath(file, Texture.class));
-        gameAssetUpdateListener.onUpdate();
-
-        texture.listeners.add(gameAssetUpdateListener);
+    private void loadTextureFromIdentifier (String gameResourceIdentifier) {
+        GameAsset<Texture> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        setGameAsset(assetForIdentifier);
     }
 
     @Override
     public void write (Json json) {
-        json.writeValue("path", path);
         GameResourceOwner.writeGameAsset(json, this);
 
         json.writeValue("color", color);
@@ -135,10 +129,9 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        path = jsonData.getString("path");
         String gameResourceIdentifier = jsonData.getString("gameResource", "");//Don't need to use it, we use path
 
-        loadTexture();
+        loadTextureFromIdentifier(gameResourceIdentifier);
 
         color = json.readValue(Color.class, jsonData.get("color"));
         if(color == null) color = new Color(Color.WHITE);
@@ -155,13 +148,4 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         return textureRegion;
     }
 
-    @Override
-    public boolean notifyAssetPathChanged (String oldPath, String newPath) {
-        if(path.equals(oldPath)) {
-            path = newPath;
-            return true;
-        }
-
-        return false;
-    }
 }

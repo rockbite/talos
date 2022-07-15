@@ -53,14 +53,15 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         list = new FilteredTree<>(skin, "modern");
         list.draggable = true;
 
-        list.setItemListener(new FilteredTree.ItemListener() {
+        list.setItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void onNodeMove (FilteredTree.Node parentToMoveTo, FilteredTree.Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
                 callValueChanged(makeDataArray());
             }
 
+
             @Override
-            public void delete (Array<FilteredTree.Node> nodes) {
+            public void delete (Array<FilteredTree.Node<Object>> nodes) {
                 deleteSelection();
             }
         });

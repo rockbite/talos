@@ -149,8 +149,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
 
-        component.path = AssetImporter.relative(importedAsset);
-        component.loadTexture();
+//        component.path = AssetImporter.relative(importedAsset);
+//        component.loadTexture();
 
         TextureRegion texture = component.getTextureRegion();
         float aspect = (float)texture.getRegionWidth() / texture.getRegionHeight();
@@ -1289,20 +1289,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     private void notifyAssetPathChanged (Array<AComponent> list, GameObject gameObject, AssetPathChanged event) {
-        Iterable<AComponent> components = gameObject.getComponents();
-        for(AComponent component: components) {
-            boolean affected = component.notifyAssetPathChanged(event.oldRelativePath, event.newRelativePath);
-            if(affected) {
-                list.add(component);
-            }
-        }
-
-        Array<GameObject> gameObjects = gameObject.getGameObjects();
-        if(gameObjects != null) {
-            for(GameObject child: gameObjects) {
-                notifyAssetPathChanged(list, child, event);
-            }
-        }
+//        Iterable<AComponent> components = gameObject.getComponents();
+//        for(AComponent component: components) {
+//            boolean affected = component.notifyAssetPathChanged(event.oldRelativePath, event.newRelativePath);
+//            if(affected) {
+//                list.add(component);
+//            }
+//        }
+//
+//        Array<GameObject> gameObjects = gameObject.getGameObjects();
+//        if(gameObjects != null) {
+//            for(GameObject child: gameObjects) {
+//                notifyAssetPathChanged(list, child, event);
+//            }
+//        }
+        System.out.println("Does nothing anymore");
     }
 
     public void dispose () {
