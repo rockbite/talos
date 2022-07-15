@@ -196,12 +196,14 @@ public class ProjectExplorerWidget extends Table {
                 String path = files.first().path();
                 if(path != null) {
                     FileHandle handle = Gdx.files.absolute(path);
-                    if(handle.isDirectory()) {
-                        if (directory) {
-                            directoryViewWidget.startRenameFor(handle);
-                        } else if (nodes.get(path) != null) {
-                            RowWidget widget = (RowWidget) nodes.get(path).getActor();
-                            widget.label.setEditMode();
+                    if (directory) {
+                        directoryViewWidget.startRenameFor(handle);
+                    } else {
+                        if (handle.isDirectory()) {
+                            if (nodes.get(path) != null) {
+                                RowWidget widget = (RowWidget) nodes.get(path).getActor();
+                                widget.label.setEditMode();
+                            }
                         }
                     }
                 }
