@@ -17,8 +17,6 @@ import java.util.function.Supplier;
 public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
 
     public GameAsset<Texture> gameAsset;
-    TextureRegion textureRegion;
-
 
     public Color color = new Color(Color.WHITE);
     public boolean flipX;
@@ -59,7 +57,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
+        AssetSelectWidget<GameAsset<Texture>> textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
             @Override
             public GameAsset<Texture> get() {
                 return gameAsset;
@@ -102,9 +100,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         @Override
         public void onUpdate () {
             if (gameAsset.isBroken()) {
-                textureRegion = AssetRepository.getInstance().brokenTextureRegion;
             } else {
-                textureRegion = new TextureRegion(gameAsset.getResource());
             }
         }
     };
@@ -144,8 +140,5 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         super.read(json, jsonData);
     }
 
-    public TextureRegion getTextureRegion () {
-        return textureRegion;
-    }
 
 }

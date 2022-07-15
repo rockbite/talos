@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -40,6 +41,7 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,7 +103,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         GizmoRegister.init(root);
 
-        assetListPopup = new AssetListPopup();
+        assetListPopup = new AssetListPopup<>();
         templateListPopup = new TemplateListPopup(root);
         templateListPopup.setListener(new TemplateListPopup.ListListener() {
             @Override
@@ -138,26 +140,29 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         createObjectByTypeName("empty", position, parent);
     }
 
-
-    public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords) {
-        return createSpriteObject(importedAsset, sceneCords, null);
-    }
-
-    public GameObject createSpriteObject (FileHandle importedAsset, Vector2 sceneCords, GameObject parent) {
+    public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
         GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
         SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
         component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+        component.setGameAsset(spriteAsset);
 
-//        component.path = AssetImporter.relative(importedAsset);
-//        component.loadTexture();
-
-        TextureRegion texture = component.getTextureRegion();
-        float aspect = (float)texture.getRegionWidth() / texture.getRegionHeight();
+        Texture texture = component.getGameResource().getResource();
+        float aspect = (float)texture.getWidth() / texture.getHeight();
         TransformComponent transformComponent = spriteObject.getComponent(TransformComponent.class);
         transformComponent.scale.x *= aspect;
 
         return spriteObject;
+    }
+
+    public GameObject createParticle (GameAsset<ParticleEffectDescriptor> asset, Vector2 sceneCords, GameObject parent) {
+        GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent);
+        ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
+
+        component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+        component.setGameAsset(asset);
+
+        return particleObject;
     }
 
     public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
@@ -553,6 +558,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             SceneEditorAddon.get().projectExplorer.reload();
         }
     }
+
+
 
     public static class ClipboardPayload {
         public Array<GameObject> objects = new Array<>();

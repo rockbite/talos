@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,6 +23,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
@@ -43,8 +47,8 @@ public class DirectoryViewWidget extends Table {
     private float boxWidth = 0;
 
     private ItemView overItem;
-    private Array<FileHandle> selected = new Array<>();
-    private FileHandle selectCandidate;
+    private Array<ItemView> selected = new Array<>();
+    private ItemView selectCandidate;
     private int selectionStart = -1;
 
     private Vector2 tmp = new Vector2();
@@ -69,10 +73,10 @@ public class DirectoryViewWidget extends Table {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
 
-                FileHandle selectCandidate = getSelectCandidate();
+                ItemView selectCandidate = getSelectCandidate();
                 if(selectCandidate != null && SceneEditorWorkspace.isRenamePressed(keycode)) {
                     for(ItemView item: items) {
-                        if(item.fileHandle.path().equals(selectCandidate.path())) {
+                        if(item.fileHandle.path().equals(selectCandidate.fileHandle.path())) {
                             // found it
                             item.setToRename();
                         }
@@ -82,11 +86,11 @@ public class DirectoryViewWidget extends Table {
                 ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
 
                 if(keycode == Input.Keys.X && SceneEditorWorkspace.ctrlPressed()) {
-                    projectExplorer.invokeCut(selected);
+                    projectExplorer.invokeCut(convertToFileArray(selected));
                 }
 
                 if(keycode == Input.Keys.C && SceneEditorWorkspace.ctrlPressed()) {
-                    projectExplorer.invokeCopy(selected);
+                    projectExplorer.invokeCopy(convertToFileArray(selected));
                 }
 
                 if(keycode == Input.Keys.V && SceneEditorWorkspace.ctrlPressed()) {
@@ -95,8 +99,8 @@ public class DirectoryViewWidget extends Table {
 
                 if(keycode == Input.Keys.FORWARD_DEL) {
                     Array<String> paths = new Array<>();
-                    for(FileHandle file: selected) {
-                        paths.add(file.path());
+                    for(ItemView file: selected) {
+                        paths.add(file.fileHandle.path());
                     }
                     projectExplorer.deletePath(paths);
                 }
@@ -123,15 +127,15 @@ public class DirectoryViewWidget extends Table {
                     return;
                 }
 
-                ItemView fileToContext = getFileAt(x, y);
+                ItemView itemViewAt = getFileAt(x, y);
 
                 if(button == 1) {
-                    if(fileToContext != null) {
-                        if (!selected.contains(fileToContext.fileHandle, true)) {
-                            selectFile(fileToContext.fileHandle);
+                    if(itemViewAt != null) {
+                        if (!selected.contains(itemViewAt, true)) {
+                            selectFile(itemViewAt);
                             reportSelectionChanged();
                         }
-                        SceneEditorAddon.get().projectExplorer.showContextMenu(selected, true);
+                        SceneEditorAddon.get().projectExplorer.showContextMenu(convertToFileArray(selected), true);
                     } else {
                         Array<FileHandle> list = new Array<>();
                         list.add(fileHandle);
@@ -143,10 +147,10 @@ public class DirectoryViewWidget extends Table {
 
                     if(fileToSelect != null) {
                         if(SceneEditorWorkspace.ctrlPressed()) {
-                            if(selected.contains(fileToSelect.fileHandle, true)) {
-                                removeFromSelection(fileToSelect.fileHandle);
+                            if(selected.contains(fileToSelect, true)) {
+                                removeFromSelection(fileToSelect);
                             } else {
-                                addToSelection(fileToSelect.fileHandle);
+                                addToSelection(fileToSelect);
                             }
                             reportSelectionChanged();
                             selectionStart = items.indexOf(fileToSelect, true);
@@ -159,13 +163,13 @@ public class DirectoryViewWidget extends Table {
                                     int max = Math.max(aPoint, bPoint);
                                     unselectFiles();
                                     for(int i = min; i <= max; i++) {
-                                        addToSelection(items.get(i).fileHandle);
+                                        addToSelection(items.get(i));
                                     }
                                     reportSelectionChanged();
                                 }
                             } else {
                                 selectionStart = items.indexOf(fileToSelect, true);
-                                selectFile(fileToSelect.fileHandle);
+                                selectFile(fileToSelect);
                                 reportSelectionChanged();
                             }
                         }
@@ -215,24 +219,32 @@ public class DirectoryViewWidget extends Table {
         setTouchable(Touchable.enabled);
     }
 
-    private void removeFromSelection(FileHandle fileHandle) {
-        selected.removeValue(fileHandle, true);
+    private Array<FileHandle> convertToFileArray (Array<ItemView> selected) {
+        Array<FileHandle> handles = new Array<>();
+        for (ItemView itemView : selected) {
+            handles.add(itemView.fileHandle);
+        }
+        return handles;
     }
 
-    private void addToSelection(FileHandle fileHandle) {
-        selected.add(fileHandle);
-        selectCandidate = fileHandle;
+    private void removeFromSelection(ItemView itemView) {
+        selected.removeValue(itemView, true);
+    }
+
+    private void addToSelection(ItemView itemView) {
+        selected.add(itemView);
+        selectCandidate = itemView;
         getStage().setKeyboardFocus(this);
     }
 
-    private void selectFile(FileHandle fileHandle) {
+    private void selectFile(ItemView itemView) {
         selected.clear();
-        selected.add(fileHandle);
-        selectCandidate = fileHandle;
+        selected.add(itemView);
+        selectCandidate = itemView;
         getStage().setKeyboardFocus(this);
     }
 
-    private FileHandle getSelectCandidate() {
+    private ItemView getSelectCandidate() {
         if(selectCandidate != null) return selectCandidate;
 
         if(selected.size > 0) {
@@ -245,7 +257,7 @@ public class DirectoryViewWidget extends Table {
     private void selectAllFiles() {
         selected.clear();
         for(ItemView view: items) {
-            selected.add(view.fileHandle);
+            selected.add(view);
         }
     }
 
@@ -300,12 +312,23 @@ public class DirectoryViewWidget extends Table {
 
                 Object object = payload.getObject();
                 if(object instanceof Array) {
-                    Array<FileHandle> array = (Array<FileHandle>) object;
-                    for(FileHandle fileHandle: array) {
-                        AssetImporter.createAssetInstance(fileHandle, SceneEditorAddon.get().workspace.getRootGO());
+
+                    //its a selection of File handles
+
+                    Array<ItemView> array = (Array<ItemView>) object;
+
+                    for (ItemView itemView : array) {
+                        if (itemView.gameAsset != null) {
+                            AssetImporter.createAssetInstance(itemView.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
+                        }
                     }
-                } else if(object instanceof FileHandle) {
-                    AssetImporter.createAssetInstance((FileHandle) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+                } else {
+                    if (object instanceof GameAsset) {
+                        AssetImporter.createAssetInstance((GameAsset) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+                    }
+                    if (object instanceof FileHandle) {
+                        //Do nothing here anymore
+                    }
                 }
 
                 unselectFiles();
@@ -388,16 +411,20 @@ public class DirectoryViewWidget extends Table {
 
                         preventDeselect = true;
 
-                        if(!selected.contains(child, true)) {
+                        if(!selected.contains(itemView, true)) {
                             selected.clear();
-                            selected.add(child);
+                            selected.add(itemView);
                         }
 
                         if(selected.size == 1) {
-                            ItemView newVIew = new ItemView();
-                            Actor dragging = ((ActorCloneable) newVIew).copyActor(itemView);
+                            ItemView newView = new ItemView();
+                            Actor dragging = ((ActorCloneable) newView).copyActor(itemView);
                             payload.setDragActor(dragging);
-                            payload.setObject(child);
+                            if (newView.gameAsset != null) {
+                                payload.setObject(newView.gameAsset);
+                            } else {
+                                payload.setObject(child);
+                            }
                         } else {
                             Label dragging = new Label("Multiple selection", TalosMain.Instance().getSkin());
                             payload.setDragActor(dragging);
@@ -460,10 +487,12 @@ public class DirectoryViewWidget extends Table {
 
     public class ItemView extends Table implements ActorCloneable<ItemView> {
 
+        private Table iconContainer;
         private Image icon;
         private EditableLabel label;
 
         private FileHandle fileHandle;
+        private GameAsset<?> gameAsset;
 
         public ItemView() {
             build();
@@ -492,7 +521,7 @@ public class DirectoryViewWidget extends Table {
                 }
             });
 
-            Table iconContainer = new Table();
+            iconContainer = new Table();
             iconContainer.add(icon).grow();
 
             add(iconContainer).size(90).pad(10);
@@ -506,7 +535,7 @@ public class DirectoryViewWidget extends Table {
             label.setEditMode();
         }
 
-        public void setFile(FileHandle fileHandle) {
+        private void setFile (FileHandle fileHandle) {
 
             String name = fileHandle.name();
             label.setText(name);
@@ -526,7 +555,20 @@ public class DirectoryViewWidget extends Table {
                 }
             }
 
-            this.fileHandle = fileHandle;        }
+            this.fileHandle = fileHandle;
+
+            GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle);
+            if (assetForPath != null) {
+                gameAsset = assetForPath;
+            }
+
+            if (assetForPath != null) {
+                //Lets add something to the icon so it shows
+                Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
+                image.setColor(Color.GREEN);
+                iconContainer.addActor(image);
+            }
+        }
 
         @Override
         public void act(float delta) {
@@ -538,7 +580,7 @@ public class DirectoryViewWidget extends Table {
                     view.setBackground((Drawable) (null));
                 }
 
-                if(selected.contains(view.fileHandle, true)) {
+                if(selected.contains(view, true)) {
                     view.setBackground(ColorLibrary.obtainBackground(skin, "white", ColorLibrary.BackgroundColor.DARK_GRAY));
                 }
             }
@@ -559,14 +601,18 @@ public class DirectoryViewWidget extends Table {
         if(!selected.isEmpty()) {
             IPropertyHolder holder = null;
             if (selected.size == 1) {
-                FileHandle item = selected.first();
-                holder = AssetImporter.readMetadataFor(item);
+                ItemView item = selected.first();
+                if (item.gameAsset != null) {
+                    holder = item.gameAsset.getRootRawAsset().metaData;
+                }
 
             } else if (selected.size > 1) {
                 Array<AMetadata> list = new Array<AMetadata>();
-                for (FileHandle item : selected) {
-                    AMetadata aMetadata = AssetImporter.readMetadataFor(item);
-                    list.add(aMetadata);
+                for (ItemView item : selected) {
+                    if (item.gameAsset != null) {
+                        RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
+                        list.add(rootRawAsset.metaData);
+                    }
                 }
                 holder = new MultiPropertyHolder(list);
             }

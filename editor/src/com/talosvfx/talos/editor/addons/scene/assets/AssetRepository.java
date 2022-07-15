@@ -1,10 +1,10 @@
 
 package com.talosvfx.talos.editor.addons.scene.assets;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -26,13 +26,17 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.assets.AssetProvider;
+import com.talosvfx.talos.runtime.serialization.ExportData;
 
 import java.util.UUID;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
+import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
+import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
 public class AssetRepository {
-
 
 	private ObjectMap<String, GameAsset> identifierGameAssetMap = new ObjectMap<>();
 	private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
@@ -43,7 +47,6 @@ public class AssetRepository {
 	private Json json;
 
 	public TextureRegion brokenTextureRegion;
-
 
 	static AssetRepository instance;
 	public static AssetRepository getInstance() {
@@ -124,11 +127,16 @@ public class AssetRepository {
 		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
 		for (String identifiersBeingUsedByComponent : identifiersBeingUsedByComponents) {
 			GameAsset<?> gameAsset = identifierGameAssetMap.get(identifiersBeingUsedByComponent);
+			if (gameAsset == null) {
+				System.out.println("Game asset is null, not exporting");
+				continue;
+			}
 			if (gameAsset.isBroken()) {
 				System.out.println("Game asset is broken, not exporting");
-			} else {
-				gameAssetsToExport.add(gameAsset);
+				continue;
 			}
+
+			gameAssetsToExport.add(gameAsset);
 		}
 
 		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
@@ -193,12 +201,12 @@ public class AssetRepository {
 		fileHandleGameAssetObjectMap.put(key, gameAsset);
 	}
 
-	public GameAsset createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value) {
+	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value) {
 		if (!assetTypeFromExtension.isRootGameAsset()) {
 			throw new GdxRuntimeException("Trying to load a game asset from a non root asset");
 		}
 
-		GameAsset gameAssetOut = null;
+		GameAsset<?> gameAssetOut = null;
 
 
 		try {
@@ -277,6 +285,51 @@ public class AssetRepository {
 			case SOUND:
 				break;
 			case VFX:
+
+				GameAsset<ParticleEffectDescriptor> particleEffectDescriptorGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+
+				gameAssetOut = particleEffectDescriptorGameAsset;
+
+				particleEffectDescriptorGameAsset.dependentRawAssets.add(value);
+
+				ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
+				particleEffectDescriptor.setAssetProvider(new AssetProvider() {
+					@Override
+					public <T> T findAsset (String assetName, Class<T> clazz) {
+
+						if (Sprite.class.isAssignableFrom(clazz)) {
+							GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+
+							if (gameAsset != null) {
+								for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+									particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
+								}
+								return (T)new Sprite(gameAsset.getResource());
+							} else {
+								particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
+							}
+						}
+
+						throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+					}
+				});
+
+				//We need to find the asset that is linked to
+				//P should be same directory, lets find it
+
+				FileHandle pFile = value.handle.parent().child(value.handle.nameWithoutExtension() + ".p");
+				if (!pFile.exists()) {
+					throw new GdxRuntimeException("No p file for tls " + value.handle.path());
+				}
+
+				RawAsset rawAssetPFile = fileHandleRawAssetMap.get(pFile);
+				particleEffectDescriptor.load(rawAssetPFile.handle);
+
+				particleEffectDescriptorGameAsset.setResourcePayload(particleEffectDescriptor);
+				value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
+
+				particleEffectDescriptorGameAsset.dependentRawAssets.add(rawAssetPFile);
+
 				break;
 			case VFX_OUTPUT:
 				break;
@@ -301,7 +354,7 @@ public class AssetRepository {
 	private void collectRawResourceFromDirectory (FileHandle dir, boolean checkGameResources) {
 
 		if (!dir.isDirectory()) {
-			rawAssetCreated(dir, false);
+			rawAssetCreated(dir, checkGameResources);
 		}
 
 		FileHandle[] list = dir.list();
@@ -330,13 +383,28 @@ public class AssetRepository {
 
 	}
 
+	public void updateVFXTLS (RawAsset tlsRawAsset, boolean checkGameResources) {
+		ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
+		String exportDataJson = writeTalosPExport(exportData);
+
+		FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
+		exportedPFile.writeString(exportDataJson, false);
+
+		rawAssetCreated(exportedPFile, checkGameResources);
+	}
+
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
+		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
+
 		RawAsset rawAsset = new RawAsset(fileHandle);
+
+		if (assetTypeFromExtension == GameAssetType.VFX) {
+			updateVFXTLS(rawAsset, checkGameResources);
+		}
 
 		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
 		if (metadataHandleFor.exists()) {
 			try {
-				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 				Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
 				rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
 			} catch (Exception e) {
@@ -353,6 +421,8 @@ public class AssetRepository {
 
 		uuidRawAssetMap.put(rawAsset.metaData.uuid, rawAsset);
 		fileHandleRawAssetMap.put(fileHandle, rawAsset);
+
+		System.out.println("Raw asset created" + rawAsset.handle.path());
 
 		if (checkGameResources) {
 			checkGameAssetCreation();

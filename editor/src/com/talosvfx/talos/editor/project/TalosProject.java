@@ -46,6 +46,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 
+import static com.talosvfx.talos.editor.serialization.ProjectSerializer.readTalosTLSProject;
+
 public class TalosProject implements IProject {
 
 	private final Comparator<ParticleEmitterWrapper> emitterComparator;
@@ -91,7 +93,7 @@ public class TalosProject implements IProject {
 		cleanData();
 
 		projectSerializer.prereadhack(data);
-		projectData = projectSerializer.read(data);
+		projectData = readTalosTLSProject(data);
 		readMetaData = projectData.metaData;
 
 		ParticleEmitterWrapper firstEmitter = null;
@@ -220,14 +222,72 @@ public class TalosProject implements IProject {
 	public void exportProject(FileHandle handle) {
 		ExportData exportData = new ExportData();
 		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
-		handle.writeString(projectSerializer.writeExport(exportData), false);
+		handle.writeString(projectSerializer.writeTalosPExport(exportData), false);
+	}
+
+	public static ExportData exportTLSDataToP (FileHandle tlsFile) {
+		ProjectData projectDataToConvert = readTalosTLSProject(tlsFile.readString());
+
+		Array<EmitterData> emitters = projectDataToConvert.getEmitters();
+
+		ExportData data = new ExportData();
+
+		for (EmitterData emitter : emitters) {
+			ExportData.EmitterExportData emitterData = new ExportData.EmitterExportData();
+			emitterData.name = emitter.name;
+			for (ModuleWrapper wrapper : emitter.modules) {
+				emitterData.modules.add(wrapper.getModule());
+
+				if (wrapper.getModule() instanceof TextureModule) {
+					TextureModule textureModule = (TextureModule)wrapper.getModule();
+					String name = textureModule.regionName;
+					if (name == null)
+						name = "fire";
+
+					if (!data.metadata.resources.contains(name, false)) {
+						data.metadata.resources.add(name);
+					}
+				}
+				if (wrapper.getModule() instanceof PolylineModule) {
+					PolylineModule module = (PolylineModule)wrapper.getModule();
+					String name = module.regionName;
+					if (name == null)
+						name = "fire";
+
+					if (!data.metadata.resources.contains(name, false)) {
+						data.metadata.resources.add(name);
+					}
+				}
+				if (wrapper.getModule() instanceof VectorFieldModule) {
+					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
+					String fgaFileName = vectorFieldModule.fgaFileName;
+
+					if (fgaFileName == null) {
+						continue;
+					}
+					fgaFileName = fgaFileName + ".fga";
+					if (!data.metadata.resources.contains(fgaFileName, false)) {
+						data.metadata.resources.add(fgaFileName);
+					}
+				}
+			}
+
+			Array<ConnectionData> connections = emitter.connections;
+			for (ConnectionData connection : connections) {
+				emitterData.connections.add(connection);
+			}
+
+			data.emitters.add(emitterData);
+		}
+
+		return data;
 	}
 
 	@Override
 	public String exportProject() {
 		ExportData exportData = new ExportData();
 		setToExportData(exportData, TalosMain.Instance().NodeStage().moduleBoardWidget);
-		return projectSerializer.writeExport(exportData);
+		return projectSerializer.writeTalosPExport(exportData);
 	}
 
 	private void cleanData() {

@@ -11,19 +11,19 @@
                 <component className="SpriteRendererComponent"></component>
             </components>
         </template>
-        <template name = "particle" title = "Particle Effect" nameTemplate = "Particle Effect" keywords = "">
+        <template name = "particle" title = "Particle Effect" nameTemplate = "Particle_Effect" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
                 <component className="ParticleComponent"></component>
             </components>
         </template>
-        <template name = "camera" title = "Camera" nameTemplate = "Main Camera" keywords = "">
+        <template name = "camera" title = "Camera" nameTemplate = "Main_Camera" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
                 <component className="CameraComponent"></component>
             </components>
         </template>
-        <template name = "spine" title = "Spine" nameTemplate = "Spine Animation" keywords = "">
+        <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
                 <component className="SkeletonComponent"></component>

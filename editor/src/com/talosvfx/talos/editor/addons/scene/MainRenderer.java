@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonRenderer;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
@@ -45,6 +47,8 @@ public class MainRenderer implements Notifications.Observer {
 
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer spineRenderer;
+
+    private TextureRegion textureRegion = new TextureRegion();
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -97,6 +101,18 @@ public class MainRenderer implements Notifications.Observer {
         for(GameObject gameObject: list) {
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
+            GameResourceOwner<?> resourceComponent = gameObject.getResourceComponent();
+            if (resourceComponent != null) {
+                //Its something with a game resource
+
+                if (resourceComponent.getGameResource().isBroken()) {
+                    //Render the broken sprite
+
+                    renderBrokenComponent(batch, gameObject, transformComponent);
+                    continue;
+                }
+            }
+
             if(gameObject.hasComponent(SpriteRendererComponent.class)) {
                 renderSprite(batch, gameObject);
             } else if(gameObject.hasComponent(ParticleComponent.class)) {
@@ -105,6 +121,20 @@ public class MainRenderer implements Notifications.Observer {
                 renderSpine(batch, gameObject);
             }
         }
+    }
+
+    private void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {
+
+        vec.set(0, 0);
+        transformComponent.localToWorld(gameObject, vec);
+        Vector2 renderPosition = vec;
+
+        batch.draw(AssetRepository.getInstance().brokenTextureRegion,
+            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+            0.5f, 0.5f,
+            1f, 1f,
+            transformComponent.scale.x, transformComponent.scale.y,
+            transformComponent.rotation);
     }
 
     private void renderSpine (Batch batch, GameObject gameObject) {
@@ -137,17 +167,11 @@ public class MainRenderer implements Notifications.Observer {
         transformComponent.localToWorld(gameObject, vec);
         Vector2 renderPosition = vec;
 
-        if(particleComponent.descriptor == null) {
-            particleComponent.reloadDescriptor();
-        }
-
-        if(particleComponent.descriptor != null) {
-            ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.descriptor);
-            instance.setPosition(renderPosition.x, renderPosition.y);
-            instance.update(Gdx.graphics.getDeltaTime()); // todo: we so hacky hacky
-            talosRenderer.setBatch(batch);
-            talosRenderer.render(instance);
-        }
+        ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.gameAsset.getResource());
+        instance.setPosition(renderPosition.x, renderPosition.y);
+        instance.update(Gdx.graphics.getDeltaTime()); // todo: we so hacky hacky
+        talosRenderer.setBatch(batch);
+        talosRenderer.render(instance);
     }
 
     private void renderSprite (Batch batch, GameObject gameObject) {
@@ -163,11 +187,13 @@ public class MainRenderer implements Notifications.Observer {
             transformComponent.localToWorld(gameObject, vec);
             Vector2 renderPosition = vec;
 
-            if(spriteRenderer.getTextureRegion() != null) {
+            Texture resource = spriteRenderer.getGameResource().getResource();
+            textureRegion.setRegion(resource);
+            if(textureRegion != null) {
                 batch.setColor(spriteRenderer.color);
 
                 if(metadata != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    Texture texture = spriteRenderer.getTextureRegion().getTexture(); // todo: pelase fix me, i am such a shit
+                    Texture texture = textureRegion.getTexture(); // todo: pelase fix me, i am such a shit
                     NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
                     float xSign = transformComponent.scale.x < 0 ? -1 : 1;
@@ -180,23 +206,23 @@ public class MainRenderer implements Notifications.Observer {
                         xSign, ySign,
                         transformComponent.rotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
-                    spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+                    textureRegion.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-                    float repeatX = transformComponent.scale.x / (spriteRenderer.getTextureRegion().getTexture().getWidth() / metadata.pixelsPerUnit);
-                    float repeatY = transformComponent.scale.y / (spriteRenderer.getTextureRegion().getTexture().getHeight() / metadata.pixelsPerUnit);
-                    spriteRenderer.getTextureRegion().setRegion(0, 0, repeatX, repeatY);
+                    float repeatX = transformComponent.scale.x / (textureRegion.getTexture().getWidth() / metadata.pixelsPerUnit);
+                    float repeatY = transformComponent.scale.y / (textureRegion.getTexture().getHeight() / metadata.pixelsPerUnit);
+                    textureRegion.setRegion(0, 0, repeatX, repeatY);
 
-                    batch.draw(spriteRenderer.getTextureRegion(),
+                    batch.draw(textureRegion,
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,
                         transformComponent.scale.x, transformComponent.scale.y,
                         transformComponent.rotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
-                    spriteRenderer.getTextureRegion().getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-                    spriteRenderer.getTextureRegion().setRegion(0, 0, spriteRenderer.getTextureRegion().getTexture().getWidth(), spriteRenderer.getTextureRegion().getTexture().getHeight());
+                    textureRegion.getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+                    textureRegion.setRegion(0, 0, textureRegion.getTexture().getWidth(), textureRegion.getTexture().getHeight());
 
-                    batch.draw(spriteRenderer.getTextureRegion(),
+                    batch.draw(textureRegion,
                         renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                         0.5f, 0.5f,
                         1f, 1f,

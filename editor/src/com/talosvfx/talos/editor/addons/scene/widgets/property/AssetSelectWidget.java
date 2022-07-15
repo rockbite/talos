@@ -106,6 +106,10 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
         }
 
         this.gameAsset = value;
-        this.nameLabel.setText(value.getRootRawAsset().handle.name());
+        if (gameAsset.isBroken()) {
+            this.nameLabel.setText("Broken asset - " + gameAsset.nameIdentifier);
+        } else {
+            this.nameLabel.setText(value.getRootRawAsset().handle.name());
+        }
     }
 }

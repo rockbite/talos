@@ -2,33 +2,29 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
-import java.io.File;
 import java.util.function.Supplier;
 
-public class ParticleComponent extends RendererComponent {
+public class ParticleComponent extends RendererComponent implements GameResourceOwner<ParticleEffectDescriptor> {
 
-    public ParticleEffectDescriptor descriptor;
-    public String path = "";
-
-    public String linkedTo = "";
-
+    public GameAsset<ParticleEffectDescriptor> gameAsset;
     @Override
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
@@ -38,62 +34,36 @@ public class ParticleComponent extends RendererComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget descriptorWidget = new AssetSelectWidget("Effect", GameAssetType.VFX, new Supplier<String>() {
+        AssetSelectWidget<ParticleEffectDescriptor> descriptorWidget = new AssetSelectWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<ParticleEffectDescriptor>>() {
             @Override
-            public String get() {
-                FileHandle fileHandle = Gdx.files.absolute(path);
-                return fileHandle.path();
+            public GameAsset<ParticleEffectDescriptor> get() {
+                return gameAsset;
             }
-        }, new PropertyWidget.ValueChanged<String>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<ParticleEffectDescriptor>>() {
             @Override
-            public void report(String value) {
-                path = value;
-                reloadDescriptor();
+            public void report(GameAsset<ParticleEffectDescriptor> value) {
+                setGameAsset(value);
             }
         });
 
         ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
             public void clicked(ButtonPropertyWidget<String> widget) {
-                String link = widget.getValue();
-                if (link.isEmpty()) {
-                    FileHandle sample = Gdx.files.internal("addons/scene/missing/sample.tls");
-                    FileHandle thisEffect = AssetImporter.get(path);
-                    FileHandle destination;
-                    if (!path.isEmpty() && thisEffect.exists()) {
-                        // idk which scenario is this
-                    } else {
-                        String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
-                        destination = AssetImporter.attemptToImport(sample);
-                        FileHandle pHandle = AssetImporter.makeSimilar(destination, "p");
-
-                        FileHandle texture = Gdx.files.internal("addons/scene/missing/white.png");
-                        FileHandle textureDst = Gdx.files.absolute(projectPath + File.separator + "assets/white.png");
-                        texture.copyTo(textureDst);
-
-                        path = pHandle.path();
-                        linkedTo = destination.path();
-
-                        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ParticleComponent.this, false));
-
-                        TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-                        TalosMain.Instance().ProjectController().loadProject(destination);
-                    }
-                } else {
-                    FileHandle fileHandle = AssetImporter.get(link);
-                    TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-                    TalosMain.Instance().ProjectController().loadProject(fileHandle);
-                }
+                //Edit this tls
+                RawAsset rootRawAsset = getGameResource().getRootRawAsset();
+                TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+                TalosMain.Instance().ProjectController().loadProject(rootRawAsset.handle);
             }
         }, new Supplier<String>() {
             @Override
             public String get() {
-                return linkedTo;
+//                return linkedTo;
+                return "";
             }
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
-                linkedTo = value;
+//                linkedTo = value;
             }
         });
 
@@ -116,38 +86,50 @@ public class ParticleComponent extends RendererComponent {
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        path = jsonData.getString("path", "");
-        linkedTo = jsonData.getString("linkedTo", "");
+        String gameResourceIdentifier = jsonData.getString("gameResource", "");//Don't need to use it, we use path
 
-        reloadDescriptor();
+        loadDescriptorFromIdentifier(gameResourceIdentifier);
 
         super.read(json, jsonData);
     }
 
+    GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
+        @Override
+        public void onUpdate () {
+            if (gameAsset.isBroken()) {
+
+            } else {
+                //Its ok
+            }
+        }
+    };
+
+    private void loadDescriptorFromIdentifier (String gameResourceIdentifier) {
+        GameAsset<ParticleEffectDescriptor> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
+        setGameAsset(assetForIdentifier);
+    }
+
     @Override
     public void write (Json json) {
-        json.writeValue("path", path);
-        json.writeValue("linkedTo", linkedTo);
+        GameResourceOwner.writeGameAsset(json, this);
         super.write(json);
     }
 
-    public void reloadDescriptor () {
-        FileHandle handle = AssetImporter.get(path);
-        if(handle.exists() && handle.extension().equals("p")) {
-            try {
-                descriptor = new ParticleEffectDescriptor();
-                descriptor.setAssetProvider(SceneEditorAddon.get().assetProvider);
-                descriptor.load(handle);
-            } catch (Exception e) {
-
-            }
-        } else {
-            // load default
-            descriptor = new ParticleEffectDescriptor();
-            descriptor.setAssetProvider(SceneEditorAddon.get().assetProvider);
-            descriptor.load(Gdx.files.internal("addons/scene/missing/sample.p"));
-        }
+    @Override
+    public GameAsset<ParticleEffectDescriptor> getGameResource () {
+        return this.gameAsset;
     }
 
+    @Override
+    public void setGameAsset (GameAsset<ParticleEffectDescriptor> newGameAsset) {
+        if (this.gameAsset != null) {
+            //Remove from old game asset, it might be the same, but it may also have changed
+            this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+        }
 
+        this.gameAsset = newGameAsset;
+        this.gameAsset.listeners.add(gameAssetUpdateListener);
+
+        gameAssetUpdateListener.onUpdate();
+    }
 }

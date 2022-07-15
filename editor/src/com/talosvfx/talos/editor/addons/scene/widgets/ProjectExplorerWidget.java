@@ -17,6 +17,7 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -70,6 +71,7 @@ public class ProjectExplorerWidget extends Table {
                 if(pathname.getAbsolutePath().endsWith(".tse")) return false;
                 if(pathname.getName().equals(".DS_Store")) return false;
                 if(pathname.getAbsolutePath().endsWith(".meta")) return false;
+                if(pathname.getAbsolutePath().endsWith(".p")) return false;
 
                 return true;
             }
@@ -252,14 +254,23 @@ public class ProjectExplorerWidget extends Table {
             createSubMenuItem(popupMenu, "Particle Effect", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
-                    String path = files.first().path();
-                    FileHandle tlsDestination = AssetImporter.suggestNewName(path, "New Effect", "tls");
-                    FileHandle metadataHandle = AssetImporter.makeSimilar(tlsDestination,"meta");
+
+                    FileHandle currentFolder = getCurrentFolder();
+
+                    FileHandle tlsDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Effect", "tls");
                     FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
-                    originalTls.copyTo(tlsDestination);
-                    TlsMetadata metadata = new TlsMetadata();
-                    metadata.tlsChecksum = AssetImporter.checkSum(tlsDestination);
-                    AssetImporter.saveMetadata(metadataHandle, metadata);
+
+                    FileHandle imageRequired = Gdx.files.internal("addons/scene/missing/white.png");
+                    if (!tlsDestination.parent().child(imageRequired.name()).exists()) {
+                        AssetRepository.getInstance().copyRawAsset(imageRequired, tlsDestination.parent());
+                    } else {
+                        System.out.println("Ignoring copying white, since we have it already");
+                    }
+
+                    AssetRepository.getInstance().copyRawAsset(originalTls, tlsDestination);
+
+
+
                     directoryViewWidget.reload();
                 }
             });
