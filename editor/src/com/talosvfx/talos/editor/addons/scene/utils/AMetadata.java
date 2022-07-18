@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -12,7 +13,8 @@ import java.util.UUID;
 
 public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, Json.Serializable {
 
-    public transient FileHandle currentFile;
+
+    public RawAsset link;
 
     public UUID uuid;
 
@@ -20,9 +22,11 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
         uuid = UUID.randomUUID();
     }
 
-    public void setFile(FileHandle currentFile) {
-        this.currentFile = currentFile;
+    public void setLinkRawAsset (RawAsset link) {
+        this.link = link;
+        System.out.println("Setting link " + link + " " + uuid.toString());
     }
+
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -48,7 +52,7 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
     public Iterable<IPropertyProvider> getPropertyProviders () {
         Array<IPropertyProvider> propertyProviders = new Array<>();
 
-        propertyProviders.add(new FilePropertyProvider(currentFile));
+        propertyProviders.add(new FilePropertyProvider(link.handle));
 
         if(getPropertyBoxTitle() != null) {
             propertyProviders.add(this);

@@ -192,7 +192,7 @@ public class MainRenderer implements Notifications.Observer {
             if(textureRegion != null) {
                 batch.setColor(spriteRenderer.color);
 
-                if(metadata != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+                if(metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                     Texture texture = textureRegion.getTexture(); // todo: pelase fix me, i am such a shit
                     NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too

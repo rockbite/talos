@@ -431,12 +431,12 @@ public class AssetRepository {
 			try {
 				Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
 				rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
+				rawAsset.metaData.setLinkRawAsset(rawAsset);
 			} catch (Exception e) {
+				e.printStackTrace();
 
 				System.out.println("Error reading meta for " + metadataHandleFor.path() + " " + metadataHandleFor.readString());
-
 				rawAsset.metaData = createMetaDataForAsset(rawAsset);
-
 			}
 		} else {
 			rawAsset.metaData = createMetaDataForAsset(rawAsset);
@@ -466,6 +466,8 @@ public class AssetRepository {
 			//Save the meta data
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(rawAsset.handle);
 			metadataHandleFor.writeString(json.prettyPrint(metaForType), false);
+
+			metaForType.setLinkRawAsset(rawAsset);
 
 			return metaForType;
 		}

@@ -23,10 +23,10 @@ public class PrefabMetadata extends AMetadata {
     public Iterable<IPropertyProvider> getPropertyProviders () {
         Array<IPropertyProvider> propertyProviders = new Array<>();
 
-        propertyProviders.add(new FilePropertyProvider(currentFile));
+        propertyProviders.add(new FilePropertyProvider(link.handle));
 
         Prefab prefab = new Prefab();
-        prefab.path = currentFile.path();
+        prefab.path = link.handle.path();
         prefab.loadFromPath();
 
         GameObject root = prefab.root;

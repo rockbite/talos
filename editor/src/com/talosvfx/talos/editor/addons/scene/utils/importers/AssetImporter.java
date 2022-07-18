@@ -105,7 +105,6 @@ public class AssetImporter {
     public static AMetadata readMetadataFor (FileHandle assetHandle) {
         if(assetHandle.isDirectory()) {
             DirectoryMetadata directoryMetadata = new DirectoryMetadata();
-            directoryMetadata.setFile(assetHandle);
             return directoryMetadata;
         }
 
@@ -129,7 +128,7 @@ public class AssetImporter {
             }
         }
 
-        t.setFile(assetHandle);
+//        t.setFile(assetHandle);
 
         return t;
     }
@@ -212,7 +211,8 @@ public class AssetImporter {
     }
 
     public static void saveMetadata (AMetadata aMetadata) {
-        FileHandle assetHandle = aMetadata.currentFile;
+
+        FileHandle assetHandle = aMetadata.link.handle;
         if(assetHandle != null && assetHandle.exists()) {
             FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
             saveMetadata(metadataHandle, aMetadata);

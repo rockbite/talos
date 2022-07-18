@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.metadata;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
@@ -58,5 +60,19 @@ public class SpriteMetadata extends AMetadata {
     @Override
     public String getPropertyBoxTitle () {
         return "Sprite";
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("borderData", borderData);
+        json.writeValue("pixelsPerUnit", pixelsPerUnit);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        borderData = json.readValue(int[].class, jsonData.get("borderData"));
+        pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", 100);
     }
 }
