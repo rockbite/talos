@@ -337,7 +337,7 @@ public class AssetRepository {
 
 				FileHandle pFile = value.handle.parent().child(value.handle.nameWithoutExtension() + ".p");
 				if (!pFile.exists()) {
-					throw new GdxRuntimeException("No p file for tls " + value.handle.path());
+					throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
 				}
 
 				RawAsset rawAssetPFile = fileHandleRawAssetMap.get(pFile);
@@ -702,6 +702,9 @@ public class AssetRepository {
 
 	//Could be a rename or a move
 	public void moveFile (FileHandle file, FileHandle destination) {
+		AssetImporter.moveFile(file, destination, true);
+	}
+	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets) {
 
 
 		if (file.isDirectory()) {
@@ -732,6 +735,16 @@ public class AssetRepository {
 				oldMeta.moveTo(destination);
 				file.moveTo(destination);
 
+				//Lets check to see if its a tls for special case
+				if (file.extension().equals("tls")) {
+					//We need to move the .p too
+					FileHandle pFile = file.parent().child(file.nameWithoutExtension() + ".p");
+					if (pFile.exists()) {
+						//Copy this too,
+						AssetImporter.moveFile(pFile, destination, false);
+					}
+				}
+
 
 				FileHandle newHandle = destination.child(file.name());
 
@@ -758,6 +771,16 @@ public class AssetRepository {
 
 					oldMeta.moveTo(destination.parent().child(destination.name() + ".meta"));
 					file.moveTo(destination);
+
+					//Lets check to see if its a tls for special case
+					if (file.extension().equals("tls")) {
+						//We need to move the .p too
+						FileHandle pFile = file.parent().child(file.nameWithoutExtension() + ".p");
+						if (pFile.exists()) {
+							//Copy this too,
+							AssetImporter.moveFile(pFile, destination, false);
+						}
+					}
 
 
 					AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
@@ -794,6 +817,10 @@ public class AssetRepository {
 				}
 			}
 
+		}
+
+		if (checkGameAssets) {
+			checkAllGameAssetCreation();
 		}
 	}
 

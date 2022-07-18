@@ -305,6 +305,10 @@ public class AssetImporter {
     }
 
     public static void moveFile(FileHandle file, FileHandle directory) {
+        moveFile(file, directory, true);
+    }
+
+    public static void moveFile(FileHandle file, FileHandle directory, boolean checkGameAssets) {
         FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
 
@@ -312,7 +316,7 @@ public class AssetImporter {
         if(file.path().equals(projectPath + File.separator + "assets")) return;
         if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
-        AssetRepository.getInstance().moveFile(file, directory);
+        AssetRepository.getInstance().moveFile(file, directory, checkGameAssets);
 
 
         SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);

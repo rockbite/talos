@@ -370,12 +370,11 @@ public class DirectoryViewWidget extends Table {
                             }
                         }
                     } else if (object instanceof GameAsset) {
-                        System.out.println("this should never happen");
-//                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
-//                        FileHandle handle = sourceItem.getRootRawAsset().handle;
-//                        if (!handle.path().equals(fileHandle.path())) {
-//                            AssetImporter.moveFile(handle, fileHandle);
-//                        }
+                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
+                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle);
+                        }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(fileHandle.path())) {
