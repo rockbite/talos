@@ -76,17 +76,35 @@ public class AssetRepository {
 		//Go over all raw assets, and create game resources
 		//Game resources need to be able to search for the raw assets to link
 
-		checkGameAssetCreation();
+		checkAllGameAssetCreation();
 	}
 
-	private void checkGameAssetCreation () {
+	private void checkAllGameAssetCreation () { //raws
+		checkGameAssetCreation(GameAssetType.SPRITE);
+		checkGameAssetCreation(GameAssetType.SCRIPT);
+		checkGameAssetCreation(GameAssetType.ATLAS);
+		checkGameAssetCreation(GameAssetType.SOUND);
+
+		checkGameAssetCreation(GameAssetType.SKELETON);
+
+		checkGameAssetCreation(GameAssetType.VFX);
+		checkGameAssetCreation(GameAssetType.PREFAB);
+
+	}
+
+	private void checkGameAssetCreation (GameAssetType type) {
+		//We need to do multiple passes here for dependent assets
+
 		for (ObjectMap.Entry<FileHandle, RawAsset> entry : fileHandleRawAssetMap) {
 			FileHandle key = entry.key;
 			RawAsset value = entry.value;
 
+
 			if (key.isDirectory()) continue;
 
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+			if (type != assetTypeFromExtension) continue;
+
 			if (assetTypeFromExtension.isRootGameAsset()) {
 				createGameAsset(key, value);
 			}
@@ -323,7 +341,13 @@ public class AssetRepository {
 				}
 
 				RawAsset rawAssetPFile = fileHandleRawAssetMap.get(pFile);
-				particleEffectDescriptor.load(rawAssetPFile.handle);
+
+				try {
+					particleEffectDescriptor.load(rawAssetPFile.handle);
+				} catch (Exception e) {
+					System.out.println("Failure to load particle effect");
+					throw e;
+				}
 
 				particleEffectDescriptorGameAsset.setResourcePayload(particleEffectDescriptor);
 				value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
@@ -425,7 +449,7 @@ public class AssetRepository {
 		System.out.println("Raw asset created" + rawAsset.handle.path());
 
 		if (checkGameResources) {
-			checkGameAssetCreation();
+			checkAllGameAssetCreation();
 		}
 	}
 
@@ -447,11 +471,17 @@ public class AssetRepository {
 		}
 	}
 
-	public GameAsset<?> getAssetForPath (FileHandle file) {
+	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {
 		if (fileHandleGameAssetObjectMap.containsKey(file)) {
 			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
-			if (!gameAsset.isBroken()) {
+			if (ignoreBroken) {
 				return gameAsset;
+			} else {
+				if (!gameAsset.isBroken()) {
+					return gameAsset;
+				} else {
+					return null;
+				}
 			}
 		}
 		return null;

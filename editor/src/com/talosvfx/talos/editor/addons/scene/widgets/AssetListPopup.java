@@ -181,7 +181,7 @@ public class AssetListPopup<T> extends VisWindow {
                 ProjectExplorerWidget.RowWidget widget = new ProjectExplorerWidget.RowWidget(listItemHandle, false);
                 EditableLabel label = widget.getLabel();
                 final FilteredTree.Node<GameAsset<T>> newNode = new FilteredTree.Node<>(listItemHandle.path(), widget);
-                GameAsset<T> assetForPath = (GameAsset<T>)AssetRepository.getInstance().getAssetForPath(listItemHandle);
+                GameAsset<T> assetForPath = (GameAsset<T>)AssetRepository.getInstance().getAssetForPath(listItemHandle, false);
                 newNode.setObject(assetForPath);
                 node.add(newNode);
                 if(listItemHandle.isDirectory()) {

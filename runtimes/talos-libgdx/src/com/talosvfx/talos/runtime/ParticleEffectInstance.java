@@ -153,6 +153,19 @@ public class ParticleEffectInstance {
 	public boolean isComplete() {
     	if(loopable) return false;
 
+		boolean allEmittersContinuous = true;
+		for (int i = 0; i < emitters.size; i++) {
+			if (!emitters.get(i).isContinuous()) {
+				allEmittersContinuous = false;
+				break;
+			}
+		}
+		
+		if (allEmittersContinuous) {
+			return false;
+		}
+
+
 		for (int i = 0; i < emitters.size; i++) {
 			if (!emitters.get(i).isComplete()) {
 				return false;

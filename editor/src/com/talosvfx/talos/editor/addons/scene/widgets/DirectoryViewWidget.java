@@ -602,7 +602,7 @@ public class DirectoryViewWidget extends Table {
 
             this.fileHandle = fileHandle;
 
-            GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle);
+            GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
             if (assetForPath != null) {
                 gameAsset = assetForPath;
             }
@@ -610,8 +610,12 @@ public class DirectoryViewWidget extends Table {
             if (assetForPath != null) {
                 //Lets add something to the icon so it shows
                 Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
-                image.setColor(Color.GREEN);
                 iconContainer.addActor(image);
+                if (assetForPath.isBroken()) {
+                    image.setColor(Color.RED);
+                } else {
+                    image.setColor(Color.GREEN);
+                }
             }
         }
 
