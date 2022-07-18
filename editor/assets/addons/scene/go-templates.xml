@@ -26,7 +26,6 @@
         <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
-                <component className="SkeletonComponent"></component>
                 <component className="SpineRendererComponent"></component>
             </components>
         </template>

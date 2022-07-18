@@ -57,7 +57,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget<GameAsset<Texture>> textureWidget = new AssetSelectWidget("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
+        AssetSelectWidget<Texture> textureWidget = new AssetSelectWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
             @Override
             public GameAsset<Texture> get() {
                 return gameAsset;
@@ -126,7 +126,6 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     @Override
     public void read (Json json, JsonValue jsonData) {
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
 
         loadTextureFromIdentifier(gameResourceIdentifier);
 

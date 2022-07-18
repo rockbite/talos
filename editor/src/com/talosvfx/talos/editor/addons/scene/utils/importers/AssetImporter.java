@@ -2,8 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
@@ -12,7 +10,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -33,7 +30,6 @@ public class AssetImporter {
     public FileTracker.Tracker assetTracker;
 
     private static ObjectMap<GameAssetType, AbstractImporter> importerMap = new ObjectMap<>();
-    private static ObjectMap<String, Class<? extends AMetadata>> metadataMap = new ObjectMap<>();
 
     private static Json json = new Json();
     static {
@@ -48,12 +44,6 @@ public class AssetImporter {
         importerMap.put(GameAssetType.SKELETON, new SpineImporter());
         importerMap.put(GameAssetType.ATLAS, new AtlasImporter());
 
-        metadataMap.put("png", SpriteMetadata.class);
-        metadataMap.put("tls", TlsMetadata.class);
-        metadataMap.put("p", TlsMetadata.class);
-        metadataMap.put("atlas", AtlasMetadata.class);
-        metadataMap.put("skel", SpineMetadata.class);
-        metadataMap.put("prefab", PrefabMetadata.class);
     }
 
     public static FileHandle attemptToImport (FileHandle handle) {
@@ -102,36 +92,6 @@ public class AssetImporter {
 //        }
 //    }
 
-    public static AMetadata readMetadataFor (FileHandle assetHandle) {
-        if(assetHandle.isDirectory()) {
-            DirectoryMetadata directoryMetadata = new DirectoryMetadata();
-            return directoryMetadata;
-        }
-
-        Class<? extends AMetadata> aClass = metadataMap.get(assetHandle.extension());
-        return readMetadataFor(assetHandle, aClass);
-    }
-
-    public static <T extends AMetadata> T readMetadataFor (FileHandle assetHandle, Class<? extends T> clazz) {
-        FileHandle handle = getMetadataHandleFor(assetHandle);
-        T t = readMetadata(handle, clazz);
-
-        if(t == null) {
-            if(clazz != null) {
-                try {
-                    t = ClassReflection.newInstance(clazz);
-                } catch (ReflectionException e) {
-                    t = (T) new EmptyMetadata();
-                }
-            } else {
-                t = (T) new EmptyMetadata();
-            }
-        }
-
-//        t.setFile(assetHandle);
-
-        return t;
-    }
 
     public static <T extends AMetadata> T readMetadata (FileHandle handle, Class<? extends T> clazz) {
         if(handle.exists()) {
@@ -216,9 +176,6 @@ public class AssetImporter {
         if(assetHandle != null && assetHandle.exists()) {
             FileHandle metadataHandle = getMetadataHandleFor(assetHandle);
             saveMetadata(metadataHandle, aMetadata);
-
-            SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-            workspace.clearMetadata(AssetImporter.relative(assetHandle.path()));
         }
     }
 

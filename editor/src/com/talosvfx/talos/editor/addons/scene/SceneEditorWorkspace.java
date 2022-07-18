@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -26,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
@@ -68,8 +70,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private SnapshotService snapshotService;
 
     private AssetListPopup assetListPopup;
-
-    private ObjectMap<String, AMetadata> metadataCache = new ObjectMap<>();
 
     private FileTracker fileTracker = new FileTracker();
     private FileWatching fileWatching = new FileWatching();
@@ -154,6 +154,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         return spriteObject;
     }
+
+    public GameObject createSpineObject (GameAsset<SkeletonData> asset, Vector2 sceneCords, GameObject parent) {
+        GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent);
+        SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
+
+        rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
+        rendererComponent.setGameAsset(asset);
+
+
+        return spineObject;
+    }
+
 
     public GameObject createParticle (GameAsset<ParticleEffectDescriptor> asset, Vector2 sceneCords, GameObject parent) {
         GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent);
@@ -558,7 +570,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             SceneEditorAddon.get().projectExplorer.reload();
         }
     }
-
 
 
     public static class ClipboardPayload {
@@ -1195,29 +1206,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         return assetListPopup;
     }
 
-    public <T extends AMetadata> T getMetadata (String assetPath, Class<? extends T> clazz) {
-        if(metadataCache.containsKey(assetPath)) {
-            return (T) metadataCache.get(assetPath);
-        } else {
-            FileHandle metadataHandle = AssetImporter.getMetadataHandleFor(assetPath);
-            if(metadataHandle.exists()) {
-                T t = SceneEditorAddon.get().assetImporter.readMetadata(metadataHandle, clazz);
-                metadataCache.put(assetPath, t);
-                return t;
-            } else {
-                T t = SceneEditorAddon.get().assetImporter.createEmptyMetadata(metadataHandle, clazz);
-                metadataCache.put(assetPath, t);
-            }
-            return null;
-        }
-
-    }
-
-    public void clearMetadata (String assetPath) {
-        if(metadataCache.containsKey(assetPath)) {
-            metadataCache.remove(assetPath);
-        }
-    }
 
 
     public FileHandle getProjectFolder() {

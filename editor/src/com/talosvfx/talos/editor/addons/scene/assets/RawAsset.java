@@ -20,6 +20,13 @@ public class RawAsset {
 
 	@Override
 	public String toString () {
-		return handle.path() + " " + metaData.getClass().getSimpleName();
+		if (metaData == null) {
+			return "Oopsi";
+		}
+		Class<? extends AMetadata> aClass = metaData.getClass();
+		if (aClass == null) {
+			return "Oopsi";
+		}
+		return handle.path() + " " + aClass.getSimpleName();
 	}
 }

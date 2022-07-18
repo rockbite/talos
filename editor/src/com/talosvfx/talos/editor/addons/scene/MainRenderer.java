@@ -139,26 +139,19 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     private void renderSpine (Batch batch, GameObject gameObject) {
+
         SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
-        SkeletonComponent skeletonComponent = gameObject.getComponent(SkeletonComponent.class);
 
         vec.set(0, 0);
         transformComponent.localToWorld(gameObject, vec);
         Vector2 renderPosition = vec;
 
-        if(skeletonComponent.state == null) {
-            SpineMetadata metadata = SceneEditorAddon.get().workspace.getMetadata(skeletonComponent.path, SpineMetadata.class);
-            skeletonComponent.reloadData(metadata.scale);
-        }
-        if(skeletonComponent.state != null) {
-            skeletonComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
-            skeletonComponent.setAtlas(spineRendererComponent.textureAtlas);
-            skeletonComponent.state.update(Gdx.graphics.getDeltaTime());
-            skeletonComponent.state.apply(skeletonComponent.skeleton);
-            skeletonComponent.skeleton.updateWorldTransform();
+        spineRendererComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
+        spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+        spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+        spineRendererComponent.skeleton.updateWorldTransform();
 
-            spineRenderer.draw(batch, skeletonComponent.skeleton); // Draw the skeleton images.
-        }
+        spineRenderer.draw(batch, spineRendererComponent.skeleton);
     }
 
     private void renderParticle (Batch batch, GameObject gameObject) {
