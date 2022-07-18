@@ -125,7 +125,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = jsonData.getString("gameResource", "");//Don't need to use it, we use path
+        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+
 
         loadTextureFromIdentifier(gameResourceIdentifier);
 

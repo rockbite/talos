@@ -101,11 +101,12 @@ public class MainRenderer implements Notifications.Observer {
         for(GameObject gameObject: list) {
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
-            GameResourceOwner<?> resourceComponent = gameObject.getResourceComponent();
+            GameResourceOwner<?> resourceComponent = gameObject.getRenderResourceComponent();
             if (resourceComponent != null) {
                 //Its something with a game resource
 
-                if (resourceComponent.getGameResource().isBroken()) {
+                GameAsset<?> gameResource = resourceComponent.getGameResource();
+                if (gameResource == null || gameResource.isBroken()) {
                     //Render the broken sprite
 
                     renderBrokenComponent(batch, gameObject, transformComponent);

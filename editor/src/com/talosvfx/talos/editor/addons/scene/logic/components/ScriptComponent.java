@@ -2,7 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -13,27 +16,24 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.util.function.Supplier;
 
-public class ScriptComponent extends AComponent implements GameResourceOwner<Object> {
+public class ScriptComponent extends AComponent implements Json.Serializable, GameResourceOwner<String> {
 
 
-    GameAsset<Object> scriptResource;
-
-    String path;
+    GameAsset<String> scriptResource;
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget widget = new AssetSelectWidget("Script", GameAssetType.SCRIPT, new Supplier<String>() {
+        AssetSelectWidget<String> widget = new AssetSelectWidget<String>("Script", GameAssetType.SCRIPT, new Supplier<GameAsset<String>>() {
             @Override
-            public String get() {
-                return path;
+            public GameAsset<String> get() {
+                return scriptResource;
             }
-        }, new PropertyWidget.ValueChanged<String>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<String>>() {
             @Override
-            public void report(String value) {
-                path = value;
-
+            public void report(GameAsset<String> value) {
+                setGameAsset(value);
             }
         });
 
@@ -58,12 +58,31 @@ public class ScriptComponent extends AComponent implements GameResourceOwner<Obj
     }
 
     @Override
-    public GameAsset<Object> getGameResource () {
+    public GameAsset<String> getGameResource () {
         return scriptResource;
     }
 
     @Override
-    public void setGameAsset (GameAsset<Object> gameAsset) {
+    public void setGameAsset (GameAsset<String> gameAsset) {
         this.scriptResource = gameAsset;
+    }
+
+    @Override
+    public void write (Json json) {
+        GameResourceOwner.writeGameAsset(json, this);
+
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+
+        loadScriptFromIdentifier(gameResourceIdentifier);
+
+    }
+
+    private void loadScriptFromIdentifier (String gameResourceIdentifier) {
+        GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SCRIPT);
+        setGameAsset(assetForIdentifier);
     }
 }

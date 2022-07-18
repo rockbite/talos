@@ -86,11 +86,18 @@ public class ParticleComponent extends RendererComponent implements GameResource
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = jsonData.getString("gameResource", "");//Don't need to use it, we use path
+
+        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         loadDescriptorFromIdentifier(gameResourceIdentifier);
 
         super.read(json, jsonData);
+    }
+
+    @Override
+    public void write (Json json) {
+        GameResourceOwner.writeGameAsset(json, this);
+        super.write(json);
     }
 
     GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
@@ -109,11 +116,7 @@ public class ParticleComponent extends RendererComponent implements GameResource
         setGameAsset(assetForIdentifier);
     }
 
-    @Override
-    public void write (Json json) {
-        GameResourceOwner.writeGameAsset(json, this);
-        super.write(json);
-    }
+
 
     @Override
     public GameAsset<ParticleEffectDescriptor> getGameResource () {

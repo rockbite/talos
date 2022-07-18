@@ -124,6 +124,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 
             return finalString;
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
 

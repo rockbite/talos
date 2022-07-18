@@ -358,6 +358,15 @@ public class AssetRepository {
 			case VFX_OUTPUT:
 				break;
 			case SCRIPT:
+
+				GameAsset<String> scriptGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				gameAssetOut = scriptGameAsset;
+
+				scriptGameAsset.setResourcePayload("ScriptDummy");
+				value.gameAssetReferences.add(scriptGameAsset);
+
+				scriptGameAsset.dependentRawAssets.add(value);
+
 				break;
 			case PREFAB:
 				break;

@@ -283,6 +283,26 @@ public class ProjectExplorerWidget extends Table {
                 }
             });
 
+            createSubMenuItem(popupMenu, "Script", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+
+                    FileHandle currentFolder = getCurrentFolder();
+
+                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Script", "ts");
+                    FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
+
+                    String templateString = templateScript.readString();
+                    templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
+                    newScriptDestination.writeString(templateString, false);
+
+                    AssetRepository.getInstance().rawAssetCreated(templateScript, true);
+
+
+                    directoryViewWidget.reload();
+                }
+            });
+
             MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {

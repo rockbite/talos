@@ -133,18 +133,9 @@ public class SEPropertyPanel extends PropertyPanel{
                         ScriptComponent scriptComponent = new ScriptComponent();
                         gameObject.addComponent(scriptComponent);
                         ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                        FileHandle currentFolder = projectExplorer.getCurrentFolder();
-                        FileHandle handle = AssetImporter.suggestNewName(currentFolder.path(), "New_Script", "ts");
-                        handle.writeString("", false);
-//                        scriptComponent.setScript(handle);
-
-                        System.out.println("Create linking of new script asset");
-
                         projectExplorer.reload();
 
                         SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-
-                        projectExplorer.getDirectoryViewWidget().startRenameFor(handle);
                     }
 
                     remove();

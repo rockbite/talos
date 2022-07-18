@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -239,6 +240,15 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         return false;
+    }
+
+    public GameResourceOwner<?> getRenderResourceComponent () {
+        for (AComponent component : components) {
+            if (component instanceof GameResourceOwner && component instanceof RendererComponent) {
+                return (GameResourceOwner<?>)component;
+            }
+        }
+        return null;
     }
 
     public GameResourceOwner<?> getResourceComponent () {

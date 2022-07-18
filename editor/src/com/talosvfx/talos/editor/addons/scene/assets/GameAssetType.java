@@ -9,6 +9,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.AtlasMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.PrefabMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -61,9 +62,10 @@ public enum GameAssetType {
 			return PrefabMetadata.class;
 		case DIRECTORY:
 			return DirectoryMetadata.class;
+		case SCRIPT:
+			return ScriptMetadata.class;
 		case VFX_OUTPUT:
 		case SOUND:
-		case SCRIPT:
 			return EmptyMetadata.class;
 		}
 		throw new GdxRuntimeException("No meta data method found for extension: " + type);
