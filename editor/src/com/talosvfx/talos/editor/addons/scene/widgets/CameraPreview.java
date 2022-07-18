@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -25,7 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 public class CameraPreview extends Actor {
 
     private FrameBuffer frameBuffer;
-    private SpriteBatch spriteBatch;
+    private PolygonSpriteBatch polygonSpriteBatch;
     private Viewport viewport;
 
     TextureRegion white;
@@ -39,7 +40,7 @@ public class CameraPreview extends Actor {
 
     public CameraPreview () {
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 200, 200, false);
-        spriteBatch = new SpriteBatch();
+        polygonSpriteBatch = new PolygonSpriteBatch();
         viewport = new FitViewport(10, 10);
         white = TalosMain.Instance().getSkin().getRegion("white");
     }
@@ -85,13 +86,13 @@ public class CameraPreview extends Actor {
         Gdx.gl.glClearColor(component.backgroundColor.r, component.backgroundColor.g, component.backgroundColor.b, component.backgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-        spriteBatch.begin();
+        polygonSpriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        polygonSpriteBatch.begin();
 
         // draw game preview here
         drawPreview();
 
-        spriteBatch.end();
+        polygonSpriteBatch.end();
         frameBuffer.end();
 
         batch.begin();
@@ -109,7 +110,7 @@ public class CameraPreview extends Actor {
         GameObject rootGO = workspace.getRootGO();
         MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
 
-        renderer.render(spriteBatch, rootGO);
+        renderer.render(polygonSpriteBatch, rootGO);
     }
 
     public void setViewport (float worldWidth, float worldHeight, float width, float height) {
