@@ -1175,6 +1175,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public GameObject getRootGO () {
+        if (currentContainer == null) return null;
         return currentContainer.getSelfObject();
     }
 

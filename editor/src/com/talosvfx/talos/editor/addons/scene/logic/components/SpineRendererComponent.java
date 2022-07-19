@@ -83,6 +83,11 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     }
 
     @Override
+    public GameAssetType getGameAssetType () {
+        return GameAssetType.SKELETON;
+    }
+
+    @Override
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
 
@@ -111,10 +116,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         return gameAsset;
     }
 
-    @Override
-    public void setGameAsset (GameAsset<SkeletonData> gameAsset) {
-        this.gameAsset = gameAsset;
 
+    private void createSkeletonFromGameAsset () {
         if (!gameAsset.isBroken()) {
             skeleton = new Skeleton(gameAsset.getResource());
             animationState = new AnimationState(new AnimationStateData(skeleton.getData()));
@@ -126,6 +129,20 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             }
 
         }
+    }
+
+    @Override
+    public void setGameAsset (GameAsset<SkeletonData> gameAsset) {
+        this.gameAsset = gameAsset;
+        this.gameAsset.listeners.add(new GameAsset.GameAssetUpdateListener() {
+            @Override
+            public void onUpdate () {
+                createSkeletonFromGameAsset();
+            }
+        });
+        createSkeletonFromGameAsset();
+
+
 
     }
 }

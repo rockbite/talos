@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.AtlasMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
@@ -32,6 +33,14 @@ public enum GameAssetType {
 		extensions = new ObjectSet<String>();
 		extensions.addAll(extensionArray);
 		this.isRootGameAsset = isRootGameAsset;
+	}
+
+	public static GameAssetType getAssetTypeFromGameResourceOwner (Class<? extends GameResourceOwner> aClass) {
+		try {
+			return ClassReflection.newInstance(aClass).getGameAssetType();
+		} catch (ReflectionException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public boolean isRootGameAsset () {

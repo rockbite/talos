@@ -116,7 +116,10 @@ public class ParticleComponent extends RendererComponent implements GameResource
         setGameAsset(assetForIdentifier);
     }
 
-
+    @Override
+    public GameAssetType getGameAssetType () {
+        return GameAssetType.VFX;
+    }
 
     @Override
     public GameAsset<ParticleEffectDescriptor> getGameResource () {

@@ -279,7 +279,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         childrenMap.put(name, gameObject);
     }
 
-    public Array<GameObject> getChildrenByComponent (Class<? extends AComponent> clazz, Array<GameObject> list) {
+    public Array<GameObject> getChildrenByComponent (Class<?> clazz, Array<GameObject> list) {
         if(children == null) return list;
         for(GameObject gameObject: children) {
             if(gameObject.hasComponentType(clazz)) {

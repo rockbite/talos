@@ -58,5 +58,12 @@ public class GameAsset<T> {
 		return dependentRawAssets.first();
 	}
 
-
+	@Override
+	public boolean equals (Object obj) {
+		if (obj instanceof GameAsset) {
+			GameAsset<?> other = (GameAsset<?>)obj;
+			return other.type == this.type && other.nameIdentifier.equals(nameIdentifier);
+		}
+		return false;
+	}
 }

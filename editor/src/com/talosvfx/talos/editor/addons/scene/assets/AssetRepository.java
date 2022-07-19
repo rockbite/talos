@@ -21,6 +21,8 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -30,6 +32,7 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
@@ -38,7 +41,25 @@ import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTal
 
 public class AssetRepository {
 
-	private ObjectMap<String, GameAsset> identifierGameAssetMap = new ObjectMap<>();
+	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
+
+	public <T> GameAsset<T> getAssetForIdentifier (String identifier, GameAssetType type) {
+		if (identifierGameAssetMap.containsKey(type)) {
+			if (identifierGameAssetMap.get(type).containsKey(identifier)) {
+				return (GameAsset<T>)identifierGameAssetMap.get(type).get(identifier);
+			}
+		}
+		return null;
+	}
+
+	private <T> void putAssetForIdentifier (String identifier, GameAssetType type, GameAsset<T> asset) {
+		if (!identifierGameAssetMap.containsKey(type)) {
+			identifierGameAssetMap.put(type, new ObjectMap<>());
+		}
+		identifierGameAssetMap.get(type).put(identifier, asset);
+	}
+
+
 	private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
 	private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
 	private ObjectMap<FileHandle, RawAsset> fileHandleRawAssetMap = new ObjectMap<>();
@@ -111,12 +132,37 @@ public class AssetRepository {
 		}
 	}
 
+	static class TypeIdentifierPair {
+		GameAssetType type;
+		String identifier;
+
+		public TypeIdentifierPair (GameAssetType type, String gameResourceIdentifier) {
+			this.type = type;
+			this.identifier = gameResourceIdentifier;
+		}
+
+		@Override
+		public boolean equals (Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			TypeIdentifierPair that = (TypeIdentifierPair)o;
+			return type == that.type && identifier.equals(that.identifier);
+		}
+
+		@Override
+		public int hashCode () {
+			return Objects.hash(type, identifier);
+		}
+	}
+
 	//Export formats
 	public void exportToFile () { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
 		FileHandle scenes = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("scenes");
-		ObjectSet<String> identifiersBeingUsedByComponents = new ObjectSet<>();
+		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
 		if (scenes.exists()) {
 			for (FileHandle handle : scenes.list()) {
 				JsonValue scene = new JsonReader().parse(handle);
@@ -132,8 +178,10 @@ public class AssetRepository {
 								if (componentIsResourceOwner(componentClazz)) {
 									//Lets grab the game resource
 
+									GameAssetType type = getGameAssetTypeFromClazz(componentClazz);
+
 									String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
-									identifiersBeingUsedByComponents.add(gameResourceIdentifier);
+									identifiersBeingUsedByComponents.add(new TypeIdentifierPair(type, gameResourceIdentifier));
 								}
 							}
 						}
@@ -143,8 +191,11 @@ public class AssetRepository {
 		}
 
 		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
-		for (String identifiersBeingUsedByComponent : identifiersBeingUsedByComponents) {
-			GameAsset<?> gameAsset = identifierGameAssetMap.get(identifiersBeingUsedByComponent);
+		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
+
+			//we need to get the identifier and type pairs
+
+			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
 			if (gameAsset == null) {
 				System.out.println("Game asset is null, not exporting");
 				continue;
@@ -175,6 +226,14 @@ public class AssetRepository {
 
 	}
 
+	private GameAssetType getGameAssetTypeFromClazz (String componentClazz) {
+		try {
+			Class<? extends GameResourceOwner> aClass = ClassReflection.forName(componentClazz);
+			return GameAssetType.getAssetTypeFromGameResourceOwner(aClass);
+		} catch (ReflectionException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static class GameAssetExportStructure {
 		String identifier;
@@ -203,19 +262,60 @@ public class AssetRepository {
 	private void createGameAsset (FileHandle key, RawAsset value) {
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(value);
 
-		if (identifierGameAssetMap.containsKey(gameAssetIdentifier) && fileHandleGameAssetObjectMap.containsKey(key)) {
-			//Already registered, ignore
-			return;
-		}
+
 
 		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
 
+		boolean shouldUpdate = false;
+		if (getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension) != null) {
+			shouldUpdate = true;
+		}
+
 		GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value);
+
+
+		if (shouldUpdate) {
+			GameAsset<?> oldGameAsset = getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension);
+			for (RawAsset dependentRawAsset : oldGameAsset.dependentRawAssets) {
+				dependentRawAsset.gameAssetReferences.removeValue(oldGameAsset, true);
+			}
+			Array<GameAsset.GameAssetUpdateListener> listeners = oldGameAsset.listeners;
+			gameAsset.listeners.addAll(listeners);
+			oldGameAsset.listeners.clear();
+
+			//Find all components in the current scene that was using this and reset their game asset to the new one
+			Array<GameObject> list = new Array<>();
+			SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
+			if (sceneEditorWorkspace != null && sceneEditorWorkspace.getRootGO() != null) {
+				sceneEditorWorkspace.getRootGO().getChildrenByComponent(GameResourceOwner.class, list);
+				for (GameObject gameObject : list) {
+					for (AComponent component : gameObject.getComponents()) {
+						if (component instanceof GameResourceOwner) {
+							GameResourceOwner<?> gameResourceOwner = (GameResourceOwner<?>)component;
+
+							GameAsset<?> gameResource = gameResourceOwner.getGameResource();
+							if (gameResource.type == GameAssetType.SKELETON) {
+								System.out.println();
+							}
+
+							if (gameResourceOwner.getGameResource().equals(oldGameAsset)) {
+								gameResourceOwner.setGameAsset(gameAsset);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (shouldUpdate) {
+			gameAsset.setUpdated();
+		}
+
 
 		if (gameAsset == null) return;
 		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
 
-		identifierGameAssetMap.put(gameAssetIdentifier, gameAsset);
+		putAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension, gameAsset);
 		fileHandleGameAssetObjectMap.put(key, gameAsset);
 	}
 
@@ -497,47 +597,6 @@ public class AssetRepository {
 		}
 		return null;
 	}
-	public <T> GameAsset<T> getAssetForPath (FileHandle file, GameAssetType assetType) {
-		String nameWithoutExtension = file.nameWithoutExtension();
-
-		if (identifierGameAssetMap.containsKey(nameWithoutExtension)) {
-			GameAsset<?> gameAsset = identifierGameAssetMap.get(nameWithoutExtension);
-			if (!gameAsset.isBroken()) {
-				if (gameAsset.type == assetType) {
-					return identifierGameAssetMap.get(nameWithoutExtension);
-				}
-			}
-		}
-
-		if (fileHandleGameAssetObjectMap.containsKey(file)) {
-			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
-			if (!gameAsset.isBroken()) {
-				if (gameAsset.type == assetType) {
-					return (GameAsset<T>)gameAsset;
-				}
-			}
-		}
-
-		GameAsset<T> tGameAsset = new GameAsset<>(file.nameWithoutExtension(), GameAssetType.SPRITE);
-		tGameAsset.setBroken(new Exception("Broken asset"));
-		return tGameAsset;
-	}
-
-	public <T> GameAsset<T> getAssetForIdentifier (String gameResourceIdentifier, GameAssetType type) {
-		GameAsset<?> gameAsset = identifierGameAssetMap.get(gameResourceIdentifier);
-		if (gameAsset != null && gameAsset.type == type) {
-			return (GameAsset<T>)gameAsset;
-		}
-		GameAsset<?> tGameAsset = new GameAsset<>(gameResourceIdentifier, GameAssetType.SPRITE);
-		tGameAsset.setBroken(new Exception("Broken asset"));
-		return (GameAsset<T>)tGameAsset;
-	}
-
-
-	private <T> GameAsset<T> getDefaultGameAsset (Class<T> resourceClass) {
-		System.out.println("Getting default game asset for " + resourceClass);
-		return null;
-	}
 
 	private void deleteFileImpl (FileHandle handle) {
 		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(handle);
@@ -563,7 +622,7 @@ public class AssetRepository {
 					gameAsset.setBroken(new Exception("Game Asset Removed"));
 					gameAsset.setUpdated();
 					fileHandleGameAssetObjectMap.remove(rawAsset.handle);
-					identifierGameAssetMap.remove(gameAsset.nameIdentifier);
+					identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
 				}
 
 			}
@@ -802,13 +861,15 @@ public class AssetRepository {
 					if (isRootGameResource(rawAsset)) {
 						//We need to update the game assets identifier
 						String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
+						GameAssetType typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
 
-						if (identifierGameAssetMap.containsKey(gameAssetIdentifierFromRawAsset)) {
-							GameAsset removedGameAsset = identifierGameAssetMap.remove(gameAssetIdentifierFromRawAsset);
-							identifierGameAssetMap.put(destination.nameWithoutExtension(), removedGameAsset);
+						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
+
+						if (assetForIdentifier != null) {
+							GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
+							putAssetForIdentifier(destination.nameWithoutExtension(), removedGameAsset.type, removedGameAsset);
 
 							removedGameAsset.setUpdated();
-
 						} else {
 							System.err.println("No game asset found for identifier " + gameAssetIdentifierFromRawAsset);
 						}

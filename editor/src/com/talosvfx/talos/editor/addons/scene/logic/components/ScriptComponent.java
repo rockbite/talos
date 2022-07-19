@@ -58,6 +58,11 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     }
 
     @Override
+    public GameAssetType getGameAssetType () {
+        return GameAssetType.SCRIPT;
+    }
+
+    @Override
     public GameAsset<String> getGameResource () {
         return scriptResource;
     }

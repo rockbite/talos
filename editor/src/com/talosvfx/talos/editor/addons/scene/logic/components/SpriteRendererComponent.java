@@ -24,6 +24,11 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public RenderMode renderMode = RenderMode.simple;
 
     @Override
+    public GameAssetType getGameAssetType () {
+        return GameAssetType.SPRITE;
+    }
+
+    @Override
     public GameAsset<Texture> getGameResource () {
         return gameAsset;
     }
