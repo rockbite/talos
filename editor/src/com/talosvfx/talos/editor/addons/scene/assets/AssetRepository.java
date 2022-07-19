@@ -157,6 +157,32 @@ public class AssetRepository {
 		}
 	}
 
+	private void collectExportedAssetsArrayGameObjects (JsonValue gameObjects, ObjectSet<TypeIdentifierPair> pairs) {
+		if (gameObjects != null) {
+			for (JsonValue gameObject : gameObjects) {
+				//Grab each component
+				if (gameObject.has("components")) {
+					JsonValue components = gameObject.get("components");
+					for (JsonValue component : components) {
+						String componentClazz = component.getString("class");
+						if (componentIsResourceOwner(componentClazz)) {
+							//Lets grab the game resource
+
+							GameAssetType type = getGameAssetTypeFromClazz(componentClazz);
+
+							String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
+							pairs.add(new TypeIdentifierPair(type, gameResourceIdentifier));
+						}
+					}
+				}
+				if (gameObject.has("children")) {
+					JsonValue children = gameObject.get("children");
+					collectExportedAssetsArrayGameObjects(children, pairs);
+				}
+			}
+		}
+	}
+
 	//Export formats
 	public void exportToFile () { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
@@ -168,25 +194,7 @@ public class AssetRepository {
 				JsonValue scene = new JsonReader().parse(handle);
 
 				JsonValue gameObjects = scene.get("gameObjects");
-				if (gameObjects != null) {
-					for (JsonValue gameObject : gameObjects) {
-						//Grab each component
-						if (gameObject.has("components")) {
-							JsonValue components = gameObject.get("components");
-							for (JsonValue component : components) {
-								String componentClazz = component.getString("class");
-								if (componentIsResourceOwner(componentClazz)) {
-									//Lets grab the game resource
-
-									GameAssetType type = getGameAssetTypeFromClazz(componentClazz);
-
-									String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
-									identifiersBeingUsedByComponents.add(new TypeIdentifierPair(type, gameResourceIdentifier));
-								}
-							}
-						}
-					}
-				}
+				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
 			}
 		}
 
