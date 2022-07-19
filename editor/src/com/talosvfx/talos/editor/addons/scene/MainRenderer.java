@@ -231,7 +231,7 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
-        if(patchCache.containsKey(texture)) {
+        if(false && patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(texture);
         } else {
             NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
