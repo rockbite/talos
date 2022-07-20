@@ -43,6 +43,7 @@ public class AssetImporter {
         importerMap.put(GameAssetType.VFX, new TlsImporter());
         importerMap.put(GameAssetType.SKELETON, new SpineImporter());
         importerMap.put(GameAssetType.ATLAS, new AtlasImporter());
+        importerMap.put(GameAssetType.PREFAB, new PrefabImporter());
 
     }
 

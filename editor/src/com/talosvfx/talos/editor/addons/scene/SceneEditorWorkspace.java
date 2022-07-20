@@ -6,7 +6,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -211,17 +210,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         return gameObject;
     }
 
-    public GameObject createFromPrefab (Prefab prefab, Vector2 position, GameObject parent) {
-        GameObject gameObject = prefab.root;
+    public GameObject createFromPrefab (GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
+
+        Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
+
+        GameObject gameObject = prefab.root.getGameObjects().first();
         String name = getUniqueGOName(prefab.name, true);
         gameObject.setName(name);
 
-        if(position != null && gameObject.hasComponent(TransformComponent.class)) {
-            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-            transformComponent.position.set(position.x, position.y);
-            transformComponent.rotation = 0;
-            transformComponent.scale.set(1, 1);
-        }
 
         if(parent == null) {
             currentContainer.addGameObject(gameObject);
@@ -563,10 +559,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         FileHandle handle = AssetImporter.suggestNewName(path, name, "prefab");
         if(handle != null) {
+            GameObject gamePrefab = new GameObject();
+            gamePrefab.setName("Prefab");
+
+            gamePrefab.addGameObject(gameObject);
+
             Prefab prefab = new Prefab();
             prefab.path = handle.path();
-            prefab.root = gameObject;
+            prefab.root = gamePrefab;
             prefab.save();
+            AssetRepository.getInstance().rawAssetCreated(handle, true);
             SceneEditorAddon.get().projectExplorer.reload();
         }
     }

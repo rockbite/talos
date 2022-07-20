@@ -22,6 +22,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
@@ -161,25 +162,29 @@ public class AssetRepository {
 		if (gameObjects != null) {
 			for (JsonValue gameObject : gameObjects) {
 				//Grab each component
-				if (gameObject.has("components")) {
-					JsonValue components = gameObject.get("components");
-					for (JsonValue component : components) {
-						String componentClazz = component.getString("class");
-						if (componentIsResourceOwner(componentClazz)) {
-							//Lets grab the game resource
+				collectGameObjectExportedAssets(pairs, gameObject);
+			}
+		}
+	}
 
-							GameAssetType type = getGameAssetTypeFromClazz(componentClazz);
+	private void collectGameObjectExportedAssets (ObjectSet<TypeIdentifierPair> pairs, JsonValue gameObject) {
+		if (gameObject.has("components")) {
+			JsonValue components = gameObject.get("components");
+			for (JsonValue component : components) {
+				String componentClazz = component.getString("class");
+				if (componentIsResourceOwner(componentClazz)) {
+					//Lets grab the game resource
 
-							String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
-							pairs.add(new TypeIdentifierPair(type, gameResourceIdentifier));
-						}
-					}
-				}
-				if (gameObject.has("children")) {
-					JsonValue children = gameObject.get("children");
-					collectExportedAssetsArrayGameObjects(children, pairs);
+					GameAssetType type = getGameAssetTypeFromClazz(componentClazz);
+
+					String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
+					pairs.add(new TypeIdentifierPair(type, gameResourceIdentifier));
 				}
 			}
+		}
+		if (gameObject.has("children")) {
+			JsonValue children = gameObject.get("children");
+			collectExportedAssetsArrayGameObjects(children, pairs);
 		}
 	}
 
@@ -197,6 +202,12 @@ public class AssetRepository {
 				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
 			}
 		}
+
+		//Find all prefabs
+		FileHandle assets = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assets");
+		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
+		findAllPrefabs(assets, identifiersBeingUsedByComponents);
+
 
 		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
 		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
@@ -234,6 +245,29 @@ public class AssetRepository {
 
 	}
 
+	private void findAllPrefabs (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {
+		FileHandle[] list = assets.list();
+		for (FileHandle handle : list) {
+			if (handle.isDirectory()) {
+				findAllPrefabs(handle, identifiersBeingUsedByComponents);
+			} else {
+				if (handle.extension().equals("prefab")) {
+					//Get the raw asset
+					GameAsset<Prefab> gameAsset = fileHandleGameAssetObjectMap.get(handle);
+					if (gameAsset != null) {
+						identifiersBeingUsedByComponents.add(new TypeIdentifierPair(GameAssetType.PREFAB, gameAsset.nameIdentifier));
+
+						JsonValue prefab = new JsonReader().parse(gameAsset.getRootRawAsset().handle);
+						JsonValue gameObject = prefab.get("root");
+
+						//Get all dependent assets of this prefab
+						collectGameObjectExportedAssets(identifiersBeingUsedByComponents, gameObject);
+					}
+				}
+			}
+		}
+	}
+
 	private GameAssetType getGameAssetTypeFromClazz (String componentClazz) {
 		try {
 			Class<? extends GameResourceOwner> aClass = ClassReflection.forName(componentClazz);
@@ -248,6 +282,7 @@ public class AssetRepository {
 		GameAssetType type;
 		Array<String> absolutePathsOfRawFiles = new Array<>();
 	}
+
 	public static class GameAssetsExportStructure {
 		Array<GameAssetExportStructure> gameAssets = new Array<>();
 	}
@@ -477,6 +512,16 @@ public class AssetRepository {
 
 				break;
 			case PREFAB:
+				GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				gameAssetOut = prefabGameAsset;
+
+				Prefab prefab = Prefab.from(value.handle);
+
+				prefabGameAsset.setResourcePayload(prefab);
+				value.gameAssetReferences.add(prefabGameAsset);
+
+				prefabGameAsset.dependentRawAssets.add(value);
+
 				break;
 			case DIRECTORY:
 				break;

@@ -30,6 +30,9 @@ public class Prefab extends SavableContainer {
         JsonValue jsonValue = new JsonReader().parse(data);
         Json json = new Json();
         root = json.readValue(GameObject.class, jsonValue.get("root"));
+        name = root.getName();
+
+        //Lets add a fake root
     }
 
     @Override

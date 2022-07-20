@@ -51,6 +51,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void write (Json json) {
         json.writeValue("name", name);
+        json.writeValue("prefabLink", prefabLink);
 
         json.writeArrayStart("components");
         for(AComponent component: components) {
@@ -70,6 +71,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void read (Json json, JsonValue jsonData) {
         name = jsonData.getString("name");
+        prefabLink = jsonData.getString("prefabLink", null);
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
@@ -280,6 +282,9 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     public Array<GameObject> getChildrenByComponent (Class<?> clazz, Array<GameObject> list) {
+        if (hasComponentType(clazz)) { //Check self in case of prefab
+            list.add(this);
+        }
         if(children == null) return list;
         for(GameObject gameObject: children) {
             if(gameObject.hasComponentType(clazz)) {
@@ -301,5 +306,9 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         return null;
+    }
+
+    public void setPrefabLink (String prefabLink) {
+        this.prefabLink = prefabLink;
     }
 }
