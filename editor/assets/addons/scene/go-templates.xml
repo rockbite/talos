@@ -54,8 +54,6 @@
         </component>
         <component className="ParticleComponent">
         </component>
-        <component className="SkeletonComponent">
-        </component>
         <component className="SpineRendererComponent">
         </component>
         <component className="ScriptComponent">
