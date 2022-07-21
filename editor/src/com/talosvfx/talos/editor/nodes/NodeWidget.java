@@ -50,7 +50,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     private final ObjectMap<String, Class<? extends AbstractWidget>> widgetClassMap = new ObjectMap<>();
 
     protected Table widgetContainer = new Table();
-    private Table headerTable;
+    protected Table headerTable;
     private String nodeName;
 
     public void graphUpdated () {

@@ -29,7 +29,7 @@ class TrackRow implements TimelineItemDataProvider<TweenNode> {
 
     @Override
     public String getItemName() {
-        return tweenNode.getTweenTitle();
+        return tweenNode.getTweenTitle() + " track " + getIndex();
     }
 
     @Override

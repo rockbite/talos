@@ -112,7 +112,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                TalosMain.Instance().getCameraController().scrolled(amountX, amountY);
+                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
