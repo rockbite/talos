@@ -15,6 +15,15 @@ public class SEAppManager {
 
     public void openApp(AEditorApp editorApp, AEditorApp.AppOpenStrategy strategy) {
         if(openedApps.containsKey(editorApp.identifier)) {
+            for (Tab tab : SceneEditorAddon.get().bottomTabbedPane.getTabs()) {
+                if(tab instanceof AppTab) {
+                    AppTab appTab = (AppTab) tab;
+                    if(appTab.app.identifier.equals(editorApp.identifier)) {
+                        SceneEditorAddon.get().bottomTabbedPane.switchTab(appTab);
+                        return;
+                    }
+                }
+            }
             return;
         }
 

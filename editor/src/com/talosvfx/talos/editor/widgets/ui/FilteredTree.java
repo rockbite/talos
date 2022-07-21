@@ -199,7 +199,11 @@ public class FilteredTree<T> extends WidgetGroup {
                     itemListener.deselect(node);
                     return false;
                 }else if (selection.contains(node)){
+                    if(itemListener != null) {
+                        itemListener.chosen(node);
+                    }
                     return false;
+                    //return false;
                 }
 
                 if(itemListener != null) {

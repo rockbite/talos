@@ -159,7 +159,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-                if(button == 0 && (!event.isCancelled() && !event.isHandled())) {
+                if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
                     FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
                 }

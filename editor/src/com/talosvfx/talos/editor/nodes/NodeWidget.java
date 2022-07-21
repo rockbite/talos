@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.shader.nodes.Vector2Node;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
@@ -27,7 +26,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     protected ObjectMap<String, Table> inputSlotMap = new ObjectMap<>();
     protected ObjectMap<String, Table> outputSlotMap = new ObjectMap<>();
 
-    NodeBoard nodeBoard;
+    public NodeBoard nodeBoard;
 
     private String hoveredSlot = null;
     private boolean hoveredSlotIsInput = false;
@@ -98,6 +97,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         widgetClassMap.put("checkbox", CheckBoxWidget.class);
         widgetClassMap.put("color", ColorWidget.class);
         widgetClassMap.put("dynamicValue", ValueWidget.class);
+        widgetClassMap.put("inputText", TextValueWidget.class);
+        widgetClassMap.put("button", ButtonWidget.class);
         // group is handled manually for now
     }
 
@@ -468,6 +469,21 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         }
 
         widgetContainer.add().growY().row();
+    }
+
+    public AbstractWidget getWidget(String key) {
+        return widgetMap.get(key);
+    }
+
+    public ButtonWidget getButton(String key) {
+        if(widgetMap.containsKey(key)) {
+            AbstractWidget abstractWidget = widgetMap.get(key);
+            if(abstractWidget instanceof ButtonWidget) {
+                return (ButtonWidget) widgetMap.get(key);
+            }
+        }
+
+        return null;
     }
 
     @Override
