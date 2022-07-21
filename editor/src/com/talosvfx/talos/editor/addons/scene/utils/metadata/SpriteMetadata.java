@@ -39,7 +39,7 @@ public class SpriteMetadata extends AMetadata {
             @Override
             public void clicked (ButtonPropertyWidget<String> widget) {
                 SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-                sceneEditorAddon.Apps().openSceneEditor(SpriteMetadata.this, new SpriteEditor.SpriteMetadataListener() {
+                sceneEditorAddon.Apps().openSpriteEditor(SpriteMetadata.this, new SpriteEditor.SpriteMetadataListener() {
                     @Override
                     public void changed(int left, int right, int top, int bottom) {
                         borderData[0] = left;

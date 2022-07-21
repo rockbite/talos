@@ -23,6 +23,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
@@ -112,6 +113,7 @@ public class AssetRepository {
 		checkGameAssetCreation(GameAssetType.VFX);
 		checkGameAssetCreation(GameAssetType.PREFAB);
 
+		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
 	}
 
 	private void checkGameAssetCreation (GameAssetType type) {
@@ -521,6 +523,18 @@ public class AssetRepository {
 				value.gameAssetReferences.add(prefabGameAsset);
 
 				prefabGameAsset.dependentRawAssets.add(value);
+
+				break;
+			case TILE_PALETTE:
+				GameAsset<TilePaletteData> paletteGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				gameAssetOut = paletteGameAsset;
+
+				TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
+				value.gameAssetReferences.add(paletteGameAsset);
+
+				paletteGameAsset.setResourcePayload(paletteData);
+
+				paletteGameAsset.dependentRawAssets.add(value);
 
 				break;
 			case DIRECTORY:

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -226,6 +227,9 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
             FileOpener.open(fileHandle.file());
             return;
+        } else if(fileHandle.extension().equals("ttp")) {
+            SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
+            sceneEditorAddon.Apps().openPaletteEditor();
         }
 
         FileOpener.open(fileHandle.file());

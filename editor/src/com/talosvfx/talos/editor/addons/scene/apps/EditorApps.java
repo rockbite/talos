@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps;
 
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.PaletteMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 public class EditorApps {
@@ -9,8 +10,11 @@ public class EditorApps {
 
     private SpriteEditor spriteEditor;
 
+    private PaletteEditor paletteEditor;
+
     private EditorApps() {
         spriteEditor = new SpriteEditor();
+        paletteEditor = new PaletteEditor();
     }
 
     public static EditorApps getInstance() {
@@ -21,7 +25,11 @@ public class EditorApps {
         return instance;
     }
 
-    public void openSceneEditor(SpriteMetadata metadata, SpriteEditor.SpriteMetadataListener listener) {
+    public void openSpriteEditor(SpriteMetadata metadata, SpriteEditor.SpriteMetadataListener listener) {
         spriteEditor.show(metadata, listener);
+    }
+
+    public void openPaletteEditor() {
+        paletteEditor.show();
     }
 }

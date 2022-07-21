@@ -12,7 +12,7 @@ public class GameAsset<T> {
 	public String nameIdentifier;
 	public GameAssetType type;
 
-	Array<RawAsset> dependentRawAssets = new Array<>();
+	public Array<RawAsset> dependentRawAssets = new Array<>();
 
 	private T resourcePayload;
 
