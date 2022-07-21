@@ -23,6 +23,7 @@ public enum GameAssetType {
 	VFX(new String[]{"tls"}, true),
 	VFX_OUTPUT(new String[]{"p"}, false),
 	SCRIPT(new String[]{"ts", "js"}, true),
+	TWEEN(new String[]{"tw"}, true),
 	PREFAB(new String[]{"prefab"}, true),
 	DIRECTORY(new String[]{}, false);
 
@@ -74,6 +75,7 @@ public enum GameAssetType {
 		case SCRIPT:
 			return ScriptMetadata.class;
 		case VFX_OUTPUT:
+		case TWEEN:
 		case SOUND:
 			return EmptyMetadata.class;
 		}

@@ -1,40 +1,50 @@
 package com.talosvfx.talos.editor.addons.scene.apps;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
 
-public abstract class AEditorApp extends VisWindow {
+public abstract class AEditorApp<T> {
 
-    public AEditorApp() {
-        super("");
-        getTitleLabel().setText(getTitle());
+    protected Table content;
+    protected String identifier;
+    protected T object;
 
-        getStyle().stageBackground = null;
+    protected AppListener listener;
 
-        setCenterOnAdd(true);
-        setResizable(true);
-        setMovable(true);
-        addCloseButton();
-        closeOnEscape();
-
-        initContent();
-
-        pack();
-        invalidate();
-
-        centerWindow();
+    interface AppListener {
+        void closeRequested();
     }
 
-    protected abstract void initContent();
+    public boolean notifyClose() {
 
-    protected abstract String getTitle();
+        if(listener != null) {
+            listener.closeRequested();
+        }
 
-    public AEditorApp show() {
-        TalosMain.Instance().UIStage().getStage().addActor(this);
-        return this;
+        return true;
     }
 
-    public void hide() {
-        remove();
+    public enum AppOpenStrategy {
+        WINDOW,
+        BOTTOM_TAB,
+        RIGHT_TAB
+    }
+
+    public AEditorApp(T object) {
+        this.object = object;
+    }
+
+    public abstract void initContent();
+
+    public abstract String getTitle();
+
+    public Table getContent() {
+        return content;
+    }
+
+    public void addListener(AppListener listener) {
+        this.listener = listener;
     }
 }
