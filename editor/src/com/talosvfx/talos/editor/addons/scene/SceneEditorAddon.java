@@ -14,8 +14,12 @@ import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.EditorApps;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -45,6 +49,7 @@ public class SceneEditorAddon implements IAddon {
     public SEAssetProvider assetProvider;
 
     public com.talosvfx.talos.editor.addons.scene.dialogs.SettingsDialog settingsDialog;
+    private Table bottomTable;
 
     @Override
     public void init () {
@@ -141,10 +146,14 @@ public class SceneEditorAddon implements IAddon {
 
         Table leftPart = new Table();
         Table midPart = new Table();
+        bottomTable = new Table();
+
         workspaceContainer = new Table();
         VisSplitPane horizontalPane = new VisSplitPane(leftPart, propertyPanel, false);
-        VisSplitPane verticalPane = new VisSplitPane(midPart, projectExplorer, true);
+        VisSplitPane verticalPane = new VisSplitPane(midPart, bottomTable, true);
         VisSplitPane midPane = new VisSplitPane(hierarchy, workspaceContainer, false);
+
+        createBottomTabs();
 
         leftPart.add(verticalPane).grow();
         midPart.add(midPane).grow();
@@ -164,6 +173,48 @@ public class SceneEditorAddon implements IAddon {
         workspaceContainer.add(workspace).grow();
 
         container.add(horizontalPane).grow();
+    }
+
+    private void createBottomTabs() {
+        TabbedPane tabbedPane = new TabbedPane();
+        bottomTable.add(tabbedPane.getTable()).left().expandX().fillX().growX().row();
+        Table bottomContainer = new Table();
+        bottomTable.add(bottomContainer).grow().expand().fillY();
+
+        Tab explorerTab = new Tab(false, false) {
+            @Override
+            public String getTabTitle() {
+                return "Project Explorer";
+            }
+
+            @Override
+            public Table getContentTable() {
+                return projectExplorer;
+            }
+        };
+
+        tabbedPane.add(explorerTab);
+
+        tabbedPane.addListener(new TabbedPaneListener() {
+            @Override
+            public void switchedTab(Tab tab) {
+                bottomContainer.clearChildren();
+                bottomContainer.add(tab.getContentTable()).grow();
+            }
+
+            @Override
+            public void removedTab(Tab tab) {
+
+            }
+
+            @Override
+            public void removedAllTabs() {
+                // do nothing
+            }
+        });
+
+        bottomContainer.clearChildren();
+        bottomContainer.add(explorerTab.getContentTable()).grow();
     }
 
     @Override
@@ -224,5 +275,12 @@ public class SceneEditorAddon implements IAddon {
 
     public EditorApps Apps() {
         return EditorApps.getInstance();
+    }
+
+    public void openAppInWindow(AEditorApp editorApp, boolean bottomTabs) {
+
+        if (bottomTabs) {
+            
+        }
     }
 }

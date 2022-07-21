@@ -303,6 +303,24 @@ public class ProjectExplorerWidget extends Table {
                 }
             });
 
+            createSubMenuItem(popupMenu, "Tween", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+
+                    FileHandle currentFolder = getCurrentFolder();
+
+                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), "Tween", "tw");
+                    newScriptDestination.writeString("{}", false);
+
+                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
+
+
+                    directoryViewWidget.reload();
+                }
+            });
+
+
+
             MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {

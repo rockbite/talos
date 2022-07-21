@@ -105,6 +105,7 @@ public class AssetRepository {
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
 		checkGameAssetCreation(GameAssetType.SCRIPT);
+		checkGameAssetCreation(GameAssetType.TWEEN);
 		checkGameAssetCreation(GameAssetType.ATLAS);
 		checkGameAssetCreation(GameAssetType.SOUND);
 
@@ -511,6 +512,13 @@ public class AssetRepository {
 
 				scriptGameAsset.dependentRawAssets.add(value);
 
+				break;
+			case TWEEN:
+				GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				gameAssetOut = tweenGameAsset;
+				tweenGameAsset.setResourcePayload("Dummy");
+				value.gameAssetReferences.add(tweenGameAsset);
+				tweenGameAsset.dependentRawAssets.add(value);
 				break;
 			case PREFAB:
 				GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
