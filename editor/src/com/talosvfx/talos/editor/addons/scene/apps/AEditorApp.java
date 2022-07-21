@@ -10,44 +10,21 @@ public abstract class AEditorApp<T> {
     protected String identifier;
     protected T object;
 
-    public AEditorApp(T object) {
-        this.object = object;
-        /*
-        super("");
-        getTitleLabel().setText(getTitle());
-
-        title = getTitle();
-
-        getStyle().stageBackground = null;
-
-        setCenterOnAdd(true);
-        setResizable(true);
-        setMovable(true);
-        addCloseButton();
-        closeOnEscape();
-
-        initContent();
-
-        pack();
-        invalidate();
-
-        centerWindow();*/
+    public enum AppOpenStrategy {
+        WINDOW,
+        BOTTOM_TAB,
+        RIGHT_TAB
     }
 
-    protected abstract void initContent();
+    public AEditorApp(T object) {
+        this.object = object;
+    }
 
-    protected abstract String getTitle();
+    public abstract void initContent();
+
+    public abstract String getTitle();
 
     public Table getContent() {
         return content;
     }
-
-/*
-    public AEditorApp show() {
-        TalosMain.Instance().UIStage().getStage().addActor(this);
-        return this;
-    }
-    public void hide() {
-        remove();
-    }*/
 }

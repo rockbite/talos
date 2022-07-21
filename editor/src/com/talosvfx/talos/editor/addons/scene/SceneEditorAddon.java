@@ -6,32 +6,25 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.kotcrab.vis.ui.widget.Menu;
-import com.kotcrab.vis.ui.widget.MenuBar;
-import com.kotcrab.vis.ui.widget.MenuItem;
-import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.widget.*;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.apps.EditorApps;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.apps.SEAppManager;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
-import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
-import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {
@@ -50,7 +43,9 @@ public class SceneEditorAddon implements IAddon {
 
     public com.talosvfx.talos.editor.addons.scene.dialogs.SettingsDialog settingsDialog;
     private Table bottomTable;
-    private TabbedPane bottomTabbedPane;
+    public TabbedPane bottomTabbedPane;
+
+    private SEAppManager seAppManager;
 
     @Override
     public void init () {
@@ -58,6 +53,8 @@ public class SceneEditorAddon implements IAddon {
 
         assetProvider = new SEAssetProvider();
         assetImporter = new AssetImporter();
+
+        seAppManager = new SEAppManager();
 
         registerEvents();
         buildUI();
@@ -274,25 +271,7 @@ public class SceneEditorAddon implements IAddon {
         return ((SceneEditorProject)TalosMain.Instance().Project()).sceneEditorAddon;
     }
 
-    public EditorApps Apps() {
-        return EditorApps.getInstance();
-    }
-
-    public void openAppInWindow(AEditorApp editorApp, boolean bottomTabs) {
-        if (bottomTabs) {
-            Tab newTab = new Tab() {
-                @Override
-                public String getTabTitle() {
-                    return editorApp.getTitleLabel().getText().toString(); // because getTitle is protected :D Don't judge
-                }
-
-                @Override
-                public Table getContentTable() {
-                    return editorApp.getContent();
-                }
-            };
-
-            bottomTabbedPane.add(newTab);
-        }
+    public void openApp(AEditorApp editorApp, AEditorApp.AppOpenStrategy strategy) {
+        seAppManager.openApp(editorApp, strategy);
     }
 }

@@ -113,6 +113,9 @@ public class TalosMain extends ApplicationAdapter {
 	private ScreenshotService screenshotService;
 
 	public Cursor pickerCursor;
+	public Cursor moveHorizontallyCursor;
+	public Cursor moveVerticallyCursor;
+	public Cursor moveAllDirections;
 	private Cursor currentCursor;
 
 	public TalosMain () {
@@ -172,6 +175,9 @@ public class TalosMain extends ApplicationAdapter {
 		VisUI.load(skin);
 
 		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
+		moveHorizontallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_horizontally.png")), 8, 8);
+		moveVerticallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_vertically.png")), 8, 8);
+		moveAllDirections = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_all_directions.png")), 8, 8);
 
 		uiStage = new UIStage(skin);
 

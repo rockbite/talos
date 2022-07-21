@@ -30,7 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.utils.CameraController;
 
 

@@ -15,12 +15,12 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     }
 
     @Override
-    protected void initContent() {
+    public void initContent() {
         content = new Table();
     }
 
     @Override
-    protected String getTitle() {
+    public String getTitle() {
         return title;
     }
 }
