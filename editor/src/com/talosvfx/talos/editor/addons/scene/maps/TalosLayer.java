@@ -65,7 +65,7 @@ public class TalosLayer implements Json.Serializable {
 	private void deserializeForDynamic (Json json, JsonValue jsonData) {
 
 	}
-	
+
 	private void serializeForStatic (Json json) {
 		json.writeValue("mapWidth", mapWidth);
 		json.writeValue("mapHeight", mapHeight);
