@@ -150,7 +150,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                Node node = getNodeAt(y);
+                Node<T> node = getNodeAt(y);
                 if(itemListener != null) {
                     if(button == 1) {
                         // this is right click
@@ -167,7 +167,7 @@ public class FilteredTree<T> extends WidgetGroup {
                     // Select range (shift).
                     if (rangeStart == null)
                         rangeStart = node;
-                    Node rangeStart = FilteredTree.this.rangeStart;
+                    Node<T> rangeStart = FilteredTree.this.rangeStart;
                     if (!UIUtils.ctrl())
                         selection.clear();
                     float start = rangeStart.actor.getY(), end = node.actor.getY();

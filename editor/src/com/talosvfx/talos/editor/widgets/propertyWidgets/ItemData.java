@@ -20,4 +20,8 @@ public class ItemData {
     public String toString () {
         return text;
     }
+
+    public void updateName (String newText) {
+            this.text = newText;
+    }
 }

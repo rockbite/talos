@@ -19,7 +19,14 @@ public class MapComponent extends AComponent {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers", new Supplier<Array<TalosLayer>>() {
+
+        Supplier<TalosLayer> supplier = new Supplier<TalosLayer>() {
+            @Override
+            public TalosLayer get () {
+                return new TalosLayer("NewLayer");
+            }
+        };
+        DynamicItemListWidget<TalosLayer> itemListWidget = new DynamicItemListWidget<>("Layers", new Supplier<Array<TalosLayer>>() {
             @Override
             public Array<TalosLayer> get () {
                 return layers;
@@ -34,17 +41,25 @@ public class MapComponent extends AComponent {
 
                 Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
             }
-        }, new DynamicItemListWidget.DynamicItemListInteraction() {
+        }, new DynamicItemListWidget.DynamicItemListInteraction<TalosLayer>() {
             @Override
-            public Supplier newInstanceCreator () {
-                return null;
+            public Supplier<TalosLayer> newInstanceCreator () {
+
+                return supplier;
             }
 
             @Override
-            public String getID (Object o) {
-                return null;
+            public String getID (TalosLayer o) {
+                return o.getName();
+            }
+
+            @Override
+            public void updateName (TalosLayer talosLayer, String newText) {
+                talosLayer.setName(newText);
             }
         });
+
+        properties.add(itemListWidget);
 
         return properties;
     }
