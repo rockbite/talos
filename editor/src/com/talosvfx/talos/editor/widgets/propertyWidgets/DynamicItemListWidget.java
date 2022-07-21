@@ -63,6 +63,13 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         list.setItemListener(new FilteredTree.ItemListener<T>() {
             @Override
+            public void chosen (FilteredTree.Node<T> node) {
+                list.getSelection().clear();
+                list.getSelection().add(node);
+
+            }
+
+            @Override
             public void onNodeMove (FilteredTree.Node<T> parentToMoveTo, FilteredTree.Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
                 callValueChanged(makeDataArray());
             }
@@ -83,7 +90,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
                 T newT = interaction.newInstanceCreator().get();
                 Selection<FilteredTree.Node<T>> selection = list.getSelection();
-                FilteredTree.Node node;
+                FilteredTree.Node<T> node;
                 if(selection.size() > 0) {
                     int index = 0;
                     Array<FilteredTree.Node<T>> rootNodes = list.getRootNodes();
@@ -154,7 +161,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         return arr;
     }
 
-    private FilteredTree.Node createNode(T t) {
+    private FilteredTree.Node<T> createNode(T t) {
         Skin skin = TalosMain.Instance().getSkin();
         EditableLabel editableLabel = new EditableLabel(t.toString(), skin);
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
@@ -163,7 +170,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
                 callValueChanged(makeDataArray());
             }
         });
-        FilteredTree.Node<T> node = new FilteredTree.Node<T>(t.toString(), editableLabel);
+        FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
         node.draggableInLayerOnly = true;
         node.setObject(t);
@@ -171,15 +178,15 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         return node;
     }
 
-    private FilteredTree.Node addNode(T T, int index) {
-        FilteredTree.Node node = createNode(T);
+    private FilteredTree.Node<T> addNode(T t, int index) {
+        FilteredTree.Node<T> node = createNode(t);
         list.insert(index, node);
 
         return node;
     }
 
-    private FilteredTree.Node addNode(T T) {
-        FilteredTree.Node node = createNode(T);
+    private FilteredTree.Node<T> addNode(T t) {
+        FilteredTree.Node<T> node = createNode(t);
         list.add(node);
 
         return node;

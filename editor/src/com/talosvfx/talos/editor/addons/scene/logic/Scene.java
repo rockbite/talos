@@ -61,7 +61,13 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
         final SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
 
-        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers", new Supplier<Array<ItemData>>() {
+        Supplier<ItemData> newItemDataSupplier = new Supplier<ItemData>() {
+            @Override
+            public ItemData get () {
+                return new ItemData("NewLayer", "NewLayer");
+            }
+        };
+        DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers", new Supplier<Array<ItemData>>() {
             @Override
             public Array<ItemData> get () {
                 Array<ItemData> list = new Array<>();
@@ -84,15 +90,15 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
                 Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
             }
-        }, new DynamicItemListWidget.DynamicItemListInteraction() {
+        }, new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
             @Override
-            public Supplier newInstanceCreator () {
-                return null;
+            public Supplier<ItemData> newInstanceCreator () {
+                return newItemDataSupplier;
             }
 
             @Override
-            public String getID (Object o) {
-                return null;
+            public String getID (ItemData o) {
+                return o.id;
             }
         });
 
