@@ -296,7 +296,7 @@ public class ProjectExplorerWidget extends Table {
                     templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
                     newScriptDestination.writeString(templateString, false);
 
-                    AssetRepository.getInstance().rawAssetCreated(templateScript, true);
+                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
                     directoryViewWidget.reload();
