@@ -242,6 +242,10 @@ public class TalosMain extends ApplicationAdapter {
 		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
 	}
 
+	public InputMultiplexer getInputMultiplexer() {
+		return inputMultiplexer;
+	}
+
 	@Override
 	public void render () {
 		try {
@@ -297,6 +301,8 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public CameraController getCameraController() {
+		if(currentWorkplaceStage == null) return null;
+
 		return currentWorkplaceStage.getCameraController();
 	}
 

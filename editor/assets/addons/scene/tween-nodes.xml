@@ -1,0 +1,7 @@
+<modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
+    <category name="artistic" title="Artistic">
+        <module name = "TestNode" title = "Color Mixer" keywords = "color">
+
+        </module>
+    </category>
+</modules>
