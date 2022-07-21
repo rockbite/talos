@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.utils.GridRenderer;
 
 public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
 
+    private final NodeStageActor container;
     protected XmlReader.Element nodeData;
     public Skin skin;
     protected NodeBoard nodeBoard;
@@ -32,6 +33,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         super();
         this.skin = skin;
         nodeData = loadData();
+
+        container = new NodeStageActor(this);
     }
 
     protected abstract XmlReader.Element loadData();
@@ -316,5 +319,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     public NodeBoard getNodeBoard () {
         return nodeBoard;
+    }
+
+    public NodeStageActor getContainer() {
+        return container;
     }
 }
