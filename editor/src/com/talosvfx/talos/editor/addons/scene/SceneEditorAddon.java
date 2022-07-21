@@ -45,7 +45,7 @@ public class SceneEditorAddon implements IAddon {
     private Table bottomTable;
     public TabbedPane bottomTabbedPane;
 
-    private SEAppManager seAppManager;
+    public SEAppManager seAppManager;
 
     @Override
     public void init () {
@@ -202,12 +202,17 @@ public class SceneEditorAddon implements IAddon {
 
             @Override
             public void removedTab(Tab tab) {
-
+                if(tab instanceof SEAppManager.AppTab) {
+                    SEAppManager.AppTab appTab = (SEAppManager.AppTab) tab;
+                    if(appTab.getApp().notifyClose()) {
+                        seAppManager.notifyClosed(appTab.getApp());
+                    }
+                }
             }
 
             @Override
             public void removedAllTabs() {
-                // do nothing
+                // do nothing ?
             }
         });
 

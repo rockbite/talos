@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -32,6 +33,8 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
     public SpriteEditor(SpriteMetadata object) {
         super(object);
         identifier = object.uuid  + "";
+        initContent();
+        show(object);
     }
 
     @Override
@@ -226,7 +229,8 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 (int) editPanel.getBottom()
             );
         }
-        // TODO: handle somehow
+
+        SceneEditorAddon.get().seAppManager.close(this);
     }
 
     @Override
@@ -242,8 +246,7 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
         void changed(int left, int right, int top, int bottom);
     }
 
-    public AEditorApp show(SpriteMetadata metadata, SpriteMetadataListener listener) {
-        this.listener = listener;
+    public AEditorApp show(SpriteMetadata metadata) {
 
         // get ninepatch
 

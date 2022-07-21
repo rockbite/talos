@@ -6,6 +6,7 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditor;
 
 public class SEAppManager {
 
@@ -18,7 +19,7 @@ public class SEAppManager {
         }
 
         if (strategy == AEditorApp.AppOpenStrategy.BOTTOM_TAB || strategy == AEditorApp.AppOpenStrategy.RIGHT_TAB) {
-            Tab newTab = new Tab() {
+            AppTab newTab = new AppTab(editorApp) {
                 @Override
                 public String getTabTitle() {
                     return editorApp.getTitle();
@@ -29,14 +30,37 @@ public class SEAppManager {
                     return editorApp.getContent();
                 }
             };
+            editorApp.addListener(new AEditorApp.AppListener() {
+                @Override
+                public void closeRequested() {
+                    newTab.removeFromTabPane();
+                }
+            });
 
             SceneEditorAddon.get().bottomTabbedPane.add(newTab);
         } else if(strategy == AEditorApp.AppOpenStrategy.WINDOW) {
             AppWindow window = new AppWindow(editorApp);
+
+            editorApp.addListener(new AEditorApp.AppListener() {
+                @Override
+                public void closeRequested() {
+                    window.hide();
+                }
+            });
+
             window.show();
         }
 
         openedApps.put(editorApp.identifier, editorApp);
+    }
+
+    public void notifyClosed(AEditorApp app) {
+        openedApps.remove(app.identifier);
+    }
+
+    public void close(SpriteEditor app) {
+        notifyClosed(app);
+        app.notifyClose();
     }
 
     class AppWindow extends VisWindow {
@@ -69,6 +93,25 @@ public class SEAppManager {
         }
         public void hide() {
             remove();
+        }
+
+        @Override
+        public boolean remove() {
+            SceneEditorAddon.get().seAppManager.notifyClosed(app);
+            return super.remove();
+        }
+    }
+
+    public abstract class AppTab extends Tab {
+
+        AEditorApp app;
+
+        public AppTab(AEditorApp app) {
+            this.app = app;
+        }
+
+        public AEditorApp getApp() {
+            return app;
         }
     }
 }
