@@ -72,6 +72,7 @@ public class AssetRepository {
 
 	static AssetRepository instance;
 	public static AssetRepository getInstance() {
+		if(instance == null) init();
 		return instance;
 	}
 	public static void init () {
