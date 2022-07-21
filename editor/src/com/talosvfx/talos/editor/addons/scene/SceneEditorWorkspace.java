@@ -41,6 +41,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
@@ -707,7 +708,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void drawContent (Batch batch, float parentAlpha) {
         if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         batch.end();
-        drawGrid(batch, parentAlpha);
+//        drawGrid(batch, parentAlpha);
+
+        GridDrawer.drawGrid(this, camera, batch,
+            1, 1, 1, true, true);
+
         batch.begin();
 
         drawMainRenderer(batch, parentAlpha);
