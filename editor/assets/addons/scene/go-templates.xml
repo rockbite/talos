@@ -23,6 +23,12 @@
                 <component className="CameraComponent"></component>
             </components>
         </template>
+        <template name = "map" title = "Map" nameTemplate = "Map" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="MapComponent"></component>
+            </components>
+        </template>
         <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
