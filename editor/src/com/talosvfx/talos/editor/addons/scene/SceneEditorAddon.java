@@ -50,6 +50,7 @@ public class SceneEditorAddon implements IAddon {
 
     public com.talosvfx.talos.editor.addons.scene.dialogs.SettingsDialog settingsDialog;
     private Table bottomTable;
+    private TabbedPane bottomTabbedPane;
 
     @Override
     public void init () {
@@ -176,8 +177,8 @@ public class SceneEditorAddon implements IAddon {
     }
 
     private void createBottomTabs() {
-        TabbedPane tabbedPane = new TabbedPane();
-        bottomTable.add(tabbedPane.getTable()).left().expandX().fillX().growX().row();
+        bottomTabbedPane = new TabbedPane();
+        bottomTable.add(bottomTabbedPane.getTable()).left().expandX().fillX().growX().row();
         Table bottomContainer = new Table();
         bottomTable.add(bottomContainer).grow().expand().fillY();
 
@@ -193,9 +194,9 @@ public class SceneEditorAddon implements IAddon {
             }
         };
 
-        tabbedPane.add(explorerTab);
+        bottomTabbedPane.add(explorerTab);
 
-        tabbedPane.addListener(new TabbedPaneListener() {
+        bottomTabbedPane.addListener(new TabbedPaneListener() {
             @Override
             public void switchedTab(Tab tab) {
                 bottomContainer.clearChildren();
@@ -278,9 +279,20 @@ public class SceneEditorAddon implements IAddon {
     }
 
     public void openAppInWindow(AEditorApp editorApp, boolean bottomTabs) {
-
         if (bottomTabs) {
-            
+            Tab newTab = new Tab() {
+                @Override
+                public String getTabTitle() {
+                    return editorApp.getTitleLabel().getText().toString(); // because getTitle is protected :D Don't judge
+                }
+
+                @Override
+                public Table getContentTable() {
+                    return editorApp.getContent();
+                }
+            };
+
+            bottomTabbedPane.add(newTab);
         }
     }
 }

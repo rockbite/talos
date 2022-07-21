@@ -228,7 +228,7 @@ public class AssetImporter {
             FileOpener.open(fileHandle.file());
             return;
         } else if(fileHandle.extension().equals("tw")) {
-            SceneEditorAddon.get().openAppInWindow(new TweenEditor(), true);
+            SceneEditorAddon.get().openAppInWindow(new TweenEditor(fileHandle), true);
             return;
         }
 

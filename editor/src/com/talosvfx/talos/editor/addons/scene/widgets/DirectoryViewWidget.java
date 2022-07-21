@@ -201,7 +201,9 @@ public class DirectoryViewWidget extends Table {
                     prevPos.set(x, y);
                 }
 
-                getStage().setKeyboardFocus(DirectoryViewWidget.this);
+                if(getStage() != null) {
+                    getStage().setKeyboardFocus(DirectoryViewWidget.this);
+                }
             }
 
             @Override
