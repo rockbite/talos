@@ -100,6 +100,11 @@ public class Scene extends SavableContainer implements IPropertyProvider {
             public String getID (ItemData o) {
                 return o.id;
             }
+
+            @Override
+            public void updateName (ItemData itemData, String newText) {
+                itemData.updateName(newText);
+            }
         });
 
         properties.add(labelWidget);
