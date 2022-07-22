@@ -9,9 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
@@ -19,6 +17,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
@@ -313,6 +312,23 @@ public class ProjectExplorerWidget extends Table {
                     newScriptDestination.writeString("{}", false);
 
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
+
+
+                    directoryViewWidget.reload();
+                }
+            });
+
+            createSubMenuItem(popupMenu, "Palette", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    FileHandle currentFolder = getCurrentFolder();
+                    FileHandle newPaletteDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Palette", "ttp");
+
+                    Json json = new Json(JsonWriter.OutputType.json);
+                    String templateString = json.toJson(new TilePaletteData());
+                    newPaletteDestination.writeString(templateString, false);
+
+                    AssetRepository.getInstance().rawAssetCreated(newPaletteDestination, true);
 
 
                     directoryViewWidget.reload();
