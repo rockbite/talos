@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -310,5 +312,26 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     public void setPrefabLink (String prefabLink) {
         this.prefabLink = prefabLink;
+    }
+
+    BoundingBox boundingBox = new BoundingBox();
+
+    private static void estimateSizeForGameObject (GameObject gameObject, BoundingBox minMax) {
+        Iterable<AComponent> components = gameObject.getComponents();
+        for (AComponent component : components) {
+            if (component instanceof RendererComponent) {
+                ((RendererComponent)component).minMaxBounds(gameObject, minMax);
+            }
+        }
+        if (gameObject.children != null) {
+            for (GameObject child : gameObject.children) {
+                estimateSizeForGameObject(child, minMax);
+            }
+        }
+    }
+    public BoundingBox estimateSizeFromRoot () {
+        boundingBox.clr();
+        estimateSizeForGameObject(this, boundingBox);
+        return boundingBox;
     }
 }

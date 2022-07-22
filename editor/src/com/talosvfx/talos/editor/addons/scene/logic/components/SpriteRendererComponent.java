@@ -3,13 +3,16 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
@@ -154,5 +157,20 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         super.read(json, jsonData);
     }
 
+    Vector2 vec = new Vector2();
+    @Override
+    public void minMaxBounds (GameObject ownerEntity, BoundingBox boundingBox) {
+        TransformComponent transformComponent = ownerEntity.getComponent(TransformComponent.class);
+        if (transformComponent != null) {
+            vec.set(0, 0);
+            transformComponent.localToWorld(ownerEntity, vec);
+
+            float width = transformComponent.scale.x * size.x;
+            float height = transformComponent.scale.y * size.y;
+
+            boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
+            boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+        }
+    }
 
 }

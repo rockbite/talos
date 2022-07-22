@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -13,6 +15,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
@@ -141,8 +144,23 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             }
         });
         createSkeletonFromGameAsset();
-
-
-
     }
+
+    Vector2 vec = new Vector2();
+    @Override
+    public void minMaxBounds (GameObject ownerEntity, BoundingBox boundingBox) {
+        TransformComponent transformComponent = ownerEntity.getComponent(TransformComponent.class);
+        if (transformComponent != null) {
+            vec.set(0, 0);
+            transformComponent.localToWorld(ownerEntity, vec);
+
+            //todo. do it properly
+            float width = transformComponent.scale.x * 1;
+            float height = transformComponent.scale.y * 1;
+
+            boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
+            boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+        }
+    }
+
 }

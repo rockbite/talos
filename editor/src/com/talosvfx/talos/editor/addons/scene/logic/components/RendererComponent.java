@@ -1,9 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -64,4 +67,6 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         sortingLayer = jsonData.getString("sortingLayer", "Default");
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
     }
+
+    public abstract void minMaxBounds (GameObject parentEntity, BoundingBox rectangle);
 }
