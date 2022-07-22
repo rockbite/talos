@@ -84,7 +84,7 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
     @Override
     public Actor getSubWidget () {
         subWidgetTable = new Table();
-        subWidgetTable.defaults().growX();
+        subWidgetTable.defaults().growX().padTop(4);
 
 
         return subWidgetTable;

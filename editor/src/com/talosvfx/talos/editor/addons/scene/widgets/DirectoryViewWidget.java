@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
@@ -539,6 +540,8 @@ public class DirectoryViewWidget extends Table {
 
         private FileHandle fileHandle;
         private GameAsset<?> gameAsset;
+
+        private GameObject basicGameObject;
 
         public ItemView() {
             build();
