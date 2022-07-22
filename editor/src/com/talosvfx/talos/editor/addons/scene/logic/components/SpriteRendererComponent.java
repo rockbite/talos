@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -22,6 +23,9 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public boolean flipX;
     public boolean flipY;
     public RenderMode renderMode = RenderMode.simple;
+
+    @ValueProperty(prefix = {"W", "H"})
+    public Vector2 size = new Vector2(1, 1);
 
     @Override
     public GameAssetType getGameAssetType () {
@@ -78,6 +82,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
+        PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
 
         properties.add(textureWidget);
         properties.add(colorWidget);
@@ -87,6 +92,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
+        properties.add(sizeWidget);
 
         return properties;
     }
@@ -123,6 +129,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         json.writeValue("flipX", flipX);
         json.writeValue("flipY", flipY);
         json.writeValue("renderMode", renderMode);
+        json.writeValue("size", size);
 
         super.write(json);
 
@@ -140,6 +147,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         flipX = jsonData.getBoolean("flipX", false);
         flipY = jsonData.getBoolean("flipY", false);
         renderMode = json.readValue(RenderMode.class, jsonData.get("renderMode"));
+        size = json.readValue(Vector2.class, jsonData.get("size"));
+
         if(renderMode == null) renderMode = RenderMode.simple;
 
         super.read(json, jsonData);
