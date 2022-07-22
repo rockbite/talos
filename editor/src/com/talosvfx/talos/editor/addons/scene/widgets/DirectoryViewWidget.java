@@ -595,14 +595,14 @@ public class DirectoryViewWidget extends Table {
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
-                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-                    Texture texture = new Texture(fileHandle);
-                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-                    icon.setDrawable(drawable);
-                    icon.setScaling(Scaling.fit);
-                }
+//                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+//                String extension = fileHandle.extension();
+//                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+//                    Texture texture = new Texture(fileHandle);
+//                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+//                    icon.setDrawable(drawable);
+//                    icon.setScaling(Scaling.fit);
+//                }
             }
 
             this.fileHandle = fileHandle;
@@ -625,11 +625,30 @@ public class DirectoryViewWidget extends Table {
                     GameObject parent = new GameObject();
                     parent.addComponent(new TransformComponent());
                     basicGameObject = parent;
-                    AssetImporter.createAssetInstance(assetForPath, parent);
 
-                    GameObjectActor gameObjectActor = new GameObjectActor(SceneEditorWorkspace.getInstance().getRenderer(), basicGameObject, true);
+                    AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                    boolean success = AssetImporter.createAssetInstance(assetForPath, parent);
+                    if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
+                        success = false;
+                    }
+                    AssetImporter.fromDirectoryView = false;
 
-                    iconContainer.addActor(gameObjectActor);
+
+                    if (success) {
+
+                        //Game asset is legit, lets try to make one
+                        GameObject copy = new GameObject();
+                        copy.addComponent(new TransformComponent());
+
+                        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                        AssetImporter.createAssetInstance(assetForPath, copy);
+                        AssetImporter.fromDirectoryView = false;
+
+
+                        GameObjectActor gameObjectActor = new GameObjectActor(SceneEditorWorkspace.getInstance().getUISceneRenderer(), basicGameObject, copy, true);
+                        gameObjectActor.setFillParent(true);
+                        iconContainer.addActor(gameObjectActor);
+                    }
                 }
             }
         }

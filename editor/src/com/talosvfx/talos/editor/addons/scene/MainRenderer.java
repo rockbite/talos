@@ -147,6 +147,8 @@ public class MainRenderer implements Notifications.Observer {
         Vector2 renderPosition = vec;
 
         spineRendererComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
+        spineRendererComponent.skeleton.setScale(transformComponent.scale.x, transformComponent.scale.y);
+        spineRendererComponent.skeleton.setScale(0.1f, 0.1f);
         spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
         spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         spineRendererComponent.skeleton.updateWorldTransform();

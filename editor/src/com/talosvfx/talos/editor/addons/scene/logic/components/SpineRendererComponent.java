@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.esotericsoftware.spine.Animation;
@@ -154,12 +155,22 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             vec.set(0, 0);
             transformComponent.localToWorld(ownerEntity, vec);
 
-            //todo. do it properly
-            float width = transformComponent.scale.x * 1;
-            float height = transformComponent.scale.y * 1;
+            skeleton.setSlotsToSetupPose();
+            skeleton.setBonesToSetupPose();
+            skeleton.updateWorldTransform();
 
-            boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
-            boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+
+            Vector2 offset = new Vector2();
+            Vector2 size = offset;
+            FloatArray floatArray = new FloatArray();
+            skeleton.getBounds(offset, size, floatArray);
+
+            //todo. do it properly
+            float width = transformComponent.scale.x * size.x;
+            float height = transformComponent.scale.y * size.y;
+
+            boundingBox.ext(-width/2, - height/2, 0);
+            boundingBox.ext(width/2, + height/2, 0);
         }
     }
 

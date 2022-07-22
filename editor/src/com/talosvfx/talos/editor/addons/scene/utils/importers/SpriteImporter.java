@@ -27,16 +27,14 @@ public class SpriteImporter extends AbstractImporter<Texture> {
         Vector2 sceneCords = workspace.getMouseCordsOnScene();
         GameObject gameObject = workspace.createSpriteObject(asset, sceneCords, parent);
 
-        if(metaData.borderData != null) {
-            SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
-            component.renderMode = SpriteRendererComponent.RenderMode.sliced;
-        } else {
-            if(gameObject.hasComponent(TransformComponent.class)) {
-                TransformComponent component = gameObject.getComponent(TransformComponent.class);
-                Texture texture = asset.getResource();
-                component.scale.x = texture.getWidth() / metaData.pixelsPerUnit;
-                component.scale.y = texture.getHeight() / metaData.pixelsPerUnit;
-            }
-        }
+        SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
+
+        boolean isSlice = metaData.isSlice();
+        component.renderMode = isSlice ? SpriteRendererComponent.RenderMode.sliced : SpriteRendererComponent.RenderMode.simple;
+
+        Texture texture = asset.getResource();
+        component.size.x = texture.getWidth() / metaData.pixelsPerUnit;
+        component.size.y = texture.getHeight() / metaData.pixelsPerUnit;
+
     }
 }

@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
@@ -66,6 +67,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     private Array<GameObject> selection = new Array<>();
     private MainRenderer renderer;
+    private final MainRenderer uiSceneRenderer;
 
     private String changeVersion = "";
     private SnapshotService snapshotService;
@@ -81,6 +83,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public boolean customGrid = false;
 
     public GridProperties gridProperties = new GridProperties();
+
+    public MainRenderer getUISceneRenderer () {
+        return uiSceneRenderer;
+    }
+
     public static class GridProperties {
         public Supplier<float[]> sizeProvider;
         public int subdivisions = 0;
@@ -127,6 +134,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         addPanListener();
 
         renderer = new MainRenderer();
+        uiSceneRenderer = new MainRenderer();
+
 
         Stage stage = TalosMain.Instance().UIStage().getStage();
         Skin skin = TalosMain.Instance().getSkin();
@@ -155,11 +164,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
         component.setGameAsset(spriteAsset);
-
-        Texture texture = component.getGameResource().getResource();
-        float aspect = (float)texture.getWidth() / texture.getHeight();
-        TransformComponent transformComponent = spriteObject.getComponent(TransformComponent.class);
-        transformComponent.scale.x *= aspect;
 
         return spriteObject;
     }
@@ -206,16 +210,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             parent.addGameObject(gameObject);
         }
 
-        initGizmos(gameObject);
 
-        Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+        if (!fromDirectoryView) {
+            initGizmos(gameObject);
+            Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run () {
+                    selectGameObjectExternally(gameObject);
+                }
+            });
+        }
 
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run () {
-                selectGameObjectExternally(gameObject);
-            }
-        });
 
         return gameObject;
     }
@@ -235,11 +241,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             parent.addGameObject(gameObject);
         }
 
-        initGizmos(gameObject);
+        if (!fromDirectoryView) {
+            initGizmos(gameObject);
 
-        Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+            Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 
-        selectGameObjectExternally(gameObject);
+            selectGameObjectExternally(gameObject);
+        }
 
         return gameObject;
     }
@@ -905,6 +913,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public void selectGameObjectExternally(GameObject gameObject) {
+        if (fromDirectoryView) return;
+
         selectGameObject(gameObject);
         Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
     }

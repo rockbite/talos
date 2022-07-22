@@ -28,6 +28,7 @@ import java.security.MessageDigest;
 
 public class AssetImporter {
 
+    public static boolean fromDirectoryView;
     public FileTracker.Tracker assetTracker;
 
     private static ObjectMap<GameAssetType, AbstractImporter> importerMap = new ObjectMap<>();
@@ -129,21 +130,16 @@ public class AssetImporter {
         return metadataHandle;
     }
 
-    public static void createAssetInstance(GameAsset<?> gameAsset, GameObject parent) {
+    public static boolean createAssetInstance(GameAsset<?> gameAsset, GameObject parent) {
         AbstractImporter abstractImporter = importerMap.get(gameAsset.type);
 
         if (abstractImporter != null) {
             abstractImporter.makeInstance(gameAsset, parent);
+            return true;
         } else {
             System.out.println("No importer found for type " + gameAsset.type);
+            return false;
         }
-
-//        if(fileHandle.extension().equals("prefab")) {
-//            SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-//            Vector2 sceneCords = workspace.getMouseCordsOnScene();
-//            Prefab prefab = Prefab.from(fileHandle);
-//            GameObject gameObject = workspace.createFromPrefab(prefab, sceneCords, parent);
-//        }
     }
 
     public static String checkSum(FileHandle fileHandle) {

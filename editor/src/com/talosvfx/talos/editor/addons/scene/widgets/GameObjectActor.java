@@ -1,42 +1,48 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.wrappers.ScopeModuleWrapper;
 
-public class GameObjectActor extends Actor {
+public class GameObjectActor extends Table {
 
 	private final GameObject gameObject;
+	private final GameObject gameObjectCopy;
 	private final boolean shouldScaleToFit;
 	private BoundingBox estimatedSize;
 
-	private final MainRenderer mainRenderer;
+	private final MainRenderer uiRenderer;
 
-	public GameObjectActor (MainRenderer mainRenderer, GameObject gameObject, boolean shouldScaleToFit) {
+	public GameObjectActor (MainRenderer mainRenderer, GameObject gameObject, GameObject copy, boolean shouldScaleToFit) {
 		this.gameObject = gameObject;
-		this.mainRenderer = mainRenderer;
+		this.gameObjectCopy = copy;
+		this.uiRenderer = mainRenderer;
 		this.shouldScaleToFit = shouldScaleToFit;
 
 		//we need to estimate the size of the object and try to fit it into the actors dimensions
-		estimatedSize = this.gameObject.estimateSizeFromRoot();
 	}
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 
+		estimatedSize = this.gameObjectCopy.estimateSizeFromRoot();
+
 		//Scale the root game object transform to fit in our actor size
 		float width = getWidth();
 		float height = getHeight();
 
-		TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+		GameObject first = gameObject.getGameObjects().first();
+		TransformComponent transform = first.getComponent(TransformComponent.class);
 
 		float scalingFactor = 1;
 		if (shouldScaleToFit) {
@@ -44,14 +50,15 @@ public class GameObjectActor extends Actor {
 			Vector2 apply = Scaling.fit.apply(estimatedSize.getWidth(), estimatedSize.getHeight(), width, height);
 
 			//This is our fit size in world units, so lets scale one of the dimensions to match this
-			float scale = estimatedSize.getWidth() / apply.x;
-			transform.scale.x = transform.scale.y = scale;
-			transform.position.set(getX(), getY());
+			float scale = apply.x / estimatedSize.getWidth();
+
+			transform.scale.set(scale, scale);
+			transform.position.set(getX() + getWidth()/2f, getY() + getHeight()/2f);
 		} else {
 			//If we arent, we just set the root transform to the x,y and leave sizing
 			transform.position.set(getX(), getY());
 		}
 
-		mainRenderer.render(batch, gameObject);
+		uiRenderer.render(batch, gameObject);
 	}
 }

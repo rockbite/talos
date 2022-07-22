@@ -171,8 +171,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
             float width = transformComponent.scale.x * size.x;
             float height = transformComponent.scale.y * size.y;
 
-            boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
-            boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+            boundingBox.ext(-width/2, -height/2, 0);
+            boundingBox.ext(+width/2, +height/2, 0);
         }
     }
 
