@@ -48,6 +48,7 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
@@ -77,6 +78,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public Array<String> layers = new Array<>();
 
+    public boolean customGrid = false;
+
+    public GridProperties gridProperties = new GridProperties();
+    public static class GridProperties {
+        public Supplier<float[]> sizeProvider;
+        public int subdivisions = 0;
+        public boolean noLayerSelected = true;
+    }
 
     // selections
     private Image selectionRect;
@@ -708,10 +717,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void drawContent (Batch batch, float parentAlpha) {
         if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         batch.end();
-        drawGrid(batch, parentAlpha);
 
-        /*GridDrawer.drawGrid(this, camera, batch,
-            1, 1, 1, true, true);*/
+        if (gridProperties.sizeProvider != null) { //Run the logic to check it
+            gridProperties.sizeProvider.get();
+        }
+
+        if (customGrid && gridProperties.sizeProvider != null && !gridProperties.noLayerSelected) {
+            float[] size = gridProperties.sizeProvider.get();
+            GridDrawer.drawGrid(this, camera, batch, size[0], size[1], 1, true, true);
+        } else {
+            drawGrid(batch, parentAlpha);
+        }
+
+
 
         batch.begin();
 

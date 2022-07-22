@@ -4,7 +4,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 
 public class StaticTile {
 
-	private GameAsset<?> staticTilesAsset;
-	private GridPosition grisPosition;
+	GameAsset<?> staticTilesAsset;
+	GridPosition gridPosition;
 
 }

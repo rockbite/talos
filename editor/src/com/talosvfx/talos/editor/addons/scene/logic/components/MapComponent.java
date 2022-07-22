@@ -16,7 +16,7 @@ public class MapComponent extends AComponent {
 
 
     private Array<TalosLayer> layers = new Array<>();
-    private transient TalosLayer selectedLayer;
+    public transient TalosLayer selectedLayer;
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {

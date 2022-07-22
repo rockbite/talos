@@ -17,8 +17,11 @@ public class TalosLayer implements Json.Serializable {
 	private int mapWidth = 100;
 	private int mapHeight = 100;
 
-	private int tileSizeX = 1;
-	private int tileSizeY = 1;
+	@ValueProperty(min = 0.001f, max = 10f)
+	private float tileSizeX = 1;
+
+	@ValueProperty(min = 0.001f, max = 10f)
+	private float tileSizeY = 1;
 
 
 	//Layer dependent info, don't use poly to keep it simple
@@ -77,14 +80,47 @@ public class TalosLayer implements Json.Serializable {
 		json.writeValue("mapHeight", mapHeight);
 		json.writeValue("tileSizeX", tileSizeX);
 		json.writeValue("tileSizeY", tileSizeY);
+
+		json.writeArrayStart("tiles");
+		for (IntMap.Entry<IntMap<StaticTile>> staticTile : staticTiles) {
+			int x = staticTile.key;
+			IntMap<StaticTile> value = staticTile.value;
+
+			for (IntMap.Entry<StaticTile> staticTileEntry : value) {
+				int y = staticTileEntry.key;
+				StaticTile tile = staticTileEntry.value;
+
+				json.writeObjectStart();
+				json.writeValue(tile);
+				json.writeObjectEnd();
+			}
+		}
+		json.writeArrayEnd();
 	}
 
 	private void deserializeForStatic (Json json, JsonValue jsonData) {
 		this.mapWidth = jsonData.getInt("mapWidth", 100);
 		this.mapHeight = jsonData.getInt("mapHeight", 100);
-		this.tileSizeX = jsonData.getInt("tileSizeX", 1);
-		this.tileSizeY = jsonData.getInt("tileSizeY", 1);
+		this.tileSizeX = jsonData.getFloat("tileSizeX", 1);
+		this.tileSizeY = jsonData.getFloat("tileSizeY", 1);
+
+		JsonValue tiles = jsonData.get("tiles");
+		for (JsonValue tile : tiles) {
+			StaticTile readTile = json.readValue(StaticTile.class, tile);
+			putTile(readTile);
+		}
 	}
+
+	private void putTile (StaticTile readTile) {
+		GridPosition gridPosition = readTile.gridPosition;
+
+		if (!staticTiles.containsKey(gridPosition.x)) {
+			staticTiles.put(gridPosition.x, new IntMap<>());
+		}
+		IntMap<StaticTile> entries = staticTiles.get(gridPosition.x);
+		entries.put(gridPosition.y, readTile);
+	}
+
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		this.type = json.readValue(LayerType.class, jsonData.get("type"));
@@ -109,5 +145,21 @@ public class TalosLayer implements Json.Serializable {
 
 	public LayerType getType () {
 		return type;
+	}
+
+	public int getMapWidth () {
+		return mapWidth;
+	}
+
+	public int getMapHeight () {
+		return mapHeight;
+	}
+
+	public float getTileSizeX () {
+		return tileSizeX;
+	}
+
+	public float getTileSizeY () {
+		return tileSizeY;
 	}
 }
