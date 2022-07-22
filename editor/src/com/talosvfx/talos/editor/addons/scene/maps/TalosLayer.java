@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
@@ -13,6 +14,8 @@ public class TalosLayer implements Json.Serializable {
 
 	private String name;
 	private LayerType type;
+
+//	private GameAsset<PaletteData> //todo hook up to this
 
 	private int mapWidth = 100;
 	private int mapHeight = 100;
