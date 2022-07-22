@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
@@ -8,6 +10,8 @@ import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 public class TweenEditor extends AEditorApp<FileHandle> {
 
     private String title;
+    public TweenStage tweenStage;
+    public AnimationTimeline animationTimeline;
 
     public TweenEditor(FileHandle twFileHandle) {
         super(twFileHandle);
@@ -20,10 +24,16 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     public void initContent() {
         content = new Table();
 
-        TweenStage tweenStage = new TweenStage(TalosMain.Instance().UIStage().getSkin());
+        Skin skin = TalosMain.Instance().UIStage().getSkin();
+
+        animationTimeline = new AnimationTimeline(skin);
+
+        tweenStage = new TweenStage(this, skin);
         tweenStage.init();
 
-        content.add(tweenStage.getContainer()).grow();
+
+        SplitPane splitPane = new SplitPane(animationTimeline, tweenStage.getContainer(), false, skin);
+        content.add(splitPane).grow();
 
         TalosMain.Instance().getInputMultiplexer().addProcessor(tweenStage.getStage());
 

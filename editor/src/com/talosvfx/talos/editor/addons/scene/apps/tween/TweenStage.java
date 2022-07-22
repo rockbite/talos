@@ -8,8 +8,11 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 
 public class TweenStage extends DynamicNodeStage {
 
-    public TweenStage(Skin skin) {
+    public final TweenEditor tweenEditor;
+
+    public TweenStage(TweenEditor tweenEditor, Skin skin) {
         super(skin);
+        this.tweenEditor = tweenEditor;
     }
 
     @Override
