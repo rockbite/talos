@@ -213,7 +213,7 @@ public class MainRenderer implements Notifications.Observer {
                             renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                             0.5f, 0.5f,
                             1f, 1f,
-                            width, height,
+                            width * transformComponent.scale.x, height * transformComponent.scale.y,
                             transformComponent.rotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
                     textureRegion.getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
@@ -223,7 +223,7 @@ public class MainRenderer implements Notifications.Observer {
                             renderPosition.x - 0.5f, renderPosition.y - 0.5f,
                             0.5f, 0.5f,
                             1f, 1f,
-                            width, height,
+                            width * transformComponent.scale.x, height * transformComponent.scale.y,
                             transformComponent.rotation);
                 }
 
