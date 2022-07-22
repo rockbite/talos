@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 import java.lang.reflect.Field;
@@ -15,7 +17,15 @@ public class WidgetFactory {
 
     public static PropertyWidget generate(Object parent, String fieldName, String title) {
         try {
-            Field field = parent.getClass().getField(fieldName);
+            Field field;
+            try {
+                field = parent.getClass().getField(fieldName);
+            } catch (Exception e) {
+                field = parent.getClass().getDeclaredField(fieldName);
+            }
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
             Object object = field.get(parent);
 
             if(field.getType().equals(boolean.class)) {
@@ -240,7 +250,7 @@ public class WidgetFactory {
                 map.put(enumVal.toString(), enumVal);
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-
+            e.printStackTrace();
         }
 
         SelectBoxWidget widget = new SelectBoxWidget(title, new Supplier<String>() {
@@ -249,7 +259,7 @@ public class WidgetFactory {
                 try {
                     return field.get(parent).toString();
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
 
                 return list.first();
@@ -262,7 +272,7 @@ public class WidgetFactory {
                         try {
                             field.set(parent, map.get(value));
                         } catch (IllegalAccessException e) {
-
+                            e.printStackTrace();
                         }
                     }
                 }

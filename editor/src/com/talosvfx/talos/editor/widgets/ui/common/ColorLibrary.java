@@ -37,6 +37,10 @@ public class ColorLibrary {
         RED ("#92313a"),
         // fifty shades of grey :D
 
+        PURPLE ("#7f3192"),
+        GREEN ("#319248"),
+        LIGHT_GREEN ("#62bd77"),
+
         LIGHT_BLUE ("#5b86ae"),
 
         BLACK ("#202020"),

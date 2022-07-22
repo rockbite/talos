@@ -61,31 +61,51 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
         final SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
 
-        DynamicItemListWidget itemListWidget = new DynamicItemListWidget("Layers", new Supplier<Array<DynamicItemListWidget.ItemData>>() {
+        Supplier<ItemData> newItemDataSupplier = new Supplier<ItemData>() {
             @Override
-            public Array<DynamicItemListWidget.ItemData> get() {
-                Array<DynamicItemListWidget.ItemData> list = new Array<>();
-                for(String layerName: workspace.layers) {
-                    DynamicItemListWidget.ItemData itemData = new DynamicItemListWidget.ItemData(layerName);
-                    if(layerName.equals("Default")) {
+            public ItemData get () {
+                return new ItemData("NewLayer", "NewLayer");
+            }
+        };
+        DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers", new Supplier<Array<ItemData>>() {
+            @Override
+            public Array<ItemData> get () {
+                Array<ItemData> list = new Array<>();
+                for (String layerName : workspace.layers) {
+                    ItemData itemData = new ItemData(layerName);
+                    if (layerName.equals("Default")) {
                         itemData.canDelete = false;
                     }
                     list.add(itemData);
                 }
                 return list;
             }
-        }, new PropertyWidget.ValueChanged<Array<DynamicItemListWidget.ItemData>>() {
+        }, new PropertyWidget.ValueChanged<Array<ItemData>>() {
             @Override
-            public void report(Array<DynamicItemListWidget.ItemData> value) {
+            public void report (Array<ItemData> value) {
                 workspace.layers.clear();
-                for(DynamicItemListWidget.ItemData item: value) {
+                for (ItemData item : value) {
                     workspace.layers.add(item.text);
                 }
 
                 Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
             }
+        }, new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
+            @Override
+            public Supplier<ItemData> newInstanceCreator () {
+                return newItemDataSupplier;
+            }
+
+            @Override
+            public String getID (ItemData o) {
+                return o.id;
+            }
+
+            @Override
+            public void updateName (ItemData itemData, String newText) {
+                itemData.updateName(newText);
+            }
         });
-        itemListWidget.defaultItemName = "New Layer";
 
         properties.add(labelWidget);
         properties.add(itemListWidget);

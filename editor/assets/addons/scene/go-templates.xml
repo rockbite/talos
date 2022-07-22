@@ -23,6 +23,12 @@
                 <component className="CameraComponent"></component>
             </components>
         </template>
+        <template name = "map" title = "Map" nameTemplate = "Map" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="MapComponent"></component>
+            </components>
+        </template>
         <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
@@ -49,12 +55,15 @@
         </component>
         <component className="SpriteRendererComponent">
             <gizmos>
-                <gizmo className="SmartTransformGizmo"></gizmo>
+                <gizmo className="SpriteTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="MapComponent">
+            <gizmos>
+                <gizmo className="MapGizmo"></gizmo>
             </gizmos>
         </component>
         <component className="ParticleComponent">
-        </component>
-        <component className="SkeletonComponent">
         </component>
         <component className="SpineRendererComponent">
         </component>

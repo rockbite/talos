@@ -77,7 +77,7 @@ public class ProjectExplorerWidget extends Table {
             }
         };
 
-        directoryTree.setItemListener(new FilteredTree.ItemListener<Object>() {
+        directoryTree.addItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void selected (FilteredTree.Node node) {
                 directoryViewWidget.setDirectory((String) node.getObject());
@@ -295,7 +295,23 @@ public class ProjectExplorerWidget extends Table {
                     templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
                     newScriptDestination.writeString(templateString, false);
 
-                    AssetRepository.getInstance().rawAssetCreated(templateScript, true);
+                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
+
+
+                    directoryViewWidget.reload();
+                }
+            });
+
+            createSubMenuItem(popupMenu, "Tween", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+
+                    FileHandle currentFolder = getCurrentFolder();
+
+                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), "Tween", "tw");
+                    newScriptDestination.writeString("{}", false);
+
+                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
                     directoryViewWidget.reload();
@@ -318,6 +334,8 @@ public class ProjectExplorerWidget extends Table {
                     directoryViewWidget.reload();
                 }
             });
+
+
 
             MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
                 @Override

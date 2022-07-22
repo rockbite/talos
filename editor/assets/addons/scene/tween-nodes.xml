@@ -1,0 +1,14 @@
+<modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
+    <category name="main" title="Main">
+        <module name = "TweenNode" title = "Tween" keywords = "tween, system">
+            <inputText name="title" default="Tween">Title</inputText>
+            <button name="addToTimelineButton">Add to Timeline</button>
+            <button name="playButton">Play</button>
+            <value port="output" name="outputValue" type="vec3">start</value>
+        </module>
+        <module name = "MoveByNode" title = "Move By" keywords = "movement">
+            <value port="input" name="startSignal" type="vec3">start</value>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+        </module>
+    </category>
+</modules>

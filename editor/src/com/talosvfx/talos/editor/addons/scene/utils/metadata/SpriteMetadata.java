@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.apps.SpriteEditor;
+import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditor;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -38,8 +38,8 @@ public class SpriteMetadata extends AMetadata {
         ButtonPropertyWidget<String> spriteEditor = new ButtonPropertyWidget<String>("Sprite Editor", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
             public void clicked (ButtonPropertyWidget<String> widget) {
-                SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-                sceneEditorAddon.Apps().openSpriteEditor(SpriteMetadata.this, new SpriteEditor.SpriteMetadataListener() {
+                SpriteEditor spriteEditor = new SpriteEditor(SpriteMetadata.this);
+                spriteEditor.setListener(new SpriteEditor.SpriteMetadataListener() {
                     @Override
                     public void changed(int left, int right, int top, int bottom) {
                         borderData[0] = left;
@@ -50,6 +50,7 @@ public class SpriteMetadata extends AMetadata {
                         Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderEdited.class));
                     }
                 });
+                SceneEditorAddon.get().openApp(spriteEditor, AEditorApp.AppOpenStrategy.WINDOW);
             }
         });
         propertyWidgets.add(spriteEditor);

@@ -30,7 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.utils.CameraController;
 
 
@@ -291,7 +290,7 @@ public abstract class ViewportWidget extends Table {
         return vec2;
     }
 
-    protected Vector2 getWorldFromLocal (float x, float y) {
+    public Vector2 getWorldFromLocal (float x, float y) {
         Vector2 vector2 = localToScreenCoordinates(new Vector2(x, y));
 
         getViewportBounds(Rectangle.tmp);
@@ -309,6 +308,15 @@ public abstract class ViewportWidget extends Table {
         getViewportBounds(Rectangle.tmp);
 
         camera.unproject(vec.set(vector2.x, vector2.y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+        return vec;
+    }
+
+    public Vector3 getTouchToLocal (float x, float y) {
+        Vector3 vec = new Vector3(x, y, 0);
+
+        getViewportBounds(Rectangle.tmp);
+
+        camera.unproject(vec.set(vec.x, vec.y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
         return vec;
     }
 

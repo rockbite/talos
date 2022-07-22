@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
+import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -815,6 +816,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 addNodeToSelection(node);
             }
         }
+    }
+
+    public DynamicNodeStage getNodeStage() {
+        return nodeStage;
     }
 
 }

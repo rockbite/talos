@@ -30,6 +30,7 @@ public class AssetListPopup<T> extends VisWindow {
 
     private ObjectMap<String, XmlReader.Element> configurationMap = new ObjectMap<>();
     private FilteredTree.Node<GameAsset<T>> rootNode;
+    private FilteredTree.ItemListener<GameAsset<T>> filterTreeListener;
 
     public interface ListListener {
         void chosen(XmlReader.Element template, float x, float y);
@@ -99,7 +100,7 @@ public class AssetListPopup<T> extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
             public void chosen(FilteredTree.Node node) {
                 if(node.children.size == 0) {
@@ -137,7 +138,7 @@ public class AssetListPopup<T> extends VisWindow {
 
         tree.expandAll();
 
-        tree.setItemListener(listener);
+        tree.addItemListener(listener);
     }
     public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
         loadTree();
@@ -162,13 +163,14 @@ public class AssetListPopup<T> extends VisWindow {
 
         tree.expandAll();
 
-        tree.setItemListener(listener);
+        this.filterTreeListener = listener;
+        tree.addItemListener(this.filterTreeListener);
     }
 
     @Override
     public boolean remove () {
         if (getStage() != null) getStage().removeListener(stageListener);
-        tree.setItemListener(null);
+        tree.removeItemListener(filterTreeListener);
         return super.remove();
     }
 

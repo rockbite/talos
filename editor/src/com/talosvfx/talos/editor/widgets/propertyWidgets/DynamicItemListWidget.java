@@ -16,14 +16,23 @@ import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import java.util.function.Supplier;
 
 
-public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListWidget.ItemData>> {
+public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
-    private FilteredTree<Object> list;
+    private DynamicItemListInteraction<T> interaction;
+    public FilteredTree<T> list;
 
-    public String defaultItemName = "New Item";
 
-    public DynamicItemListWidget(String name, Supplier<Array<ItemData>> supplier, ValueChanged<Array<ItemData>> valueChanged) {
+    public interface DynamicItemListInteraction<T> {
+        Supplier<T> newInstanceCreator ();
+        String getID (T t);
+
+        void updateName (T t, String newText);
+    }
+
+
+    public DynamicItemListWidget(String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, DynamicItemListInteraction<T> interaction) {
         super(name, supplier, valueChanged);
+        this.interaction = interaction;
     }
 
 
@@ -53,15 +62,21 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         list = new FilteredTree<>(skin, "modern");
         list.draggable = true;
 
-        list.setItemListener(new FilteredTree.ItemListener<Object>() {
+        list.addItemListener(new FilteredTree.ItemListener<T>() {
             @Override
-            public void onNodeMove (FilteredTree.Node parentToMoveTo, FilteredTree.Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+            public void chosen (FilteredTree.Node<T> node) {
+                list.getSelection().clear();
+                list.getSelection().add(node);
+
+            }
+
+            @Override
+            public void onNodeMove (FilteredTree.Node<T> parentToMoveTo, FilteredTree.Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
                 callValueChanged(makeDataArray());
             }
 
-
             @Override
-            public void delete (Array<FilteredTree.Node<Object>> nodes) {
+            public void delete (Array<FilteredTree.Node<T>> nodes) {
                 deleteSelection();
             }
         });
@@ -73,20 +88,21 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         newBtn.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                ItemData newItemData = new ItemData(defaultItemName, defaultItemName);
-                Selection<FilteredTree.Node<Object>> selection = list.getSelection();
-                FilteredTree.Node node;
+
+                T newT = interaction.newInstanceCreator().get();
+                Selection<FilteredTree.Node<T>> selection = list.getSelection();
+                FilteredTree.Node<T> node;
                 if(selection.size() > 0) {
                     int index = 0;
-                    Array<FilteredTree.Node<Object>> rootNodes = list.getRootNodes();
+                    Array<FilteredTree.Node<T>> rootNodes = list.getRootNodes();
                     for(index = 0; index < rootNodes.size; index++) {
                         if(rootNodes.get(index) == selection.first()) {
                             break;
                         }
                     }
-                    node = addNode(newItemData, index + 1);
+                    node = addNode(newT, index + 1);
                 } else {
-                    node = addNode(newItemData);
+                    node = addNode(newT);
                 }
 
                 callValueChanged(makeDataArray());
@@ -106,14 +122,18 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         return table;
     }
 
+    public boolean canDelete (T t) {
+        return true;
+    }
+
     private void deleteSelection () {
-        Selection<FilteredTree.Node<Object>> selection = list.getSelection();
+        Selection<FilteredTree.Node<T>> selection = list.getSelection();
         if(selection.size() > 0) {
-            FilteredTree.Node<Object> item = selection.first();
-            ItemData itemData = (ItemData) item.getObject();
-            if(itemData.canDelete) {
+            FilteredTree.Node<T> item = selection.first();
+            T t = item.getObject();
+            if(canDelete(t)) {
                 int index = 0;
-                Array<FilteredTree.Node<Object>> rootNodes = list.getRootNodes();
+                Array<FilteredTree.Node<T>> rootNodes = list.getRootNodes();
                 for (index = 0; index < rootNodes.size; index++) {
                     if (rootNodes.get(index) == selection.first()) {
                         break;
@@ -133,69 +153,54 @@ public class DynamicItemListWidget extends PropertyWidget<Array<DynamicItemListW
         }
     }
 
-    private Array<ItemData> makeDataArray () {
-        Array<ItemData> arr = new Array<>();
-        Array<FilteredTree.Node<Object>> rootNodes = list.getRootNodes();
-        for(FilteredTree.Node<Object> node: rootNodes) {
-            EditableLabel label = (EditableLabel) node.getActor();
-            arr.add(new ItemData(node.name, label.getText()));
+    private Array<T> makeDataArray () {
+        Array<T> arr = new Array<>();
+        Array<FilteredTree.Node<T>> rootNodes = list.getRootNodes();
+        for(FilteredTree.Node<T> node: rootNodes) {
+            arr.add(node.getObject());
         }
         return arr;
     }
 
-    private FilteredTree.Node createNode(ItemData itemData) {
+    private FilteredTree.Node<T> createNode(T t) {
         Skin skin = TalosMain.Instance().getSkin();
-        EditableLabel editableLabel = new EditableLabel(itemData.text, skin);
+        EditableLabel editableLabel = new EditableLabel(t.toString(), skin);
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
             public void changed (String newText) {
+                interaction.updateName(t, newText);
                 callValueChanged(makeDataArray());
             }
         });
-        FilteredTree.Node node = new FilteredTree.Node(itemData.id, editableLabel);
+        FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
         node.draggableInLayerOnly = true;
-        node.setObject(itemData);
+        node.setObject(t);
 
         return node;
     }
 
-    private FilteredTree.Node addNode(ItemData itemData, int index) {
-        FilteredTree.Node node = createNode(itemData);
+    private FilteredTree.Node<T> addNode(T t, int index) {
+        FilteredTree.Node<T> node = createNode(t);
         list.insert(index, node);
 
         return node;
     }
 
-    private FilteredTree.Node addNode(ItemData itemData) {
-        FilteredTree.Node node = createNode(itemData);
+    private FilteredTree.Node<T> addNode(T t) {
+        FilteredTree.Node<T> node = createNode(t);
         list.add(node);
 
         return node;
     }
 
     @Override
-    public void updateWidget (Array<DynamicItemListWidget.ItemData> value) {
+    public void updateWidget (Array<T> value) {
         list.clearChildren();
-        for(ItemData item: value) {
+        for(T item: value) {
             addNode(item);
         }
     }
 
-    public static class ItemData {
-        public String id;
-        public String text;
 
-        public boolean canDelete = true;
-
-        public ItemData(String id, String text) {
-            this.id = id;
-            this.text = text;
-        }
-
-        public ItemData(String text) {
-            this.id = text;
-            this.text = text;
-        }
-    }
 }
