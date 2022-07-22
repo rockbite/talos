@@ -147,7 +147,10 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         flipX = jsonData.getBoolean("flipX", false);
         flipY = jsonData.getBoolean("flipY", false);
         renderMode = json.readValue(RenderMode.class, jsonData.get("renderMode"));
-        size = json.readValue(Vector2.class, jsonData.get("size"));
+        JsonValue size = jsonData.get("size");
+        if (size != null) {
+            this.size = json.readValue(Vector2.class, size);
+        }
 
         if(renderMode == null) renderMode = RenderMode.simple;
 

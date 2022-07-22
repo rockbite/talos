@@ -227,6 +227,10 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
             FileOpener.open(fileHandle.file());
             return;
+        } else if(fileHandle.extension().equals("ttp")) {
+            // TODO: add code for opening tile palette editor here
+//            SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
+//            sceneEditorAddon.Apps().openPaletteEditor();
         } else if(fileHandle.extension().equals("tw")) {
             SceneEditorAddon.get().openApp(new TweenEditor(fileHandle), AEditorApp.AppOpenStrategy.BOTTOM_TAB);
             return;

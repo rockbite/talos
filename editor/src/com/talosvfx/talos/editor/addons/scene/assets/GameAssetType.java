@@ -6,14 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.AtlasMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.PrefabMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
 
 public enum GameAssetType {
 	SPRITE(new String[]{"png", "jpg", "jpeg"}, true),
@@ -25,7 +18,8 @@ public enum GameAssetType {
 	SCRIPT(new String[]{"ts", "js"}, true),
 	TWEEN(new String[]{"tw"}, true),
 	PREFAB(new String[]{"prefab"}, true),
-	DIRECTORY(new String[]{}, false);
+	DIRECTORY(new String[]{}, false),
+	TILE_PALETTE(new String[]{"ttp"}, true);
 
 	private ObjectSet<String> extensions;
 	private boolean isRootGameAsset;
@@ -74,6 +68,8 @@ public enum GameAssetType {
 			return DirectoryMetadata.class;
 		case SCRIPT:
 			return ScriptMetadata.class;
+		case TILE_PALETTE:
+			return PaletteMetadata.class;
 		case VFX_OUTPUT:
 		case TWEEN:
 		case SOUND:
