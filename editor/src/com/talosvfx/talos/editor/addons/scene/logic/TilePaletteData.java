@@ -41,34 +41,27 @@ public class TilePaletteData implements Json.Serializable{
     public void read(Json json, JsonValue jsonData) {
         JsonValue references = jsonData.get("references");
         for (JsonValue reference : references) {
-            String identifier = reference.getString("gameIdentifier");
-            JsonValue type1 = reference.get("type");
-            GameAssetType type = json.readValue(GameAssetType.class, type1);
+            GameAsset<Object> assetForIdentifier;
+            float[] position;
 
-            GameAsset<Object> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+            String identifier = reference.getString("gameIdentifier");
+            JsonValue typeVal = reference.get("type");
+            GameAssetType type = json.readValue(GameAssetType.class, typeVal);
+            assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+
+            JsonValue posVal = reference.get("position");
+            float x = posVal.get(0).asFloat();
+            float y = posVal.get(1).asFloat();
+            position = new float[]{x, y};
+
             UUID uuid = assetForIdentifier.getRootRawAsset().metaData.uuid;
             if (assetForIdentifier == null) {
                 System.out.println(type + " with identifier " + identifier + " is not found.");
             } else {
                 // TODO: add type restrictions to references' type, e. g. you cannot have palette reference inside of a palette
                 this.references.put(uuid, assetForIdentifier);
+                this.positions.put(uuid, position);
             }
         }
     }
-
-//    public static void main(String[] args) {
-//        TilePaletteData paletteData = new TilePaletteData();
-//        paletteData.references = new Map<>();
-//        for (int i = 0; i < 10; i++) {
-//            GameAsset<Object> garbage = new GameAsset<>("garbage"+i, GameAssetType.TILE_PALETTE);
-//            RawAsset rawAsset = new RawAsset(null);
-//            rawAsset.metaData = new PaletteMetadata();
-//            garbage.dependentRawAssets.add(rawAsset);
-//            paletteData.references.add(garbage);
-//        }
-//        Json json = new Json();
-//        json.setOutputType(JsonWriter.OutputType.json);
-//        String jsonString = json.prettyPrint(paletteData);
-//        System.out.println(jsonString);
-//    }
 }
