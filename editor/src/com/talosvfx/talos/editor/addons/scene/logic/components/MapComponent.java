@@ -7,6 +7,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.TalosLayerPropertiesWidget;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 import java.util.function.Supplier;
 
@@ -14,6 +16,7 @@ public class MapComponent extends AComponent {
 
 
     private Array<TalosLayer> layers = new Array<>();
+    private transient TalosLayer selectedLayer;
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -59,7 +62,29 @@ public class MapComponent extends AComponent {
             }
         });
 
+        TalosLayerPropertiesWidget talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
+            @Override
+            public TalosLayer get () {
+                return selectedLayer;
+            }
+        }, new PropertyWidget.ValueChanged<TalosLayer>() {
+            @Override
+            public void report (TalosLayer value) {
+            }
+        });
+        itemListWidget.list.addItemListener(new FilteredTree.ItemListener<TalosLayer>() {
+            @Override
+            public void chosen (FilteredTree.Node<TalosLayer> node) {
+                super.chosen(node);
+                selectedLayer = node.getObject();
+                talosLayerPropertiesWidget.updateWidget(node.getObject());
+                talosLayerPropertiesWidget.toggleHide(false);
+            }
+        });
+
         properties.add(itemListWidget);
+        properties.add(talosLayerPropertiesWidget);
+
 
         return properties;
     }

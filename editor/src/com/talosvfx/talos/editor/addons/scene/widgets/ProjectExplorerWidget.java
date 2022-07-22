@@ -78,7 +78,7 @@ public class ProjectExplorerWidget extends Table {
             }
         };
 
-        directoryTree.setItemListener(new FilteredTree.ItemListener<Object>() {
+        directoryTree.addItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void selected (FilteredTree.Node node) {
                 directoryViewWidget.setDirectory((String) node.getObject());

@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
     private DynamicItemListInteraction<T> interaction;
-    private FilteredTree<T> list;
+    public FilteredTree<T> list;
 
 
     public interface DynamicItemListInteraction<T> {
@@ -62,7 +62,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         list = new FilteredTree<>(skin, "modern");
         list.draggable = true;
 
-        list.setItemListener(new FilteredTree.ItemListener<T>() {
+        list.addItemListener(new FilteredTree.ItemListener<T>() {
             @Override
             public void chosen (FilteredTree.Node<T> node) {
                 list.getSelection().clear();

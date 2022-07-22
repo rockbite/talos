@@ -95,7 +95,7 @@ public class TemplateListPopup extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
             public void chosen(FilteredTree.Node node) {
                 if(node.children.size == 0) {

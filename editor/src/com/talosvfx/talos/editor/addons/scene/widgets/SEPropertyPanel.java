@@ -123,7 +123,7 @@ public class SEPropertyPanel extends PropertyPanel{
                 }
             };
 
-            tree.setItemListener(new FilteredTree.ItemListener() {
+            tree.addItemListener(new FilteredTree.ItemListener() {
                 @Override
                 public void chosen(FilteredTree.Node node) {
 

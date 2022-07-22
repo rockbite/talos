@@ -11,24 +11,22 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 public class TalosLayer implements Json.Serializable {
 
 
-
-	enum LayerType {
-		STATIC,
-		DYNAMIC_ENTITY
-	}
-
 	private String name;
 	private LayerType type;
 
 	private int mapWidth = 100;
 	private int mapHeight = 100;
 
+	private int tileSizeX = 1;
+	private int tileSizeY = 1;
+
+
 	//Layer dependent info, don't use poly to keep it simple
 
 	//One is a 2d array, one is a bag of entities
 
 	IntMap<IntMap<StaticTile>> staticTiles = new IntMap<IntMap<StaticTile>>();
-	Array<GameObject> entities = new Array<>();
+	Array<GameObject> rootEntities = new Array<>();
 
 
 	protected TalosLayer () {}
@@ -60,19 +58,32 @@ public class TalosLayer implements Json.Serializable {
 	}
 
 	private void serializeForDynamic (Json json) {
-
+		json.writeArrayStart("entities");
+		for (GameObject rootEntity : rootEntities) {
+			json.writeValue(rootEntity);
+		}
+		json.writeArrayEnd();
 	}
 	private void deserializeForDynamic (Json json, JsonValue jsonData) {
-
+		JsonValue entities = jsonData.get("entities");
+		for (JsonValue entity : entities) {
+			GameObject object = json.readValue(GameObject.class, entity);
+			this.rootEntities.add(object);
+		}
 	}
 
 	private void serializeForStatic (Json json) {
 		json.writeValue("mapWidth", mapWidth);
 		json.writeValue("mapHeight", mapHeight);
+		json.writeValue("tileSizeX", tileSizeX);
+		json.writeValue("tileSizeY", tileSizeY);
 	}
 
 	private void deserializeForStatic (Json json, JsonValue jsonData) {
-
+		this.mapWidth = jsonData.getInt("mapWidth", 100);
+		this.mapHeight = jsonData.getInt("mapHeight", 100);
+		this.tileSizeX = jsonData.getInt("tileSizeX", 1);
+		this.tileSizeY = jsonData.getInt("tileSizeY", 1);
 	}
 	@Override
 	public void read (Json json, JsonValue jsonData) {
@@ -94,5 +105,9 @@ public class TalosLayer implements Json.Serializable {
 	@Override
 	public String toString () {
 		return name + " - " + type.toString();
+	}
+
+	public LayerType getType () {
+		return type;
 	}
 }

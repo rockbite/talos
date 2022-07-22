@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -28,6 +30,25 @@ public abstract class PropertyWidget<T> extends Table {
 	private ValueChanged<T> valueChanged;
 
 	private boolean hasName = true;
+
+
+	public void toggleHide (boolean hidden) {
+		//Check if we are in a cell
+		if (getParent() instanceof Table) {
+			Cell<PropertyWidget<T>> cell = ((Table)getParent()).getCell(this);
+			if (cell != null) {
+				if (hidden) {
+					setVisible(false);
+					cell.height(0);
+					((Table)getParent()).invalidateHierarchy();
+				} else {
+					setVisible(true);
+					cell.height(Value.prefHeight);
+					((Table)getParent()).invalidateHierarchy();
+				}
+			}
+		}
+	}
 
 	public interface ValueChanged<T> {
 		void report(T value);
@@ -96,6 +117,7 @@ public abstract class PropertyWidget<T> extends Table {
 	}
 
 	public void valueChanged(T value) {
+		fire(new ChangeListener.ChangeEvent());
 		valueChanged.report(value);
 	}
 
