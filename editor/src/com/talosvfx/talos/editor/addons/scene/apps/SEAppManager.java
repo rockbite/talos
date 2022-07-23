@@ -39,7 +39,7 @@ public class SEAppManager {
                     return editorApp.getContent();
                 }
             };
-            editorApp.addListener(new AEditorApp.AppListener() {
+            editorApp.addAppListener(new AEditorApp.AppListener() {
                 @Override
                 public void closeRequested() {
                     newTab.removeFromTabPane();
@@ -50,7 +50,7 @@ public class SEAppManager {
         } else if(strategy == AEditorApp.AppOpenStrategy.WINDOW) {
             AppWindow window = new AppWindow(editorApp);
 
-            editorApp.addListener(new AEditorApp.AppListener() {
+            editorApp.addAppListener(new AEditorApp.AppListener() {
                 @Override
                 public void closeRequested() {
                     window.hide();

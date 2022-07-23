@@ -1,9 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.TalosMain;
 
 public abstract class AEditorApp<T> {
 
@@ -44,7 +41,7 @@ public abstract class AEditorApp<T> {
         return content;
     }
 
-    public void addListener(AppListener listener) {
+    public void addAppListener(AppListener listener) {
         this.listener = listener;
     }
 }
