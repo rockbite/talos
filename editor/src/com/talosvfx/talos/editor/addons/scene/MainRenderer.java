@@ -131,11 +131,11 @@ public class MainRenderer implements Notifications.Observer {
         Vector2 renderPosition = vec;
 
         batch.draw(AssetRepository.getInstance().brokenTextureRegion,
-            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
-            0.5f, 0.5f,
-            1f, 1f,
-            transformComponent.scale.x, transformComponent.scale.y,
-            transformComponent.rotation);
+                renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                0.5f, 0.5f,
+                1f, 1f,
+                transformComponent.scale.x, transformComponent.scale.y,
+                transformComponent.rotation);
     }
 
     private void renderSpine (Batch batch, GameObject gameObject) {
@@ -147,6 +147,8 @@ public class MainRenderer implements Notifications.Observer {
         Vector2 renderPosition = vec;
 
         spineRendererComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
+        spineRendererComponent.skeleton.setScale(transformComponent.scale.x, transformComponent.scale.y);
+        spineRendererComponent.skeleton.setScale(0.1f, 0.1f);
         spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
         spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         spineRendererComponent.skeleton.updateWorldTransform();
@@ -186,42 +188,45 @@ public class MainRenderer implements Notifications.Observer {
             if(textureRegion != null) {
                 batch.setColor(spriteRenderer.color);
 
+                final float width = spriteRenderer.size.x;
+                final float height = spriteRenderer.size.y;
+
                 if(metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
                     Texture texture = textureRegion.getTexture(); // todo: pelase fix me, i am such a shit
                     NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
-                    float xSign = transformComponent.scale.x < 0 ? -1 : 1;
-                    float ySign = transformComponent.scale.y < 0 ? -1 : 1;
+                    float xSign = width < 0 ? -1 : 1;
+                    float ySign = height < 0 ? -1 : 1;
 
                     patch.draw(batch,
-                        renderPosition.x - 0.5f * transformComponent.scale.x * xSign, renderPosition.y - 0.5f * transformComponent.scale.y * ySign,
-                        0.5f * transformComponent.scale.x * xSign, 0.5f * transformComponent.scale.y * ySign,
-                        Math.abs(transformComponent.scale.x), Math.abs(transformComponent.scale.y),
-                        xSign, ySign,
-                        transformComponent.rotation);
+                            renderPosition.x - 0.5f * width * xSign, renderPosition.y - 0.5f * height * ySign,
+                            0.5f * width * xSign, 0.5f * height * ySign,
+                            Math.abs(width), Math.abs(height),
+                            xSign * transformComponent.scale.x, ySign * transformComponent.scale.y,
+                            transformComponent.rotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
                     textureRegion.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-                    float repeatX = transformComponent.scale.x / (textureRegion.getTexture().getWidth() / metadata.pixelsPerUnit);
-                    float repeatY = transformComponent.scale.y / (textureRegion.getTexture().getHeight() / metadata.pixelsPerUnit);
+                    float repeatX = width / (textureRegion.getTexture().getWidth() / metadata.pixelsPerUnit);
+                    float repeatY = height / (textureRegion.getTexture().getHeight() / metadata.pixelsPerUnit);
                     textureRegion.setRegion(0, 0, repeatX, repeatY);
 
                     batch.draw(textureRegion,
-                        renderPosition.x - 0.5f, renderPosition.y - 0.5f,
-                        0.5f, 0.5f,
-                        1f, 1f,
-                        transformComponent.scale.x, transformComponent.scale.y,
-                        transformComponent.rotation);
+                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                            0.5f, 0.5f,
+                            1f, 1f,
+                            width * transformComponent.scale.x, height * transformComponent.scale.y,
+                            transformComponent.rotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
                     textureRegion.getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
                     textureRegion.setRegion(0, 0, textureRegion.getTexture().getWidth(), textureRegion.getTexture().getHeight());
 
                     batch.draw(textureRegion,
-                        renderPosition.x - 0.5f, renderPosition.y - 0.5f,
-                        0.5f, 0.5f,
-                        1f, 1f,
-                        transformComponent.scale.x, transformComponent.scale.y,
-                        transformComponent.rotation);
+                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                            0.5f, 0.5f,
+                            1f, 1f,
+                            width * transformComponent.scale.x, height * transformComponent.scale.y,
+                            transformComponent.rotation);
                 }
 
                 batch.setColor(Color.WHITE);

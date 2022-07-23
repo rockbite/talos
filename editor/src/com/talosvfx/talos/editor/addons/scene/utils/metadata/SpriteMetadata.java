@@ -73,7 +73,18 @@ public class SpriteMetadata extends AMetadata {
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        borderData = json.readValue(int[].class, jsonData.get("borderData"));
+        JsonValue borderDataJsonValue = jsonData.get("borderData");
+        if (borderDataJsonValue != null) {
+            borderData = json.readValue(int[].class, borderDataJsonValue);
+        }
         pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", 100);
+    }
+
+    public boolean isSlice () {
+        for (int i = 0; i < 4; i++) {
+            boolean isNonZeroBorderData = borderData[i] != 0;
+            if (isNonZeroBorderData) return true;
+        }
+        return false;
     }
 }

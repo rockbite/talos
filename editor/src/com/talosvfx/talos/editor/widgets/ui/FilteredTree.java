@@ -78,8 +78,15 @@ public class FilteredTree<T> extends WidgetGroup {
         this.skin = skin;
     }
 
-    private ItemListener itemListener;
+    private Array<ItemListener<T>> itemListeners = new Array<>();
 
+    public void addItemListener (ItemListener<T> itemListener) {
+        itemListeners.add(itemListener);
+    }
+
+    public void removeItemListener (ItemListener<T> filterTreeListener) {
+        itemListeners.removeValue(filterTreeListener, true);
+    }
 
     public static abstract class ItemListener<T> {
         public void chosen(Node<T> node) {
@@ -105,9 +112,6 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    public void setItemListener(ItemListener itemListener) {
-        this.itemListener = itemListener;
-    }
 
     public FilteredTree (Skin skin, String styleName) {
         this(skin.get(styleName, TreeStyle.class));
@@ -140,9 +144,10 @@ public class FilteredTree<T> extends WidgetGroup {
 
         if(result.size == 0) return;
 
-        if(itemListener != null) {
+        for (ItemListener<T> itemListener : itemListeners) {
             itemListener.chosen(result.get(autoSelectionIndex));
         }
+
     }
 
     private void initialize () {
@@ -151,12 +156,12 @@ public class FilteredTree<T> extends WidgetGroup {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 Node<T> node = getNodeAt(y);
-                if(itemListener != null) {
-                    if(button == 1) {
-                        // this is right click
-                        itemListener.rightClick(node);
+                if (itemListeners.size > 0) {
+                    if (button == 1) {
+                        for (ItemListener<T> itemListener : itemListeners) {
+                            itemListener.rightClick(node);
+                        }
                         event.cancel();
-
                         return true;
                     }
                 }
@@ -196,17 +201,19 @@ public class FilteredTree<T> extends WidgetGroup {
                     return false;
                 if(selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
                     selection.remove(node);
-                    itemListener.deselect(node);
+                    for (ItemListener<T> itemListener : itemListeners) {
+                        itemListener.deselect(node);
+                    }
                     return false;
-                }else if (selection.contains(node)){
-                    if(itemListener != null) {
+                }else if (selection.contains(node)) {
+                    for (ItemListener<T> itemListener : itemListeners) {
                         itemListener.chosen(node);
                     }
                     return false;
                     //return false;
                 }
 
-                if(itemListener != null) {
+                for (ItemListener<T> itemListener : itemListeners) {
                     itemListener.chosen(node);
                 }
                 if (!selection.isEmpty())
@@ -217,14 +224,15 @@ public class FilteredTree<T> extends WidgetGroup {
 
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
-                if(itemListener != null) {
-                    if (keycode == Input.Keys.DEL && false) {//todo removed this feature, editing text messes this up
-                        if(!selection.isEmpty()) {
-                            Array<FilteredTree.Node> nodes = new Array<>();
-                            for(Object nodeObject: selection) {
-                                FilteredTree.Node node = (FilteredTree.Node) nodeObject;
-                                nodes.add(node);
-                            }
+
+                if (keycode == Input.Keys.DEL && false) {//todo removed this feature, editing text messes this up
+                    if(!selection.isEmpty()) {
+                        Array<FilteredTree.Node<T>> nodes = new Array<>();
+                        for(Object nodeObject: selection) {
+                            FilteredTree.Node<T> node = (FilteredTree.Node<T>) nodeObject;
+                            nodes.add(node);
+                        }
+                        for (ItemListener<T> itemListener : itemListeners) {
                             itemListener.delete(nodes);
                         }
                     }
@@ -455,7 +463,7 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
-        if(itemListener != null) {
+        for (ItemListener<T> itemListener : itemListeners) {
             itemListener.onNodeMove(parentToMoveTo, childThatHasMoved, indexInParent, indexOfPayloadInPayloadBefore);
         }
     }
@@ -615,8 +623,9 @@ public class FilteredTree<T> extends WidgetGroup {
         selection.add(node);
         if(node.parent != null) node.parent.setExpanded(true);
 
-        if(itemListener != null) {
+        for (ItemListener<T> itemListener : itemListeners) {
             itemListener.selected(node);
+
         }
     }
 

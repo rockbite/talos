@@ -55,7 +55,12 @@
         </component>
         <component className="SpriteRendererComponent">
             <gizmos>
-                <gizmo className="SmartTransformGizmo"></gizmo>
+                <gizmo className="SpriteTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="MapComponent">
+            <gizmos>
+                <gizmo className="MapGizmo"></gizmo>
             </gizmos>
         </component>
         <component className="ParticleComponent">

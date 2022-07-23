@@ -26,8 +26,10 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -540,6 +542,8 @@ public class DirectoryViewWidget extends Table {
         private FileHandle fileHandle;
         private GameAsset<?> gameAsset;
 
+        private GameObject basicGameObject;
+
         public ItemView() {
             build();
         }
@@ -591,14 +595,14 @@ public class DirectoryViewWidget extends Table {
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
-                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-                    Texture texture = new Texture(fileHandle);
-                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-                    icon.setDrawable(drawable);
-                    icon.setScaling(Scaling.fit);
-                }
+//                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+//                String extension = fileHandle.extension();
+//                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+//                    Texture texture = new Texture(fileHandle);
+//                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+//                    icon.setDrawable(drawable);
+//                    icon.setScaling(Scaling.fit);
+//                }
             }
 
             this.fileHandle = fileHandle;
@@ -616,6 +620,35 @@ public class DirectoryViewWidget extends Table {
                     image.setColor(Color.RED);
                 } else {
                     image.setColor(Color.GREEN);
+
+                    //Game asset is legit, lets try to make one
+                    GameObject parent = new GameObject();
+                    parent.addComponent(new TransformComponent());
+                    basicGameObject = parent;
+
+                    AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                    boolean success = AssetImporter.createAssetInstance(assetForPath, parent);
+                    if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
+                        success = false;
+                    }
+                    AssetImporter.fromDirectoryView = false;
+
+
+                    if (success) {
+
+                        //Game asset is legit, lets try to make one
+                        GameObject copy = new GameObject();
+                        copy.addComponent(new TransformComponent());
+
+                        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                        AssetImporter.createAssetInstance(assetForPath, copy);
+                        AssetImporter.fromDirectoryView = false;
+
+
+                        GameObjectActor gameObjectActor = new GameObjectActor(SceneEditorWorkspace.getInstance().getUISceneRenderer(), basicGameObject, copy, true);
+                        gameObjectActor.setFillParent(true);
+                        iconContainer.addActor(gameObjectActor);
+                    }
                 }
             }
         }
