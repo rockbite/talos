@@ -19,16 +19,7 @@ public class TweenNode extends AbstractTweenNode {
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
 
-        ButtonWidget addToTimelineButton = getButton("addToTimelineButton");
-
-        addToTimelineButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                TweenStage tweenStage = (TweenStage) nodeBoard.getNodeStage();
-                tweenStage.tweenEditor.animationTimeline.addTrack(TweenNode.this);
-            }
-        });
-
+        // add some additional widget logic here, if ay
     }
 
     public String getTweenTitle() {

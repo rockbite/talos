@@ -45,7 +45,9 @@ public class TweenEditor extends AEditorApp<FileHandle> {
             Json json = new Json();
             JsonReader jsonReader = new JsonReader();
             tweenStage.read(json, jsonReader.parse(targetFileHandle));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         content.add(tweenStage.getContainer()).grow();
 
