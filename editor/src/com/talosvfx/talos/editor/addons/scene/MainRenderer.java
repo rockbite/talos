@@ -17,7 +17,6 @@ import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -29,7 +28,10 @@ import java.util.Comparator;
 
 public class MainRenderer implements Notifications.Observer {
 
-    private final Comparator<GameObject> layerComparator;
+    private final Comparator<GameObject> layerAndDrawOrderComparator;
+
+    private  Comparator<GameObject> activeSorter;
+
     private TransformComponent transformComponent = new TransformComponent();
     private Vector2 vec = new Vector2();
     private Vector2[] points = new Vector2[4];
@@ -60,7 +62,7 @@ public class MainRenderer implements Notifications.Observer {
         talosRenderer = new SpriteBatchParticleRenderer();
         spineRenderer = new SkeletonRenderer();
 
-        layerComparator = new Comparator<GameObject>() {
+        layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
             public int compare (GameObject o1, GameObject o2) {
 
@@ -89,6 +91,12 @@ public class MainRenderer implements Notifications.Observer {
                 return 0;
             }
         };
+
+        activeSorter = layerAndDrawOrderComparator;
+    }
+
+    public void setActiveSorter (Comparator<GameObject> customSorter) {
+        this.activeSorter = customSorter;
     }
 
     // todo: do fancier logic later
@@ -268,7 +276,7 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     private void sort (Array<GameObject> list) {
-        list.sort(layerComparator);
+        list.sort(activeSorter);
     }
 
     private TransformComponent getWorldTransform(GameObject gameObject) {
