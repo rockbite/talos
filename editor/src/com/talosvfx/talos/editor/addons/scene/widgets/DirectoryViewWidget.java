@@ -595,14 +595,14 @@ public class DirectoryViewWidget extends Table {
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
-//                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-//                String extension = fileHandle.extension();
-//                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-//                    Texture texture = new Texture(fileHandle);
-//                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-//                    icon.setDrawable(drawable);
-//                    icon.setScaling(Scaling.fit);
-//                }
+                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+                String extension = fileHandle.extension();
+                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+                    Texture texture = new Texture(fileHandle);
+                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+                    icon.setDrawable(drawable);
+                    icon.setScaling(Scaling.fit);
+                }
             }
 
             this.fileHandle = fileHandle;
@@ -647,7 +647,7 @@ public class DirectoryViewWidget extends Table {
 
                         GameObjectActor gameObjectActor = new GameObjectActor(SceneEditorWorkspace.getInstance().getUISceneRenderer(), basicGameObject, copy, true);
                         gameObjectActor.setFillParent(true);
-                        iconContainer.addActor(gameObjectActor);
+//                        iconContainer.addActor(gameObjectActor);
                     }
                 }
             }
