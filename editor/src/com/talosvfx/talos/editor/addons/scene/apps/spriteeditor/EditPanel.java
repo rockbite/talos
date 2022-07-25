@@ -19,6 +19,9 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class EditPanel extends Table {
+    public static final float WIDTH = 370.0f;
+    public static final float HEIGHT = 370.0f;
+
     public static final int LEFT = 0b1;
     public static final int RIGHT = 0b10;
     public static final int TOP = 0b100;
@@ -309,8 +312,8 @@ public class EditPanel extends Table {
         this.texture = texture;
         this.image = new Image(texture);
 
-        float zoomX = getWidth() / texture.getWidth();
-        float zoomY = getHeight() / texture.getHeight();
+        float zoomX = WIDTH / texture.getWidth();
+        float zoomY = HEIGHT / texture.getHeight();
         zoom = Math.min(zoomX, zoomY);
         float longestSide = Math.max(texture.getWidth(), texture.getHeight());
         offset.set(
