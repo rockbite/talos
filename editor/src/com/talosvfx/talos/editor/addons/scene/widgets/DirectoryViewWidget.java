@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -644,8 +646,9 @@ public class DirectoryViewWidget extends Table {
                         AssetImporter.createAssetInstance(assetForPath, copy);
                         AssetImporter.fromDirectoryView = false;
 
-
-                        GameObjectActor gameObjectActor = new GameObjectActor(SceneEditorWorkspace.getInstance().getUISceneRenderer(), basicGameObject, copy, true);
+                        MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
+                        uiSceneRenderer.setCamera((OrthographicCamera)getStage().getCamera());
+                        GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
                         gameObjectActor.setFillParent(true);
 //                        iconContainer.addActor(gameObjectActor);
                     }

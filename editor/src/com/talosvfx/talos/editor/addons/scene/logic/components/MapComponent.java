@@ -1,26 +1,38 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.maps.MapType;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.TalosLayerPropertiesWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 import java.util.function.Supplier;
 
-public class MapComponent extends AComponent {
+public class MapComponent extends RendererComponent {
 
 
     private Array<TalosLayer> layers = new Array<>();
+    private MapType mapType = MapType.ORTHOGRAPHIC_TOPDOWN;
     public transient TalosLayer selectedLayer;
+    public transient MainRenderer mainRenderer = new MainRenderer();
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
+
+
+
 
 
         Supplier<TalosLayer> supplier = new Supplier<TalosLayer>() {
@@ -82,11 +94,32 @@ public class MapComponent extends AComponent {
             }
         });
 
+        properties.add(WidgetFactory.generate(this, "mapType", "Type"));
         properties.add(itemListWidget);
         properties.add(talosLayerPropertiesWidget);
 
 
         return properties;
+    }
+
+    @Override
+    public void minMaxBounds (GameObject parentEntity, BoundingBox rectangle) {
+        //todo
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+
+        json.writeValue("layers", layers);
+        json.writeValue("mapType", mapType);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        layers = json.readValue(Array.class, TalosLayer.class, jsonData.get("layers"));
+        mapType = json.readValue(MapType.class, jsonData.get("mapType"));
     }
 
     @Override
@@ -102,5 +135,13 @@ public class MapComponent extends AComponent {
     @Override
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
+    }
+
+    public Array<TalosLayer> getLayers () {
+        return layers;
+    }
+
+    public MapType getMapType () {
+        return mapType;
     }
 }

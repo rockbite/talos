@@ -741,6 +741,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         batch.begin();
 
+        renderer.setCamera(camera);
         drawMainRenderer(batch, parentAlpha);
 
         for(int i = 0; i < gizmoList.size; i++) {

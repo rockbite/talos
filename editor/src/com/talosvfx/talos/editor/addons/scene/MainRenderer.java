@@ -1,7 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -16,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -50,7 +53,10 @@ public class MainRenderer implements Notifications.Observer {
     private SpriteBatchParticleRenderer talosRenderer;
     private SkeletonRenderer spineRenderer;
 
+    private TalosMapRenderer mapRenderer;
+
     private TextureRegion textureRegion = new TextureRegion();
+    private OrthographicCamera camera;
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -61,6 +67,7 @@ public class MainRenderer implements Notifications.Observer {
 
         talosRenderer = new SpriteBatchParticleRenderer();
         spineRenderer = new SkeletonRenderer();
+        mapRenderer = new TalosMapRenderer();
 
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
@@ -101,6 +108,8 @@ public class MainRenderer implements Notifications.Observer {
 
     // todo: do fancier logic later
     public void render (Batch batch, GameObject root) {
+        mapRenderer.setCamera(this.camera);
+
         updateLayerOrderLookup(root);
         list.clear();
         list = root.getChildrenByComponent(RendererComponent.class, list);
@@ -128,9 +137,13 @@ public class MainRenderer implements Notifications.Observer {
                 renderParticle(batch, gameObject);
             } else if(gameObject.hasComponent(SpineRendererComponent.class)) {
                 renderSpine(batch, gameObject);
+            } else if(gameObject.hasComponent(MapComponent.class)) {
+                renderMap(batch, gameObject);
             }
         }
     }
+
+
 
     private void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {
 
@@ -243,6 +256,13 @@ public class MainRenderer implements Notifications.Observer {
 
     }
 
+    private void renderMap (Batch batch, GameObject gameObject) {
+        //We render the map with its own main renderer, its own sorter
+        MapComponent map = gameObject.getComponent(MapComponent.class);
+
+        mapRenderer.render(this, batch, gameObject, map);
+    }
+
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
         if(false && patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(texture);
@@ -315,5 +335,13 @@ public class MainRenderer implements Notifications.Observer {
         if(event.getComponent() instanceof ParticleComponent) {
             particleCache.remove((ParticleComponent)event.getComponent());
         }
+    }
+
+    public void setCamera (OrthographicCamera camera) {
+        this.camera = camera;
+    }
+
+    public OrthographicCamera getCamera () {
+        return camera;
     }
 }
