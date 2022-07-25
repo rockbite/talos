@@ -30,11 +30,11 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
     private Texture texture;
     private NinePatchDrawable patchDrawable;
 
-    public SpriteEditor(SpriteMetadata object) {
-        super(object);
+    public SpriteEditor(SpriteMetadata metadata) {
+        super(metadata);
         identifier = object.uuid  + "";
         initContent();
-        show(object);
+        show(metadata);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
             }
         });
 
-        rightSide.add(ninePatchPreview).size(175, 175).space(20).right();
+        rightSide.add(ninePatchPreview).size(NinePatchPreview.WIDTH, NinePatchPreview.HEIGHT).space(20).right();
         rightSide.row();
         rightSide.add(numberControls).expand().right();
 
@@ -99,7 +99,7 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
         rightSide.add(saveSpriteMetaData).size(60, 40).bottom().right().padTop(10);
 
         content.pad(15);
-        content.add(editPanel).size(370).space(40);
+        content.add(editPanel).width(EditPanel.WIDTH).height(EditPanel.HEIGHT).space(40);
         content.add(rightSide).size(300, 370);
 
         leftProperty.setListener(new NumberPanel.NumberPanelListener() {
@@ -249,7 +249,6 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
     public AEditorApp show(SpriteMetadata metadata) {
 
         // get ninepatch
-
         FileHandle file = metadata.link.handle;
         texture = new Texture(file);
         // clamp metadata values in case they are invalid
@@ -303,12 +302,15 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
     }
 
     private static class NinePatchPreview extends Table {
+        public static final float WIDTH = 175.0f;
+        public static final float HEIGHT = 175.0f;
+
         public void show (NinePatchDrawable patchDrawable) {
             clearChildren();
             Image vertical = new Image(patchDrawable) {
                 {
-                    float w = NinePatchPreview.this.getWidth() / 4f - 5;
-                    float h = 3 * NinePatchPreview.this.getHeight() / 4f;
+                    float w = NinePatchPreview.WIDTH / 4f - 5;
+                    float h = 3 * NinePatchPreview.HEIGHT / 4f;
                     float ratio = h / w;
                     setSize(getWidth(), getHeight() * ratio);
 
@@ -316,13 +318,13 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                     float scaleY = h / getHeight();
                     float scale = Math.min(scaleX, scaleY);
                     setScale(scale, scale);
-                    setPosition(0, NinePatchPreview.this.getWidth() - getHeight() * getScaleY());
+                    setPosition(0, NinePatchPreview.WIDTH - getHeight() * getScaleY());
                 }
             };
             Image square = new Image(patchDrawable) {
                 {
-                    float w = 3 * NinePatchPreview.this.getWidth() / 4f;
-                    float h = 3 * NinePatchPreview.this.getHeight() / 4f;
+                    float w = 3 * NinePatchPreview.WIDTH / 4f;
+                    float h = 3 * NinePatchPreview.HEIGHT / 4f;
                     float ratio = w / h;
                     setSize(getWidth() * ratio, getHeight());
 
@@ -330,13 +332,13 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                     float scaleY = h / getHeight();
                     float scale = Math.min(scaleX, scaleY);
                     setScale(scale, scale);
-                    setPosition(NinePatchPreview.this.getWidth() - getWidth() * getScaleX(), NinePatchPreview.this.getHeight() - getHeight() * getScaleY());
+                    setPosition(NinePatchPreview.WIDTH - getWidth() * getScaleX(), NinePatchPreview.HEIGHT - getHeight() * getScaleY());
                 }
             };
             Image horizontal = new Image(patchDrawable) {
                 {
-                    float w = NinePatchPreview.this.getWidth();
-                    float h = NinePatchPreview.this.getHeight() / 4f - 5;
+                    float w = NinePatchPreview.WIDTH;
+                    float h = NinePatchPreview.HEIGHT / 4f - 5;
                     float ratio = w / h;
                     setSize(getWidth() * ratio, getHeight());
 
