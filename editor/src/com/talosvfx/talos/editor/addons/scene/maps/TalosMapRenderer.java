@@ -83,7 +83,7 @@ public class TalosMapRenderer {
 
 					if (staticTiles.containsKey(i)) {
 						IntMap<StaticTile> entries = staticTiles.get(i);
-						for (int j = sY; j < sY - viewportHeight; j -= tileSizeY) {
+						for (int j = sY; j > sY - viewportHeight; j -= tileSizeY) {
 							if (j < 0 || j >= mapHeight) {
 								continue;
 							}
