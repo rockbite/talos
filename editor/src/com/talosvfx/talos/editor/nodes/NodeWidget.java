@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.nodes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,6 +19,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
@@ -52,6 +54,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     protected Table widgetContainer = new Table();
     protected Table headerTable;
     private String nodeName;
+    private ObjectMap<String, Table> containerMap = new ObjectMap<>();
 
     public void graphUpdated () {
 
@@ -194,7 +197,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     @Override
     public void invalidateHierarchy() {
         super.invalidateHierarchy();
-        pack();
+        setSize(getPrefWidth(), getPrefHeight());
     }
 
     public void setConfig(XmlReader.Element config) {
@@ -416,6 +419,15 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     protected void addRow(XmlReader.Element row, int index, int count, boolean isGroup, Table customContainer, boolean skipListener) {
         String tagName = row.getName();
+
+        if(tagName.equals("container")) {
+            Table container = new Table();
+            containerMap.put(row.getAttribute("name"), container);
+            customContainer.add(container).padTop(10).padBottom(1).growX().row();
+
+            return;
+        }
+
         Class<? extends AbstractWidget> clazz = widgetClassMap.get(tagName);
 
         if (clazz != null) {
@@ -550,5 +562,9 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     public Actor getOutputSlotActor(String slot) {
         return outputSlotMap.get(slot);
+    }
+
+    public Table getCustomContainer(String name) {
+        return containerMap.get(name);
     }
 }

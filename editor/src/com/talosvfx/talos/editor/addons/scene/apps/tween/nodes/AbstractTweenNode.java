@@ -74,13 +74,16 @@ public abstract class AbstractTweenNode extends NodeWidget {
     protected void sendSignal(String portName, String command, Object[] payload) {
         Array<Connection> connections = outputs.get(portName);
 
-        if (connections == null)
-            throw new GdxRuntimeException("Output port with name: '" + portName + "' + not found on this node, to send signal");
+        if (connections == null) {
+            return;
+        }
 
         for(Connection connection : connections) {
             String targetSlot = connection.targetSlot;
 
-            if (targetSlot == null) throw new GdxRuntimeException("Output port is not connected to any input");
+            if (targetSlot == null) {
+                return;
+            }
 
             AbstractTweenNode targetNode = (AbstractTweenNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
 

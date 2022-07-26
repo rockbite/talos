@@ -5,7 +5,8 @@ public class DelayNode extends AbstractGenericTweenNode {
     @Override
     protected void onSignalReceived(String command, Object[] payload) {
 
-        System.out.println("YATAAAAA I got signalz");
-
+        if(command.equals("execute")) {
+            runGenericTween();
+        }
     }
 }
