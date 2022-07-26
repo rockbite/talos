@@ -11,11 +11,13 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
@@ -224,9 +226,12 @@ public class AssetImporter {
             FileOpener.open(fileHandle.file());
             return;
         } else if(fileHandle.extension().equals("ttp")) {
-            // TODO: add code for opening tile palette editor here
-//            SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-//            sceneEditorAddon.Apps().openPaletteEditor();
+            GameAsset<TilePaletteData> paletteData = (GameAsset<TilePaletteData>) AssetRepository.getInstance().getAssetForPath(fileHandle, true);
+            if (paletteData != null) {
+                SceneEditorAddon.get().openApp(new PaletteEditor(paletteData), AEditorApp.AppOpenStrategy.WINDOW);
+            } else {
+                System.out.println("Palette Asset not located");
+            }
         } else if(fileHandle.extension().equals("tw")) {
             SceneEditorAddon.get().openApp(new TweenEditor(fileHandle), AEditorApp.AppOpenStrategy.BOTTOM_TAB);
             return;

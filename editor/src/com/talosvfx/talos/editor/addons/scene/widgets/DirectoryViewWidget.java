@@ -58,8 +58,11 @@ public class DirectoryViewWidget extends Table {
 
     private boolean preventDeselect = false;
 
+    private Array<DragAndDrop.Target> externalTargets;
+
     public DirectoryViewWidget() {
         build();
+        externalTargets = new Array<>();
     }
 
     private void build () {
@@ -299,6 +302,10 @@ public class DirectoryViewWidget extends Table {
         dragAndDrop.clear();
         clearChildren();
         items.clear();
+
+        for (DragAndDrop.Target externalTarget : externalTargets) {
+            dragAndDrop.addTarget(externalTarget);
+        }
 
         dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
             @Override
@@ -704,6 +711,16 @@ public class DirectoryViewWidget extends Table {
                 Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(holder));
             }
         }
+    }
+
+    public void registerTarget(DragAndDrop.Target externalTarget) {
+        externalTargets.add(externalTarget);
+        dragAndDrop.addTarget(externalTarget);
+    }
+
+    public void unregisterTarget(DragAndDrop.Target externalTarget) {
+        externalTargets.removeValue(externalTarget, true);
+        dragAndDrop.removeTarget(externalTarget);
     }
 }
 
