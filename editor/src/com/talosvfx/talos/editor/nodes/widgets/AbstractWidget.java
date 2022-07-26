@@ -13,6 +13,9 @@ public abstract class AbstractWidget<T> extends Table {
     protected Table content;
     protected Table portContainer;
 
+    private boolean isInput;
+    private Table portBody;
+
     public AbstractWidget() {
         content = new Table();
         portContainer = new Table();
@@ -34,7 +37,9 @@ public abstract class AbstractWidget<T> extends Table {
     public Table addPort(boolean isInput) {
         portContainer.clearChildren();
 
-        Table portBody = new Table();
+        this.isInput = isInput;
+
+        portBody = new Table();
         Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.add(portBorder).growX().pad(-1f);
@@ -52,6 +57,18 @@ public abstract class AbstractWidget<T> extends Table {
         portBody.setY(getHeight()/2f - portBody.getHeight()/2f);
 
         return portBody;
+    }
+
+    @Override
+    public void act(float delta) {
+        if(portBody != null) {
+            if (isInput) {
+                portBody.setX(-24);
+            } else {
+                portBody.setX(getWidth() + 9);
+            }
+            portBody.setY(getHeight() / 2f - portBody.getHeight() / 2f);
+        }
     }
 
     protected boolean fireChangedEvent() {

@@ -14,11 +14,13 @@
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "DelayNode" title = "Delay" keywords = "tween">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "StaggerNode" title = "Stagger" keywords = "tween">
