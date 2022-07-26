@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
@@ -135,6 +136,32 @@ public class AssetRepository {
 				createGameAsset(key, value);
 			}
 		}
+	}
+
+	public void reloadGameAssetForRawFile (RawAsset link) {
+		Array<GameAsset> gameAssetReferences = new Array<>();
+		gameAssetReferences.addAll(link.gameAssetReferences);
+
+		for (GameAsset gameAssetReference : gameAssetReferences) {
+			reloadGameAsset(gameAssetReference);
+		}
+	}
+
+	private void reloadGameAsset (GameAsset gameAssetReference) {
+		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
+		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
+
+		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
+		try {
+			GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rootRawAsset, false);
+			gameAssetReference.setResourcePayload(gameAsset.getResource());
+			gameAssetReference.setUpdated();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	static class TypeIdentifierPair {
@@ -318,7 +345,7 @@ public class AssetRepository {
 			shouldUpdate = true;
 		}
 
-		GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value);
+		GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value, true);
 
 
 		if (shouldUpdate) {
@@ -366,7 +393,7 @@ public class AssetRepository {
 		fileHandleGameAssetObjectMap.put(key, gameAsset);
 	}
 
-	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value) {
+	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
 		if (!assetTypeFromExtension.isRootGameAsset()) {
 			throw new GdxRuntimeException("Trying to load a game asset from a non root asset");
 		}
@@ -381,9 +408,11 @@ public class AssetRepository {
 				gameAssetOut = textureGameAsset;
 
 				textureGameAsset.setResourcePayload(new Texture(value.handle));
-				value.gameAssetReferences.add(textureGameAsset);
 
-				textureGameAsset.dependentRawAssets.add(value);
+				if (createLinks) {
+					value.gameAssetReferences.add(textureGameAsset);
+					textureGameAsset.dependentRawAssets.add(value);
+				}
 
 				break;
 			case ATLAS:
@@ -394,20 +423,24 @@ public class AssetRepository {
 				TextureAtlas atlas = new TextureAtlas(textureAtlasData);
 				textureAtlasGameAsset.setResourcePayload(atlas);
 
-				value.gameAssetReferences.add(textureAtlasGameAsset);
+				if (createLinks) {
+					value.gameAssetReferences.add(textureAtlasGameAsset);
+					textureAtlasGameAsset.dependentRawAssets.add(value);
 
-				textureAtlasGameAsset.dependentRawAssets.add(value);
+					for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
+						FileHandle textureFile = page.textureFile;
+						if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+							throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+						}
 
-				for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
-					FileHandle textureFile = page.textureFile;
-					if (!fileHandleRawAssetMap.containsKey(textureFile)) {
-						throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+						RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+
+						rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
+						textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
 					}
-
-					RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
-					rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
-					textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
 				}
+
+
 
 				break;
 
@@ -422,28 +455,35 @@ public class AssetRepository {
 				TextureAtlas.TextureAtlasData skeleAtlasData = new TextureAtlas.TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				TextureAtlas skeleAtlas = new TextureAtlas(skeleAtlasData);
 
-
 				if (atlasFile.exists()) {
 					SkeletonBinary skeletonBinary = new SkeletonBinary(skeleAtlas);
+
+					SpineMetadata metaData = (SpineMetadata)value.metaData;
+
+					skeletonBinary.setScale(1f/metaData.pixelsPerUnit);
+
 					SkeletonData skeletonData = skeletonBinary.readSkeletonData(value.handle);
 					skeletonDataGameAsset.setResourcePayload(skeletonData);
 
-					value.gameAssetReferences.add(skeletonDataGameAsset);
-					skeletonDataGameAsset.dependentRawAssets.add(value);
+					if (createLinks) {
+						value.gameAssetReferences.add(skeletonDataGameAsset);
+						skeletonDataGameAsset.dependentRawAssets.add(value);
 
-					RawAsset skeleAtlasRawAsset = fileHandleRawAssetMap.get(atlasFile);
-					skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
+						RawAsset skeleAtlasRawAsset = fileHandleRawAssetMap.get(atlasFile);
+						skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
 
-					for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
-						FileHandle textureFile = page.textureFile;
-						if (!fileHandleRawAssetMap.containsKey(textureFile)) {
-							throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+						for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
+							FileHandle textureFile = page.textureFile;
+							if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+								throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+							}
+
+							RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+							rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
+							skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 						}
-
-						RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
-						rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
-						skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 					}
+
 				}
 
 				break;
@@ -455,7 +495,9 @@ public class AssetRepository {
 
 				gameAssetOut = particleEffectDescriptorGameAsset;
 
-				particleEffectDescriptorGameAsset.dependentRawAssets.add(value);
+				if (createLinks) {
+					particleEffectDescriptorGameAsset.dependentRawAssets.add(value);
+				}
 
 				ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 				particleEffectDescriptor.setAssetProvider(new AssetProvider() {
@@ -466,8 +508,10 @@ public class AssetRepository {
 							GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
 							if (gameAsset != null) {
-								for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-									particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
+								if (createLinks) {
+									for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+										particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
+									}
 								}
 								return (T)new Sprite(gameAsset.getResource());
 							} else {
@@ -497,9 +541,11 @@ public class AssetRepository {
 				}
 
 				particleEffectDescriptorGameAsset.setResourcePayload(particleEffectDescriptor);
-				value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
 
-				particleEffectDescriptorGameAsset.dependentRawAssets.add(rawAssetPFile);
+				if (createLinks) {
+					value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
+					particleEffectDescriptorGameAsset.dependentRawAssets.add(rawAssetPFile);
+				}
 
 				break;
 			case VFX_OUTPUT:
@@ -510,17 +556,23 @@ public class AssetRepository {
 				gameAssetOut = scriptGameAsset;
 
 				scriptGameAsset.setResourcePayload("ScriptDummy");
-				value.gameAssetReferences.add(scriptGameAsset);
 
-				scriptGameAsset.dependentRawAssets.add(value);
+				if (createLinks) {
+					value.gameAssetReferences.add(scriptGameAsset);
+					scriptGameAsset.dependentRawAssets.add(value);
+				}
 
 				break;
 			case TWEEN:
 				GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 				gameAssetOut = tweenGameAsset;
 				tweenGameAsset.setResourcePayload("Dummy");
-				value.gameAssetReferences.add(tweenGameAsset);
-				tweenGameAsset.dependentRawAssets.add(value);
+
+				if (createLinks) {
+					value.gameAssetReferences.add(tweenGameAsset);
+					tweenGameAsset.dependentRawAssets.add(value);
+				}
+
 				break;
 			case PREFAB:
 				GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
@@ -529,9 +581,11 @@ public class AssetRepository {
 				Prefab prefab = Prefab.from(value.handle);
 
 				prefabGameAsset.setResourcePayload(prefab);
-				value.gameAssetReferences.add(prefabGameAsset);
 
-				prefabGameAsset.dependentRawAssets.add(value);
+				if (createLinks) {
+					value.gameAssetReferences.add(prefabGameAsset);
+					prefabGameAsset.dependentRawAssets.add(value);
+				}
 
 				break;
 			case TILE_PALETTE:
@@ -539,11 +593,13 @@ public class AssetRepository {
 				gameAssetOut = paletteGameAsset;
 
 				TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
-				value.gameAssetReferences.add(paletteGameAsset);
 
 				paletteGameAsset.setResourcePayload(paletteData);
 
-				paletteGameAsset.dependentRawAssets.add(value);
+				if (createLinks) {
+					value.gameAssetReferences.add(paletteGameAsset);
+					paletteGameAsset.dependentRawAssets.add(value);
+				}
 
 				break;
 			case DIRECTORY:

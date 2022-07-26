@@ -165,4 +165,12 @@ public class TalosLayer implements Json.Serializable {
 	public float getTileSizeY () {
 		return tileSizeY;
 	}
+
+	public Array<GameObject> getRootEntities () {
+		return rootEntities;
+	}
+
+	public IntMap<IntMap<StaticTile>> getStaticTiles () {
+		return staticTiles;
+	}
 }

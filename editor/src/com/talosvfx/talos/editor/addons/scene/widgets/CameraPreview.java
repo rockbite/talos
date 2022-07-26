@@ -110,6 +110,8 @@ public class CameraPreview extends Actor {
         GameObject rootGO = workspace.getRootGO();
         MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
 
+        renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
+        renderer.update(rootGO);
         renderer.render(polygonSpriteBatch, rootGO);
     }
 

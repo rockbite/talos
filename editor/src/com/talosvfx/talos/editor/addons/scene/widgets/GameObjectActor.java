@@ -30,6 +30,8 @@ public class GameObjectActor extends Table {
 		//we need to estimate the size of the object and try to fit it into the actors dimensions
 	}
 
+
+
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
@@ -59,6 +61,7 @@ public class GameObjectActor extends Table {
 			transform.position.set(getX(), getY());
 		}
 
+		uiRenderer.update(gameObject);
 		uiRenderer.render(batch, gameObject);
 	}
 }

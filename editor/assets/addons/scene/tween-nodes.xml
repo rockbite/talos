@@ -1,25 +1,27 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
     <category name="main" title="Main">
         <module name = "TweenNode" title = "Tween" keywords = "tween, system">
-            <value port="input" name="startSignal" type="vec3">play</value>
+            <value port="input" name="startSignal" type="signal">play</value>
             <inputText name="title" default="Tween">Title</inputText>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
-            <value port="output" name="startSignal" type="vec3">start</value>
+            <value port="output" name="startSignal" type="signal">start</value>
         </module>
         <module name = "MoveByNode" title = "Move By" keywords = "movement">
-            <value port="input" name="startSignal" type="vec3">start</value>
+            <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
-            <value port="output" name="onComplete" type="vec3">onComplete</value>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "DelayNode" title = "Delay" keywords = "tween">
-            <value port="input" name="startSignal" type="vec3">start</value>
+            <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
-            <value port="output" name="onComplete" type="vec3">onComplete</value>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "StaggerNode" title = "Stagger" keywords = "tween">
 
