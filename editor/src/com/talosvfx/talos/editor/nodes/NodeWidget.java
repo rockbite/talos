@@ -42,8 +42,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     protected ObjectMap<String, String> typeMap = new ObjectMap();
     protected ObjectMap<String, String> defaultsMap = new ObjectMap();
 
-    protected ObjectMap<String, Connection> inputs = new ObjectMap();
-    protected ObjectMap<String, Connection> outputs = new ObjectMap();
+    protected ObjectMap<String, Array<Connection>> inputs = new ObjectMap();
+    protected ObjectMap<String, Array<Connection>> outputs = new ObjectMap();
     private int id = 0;
     private int uniqueId = 0;
 
@@ -88,6 +88,15 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         public Connection(NodeWidget targetNode, String targetSlot) {
             this.targetNode = targetNode;
             this.targetSlot = targetSlot;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            Connection con = (Connection) obj;
+
+            if(con.targetSlot.equals(targetSlot) && con.targetNode == this.targetNode) return true;
+
+            return false;
         }
     }
 
@@ -364,18 +373,36 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     public void attachNodeToMyInput(NodeWidget node, String mySlot, String targetSlot) {
-        inputs.put(mySlot, new Connection(node, targetSlot));
+        Array<Connection> connections = inputs.get(mySlot);
+        if (connections == null) {
+            connections = new Array<>();
+            inputs.put(mySlot, connections);
+        }
+
+        Connection connection = new Connection(node, targetSlot);
+        if(!connections.contains(connection, false)) {
+            connections.add(connection);
+        }
     }
 
     public void attachNodeToMyOutput(NodeWidget node, String mySlot, String targetSlot) {
-        outputs.put(mySlot, new Connection(node, targetSlot));
+        Array<Connection> connections = outputs.get(mySlot);
+        if (connections == null) {
+            connections = new Array<>();
+            outputs.put(mySlot, connections);
+        }
+
+        Connection connection = new Connection(node, targetSlot);
+        if(!connections.contains(connection, false)) {
+            connections.add(connection);
+        }
     }
 
     public Array<String> getInputSlots () {
         return inputSlots;
     }
 
-    public ObjectMap<String, Connection> getInputs() {
+    public ObjectMap<String, Array<Connection>> getInputs() {
         return inputs;
     }
 
@@ -515,5 +542,13 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
             setX(0);
             setY(0);
         }
+    }
+
+    public Actor getInputSlotActor(String slot) {
+        return inputSlotMap.get(slot);
+    }
+
+    public Actor getOutputSlotActor(String slot) {
+        return outputSlotMap.get(slot);
     }
 }

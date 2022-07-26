@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -40,6 +41,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     Vector2 tmp2 = new Vector2();
     Vector2 prev = new Vector2();
 
+    public static Color curveColor = new Color(1, 1, 1, 0.4f);
+
     public int globalNodeCounter = 0;
     private ObjectIntMap<Class<? extends NodeWidget>> nodeCounter = new ObjectIntMap<>();
 
@@ -60,6 +63,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public Array<NodeGroup> groups = new Array<>();
     public Group groupContainer = new Group();
     public Group mainContainer = new Group();
+    private Color tmpColor = new Color();
 
     public void reset () {
         nodeCounter = new ObjectIntMap<>();
@@ -80,6 +84,26 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         public NodeWidget toNode;
         public String fromId;
         public String toId;
+
+        private Actor dataActor = null;
+
+        public void setHighlightActor(Actor tmpActor) {
+            dataActor = tmpActor;
+        }
+
+        public void unsetHighlightActor() {
+            dataActor = null;
+        }
+
+        public float getHighlight() {
+            if(dataActor == null) return -1;
+            return dataActor.getX();
+        }
+
+        public Color getHighlightColor() {
+            if(dataActor == null) return NodeBoard.curveColor;
+            return dataActor.getColor();
+        }
     }
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
@@ -140,11 +164,16 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             connection.toNode.getInputSlotPos(connection.toId, tmp);
             float toX = tmp.x;
             float toY = tmp.y;
-            drawCurve(x, y, toX, toY);
+
+            drawCurve(x, y, toX, toY, connection.getHighlight(), connection.getHighlightColor());
         }
     }
 
     private void drawCurve(float x, float y, float toX, float toY) {
+        drawCurve(x, y, toX, toY, -1, NodeBoard.curveColor);
+    }
+
+    private void drawCurve(float x, float y, float toX, float toY, float highlight, Color highlightColor) {
         float minOffset = 10f;
         float maxOffset = 150f;
 
@@ -164,9 +193,27 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         float resolution = 1f/20f;
 
         for(float i = 0; i < 1f; i+=resolution) {
+
+            float thickness = 2f;
+
+            if(highlight >= 0) {
+                float highlightDist = Math.abs(i - highlight);
+                float clamp = 0.2f;
+                float interpolationAlpha = MathUtils.clamp(highlightDist, 0, clamp) * (1f/clamp); // 0->1 value, where 0 is max highlight, 1 is default
+                tmpColor.a = MathUtils.lerp(highlightColor.a, NodeBoard.curveColor.a, interpolationAlpha);
+                tmpColor.r = MathUtils.lerp(highlightColor.r, NodeBoard.curveColor.r, interpolationAlpha);
+                tmpColor.g = MathUtils.lerp(highlightColor.g, NodeBoard.curveColor.g, interpolationAlpha);
+                tmpColor.b = MathUtils.lerp(highlightColor.b, NodeBoard.curveColor.b, interpolationAlpha);
+                thickness = 2f + (1f - interpolationAlpha) * 2f;
+
+                shapeRenderer.setColor(tmpColor);
+            } else {
+                shapeRenderer.setColor(NodeBoard.curveColor);
+            }
+
             bezier.valueAt(tmp, i);
             if(i > 0) {
-                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, 2f);
+                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, thickness);
             }
             prev.set(tmp);
         }
@@ -303,6 +350,17 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         if(activeCurve != null) {
             activeCurve.setTo(toX, toY);
         }
+    }
+
+    public NodeConnection findConnection(NodeWidget from, NodeWidget to, String slotForm, String slotTo) {
+        // a bit slow but...
+        for(NodeConnection connection : nodeConnections) {
+            if(connection.fromNode == from && connection.toNode == to && slotForm.equals(connection.fromId) && slotTo.equals(connection.toId)) {
+                return connection;
+            }
+        }
+
+        return null;
     }
 
     public NodeConnection addConnectionCurve(NodeWidget from, NodeWidget to, String slotForm, String slotTo) {
@@ -731,8 +789,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     private void collectNodesNodeAffects(Array<NodeWidget> nodeList, NodeWidget node) {
         nodeList.add(node);
 
-        for(NodeWidget.Connection connection: node.outputs.values()) {
-            collectNodesNodeAffects(nodeList, connection.targetNode);
+        for(Array<NodeWidget.Connection> connections: node.outputs.values()) {
+            for(NodeWidget.Connection connection : connections) {
+                collectNodesNodeAffects(nodeList, connection.targetNode);
+            }
         }
     }
 
