@@ -30,7 +30,7 @@
     pos -= 0.5;
     pos = normalize(pos);
 
-    float pixelAngle = (atan(pos.x, pos.y) + pi)/(2*pi);
+    float pixelAngle = (atan(pos.x, pos.y) + pi)/(2.0*pi);
 
     float ratio = step(alpha, pixelAngle);
 

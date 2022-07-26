@@ -204,7 +204,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 tmpColor.r = MathUtils.lerp(highlightColor.r, NodeBoard.curveColor.r, interpolationAlpha);
                 tmpColor.g = MathUtils.lerp(highlightColor.g, NodeBoard.curveColor.g, interpolationAlpha);
                 tmpColor.b = MathUtils.lerp(highlightColor.b, NodeBoard.curveColor.b, interpolationAlpha);
-                thickness = 2f + (1f - interpolationAlpha) * 2f;
+                thickness = 2f + (1f - interpolationAlpha) * 6f;
 
                 shapeRenderer.setColor(tmpColor);
             } else {
