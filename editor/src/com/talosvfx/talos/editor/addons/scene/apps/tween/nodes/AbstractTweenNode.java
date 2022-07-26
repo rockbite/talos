@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.nodes;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -8,7 +9,7 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public class AbstractTweenNode extends NodeWidget {
+public abstract class AbstractTweenNode extends NodeWidget {
 
     @Override
     public void init(Skin skin, NodeBoard nodeBoard) {
@@ -65,4 +66,27 @@ public class AbstractTweenNode extends NodeWidget {
     protected void writeProperties(Json json) {
 
     }
+
+    protected void sendSignal(String portName, String command, Object[] payload) {
+        Connection connection = outputs.get(portName);
+
+        if(connection == null) throw new GdxRuntimeException("Output port with name: '" + portName + "' + not found on this node, to send signal");
+
+        String targetSlot = connection.targetSlot;
+
+        if(targetSlot == null) throw new GdxRuntimeException("Output port is not connected to any input");
+
+        AbstractTweenNode targetNode = (AbstractTweenNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
+
+        // animate the signal
+        animateSignal(connection);
+
+        targetNode.onSignalReceived(command, payload);
+    }
+
+    private void animateSignal(Connection connection) {
+
+    }
+
+    protected abstract void onSignalReceived(String command, Object[] payload);
 }

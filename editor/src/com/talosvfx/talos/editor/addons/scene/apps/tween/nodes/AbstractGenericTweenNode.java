@@ -1,4 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.nodes;
 
-public class AbstractGenericTweenNode extends AbstractTweenNode {
+public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
+
+    @Override
+    protected void onSignalReceived(String command, Object[] payload) {
+        // just do nothing
+    }
 }
