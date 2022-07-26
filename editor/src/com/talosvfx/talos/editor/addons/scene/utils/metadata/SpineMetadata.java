@@ -12,8 +12,7 @@ import java.util.function.Supplier;
 
 public class SpineMetadata extends AMetadata {
 
-    @ValueProperty(min = 0.001f, max = 2, step = 0.001f)
-    public float scale = 0.01f;
+    public float pixelsPerUnit = DefaultConstants.PIXELS_PER_UNIT;
 
     public String atlasPath;
 
@@ -25,7 +24,7 @@ public class SpineMetadata extends AMetadata {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> propertyWidgets = new Array<>();
 
-        propertyWidgets.add(WidgetFactory.generate(this, "scale", "Scale"));
+        propertyWidgets.add(WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld"));
 
         AssetSelectWidget atlasWidget = new AssetSelectWidget("Atlas", GameAssetType.ATLAS, new Supplier<String>() {
             @Override

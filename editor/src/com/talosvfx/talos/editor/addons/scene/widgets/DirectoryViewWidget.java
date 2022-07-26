@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -647,7 +648,8 @@ public class DirectoryViewWidget extends Table {
                         AssetImporter.fromDirectoryView = false;
 
                         MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
-                        uiSceneRenderer.setCamera((OrthographicCamera)getStage().getCamera());
+                        Stage stage = SceneEditorWorkspace.getInstance().getStage();
+                        uiSceneRenderer.setCamera((OrthographicCamera)stage.getCamera());
                         GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
                         gameObjectActor.setFillParent(true);
 //                        iconContainer.addActor(gameObjectActor);
