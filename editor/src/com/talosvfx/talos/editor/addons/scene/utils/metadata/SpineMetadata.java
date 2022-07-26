@@ -1,6 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.utils.metadata;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
@@ -24,7 +29,15 @@ public class SpineMetadata extends AMetadata {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> propertyWidgets = new Array<>();
 
-        propertyWidgets.add(WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld"));
+        PropertyWidget pixelPerUnit = WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld");
+        pixelPerUnit.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                //Reload the game asset with new import scale
+                AssetRepository.getInstance().reloadGameAssetForRawFile(link);
+            }
+        });
+        propertyWidgets.add(pixelPerUnit);
 
         AssetSelectWidget atlasWidget = new AssetSelectWidget("Atlas", GameAssetType.ATLAS, new Supplier<String>() {
             @Override
@@ -40,6 +53,18 @@ public class SpineMetadata extends AMetadata {
         propertyWidgets.add(atlasWidget);
 
         return propertyWidgets;
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
+        pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", pixelsPerUnit);
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("pixelsPerUnit", pixelsPerUnit);
     }
 
     @Override

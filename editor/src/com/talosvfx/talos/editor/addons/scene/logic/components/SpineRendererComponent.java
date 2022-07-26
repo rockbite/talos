@@ -22,6 +22,8 @@ import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
@@ -32,7 +34,10 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public Skeleton skeleton;
     public AnimationState animationState;
 
-    public float scale = 1/128f;
+
+    @ValueProperty(prefix = {"scale"})
+    public float scale = 1f;
+
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -51,18 +56,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         });
 
         properties.add(atlasWidget);
-        properties.add(new FloatPropertyWidget("scale", new Supplier<Float>() {
-            @Override
-            public Float get () {
-                return scale;
-            }
-        }, new PropertyWidget.ValueChanged<Float>() {
-            @Override
-            public void report (Float value) {
-                scale = value;
-                skeleton.setScale(scale, scale);
-            }
-        }));
+
+        properties.add(WidgetFactory.generate(this, "scale", "Scale"));
+
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
