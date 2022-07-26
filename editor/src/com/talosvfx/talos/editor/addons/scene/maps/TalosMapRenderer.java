@@ -70,8 +70,15 @@ public class TalosMapRenderer {
 
 				//Top down left to right
 
-				float tileSizeX = layer.getTileSizeX();
-				float tileSizeY = layer.getTileSizeY();
+				int tileSizeX = MathUtils.round(layer.getTileSizeX());
+				int tileSizeY = MathUtils.round(layer.getTileSizeY());
+
+				if (tileSizeX == 0) {
+					tileSizeX = 1;
+				}
+				if (tileSizeY == 0) {
+					tileSizeY = 1;
+				}
 
 				int sX = (int)(MathUtils.floor(startX / tileSizeX) * tileSizeX);
 				int sY = (int)(MathUtils.floor(startY / tileSizeY) * tileSizeY);
