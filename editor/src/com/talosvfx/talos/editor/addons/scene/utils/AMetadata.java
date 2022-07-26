@@ -24,7 +24,6 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
 
     public void setLinkRawAsset (RawAsset link) {
         this.link = link;
-        System.out.println("Setting link " + link + " " + uuid.toString());
     }
 
 

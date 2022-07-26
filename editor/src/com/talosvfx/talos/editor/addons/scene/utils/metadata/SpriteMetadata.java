@@ -20,7 +20,7 @@ public class SpriteMetadata extends AMetadata {
 
     public int[] borderData = {0, 0, 0, 0};
 
-    public float pixelsPerUnit = 100;
+    public float pixelsPerUnit = DefaultConstants.PIXELS_PER_UNIT;
 
     public Texture.TextureFilter filterMode = Texture.TextureFilter.Nearest;
 

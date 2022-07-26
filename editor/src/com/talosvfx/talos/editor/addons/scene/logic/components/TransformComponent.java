@@ -15,6 +15,11 @@ public class TransformComponent extends AComponent {
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 scale = new Vector2(1, 1);
 
+
+    public transient Vector2 worldPosition = new Vector2();
+    public transient Vector2 worldScale = new Vector2();
+    public transient float worldRotation = 0;
+
     public static Array<GameObject> tmp = new Array<>();
     public static Vector2 vec = new Vector2();
 

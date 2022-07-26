@@ -1,7 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -35,7 +34,7 @@ public class MainRenderer implements Notifications.Observer {
 
     private  Comparator<GameObject> activeSorter;
 
-    private TransformComponent transformComponent = new TransformComponent();
+    private TransformComponent tempTransform = new TransformComponent();
     private Vector2 vec = new Vector2();
     private Vector2[] points = new Vector2[4];
 
@@ -75,6 +74,10 @@ public class MainRenderer implements Notifications.Observer {
 
                 RendererComponent o1c = o1.getComponentSlow(RendererComponent.class);
                 RendererComponent o2c = o2.getComponentSlow(RendererComponent.class);
+
+                if (o1c == null) return -1;
+                if (o2c == null) return 1;
+
                 int o1l = layerOrderLookup.get(o1c.sortingLayer);
                 int o2l = layerOrderLookup.get(o2c.sortingLayer);
                 int o1i = o1c.orderingInLayer;
@@ -106,14 +109,60 @@ public class MainRenderer implements Notifications.Observer {
         this.activeSorter = customSorter;
     }
 
-    // todo: do fancier logic later
+    public void update (GameObject root) {
+        if (root.hasComponent(TransformComponent.class)) {
+            TransformComponent transform = root.getComponent(TransformComponent.class);
+
+
+            transform.worldPosition.set(transform.position);
+            transform.worldScale.set(transform.scale);
+            transform.worldRotation = transform.rotation;
+
+            if (root.parent != null) {
+
+                if (root.parent.hasComponent(TransformComponent.class)) {
+                    //Combine our world with the parent
+
+                    TransformComponent parentTransform = root.parent.getComponent(TransformComponent.class);
+                    transform.worldPosition.scl(parentTransform.worldScale);
+                    transform.worldPosition.rotateDeg(parentTransform.worldRotation);
+                    transform.worldPosition.add(parentTransform.worldPosition);
+
+                    transform.worldRotation += parentTransform.worldRotation;
+                    transform.worldScale.scl(parentTransform.worldScale);
+                }
+            }
+        }
+
+        if (root.getGameObjects() != null) {
+            for (int i = 0; i < root.getGameObjects().size; i++) {
+                GameObject child = root.getGameObjects().get(i);
+                update(child);
+            }
+        }
+    }
+
+    private void fillRenderableEntities (GameObject root, Array<GameObject> list) {
+        if (root.hasComponentType(RendererComponent.class)) {
+            list.add(root);
+        }
+        if (root.getGameObjects() != null) {
+            for (int i = 0; i < root.getGameObjects().size; i++) {
+                fillRenderableEntities(root.getGameObjects().get(i), list);
+            }
+        }
+    }
+
     public void render (Batch batch, GameObject root) {
         mapRenderer.setCamera(this.camera);
 
         updateLayerOrderLookup(root);
+
+        //fill entities
         list.clear();
-        list = root.getChildrenByComponent(RendererComponent.class, list);
+        fillRenderableEntities(root, list);
         sort(list);
+
 
         for(GameObject gameObject: list) {
             TransformComponent transformComponent = getWorldTransform(gameObject);
@@ -147,29 +196,21 @@ public class MainRenderer implements Notifications.Observer {
 
     private void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {
 
-        vec.set(0, 0);
-        transformComponent.localToWorld(gameObject, vec);
-        Vector2 renderPosition = vec;
 
         batch.draw(AssetRepository.getInstance().brokenTextureRegion,
-                renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
                 0.5f, 0.5f,
                 1f, 1f,
-                transformComponent.scale.x, transformComponent.scale.y,
-                transformComponent.rotation);
+                transformComponent.worldScale.x, transformComponent.worldScale.y,
+                transformComponent.worldRotation);
     }
 
     private void renderSpine (Batch batch, GameObject gameObject) {
-
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
 
-        vec.set(0, 0);
-        transformComponent.localToWorld(gameObject, vec);
-        Vector2 renderPosition = vec;
-
-        spineRendererComponent.skeleton.setPosition(renderPosition.x, renderPosition.y);
-        spineRendererComponent.skeleton.setScale(transformComponent.scale.x, transformComponent.scale.y);
-        spineRendererComponent.skeleton.setScale(0.1f, 0.1f);
+        spineRendererComponent.skeleton.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
+        spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
         spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
         spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         spineRendererComponent.skeleton.updateWorldTransform();
@@ -178,20 +219,19 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     private void renderParticle (Batch batch, GameObject gameObject) {
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
 
-        vec.set(0, 0);
-        transformComponent.localToWorld(gameObject, vec);
-        Vector2 renderPosition = vec;
-
         ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.gameAsset.getResource());
-        instance.setPosition(renderPosition.x, renderPosition.y);
+        instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
         instance.update(Gdx.graphics.getDeltaTime()); // todo: we so hacky hacky
         talosRenderer.setBatch(batch);
         talosRenderer.render(instance);
     }
 
     private void renderSprite (Batch batch, GameObject gameObject) {
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+
         SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
         GameAsset<Texture> gameResource = spriteRenderer.getGameResource();
         RawAsset rootRawAsset = gameResource.getRootRawAsset();
@@ -199,10 +239,6 @@ public class MainRenderer implements Notifications.Observer {
         if (metaData instanceof SpriteMetadata) {
             //It should be
             SpriteMetadata metadata = (SpriteMetadata)metaData;
-
-            vec.set(0, 0);
-            transformComponent.localToWorld(gameObject, vec);
-            Vector2 renderPosition = vec;
 
             Texture resource = spriteRenderer.getGameResource().getResource();
             textureRegion.setRegion(resource);
@@ -220,11 +256,11 @@ public class MainRenderer implements Notifications.Observer {
                     float ySign = height < 0 ? -1 : 1;
 
                     patch.draw(batch,
-                            renderPosition.x - 0.5f * width * xSign, renderPosition.y - 0.5f * height * ySign,
+                            transformComponent.worldPosition.x - 0.5f * width * xSign, transformComponent.worldPosition.y - 0.5f * height * ySign,
                             0.5f * width * xSign, 0.5f * height * ySign,
                             Math.abs(width), Math.abs(height),
-                            xSign * transformComponent.scale.x, ySign * transformComponent.scale.y,
-                            transformComponent.rotation);
+                            xSign * transformComponent.worldScale.x, ySign * transformComponent.worldScale.y,
+                            transformComponent.worldRotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
                     textureRegion.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
@@ -233,21 +269,21 @@ public class MainRenderer implements Notifications.Observer {
                     textureRegion.setRegion(0, 0, repeatX, repeatY);
 
                     batch.draw(textureRegion,
-                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                        transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
                             0.5f, 0.5f,
                             1f, 1f,
-                            width * transformComponent.scale.x, height * transformComponent.scale.y,
-                            transformComponent.rotation);
+                            width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
+                            transformComponent.worldRotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
                     textureRegion.getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
                     textureRegion.setRegion(0, 0, textureRegion.getTexture().getWidth(), textureRegion.getTexture().getHeight());
 
                     batch.draw(textureRegion,
-                            renderPosition.x - 0.5f, renderPosition.y - 0.5f,
+                        transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
                             0.5f, 0.5f,
                             1f, 1f,
-                            width * transformComponent.scale.x, height * transformComponent.scale.y,
-                            transformComponent.rotation);
+                            width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
+                            transformComponent.worldRotation);
                 }
 
                 batch.setColor(Color.WHITE);
@@ -310,17 +346,17 @@ public class MainRenderer implements Notifications.Observer {
         float ySign = transform.scale.y < 0 ? -1: 1;
 
         vec.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]); // midpoint
-        transformComponent.position.set(vec);
+        tempTransform.position.set(vec);
         vec.set(points[RT]).sub(points[LB]);
-        transformComponent.scale.set(points[RT].dst(points[LT]) * xSign, points[RT].dst(points[RB]) * ySign);
+        tempTransform.scale.set(points[RT].dst(points[LT]) * xSign, points[RT].dst(points[RB]) * ySign);
         vec.set(points[RT]).sub(points[LT]).angleDeg();
-        transformComponent.rotation = vec.angleDeg();
+        tempTransform.rotation = vec.angleDeg();
 
-        if(xSign < 0) transformComponent.rotation -= 180;
-        if(ySign < 0) transformComponent.rotation += 0;
+        if(xSign < 0) tempTransform.rotation -= 180;
+        if(ySign < 0) tempTransform.rotation += 0;
 
 
-        return transformComponent;
+        return tempTransform;
     }
 
     private Vector2 getWorldLocAround(GameObject gameObject, Vector2 point, float x, float y) {

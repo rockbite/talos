@@ -754,6 +754,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     private void drawMainRenderer (Batch batch, float parentAlpha) {
         if(currentContainer == null) return;
 
+        renderer.update(currentContainer.getSelfObject());
         renderer.render(batch, currentContainer.getSelfObject());
     }
 
