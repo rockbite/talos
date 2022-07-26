@@ -17,6 +17,20 @@ public class TweenNode extends AbstractTweenNode {
     }
 
     @Override
+    protected void onSignalReceived(String command, Object[] payload) {
+        if(command.equals("execute")) {
+            playTween();
+        }
+    }
+
+    private void playTween() {
+        String target = (String) (getWidget("target").getValue());
+        Object[] payload = new Object[1];
+        payload[0] = target;
+        sendSignal("startSignal", "execute", payload);
+    }
+
+    @Override
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
 
@@ -25,10 +39,7 @@ public class TweenNode extends AbstractTweenNode {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String target = (String) (getWidget("target").getValue());
-                Object[] payload = new Object[1];
-                payload[0] = target;
-                sendSignal("startSignal", "execute", payload);
+                playTween();
                 super.clicked(event, x, y);
             }
         });
@@ -38,10 +49,5 @@ public class TweenNode extends AbstractTweenNode {
     public String getTweenTitle() {
         TextValueWidget titleText = (TextValueWidget) getWidget("title");
         return titleText.getValue();
-    }
-
-    @Override
-    protected void onSignalReceived(String command, Object[] payload) {
-
     }
 }

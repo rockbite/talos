@@ -16,7 +16,9 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     @Override
     protected void onSignalReceived(String command, Object[] payload) {
-        // just do nothing
+        if(command.equals("execute")) {
+            runGenericTween();
+        }
     }
 
     public void runGenericTween() {
