@@ -106,6 +106,7 @@ public class TalosMapRenderer {
 
 				mainRenderer.setActiveSorter(orthoTopDownSorter);
 				for (GameObject rootEntity : rootEntities) {
+					mainRenderer.update(rootEntity);
 					mainRenderer.render(batch, rootEntity);
 				}
 
