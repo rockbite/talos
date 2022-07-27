@@ -84,6 +84,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         }
     }
 
+    public void notifyRemoved() {
+
+    }
+
     public class Connection {
         public String targetSlot;
         public NodeWidget targetNode;

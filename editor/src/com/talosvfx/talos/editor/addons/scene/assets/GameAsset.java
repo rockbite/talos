@@ -13,6 +13,7 @@ public class GameAsset<T> {
 	public GameAssetType type;
 
 	public Array<RawAsset> dependentRawAssets = new Array<>();
+	public Array<GameAsset<?>> dependentGameAssets = new Array<>();
 
 	private T resourcePayload;
 

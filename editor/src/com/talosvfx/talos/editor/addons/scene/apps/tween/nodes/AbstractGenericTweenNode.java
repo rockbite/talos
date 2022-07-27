@@ -1,11 +1,26 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.nodes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 
@@ -13,6 +28,13 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     boolean running = false;
     float time = 0;
+
+    private Vector2 vec = new Vector2();
+    private Vector2 vec2 = new Vector2();
+
+    private MicroNodeView microNodeView;
+
+    private boolean isMicroView = false;
 
     @Override
     protected void onSignalReceived(String command, Object[] payload) {
@@ -24,8 +46,16 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
     public void runGenericTween() {
         running = true;
         time = 0;
+
+        if(isMicroView) {
+            microNodeView.showProgressDisc();
+        }
     }
 
+    @Override
+    public void notifyRemoved() {
+        microNodeView.remove();
+    }
 
     @Override
     public void constructNode(XmlReader.Element module) {
@@ -33,8 +63,202 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
         InterpolationTimeline widget = new InterpolationTimeline(getSkin());
         getCustomContainer("timeline").add(widget).growX().height(58);
+
+        microNodeView = new MicroNodeView();
+        microNodeView.setTouchable(Touchable.enabled);
+
+        microNodeView.addListener(new InputListener() {
+
+            long clickTime = 0;
+
+            Vector2 prevPos = new Vector2();
+            Vector2 tmp = new Vector2();
+            Vector2 tmp2 = new Vector2();
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                long now = TimeUtils.millis();
+
+                if(now - clickTime < 200 && button == 0) {
+                    doubleClick();
+                }
+                clickTime = now;
+
+                tmp.set(x, y);
+                event.getTarget().localToStageCoordinates(tmp);
+                prevPos.set(tmp);
+
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                super.touchDragged(event, x, y, pointer);
+
+                tmp.set(x, y);
+                event.getTarget().localToStageCoordinates(tmp);
+                tmp2.set(tmp);
+                tmp.sub(prevPos);
+                prevPos.set(tmp2);
+
+                setPosition(getX() + tmp.x, getY() + tmp.y);
+                microNodeView.setPosition(microNodeView.getX() + tmp.x, microNodeView.getY() + tmp.y);
+
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                nodeBoard.selectNode(AbstractGenericTweenNode.this);
+                event.cancel();
+                super.touchUp(event, x, y, pointer, button);
+            }
+
+            private void doubleClick() {
+                animateShow();
+            }
+        });
+
+        headerTable.setTouchable(Touchable.enabled);
+        headerTable.addListener(new ClickListener() {
+
+            long clickTime = 0;
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                long now = TimeUtils.millis();
+                
+                if(now - clickTime < 200 && button == 0) {
+                    doubleClick();
+                }
+                clickTime = now;
+
+                event.handle();
+                return false;
+            }
+
+            private void doubleClick() {
+                animateHide();
+            }
+        });
     }
 
+    @Override
+    public void getOutputSlotPos(String id, Vector2 tmp) {
+        super.getOutputSlotPos(id, tmp);
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        vec2.set(tmp).sub(vec).scl(getColor().a);
+        vec2.add(vec);
+
+        tmp.set(vec2);
+    }
+
+    @Override
+    public void getInputSlotPos(String id, Vector2 tmp) {
+        super.getInputSlotPos(id, tmp);
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        vec2.set(tmp).sub(vec).scl(getColor().a);
+        vec2.add(vec);
+
+        tmp.set(vec2);
+    }
+
+    public void animateShow() {
+
+        setTransform(true);
+        setVisible(true);
+        clearActions();
+        setScale(0f);
+        getColor().a = 0;
+
+        setOrigin(Align.center);
+
+        addAction(Actions.fadeIn(0.2f));
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        // hide disk
+        microNodeView.hide();
+        isMicroView = false;
+
+        addAction(Actions.sequence(
+                Actions.scaleTo(1f, 1f, 0.22f, Interpolation.swingOut),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        setTransform(false);
+                        setVisible(true);
+                    }
+                })
+        ));
+
+    }
+
+    public void animateHide() {
+
+        setTransform(true);
+        setVisible(true);
+        clearActions();
+        setScale(1f);
+        getColor().a = 1;
+
+        setOrigin(Align.center);
+
+        addAction(Actions.fadeOut(0.1f));
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        // show disk
+        microNodeView.setVisible(false);
+        nodeBoard.getStage().addActor(microNodeView);
+        microNodeView.setPosition(vec.x, vec.y);
+        microNodeView.show();
+        isMicroView = true;
+
+        addAction(Actions.sequence(
+                Actions.scaleTo(0.8f, 0.8f, 0.22f, Interpolation.swingIn),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        setTransform(false);
+                        setVisible(false);
+                    }
+                })
+        ));
+
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+    }
+
+    public void setMini() {
+        setVisible(false);
+        setTransform(false);
+        clearActions();
+        getColor().a = 0;
+        setOrigin(Align.center);
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        // show disk
+        microNodeView.setVisible(false);
+        nodeBoard.getStage().addActor(microNodeView);
+        microNodeView.setPosition(vec.x, vec.y);
+        microNodeView.show();
+        isMicroView = true;
+    }
 
     class InterpolationTimeline extends Table {
 
@@ -63,6 +287,10 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
         protected void fireOnComplete() {
             sendSignal("onComplete", "execute", null);
+
+            if(isMicroView) {
+                microNodeView.hideProgressDisc();
+            }
         }
 
         @Override
@@ -85,6 +313,14 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
                 }
 
                 alpha = time/duration;
+
+                if(isMicroView) {
+                    microNodeView.setProgress(alpha);
+                    float val = time;
+                    if(val == 0) val =  duration;
+                    microNodeView.setLabel(((int)(val * 100))/100f + "");
+                }
+
             }
 
             tracker.setY(getHeight() - 15);
@@ -120,4 +356,210 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             return 58;
         }
     }
+
+    class ProgressWidget extends Table {
+
+        private final TextureAtlas.AtlasRegion region;
+        private final Image progressImage;
+        private float progress = 0;
+
+        private ShaderProgram shaderProgram;
+
+        public ProgressWidget() {
+            super(TalosMain.Instance().getSkin());
+
+            region = getSkin().getAtlas().findRegion("mini-node-bg");
+
+            progressImage = new Image(ColorLibrary.obtainBackground(getSkin(), "mini-node-bg", ColorLibrary.BackgroundColor.GREEN));
+            progressImage.setSize(110, 110);
+            progressImage.setPosition(-progressImage.getWidth()/2, -progressImage.getHeight()/2);
+            progressImage.setRotation(180);
+            progressImage.setOrigin(Align.center);
+            addActor(progressImage);
+
+            shaderProgram = new ShaderProgram(Gdx.files.internal("addons/scene/shaders/default.vert.glsl"), Gdx.files.internal("addons/scene/shaders/circularbar.frag.glsl"));
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+
+            ShaderProgram prevShader = null;
+
+            if(progress > 0 && progress < 1) {
+                // enable shader
+                prevShader = batch.getShader();
+
+                batch.setShader(shaderProgram);
+                shaderProgram.setUniformf("regionU", region.getU());
+                shaderProgram.setUniformf("regionV", region.getV());
+                shaderProgram.setUniformf("regionU2", region.getU2());
+                shaderProgram.setUniformf("regionV2", region.getV2());
+
+                shaderProgram.setUniformf("alpha", progress);
+            }
+
+            super.draw(batch, parentAlpha);
+
+            if(prevShader != null) {
+                // change shader back
+                batch.setShader(prevShader);
+            }
+        }
+
+        public void setProgress(float progress) {
+            this.progress = progress;
+
+            progressImage.setRotation(180 - progress * 90);
+        }
+    }
+
+    class MicroNodeView extends Table {
+
+
+        private Image shadow;
+        private ProgressWidget progressContainer;
+        private Image bg;
+
+        private Label label;
+
+        private float progress = 0;
+
+        public MicroNodeView() {
+            super(TalosMain.Instance().getSkin());
+
+            shadow = new Image(ColorLibrary.obtainBackground(getSkin(), "mini-node-bg-shadow", ColorLibrary.BackgroundColor.DARK_GRAY));
+            shadow.getColor().a = 0.4f;
+
+            progressContainer = new ProgressWidget();
+            progressContainer.setVisible(false);
+
+            bg = new Image(ColorLibrary.obtainBackground(getSkin(), "mini-node-bg", ColorLibrary.BackgroundColor.DARK_GRAY));
+            bg.getColor().a = 1f;
+
+            addActor(shadow);
+            addActor(progressContainer);
+            addActor(bg);
+
+            shadow.setOrigin(Align.center);
+            shadow.setPosition(-shadow.getWidth()/2, -shadow.getHeight()/2);
+            bg.setPosition(-bg.getWidth()/2, -bg.getHeight()/2);
+
+            label = new Label("1.0", TalosMain.Instance().getSkin());
+            add(label).expand().center();
+        }
+
+        public void showProgressDisc() {
+            progressContainer.setTransform(true);
+            progressContainer.setVisible(true);
+            progressContainer.clearActions();
+            progressContainer.setScale(0.8f);
+            progressContainer.getColor().a = 0;
+
+            progressContainer.addAction(Actions.fadeIn(0.2f));
+
+            progressContainer.addAction(Actions.sequence(
+                    Actions.scaleTo(1.1f, 1.1f, 0.18f, Interpolation.pow2Out),
+                    Actions.scaleTo(1f, 1f, 0.1f, Interpolation.pow2In),
+                    Actions.run(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressContainer.setTransform(false);
+                        }
+                    })
+            ));
+        }
+
+        public void show() {
+            setTransform(true);
+            setVisible(true);
+            getColor().a = 0;
+            setScale(0);
+            clearActions();
+
+            addAction(Actions.fadeIn(0.2f));
+
+            shadow.clearActions();
+            shadow.addAction(Actions.alpha(0.4f, 0.1f));
+            shadow.setScale(1);
+
+            addAction(Actions.sequence(
+                    Actions.scaleTo(1.2f, 1.2f, 0.18f, Interpolation.pow2Out),
+                    Actions.scaleTo(1f, 1f, 0.1f, Interpolation.pow2In),
+                    Actions.run(new Runnable() {
+                        @Override
+                        public void run() {
+                            setTransform(false);
+                        }
+                    })
+            ));
+        }
+
+        public void hide() {
+            setTransform(true);
+            setVisible(true);
+            clearActions();
+
+            shadow.clearActions();
+            shadow.addAction(Actions.sequence(
+                    Actions.scaleTo(1.1f, 1.1f, 0.18f, Interpolation.pow2Out),
+                    Actions.scaleTo(1f, 1f, 0.1f, Interpolation.pow2Out)
+            ));
+            shadow.addAction(Actions.sequence(
+                    Actions.delay(0.18f),
+                    Actions.fadeOut(0.1f, Interpolation.pow2Out)
+            ));
+
+            addAction(Actions.sequence(
+                    Actions.parallel(
+                        Actions.fadeOut(0.05f),
+                        Actions.scaleTo(0.2f, 0.2f, 0.05f, Interpolation.pow2In)
+                    ),
+
+                    Actions.run(new Runnable() {
+                        @Override
+                        public void run() {
+                            setTransform(false);
+                            setVisible(false);
+                            remove();
+                        }
+                    })
+            ));
+        }
+
+        public void hideProgressDisc() {
+            progressContainer.setTransform(true);
+            progressContainer.setVisible(true);
+            progressContainer.clearActions();
+            progressContainer.setScale(1f);
+            progressContainer.getColor().a = 1;
+
+            progressContainer.addAction(Actions.sequence(
+                    Actions.scaleTo(1.2f, 1.2f, 0.18f, Interpolation.pow2Out),
+                    Actions.scaleTo(0.8f, 0.8f, 0.1f, Interpolation.pow2In),
+                    Actions.run(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressContainer.setTransform(false);
+                            progressContainer.setVisible(false);
+                        }
+                    })
+            ));
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            progressContainer.setProgress(progress);
+        }
+
+        public void setProgress(float alpha) {
+            progress = alpha;
+        }
+
+        public void setLabel(String string) {
+            label.setText(string);
+        }
+    }
 }
+

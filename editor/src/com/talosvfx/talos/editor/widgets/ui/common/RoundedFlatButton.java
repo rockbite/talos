@@ -32,7 +32,6 @@ public class RoundedFlatButton extends Button {
 
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
 
-        getStyle().checked = null;
     }
 
     public RoundedFlatButton(Skin skin, Drawable drawable, boolean toggle) {

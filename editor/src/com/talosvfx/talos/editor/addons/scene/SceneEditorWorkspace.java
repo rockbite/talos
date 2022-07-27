@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
@@ -29,10 +30,12 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
+import com.talosvfx.talos.editor.addons.scene.widgets.MapEditorToolbar;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
@@ -41,6 +44,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -80,13 +84,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public Array<String> layers = new Array<>();
 
-    public boolean customGrid = false;
-
+    private final GridDrawer gridDrawer;
     public GridProperties gridProperties = new GridProperties();
+    private MapEditorState mapEditorState;
+    private MapEditorToolbar mapEditorToolbar;
 
     public MainRenderer getUISceneRenderer () {
         return uiSceneRenderer;
     }
+
+
 
     public static class GridProperties {
         public Supplier<float[]> sizeProvider;
@@ -108,8 +115,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
+        mapEditorToolbar = new MapEditorToolbar(TalosMain.Instance().getSkin());
 
         snapshotService = new SnapshotService();
+        mapEditorState = new MapEditorState();
 
         Notifications.registerObserver(this);
 
@@ -143,6 +152,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         selectionRect.setSize(0, 0);
         selectionRect.setVisible(false);
         addActor(selectionRect);
+
+        gridDrawer = new GridDrawer(this, camera, gridProperties);
     }
 
 
@@ -329,6 +340,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
+                if (mapEditorState.isEditing()) {
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+
 
                 upWillClear = true;
                 dragged = false;
@@ -641,9 +657,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         changeVersion = UUID.randomUUID().toString();
 
-        if(projectPath != null) {
-            json.writeValue("projectPath", projectPath);
-
+        if (projectPath != null) {
             json.writeArrayStart("layers");
             for (String layer : layers) {
                 json.writeValue(layer);
@@ -672,9 +686,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
 
-        if(projectPath == null || projectPath.isEmpty()) {
-            projectPath = jsonData.getString("projectPath", "");
-        }
         projectExplorer.loadDirectoryTree(projectPath);
 
         JsonValue layersJson = jsonData.get("layers");
@@ -726,13 +737,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         batch.end();
 
-        if (gridProperties.sizeProvider != null) { //Run the logic to check it
-            gridProperties.sizeProvider.get();
-        }
-
-        if (customGrid && gridProperties.sizeProvider != null && !gridProperties.noLayerSelected) {
-            float[] size = gridProperties.sizeProvider.get();
-            GridDrawer.drawGrid(this, camera, batch, size[0], size[1], 1, true, true);
+        if (mapEditorState.isEditing()) {
+            gridDrawer.highlightCursorHover = true;
+            gridDrawer.drawGrid();
         } else {
             drawGrid(batch, parentAlpha);
         }
@@ -1075,6 +1082,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @EventHandler
     public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
+        mapEditorState.update(event);
         Array<GameObject> gameObjects = event.get();
 
         for(Gizmo gizmo: gizmoList) {
@@ -1160,9 +1168,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
-
         String path = jsonData.getString("currentScene", "");
-        String projectPath = jsonData.getString("projectPath", "");
 
         AssetRepository.init();
         AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath).child("assets"));
@@ -1342,4 +1348,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void dispose () {
         fileWatching.shutdown();
     }
+
+
+
+    public void showMapEditToolbar () {
+        mapEditorToolbar.build();
+        mapEditorToolbar.addAction(Actions.fadeOut(0));
+        mapEditorToolbar.addAction(Actions.fadeIn(0.3f));
+        addActor(mapEditorToolbar);
+    }
+
+    public void hideMapEditToolbar () {
+        mapEditorToolbar.addAction(Actions.sequence(Actions.fadeOut(0.3f), Actions.removeActor()));
+    }
+
 }
