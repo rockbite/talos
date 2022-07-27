@@ -13,12 +13,14 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.UUID;
@@ -205,7 +207,19 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         }
 
         public void addEntity(GameAsset<?> gameAsset) {
-            object.getResource().gameObjects.put(gameAsset, new GameObject());
+
+            //Lets create an entity from the asset
+            AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+            GameObject tempParent = new GameObject();
+            boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent);
+            if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
+                success = false;
+            }
+            AssetImporter.fromDirectoryView = false;
+
+            if (success) {
+                object.getResource().gameObjects.put(gameAsset, tempParent.getGameObjects().first());
+            }
         }
 
         public void removeEntity(GameAsset<?> gameAsset) {
