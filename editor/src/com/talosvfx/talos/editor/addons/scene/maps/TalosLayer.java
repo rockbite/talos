@@ -56,7 +56,9 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 	@Override
 	public void write (Json json) {
-		GameResourceOwner.writeGameAsset(json, this);
+		if (gameAsset != null) { //can be null
+			GameResourceOwner.writeGameAsset(json, this);
+		}
 
 		json.writeValue("type", this.type);
 		json.writeValue("name", this.name);
