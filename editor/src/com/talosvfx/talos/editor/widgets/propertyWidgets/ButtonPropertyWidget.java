@@ -76,9 +76,6 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 
         buttonLabel = new Label("Edit", skin);
         button = new SquareButton(skin, buttonLabel);
-        button.getStyle().checked = null;
-        button.getStyle().checkedOver = null;
-        button.getStyle().checkedDown = null;
 
         table.add(button).expand().right().growX();
 

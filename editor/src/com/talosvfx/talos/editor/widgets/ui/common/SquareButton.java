@@ -15,13 +15,13 @@ public class SquareButton extends Button {
 
     public SquareButton(Skin skin, Label label) {
         setSkin(skin);
-        setStyle(skin.get("square", ButtonStyle.class));
+        ButtonStyle square = skin.get("square", ButtonStyle.class);
+        setStyle(square);
 
         label.setAlignment(Align.center);
 
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
 
-        getStyle().checked = null;
     }
 
     public SquareButton(Skin skin, Drawable drawable, boolean toggle) {
@@ -30,7 +30,8 @@ public class SquareButton extends Button {
 
     private void build(Skin skin, Drawable drawable, boolean toggle) {
         setSkin(skin);
-        setStyle(skin.get("square", ButtonStyle.class));
+        ButtonStyle square = skin.get("square", ButtonStyle.class);
+        setStyle(square);
         if(!toggle) {
            setDisabled(true);
         }

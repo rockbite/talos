@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
@@ -29,10 +30,12 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
+import com.talosvfx.talos.editor.addons.scene.widgets.MapEditorToolbar;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
@@ -83,10 +86,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public boolean customGrid = false;
 
     public GridProperties gridProperties = new GridProperties();
+    private MapEditorState mapEditorState;
+    private MapEditorToolbar mapEditorToolbar;
 
     public MainRenderer getUISceneRenderer () {
         return uiSceneRenderer;
     }
+
+
 
     public static class GridProperties {
         public Supplier<float[]> sizeProvider;
@@ -108,8 +115,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         setSkin(TalosMain.Instance().getSkin());
         setWorldSize(10);
+        mapEditorToolbar = new MapEditorToolbar(TalosMain.Instance().getSkin());
 
         snapshotService = new SnapshotService();
+        mapEditorState = new MapEditorState();
 
         Notifications.registerObserver(this);
 
@@ -329,6 +338,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
+                if (mapEditorState.isEditing()) {
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+
 
                 upWillClear = true;
                 dragged = false;
@@ -1075,6 +1089,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     @EventHandler
     public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
+        mapEditorState.update(event);
         Array<GameObject> gameObjects = event.get();
 
         for(Gizmo gizmo: gizmoList) {
@@ -1342,4 +1357,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public void dispose () {
         fileWatching.shutdown();
     }
+
+
+
+    public void showMapEditToolbar () {
+        mapEditorToolbar.build();
+        mapEditorToolbar.addAction(Actions.fadeOut(0));
+        mapEditorToolbar.addAction(Actions.fadeIn(0.3f));
+        addActor(mapEditorToolbar);
+    }
+
+    public void hideMapEditToolbar () {
+        mapEditorToolbar.addAction(Actions.sequence(Actions.fadeOut(0.3f), Actions.removeActor()));
+    }
+
 }
