@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
@@ -299,6 +300,10 @@ public class MainRenderer implements Notifications.Observer {
         mapRenderer.render(this, batch, gameObject, map);
     }
 
+    public void renderStaticTileDynamic (StaticTile staticTile, Batch batch) {
+        System.out.println("Todo render static tile");
+    }
+
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
         if(false && patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(texture);
@@ -380,4 +385,6 @@ public class MainRenderer implements Notifications.Observer {
     public OrthographicCamera getCamera () {
         return camera;
     }
+
+
 }

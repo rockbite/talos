@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -39,6 +41,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
     private Image selectionRect;
 
+    private MainRenderer mainRenderer;
 
     public PaletteEditorWorkspace(GameAsset<TilePaletteData> paletteData) {
         super();
@@ -46,6 +49,9 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         setWorldSize(10f);
         setCameraPos(0, 0);
 
+
+
+        mainRenderer = new MainRenderer();
 
         gridProperties = new SceneEditorWorkspace.GridProperties();
         gridProperties.sizeProvider = new Supplier<float[]>() {
