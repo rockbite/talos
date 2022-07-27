@@ -205,7 +205,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         }
 
         public void addEntity(GameAsset<?> gameAsset) {
-            new GameObject();
+            gameObjects.put(gameAsset, new GameObject());
         }
 
         public void removeEntity(GameAsset<?> gameAsset) {
