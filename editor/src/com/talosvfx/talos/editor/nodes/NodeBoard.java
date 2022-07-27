@@ -39,9 +39,12 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     private Vector2[] curvePoints = new Vector2[4];
     Vector2 tmp = new Vector2();
     Vector2 tmp2 = new Vector2();
+    Vector2 tmp3 = new Vector2();
+    Vector3 vec3 = new Vector3();
     Vector2 prev = new Vector2();
 
     public static Color curveColor = new Color(1, 1, 1, 0.4f);
+    public static Color curveColorSelected = new Color(1, 1, 1, 0.8f);
 
     public int globalNodeCounter = 0;
     private ObjectIntMap<Class<? extends NodeWidget>> nodeCounter = new ObjectIntMap<>();
@@ -64,6 +67,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
     public Group groupContainer = new Group();
     public Group mainContainer = new Group();
     private Color tmpColor = new Color();
+    private NodeConnection hoveredConnection = null;
 
     public void reset () {
         nodeCounter = new ObjectIntMap<>();
@@ -77,6 +81,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         groupContainer.clearChildren();
 
 
+    }
+
+    public NodeConnection getHoveredConnection() {
+        return hoveredConnection;
     }
 
     public static class NodeConnection {
@@ -152,8 +160,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         // draw active curve
         if(activeCurve != null) {
             shapeRenderer.setColor(0, 203/255f, 124/255f, 1f);
-            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
+            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y, null, null);
         }
+
+        NodeConnection hoveredConnectionRef = hoveredConnection;
+        hoveredConnection = null;
 
         shapeRenderer.setColor(1, 1, 1, 0.4f);
         // draw nodes
@@ -165,15 +176,21 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             float toX = tmp.x;
             float toY = tmp.y;
 
-            drawCurve(x, y, toX, toY, connection.getHighlight(), connection.getHighlightColor());
+            drawCurve(x, y, toX, toY, connection, hoveredConnectionRef);
         }
     }
 
-    private void drawCurve(float x, float y, float toX, float toY) {
-        drawCurve(x, y, toX, toY, -1, NodeBoard.curveColor);
-    }
 
-    private void drawCurve(float x, float y, float toX, float toY, float highlight, Color highlightColor) {
+    private void drawCurve(float x, float y, float toX, float toY, NodeConnection nodeConnection, NodeConnection hoveredConnectionRef) {
+
+        float highlight = 0;
+        Color highlightColor = NodeBoard.curveColor;
+
+        if(nodeConnection != null) {
+            highlight = nodeConnection.getHighlight();
+            highlightColor = nodeConnection.getHighlightColor();
+        }
+
         float minOffset = 10f;
         float maxOffset = 150f;
 
@@ -196,19 +213,26 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
             float thickness = 2f;
 
+            Color mainColor = NodeBoard.curveColor;
+
+            if(hoveredConnectionRef == nodeConnection && nodeConnection != null) {
+                thickness = 2.5f;
+                mainColor = curveColorSelected;
+            }
+
             if(highlight >= 0) {
                 float highlightDist = Math.abs(i - highlight);
                 float clamp = 0.2f;
                 float interpolationAlpha = MathUtils.clamp(highlightDist, 0, clamp) * (1f/clamp); // 0->1 value, where 0 is max highlight, 1 is default
-                tmpColor.a = MathUtils.lerp(highlightColor.a, NodeBoard.curveColor.a, interpolationAlpha);
-                tmpColor.r = MathUtils.lerp(highlightColor.r, NodeBoard.curveColor.r, interpolationAlpha);
-                tmpColor.g = MathUtils.lerp(highlightColor.g, NodeBoard.curveColor.g, interpolationAlpha);
-                tmpColor.b = MathUtils.lerp(highlightColor.b, NodeBoard.curveColor.b, interpolationAlpha);
+                tmpColor.a = MathUtils.lerp(highlightColor.a, mainColor.a, interpolationAlpha);
+                tmpColor.r = MathUtils.lerp(highlightColor.r, mainColor.r, interpolationAlpha);
+                tmpColor.g = MathUtils.lerp(highlightColor.g, mainColor.g, interpolationAlpha);
+                tmpColor.b = MathUtils.lerp(highlightColor.b, mainColor.b, interpolationAlpha);
                 thickness = 2f + (1f - interpolationAlpha) * 6f;
 
                 shapeRenderer.setColor(tmpColor);
             } else {
-                shapeRenderer.setColor(NodeBoard.curveColor);
+                shapeRenderer.setColor(mainColor);
             }
 
             bezier.valueAt(tmp, i);
@@ -216,7 +240,28 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, thickness);
             }
             prev.set(tmp);
+
+            boolean isSegmentHit = segmentHit(prev, tmp);
+
+            if(isSegmentHit) {
+                hoveredConnection = nodeConnection;
+            }
         }
+    }
+
+    private boolean segmentHit(Vector2 p1, Vector2 p2) {
+
+        vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        nodeStage.getCamera().unproject(vec3);
+        tmp3.set(vec3.x, vec3.y);
+
+        float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
+
+        if(dist < 30) {
+            return true; // it's a mario!
+        }
+
+        return false;
     }
 
     public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
@@ -271,6 +316,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(node));
 
         mainContainer.removeActor(node);
+
+        node.notifyRemoved();
 
         TalosMain.Instance().ProjectController().setDirty();
     }

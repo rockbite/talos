@@ -52,6 +52,10 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         }
     }
 
+    @Override
+    public void notifyRemoved() {
+        microNodeView.remove();
+    }
 
     @Override
     public void constructNode(XmlReader.Element module) {
@@ -105,6 +109,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                nodeBoard.selectNode(AbstractGenericTweenNode.this);
+                event.cancel();
                 super.touchUp(event, x, y, pointer, button);
             }
 
@@ -236,6 +242,24 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         super.act(delta);
     }
 
+    public void setMini() {
+        setVisible(false);
+        setTransform(false);
+        clearActions();
+        getColor().a = 0;
+        setOrigin(Align.center);
+
+        vec.set(getWidth()/2f, getHeight()/2f);
+        localToStageCoordinates(vec);
+
+        // show disk
+        microNodeView.setVisible(false);
+        nodeBoard.getStage().addActor(microNodeView);
+        microNodeView.setPosition(vec.x, vec.y);
+        microNodeView.show();
+        isMicroView = true;
+    }
+
     class InterpolationTimeline extends Table {
 
         private Image tracker;
@@ -292,7 +316,9 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
                 if(isMicroView) {
                     microNodeView.setProgress(alpha);
-                    microNodeView.setLabel(((int)(time * 100))/100f + "");
+                    float val = time;
+                    if(val == 0) val =  duration;
+                    microNodeView.setLabel(((int)(val * 100))/100f + "");
                 }
 
             }
@@ -418,7 +444,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             shadow.setPosition(-shadow.getWidth()/2, -shadow.getHeight()/2);
             bg.setPosition(-bg.getWidth()/2, -bg.getHeight()/2);
 
-            label = new Label("0.0", TalosMain.Instance().getSkin());
+            label = new Label("1.0", TalosMain.Instance().getSkin());
             add(label).expand().center();
         }
 

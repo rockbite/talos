@@ -126,6 +126,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                     startPos.set(x, y);
                 }
 
+                NodeBoard.NodeConnection hoveredConnection = nodeBoard.getHoveredConnection();
+
+                if(hoveredConnection != null && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && button == 0) {
+                    onConnectionClicked(hoveredConnection);
+                }
+
                 return true;
             }
 
@@ -214,6 +220,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 return super.keyDown(event, keycode);
             }
         });
+    }
+
+    protected void onConnectionClicked(NodeBoard.NodeConnection hoveredConnection) {
+
     }
 
     public void write (Json json) {
