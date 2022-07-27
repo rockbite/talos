@@ -303,7 +303,6 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     public void renderStaticTileDynamic (StaticTile staticTile, Batch batch, float tileSizeX, float tileSizeY) {
-        System.out.println("Todo render static tile");
         GridPosition gridPosition = staticTile.getGridPosition();
         GameAsset<?> staticTilesAsset = staticTile.getStaticTilesAsset();
         if (staticTilesAsset.type == GameAssetType.SPRITE) {
