@@ -7,6 +7,13 @@ public class StaticTile {
 	GameAsset<?> staticTilesAsset;
 	GridPosition gridPosition;
 
+	public StaticTile() { }
+
+	public StaticTile(GameAsset<?> gameAsset, GridPosition gridPosition) {
+		staticTilesAsset = gameAsset;
+		this.gridPosition = gridPosition;
+	}
+
 	public GameAsset<?> getStaticTilesAsset () {
 		return staticTilesAsset;
 	}

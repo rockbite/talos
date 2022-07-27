@@ -13,7 +13,11 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.UUID;
@@ -21,6 +25,9 @@ import java.util.UUID;
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private String title;
     private DragAndDrop.Target target;
+
+    private ObjectMap<GameAsset<?>, StaticTile> staticTiles;
+    private ObjectMap<GameAsset<?>, GameObject> gameObjects;
 
     enum PaletteFilterMode {
         TILE,
@@ -128,7 +135,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         @Override
         public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-            return payload.getObject() instanceof GameAsset<?>;
+            return payload.getObject() instanceof GameAsset<?> && validForImport((GameAsset<?>) payload.getObject());
         }
 
         @Override
@@ -159,6 +166,16 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
 
             tilePaletteGameAsset.dependentGameAssets.add(gameAsset);
+
+            if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
+                if (gameAsset.type == GameAssetType.SPRITE) {
+                    addSprite(gameAsset);
+                } else {
+                    System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
+                }
+            } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
+                addEntity(gameAsset);
+            }
         }
 
         public void removeGameAsset (GameAsset<?> gameAsset) {
@@ -177,28 +194,38 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         }
 
-        public void addSprite() {
-
+        public void addSprite(GameAsset<?> gameAsset) {
+            GridPosition gridPosition = new GridPosition(0, 0);
+            staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
         }
 
-        public void removeSprite() {
-
+        public void removeSprite(GameAsset<?> gameAsset) {
+            // check type
+            // remove references
         }
 
-        public void addEntity() {
-
+        public void addEntity(GameAsset<?> gameAsset) {
+            new GameObject();
         }
 
-        public void removeEntity() {
-
+        public void removeEntity(GameAsset<?> gameAsset) {
+            // add entity
         }
 
         // keep reference of what 'GameAsset' is selected. Our reference should be GameAsset type, but algorithms to select the entities/sprites can two combined
-        //different approachs
+        // different approaches
 
-        // also when dropping sprite snap to grid
+        // also, when dropping sprite snap to grid
         // save after every edit event such as drop, remove or just move
         // draw mode such as brush and shit
         // main renderer
+    }
+
+    public static boolean validForImport (GameAsset<?> gameAsset) {
+        boolean valid = (gameAsset.type == GameAssetType.SPRITE) ||
+                (gameAsset.type == GameAssetType.SKELETON) ||
+                (gameAsset.type == GameAssetType.VFX) ||
+                (gameAsset.type == GameAssetType.PREFAB);
+        return valid;
     }
 }
