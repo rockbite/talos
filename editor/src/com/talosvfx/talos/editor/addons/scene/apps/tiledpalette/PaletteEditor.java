@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -194,6 +192,15 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             references.remove(gameAssetUUID);
             positions.remove(gameAssetUUID);
 
+            if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
+                if (gameAsset.type == GameAssetType.SPRITE) {
+                    removeSprite(gameAsset);
+                } else {
+                    System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
+                }
+            } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
+                removeEntity(gameAsset);
+            }
         }
 
         public void addSprite(GameAsset<?> gameAsset) {
@@ -202,8 +209,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         }
 
         public void removeSprite(GameAsset<?> gameAsset) {
-            // check type
-            // remove references
+            
         }
 
         public void addEntity(GameAsset<?> gameAsset) {

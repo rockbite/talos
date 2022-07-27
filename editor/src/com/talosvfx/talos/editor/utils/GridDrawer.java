@@ -144,4 +144,23 @@ public class GridDrawer {
 		shapeRenderer.end();
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	}
+
+	public void toLocalCell (Vector3 vec) {
+		float[] floats = gridProperties.sizeProvider.get();
+
+		float gridSizeX = floats[0];
+		float gridSizeY = floats[1];
+
+		//Find the 'cell'
+		float projX = vec.x;
+		projX /= gridSizeX;
+		projX = MathUtils.floor(projX);
+		projX *= gridSizeX;
+
+		float projY = vec.y;
+		projY /= gridSizeY;
+		projY = MathUtils.floor(projY);
+		projY *= gridSizeY;
+		vec.set(projX, projY, vec.z);
+	}
 }

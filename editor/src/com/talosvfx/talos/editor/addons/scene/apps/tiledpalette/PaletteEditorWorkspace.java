@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -45,8 +46,6 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         this.paletteData = paletteData;
         setWorldSize(10f);
         setCameraPos(0, 0);
-
-
 
         mainRenderer = new MainRenderer();
 
@@ -141,7 +140,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
                 if(selectionRect.isVisible()) {
                     upWillClear = false;
-                    //selectByRect(rectangle); todo
+                    selectByRect(rectangle);
 //                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection)); //todo
                 } else if(upWillClear) {
                     FocusManager.resetFocus(getStage());
@@ -223,7 +222,29 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         }
     }
 
+    public void selectByRect(Rectangle rectangle) {
+        Rectangle localRect = new Rectangle();
+        Vector3 lb = new Vector3(rectangle.x, rectangle.y, 0);
+        Vector3 lt = new Vector3(rectangle.x, rectangle.y + rectangle.height, 0);
+        Vector3 rb = new Vector3(rectangle.x + rectangle.width, rectangle.y, 0);
+        Vector3 rt = new Vector3(rectangle.x + rectangle.width, rectangle.y + rectangle.height, 0);
+        PaletteEditorWorkspace.this.getWorldFromLocal(lb);
+        PaletteEditorWorkspace.this.getWorldFromLocal(lt);
+        PaletteEditorWorkspace.this.getWorldFromLocal(rb);
+        PaletteEditorWorkspace.this.getWorldFromLocal(rt);
+        localRect.set(lb.x, lb.y, Math.abs(rb.x - lb.x), Math.abs(lt.y - lb.y)); // selection rectangle in grid space
 
+        // get list of entities that have their origin in the rectangle
+        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
+
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObject : gameObjects) {
+            float[] pos = positions.get(gameObject.key.getRootRawAsset().metaData.uuid);
+            if(localRect.contains(pos[0], pos[1])) {
+                System.out.println("Contains the element with uid " + gameObject.key.getRootRawAsset().metaData.uuid);
+            }
+        }
+    }
 
     @Override
     public void act(float delta) {
