@@ -12,6 +12,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
@@ -27,14 +28,14 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
     }
 
     @Override
-    public void updateWidget (TalosLayer value) {
+    public void updateWidget (TalosLayer layer) {
         //Update it from the existing shit
 
         subWidgetTable.clearChildren();
 
         Array<PropertyWidget<?>> widgets = new Array<>();
-        if (value != null) {
-            PropertyWidget typeWidget = WidgetFactory.generate(value, "type", "Type");
+        if (layer != null) {
+            PropertyWidget typeWidget = WidgetFactory.generate(layer, "type", "Type");
             typeWidget.updateValue(); //kind of a hack to do this /shrug face
             widgets.add(typeWidget);
 
@@ -44,30 +45,43 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run () {
-                            updateWidget(value);
+                            updateWidget(layer);
                         }
                     });
                 }
             });
 
+            AssetSelectWidget<TilePaletteData> paletteWidget = new AssetSelectWidget<>("Palette", GameAssetType.TILE_PALETTE, new Supplier<GameAsset<TilePaletteData>>() {
+                @Override
+                public GameAsset<TilePaletteData> get() {
+                    return layer.getGameResource();
+                }
+            }, new PropertyWidget.ValueChanged<GameAsset<TilePaletteData>>() {
+                @Override
+                public void report(GameAsset<TilePaletteData> value) {
+                    layer.setGameAsset(value);
+                }
+            });
+            widgets.add(paletteWidget);
+
 
             //Static properties only
 
-            if (value.getType() == LayerType.STATIC) {
+            if (layer.getType() == LayerType.STATIC) {
 
-                PropertyWidget mapWidthX = WidgetFactory.generate(value, "mapWidth", "MapWidth");
+                PropertyWidget mapWidthX = WidgetFactory.generate(layer, "mapWidth", "MapWidth");
                 mapWidthX.updateValue(); //kind of a hack to do this /shrug face
                 widgets.add(mapWidthX);
 
-                PropertyWidget mapWidthY = WidgetFactory.generate(value, "mapHeight", "MapHeight");
+                PropertyWidget mapWidthY = WidgetFactory.generate(layer, "mapHeight", "MapHeight");
                 mapWidthY.updateValue(); //kind of a hack to do this /shrug face
                 widgets.add(mapWidthY);
 
-                PropertyWidget tileSizeX = WidgetFactory.generate(value, "tileSizeX", "TileSize X");
+                PropertyWidget tileSizeX = WidgetFactory.generate(layer, "tileSizeX", "TileSize X");
                 tileSizeX.updateValue(); //kind of a hack to do this /shrug face
                 widgets.add(tileSizeX);
 
-                PropertyWidget tileSizeY = WidgetFactory.generate(value, "tileSizeY", "TileSize Y");
+                PropertyWidget tileSizeY = WidgetFactory.generate(layer, "tileSizeY", "TileSize Y");
                 tileSizeY.updateValue(); //kind of a hack to do this /shrug face
                 widgets.add(tileSizeY);
             }

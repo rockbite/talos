@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
+import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.maps.MapType;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
@@ -89,6 +90,9 @@ public class MapComponent extends RendererComponent {
             public void chosen (FilteredTree.Node<TalosLayer> node) {
                 super.chosen(node);
                 selectedLayer = node.getObject();
+                TalosLayerSelectEvent talosLayerSelectEvent = Notifications.obtainEvent(TalosLayerSelectEvent.class);
+                talosLayerSelectEvent.layer = selectedLayer;
+                Notifications.fireEvent(talosLayerSelectEvent);
                 talosLayerPropertiesWidget.updateWidget(node.getObject());
                 talosLayerPropertiesWidget.toggleHide(false);
             }

@@ -55,7 +55,7 @@ public class CameraController extends InputAdapter {
 
 		camera.zoom = nextZoom;
 
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 10f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.01f, 30f);
 
 		return true;
 	}

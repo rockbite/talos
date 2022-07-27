@@ -45,8 +45,8 @@ public abstract class ViewportWidget extends Table {
 
     protected Color bgColor = new Color(Color.BLACK);
 
-    protected float maxZoom = 0.1f;
-    protected float minZoom = 100f;
+    protected float maxZoom = 0.01f;
+    protected float minZoom = 200f;
 
     protected ShapeRenderer shapeRenderer;
     private float gridSize;
@@ -205,7 +205,7 @@ public abstract class ViewportWidget extends Table {
         camera.zoom = worldWidth/camera.viewportWidth;
         gridSize = worldWidth/40f;
         float minWidth = gridSize * 4f;
-        float maxWidth = worldWidth * 2f;
+        float maxWidth = worldWidth * 10f;
         minZoom = minWidth/camera.viewportWidth;
         maxZoom = maxWidth/camera.viewportWidth;
         camera.update();

@@ -21,10 +21,8 @@ public class MapGizmo extends TransformGizmo {
     public void setSelected (boolean selected) {
         super.setSelected(selected);
         if (isSelected()) {
-            SceneEditorWorkspace.getInstance().customGrid = true;
             setupForCustomGrid(gameObject);
         } else {
-            SceneEditorWorkspace.getInstance().customGrid = false;
         }
     }
 
