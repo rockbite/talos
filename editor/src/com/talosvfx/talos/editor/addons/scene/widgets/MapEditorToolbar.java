@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class MapEditorToolbar extends Table {
@@ -50,6 +51,8 @@ public class MapEditorToolbar extends Table {
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				paint.setChecked(!paint.isChecked());
+
+				SceneEditorWorkspace.getInstance().mapEditorState.painting = paint.isChecked();
 			}
 		});
 		erase.addListener(new ClickListener() {
@@ -60,6 +63,7 @@ public class MapEditorToolbar extends Table {
 				super.clicked(event, x, y);
 				erase.setChecked(!erase.isChecked());
 
+				SceneEditorWorkspace.getInstance().mapEditorState.erasing = erase.isChecked();
 			}
 		});
 

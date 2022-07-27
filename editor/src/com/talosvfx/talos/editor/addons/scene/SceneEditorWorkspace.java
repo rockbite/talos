@@ -86,7 +86,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     private final GridDrawer gridDrawer;
     public GridProperties gridProperties = new GridProperties();
-    private MapEditorState mapEditorState;
+    public MapEditorState mapEditorState;
     private MapEditorToolbar mapEditorToolbar;
 
     public MainRenderer getUISceneRenderer () {
@@ -98,7 +98,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     public static class GridProperties {
         public Supplier<float[]> sizeProvider;
         public int subdivisions = 0;
-        public boolean noLayerSelected = true;
     }
 
     // selections

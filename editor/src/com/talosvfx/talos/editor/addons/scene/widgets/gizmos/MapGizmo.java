@@ -37,10 +37,8 @@ public class MapGizmo extends TransformGizmo {
                 TalosLayer selectedLayer = mapComponent.selectedLayer;
 
                 if (selectedLayer == null) {
-                    gridProperties.noLayerSelected = true;
                     return new float[]{1,1};
                 } else {
-                    gridProperties.noLayerSelected = false;
                     return new float[]{selectedLayer.getTileSizeX(), selectedLayer.getTileSizeY()};
                 }
 

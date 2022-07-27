@@ -17,6 +17,9 @@ public class MapEditorState implements Notifications.Observer {
 
 	private boolean mapFocused;
 
+	public boolean painting = false;
+	public boolean erasing = false;
+
 	public MapEditorState () {
 		Notifications.registerObserver(this);
 	}
@@ -73,5 +76,9 @@ public class MapEditorState implements Notifications.Observer {
 
 	public boolean isEditing () {
 		return layerSelected != null;
+	}
+
+	public TalosLayer getLayerSelected () {
+		return layerSelected;
 	}
 }
