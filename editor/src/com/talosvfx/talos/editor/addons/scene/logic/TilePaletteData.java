@@ -20,6 +20,9 @@ public class TilePaletteData implements Json.Serializable{
     public TilePaletteData () {
         references = new ObjectMap<>();
         positions = new ObjectMap<>();
+
+        staticTiles = new ObjectMap<>();
+        gameObjects = new ObjectMap<>();
     }
 
     @Override
