@@ -7,23 +7,29 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.project.IProject;
 
 public class TweenStage extends DynamicNodeStage {
 
     public final TweenEditor tweenEditor;
 
     private Vector2 tmp = new Vector2();
+    private String state;
 
     public TweenStage(TweenEditor tweenEditor, Skin skin) {
         super(skin);
@@ -67,24 +73,89 @@ public class TweenStage extends DynamicNodeStage {
         float toX = tmp.x;
         float toY = tmp.y;
 
-        tmp.set((x + toX)/2f, (y + toY)/2f); // midpoint
+        String toType = connection.toNode.getType(connection.toId);
+        String fromType = connection.fromNode.getType(connection.fromId);
 
-        DelayNode delayNode = (DelayNode)createNode("DelayNode", tmp.x, tmp.y);
-        if(delayNode != null) {
-            delayNode.constructNode(getNodeListPopup().getModuleByName("DelayNode"));
-            Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(delayNode));
+        if(toType.equals("signal") && fromType.equals("signal")) {
 
-            nodeBoard.tryAndConnectLasCC(delayNode);
+            tmp.set((x + toX) / 2f, (y + toY) / 2f); // midpoint
+
+            DelayNode delayNode = (DelayNode) createNode("DelayNode", tmp.x, tmp.y);
+            if (delayNode != null) {
+                delayNode.constructNode(getNodeListPopup().getModuleByName("DelayNode"));
+                Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(delayNode));
+
+                nodeBoard.tryAndConnectLasCC(delayNode);
+            }
+
+            delayNode.setY(delayNode.getY() - delayNode.getHeight() / 2f + 40);
+
+            delayNode.setMini();
+
+            nodeBoard.removeConnection(connection);
+
+            nodeBoard.makeConnection(connection.fromNode, delayNode, connection.fromId, "startSignal");
+            nodeBoard.makeConnection(delayNode, connection.toNode, "onComplete", connection.toId);
+        }
+    }
+
+    /**
+     * reset data to normal if needed
+     * keep data defaults for next time
+     */
+    public void playInitiated() {
+        if(state != null) loadFromSnapshot();
+        makeSnapshot();
+    }
+
+    /**
+     * Time to reset everything to normal and reset any defaults
+     */
+    private void playFinished() {
+        loadFromSnapshot();
+        resetSnapshot();
+    }
+
+    /**
+     * is reported when any node is completed, even though other oe can be started
+     */
+    public void nodeReportedComplete() {
+
+        boolean isRunning = false;
+        Array<NodeWidget> nodes = getNodeBoard().getNodes();
+        for(NodeWidget node : nodes) {
+            if (node instanceof AbstractGenericTweenNode) {
+                AbstractGenericTweenNode tweenNode = (AbstractGenericTweenNode) node;
+
+                if(tweenNode.isRunning()) {
+                    isRunning = true;
+                    break;
+                }
+            }
         }
 
-        delayNode.setY(delayNode.getY() - delayNode.getHeight()/2f + 40);
+        if(!isRunning) {
+            // seems like all is Complete
+            playFinished();
+        }
+    }
 
-        delayNode.setMini();
+    private void resetSnapshot() {
+        state = null;
+    }
 
-        nodeBoard.removeConnection(connection);
+    private void loadFromSnapshot() {
+        SceneEditorProject project = (SceneEditorProject) TalosMain.Instance().ProjectController().getProject();
+        SceneEditorAddon sceneEditorAddon = project.sceneEditorAddon;
 
-        nodeBoard.makeConnection(connection.fromNode, delayNode, connection.fromId, "startSignal");
-        nodeBoard.makeConnection(delayNode, connection.toNode, "onComplete", connection.toId);
+        if(state != null) {
+            sceneEditorAddon.workspace.getCurrentContainer().load(state);
+        }
+    }
 
+    private void makeSnapshot() {
+        SceneEditorProject project = (SceneEditorProject) TalosMain.Instance().ProjectController().getProject();
+        SceneEditorAddon sceneEditorAddon = project.sceneEditorAddon;
+        state = sceneEditorAddon.workspace.getCurrentContainer().getAsString();
     }
 }

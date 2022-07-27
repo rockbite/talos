@@ -95,8 +95,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
         private Actor dataActor = null;
 
+        public boolean basic = false;
+
         public void setHighlightActor(Actor tmpActor) {
             dataActor = tmpActor;
+            basic = false;
         }
 
         public void unsetHighlightActor() {
@@ -111,6 +114,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         public Color getHighlightColor() {
             if(dataActor == null) return NodeBoard.curveColor;
             return dataActor.getColor();
+        }
+
+        public void setHighlightActorBasic(Actor tmpActor) {
+            dataActor = tmpActor;
+            basic = true;
         }
     }
 
@@ -222,6 +230,11 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
             if(highlight >= 0) {
                 float highlightDist = Math.abs(i - highlight);
+
+                if(nodeConnection.basic) {
+                    highlightDist = 0;
+                }
+
                 float clamp = 0.2f;
                 float interpolationAlpha = MathUtils.clamp(highlightDist, 0, clamp) * (1f/clamp); // 0->1 value, where 0 is max highlight, 1 is default
                 tmpColor.a = MathUtils.lerp(highlightColor.a, mainColor.a, interpolationAlpha);
@@ -229,6 +242,10 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                 tmpColor.g = MathUtils.lerp(highlightColor.g, mainColor.g, interpolationAlpha);
                 tmpColor.b = MathUtils.lerp(highlightColor.b, mainColor.b, interpolationAlpha);
                 thickness = 2f + (1f - interpolationAlpha) * 6f;
+
+                if(nodeConnection.basic) {
+                    thickness = 2f;
+                }
 
                 shapeRenderer.setColor(tmpColor);
             } else {

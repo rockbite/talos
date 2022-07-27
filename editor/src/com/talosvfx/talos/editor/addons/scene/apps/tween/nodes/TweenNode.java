@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween.nodes;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
@@ -17,7 +18,7 @@ public class TweenNode extends AbstractTweenNode {
     }
 
     @Override
-    protected void onSignalReceived(String command, Object[] payload) {
+    protected void onSignalReceived(String command, ObjectMap<String, Object> payload) {
         if(command.equals("execute")) {
             playTween();
         }
@@ -25,8 +26,8 @@ public class TweenNode extends AbstractTweenNode {
 
     private void playTween() {
         String target = (String) (getWidget("target").getValue());
-        Object[] payload = new Object[1];
-        payload[0] = target;
+        ObjectMap payload = new ObjectMap<String, Object>();
+        payload.put("target", target);
         sendSignal("startSignal", "execute", payload);
     }
 
@@ -39,6 +40,9 @@ public class TweenNode extends AbstractTweenNode {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
+                ((TweenStage)nodeBoard.getNodeStage()).playInitiated();
+
                 playTween();
                 super.clicked(event, x, y);
             }

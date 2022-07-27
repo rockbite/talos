@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
@@ -71,18 +68,18 @@ public abstract class AbstractTweenNode extends NodeWidget {
 
     }
 
-    protected void sendSignal(String portName, String command, Object[] payload) {
+    protected boolean sendSignal(String portName, String command, ObjectMap<String, Object> payload) {
         Array<Connection> connections = outputs.get(portName);
 
         if (connections == null) {
-            return;
+            return false;
         }
 
         for(Connection connection : connections) {
             String targetSlot = connection.targetSlot;
 
             if (targetSlot == null) {
-                return;
+                return false;
             }
 
             AbstractTweenNode targetNode = (AbstractTweenNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
@@ -92,6 +89,29 @@ public abstract class AbstractTweenNode extends NodeWidget {
 
             targetNode.onSignalReceived(command, payload);
         }
+
+        return true;
+    }
+
+    private void animateInput(String fromSlot, Connection connection) {
+        Color color = Color.valueOf("#0957a8");
+        Actor tmpActor = new Actor();
+        addActor(tmpActor);
+        NodeBoard.NodeConnection nodeConnection = nodeBoard.findConnection(connection.targetNode, this, connection.targetSlot, fromSlot);
+        nodeConnection.setHighlightActorBasic(tmpActor);
+        tmpActor.setColor(NodeBoard.curveColor);
+
+        tmpActor.addAction(Actions.sequence(
+                Actions.color(color, 0.05f),
+                Actions.color(NodeBoard.curveColor, 0.5f),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        nodeConnection.unsetHighlightActor();
+                        tmpActor.remove();
+                    }
+                })
+        ));
     }
 
     private void animateSignal(String fromSlot, Connection connection) {
@@ -134,5 +154,32 @@ public abstract class AbstractTweenNode extends NodeWidget {
         ));
     }
 
-    protected abstract void onSignalReceived(String command, Object[] payload);
+    protected void onSignalReceived(String command, ObjectMap<String, Object> payload) {
+
+    }
+
+    protected float getWidgetFloatValue(String name) {
+        return (float)getWidgetValue(name);
+    }
+
+    protected Object getWidgetValue(String name) {
+        AbstractWidget widget = getWidget(name);
+        Array<Connection> connections = getInputs().get(name);
+
+        if(connections == null || connections.size == 0) {
+            return widget.getValue();
+        } else {
+            Connection first = connections.first();
+
+            animateInput(name, first);
+
+            AbstractTweenNode targetNode = (AbstractTweenNode) first.targetNode;
+            return targetNode.getOutputValue(first.targetSlot);
+        }
+    }
+
+    public Object getOutputValue(String name) {
+        return 0f;
+    }
 }
+

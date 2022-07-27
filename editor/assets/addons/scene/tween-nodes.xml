@@ -29,5 +29,12 @@
         <module name = "TimeLineNode" title = "Stagger" keywords = "tween">
 
         </module>
+        <module name = "NumberNode" title = "Number" keywords = "">
+            <dynamicValue port="output" name="value" type="float" min="-1000" max="1000">Value: </dynamicValue>
+        </module>
+        <module name = "OneMinusNode" title = "One Minus" keywords = "">
+            <value port="input" name="input" type="float">input</value>
+            <value port="output" name="output" type="float">output</value>
+        </module>
     </category>
 </modules>

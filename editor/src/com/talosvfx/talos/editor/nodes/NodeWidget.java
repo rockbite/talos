@@ -599,4 +599,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     public Table getCustomContainer(String name) {
         return containerMap.get(name);
     }
+
+    public String getType(String name) {
+        return typeMap.get(name);
+    }
 }

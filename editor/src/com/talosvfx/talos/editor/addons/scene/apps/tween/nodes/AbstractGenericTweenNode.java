@@ -17,10 +17,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 
@@ -28,6 +31,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     boolean running = false;
     float time = 0;
+    float duration;
 
     private Vector2 vec = new Vector2();
     private Vector2 vec2 = new Vector2();
@@ -36,20 +40,74 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     private boolean isMicroView = false;
 
+    private ObjectMap<String, Object> payload;
+
     @Override
-    protected void onSignalReceived(String command, Object[] payload) {
+    protected void onSignalReceived(String command, ObjectMap<String, Object> payload) {
         if(command.equals("execute")) {
-            runGenericTween();
+            runGenericTween(payload);
         }
     }
 
-    public void runGenericTween() {
+    public void runGenericTween(ObjectMap<String, Object> payload) {
+        this.payload = payload;
+        String targetString = (String)payload.get("target");
+        GameObject gameObject = fetchGameObject(targetString);
+
         running = true;
         time = 0;
+
+        duration = getWidgetFloatValue("duration");
+
+        startTween(gameObject);
 
         if(isMicroView) {
             microNodeView.showProgressDisc();
         }
+    }
+
+    private GameObject fetchGameObject(String targetString) {
+
+        SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
+        GameObject root = sceneEditorAddon.workspace.getCurrentContainer().root;
+
+        return findGameObject(root, targetString);
+    }
+
+    private GameObject findGameObject(GameObject parent, String targetString) {
+
+        int dotIndex = targetString.indexOf(".");
+        String lastPart = "";
+
+        String levelName = targetString;
+        if(dotIndex >= 0) {
+            levelName = targetString.substring(0, targetString.indexOf("."));
+
+            if(targetString.length() > dotIndex + 1) {
+                lastPart = targetString.substring(targetString.indexOf(".") + 1);
+            } else {
+                //irrelevant dot
+                lastPart = "";
+            }
+        }
+
+        Array<GameObject> gameObjects = parent.getGameObjects();
+
+        for(GameObject gameObject : gameObjects) {
+            if(gameObject.getName().equals(levelName)) {
+                if(lastPart.length() == 0) {
+                    return gameObject;
+                } else {
+                    return findGameObject(gameObject, lastPart);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    protected void startTween(GameObject target) {
+
     }
 
     @Override
@@ -222,6 +280,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         nodeBoard.getStage().addActor(microNodeView);
         microNodeView.setPosition(vec.x, vec.y);
         microNodeView.show();
+
+        microNodeView.setLabel(((int)(getWidgetFloatValue("duration")*100f)/100f) + "");
         isMicroView = true;
 
         addAction(Actions.sequence(
@@ -260,6 +320,10 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         isMicroView = true;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
     class InterpolationTimeline extends Table {
 
         private Image tracker;
@@ -286,7 +350,9 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         }
 
         protected void fireOnComplete() {
-            sendSignal("onComplete", "execute", null);
+            boolean sent = sendSignal("onComplete", "execute", payload);
+
+            ((TweenStage)nodeBoard.getNodeStage()).nodeReportedComplete();
 
             if(isMicroView) {
                 microNodeView.hideProgressDisc();
@@ -298,21 +364,19 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             super.act(delta);
 
             if(running) {
-                float duration = (float) getWidget("duration").getValue();
                 time += delta;
 
                 if(time >= duration) {
                     time = duration;
                     running = false;
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            fireOnComplete();
-                        }
-                    });
+                    fireOnComplete();
                 }
 
                 alpha = time/duration;
+
+                //todo: add interpolation of alpha here
+
+                tick(alpha);
 
                 if(isMicroView) {
                     microNodeView.setProgress(alpha);
@@ -355,6 +419,10 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         public float getPrefHeight() {
             return 58;
         }
+    }
+
+    protected void tick(float alpha) {
+
     }
 
     class ProgressWidget extends Table {
