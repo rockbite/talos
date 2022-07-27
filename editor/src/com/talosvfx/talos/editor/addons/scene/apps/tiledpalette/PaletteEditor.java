@@ -26,8 +26,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private String title;
     private DragAndDrop.Target target;
 
-    private ObjectMap<GameAsset<?>, StaticTile> staticTiles;
-    private ObjectMap<GameAsset<?>, GameObject> gameObjects;
+
 
     enum PaletteFilterMode {
         TILE,
@@ -196,7 +195,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         public void addSprite(GameAsset<?> gameAsset) {
             GridPosition gridPosition = new GridPosition(0, 0);
-            staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
+            object.getResource().staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
         }
 
         public void removeSprite(GameAsset<?> gameAsset) {

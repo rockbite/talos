@@ -4,12 +4,18 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 
 import java.util.UUID;
 
 public class TilePaletteData implements Json.Serializable{
     public ObjectMap<UUID, GameAsset<?>> references;
     public ObjectMap<UUID, float[]> positions;
+
+
+    //Working not for serializing
+    public transient ObjectMap<GameAsset<?>, StaticTile> staticTiles;
+    public transient ObjectMap<GameAsset<?>, GameObject> gameObjects;
 
     public TilePaletteData () {
         references = new ObjectMap<>();
