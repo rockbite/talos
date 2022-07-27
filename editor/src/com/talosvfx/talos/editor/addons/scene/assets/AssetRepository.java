@@ -256,6 +256,7 @@ public class AssetRepository {
 			}
 
 			gameAssetsToExport.add(gameAsset);
+			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
 		}
 
 		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
@@ -599,6 +600,11 @@ public class AssetRepository {
 				if (createLinks) {
 					value.gameAssetReferences.add(paletteGameAsset);
 					paletteGameAsset.dependentRawAssets.add(value);
+
+					for (ObjectMap.Entry<UUID, GameAsset<?>> reference : paletteData.references) {
+						//Add the dependent game asset's root assets
+						paletteGameAsset.dependentGameAssets.addAll(reference.value);
+					}
 				}
 
 				break;
