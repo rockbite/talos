@@ -89,11 +89,13 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
 
                 if(button == 2 || ctrlPressed()) {
+
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
 
-                    getStage().setKeyboardFocus(PaletteEditorWorkspace.this);
+                    getStage().cancelTouchFocusExcept(this, PaletteEditorWorkspace.this);
+
 
                     event.handle();
 
