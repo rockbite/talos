@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -204,7 +205,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         }
 
         public void addEntity(GameAsset<?> gameAsset) {
-            gameObjects.put(gameAsset, new GameObject());
+            object.getResource().gameObjects.put(gameAsset, new GameObject());
         }
 
         public void removeEntity(GameAsset<?> gameAsset) {
