@@ -44,6 +44,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -655,9 +656,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         changeVersion = UUID.randomUUID().toString();
 
-        if(projectPath != null) {
-            json.writeValue("projectPath", projectPath);
-
+        if (projectPath != null) {
             json.writeArrayStart("layers");
             for (String layer : layers) {
                 json.writeValue(layer);
@@ -686,9 +685,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
         ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
 
-        if(projectPath == null || projectPath.isEmpty()) {
-            projectPath = jsonData.getString("projectPath", "");
-        }
         projectExplorer.loadDirectoryTree(projectPath);
 
         JsonValue layersJson = jsonData.get("layers");
@@ -1175,9 +1171,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
     }
 
     public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
-
         String path = jsonData.getString("currentScene", "");
-        String projectPath = jsonData.getString("projectPath", "");
 
         AssetRepository.init();
         AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath).child("assets"));
