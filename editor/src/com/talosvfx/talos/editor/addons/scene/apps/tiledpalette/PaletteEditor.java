@@ -118,7 +118,9 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         }
 
-        // keep reference of what is selected
+        // keep reference of what 'GameAsset' is selected. Our reference should be GameAsset type, but algorithms to select the entities/sprites can two combined
+        //different approachs
+        
         // also when dropping sprite snap to grid
         // save after every edit event such as drop, remove or just move
         // draw mode such as brush and shit
