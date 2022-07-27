@@ -84,8 +84,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
     public Array<String> layers = new Array<>();
 
-    public boolean customGrid = false;
-
+    private final GridDrawer gridDrawer;
     public GridProperties gridProperties = new GridProperties();
     private MapEditorState mapEditorState;
     private MapEditorToolbar mapEditorToolbar;
@@ -153,6 +152,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         selectionRect.setSize(0, 0);
         selectionRect.setVisible(false);
         addActor(selectionRect);
+
+        gridDrawer = new GridDrawer(this, camera, gridProperties);
     }
 
 
@@ -736,13 +737,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         if(!(TalosMain.Instance().Project() instanceof SceneEditorProject)) return;
         batch.end();
 
-        if (gridProperties.sizeProvider != null) { //Run the logic to check it
-            gridProperties.sizeProvider.get();
-        }
-
-        if (customGrid && gridProperties.sizeProvider != null && !gridProperties.noLayerSelected) {
-            float[] size = gridProperties.sizeProvider.get();
-            GridDrawer.drawGrid(this, camera, batch, size[0], size[1], 1, true, true);
+        if (mapEditorState.isEditing()) {
+            gridDrawer.highlightCursorHover = true;
+            gridDrawer.drawGrid();
         } else {
             drawGrid(batch, parentAlpha);
         }
