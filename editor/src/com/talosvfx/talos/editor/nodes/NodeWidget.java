@@ -347,14 +347,42 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         }
     }
 
-    public void setSlotInactive (String toId, boolean isInput) {
+    public void setSlotConnectionInactive (NodeBoard.NodeConnection nodeConnection, boolean isInput) {
         if(isInput) {
-            //inputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
-            inputs.remove(toId);
+            Array<Connection> connections = inputs.get(nodeConnection.toId);
+            if(connections == null) {
+                return;
+            }
+            Connection deleteConnection = null;
+            for(Connection connection : connections) {
+                if (connection.targetSlot.equals(nodeConnection.fromId) && connection.targetNode == nodeConnection.fromNode) {
+                    deleteConnection = connection;
+                    break;
+                }
+            }
+            if(deleteConnection != null) {
+                connections.removeValue(deleteConnection, true);
+            }
         } else {
-            //outputSlotMap.get(toId).setDrawable(getSkin().getDrawable("node-connector-off"));
-            outputs.remove(toId);
-            lastAttachedNode = null;
+            Array<Connection> connections = outputs.get(nodeConnection.fromId);
+            if(connections == null) {
+                lastAttachedNode = null;
+                return;
+            }
+            Connection deleteConnection = null;
+            for(Connection connection : connections) {
+                if (connection.targetSlot.equals(nodeConnection.toId) && connection.targetNode == nodeConnection.toNode) {
+                    deleteConnection = connection;
+                    break;
+                }
+            }
+            if(deleteConnection != null) {
+                connections.removeValue(deleteConnection, true);
+            }
+
+            if(connections.size == 0) {
+                lastAttachedNode = null;
+            }
         }
     }
 

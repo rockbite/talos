@@ -183,7 +183,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     private void drawCurve(float x, float y, float toX, float toY, NodeConnection nodeConnection, NodeConnection hoveredConnectionRef) {
 
-        float highlight = 0;
+        float highlight = -1;
         Color highlightColor = NodeBoard.curveColor;
 
         if(nodeConnection != null) {
@@ -381,8 +381,8 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         //Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionPreRemovedEvent.class).set(connection));
         nodeConnections.removeValue(connection, true);
 
-        connection.fromNode.setSlotInactive(connection.fromId, false);
-        connection.toNode.setSlotInactive(connection.toId, true);
+        connection.fromNode.setSlotConnectionInactive(connection, false);
+        connection.toNode.setSlotConnectionInactive(connection, true);
 
         Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
 
