@@ -15,7 +15,11 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -172,6 +176,10 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
         ObjectMap<UUID, GameAsset<?>> references = paletteData.getResource().references;
 
+        ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
+        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+
         for (ObjectMap.Entry<UUID, GameAsset<?>> reference : references) {
             float[] position = positions.get(reference.key);
             float x = position[0];
@@ -182,6 +190,37 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         shapeRenderer.end();
 
         batch.begin();
+
+        TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+        float tileSizeX = 1;
+        float tileSizeY = 1;
+        if (layerSelected != null) {
+            tileSizeX = layerSelected.getTileSizeX();
+            tileSizeY = layerSelected.getTileSizeY();
+        }
+        for (ObjectMap.Entry<GameAsset<?>, StaticTile> entry : staticTiles) {
+            float[] pos = positions.get(entry.key.getRootRawAsset().metaData.uuid);
+
+            StaticTile staticTile = entry.value;
+            StaticTile value = staticTile;
+            GridPosition gridPosition = value.getGridPosition();
+            gridPosition.x = pos[0];
+            gridPosition.y = pos[1];
+
+            mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
+        }
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
+            float[] pos = positions.get(entry.key.getRootRawAsset().metaData.uuid);
+
+            GameObject gameObject = entry.value;
+            if (gameObject.hasComponent(TransformComponent.class)) {
+                TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+                transform.position.set(pos[0], pos[1]);
+            }
+
+            mainRenderer.update(gameObject);
+            mainRenderer.render(batch, gameObject);
+        }
     }
 
 
