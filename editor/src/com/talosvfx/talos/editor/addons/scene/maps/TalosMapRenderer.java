@@ -98,7 +98,7 @@ public class TalosMapRenderer {
 							if (entries.containsKey(j)) {
 								StaticTile staticTile = entries.get(j);
 
-								renderTileDynamic(mainRenderer, batch, staticTile);
+								renderTileDynamic(mainRenderer, batch, staticTile, layer.getTileSizeX(), layer.getTileSizeY());
 
 							}
 						}
@@ -122,8 +122,8 @@ public class TalosMapRenderer {
 		}
 	}
 
-	public void renderTileDynamic (MainRenderer mainRenderer, Batch batch, StaticTile staticTile) {
-		mainRenderer.renderStaticTileDynamic(staticTile, batch);
+	public void renderTileDynamic (MainRenderer mainRenderer, Batch batch, StaticTile staticTile, float tileSizeX, float tileSizeY) {
+		mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
 	}
 
 	public void render (MainRenderer mainRenderer, Batch batch, GameObject entityThatHasTheMap, MapComponent map) {

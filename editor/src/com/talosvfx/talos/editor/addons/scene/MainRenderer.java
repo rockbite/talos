@@ -13,10 +13,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
@@ -300,8 +302,16 @@ public class MainRenderer implements Notifications.Observer {
         mapRenderer.render(this, batch, gameObject, map);
     }
 
-    public void renderStaticTileDynamic (StaticTile staticTile, Batch batch) {
+    public void renderStaticTileDynamic (StaticTile staticTile, Batch batch, float tileSizeX, float tileSizeY) {
         System.out.println("Todo render static tile");
+        GridPosition gridPosition = staticTile.getGridPosition();
+        GameAsset<?> staticTilesAsset = staticTile.getStaticTilesAsset();
+        if (staticTilesAsset.type == GameAssetType.SPRITE) {
+            GameAsset<Texture> texGameAsset = (GameAsset<Texture>)staticTilesAsset;
+            Texture resource = texGameAsset.getResource();
+
+            batch.draw(resource, gridPosition.getIntX(), gridPosition.getIntY(), tileSizeX, tileSizeY);
+        }
     }
 
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {

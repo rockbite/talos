@@ -126,11 +126,11 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	private void putTile (StaticTile readTile) {
 		GridPosition gridPosition = readTile.gridPosition;
 
-		if (!staticTiles.containsKey(gridPosition.x)) {
-			staticTiles.put(gridPosition.x, new IntMap<>());
+		if (!staticTiles.containsKey(gridPosition.getIntX())) {
+			staticTiles.put(gridPosition.getIntX(), new IntMap<>());
 		}
-		IntMap<StaticTile> entries = staticTiles.get(gridPosition.x);
-		entries.put(gridPosition.y, readTile);
+		IntMap<StaticTile> entries = staticTiles.get(gridPosition.getIntX());
+		entries.put(gridPosition.getIntY(), readTile);
 	}
 
 	@Override
