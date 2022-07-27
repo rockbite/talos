@@ -1,21 +1,26 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
-public class TalosLayer implements Json.Serializable {
+public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Serializable {
 
 
 	private String name;
 	private LayerType type;
 
-//	private GameAsset<PaletteData> //todo hook up to this
+	private GameAsset<TilePaletteData> gameAsset;
 
 	private int mapWidth = 100;
 	private int mapHeight = 100;
@@ -51,6 +56,8 @@ public class TalosLayer implements Json.Serializable {
 
 	@Override
 	public void write (Json json) {
+		GameResourceOwner.writeGameAsset(json, this);
+
 		json.writeValue("type", this.type);
 		json.writeValue("name", this.name);
 		switch (type) {
@@ -126,6 +133,10 @@ public class TalosLayer implements Json.Serializable {
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
+		String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+
+		loadPaletteFromIdentifier(gameResourceIdentifier);
+
 		this.type = json.readValue(LayerType.class, jsonData.get("type"));
 		this.name = jsonData.getString("name");
 
@@ -172,5 +183,45 @@ public class TalosLayer implements Json.Serializable {
 
 	public IntMap<IntMap<StaticTile>> getStaticTiles () {
 		return staticTiles;
+	}
+
+	@Override
+	public GameAssetType getGameAssetType () {
+		return GameAssetType.TILE_PALETTE;
+	}
+
+	@Override
+	public GameAsset<TilePaletteData> getGameResource () {
+		return gameAsset;
+	}
+
+	GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
+		@Override
+		public void onUpdate () {
+			if (gameAsset.isBroken()) {
+			} else {
+			}
+		}
+	};
+
+	@Override
+	public void setGameAsset (GameAsset<TilePaletteData> newGameAsset) {
+		if (this.gameAsset != null) {
+			//Remove from old game asset, it might be the same, but it may also have changed
+			this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+		}
+
+		this.gameAsset = newGameAsset;
+
+		if (newGameAsset != null) {
+			this.gameAsset.listeners.add(gameAssetUpdateListener);
+
+			gameAssetUpdateListener.onUpdate();
+		}
+	}
+
+	private void loadPaletteFromIdentifier (String identifier) {
+		GameAsset<TilePaletteData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(identifier, GameAssetType.TILE_PALETTE);
+		setGameAsset(assetForIdentifier);
 	}
 }
