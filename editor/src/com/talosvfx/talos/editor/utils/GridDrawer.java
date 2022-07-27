@@ -95,6 +95,7 @@ public class GridDrawer {
 		shapeRenderer.setAutoShapeType(true);
 		shapeRenderer.begin();
 
+
 		for (float x = startGridX; x < startGridX + totalWidth; x += gridSizeX) {
 			shapeRenderer.line(x, bottomSide, x, bottomSide + totalHeight);
 		}
@@ -117,6 +118,11 @@ public class GridDrawer {
 				}
 			}
 		}
+
+		shapeRenderer.setColor(Color.GREEN);
+		shapeRenderer.line(-totalWidth, 0, totalWidth, 0);
+		shapeRenderer.setColor(Color.RED);
+		shapeRenderer.line(0, -totalHeight, 0, totalHeight);
 
 		shapeRenderer.setColor(color);
 

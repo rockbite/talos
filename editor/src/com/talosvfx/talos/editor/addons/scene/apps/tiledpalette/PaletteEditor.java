@@ -2,19 +2,33 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.UUID;
 
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private String title;
     private DragAndDrop.Target target;
+
+    enum PaletteFilterMode {
+        TILE,
+        ENTITY,
+        TILE_ENTITY
+    }
+
+    protected PaletteFilterMode currentFilterMode = PaletteFilterMode.TILE_ENTITY;
 
     public PaletteEditor(GameAsset<TilePaletteData> paletteData) {
         super(paletteData);
@@ -28,6 +42,67 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         content = new Table();
         PaletteEditorWorkspace paletteEditorWorkspace = new PaletteEditorWorkspace(this.object);
         this.content.add(paletteEditorWorkspace).minSize(500).grow();
+
+        Skin skin = TalosMain.Instance().getSkin();
+
+        Table toolbar = new Table();
+        toolbar.setFillParent(true);
+        toolbar.top().left();
+
+        Table element = new Table();
+        element.setBackground(skin.newDrawable("button-main-menu"));
+        toolbar.add(element);
+
+        element.defaults().pad(5);
+
+        SquareButton tile = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+
+
+        tile.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tile.setChecked(!tile.isChecked());
+                if (tile.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.TILE;
+                }
+            }
+        });
+        entity.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                entity.setChecked(!entity.isChecked());
+                if (entity.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.ENTITY;
+                }
+            }
+        });
+        tileEntity.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tileEntity.setChecked(!tileEntity.isChecked());
+                if (tileEntity.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.TILE_ENTITY;
+                }
+            }
+        });
+
+        ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
+        buttonButtonGroup.add(tile, entity, tileEntity);
+        buttonButtonGroup.setMaxCheckCount(1);
+        buttonButtonGroup.setMinCheckCount(1);
+
+        tileEntity.setChecked(true);
+
+        element.add(tileEntity);
+        element.add(tile);
+        element.add(entity);
+
+        this.content.addActor(toolbar);
 
         // register the drag and drop target
         target = new PaletteDragAndDropTarget(paletteEditorWorkspace);
@@ -120,7 +195,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         // keep reference of what 'GameAsset' is selected. Our reference should be GameAsset type, but algorithms to select the entities/sprites can two combined
         //different approachs
-        
+
         // also when dropping sprite snap to grid
         // save after every edit event such as drop, remove or just move
         // draw mode such as brush and shit
