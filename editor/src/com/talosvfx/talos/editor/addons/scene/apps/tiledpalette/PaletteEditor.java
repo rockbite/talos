@@ -9,7 +9,6 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.utils.GridDrawer;
 
 import java.util.UUID;
 
@@ -60,13 +59,47 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         @Override
         public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
             GameAsset<?> gameAsset = (GameAsset<?>) payload.getObject();
-            ObjectMap<UUID, GameAsset<?>> references = PaletteEditor.this.object.getResource().references;
-            ObjectMap<UUID, float[]> positions = PaletteEditor.this.object.getResource().positions;
-            references.put(gameAsset.getRootRawAsset().metaData.uuid, gameAsset);
+            addGameAsset(gameAsset, x, y);
+        }
+
+        public void addGameAsset (GameAsset<?> gameAsset, float x, float y) {
+            //Check if we already have it
+            GameAsset<TilePaletteData> tilePaletteGameAsset = PaletteEditor.this.object;
+
+            TilePaletteData paletteData = tilePaletteGameAsset.getResource();
+            ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
+            ObjectMap<UUID, float[]> positions = paletteData.positions;
+
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+            if (references.containsKey(gameAssetUUID)) {
+                System.out.println("Adding a duplicate, ignoring");
+                return;
+            }
+
 
             PaletteEditorWorkspace workspace = (PaletteEditorWorkspace) getActor();
-            Vector2 pos = workspace.getWorldFromLocal(x, y);
-            positions.put(gameAsset.getRootRawAsset().metaData.uuid, new float[]{pos.x, pos.y});
+            Vector2 worldSpace = workspace.getWorldFromLocal(x, y);
+
+            references.put(gameAssetUUID, gameAsset);
+            positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
+
+            tilePaletteGameAsset.dependentGameAssets.add(gameAsset);
+        }
+
+        public void removeGameAsset (GameAsset<?> gameAsset) {
+            GameAsset<TilePaletteData> tilePaletteGameAsset = PaletteEditor.this.object;
+
+            TilePaletteData paletteData = tilePaletteGameAsset.getResource();
+            ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
+            ObjectMap<UUID, float[]> positions = paletteData.positions;
+
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+
+            tilePaletteGameAsset.dependentGameAssets.removeValue(gameAsset, true);
+
+            references.remove(gameAssetUUID);
+            positions.remove(gameAssetUUID);
+
         }
 
         public void addSprite() {
