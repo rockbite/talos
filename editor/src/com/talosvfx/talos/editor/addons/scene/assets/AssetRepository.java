@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
+import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
@@ -210,6 +211,16 @@ public class AssetRepository {
 
 					String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(component);
 					pairs.add(new TypeIdentifierPair(type, gameResourceIdentifier));
+				}
+				if (componentClazz.equals(MapComponent.class.getName())) {
+					JsonValue layers = component.get("layers");
+
+					for (int i = 0; i < layers.size; i++) {
+						JsonValue layer = layers.get(i);
+						String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(layer);
+						pairs.add(new TypeIdentifierPair(GameAssetType.TILE_PALETTE, gameResourceIdentifier));
+					}
+
 				}
 			}
 		}
