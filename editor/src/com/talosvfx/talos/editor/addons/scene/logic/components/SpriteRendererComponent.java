@@ -25,6 +25,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public Color color = new Color(Color.WHITE);
     public boolean flipX;
     public boolean flipY;
+    public boolean fixAspectRatio;
     public RenderMode renderMode = RenderMode.simple;
 
     @ValueProperty(prefix = {"W", "H"})
@@ -84,11 +85,13 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
+        PropertyWidget fixAspectRatio = WidgetFactory.generate(this, "fixAspectRatio", "Fix Aspect Ratio");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
 
         properties.add(textureWidget);
         properties.add(colorWidget);
+        properties.add(fixAspectRatio);
         properties.add(flipXWidget);
         properties.add(flipYWidget);
         properties.add(renderModesWidget);
