@@ -5,15 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pool;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
@@ -36,7 +35,6 @@ import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPr
 public class PaletteEditorWorkspace extends ViewportWidget {
     GameAsset<TilePaletteData> paletteData;
 
-
     private GridDrawer gridDrawer;
     private SceneEditorWorkspace.GridProperties gridProperties;
 
@@ -44,6 +42,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
     private MainRenderer mainRenderer;
 
+    private Pool<PaletteEvent> paletteEventPool;
 
     public PaletteEditorWorkspace(GameAsset<TilePaletteData> paletteData) {
         super();
@@ -52,6 +51,15 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         setCameraPos(0, 0);
 
         mainRenderer = new MainRenderer();
+
+        paletteEventPool = new Pool<PaletteEvent>() {
+            @Override
+            protected PaletteEvent newObject() {
+                PaletteEvent e = new PaletteEvent();
+                e.setTarget(PaletteEditorWorkspace.this);
+                return e;
+            }
+        };
 
         gridProperties = new SceneEditorWorkspace.GridProperties();
         gridProperties.sizeProvider = new Supplier<float[]>() {
@@ -239,17 +247,18 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
     private void selectByPoint (float x, float y) {
         Vector3 localPoint = new Vector3(x, y, 0);
-        PaletteEditorWorkspace.this.getWorldFromLocal(localPoint);
+        getWorldFromLocal(localPoint);
 
         // get list of entities that have their origin in the rectangle
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
         paletteData.getResource().selectedGameAssets.clear();
 
         //find closest
         GameAsset<?> closestGameAsset = null;
-
+        PaletteEditor.PaletteFilterMode mode = PaletteEditor.PaletteFilterMode.NONE;
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
             UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
@@ -265,33 +274,74 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             if (squareDistanceToCheck < squaredDistance) {
                 if (squareDistanceToCheck < currentClosestDistance) {
                     closestGameAsset = gameAsset;
+                    mode = PaletteEditor.PaletteFilterMode.ENTITY;
                 }
             }
         }
+        for (ObjectMap.Entry<GameAsset<?>, StaticTile> staticTileEntry : staticTiles) {
+            GameAsset<?> gameAsset = staticTileEntry.key;
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+            StaticTile staticTile = staticTileEntry.value;
+
+            float[] pos = positions.get(gameAssetUUID);
+
+            float minDistance = 1;
+            float squaredDistance = minDistance * minDistance;
+            float currentClosestDistance = squaredDistance + 1;
+
+            float squareDistanceToCheck = (float)(Math.pow(pos[0] - localPoint.x, 2) + Math.pow(pos[1] - localPoint.y, 2));
+            if (squareDistanceToCheck < squaredDistance) {
+                if (squareDistanceToCheck < currentClosestDistance) {
+                    closestGameAsset = gameAsset;
+                    mode = PaletteEditor.PaletteFilterMode.TILE;
+                }
+            }
+        }
+        // fire event more palette
         if (closestGameAsset != null) {
             paletteData.getResource().selectedGameAssets.add(closestGameAsset);
+            PaletteEvent event = paletteEventPool.obtain();
+            event.setType(PaletteEvent.Type.selected);
+            event.setSelectedGameAssets(paletteData.getResource().selectedGameAssets);
+            event.setCurrentFilterMode(mode);
+            notify(event, false);
         }
     }
 
+    Vector3 lb = new Vector3();
+    Vector3 lt = new Vector3();
+    Vector3 rb = new Vector3();
+    Vector3 rt = new Vector3();
     private void selectByRect(Rectangle rectangle) {
         Rectangle localRect = new Rectangle();
-        Vector3 lb = new Vector3(rectangle.x, rectangle.y, 0);
-        Vector3 lt = new Vector3(rectangle.x, rectangle.y + rectangle.height, 0);
-        Vector3 rb = new Vector3(rectangle.x + rectangle.width, rectangle.y, 0);
-        Vector3 rt = new Vector3(rectangle.x + rectangle.width, rectangle.y + rectangle.height, 0);
-        PaletteEditorWorkspace.this.getWorldFromLocal(lb);
-        PaletteEditorWorkspace.this.getWorldFromLocal(lt);
-        PaletteEditorWorkspace.this.getWorldFromLocal(rb);
-        PaletteEditorWorkspace.this.getWorldFromLocal(rt);
+        lb.set(rectangle.x, rectangle.y, 0);
+        lt.set(rectangle.x, rectangle.y + rectangle.height, 0);
+        rb.set(rectangle.x + rectangle.width, rectangle.y, 0);
+        rt.set(rectangle.x + rectangle.width, rectangle.y + rectangle.height, 0);
+        getWorldFromLocal(lb);
+        getWorldFromLocal(lt);
+        getWorldFromLocal(rb);
+        getWorldFromLocal(rt);
         localRect.set(lb.x, lb.y, Math.abs(rb.x - lb.x), Math.abs(lt.y - lb.y)); // selection rectangle in grid space
 
         // get list of entities that have their origin in the rectangle
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
         paletteData.getResource().selectedGameAssets.clear();
+        // entities
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+            float[] pos = positions.get(gameAssetUUID);
+            if(localRect.contains(pos[0], pos[1])) {
+                paletteData.getResource().selectedGameAssets.add(gameAsset);
+            }
+        }
+        // static tiles
+        for (ObjectMap.Entry<GameAsset<?>, StaticTile> staticTileEntry : staticTiles) {
+            GameAsset<?> gameAsset = staticTileEntry.key;
             UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
             float[] pos = positions.get(gameAssetUUID);
             if(localRect.contains(pos[0], pos[1])) {

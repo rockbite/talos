@@ -74,5 +74,8 @@ public class TilePaletteData implements Json.Serializable{
                 this.positions.put(uuid, position);
             }
         }
+
+        // make actual objects
+//        references.
     }
 }

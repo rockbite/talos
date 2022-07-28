@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -26,10 +27,10 @@ import java.util.UUID;
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private String title;
     private DragAndDrop.Target target;
-
-
+    private PaletteEditorWorkspace paletteEditorWorkspace;
 
     enum PaletteFilterMode {
+        NONE,
         TILE,
         ENTITY,
         TILE_ENTITY
@@ -47,7 +48,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     @Override
     public void initContent() {
         content = new Table();
-        PaletteEditorWorkspace paletteEditorWorkspace = new PaletteEditorWorkspace(this.object);
+        paletteEditorWorkspace = new PaletteEditorWorkspace(this.object);
         this.content.add(paletteEditorWorkspace).minSize(500).grow();
 
         Skin skin = TalosMain.Instance().getSkin();
@@ -103,8 +104,44 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                for (GameAsset<?> selectedGameAsset : object.getResource().selectedGameAssets) {
+                    if (currentFilterMode == PaletteFilterMode.TILE) {
+                        removeSprite(selectedGameAsset);
+                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
+                        removeEntity(selectedGameAsset);
+                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
+                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
+                            removeSprite(selectedGameAsset);
+                        } else {
+                            removeEntity(selectedGameAsset);
+                        }
+                    }
+                }
+            }
+        });
 
-                //todo delete current selection
+        // mode buttons should react on palette changes
+        paletteEditorWorkspace.addListener(new PaletteListener() {
+            @Override
+            public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteFilterMode mode) {
+                if (mode != PaletteFilterMode.NONE) {
+                    currentFilterMode = mode;
+                    tile.setChecked(false);
+                    entity.setChecked(false);
+                    tileEntity.setChecked(false);
+                    switch (currentFilterMode) {
+                        case TILE:
+                            tile.setChecked(true);
+                            break;
+                        case ENTITY:
+                            entity.setChecked(true);
+                            break;
+                        case TILE_ENTITY:
+                            tileEntity.setChecked(true);
+                            break;
+                    }
+                }
+                return false;
             }
         });
 
@@ -140,6 +177,100 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         return super.notifyClose();
     }
 
+    public void addGameAsset (GameAsset<?> gameAsset, float x, float y) {
+        //Check if we already have it
+        GameAsset<TilePaletteData> tilePaletteGameAsset = object;
+
+        TilePaletteData paletteData = tilePaletteGameAsset.getResource();
+        ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
+        ObjectMap<UUID, float[]> positions = paletteData.positions;
+
+        UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+        if (references.containsKey(gameAssetUUID)) {
+            System.out.println("Adding a duplicate, ignoring");
+            return;
+        }
+
+        PaletteEditorWorkspace workspace = paletteEditorWorkspace;
+        Vector2 worldSpace = workspace.getWorldFromLocal(x, y);
+
+        references.put(gameAssetUUID, gameAsset);
+        positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
+
+        tilePaletteGameAsset.dependentGameAssets.add(gameAsset);
+
+        if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
+            if (gameAsset.type == GameAssetType.SPRITE) {
+                addSprite(gameAsset);
+            } else {
+                System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
+            }
+        } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
+            addEntity(gameAsset);
+        }
+
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(tilePaletteGameAsset);
+    }
+
+    public void removeGameAsset (GameAsset<?> gameAsset) {
+        GameAsset<TilePaletteData> tilePaletteGameAsset = object;
+
+        TilePaletteData paletteData = tilePaletteGameAsset.getResource();
+        // first remove from selections
+        paletteData.selectedGameAssets.removeValue(gameAsset, true);
+
+        ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
+        ObjectMap<UUID, float[]> positions = paletteData.positions;
+
+        UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+
+        tilePaletteGameAsset.dependentGameAssets.removeValue(gameAsset, true);
+
+        references.remove(gameAssetUUID);
+        positions.remove(gameAssetUUID);
+
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(tilePaletteGameAsset);
+    }
+
+    public void addSprite(GameAsset<?> gameAsset) {
+        GridPosition gridPosition = new GridPosition(0, 0);
+        object.getResource().staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
+    }
+
+    public void removeSprite(GameAsset<?> gameAsset) {
+        object.getResource().staticTiles.remove(gameAsset);
+        removeGameAsset(gameAsset);
+    }
+
+    public void addEntity(GameAsset<?> gameAsset) {
+
+        //Lets create an entity from the asset
+        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+        GameObject tempParent = new GameObject();
+        boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent);
+        if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
+            success = false;
+        }
+        AssetImporter.fromDirectoryView = false;
+
+        if (success) {
+            object.getResource().gameObjects.put(gameAsset, tempParent.getGameObjects().first());
+        }
+    }
+
+    public void removeEntity(GameAsset<?> gameAsset) {
+        object.getResource().gameObjects.remove(gameAsset);
+        removeGameAsset(gameAsset);
+    }
+
+    public static boolean validForImport (GameAsset<?> gameAsset) {
+        boolean valid = (gameAsset.type == GameAssetType.SPRITE) ||
+                (gameAsset.type == GameAssetType.SKELETON) ||
+                (gameAsset.type == GameAssetType.VFX) ||
+                (gameAsset.type == GameAssetType.PREFAB);
+        return valid;
+    }
+
     private class PaletteDragAndDropTarget extends DragAndDrop.Target {
 
         public PaletteDragAndDropTarget(Actor actor) {
@@ -156,95 +287,6 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             GameAsset<?> gameAsset = (GameAsset<?>) payload.getObject();
             addGameAsset(gameAsset, x, y);
         }
-
-        public void addGameAsset (GameAsset<?> gameAsset, float x, float y) {
-            //Check if we already have it
-            GameAsset<TilePaletteData> tilePaletteGameAsset = PaletteEditor.this.object;
-
-            TilePaletteData paletteData = tilePaletteGameAsset.getResource();
-            ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
-            ObjectMap<UUID, float[]> positions = paletteData.positions;
-
-            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
-            if (references.containsKey(gameAssetUUID)) {
-                System.out.println("Adding a duplicate, ignoring");
-                return;
-            }
-
-
-            PaletteEditorWorkspace workspace = (PaletteEditorWorkspace) getActor();
-            Vector2 worldSpace = workspace.getWorldFromLocal(x, y);
-
-            references.put(gameAssetUUID, gameAsset);
-            positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
-
-            tilePaletteGameAsset.dependentGameAssets.add(gameAsset);
-
-            if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
-                if (gameAsset.type == GameAssetType.SPRITE) {
-                    addSprite(gameAsset);
-                } else {
-                    System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
-                }
-            } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
-                addEntity(gameAsset);
-            }
-        }
-
-        public void removeGameAsset (GameAsset<?> gameAsset) {
-            GameAsset<TilePaletteData> tilePaletteGameAsset = PaletteEditor.this.object;
-
-            TilePaletteData paletteData = tilePaletteGameAsset.getResource();
-            ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
-            ObjectMap<UUID, float[]> positions = paletteData.positions;
-
-            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
-
-            tilePaletteGameAsset.dependentGameAssets.removeValue(gameAsset, true);
-
-            references.remove(gameAssetUUID);
-            positions.remove(gameAssetUUID);
-
-            if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
-                if (gameAsset.type == GameAssetType.SPRITE) {
-                    removeSprite(gameAsset);
-                } else {
-                    System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
-                }
-            } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
-                removeEntity(gameAsset);
-            }
-        }
-
-        public void addSprite(GameAsset<?> gameAsset) {
-            GridPosition gridPosition = new GridPosition(0, 0);
-            object.getResource().staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
-        }
-
-        public void removeSprite(GameAsset<?> gameAsset) {
-            
-        }
-
-        public void addEntity(GameAsset<?> gameAsset) {
-
-            //Lets create an entity from the asset
-            AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-            GameObject tempParent = new GameObject();
-            boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent);
-            if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
-                success = false;
-            }
-            AssetImporter.fromDirectoryView = false;
-
-            if (success) {
-                object.getResource().gameObjects.put(gameAsset, tempParent.getGameObjects().first());
-            }
-        }
-
-        public void removeEntity(GameAsset<?> gameAsset) {
-            // add entity
-        }
-
         // keep reference of what 'GameAsset' is selected. Our reference should be GameAsset type, but algorithms to select the entities/sprites can two combined
         // different approaches
 
@@ -252,13 +294,5 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         // save after every edit event such as drop, remove or just move
         // draw mode such as brush and shit
         // main renderer
-    }
-
-    public static boolean validForImport (GameAsset<?> gameAsset) {
-        boolean valid = (gameAsset.type == GameAssetType.SPRITE) ||
-                (gameAsset.type == GameAssetType.SKELETON) ||
-                (gameAsset.type == GameAssetType.VFX) ||
-                (gameAsset.type == GameAssetType.PREFAB);
-        return valid;
     }
 }
