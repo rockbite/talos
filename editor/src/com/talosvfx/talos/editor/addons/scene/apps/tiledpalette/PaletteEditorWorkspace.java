@@ -2,14 +2,17 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
@@ -40,6 +43,8 @@ public class PaletteEditorWorkspace extends ViewportWidget {
     private Image selectionRect;
 
     private MainRenderer mainRenderer;
+
+    private Array<GameAsset<?>> selectedGameAssets = new Array<>();
 
     public PaletteEditorWorkspace(GameAsset<TilePaletteData> paletteData) {
         super();
@@ -83,15 +88,18 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             Vector2 vec = new Vector2();
             Rectangle rectangle = new Rectangle();
             boolean upWillClear = true;
+            private boolean isSelectingWithDrag = false;
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                selectedGameAssets.clear();
 
                 upWillClear = true;
 
 
                 if(button == 2 || ctrlPressed()) {
 
+                    isSelectingWithDrag = true;
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
@@ -104,7 +112,8 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
                     return true;
                 }
-                return super.touchDown(event, x, y, pointer, button);
+
+                return true;
             }
 
             @Override
@@ -138,14 +147,18 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
+                if (!isSelectingWithDrag) {
+                    //Find what we got on touch up and see
+                    selectByPoint(x, y);
+                }
+
+
                 if(selectionRect.isVisible()) {
                     upWillClear = false;
                     selectByRect(rectangle);
-//                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection)); //todo
                 } else if(upWillClear) {
                     FocusManager.resetFocus(getStage());
-//                    clearSelection(); todo
-//                    Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+//                    selectedGameAssets.clear(); //Dont need here
                 } else {
                     if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                         // deselect all others, if they are selected
@@ -156,7 +169,9 @@ public class PaletteEditorWorkspace extends ViewportWidget {
                 }
 
 
+
                 selectionRect.setVisible(false);
+                isSelectingWithDrag = false;
 
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -166,29 +181,14 @@ public class PaletteEditorWorkspace extends ViewportWidget {
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
         batch.end();
-
         gridDrawer.drawGrid();
-
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        batch.begin();
 
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
         ObjectMap<UUID, GameAsset<?>> references = paletteData.getResource().references;
 
         ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
-
-
-        for (ObjectMap.Entry<UUID, GameAsset<?>> reference : references) {
-            float[] position = positions.get(reference.key);
-            float x = position[0];
-            float y = position[1];
-            shapeRenderer.setColor(1, 0, 0, 1);
-            shapeRenderer.rect(x, y, 1, 1);
-        }
-        shapeRenderer.end();
-
-        batch.begin();
 
         TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
         float tileSizeX = 1;
@@ -220,9 +220,61 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             mainRenderer.update(gameObject);
             mainRenderer.render(batch, gameObject);
         }
+
+        batch.end();
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.ORANGE);
+
+
+        for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
+            UUID uuid = selectedGameAsset.getRootRawAsset().metaData.uuid;
+            float[] floats = positions.get(uuid);
+            shapeRenderer.rect(floats[0] - 0.5f, floats[1] - 0.5f, 1, 1);
+        }
+
+        shapeRenderer.end();
+
+        batch.begin();
     }
 
-    public void selectByRect(Rectangle rectangle) {
+    private void selectByPoint (float x, float y) {
+        Vector3 localPoint = new Vector3(x, y, 0);
+        PaletteEditorWorkspace.this.getWorldFromLocal(localPoint);
+
+        // get list of entities that have their origin in the rectangle
+        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
+
+        selectedGameAssets.clear();
+
+        //find closest
+        GameAsset<?> closestGameAsset = null;
+
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
+            GameAsset<?> gameAsset = gameObjectEntry.key;
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+            GameObject gameObject = gameObjectEntry.value;
+
+            float[] pos = positions.get(gameAssetUUID);
+
+            float minDistance = 1;
+            float squaredDistance = minDistance * minDistance;
+            float currentClosestDistance = squaredDistance + 1;
+
+            float squareDistanceToCheck = (float)(Math.pow(pos[0] - localPoint.x, 2) + Math.pow(pos[1] - localPoint.y, 2));
+            if (squareDistanceToCheck < squaredDistance) {
+                if (squareDistanceToCheck < currentClosestDistance) {
+                    closestGameAsset = gameAsset;
+                }
+            }
+        }
+        if (closestGameAsset != null) {
+            selectedGameAssets.add(closestGameAsset);
+        }
+    }
+
+    private void selectByRect(Rectangle rectangle) {
         Rectangle localRect = new Rectangle();
         Vector3 lb = new Vector3(rectangle.x, rectangle.y, 0);
         Vector3 lt = new Vector3(rectangle.x, rectangle.y + rectangle.height, 0);
@@ -238,10 +290,13 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
-        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObject : gameObjects) {
-            float[] pos = positions.get(gameObject.key.getRootRawAsset().metaData.uuid);
+        selectedGameAssets.clear();
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
+            GameAsset<?> gameAsset = gameObjectEntry.key;
+            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+            float[] pos = positions.get(gameAssetUUID);
             if(localRect.contains(pos[0], pos[1])) {
-                System.out.println("Contains the element with uid " + gameObject.key.getRootRawAsset().metaData.uuid);
+                selectedGameAssets.add(gameAsset);
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
+import com.badlogic.gdx.math.MathUtils;
+
 public class GridPosition {
 	public float x;
 	public float y;
@@ -12,10 +14,10 @@ public class GridPosition {
 	}
 
 	public int getIntX () {
-		return (int)x;
+		return MathUtils.floor(x);
 	}
 
 	public int getIntY () {
-		return (int)y;
+		return MathUtils.floor(y);
 	}
 }
