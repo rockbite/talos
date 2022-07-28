@@ -233,8 +233,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     }
 
     public void addSprite(GameAsset<?> gameAsset) {
-        GridPosition gridPosition = new GridPosition(0, 0);
-        object.getResource().staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
+        object.getResource().addSprite(gameAsset);
+
     }
 
     public void removeSprite(GameAsset<?> gameAsset) {
@@ -243,19 +243,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     }
 
     public void addEntity(GameAsset<?> gameAsset) {
-
-        //Lets create an entity from the asset
-        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-        GameObject tempParent = new GameObject();
-        boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent);
-        if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
-            success = false;
-        }
-        AssetImporter.fromDirectoryView = false;
-
-        if (success) {
-            object.getResource().gameObjects.put(gameAsset, tempParent.getGameObjects().first());
-        }
+        object.getResource().addEntity(gameAsset);
     }
 
     public void removeEntity(GameAsset<?> gameAsset) {

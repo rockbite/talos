@@ -173,7 +173,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
-		component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+		if (!fromDirectoryView) {
+			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+		}
 		component.setGameAsset(spriteAsset);
 
 		return spriteObject;
@@ -183,7 +185,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent);
 		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
 
-		rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
+		if (!fromDirectoryView) {
+			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
+		}
 		rendererComponent.setGameAsset(asset);
 
 		return spineObject;
@@ -193,7 +197,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent);
 		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
 
-		component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+		if (!fromDirectoryView) {
+			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+		}
 		component.setGameAsset(asset);
 
 		return particleObject;
@@ -263,6 +269,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	private String getUniqueGOName (String nameTemplate, boolean keepOriginal) {
+		if (fromDirectoryView) {
+			return UUID.randomUUID().toString().substring(0, 10);
+		}
+
 		int number = 0;
 
 		String name = nameTemplate;
