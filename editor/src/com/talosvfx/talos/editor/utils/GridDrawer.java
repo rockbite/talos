@@ -120,9 +120,9 @@ public class GridDrawer {
 		}
 
 		shapeRenderer.setColor(Color.GREEN);
-		shapeRenderer.line(-totalWidth, 0, totalWidth, 0);
+		shapeRenderer.line(camera.position.x - totalWidth/2, 0, camera.position.x + totalWidth, 0);
 		shapeRenderer.setColor(Color.RED);
-		shapeRenderer.line(0, -totalHeight, 0, totalHeight);
+		shapeRenderer.line(0, camera.position.y - totalHeight, 0, camera.position.y + totalHeight);
 
 		shapeRenderer.setColor(color);
 

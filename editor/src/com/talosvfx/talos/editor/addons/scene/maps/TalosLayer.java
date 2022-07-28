@@ -123,6 +123,15 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		}
 	}
 
+	public void removeTile (int x, int y) {
+		if (staticTiles.containsKey(x)) {
+			IntMap<StaticTile> entries = staticTiles.get(x);
+			if (entries.containsKey(y)) {
+				entries.remove(y);
+			}
+		}
+	}
+
 	private void putTile (StaticTile readTile) {
 		GridPosition gridPosition = readTile.gridPosition;
 
@@ -230,4 +239,5 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	public void setStaticTile (StaticTile staticTile) {
 		putTile(staticTile);
 	}
+
 }
