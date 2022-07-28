@@ -849,7 +849,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
         if(currentContainer == null) return;
 
         renderer.update(currentContainer.getSelfObject());
-        renderer.render(batch, currentContainer.getSelfObject());
+        renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
     }
 
     public void setAddon (SceneEditorAddon sceneEditorAddon) {

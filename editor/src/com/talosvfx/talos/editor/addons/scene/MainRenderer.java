@@ -33,7 +33,7 @@ import java.util.Comparator;
 
 public class MainRenderer implements Notifications.Observer {
 
-    private final Comparator<GameObject> layerAndDrawOrderComparator;
+    public final Comparator<GameObject> layerAndDrawOrderComparator;
 
     private  Comparator<GameObject> activeSorter;
 
@@ -41,7 +41,6 @@ public class MainRenderer implements Notifications.Observer {
     private Vector2 vec = new Vector2();
     private Vector2[] points = new Vector2[4];
 
-    private Array<GameObject> list = new Array<>();
     private ObjectMap<String, Integer> layerOrderLookup = new ObjectMap<>();
 
     private static final int LB = 0;
@@ -59,6 +58,10 @@ public class MainRenderer implements Notifications.Observer {
 
     private TextureRegion textureRegion = new TextureRegion();
     private OrthographicCamera camera;
+
+    public static class RenderState {
+        private Array<GameObject> list = new Array<>();
+    }
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -156,18 +159,18 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    public void render (Batch batch, GameObject root) {
+    public void render (Batch batch, RenderState state, GameObject root) {
         mapRenderer.setCamera(this.camera);
 
         updateLayerOrderLookup(root);
 
         //fill entities
-        list.clear();
-        fillRenderableEntities(root, list);
-        sort(list);
+        state.list.clear();
+        fillRenderableEntities(root, state.list);
+        sort(state.list);
 
-        for (int i = 0; i < list.size; i++) {
-            GameObject gameObject = list.get(i);
+        for (int i = 0; i < state.list.size; i++) {
+            GameObject gameObject = state.list.get(i);
 
             TransformComponent transformComponent = getWorldTransform(gameObject);
 

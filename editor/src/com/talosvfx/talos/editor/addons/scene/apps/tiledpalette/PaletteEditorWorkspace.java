@@ -217,7 +217,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             }
 
             mainRenderer.update(gameObject);
-            mainRenderer.render(batch, gameObject);
+            mainRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
         }
 
         batch.end();

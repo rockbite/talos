@@ -42,8 +42,11 @@ public class TalosMapRenderer {
 		}
 	};
 
+	private MainRenderer.RenderState state;
+
 	public TalosMapRenderer () {
 		renderModes.put(MapType.ORTHOGRAPHIC_TOPDOWN, this::orthoRenderMap);
+		state = new MainRenderer.RenderState();
 	}
 
 	private void orthoRenderMap (MainRenderer mainRenderer, Batch batch, GameObject gameObject, MapComponent map) {
@@ -114,8 +117,9 @@ public class TalosMapRenderer {
 				mainRenderer.setActiveSorter(orthoTopDownSorter);
 				for (GameObject rootEntity : rootEntities) {
 					mainRenderer.update(rootEntity);
-					mainRenderer.render(batch, rootEntity);
+					mainRenderer.render(batch, state, rootEntity);
 				}
+				mainRenderer.setActiveSorter(mainRenderer.layerAndDrawOrderComparator);
 
 				break;
 			}
