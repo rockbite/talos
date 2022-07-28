@@ -44,7 +44,6 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
     private MainRenderer mainRenderer;
 
-    private Array<GameAsset<?>> selectedGameAssets = new Array<>();
 
     public PaletteEditorWorkspace(GameAsset<TilePaletteData> paletteData) {
         super();
@@ -92,7 +91,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                selectedGameAssets.clear();
+                paletteData.getResource().selectedGameAssets.clear();
 
                 upWillClear = true;
 
@@ -227,7 +226,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         shapeRenderer.setColor(Color.ORANGE);
 
 
-        for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
+        for (GameAsset<?> selectedGameAsset : paletteData.getResource().selectedGameAssets) {
             UUID uuid = selectedGameAsset.getRootRawAsset().metaData.uuid;
             float[] floats = positions.get(uuid);
             shapeRenderer.rect(floats[0] - 0.5f, floats[1] - 0.5f, 1, 1);
@@ -246,7 +245,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
-        selectedGameAssets.clear();
+        paletteData.getResource().selectedGameAssets.clear();
 
         //find closest
         GameAsset<?> closestGameAsset = null;
@@ -270,7 +269,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             }
         }
         if (closestGameAsset != null) {
-            selectedGameAssets.add(closestGameAsset);
+            paletteData.getResource().selectedGameAssets.add(closestGameAsset);
         }
     }
 
@@ -290,13 +289,13 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
-        selectedGameAssets.clear();
+        paletteData.getResource().selectedGameAssets.clear();
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
             UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
             float[] pos = positions.get(gameAssetUUID);
             if(localRect.contains(pos[0], pos[1])) {
-                selectedGameAssets.add(gameAsset);
+                paletteData.getResource().selectedGameAssets.add(gameAsset);
             }
         }
     }

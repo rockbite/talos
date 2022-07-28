@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -31,6 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComp
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
+import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
@@ -44,7 +46,6 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -341,9 +342,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
                 if (mapEditorState.isEditing()) {
+                    if (mapEditorState.painting) {
+                        //Place a tile and return
+                        paintTileAt(x, y);
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+
                     return super.touchDown(event, x, y, pointer, button);
                 }
-
 
                 upWillClear = true;
                 dragged = false;
@@ -427,6 +433,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
+
+                if (mapEditorState.isEditing()) {
+                    if (mapEditorState.painting) {
+                        //Place a tile and return
+                        paintTileAt(x, y);
+                        return;
+                    }
+                    return;
+                }
 
                 dragged = true;
 
@@ -544,6 +559,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 return super.keyDown(event, keycode);
             }
         });
+    }
+
+    private void paintTileAt (float x, float y) {
+        Vector2 worldFromLocal = getWorldFromLocal(x, y);
+
+        if (mapEditorState.painting) {
+            int mouseCellX = gridDrawer.getMouseCellX();
+            int mouseCellY = gridDrawer.getMouseCellY();
+            //Targets
+
+            TalosLayer layerSelected = mapEditorState.getLayerSelected();
+            if (layerSelected != null) {
+                GameAsset<TilePaletteData> gameResource = layerSelected.getGameResource();
+                TilePaletteData palette = gameResource.getResource();
+            }
+
+        }
     }
 
     public static boolean isRenamePressed(int keycode) {

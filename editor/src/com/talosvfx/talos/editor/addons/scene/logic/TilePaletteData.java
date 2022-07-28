@@ -16,6 +16,7 @@ public class TilePaletteData implements Json.Serializable{
     //Working not for serializing
     public transient ObjectMap<GameAsset<?>, StaticTile> staticTiles;
     public transient ObjectMap<GameAsset<?>, GameObject> gameObjects;
+    public transient Array<GameAsset<?>> selectedGameAssets;
 
     public TilePaletteData () {
         references = new ObjectMap<>();
@@ -23,6 +24,7 @@ public class TilePaletteData implements Json.Serializable{
 
         staticTiles = new ObjectMap<>();
         gameObjects = new ObjectMap<>();
+        selectedGameAssets = new Array<>();
     }
 
     @Override
