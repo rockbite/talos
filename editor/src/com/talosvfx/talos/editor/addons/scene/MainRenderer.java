@@ -148,25 +148,33 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    private void fillRenderableEntities (GameObject root, Array<GameObject> list) {
-        if (root.hasComponentType(RendererComponent.class)) {
-            list.add(root);
-        }
-        if (root.getGameObjects() != null) {
-            for (int i = 0; i < root.getGameObjects().size; i++) {
-                fillRenderableEntities(root.getGameObjects().get(i), list);
+    private void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
+        for (GameObject root : rootObjects) {
+            if (root.hasComponentType(RendererComponent.class)) {
+                list.add(root);
+            }
+            if (root.getGameObjects() != null) {
+                fillRenderableEntities(root.getGameObjects(), list);
             }
         }
+
     }
 
+
+    Array<GameObject> temp = new Array<>();
     public void render (Batch batch, RenderState state, GameObject root) {
+        temp.clear();
+        temp.add(root);
+        render(batch, state, temp);
+    }
+    public void render (Batch batch, RenderState state, Array<GameObject> rootObjects) {
         mapRenderer.setCamera(this.camera);
 
-        updateLayerOrderLookup(root);
+        updateLayerOrderLookup();
 
         //fill entities
         state.list.clear();
-        fillRenderableEntities(root, state.list);
+        fillRenderableEntities(rootObjects, state.list);
         sort(state.list);
 
         for (int i = 0; i < state.list.size; i++) {
@@ -340,7 +348,7 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    private void updateLayerOrderLookup (GameObject root) {
+    private void updateLayerOrderLookup () {
         Array<String> layerList = SceneEditorAddon.get().workspace.getLayerList();
         layerOrderLookup.clear();
         int i = 0;

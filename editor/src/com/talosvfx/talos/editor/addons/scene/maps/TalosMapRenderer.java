@@ -38,7 +38,7 @@ public class TalosMapRenderer {
 
 			//Y only
 
-			return Float.compare(o1c.position.y, o2c.position.y);
+			return -Float.compare(o1c.position.y, o2c.position.y);
 		}
 	};
 
@@ -117,8 +117,9 @@ public class TalosMapRenderer {
 				mainRenderer.setActiveSorter(orthoTopDownSorter);
 				for (GameObject rootEntity : rootEntities) {
 					mainRenderer.update(rootEntity);
-					mainRenderer.render(batch, state, rootEntity);
 				}
+				mainRenderer.render(batch, state, rootEntities);
+
 				mainRenderer.setActiveSorter(mainRenderer.layerAndDrawOrderComparator);
 
 				break;

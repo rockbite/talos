@@ -103,10 +103,7 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 			for (IntMap.Entry<StaticTile> staticTileEntry : value) {
 				int y = staticTileEntry.key;
 				StaticTile tile = staticTileEntry.value;
-
-				json.writeObjectStart();
 				json.writeValue(tile);
-				json.writeObjectEnd();
 			}
 		}
 		json.writeArrayEnd();
