@@ -226,4 +226,8 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		GameAsset<TilePaletteData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(identifier, GameAssetType.TILE_PALETTE);
 		setGameAsset(assetForIdentifier);
 	}
+
+	public void setStaticTile (StaticTile staticTile) {
+		putTile(staticTile);
+	}
 }

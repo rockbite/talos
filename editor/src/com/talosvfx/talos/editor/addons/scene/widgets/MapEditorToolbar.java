@@ -52,6 +52,9 @@ public class MapEditorToolbar extends Table {
 				super.clicked(event, x, y);
 				paint.setChecked(!paint.isChecked());
 
+				SceneEditorWorkspace.getInstance().mapEditorState.erasing = false;
+				SceneEditorWorkspace.getInstance().mapEditorState.painting = false;
+
 				SceneEditorWorkspace.getInstance().mapEditorState.painting = paint.isChecked();
 			}
 		});
@@ -62,6 +65,9 @@ public class MapEditorToolbar extends Table {
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				erase.setChecked(!erase.isChecked());
+
+				SceneEditorWorkspace.getInstance().mapEditorState.erasing = false;
+				SceneEditorWorkspace.getInstance().mapEditorState.painting = false;
 
 				SceneEditorWorkspace.getInstance().mapEditorState.erasing = erase.isChecked();
 			}

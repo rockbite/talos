@@ -166,8 +166,9 @@ public class MainRenderer implements Notifications.Observer {
         fillRenderableEntities(root, list);
         sort(list);
 
+        for (int i = 0; i < list.size; i++) {
+            GameObject gameObject = list.get(i);
 
-        for(GameObject gameObject: list) {
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
             GameResourceOwner<?> resourceComponent = gameObject.getRenderResourceComponent();

@@ -23,6 +23,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -31,7 +32,10 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
+import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -324,6 +328,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
             GameObject selectedGameObject;
 
+            private boolean painting = false;
+
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
 
@@ -345,7 +351,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                     if (mapEditorState.painting) {
                         //Place a tile and return
                         paintTileAt(x, y);
-                        return super.touchDown(event, x, y, pointer, button);
+                        painting = true;
+                        return true;
                     }
 
                     return super.touchDown(event, x, y, pointer, button);
@@ -436,8 +443,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
                 if (mapEditorState.isEditing()) {
                     if (mapEditorState.painting) {
-                        //Place a tile and return
-                        paintTileAt(x, y);
+
+                        //Check to see if we are in static tile first
+
+                        if (mapEditorState.getLayerSelected() != null ) {
+                            if (mapEditorState.getLayerSelected().getType() == LayerType.STATIC) {
+                                //Place a tile and return
+                                paintTileAt(x, y);
+                            }
+                        }
                         return;
                     }
                     return;
@@ -483,6 +497,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
                 Vector2 hitCords = getWorldFromLocal(x, y);
 
                 Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
+
+                if (painting) return;
+
+                painting = false;
 
                 if(touchedGizmo != null) {
                     touchedGizmo.touchUp(hitCords.x, hitCords.y);
@@ -573,6 +591,44 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
             if (layerSelected != null) {
                 GameAsset<TilePaletteData> gameResource = layerSelected.getGameResource();
                 TilePaletteData palette = gameResource.getResource();
+
+                Array<GameAsset<?>> selectedGameAssets = palette.selectedGameAssets;
+
+                if (selectedGameAssets.size > 1) {
+                    System.out.println("Multi stamp not supported yet");
+                } else if (selectedGameAssets.size == 1) {
+                    GameAsset<?> gameAssetToPaint = selectedGameAssets.first();
+
+                    //Paint it into the layer
+                    LayerType type = layerSelected.getType();
+                    if (type == LayerType.STATIC) {
+                        if (gameAssetToPaint.type != GameAssetType.SPRITE) {
+                            System.out.println("Trying to paint a non sprite into a static layer");
+                            return;
+                        }
+
+                        StaticTile staticTile = new StaticTile(gameAssetToPaint, new GridPosition(mouseCellX, mouseCellY));
+                        layerSelected.setStaticTile(staticTile);
+
+                    } else {
+                        //Always do it like entities
+
+                        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                        GameObject tempParent = new GameObject();
+                        boolean success = AssetImporter.createAssetInstance(gameAssetToPaint, tempParent);
+                        if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
+                            success = false;
+                        }
+                        AssetImporter.fromDirectoryView = false;
+
+                        if (success) {
+                            //We can add this to layer entities
+                            layerSelected.getRootEntities().add(tempParent.getGameObjects().first());
+                        }
+
+                    }
+
+                }
             }
 
         }
