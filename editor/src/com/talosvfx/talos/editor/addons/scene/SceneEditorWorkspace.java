@@ -347,7 +347,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						painting = true;
 						return true;
 					} else if (mapEditorState.erasing) {
-						eraseTileAt(x, y);
+						TalosLayer layerSelected = mapEditorState.getLayerSelected();
+						if (layerSelected != null) {
+							if (layerSelected.getType() == LayerType.STATIC) {
+								eraseTileAt(x, y);
+							} else {
+								eraseEntityAt(x, y);
+							}
+						}
 						erasing = true;
 						return true;
 					}
@@ -454,6 +461,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 							if (mapEditorState.getLayerSelected().getType() == LayerType.STATIC) {
 								//Place a tile and return
 								eraseTileAt(x, y);
+							} else  {
+//								eraseEntityAt(x, y);
 							}
 						}
 						return;
@@ -601,6 +610,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				layerSelected.removeTile(mouseCellX, mouseCellY);
 			}
 
+		}
+	}
+
+	private void eraseEntityAt (float x, float y) {
+		Vector2 worldFromLocal = getWorldFromLocal(x, y);
+		TalosLayer layerSelected = mapEditorState.getLayerSelected();
+		if (layerSelected != null) {
+			layerSelected.removeEntity(worldFromLocal.x, worldFromLocal.y);
 		}
 	}
 

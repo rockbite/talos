@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
@@ -12,6 +13,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
 public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Serializable {
@@ -240,4 +242,23 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		putTile(staticTile);
 	}
 
+	static Vector2 temp = new Vector2();
+	public void removeEntity (float x, float y) {
+		float smallestDistance = Float.MAX_VALUE;
+		GameObject target = null;
+		for (GameObject rootEntity : getRootEntities()) {
+			if (rootEntity.hasComponent(TransformComponent.class)) {
+				TransformComponent component = rootEntity.getComponent(TransformComponent.class);
+				float dst = temp.set(x, y).dst(component.position);
+				if (dst < smallestDistance) {
+					smallestDistance = dst;
+					target = rootEntity;
+				}
+			}
+		}
+
+		if (target != null) {
+			getRootEntities().removeValue(target, true);
+		}
+	}
 }
