@@ -58,13 +58,14 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         Table element = new Table();
         element.setBackground(skin.newDrawable("button-main-menu"));
-        toolbar.add(element);
+        toolbar.add(element).growX();
 
         element.defaults().pad(5);
 
         SquareButton tile = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
         SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
         SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton delete = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
 
 
         tile.addListener(new ClickListener() {
@@ -98,6 +99,16 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             }
         });
 
+        delete.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                //todo delete current selection
+            }
+        });
+
+
         ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
         buttonButtonGroup.add(tile, entity, tileEntity);
         buttonButtonGroup.setMaxCheckCount(1);
@@ -108,6 +119,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         element.add(tileEntity);
         element.add(tile);
         element.add(entity);
+        element.add().expandX();
+        element.add(delete);
 
         this.content.addActor(toolbar);
 
