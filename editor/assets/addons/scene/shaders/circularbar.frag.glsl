@@ -9,7 +9,9 @@
  varying vec2 v_texCoords;
  uniform sampler2D u_texture;
 
- uniform float alpha;
+ #define POINT_BUFFER 30
+ uniform float alpha[POINT_BUFFER];
+ uniform int alphaCount;
 
  uniform float regionU;
  uniform float regionV;
@@ -20,8 +22,8 @@
  void main()
  {
     vec4 color = texture2D(u_texture, v_texCoords);
-    vec4 fillColor = vec4(49.0 / 255.0, 146.0 / 255.0, 72.0 / 255.0, 1.0);
-    vec4 bgColor = vec4(58.0 / 255.0, 58.0 / 255.0, 58.0 / 255.0, 1.0);
+    vec3 fillColor = vec3(49.0 / 255.0, 146.0 / 255.0, 72.0 / 255.0);
+    vec3 bgColor = vec3(58.0 / 255.0, 58.0 / 255.0, 58.0 / 255.0);
 
     float pi = 3.1415926;
 
@@ -32,11 +34,21 @@
 
     float pixelAngle = (atan(pos.x, pos.y) + pi)/(2.0*pi);
 
-    float ratio = step(alpha, pixelAngle);
+    vec4 result =  vec4(0.0, 0.0, 0.0, v_color.a * color.a);
 
-    vec4 result = mix(fillColor, bgColor, ratio);
+    for(int i = 0; i < alphaCount; i++) {
+         float alphaVal = alpha[i];
+         float ratio = step(alphaVal, pixelAngle); // if ratio is 1 it's background if 0 we fill with green
 
-    result.a *=  v_color.a * color.a;
+         vec3 tempFill = fillColor.rgb;
+         tempFill *= (1.0 / alphaCount);
+         vec3 tempBg = bgColor.rgb;
+         tempBg *= (1.0 / alphaCount);
+
+         vec3 fill = mix(tempFill, tempBg, ratio);
+
+         result.rgb += fill.rgb;
+    }
 
     gl_FragColor = result;
  }

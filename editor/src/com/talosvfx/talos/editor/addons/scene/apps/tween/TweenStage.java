@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -30,6 +31,8 @@ public class TweenStage extends DynamicNodeStage {
 
     private Vector2 tmp = new Vector2();
     private String state;
+
+    private float timeScale = 1f;
 
     public TweenStage(TweenEditor tweenEditor, Skin skin) {
         super(skin);
@@ -106,6 +109,15 @@ public class TweenStage extends DynamicNodeStage {
     public void playInitiated() {
         if(state != null) loadFromSnapshot();
         makeSnapshot();
+
+        Array<NodeWidget> nodes = getNodeBoard().getNodes();
+        for(NodeWidget node : nodes) {
+            if (node instanceof AbstractTweenNode) {
+                AbstractTweenNode tweenNode = (AbstractTweenNode) node;
+
+                tweenNode.reset();
+            }
+        }
     }
 
     /**
@@ -157,5 +169,9 @@ public class TweenStage extends DynamicNodeStage {
         SceneEditorProject project = (SceneEditorProject) TalosMain.Instance().ProjectController().getProject();
         SceneEditorAddon sceneEditorAddon = project.sceneEditorAddon;
         state = sceneEditorAddon.workspace.getCurrentContainer().getAsString();
+    }
+
+    public float getDelta() {
+        return Gdx.graphics.getDeltaTime() * timeScale;
     }
 }

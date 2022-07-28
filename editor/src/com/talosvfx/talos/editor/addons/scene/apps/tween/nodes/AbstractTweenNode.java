@@ -5,12 +5,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public abstract class AbstractTweenNode extends NodeWidget {
+
+    protected ObjectMap<String, Object> params = new ObjectMap<>();
 
     @Override
     public void init(Skin skin, NodeBoard nodeBoard) {
@@ -159,12 +162,41 @@ public abstract class AbstractTweenNode extends NodeWidget {
     }
 
     protected float getWidgetFloatValue(String name) {
-        return (float)getWidgetValue(name);
+        return getWidgetFloatValue(name, null);
+    }
+
+    protected float getWidgetFloatValue(String name, ObjectMap<String, Object> params) {
+        Object widgetValue = getWidgetValue(name, params);
+        if(widgetValue instanceof Integer) {
+            return (Integer)widgetValue;
+        }
+
+        return (Float)widgetValue;
+    }
+
+    protected boolean getWidgetBooleanValue(String name) {
+        Object widgetValue = getWidgetValue(name, null);
+        boolean result = false;
+        if(widgetValue instanceof Integer) {
+            result = (Integer)widgetValue > 0;
+        } else if(widgetValue instanceof Float) {
+            result = (Float)widgetValue > 0;
+        } else if(widgetValue instanceof Boolean) {
+            result = (Boolean)widgetValue;
+        }
+
+        return result;
     }
 
     protected Object getWidgetValue(String name) {
+        return getWidgetValue(name, null);
+    }
+
+    protected Object getWidgetValue(String name, ObjectMap<String, Object> params) {
         AbstractWidget widget = getWidget(name);
         Array<Connection> connections = getInputs().get(name);
+
+        if(widget == null) return 0f;
 
         if(connections == null || connections.size == 0) {
             return widget.getValue();
@@ -174,12 +206,20 @@ public abstract class AbstractTweenNode extends NodeWidget {
             animateInput(name, first);
 
             AbstractTweenNode targetNode = (AbstractTweenNode) first.targetNode;
-            return targetNode.getOutputValue(first.targetSlot);
+            return targetNode.getOutputValue(first.targetSlot, params);
         }
     }
 
-    public Object getOutputValue(String name) {
+    public void reset() {
+
+    }
+
+    public Object getOutputValue(String name, ObjectMap<String, Object> params) {
         return 0f;
+    }
+
+    public float getDelta() {
+        return ((TweenStage)nodeBoard.getNodeStage()).getDelta();
     }
 }
 

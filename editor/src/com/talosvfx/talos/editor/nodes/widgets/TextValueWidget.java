@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
@@ -56,7 +57,9 @@ public class TextValueWidget extends AbstractWidget<String> {
         editing.add(textField).growX().padLeft(12);
 
         main.add(label).padLeft(12).left().expandX();
-        main.add(valueLabel).padRight(12).right().expandX();
+        main.add(valueLabel).padRight(12).right().width(0).growX();
+        valueLabel.setEllipsis(true);
+        valueLabel.setAlignment(Align.right);
 
         mainStack.add(editing);
         mainStack.add(main);

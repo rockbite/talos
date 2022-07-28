@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -23,15 +24,12 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 
 public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     boolean running = false;
-    float time = 0;
-    float duration;
 
     private Vector2 vec = new Vector2();
     private Vector2 vec2 = new Vector2();
@@ -42,6 +40,30 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     private ObjectMap<String, Object> payload;
 
+    private Array<String> removeList = new Array<>();
+    protected ObjectMap<String, GenericTweenData> dataMap = new ObjectMap<>();
+
+    protected class GenericTweenData {
+        public float chunkIndex;
+        public GameObject target;
+        public float alpha;
+        public float duration;
+        public boolean yoyo = false;
+        public int direction = 1;
+        public boolean complete = false;
+        public ObjectMap<String, Object> misc;
+        public Array<GameObject> neighbours = new Array<>();
+    }
+
+    @Override
+    public void reset() {
+        running = false;
+        dataMap.clear();
+        removeList.clear();
+
+        microNodeView.progressMap.clear();
+    }
+
     @Override
     protected void onSignalReceived(String command, ObjectMap<String, Object> payload) {
         if(command.equals("execute")) {
@@ -49,32 +71,101 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         }
     }
 
+    protected ObjectMap<String, Object> buildParams(GameObject targetObject) {
+        String exactString = getGameObjectPath(targetObject);
+        return buildParams(exactString);
+    }
+
+    protected ObjectMap<String, Object> buildParams(String target) {
+        params.clear();
+        params.put("targetGO", dataMap.get(target).target);
+        params.put("target", dataMap.get(target));
+        params.put("chunkIndex", dataMap.get(target).chunkIndex);
+        params.put("neighbours", dataMap.get(target).neighbours);
+
+        return params;
+    }
+
     public void runGenericTween(ObjectMap<String, Object> payload) {
         this.payload = payload;
         String targetString = (String)payload.get("target");
-        GameObject gameObject = fetchGameObject(targetString);
+        Array<GameObject> list = new Array<>();
+        targetString = targetString.replaceAll(" ", "");
+        String[] split = targetString.split(",");
+        for(String row: split) {
+            fetchGameObjects(list, row);
+        }
 
         running = true;
-        time = 0;
 
-        duration = getWidgetFloatValue("duration");
+        for(GameObject target: list) {
+            GenericTweenData data = new GenericTweenData();
+            String exactString = getGameObjectPath(target);
+            dataMap.put(exactString, data);
+        }
 
-        startTween(gameObject);
+        int iter = 0;
+        for(GameObject target: list) {
+            String targetPath = getGameObjectPath(target);
+            GenericTweenData data = dataMap.get(targetPath);
+            data.alpha = 0;
+            data.target = target;
+
+            if(list.size > 1) {
+                data.chunkIndex = (iter++)/(float)dataMap.size;
+                data.neighbours.clear();
+                data.neighbours.addAll(list);
+            } else {
+                if (payload.containsKey("chunkIndex")) {
+                    data.chunkIndex = (float) payload.get("chunkIndex");
+                    data.neighbours = (Array<GameObject>) payload.get("neighbours");
+                } else {
+                    data.chunkIndex = 0f;
+                    data.neighbours.clear();
+                }
+            }
+
+            data.duration = getWidgetFloatValue("duration", buildParams(targetPath));
+            data.yoyo = getWidgetBooleanValue("yoyo");
+            startTween(target, data);
+        }
 
         if(isMicroView) {
             microNodeView.showProgressDisc();
         }
     }
 
-    private GameObject fetchGameObject(String targetString) {
+    private String getGameObjectPath(GameObject gameObject, String path) {
+        if(path.isEmpty()) {
+            path = gameObject.getName();
+        } else {
+            path = gameObject.getName() + "." + path;
+        }
+        if(gameObject.parent != null) {
+            path = getGameObjectPath(gameObject.parent, path);
+        }
+
+        return path;
+    }
+
+    private String getGameObjectPath(GameObject gameObject) {
+        String path = getGameObjectPath(gameObject, "");
+
+        // remove last child
+        path = path.substring(path.indexOf(".") + 1);
+
+        return path;
+    }
+
+    private void fetchGameObjects(Array<GameObject> list, String targetString) {
 
         SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
         GameObject root = sceneEditorAddon.workspace.getCurrentContainer().root;
 
-        return findGameObject(root, targetString);
+        findGameObjects(list, root, targetString);
     }
 
-    private GameObject findGameObject(GameObject parent, String targetString) {
+    private void findGameObjects(Array<GameObject> list, GameObject parent, String targetString) {
 
         int dotIndex = targetString.indexOf(".");
         String lastPart = "";
@@ -94,19 +185,26 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         Array<GameObject> gameObjects = parent.getGameObjects();
 
         for(GameObject gameObject : gameObjects) {
-            if(gameObject.getName().equals(levelName)) {
+
+            boolean matchCriteria = false;
+            if(levelName.contains("*")) {
+                String expression = levelName.replaceAll("\\*", ".*");
+                matchCriteria = gameObject.getName().matches(expression);
+            } else {
+                matchCriteria = gameObject.getName().equals(levelName);
+            }
+
+            if(matchCriteria) {
                 if(lastPart.length() == 0) {
-                    return gameObject;
+                    list.add(gameObject);
                 } else {
-                    return findGameObject(gameObject, lastPart);
+                    findGameObjects(list, gameObject, lastPart);
                 }
             }
         }
-
-        return null;
     }
 
-    protected void startTween(GameObject target) {
+    protected void startTween(GameObject target, GenericTweenData data) {
 
     }
 
@@ -326,36 +424,91 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     class InterpolationTimeline extends Table {
 
-        private Image tracker;
-
-        private Image bgFill;
-        private Image line;
-
-        private float alpha = 0;
+        private Group container = new Group();
+        private ObjectMap<String, Image> progressMap = new ObjectMap<>();
 
         public InterpolationTimeline(Skin skin) {
             super(skin);
             setBackground(getSkin().getDrawable("timelinebg"));
 
-            tracker = new Image(getSkin().getDrawable("time-selector-green"));
-            bgFill = new Image(getSkin().getDrawable("white"));
-            line = new Image(getSkin().getDrawable("white"));
 
-            line.setColor(Color.valueOf("#3e7561"));
-            bgFill.setColor(Color.valueOf("#37574a"));
 
-            addActor(bgFill);
-            addActor(line);
-            addActor(tracker);
+            addActor(container);
         }
 
-        protected void fireOnComplete() {
-            boolean sent = sendSignal("onComplete", "execute", payload);
+        protected void fireOnComplete(String target) {
+            payload.put("target", target);
+            payload.put("targetGO", dataMap.get(target).target);
+            payload.put("chunkIndex", dataMap.get(target).chunkIndex);
+            payload.put("neighbours", dataMap.get(target).neighbours);
 
-            ((TweenStage)nodeBoard.getNodeStage()).nodeReportedComplete();
+            boolean sent = sendSignal("onComplete", "execute", payload);
+        }
+
+        public void actTarget(String target, GenericTweenData data, float delta) {
+            data.alpha += data.direction * delta/data.duration;
+
+            boolean complete = false;
+
+            if(data.yoyo) {
+                if(data.direction == 1 && data.alpha >= 1) {
+                    data.alpha = 0.99f;
+                    data.direction = -1;
+                } else if(data.direction == -1 && data.alpha <= 0) {
+                    data.alpha = 0;
+                    complete = true;
+                }
+            } else {
+                if(data.direction == 1 && data.alpha >= 1) {
+                    data.alpha = 1;
+                    complete = true;
+                }
+            }
+
+            //todo: add interpolation of alpha here
+
+            tick(target, data, data.alpha);
+
+            if(complete) {
+                data.complete = true;
+                fireOnComplete(target);
+            }
 
             if(isMicroView) {
-                microNodeView.hideProgressDisc();
+                microNodeView.setProgress(target, data.alpha);
+                microNodeView.setLabel(((int)(data.duration * 100))/100f + "");
+            }
+        }
+
+        private void positionTargetProgress(String target) {
+            if(!progressMap.containsKey(target)) {
+                Image image = new Image(getSkin().getDrawable("white"));
+                image.setColor(Color.valueOf("#37574a"));
+                progressMap.put(target, image);
+                container.addActor(image);
+            }
+
+            Image image = progressMap.get(target);
+
+            image.getColor().a = 0.4f;
+
+            float alpha = dataMap.get(target).alpha;
+
+            image.setPosition(1, 1);
+
+            if(alpha * (getWidth() - 1) > 0) {
+                float width = alpha * (getWidth() - 1);
+                if(width > getWidth() - 2) width = getWidth() - 2;
+                image.setSize(width, getHeight() - 2);
+                image.setVisible(true);
+            } else {
+                image.setVisible(false);
+            }
+
+            if(alpha == 0 || alpha == 1) {
+                image.setVisible(false);
+            } else {
+                image.setVisible(true);
             }
         }
 
@@ -364,55 +517,37 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             super.act(delta);
 
             if(running) {
-                time += delta;
-
-                if(time >= duration) {
-                    time = duration;
-                    running = false;
-                    fireOnComplete();
+                for(String target: dataMap.keys()) {
+                    actTarget(target, dataMap.get(target), getDelta());
+                    positionTargetProgress(target);
                 }
 
-                alpha = time/duration;
-
-                //todo: add interpolation of alpha here
-
-                tick(alpha);
-
-                if(isMicroView) {
-                    microNodeView.setProgress(alpha);
-                    float val = time;
-                    if(val == 0) val =  duration;
-                    microNodeView.setLabel(((int)(val * 100))/100f + "");
+                running = false;
+                removeList.clear();
+                for(String item: dataMap.keys()) {
+                    if(!dataMap.get(item).complete) {
+                        running = true;
+                    } else {
+                        removeList.add(item);
+                    }
                 }
 
-            }
+                for(String item: removeList) {
+                    dataMap.remove(item);
+                }
 
-            tracker.setY(getHeight() - 15);
-            tracker.setX(alpha * (getWidth()-1) - 4);
+                if(!running) {
+                    ((TweenStage) nodeBoard.getNodeStage()).nodeReportedComplete();
 
-            line.setX(tracker.getX() + 4);
-            line.setSize(1, getHeight());
-
-            bgFill.setPosition(1, 1);
-
-            if(tracker.getX() + 4 > 0) {
-                float width = tracker.getX() + 4;
-                if(width > getWidth() - 2) width = getWidth() - 2;
-                bgFill.setSize(width, getHeight() - 2);
-                bgFill.setVisible(true);
-            } else {
-                bgFill.setVisible(false);
-            }
-
-            if(alpha == 0 || alpha == 1) {
-                line.setVisible(false);
-            } else {
-                line.setVisible(true);
+                    if(isMicroView) {
+                        microNodeView.hideProgressDisc();
+                    }
+                }
             }
         }
 
         public void setTimeValue(float alpha) {
-            this.alpha = alpha;
+            //this.alpha = alpha;
         }
 
         @Override
@@ -421,7 +556,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         }
     }
 
-    protected void tick(float alpha) {
+    protected void tick(String target, GenericTweenData data, float alpha) {
 
     }
 
@@ -429,7 +564,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
         private final TextureAtlas.AtlasRegion region;
         private final Image progressImage;
-        private float progress = 0;
+
+        private ObjectFloatMap<String> progressMap = new ObjectFloatMap<>();
 
         private ShaderProgram shaderProgram;
 
@@ -453,7 +589,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
             ShaderProgram prevShader = null;
 
-            if(progress > 0 && progress < 1) {
+            if(progressMap.size > 0) {
                 // enable shader
                 prevShader = batch.getShader();
 
@@ -463,7 +599,12 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
                 shaderProgram.setUniformf("regionU2", region.getU2());
                 shaderProgram.setUniformf("regionV2", region.getV2());
 
-                shaderProgram.setUniformf("alpha", progress);
+                int i = 0;
+                for(ObjectFloatMap.Entry<String> entry : progressMap) {
+                    float progress = entry.value;
+                    shaderProgram.setUniformf("alpha[" + (i++) + "]", progress);
+                }
+                shaderProgram.setUniformi("alphaCount", progressMap.size);
             }
 
             super.draw(batch, parentAlpha);
@@ -474,10 +615,16 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             }
         }
 
-        public void setProgress(float progress) {
-            this.progress = progress;
+        public void setProgress(ObjectFloatMap<String> progressMap) {
+            this.progressMap = progressMap;
 
-            progressImage.setRotation(180 - progress * 90);
+            float min = 1;
+            for(ObjectFloatMap.Entry<String> entry : progressMap) {
+                float progress = entry.value;
+                if(min > progress) min = progress;
+            }
+
+            progressImage.setRotation(180 - min * 90);
         }
     }
 
@@ -490,7 +637,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
         private Label label;
 
-        private float progress = 0;
+        private ObjectFloatMap<String> progressMap = new ObjectFloatMap<>();
 
         public MicroNodeView() {
             super(TalosMain.Instance().getSkin());
@@ -617,12 +764,11 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         @Override
         public void act(float delta) {
             super.act(delta);
-
-            progressContainer.setProgress(progress);
+            progressContainer.setProgress(progressMap);
         }
 
-        public void setProgress(float alpha) {
-            progress = alpha;
+        public void setProgress(String target, float alpha) {
+            progressMap.put(target, alpha);
         }
 
         public void setLabel(String string) {
