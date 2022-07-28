@@ -622,7 +622,7 @@ public class AssetRepository {
 		return gameAssetOut;
 	}
 
-	public void saveGameAssetToFile (GameAsset<?> gameAsset) {
+	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset) {
 		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
 
 		String jsonString = json.toJson(gameAsset.getResource());
