@@ -75,7 +75,8 @@ public class PropertiesPanel extends Table {
 
 
     public void updateValues() {
-        for(PropertyWidget widget: propertyWidgets) {
+        for (int i = 0; i < propertyWidgets.size; i++) {
+            PropertyWidget widget = propertyWidgets.get(i);
             widget.updateValue();
         }
     }
