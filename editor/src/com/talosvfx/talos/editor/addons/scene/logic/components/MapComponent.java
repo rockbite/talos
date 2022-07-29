@@ -30,11 +30,8 @@ public class MapComponent extends RendererComponent {
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
-        Array<PropertyWidget> properties = new Array<>();
 
-
-
-
+        Array<PropertyWidget> properties = super.getListOfProperties();
 
         Supplier<TalosLayer> supplier = new Supplier<TalosLayer>() {
             @Override

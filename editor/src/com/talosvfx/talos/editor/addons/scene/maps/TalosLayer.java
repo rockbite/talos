@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
@@ -12,6 +13,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
 public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Serializable {
@@ -101,10 +103,7 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 			for (IntMap.Entry<StaticTile> staticTileEntry : value) {
 				int y = staticTileEntry.key;
 				StaticTile tile = staticTileEntry.value;
-
-				json.writeObjectStart();
 				json.writeValue(tile);
-				json.writeObjectEnd();
 			}
 		}
 		json.writeArrayEnd();
@@ -123,14 +122,23 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		}
 	}
 
+	public void removeTile (int x, int y) {
+		if (staticTiles.containsKey(x)) {
+			IntMap<StaticTile> entries = staticTiles.get(x);
+			if (entries.containsKey(y)) {
+				entries.remove(y);
+			}
+		}
+	}
+
 	private void putTile (StaticTile readTile) {
 		GridPosition gridPosition = readTile.gridPosition;
 
-		if (!staticTiles.containsKey(gridPosition.x)) {
-			staticTiles.put(gridPosition.x, new IntMap<>());
+		if (!staticTiles.containsKey(gridPosition.getIntX())) {
+			staticTiles.put(gridPosition.getIntX(), new IntMap<>());
 		}
-		IntMap<StaticTile> entries = staticTiles.get(gridPosition.x);
-		entries.put(gridPosition.y, readTile);
+		IntMap<StaticTile> entries = staticTiles.get(gridPosition.getIntX());
+		entries.put(gridPosition.getIntY(), readTile);
 	}
 
 	@Override
@@ -225,5 +233,29 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	private void loadPaletteFromIdentifier (String identifier) {
 		GameAsset<TilePaletteData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(identifier, GameAssetType.TILE_PALETTE);
 		setGameAsset(assetForIdentifier);
+	}
+
+	public void setStaticTile (StaticTile staticTile) {
+		putTile(staticTile);
+	}
+
+	static Vector2 temp = new Vector2();
+	public void removeEntity (float x, float y) {
+		float smallestDistance = Float.MAX_VALUE;
+		GameObject target = null;
+		for (GameObject rootEntity : getRootEntities()) {
+			if (rootEntity.hasComponent(TransformComponent.class)) {
+				TransformComponent component = rootEntity.getComponent(TransformComponent.class);
+				float dst = temp.set(x, y).dst(component.position);
+				if (dst < smallestDistance) {
+					smallestDistance = dst;
+					target = rootEntity;
+				}
+			}
+		}
+
+		if (target != null) {
+			getRootEntities().removeValue(target, true);
+		}
 	}
 }

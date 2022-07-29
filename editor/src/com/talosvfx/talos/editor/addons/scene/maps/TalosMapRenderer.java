@@ -38,12 +38,15 @@ public class TalosMapRenderer {
 
 			//Y only
 
-			return Float.compare(o1c.position.y, o2c.position.y);
+			return -Float.compare(o1c.position.y, o2c.position.y);
 		}
 	};
 
+	private MainRenderer.RenderState state;
+
 	public TalosMapRenderer () {
 		renderModes.put(MapType.ORTHOGRAPHIC_TOPDOWN, this::orthoRenderMap);
+		state = new MainRenderer.RenderState();
 	}
 
 	private void orthoRenderMap (MainRenderer mainRenderer, Batch batch, GameObject gameObject, MapComponent map) {
@@ -98,7 +101,7 @@ public class TalosMapRenderer {
 							if (entries.containsKey(j)) {
 								StaticTile staticTile = entries.get(j);
 
-								renderTileAt(i, j, staticTile);
+								renderTileDynamic(mainRenderer, batch, staticTile, layer.getTileSizeX(), layer.getTileSizeY());
 
 							}
 						}
@@ -114,15 +117,18 @@ public class TalosMapRenderer {
 				mainRenderer.setActiveSorter(orthoTopDownSorter);
 				for (GameObject rootEntity : rootEntities) {
 					mainRenderer.update(rootEntity);
-					mainRenderer.render(batch, rootEntity);
 				}
+				mainRenderer.render(batch, state, rootEntities);
+
+				mainRenderer.setActiveSorter(mainRenderer.layerAndDrawOrderComparator);
 
 				break;
 			}
 		}
 	}
 
-	private void renderTileAt (int i, int j, StaticTile staticTile) {
+	public void renderTileDynamic (MainRenderer mainRenderer, Batch batch, StaticTile staticTile, float tileSizeX, float tileSizeY) {
+		mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
 	}
 
 	public void render (MainRenderer mainRenderer, Batch batch, GameObject entityThatHasTheMap, MapComponent map) {

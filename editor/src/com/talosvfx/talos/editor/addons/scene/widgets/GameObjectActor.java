@@ -62,6 +62,6 @@ public class GameObjectActor extends Table {
 		}
 
 		uiRenderer.update(gameObject);
-		uiRenderer.render(batch, gameObject);
+		uiRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
 	}
 }

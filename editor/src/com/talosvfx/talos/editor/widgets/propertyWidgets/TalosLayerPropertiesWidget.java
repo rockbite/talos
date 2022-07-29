@@ -62,6 +62,7 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
                     layer.setGameAsset(value);
                 }
             });
+            paletteWidget.updateValue(); //kind of a hack to do this /shrug face
             widgets.add(paletteWidget);
 
 

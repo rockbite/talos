@@ -13,10 +13,13 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
@@ -30,7 +33,7 @@ import java.util.Comparator;
 
 public class MainRenderer implements Notifications.Observer {
 
-    private final Comparator<GameObject> layerAndDrawOrderComparator;
+    public final Comparator<GameObject> layerAndDrawOrderComparator;
 
     private  Comparator<GameObject> activeSorter;
 
@@ -38,7 +41,6 @@ public class MainRenderer implements Notifications.Observer {
     private Vector2 vec = new Vector2();
     private Vector2[] points = new Vector2[4];
 
-    private Array<GameObject> list = new Array<>();
     private ObjectMap<String, Integer> layerOrderLookup = new ObjectMap<>();
 
     private static final int LB = 0;
@@ -56,6 +58,10 @@ public class MainRenderer implements Notifications.Observer {
 
     private TextureRegion textureRegion = new TextureRegion();
     private OrthographicCamera camera;
+
+    public static class RenderState {
+        private Array<GameObject> list = new Array<>();
+    }
 
     public MainRenderer() {
         for (int i = 0; i < 4; i++) {
@@ -142,29 +148,38 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    private void fillRenderableEntities (GameObject root, Array<GameObject> list) {
-        if (root.hasComponentType(RendererComponent.class)) {
-            list.add(root);
-        }
-        if (root.getGameObjects() != null) {
-            for (int i = 0; i < root.getGameObjects().size; i++) {
-                fillRenderableEntities(root.getGameObjects().get(i), list);
+    private void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
+        for (GameObject root : rootObjects) {
+            if (root.hasComponentType(RendererComponent.class)) {
+                list.add(root);
+            }
+            if (root.getGameObjects() != null) {
+                fillRenderableEntities(root.getGameObjects(), list);
             }
         }
+
     }
 
-    public void render (Batch batch, GameObject root) {
+
+    Array<GameObject> temp = new Array<>();
+    public void render (Batch batch, RenderState state, GameObject root) {
+        temp.clear();
+        temp.add(root);
+        render(batch, state, temp);
+    }
+    public void render (Batch batch, RenderState state, Array<GameObject> rootObjects) {
         mapRenderer.setCamera(this.camera);
 
-        updateLayerOrderLookup(root);
+        updateLayerOrderLookup();
 
         //fill entities
-        list.clear();
-        fillRenderableEntities(root, list);
-        sort(list);
+        state.list.clear();
+        fillRenderableEntities(rootObjects, state.list);
+        sort(state.list);
 
+        for (int i = 0; i < state.list.size; i++) {
+            GameObject gameObject = state.list.get(i);
 
-        for(GameObject gameObject: list) {
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
             GameResourceOwner<?> resourceComponent = gameObject.getRenderResourceComponent();
@@ -299,6 +314,17 @@ public class MainRenderer implements Notifications.Observer {
         mapRenderer.render(this, batch, gameObject, map);
     }
 
+    public void renderStaticTileDynamic (StaticTile staticTile, Batch batch, float tileSizeX, float tileSizeY) {
+        GridPosition gridPosition = staticTile.getGridPosition();
+        GameAsset<?> staticTilesAsset = staticTile.getStaticTilesAsset();
+        if (staticTilesAsset.type == GameAssetType.SPRITE) {
+            GameAsset<Texture> texGameAsset = (GameAsset<Texture>)staticTilesAsset;
+            Texture resource = texGameAsset.getResource();
+
+            batch.draw(resource, gridPosition.getIntX(), gridPosition.getIntY(), tileSizeX, tileSizeY);
+        }
+    }
+
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
         if(false && patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(texture);
@@ -322,7 +348,7 @@ public class MainRenderer implements Notifications.Observer {
         }
     }
 
-    private void updateLayerOrderLookup (GameObject root) {
+    private void updateLayerOrderLookup () {
         Array<String> layerList = SceneEditorAddon.get().workspace.getLayerList();
         layerOrderLookup.clear();
         int i = 0;
@@ -380,4 +406,6 @@ public class MainRenderer implements Notifications.Observer {
     public OrthographicCamera getCamera () {
         return camera;
     }
+
+
 }

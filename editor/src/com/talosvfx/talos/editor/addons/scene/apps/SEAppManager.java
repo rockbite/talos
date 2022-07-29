@@ -88,7 +88,7 @@ public class SEAppManager {
             addCloseButton();
             closeOnEscape();
 
-            add(app.getContent());
+            add(app.getContent()).grow();
 
             pack();
             invalidate();

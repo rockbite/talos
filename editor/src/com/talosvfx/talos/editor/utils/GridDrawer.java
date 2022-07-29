@@ -95,6 +95,7 @@ public class GridDrawer {
 		shapeRenderer.setAutoShapeType(true);
 		shapeRenderer.begin();
 
+
 		for (float x = startGridX; x < startGridX + totalWidth; x += gridSizeX) {
 			shapeRenderer.line(x, bottomSide, x, bottomSide + totalHeight);
 		}
@@ -118,6 +119,11 @@ public class GridDrawer {
 			}
 		}
 
+		shapeRenderer.setColor(Color.GREEN);
+		shapeRenderer.line(camera.position.x - totalWidth/2, 0, camera.position.x + totalWidth, 0);
+		shapeRenderer.setColor(Color.RED);
+		shapeRenderer.line(0, camera.position.y - totalHeight, 0, camera.position.y + totalHeight);
+
 		shapeRenderer.setColor(color);
 
 
@@ -137,5 +143,24 @@ public class GridDrawer {
 
 		shapeRenderer.end();
 		Gdx.gl.glDisable(GL20.GL_BLEND);
+	}
+
+	public void toLocalCell (Vector3 vec) {
+		float[] floats = gridProperties.sizeProvider.get();
+
+		float gridSizeX = floats[0];
+		float gridSizeY = floats[1];
+
+		//Find the 'cell'
+		float projX = vec.x;
+		projX /= gridSizeX;
+		projX = MathUtils.floor(projX);
+		projX *= gridSizeX;
+
+		float projY = vec.y;
+		projY /= gridSizeY;
+		projY = MathUtils.floor(projY);
+		projY *= gridSizeY;
+		vec.set(projX, projY, vec.z);
 	}
 }

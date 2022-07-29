@@ -112,7 +112,7 @@ public class CameraPreview extends Actor {
 
         renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
         renderer.update(rootGO);
-        renderer.render(polygonSpriteBatch, rootGO);
+        renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
     }
 
     public void setViewport (float worldWidth, float worldHeight, float width, float height) {
