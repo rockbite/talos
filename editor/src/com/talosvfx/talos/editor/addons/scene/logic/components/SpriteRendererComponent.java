@@ -92,6 +92,23 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
 
+        // snap to aspect ratio
+        fixAspectRatioWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (!fixAspectRatio) return;;
+
+                final Texture texture = getGameResource().getResource();
+
+                final float aspect = texture.getHeight() * 1f / texture.getWidth();
+                size.y = size.x * aspect;
+
+                final ValueWidget yValue = ((Vector2PropertyWidget) sizeWidget).yValue;
+                yValue.setValue(size.y, false);
+
+            }
+        });
+
         // change size by aspect ratio if aspect ratio is fixed
         sizeWidget.addListener(new ChangeListener() {
             @Override
