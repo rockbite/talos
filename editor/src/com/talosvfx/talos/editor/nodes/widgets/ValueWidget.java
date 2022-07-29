@@ -279,6 +279,10 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
+        setValue(value, true);
+    }
+
+    public void setValue(float value, boolean notify) {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
@@ -296,7 +300,9 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         updateProgress();
 
-        fireChangedEvent();
+        if (notify) {
+            fireChangedEvent();
+        }
     }
 
     private void updateProgress() {

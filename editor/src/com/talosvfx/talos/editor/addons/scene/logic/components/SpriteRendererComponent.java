@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -14,6 +16,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
@@ -85,13 +88,41 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
-        PropertyWidget fixAspectRatio = WidgetFactory.generate(this, "fixAspectRatio", "Fix Aspect Ratio");
+        PropertyWidget fixAspectRatioWidget = WidgetFactory.generate(this, "fixAspectRatio", "Fix Aspect Ratio");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
 
+        // change size by aspect ratio if aspect ratio is fixed
+        sizeWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (!fixAspectRatio) return;
+
+                if (event.getTarget() instanceof ValueWidget) {
+                    final Vector2PropertyWidget vector2PropertyWidget = ((Vector2PropertyWidget) sizeWidget);
+                    final ValueWidget xValue = vector2PropertyWidget.xValue;
+                    final ValueWidget yValue = vector2PropertyWidget.yValue;
+                    final Texture texture = getGameResource().getResource();
+
+                    final float aspect = texture.getHeight() * 1f / texture.getWidth();
+
+                    if (event.getTarget() == xValue) {
+                        size.y = size.x * aspect;
+                    }
+
+                    if (event.getTarget() == yValue) {
+                        size.x = size.y / aspect;
+                    }
+
+                    xValue.setValue(size.x, false);
+                    yValue.setValue(size.y, false);
+                }
+            }
+        });
+
         properties.add(textureWidget);
         properties.add(colorWidget);
-        properties.add(fixAspectRatio);
+        properties.add(fixAspectRatioWidget);
         properties.add(flipXWidget);
         properties.add(flipYWidget);
         properties.add(renderModesWidget);

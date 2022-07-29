@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 
 public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 
-    private ValueWidget xValue;
-    private ValueWidget yValue;
+    public ValueWidget xValue;
+    public ValueWidget yValue;
 
     private ValueProperty annotation;
     private Label title;
