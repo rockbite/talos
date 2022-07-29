@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -44,6 +45,15 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
         spriteRendererComponent.size.set(nextPoints[RB].dst(nextPoints[LB]), nextPoints[LB].dst(nextPoints[LT]));
         spriteRendererComponent.size = lowerPrecision(spriteRendererComponent.size);
+
+        // if aspect ratio is fixed set height by width
+        if (spriteRendererComponent.fixAspectRatio) {
+            Texture texture = spriteRendererComponent.getGameResource().getResource();
+
+            final float aspect = texture.getHeight() * 1f / texture.getWidth();
+            spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
+        }
+
         tmp.set(nextPoints[RT]).sub(nextPoints[LB]).scl(0.5f).add(nextPoints[LB]); // this is midpoint
         transform.position = lowerPrecision(transform.position);
     }
