@@ -308,7 +308,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 
 	protected void initListeners () {
-		addListener(new InputListener() {
+		inputListener = new InputListener() {
 
 			Vector2 vec = new Vector2();
 			Gizmo touchedGizmo = null;
@@ -600,7 +600,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				return super.keyDown(event, keycode);
 			}
-		});
+		};
+
+		addListener(inputListener);
 	}
 
 	private void eraseTileAt (float x, float y) {

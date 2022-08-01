@@ -25,6 +25,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -36,11 +37,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+
+import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPressed;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -137,7 +142,12 @@ public class PreviewWidget extends ViewportWidget {
         add(previewController).bottom().left().growX();
 
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
-        addListener(new InputListener() {
+
+        initListeners();
+    }
+
+    private void initListeners () {
+        inputListener = new InputListener() {
 
             boolean moving = false;
             private Vector3 tmp = new Vector3();
@@ -208,7 +218,9 @@ public class PreviewWidget extends ViewportWidget {
             public boolean keyUp(InputEvent event, int keycode) {
                 return super.keyUp(event, keycode);
             }
-        });
+        };
+
+        addListener(inputListener);
     }
 
 

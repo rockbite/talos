@@ -21,12 +21,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
@@ -116,6 +113,7 @@ public class TalosMain extends ApplicationAdapter {
 	public Cursor moveHorizontallyCursor;
 	public Cursor moveVerticallyCursor;
 	public Cursor moveAllDirections;
+	public Cursor handGrabbed;
 	private Cursor currentCursor;
 
 	public TalosMain () {
@@ -178,6 +176,7 @@ public class TalosMain extends ApplicationAdapter {
 		moveHorizontallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_horizontally.png")), 8, 8);
 		moveVerticallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_vertically.png")), 8, 8);
 		moveAllDirections = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_all_directions.png")), 8, 8);
+		handGrabbed = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/hand_grabbed.png")), 8, 8);
 
 		uiStage = new UIStage(skin);
 

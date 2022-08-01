@@ -94,8 +94,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         selectionRect.setVisible(false);
         addActor(selectionRect);
 
-        addListener(new InputListener() {
+        initListeners();
+    }
 
+    private void initListeners () {
+        inputListener = new InputListener() {
             // selection stuff
             Vector2 startPos = new Vector2();
             Vector2 vec = new Vector2();
@@ -188,7 +191,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                 super.touchUp(event, x, y, pointer, button);
             }
-        });
+        };
+
+        addListener(inputListener);
     }
 
     @Override

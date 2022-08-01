@@ -114,7 +114,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     private void addListeners() {
-        addListener(new ClickListener() {
+        inputListener = new ClickListener() {
 
             private Vector3 tmp3 = new Vector3();
             private Vector2 pos = new Vector2();
@@ -263,7 +263,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                 return super.keyDown(event, keycode);
             }
-        });
+        };
+
+        addListener(inputListener);
     }
 
     public void effectSelected(BoundEffect effect) {
