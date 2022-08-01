@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -20,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.UUID;
@@ -43,6 +45,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         identifier = paletteData.nameIdentifier;
         title = paletteData.nameIdentifier;
         initContent();
+
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : paletteData.getResource().gameObjects) {
+            SceneEditorWorkspace.getInstance().initGizmos(entry.value, paletteEditorWorkspace);
+        }
     }
 
     @Override
@@ -171,10 +177,16 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         return title;
     }
 
+
     @Override
-    public boolean notifyClose() {
+    public void onHide () {
+        super.onHide();
         SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().unregisterTarget(target);
-        return super.notifyClose();
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : object.getResource().gameObjects) {
+            SceneEditorWorkspace.getInstance().removeGizmos(entry.value);
+        }
+        Notifications.registerObserver(paletteEditorWorkspace);
+
     }
 
     public void addGameAsset (GameAsset<?> gameAsset, float x, float y) {

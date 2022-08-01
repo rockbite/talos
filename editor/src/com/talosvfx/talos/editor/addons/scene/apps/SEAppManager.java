@@ -54,6 +54,7 @@ public class SEAppManager {
                 @Override
                 public void closeRequested() {
                     window.hide();
+                    editorApp.onHide();
                 }
             });
 

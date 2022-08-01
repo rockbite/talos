@@ -24,7 +24,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     Vector2 tmp = new Vector2();
 
-    protected float worldPerPixel;
+    protected float worldPerPixel = 1f;
 
     protected Rectangle hitBox = new Rectangle();
 

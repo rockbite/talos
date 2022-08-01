@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -35,7 +36,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPressed;
 
-public class PaletteEditorWorkspace extends ViewportWidget {
+public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
     GameAsset<TilePaletteData> paletteData;
 
     private GridDrawer gridDrawer;
@@ -52,6 +53,8 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         this.paletteData = paletteData;
         setWorldSize(10f);
         setCameraPos(0, 0);
+
+        Notifications.registerObserver(this);
 
         mainRenderer = new MainRenderer();
 
@@ -239,18 +242,41 @@ public class PaletteEditorWorkspace extends ViewportWidget {
         batch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.ORANGE);
+        shapeRenderer.setColor(Color.CYAN);
 
+        Array<GameAsset<?>> selectedGameAssets = paletteData.getResource().selectedGameAssets;
 
-        for (GameAsset<?> selectedGameAsset : paletteData.getResource().selectedGameAssets) {
-            UUID uuid = selectedGameAsset.getRootRawAsset().metaData.uuid;
-            float[] floats = positions.get(uuid);
-            shapeRenderer.rect(floats[0] - 0.5f, floats[1] - 0.5f, 1, 1);
+        for (ObjectMap.Entry<GameAsset<?>, StaticTile> entry : staticTiles) {
+            GameAsset<?> key = entry.key;
+            StaticTile value = entry.value;
+
+            if (selectedGameAssets.contains(key, true)) {
+
+                GridPosition gridPosition = value.getGridPosition();
+                float gridSizeX = 1;
+                float gridSizeY = 1;
+
+                if (layerSelected != null) {
+                    gridSizeX = layerSelected.getTileSizeX();
+                    gridSizeY = layerSelected.getTileSizeY();
+                }
+
+                shapeRenderer.rect(gridPosition.getIntX(), gridPosition.getIntY(), gridSizeX, gridSizeY);
+            }
+
         }
+
 
         shapeRenderer.end();
 
         batch.begin();
+    }
+
+    @EventHandler
+    public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
+        Array<GameObject> gameObjects = event.get();
+
+        selectGizmos(gameObjects);
     }
 
     private void selectByPoint (float x, float y) {

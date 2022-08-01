@@ -30,9 +30,15 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.utils.CameraController;
-
+import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 
 public abstract class ViewportWidget extends Table {
 
@@ -63,6 +69,8 @@ public abstract class ViewportWidget extends Table {
     private boolean isDragging;
     private boolean inputListenersEnabled = true;
 
+    protected Gizmos gizmos = new Gizmos();
+
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
         camera = new OrthographicCamera();
@@ -74,6 +82,120 @@ public abstract class ViewportWidget extends Table {
         cameraController.setInvert(true);
 
         addPanListener();
+
+        addGizmoListener();
+    }
+
+    public void selectGizmos (Array<GameObject> gameObjects) {
+        for (Gizmo gizmo : this.gizmos.gizmoList) {
+            gizmo.setSelected(false);
+        }
+
+        if (gameObjects.size == 1) {
+            Array<Gizmo> gizmos = this.gizmos.gizmoMap.get(gameObjects.get(0));
+            if (gizmos != null) {
+                for (Gizmo gizmo : gizmos) {
+                    gizmo.setSelected(true);
+                }
+            }
+        } else {
+            for (GameObject gameObject : gameObjects) {
+                Array<Gizmo> gizmos = this.gizmos.gizmoMap.get(gameObject);
+                if (gizmos != null) {
+                    for (Gizmo gizmo : gizmos) {
+                        if (gizmo.isMultiSelect()) {
+                            gizmo.setSelected(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void addGizmoListener () {
+
+    }
+
+
+    private void removeGizmos () {
+        //todo clear on change, not on start
+        for (Gizmo gizmo : gizmos.gizmoList) {
+            gizmo.remove();
+        }
+        gizmos.gizmoList.clear();
+        gizmos.gizmoMap.clear();
+    }
+
+    public void removeGizmos (GameObject gameObject) {
+        Array<Gizmo> list = gizmos.gizmoMap.get(gameObject);
+        if (list == null) {
+            System.out.println("No gimzmo for " + gameObject);
+            return;
+        } else {
+            System.out.println("removing gizmos for " + gameObject);
+        }
+        for (Gizmo gizmo : list) {
+            gizmo.notifyRemove();
+            gizmo.remove();
+        }
+        gizmos.gizmoList.removeAll(list, true);
+        gizmos.gizmoMap.remove(gameObject);
+    }
+
+    public void initGizmos (GameObject gameObject, ViewportWidget parent) {
+        makeGizmosFor(gameObject, parent);
+        Array<GameObject> childObjects = gameObject.getGameObjects();
+        if (childObjects != null) {
+            for (GameObject childObject : childObjects) {
+                makeGizmosFor(childObject, parent);
+                initGizmos(childObject, parent);
+            }
+        }
+    }
+
+    public void initGizmos (GameObjectContainer gameObjectContainer, ViewportWidget parent) {
+        Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
+        if (childObjects != null) {
+            for (GameObject childObject : childObjects) {
+                initGizmos(childObject, parent);
+            }
+        }
+    }
+
+    public void makeGizmosFor (GameObject gameObject, ViewportWidget parent) {
+        if (parent.gizmos.gizmoMap.containsKey(gameObject))
+            return;
+
+        Iterable<AComponent> components = gameObject.getComponents();
+        for (AComponent component : components) {
+            Array<Gizmo> gizmos = GizmoRegister.makeGizmosFor(component);
+
+            for (Gizmo gizmo : gizmos) {
+                if (gizmo != null) {
+                    gizmo.setGameObject(gameObject);
+
+                    Array<Gizmo> list = parent.gizmos.gizmoMap.get(gameObject);
+                    if (list == null)
+                        list = new Array<>();
+
+                    parent.gizmos.gizmoMap.put(gameObject, list);
+
+                    if (gizmo != null) {
+                        parent.gizmos.gizmoList.add(gizmo);
+                        list.add(gizmo);
+                    }
+                }
+            }
+        }
+    }
+
+    protected Gizmo hitGizmo (float x, float y) {
+        for (Gizmo gizmo : gizmos.gizmoList) {
+            if (gizmo.hit(x, y))
+                return gizmo;
+        }
+
+        return null;
     }
 
     protected void addPanListener() {
@@ -134,24 +256,6 @@ public abstract class ViewportWidget extends Table {
 
     Vector2 temp = new Vector2();
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-
-        // allow moving around if space bar is pressed and is in viewport or has dragged from viewport
-        canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
-
-        if (canMoveAround) {
-            TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
-            disableClickListener();
-        } else {
-            TalosMain.Instance().setCursor(null);
-            enableClickListener();
-        }
-    }
-
-
-
     private void enableClickListener () {
         if (inputListener == null) return;
         if (inputListenersEnabled) return;
@@ -200,6 +304,13 @@ public abstract class ViewportWidget extends Table {
 
         batch.begin();
         drawContent(batch, parentAlpha);
+
+        for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
+            Gizmo gizmo = this.gizmos.gizmoList.get(i);
+            gizmo.setWoldWidth(getWorldWidth() * camera.zoom);
+            gizmo.draw(batch, parentAlpha);
+        }
+
         batch.end();
 
         HdpiUtils.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -213,6 +324,27 @@ public abstract class ViewportWidget extends Table {
 
     protected void drawGroup(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
+    }
+
+    @Override
+    public void act (float delta) {
+        super.act(delta);
+
+        // allow moving around if space bar is pressed and is in viewport or has dragged from viewport
+        canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
+
+        if (canMoveAround) {
+            TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+            disableClickListener();
+        } else {
+            TalosMain.Instance().setCursor(null);
+            enableClickListener();
+        }
+
+        for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
+            Gizmo gizmo = this.gizmos.gizmoList.get(i);
+            gizmo.act(delta);
+        }
     }
 
     public abstract void drawContent(Batch batch, float parentAlpha);
