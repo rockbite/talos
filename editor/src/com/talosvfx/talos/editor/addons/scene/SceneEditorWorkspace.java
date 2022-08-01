@@ -4,11 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -818,6 +821,62 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		projectPath = path;
 	}
 
+	protected void addPanListener() {
+		addListener(new InputListener() {
+			@Override
+			public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
+				float currWidth = camera.viewportWidth * camera.zoom;
+				float nextWidth = currWidth * (1f + amountY * 0.1f);
+				float nextZoom = nextWidth/camera.viewportWidth;
+				camera.zoom = nextZoom;
+
+				camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
+				camera.update();
+
+				return true;
+			}
+
+			@Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				cameraController.touchDown((int)x, (int)y, pointer, button);
+				return !event.isHandled();
+			}
+
+			@Override
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				isDragging = false;
+				cameraController.touchUp((int)x, (int)y, pointer, button);
+			}
+
+			@Override
+			public void touchDragged (InputEvent event, float x, float y, int pointer) {
+				// can't move around disable dragging
+				if (!canMoveAround) return;
+
+				isDragging = true;
+
+				cameraController.touchDragged((int)x, (int)y, pointer);
+			}
+
+			@Override
+			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				isInViewPort = true;
+
+				super.enter(event, x, y, pointer, fromActor);
+				TalosMain.Instance().UIStage().getStage().setScrollFocus(SceneEditorWorkspace.this);
+			}
+
+			@Override
+			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				if (pointer != -1) return; //Only care about exit/enter from mouse move
+				TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
+
+				isInViewPort = false;
+				super.exit(event, x, y, pointer, toActor);
+			}
+		});
+	}
+
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		changeVersion = jsonData.getString("changeVersion", "");
@@ -851,11 +910,24 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 //        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
 	}
 
+	private boolean canMoveAround;
+	private boolean isInViewPort;
+	private boolean isDragging;
+
 	@Override
 	public void act (float delta) {
 		if (!(TalosMain.Instance().Project() instanceof SceneEditorProject))
 			return;
 		super.act(delta);
+
+		// allow moving around if space bar is pressed and is in viewport or has dragged from viewport
+		canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
+
+		if (canMoveAround) {
+			TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+		} else {
+			TalosMain.Instance().setCursor(null);
+		}
 
 		for (int i = 0; i < gizmoList.size; i++) {
 			Gizmo gizmo = gizmoList.get(i);
