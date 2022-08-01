@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
@@ -37,6 +38,8 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
+        properties.add(WidgetFactory.generate(this, "fakeZ", "FakeZ"));
+        properties.add(WidgetFactory.generate(this, "visualOffset", "VisualOffset"));
 
         return properties;
     }
