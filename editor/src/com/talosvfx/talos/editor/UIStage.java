@@ -373,7 +373,7 @@ public class UIStage {
 			}
 		});
 
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
+		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.getFileName());
 
 		stage.addActor(fileChooser.fadeIn());
 	}
