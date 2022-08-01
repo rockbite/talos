@@ -111,6 +111,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	private AssetRepository assetRepository;
 
+	private InputListener inputListener;
+
 	public SceneEditorWorkspace () {
 
 		layers.clear();
@@ -320,7 +322,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	protected void initListeners () {
-		addListener(new InputListener() {
+		inputListener = new InputListener() {
 
 			Vector2 vec = new Vector2();
 			Gizmo touchedGizmo = null;
@@ -610,7 +612,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				return super.keyDown(event, keycode);
 			}
-		});
+		};
+
+		addListener(inputListener);
 	}
 
 	private void eraseTileAt (float x, float y) {
@@ -913,6 +917,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private boolean canMoveAround;
 	private boolean isInViewPort;
 	private boolean isDragging;
+	private boolean inputListenersEnabled = true;
 
 	@Override
 	public void act (float delta) {
@@ -925,8 +930,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (canMoveAround) {
 			TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+			disableClickListener();
 		} else {
 			TalosMain.Instance().setCursor(null);
+			enableClickListener();
 		}
 
 		for (int i = 0; i < gizmoList.size; i++) {
@@ -941,6 +948,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				reloadProjectExplorer();
 			}
 		}
+	}
+
+	private void enableClickListener () {
+		if (inputListenersEnabled) return;
+		inputListenersEnabled = true;
+		addListener(inputListener);
+	}
+
+	private void disableClickListener () {
+		if (!inputListenersEnabled) return;
+		inputListenersEnabled = false;
+		removeListener(inputListener);
 	}
 
 	@Override
