@@ -6,9 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.ProjectOpened;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
 
@@ -27,8 +25,7 @@ public class SceneEditorProject implements IProject {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
 
-        sceneEditorAddon.workspace.readProjectPath(projectFileHandle, jsonValue);
-
+        sceneEditorAddon.workspace.setProjectPath(projectFileHandle.parent().path());
         sceneEditorAddon.workspace.loadFromData(json, jsonValue, fromMemory);
     }
 

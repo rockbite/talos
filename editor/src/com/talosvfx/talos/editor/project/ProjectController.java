@@ -18,6 +18,7 @@ public class ProjectController {
     public FileTab currentTab;
     private ObjectMap<String, String> fileCache = new ObjectMap<>();
     private ObjectMap<String, String> pathCache = new ObjectMap<>();
+    private ObjectMap<String, FileTab> tabCache = new ObjectMap<>();
     private ObjectMap<String, String> exporthPathCache = new ObjectMap<>();
     private boolean loading = false;
 
@@ -54,7 +55,7 @@ public class ProjectController {
                 currentProjectPath = projectFileHandle.path();
                 projectFileName = projectFileHandle.name();
                 loading = true;
-                currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
+                currentTab = new FileTab(projectFileHandle, currentProject); // trackers need to know what current tab is
                 String string = projectFileHandle.readString();
                 currentProject.loadProject(projectFileHandle, string, false);
                 snapshotTracker.reset(string);
@@ -91,19 +92,6 @@ public class ProjectController {
         }
     }
 
-    private void getProjectFromCache(String projectFileName) {
-        try {
-            loading = true;
-            currentProjectPath = pathCache.get(projectFileName);
-            String string = fileCache.get(projectFileName);
-            currentProject.loadProject(null, string, true);
-            snapshotTracker.reset(string);
-            loading = false;
-        } catch (Exception e) {
-            TalosMain.Instance().reportException(e);
-        }
-    }
-
     private void getProjectFromString(String string, boolean fromMemory) {
         try {
             loading = true;
@@ -131,7 +119,7 @@ public class ProjectController {
 
             if (!currentTab.getFileName().equals(projectFileName)) {
                 clearCache(currentTab.getFileName());
-                currentTab.setFileName(projectFileName);
+                currentTab.setProjectFileHandle(destination);
                 TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
                 fileCache.put(projectFileName, data);
             }
@@ -178,8 +166,8 @@ public class ProjectController {
             }
         }
 
-        String newName = fileName;
-        FileTab tab = new FileTab(newName, project);
+        final FileTab tab = new FileTab(Gdx.files.local(fileName), project);
+
         tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
         TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
@@ -244,19 +232,22 @@ public class ProjectController {
     public void loadFromTab(FileTab tab) {
         String fileName = tab.getFileName();
 
-        if(currentTab != null && currentTab != tab) {
+        if (currentTab != null && currentTab != tab) {
             saveProjectToCache(projectFileName);
         }
-        if(fileCache.containsKey(fileName)) {
+
+        if (fileCache.containsKey(fileName)) {
             currentProject = tab.getProjectType();
-            currentTab =  tab;
-            getProjectFromCache(fileName);
+            currentTab = tab;
+            final FileHandle projectFileHandle = tab.getProjectFileHandle();
+            final String fileData = fileCache.get(tab.getFileName());
+            currentProject.loadProject(projectFileHandle, fileData, true);
         }
 
         projectFileName = fileName;
         currentTab = tab;
         currentProject = currentTab.getProjectType();
-        if(tab.getProjectType() == TLS) {
+        if (tab.getProjectType() == TLS) {
             TalosMain.Instance().UIStage().swapToTalosContent();
         } else {
             currentProject.initUIContent();
