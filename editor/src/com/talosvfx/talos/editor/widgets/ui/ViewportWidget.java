@@ -76,6 +76,8 @@ public abstract class ViewportWidget extends Table {
 
         addPanListener();
 
+        addGizmoListener();
+
     }
 
     public void selectGizmos (Array<GameObject> gameObjects) {
@@ -102,6 +104,10 @@ public abstract class ViewportWidget extends Table {
                 }
             }
         }
+    }
+
+    protected void addGizmoListener () {
+
     }
 
 
