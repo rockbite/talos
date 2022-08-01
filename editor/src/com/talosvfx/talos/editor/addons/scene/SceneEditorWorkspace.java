@@ -808,16 +808,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void readProjectPath (FileHandle projectFileHandle, JsonValue jsonValue) {
-		String path = "";
-		if (projectFileHandle != null) {
-			path = projectFileHandle.parent().path();
-		} else {
-			jsonValue.getString("projectPath", "");
-		}
-		projectPath = path;
-	}
-
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		changeVersion = jsonData.getString("changeVersion", "");
