@@ -10,6 +10,10 @@ public abstract class AEditorApp<T> {
 
     protected AppListener listener;
 
+    public void onHide () {
+
+    }
+
     interface AppListener {
         void closeRequested();
     }

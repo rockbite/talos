@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -71,8 +70,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private String projectPath;
 
 	private SavableContainer currentContainer;
-	private Array<Gizmo> gizmoList = new Array<>();
-	private ObjectMap<GameObject, Array<Gizmo>> gizmoMap = new ObjectMap<>();
+
 
 	private Array<GameObject> selection = new Array<>();
 	private MainRenderer renderer;
@@ -226,7 +224,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		if (!fromDirectoryView) {
-			initGizmos(gameObject);
+			initGizmos(gameObject, this);
 			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 			Gdx.app.postRunnable(new Runnable() {
 				@Override
@@ -254,7 +252,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		if (!fromDirectoryView) {
-			initGizmos(gameObject);
+			initGizmos(gameObject, this);
 
 			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 
@@ -307,14 +305,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	private Gizmo hitGizmo (float x, float y) {
-		for (Gizmo gizmo : gizmoList) {
-			if (gizmo.hit(x, y))
-				return gizmo;
-		}
 
-		return null;
-	}
 
 	protected void initListeners () {
 		addListener(new InputListener() {
@@ -337,8 +328,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			public boolean mouseMoved (InputEvent event, float x, float y) {
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
-				for (int i = 0; i < gizmoList.size; i++) {
-					Gizmo item = gizmoList.get(i);
+				for (int i = 0; i < SceneEditorWorkspace.this.gizmos.gizmoList.size; i++) {
+					Gizmo item = SceneEditorWorkspace.this.gizmos.gizmoList.get(i);
 					if (item.isSelected()) {
 						item.mouseMoved(hitCords.x, hitCords.y);
 					}
@@ -405,8 +396,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
 					// also tell all other selected gizmos about this touchdown
-					for (int i = 0; i < gizmoList.size; i++) {
-						Gizmo item = gizmoList.get(i);
+
+
+					for (int i = 0; i < SceneEditorWorkspace.this.gizmos.gizmoList.size; i++) {
+						Gizmo item = SceneEditorWorkspace.this.gizmos.gizmoList.get(i);
 						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
 							item.touchDown(hitCords.x, hitCords.y, button);
 						}
@@ -487,8 +480,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (touchedGizmo != null) {
 					touchedGizmo.touchDragged(hitCords.x, hitCords.y);
-					for (int i = 0; i < gizmoList.size; i++) {
-						Gizmo item = gizmoList.get(i);
+					for (int i = 0; i < SceneEditorWorkspace.this.gizmos.gizmoList.size; i++) {
+						Gizmo item = SceneEditorWorkspace.this.gizmos.gizmoList.get(i);
 						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
 							item.touchDragged(hitCords.x, hitCords.y);
 						}
@@ -535,8 +528,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (touchedGizmo != null) {
 					touchedGizmo.touchUp(hitCords.x, hitCords.y);
-					for (int i = 0; i < gizmoList.size; i++) {
-						Gizmo item = gizmoList.get(i);
+					for (int i = 0; i < SceneEditorWorkspace.this.gizmos.gizmoList.size; i++) {
+						Gizmo item = SceneEditorWorkspace.this.gizmos.gizmoList.get(i);
 						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
 							item.touchUp(hitCords.x, hitCords.y);
 						}
@@ -547,7 +540,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (selectionRect.isVisible()) {
 					upWillClear = false;
-					selectByRect(rectangle);
+					selectGizmosByRect(rectangle);
 					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
 				} else if (upWillClear) {
 					FocusManager.resetFocus(getStage());
@@ -599,7 +592,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					TalosMain.Instance().ProjectController().redo();
 				}
 
-				for (Gizmo gizmo : gizmoList) {
+				for (Gizmo gizmo : SceneEditorWorkspace.this.gizmos.gizmoList) {
 					if (gizmo.isSelected()) {
 						gizmo.keyDown(event, keycode);
 					}
@@ -780,7 +773,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				currentContainer.addGameObject(gameObject);
 				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 				transformComponent.position.add(offset);
-				initGizmos(gameObject);
+				initGizmos(gameObject, this);
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
@@ -857,10 +850,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		super.act(delta);
 
-		for (int i = 0; i < gizmoList.size; i++) {
-			Gizmo gizmo = gizmoList.get(i);
-			gizmo.act(delta);
-		}
 
 		if (reloadScheduled > 0) {
 			reloadScheduled -= delta;
@@ -889,11 +878,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.setCamera(camera);
 		drawMainRenderer(batch, parentAlpha);
 
-		for (int i = 0; i < gizmoList.size; i++) {
-			Gizmo gizmo = gizmoList.get(i);
-			gizmo.setWoldWidth(getWorldWidth() * camera.zoom);
-			gizmo.draw(batch, parentAlpha);
-		}
+
 	}
 
 	private void drawMainRenderer (Batch batch, float parentAlpha) {
@@ -982,8 +967,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		currentContainer = mainScene;
 
 		// process all game objects
-		removeGizmos();
-		initGizmos(mainScene);
+		initGizmos(mainScene, this);
 
 		clearSelection();
 
@@ -997,66 +981,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	private void removeGizmos () {
-		gizmoList.clear();
-		gizmoMap.clear();
-	}
-
-	public void removeGizmos (GameObject gameObject) {
-		Array<Gizmo> list = gizmoMap.get(gameObject);
-		for (Gizmo gizmo : list) {
-			gizmo.notifyRemove();
-		}
-		gizmoList.removeAll(list, true);
-		gizmoMap.remove(gameObject);
-	}
-
-	public void initGizmos (GameObject gameObject) {
-		makeGizmosFor(gameObject);
-		Array<GameObject> childObjects = gameObject.getGameObjects();
-		if (childObjects != null) {
-			for (GameObject childObject : childObjects) {
-				makeGizmosFor(childObject);
-				initGizmos(childObject);
-			}
-		}
-	}
-
-	private void initGizmos (GameObjectContainer gameObjectContainer) {
-		Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
-		if (childObjects != null) {
-			for (GameObject childObject : childObjects) {
-				initGizmos(childObject);
-			}
-		}
-	}
-
-	private void makeGizmosFor (GameObject gameObject) {
-		if (gizmoMap.containsKey(gameObject))
-			return;
-
-		Iterable<AComponent> components = gameObject.getComponents();
-		for (AComponent component : components) {
-			Array<Gizmo> gizmos = GizmoRegister.makeGizmosFor(component);
-
-			for (Gizmo gizmo : gizmos) {
-				if (gizmo != null) {
-					gizmo.setGameObject(gameObject);
-
-					Array<Gizmo> list = gizmoMap.get(gameObject);
-					if (list == null)
-						list = new Array<>();
-
-					gizmoMap.put(gameObject, list);
-
-					if (gizmo != null) {
-						gizmoList.add(gizmo);
-						list.add(gizmo);
-					}
-				}
-			}
-		}
-	}
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
 		if (propertyHolder == null)
@@ -1142,12 +1066,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		selection.clear();
 	}
 
-	private void selectByRect (Rectangle rectangle) {
+	public void selectGizmosByRect (Rectangle rectangle) {
 		if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 			clearSelection();
 		}
-		for (int i = 0; i < gizmoList.size; i++) {
-			Gizmo gizmo = gizmoList.get(i);
+		for (int i = 0; i < gizmos.gizmoList.size; i++) {
+			Gizmo gizmo = gizmos.gizmoList.get(i);
 			if (gizmo instanceof TransformGizmo) {
 				TransformGizmo transformGizmo = (TransformGizmo)gizmo;
 				Vector2 worldPos = transformGizmo.getWorldPos();
@@ -1238,29 +1162,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		mapEditorState.update(event);
 		Array<GameObject> gameObjects = event.get();
 
-		for (Gizmo gizmo : gizmoList) {
-			gizmo.setSelected(false);
-		}
-
-		if (gameObjects.size == 1) {
-			Array<Gizmo> gizmos = gizmoMap.get(gameObjects.get(0));
-			if (gizmos != null) {
-				for (Gizmo gizmo : gizmos) {
-					gizmo.setSelected(true);
-				}
-			}
-		} else {
-			for (GameObject gameObject : gameObjects) {
-				Array<Gizmo> gizmos = gizmoMap.get(gameObject);
-				if (gizmos != null) {
-					for (Gizmo gizmo : gizmos) {
-						if (gizmo.isMultiSelect()) {
-							gizmo.setSelected(true);
-						}
-					}
-				}
-			}
-		}
+		selectGizmos(gameObjects);
 
 		// now for properties
 
@@ -1279,6 +1181,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 	}
+
 
 	public void changeGOName (GameObject gameObject, String suggestedName) {
 		if (suggestedName.equals(gameObject.getName()))
@@ -1346,7 +1249,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
 			}
 
-			openSavableContainer(container);
+//			openSavableContainer(container);
 		}
 
 		if (!fromMemory) {
