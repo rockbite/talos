@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
@@ -222,7 +223,22 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
             return;
-        } else if(fileHandle.extension().equals("js") || fileHandle.extension().equals("json") || fileHandle.extension().equals("ts")) {
+        } else if (fileHandle.extension().equals("js") || fileHandle.extension().equals("ts")) {
+            //Try to find script if it exists in export
+
+            String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
+
+
+            FileHandle scriptsDir = Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
+            FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
+            if (targetScriptInSrc.exists()) {
+                FileOpener.open(targetScriptInSrc.file());
+            } else {
+                FileOpener.open(fileHandle.file());
+            }
+
+            return;
+        } else if (fileHandle.extension().equals("json")) {
             FileOpener.open(fileHandle.file());
             return;
         } else if(fileHandle.extension().equals("ttp")) {

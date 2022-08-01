@@ -964,6 +964,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		projectPath = path;
 	}
 
+
 	// if asset is updated externally, do something about it maybe
 	public void updateAsset (FileHandle handle) {
 
