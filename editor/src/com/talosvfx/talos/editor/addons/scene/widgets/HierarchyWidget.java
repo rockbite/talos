@@ -219,11 +219,16 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             Array<GameObject> gameObjects = event.get();
             Array<FilteredTree.Node> nodes = new Array<>();
             for(GameObject gameObject: gameObjects) {
-                nodes.add(nodeMap.get(gameObject));
+                boolean hasNode = nodeMap.containsValue(gameObject, true);
+                if (hasNode) {
+                    nodes.add(nodeMap.get(gameObject));
+                }
+
             }
             tree.getSelection().clear();
-            tree.getSelection().addAll(nodes);
-
+            if (nodes.size > 0) {
+                tree.getSelection().addAll(nodes);
+            }
         }
     }
 

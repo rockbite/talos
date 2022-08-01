@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -36,8 +37,16 @@ public class TilePaletteData implements Json.Serializable{
         AssetImporter.fromDirectoryView = false;
 
         if (success) {
-            gameObjects.put(gameAsset, tempParent.getGameObjects().first());
+            GameObject first = tempParent.getGameObjects().first();
+            gameObjects.put(gameAsset, first);
+
+            SceneEditorWorkspace.getInstance().initGizmos(first);
         }
+    }
+
+    public void removeEntity (GameAsset<?> gameAsset) {
+        GameObject gameObject = gameObjects.remove(gameAsset);
+        SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
     }
 
     public enum TileOrEntity {

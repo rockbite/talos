@@ -42,6 +42,8 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class DirectoryViewWidget extends Table {
 
@@ -450,7 +452,22 @@ public class DirectoryViewWidget extends Table {
 
         if (fileHandle.isDirectory()) {
             int count = 0;
-            for (FileHandle child : fileHandle.list()) {
+            FileHandle[] list = fileHandle.list();
+            Array<FileHandle> sortedList = new Array<>();
+            sortedList.addAll(list);
+            sortedList.sort(new Comparator<FileHandle>() {
+                @Override
+                public int compare (FileHandle o1, FileHandle o2) {
+                    if (o1.isDirectory() && !o2.isDirectory()) {
+                        return -1;
+                    } else if (o2.isDirectory() && !o1.isDirectory()) {
+                        return 1;
+                    }
+
+                    return o1.name().compareTo(o2.name());
+                }
+            });
+            for (FileHandle child : sortedList) {
                 if(!ProjectExplorerWidget.fileFilter.accept(child.file())) {
                     continue;
                 }

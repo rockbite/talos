@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.kotcrab.vis.ui.FocusManager;
@@ -18,12 +19,14 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
@@ -258,6 +261,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
 
         //find closest
         GameAsset<?> closestGameAsset = null;
+        GameObject closestGameObject = null;
         PaletteEditor.PaletteFilterMode mode = PaletteEditor.PaletteFilterMode.NONE;
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
@@ -275,6 +279,7 @@ public class PaletteEditorWorkspace extends ViewportWidget {
                 if (squareDistanceToCheck < currentClosestDistance) {
                     closestGameAsset = gameAsset;
                     mode = PaletteEditor.PaletteFilterMode.ENTITY;
+                    closestGameObject = gameObject;
                 }
             }
         }
@@ -305,6 +310,13 @@ public class PaletteEditorWorkspace extends ViewportWidget {
             event.setSelectedGameAssets(paletteData.getResource().selectedGameAssets);
             event.setCurrentFilterMode(mode);
             notify(event, false);
+
+            if (closestGameObject != null) {
+                SceneEditorWorkspace.getInstance().selectPropertyHolder(closestGameObject);
+                Array<GameObject> gameObjectSelection = new Array<>();
+                gameObjectSelection.add(closestGameObject);
+                Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(gameObjectSelection));
+            }
         }
     }
 

@@ -1002,7 +1002,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		gizmoMap.clear();
 	}
 
-	private void removeGizmos (GameObject gameObject) {
+	public void removeGizmos (GameObject gameObject) {
 		Array<Gizmo> list = gizmoMap.get(gameObject);
 		for (Gizmo gizmo : list) {
 			gizmo.notifyRemove();
@@ -1011,7 +1011,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		gizmoMap.remove(gameObject);
 	}
 
-	private void initGizmos (GameObject gameObject) {
+	public void initGizmos (GameObject gameObject) {
 		makeGizmosFor(gameObject);
 		Array<GameObject> childObjects = gameObject.getGameObjects();
 		if (childObjects != null) {
@@ -1244,8 +1244,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (gameObjects.size == 1) {
 			Array<Gizmo> gizmos = gizmoMap.get(gameObjects.get(0));
-			for (Gizmo gizmo : gizmos) {
-				gizmo.setSelected(true);
+			if (gizmos != null) {
+				for (Gizmo gizmo : gizmos) {
+					gizmo.setSelected(true);
+				}
 			}
 		} else {
 			for (GameObject gameObject : gameObjects) {
