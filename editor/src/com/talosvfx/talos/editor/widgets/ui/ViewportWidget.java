@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -55,6 +56,13 @@ public abstract class ViewportWidget extends Table {
     private Vector3 tmp = new Vector3();
     private Vector2 vec2 = new Vector2();
 
+    protected InputListener inputListener;
+
+    private boolean canMoveAround;
+    private boolean isInViewPort;
+    private boolean isDragging;
+    private boolean inputListenersEnabled = true;
+
     public ViewportWidget() {
         shapeRenderer = new ShapeRenderer();
         camera = new OrthographicCamera();
@@ -66,7 +74,6 @@ public abstract class ViewportWidget extends Table {
         cameraController.setInvert(true);
 
         addPanListener();
-
     }
 
     protected void addPanListener() {
@@ -92,30 +99,72 @@ public abstract class ViewportWidget extends Table {
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                isDragging = false;
                 cameraController.touchUp((int)x, (int)y, pointer, button);
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                // can't move around disable dragging
+                if (!canMoveAround) return;
+
+                isDragging = true;
+
                 cameraController.touchDragged((int)x, (int)y, pointer);
             }
 
             @Override
             public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                isInViewPort = true;
+
                 super.enter(event, x, y, pointer, fromActor);
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(ViewportWidget.this);
             }
 
             @Override
             public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
                 if (pointer != -1) return; //Only care about exit/enter from mouse move
                 TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
+
+                isInViewPort = false;
+                super.exit(event, x, y, pointer, toActor);
             }
         });
     }
 
     Vector2 temp = new Vector2();
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        // allow moving around if space bar is pressed and is in viewport or has dragged from viewport
+        canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
+
+        if (canMoveAround) {
+            TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+            disableClickListener();
+        } else {
+            TalosMain.Instance().setCursor(null);
+            enableClickListener();
+        }
+    }
+
+
+
+    private void enableClickListener () {
+        if (inputListener == null) return;
+        if (inputListenersEnabled) return;
+        inputListenersEnabled = true;
+        addListener(inputListener);
+    }
+
+    private void disableClickListener () {
+        if (inputListener == null) return;
+        if (!inputListenersEnabled) return;
+        inputListenersEnabled = false;
+        removeListener(inputListener);
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
