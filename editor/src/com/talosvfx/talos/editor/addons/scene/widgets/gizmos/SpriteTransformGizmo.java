@@ -1,7 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -13,6 +18,25 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         super();
     }
 
+    @Override
+    public void draw (Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+
+        Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+
+        SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
+        vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
+
+        if (isOnTouchedPoint(vec.x, vec.y)) {
+//            TalosMain.Instance().setCursor(TalosMain.Instance().pickerCursor);
+        } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
+//            TalosMain.Instance().setCursor(TalosMain.Instance().moveAllDirections);
+
+        } else {
+//            TalosMain.Instance().setCursor(null);
+        }
+
+    }
 
     public void getBounds (Rectangle rectangle) {
 

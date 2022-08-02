@@ -19,6 +19,8 @@ public class TransformGizmo extends Gizmo {
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
+
+
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
             transform.localToWorld(gameObject, tmp.set(0, 0));
