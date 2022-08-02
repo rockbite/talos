@@ -437,12 +437,7 @@ public abstract class ViewportWidget extends Table {
 		batch.begin();
 		drawContent(batch, parentAlpha);
 
-		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
-			Gizmo gizmo = this.gizmos.gizmoList.get(i);
-			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * camera.zoom);
-
-			gizmo.draw(batch, parentAlpha);
-		}
+		drawGizmos(batch, parentAlpha);
 
 		batch.end();
 
@@ -743,5 +738,14 @@ public abstract class ViewportWidget extends Table {
 		tmp.add(gameObject);
 
 		setSelection(tmp);
+	}
+
+	protected void drawGizmos (Batch batch, float parentAlpha) {
+		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
+			Gizmo gizmo = this.gizmos.gizmoList.get(i);
+			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * camera.zoom);
+
+			gizmo.draw(batch, parentAlpha);
+		}
 	}
 }

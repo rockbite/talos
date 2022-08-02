@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPressed;
 
 public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
+    private PaletteEditor paletteEditor;
     GameAsset<TilePaletteData> paletteData;
 
     private GridDrawer gridDrawer;
@@ -48,9 +49,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     private Pool<PaletteEvent> paletteEventPool;
 
-    public PaletteEditorWorkspace(GameAsset<TilePaletteData> paletteData) {
+    public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
-        this.paletteData = paletteData;
+        this.paletteEditor = paletteEditor;
+        this.paletteData = paletteEditor.getObject();
         setWorldSize(10f);
         setCameraPos(0, 0);
 
@@ -270,8 +272,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     @EventHandler
     public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
         Array<GameObject> gameObjects = event.get();
-
-        selectGizmos(gameObjects);
+        if (!paletteEditor.isEditMode()) {
+            selectGizmos(gameObjects);
+        }
     }
 
     private void selectByPoint (float x, float y) {
@@ -291,7 +294,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         PaletteEditor.PaletteFilterMode mode = PaletteEditor.PaletteFilterMode.NONE;
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
-            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
             GameObject gameObject = gameObjectEntry.value;
 
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
@@ -343,6 +345,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 gameObjectSelection.add(closestGameObject);
                 Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(gameObjectSelection));
             }
+        } else {
+            PaletteEvent event = paletteEventPool.obtain();
+            event.setType(PaletteEvent.Type.lostFocus);
+            event.setCurrentFilterMode(PaletteEditor.PaletteFilterMode.TILE_ENTITY);
+            notify(event, false);
         }
     }
 
@@ -371,9 +378,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         // entities
         for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
             GameAsset<?> gameAsset = gameObjectEntry.key;
-            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
-            float[] pos = positions.get(gameAssetUUID);
-            if(localRect.contains(pos[0], pos[1])) {
+            GameObject gameObject = gameObjectEntry.value;
+            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+            if (localRect.contains(transformComponent.position)) {
                 paletteData.getResource().selectedGameAssets.add(gameAsset);
             }
         }
@@ -385,6 +392,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             if(localRect.contains(pos[0], pos[1])) {
                 paletteData.getResource().selectedGameAssets.add(gameAsset);
             }
+        }
+    }
+
+    @Override
+    protected void drawGizmos(Batch batch, float parentAlpha) {
+        if (!paletteEditor.isEditMode()) {
+            super.drawGizmos(batch, parentAlpha);
         }
     }
 

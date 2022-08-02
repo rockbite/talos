@@ -22,6 +22,8 @@ public class PaletteListener implements EventListener {
                 return removed(event); // handle removal
             case moved:
                 return moved(event); // handle movement
+            case lostFocus:
+                return lostFocus(event); // handle movement
         }
         return false;
     }
@@ -31,6 +33,10 @@ public class PaletteListener implements EventListener {
     }
 
     public boolean selectedMultiple(PaletteEvent e, GameAsset<?>[] gameAssets, PaletteEditor.PaletteFilterMode mode) { // game assets of selected items
+        return false;
+    }
+
+    public boolean lostFocus(PaletteEvent e) { // game assets of selected items
         return false;
     }
 

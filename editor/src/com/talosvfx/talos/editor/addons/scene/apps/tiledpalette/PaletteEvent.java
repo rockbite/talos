@@ -45,5 +45,6 @@ public class PaletteEvent extends Event {
         imported,
         removed,
         moved,
+        lostFocus,
     }
 }

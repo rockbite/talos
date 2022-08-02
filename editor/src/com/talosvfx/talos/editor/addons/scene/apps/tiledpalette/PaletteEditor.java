@@ -19,9 +19,6 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
@@ -31,6 +28,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private String title;
     private DragAndDrop.Target target;
     private PaletteEditorWorkspace paletteEditorWorkspace;
+
+    private boolean editMode; // edit mode is on
+    private PaletteListener defaultPaletteListener;
+    private Table buttonMainMenu;
 
     enum PaletteFilterMode {
         NONE,
@@ -54,8 +55,9 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
     @Override
     public void initContent() {
+        editMode = false;
         content = new Table();
-        paletteEditorWorkspace = new PaletteEditorWorkspace(this.object);
+        paletteEditorWorkspace = new PaletteEditorWorkspace(this);
         this.content.add(paletteEditorWorkspace).minSize(500).grow();
 
         Skin skin = TalosMain.Instance().getSkin();
@@ -64,107 +66,13 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         toolbar.setFillParent(true);
         toolbar.top().left();
 
-        Table element = new Table();
-        element.setBackground(skin.newDrawable("button-main-menu"));
-        toolbar.add(element).growX();
+        buttonMainMenu = new Table();
+        buttonMainMenu.setBackground(skin.newDrawable("button-main-menu"));
+        toolbar.add(buttonMainMenu).growX();
 
-        element.defaults().pad(5);
+        buttonMainMenu.defaults().pad(5);
 
-        SquareButton tile = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton delete = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-
-
-        tile.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                tile.setChecked(!tile.isChecked());
-                if (tile.isChecked()) {
-                    currentFilterMode = PaletteFilterMode.TILE;
-                }
-            }
-        });
-        entity.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                entity.setChecked(!entity.isChecked());
-                if (entity.isChecked()) {
-                    currentFilterMode = PaletteFilterMode.ENTITY;
-                }
-            }
-        });
-        tileEntity.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                tileEntity.setChecked(!tileEntity.isChecked());
-                if (tileEntity.isChecked()) {
-                    currentFilterMode = PaletteFilterMode.TILE_ENTITY;
-                }
-            }
-        });
-
-        delete.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                for (GameAsset<?> selectedGameAsset : object.getResource().selectedGameAssets) {
-                    if (currentFilterMode == PaletteFilterMode.TILE) {
-                        removeSprite(selectedGameAsset);
-                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
-                        removeEntity(selectedGameAsset);
-                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
-                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
-                            removeSprite(selectedGameAsset);
-                        } else {
-                            removeEntity(selectedGameAsset);
-                        }
-                    }
-                }
-            }
-        });
-
-        // mode buttons should react on palette changes
-        paletteEditorWorkspace.addListener(new PaletteListener() {
-            @Override
-            public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteFilterMode mode) {
-                if (mode != PaletteFilterMode.NONE) {
-                    currentFilterMode = mode;
-                    tile.setChecked(false);
-                    entity.setChecked(false);
-                    tileEntity.setChecked(false);
-                    switch (currentFilterMode) {
-                        case TILE:
-                            tile.setChecked(true);
-                            break;
-                        case ENTITY:
-                            entity.setChecked(true);
-                            break;
-                        case TILE_ENTITY:
-                            tileEntity.setChecked(true);
-                            break;
-                    }
-                }
-                return false;
-            }
-        });
-
-
-        ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
-        buttonButtonGroup.add(tile, entity, tileEntity);
-        buttonButtonGroup.setMaxCheckCount(1);
-        buttonButtonGroup.setMinCheckCount(1);
-
-        tileEntity.setChecked(true);
-
-        element.add(tileEntity);
-        element.add(tile);
-        element.add(entity);
-        element.add().expandX();
-        element.add(delete);
+        addDefaultButtons();
 
         this.content.addActor(toolbar);
 
@@ -303,5 +211,173 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         // save after every edit event such as drop, remove or just move
         // draw mode such as brush and shit
         // main renderer
+    }
+
+    public GameAsset<TilePaletteData> getObject() {
+        return object;
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    private void addDefaultButtons () {
+        Skin skin = TalosMain.Instance().getSkin();
+
+        SquareButton tile = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton delete = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton edit = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+
+        tile.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tile.setChecked(!tile.isChecked());
+                if (tile.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.TILE;
+                }
+            }
+        });
+        entity.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                entity.setChecked(!entity.isChecked());
+                if (entity.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.ENTITY;
+                }
+            }
+        });
+        tileEntity.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tileEntity.setChecked(!tileEntity.isChecked());
+                if (tileEntity.isChecked()) {
+                    currentFilterMode = PaletteFilterMode.TILE_ENTITY;
+                }
+            }
+        });
+
+        delete.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                for (GameAsset<?> selectedGameAsset : object.getResource().selectedGameAssets) {
+                    if (currentFilterMode == PaletteFilterMode.TILE) {
+                        removeSprite(selectedGameAsset);
+                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
+                        removeEntity(selectedGameAsset);
+                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
+                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
+                            removeSprite(selectedGameAsset);
+                        } else {
+                            removeEntity(selectedGameAsset);
+                        }
+                    }
+                }
+            }
+        });
+
+        // mode buttons should react on palette changes
+        defaultPaletteListener = new PaletteListener() {
+            @Override
+            public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteFilterMode mode) {
+                if (mode != PaletteFilterMode.NONE) {
+                    currentFilterMode = mode;
+                    tile.setChecked(false);
+                    entity.setChecked(false);
+                    tileEntity.setChecked(false);
+                    switch (currentFilterMode) {
+                        case TILE:
+                            tile.setChecked(true);
+                            break;
+                        case ENTITY:
+                            entity.setChecked(true);
+                            break;
+                        case TILE_ENTITY:
+                            tileEntity.setChecked(true);
+                            break;
+                    }
+                }
+
+                edit.setDisabled(false);
+
+                return false;
+            }
+
+            public boolean lostFocus(PaletteEvent e) {
+                editMode = false;
+                edit.setDisabled(true);
+                return super.lostFocus(e);
+            }
+        };
+        paletteEditorWorkspace.addListener(defaultPaletteListener);
+
+        edit.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if (!edit.isDisabled()) {
+                    editMode = true;
+                    paletteEditorWorkspace.removeListener(defaultPaletteListener);
+                    addEditButtons();
+                }
+            }
+        });
+
+        edit.setDisabled(true);
+
+        ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
+        buttonButtonGroup.add(tile, entity, tileEntity);
+        buttonButtonGroup.setMaxCheckCount(1);
+        buttonButtonGroup.setMinCheckCount(1);
+
+        tileEntity.setChecked(true);
+
+        buttonMainMenu.clear();
+        buttonMainMenu.add(tileEntity);
+        buttonMainMenu.add(tile);
+        buttonMainMenu.add(entity);
+        buttonMainMenu.add().expandX();
+        buttonMainMenu.add(edit);
+        buttonMainMenu.add(delete);
+    }
+
+    private void addEditButtons () {
+        Skin skin = TalosMain.Instance().getSkin();
+
+        SquareButton cancel = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton accept = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+
+        cancel.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                editMode = false;
+                addDefaultButtons();
+                // add cancel logic
+            }
+        });
+        accept.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                editMode = false;
+                addDefaultButtons();
+                // add accept logic
+            }
+        });
+
+        ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
+        buttonButtonGroup.add(cancel, accept);
+        buttonButtonGroup.setMaxCheckCount(1);
+        buttonButtonGroup.setMinCheckCount(1);
+
+        buttonMainMenu.clear();
+        buttonMainMenu.add(cancel);
+        buttonMainMenu.add(accept);
     }
 }
