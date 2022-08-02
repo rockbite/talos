@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
@@ -230,6 +231,12 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         SquareButton delete = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
         SquareButton edit = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
 
+        tile.setDisabled(false);
+        entity.setDisabled(false);
+        tileEntity.setDisabled(false);
+        delete.setDisabled(false);
+        edit.setDisabled(false);
+
         tile.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -324,11 +331,15 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
                     editMode = true;
                     paletteEditorWorkspace.removeListener(defaultPaletteListener);
                     addEditButtons();
+
+                    // turn off all the gizmos
+                    paletteEditorWorkspace.startEditMode();
                 }
             }
         });
-
-        edit.setDisabled(true);
+        if (object.getResource().selectedGameAssets.isEmpty()) {
+            edit.setDisabled(true);
+        }
 
         ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
         buttonButtonGroup.add(tile, entity, tileEntity);
@@ -358,6 +369,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
                 super.clicked(event, x, y);
                 editMode = false;
                 addDefaultButtons();
+                paletteEditorWorkspace.unlockGizmos();
                 // add cancel logic
             }
         });
@@ -365,9 +377,19 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                // save the fake height
+                float tmpHeightOffset = paletteEditorWorkspace.getTmpHeightOffset();
+                GameAsset<?> gameAsset = object.getResource().selectedGameAssets.first();
+                GameObject gameObject = object.getResource().gameObjects.get(gameAsset);
+                TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+                tileDataComponent.setFakeZ(tmpHeightOffset - transformComponent.position.y);
+
+                AssetRepository.getInstance().saveGameAssetResourceJsonToFile(object);
+
                 editMode = false;
                 addDefaultButtons();
-                // add accept logic
+                paletteEditorWorkspace.unlockGizmos();
             }
         });
 

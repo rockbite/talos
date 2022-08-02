@@ -86,4 +86,12 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
             }
         }
     }
+
+    public float getFakeZ () {
+        return fakeZ;
+    }
+
+    public void setFakeZ(float fakeZ) {
+        this.fakeZ = fakeZ;
+    }
 }

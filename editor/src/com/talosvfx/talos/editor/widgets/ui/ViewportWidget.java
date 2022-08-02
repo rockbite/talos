@@ -33,7 +33,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -73,7 +72,7 @@ public abstract class ViewportWidget extends Table {
 
 	protected InputListener inputListener;
 
-	private boolean canMoveAround;
+	protected boolean canMoveAround;
 	private boolean isInViewPort;
 	private boolean isDragging;
 	private boolean inputListenersEnabled = true;
@@ -81,6 +80,8 @@ public abstract class ViewportWidget extends Table {
 	protected Gizmos gizmos = new Gizmos();
 
 	protected Array<GameObject> selection = new Array<>();
+
+	protected boolean locked;
 
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
@@ -134,7 +135,12 @@ public abstract class ViewportWidget extends Table {
 				if (handled) {
 					return true;
 				}
+
 				if (canMoveAround) return false;
+
+				if (locked) {
+					return true;
+				}
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
@@ -183,6 +189,10 @@ public abstract class ViewportWidget extends Table {
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
 				if (canMoveAround) return;
 
+				if (locked) {
+					return;
+				}
+
 				super.touchDragged(event, x, y, pointer);
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
@@ -201,6 +211,10 @@ public abstract class ViewportWidget extends Table {
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				if (canMoveAround) return;
+
+				if (locked) {
+					return;
+				}
 
 				super.touchUp(event, x, y, pointer, button);
 
@@ -223,6 +237,10 @@ public abstract class ViewportWidget extends Table {
 			public boolean mouseMoved (InputEvent event, float x, float y) {
 				if (canMoveAround) return super.mouseMoved(event, x, y);
 
+				if (locked) {
+					return true;
+				}
+
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				for (int i = 0; i < ViewportWidget.this.gizmos.gizmoList.size; i++) {
 					Gizmo item = ViewportWidget.this.gizmos.gizmoList.get(i);
@@ -236,6 +254,10 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean keyDown (InputEvent event, int keycode) {
+				if (locked) {
+					return true;
+				}
+
 				for (Gizmo gizmo : ViewportWidget.this.gizmos.gizmoList) {
 					if (gizmo.isSelected()) {
 						gizmo.keyDown(event, keycode);
@@ -457,7 +479,9 @@ public abstract class ViewportWidget extends Table {
 		batch.begin();
 		drawContent(batch, parentAlpha);
 
-		drawGizmos(batch, parentAlpha);
+		if (!locked) {
+			drawGizmos(batch, parentAlpha);
+		}
 
 		batch.end();
 
@@ -760,12 +784,20 @@ public abstract class ViewportWidget extends Table {
 		setSelection(tmp);
 	}
 
-	protected void drawGizmos (Batch batch, float parentAlpha) {
+	private void drawGizmos (Batch batch, float parentAlpha) {
 		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
 			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * camera.zoom);
 
 			gizmo.draw(batch, parentAlpha);
 		}
+	}
+
+	public void lockGizmos () {
+		locked = true;
+	}
+
+	public void unlockGizmos () {
+		locked = false;
 	}
 }

@@ -5,9 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -22,6 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
@@ -48,6 +47,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     private MainRenderer mainRenderer;
 
     private Pool<PaletteEvent> paletteEventPool;
+
+    private float tmpHeightOffset;
 
     public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
@@ -110,12 +111,19 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                if (canMoveAround) {
+                    return false;
+                }
+
+                if (locked) {
+                    return true;
+                }
                 paletteData.getResource().selectedGameAssets.clear();
 
                 upWillClear = true;
 
 
-                if(button == 2 || ctrlPressed()) {
+                if (button == 2 || ctrlPressed()) {
 
                     isSelectingWithDrag = true;
                     selectionRect.setVisible(true);
@@ -136,6 +144,14 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                if (canMoveAround) {
+                    return;
+                }
+
+                if (locked) {
+                    return;
+                }
+
                 super.touchDragged(event, x, y, pointer);
 
                 if(selectionRect.isVisible()) {
@@ -164,7 +180,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                if (canMoveAround) {
+                    return;
+                }
 
+                if (locked) {
+                    return;
+                }
                 if (!isSelectingWithDrag) {
                     //Find what we got on touch up and see
                     selectByPoint(x, y);
@@ -194,6 +216,80 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 super.touchUp(event, x, y, pointer, button);
             }
         };
+
+        addCaptureListener(new InputListener() {
+            private boolean isDragging = false;
+            private boolean overLine = false;
+            private float y = 0;
+            Vector2 last = new Vector2(); // local vector to store last dragged position
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (!paletteEditor.isEditMode()) {
+                    return false;
+                }
+                last.set(x, y);
+                return true;
+            }
+
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                if (!paletteEditor.isEditMode()) {
+                    return false;
+                }
+
+                float x1, y1, x2, y2;
+                float dist = 0.3f;
+                float tmpDist;
+                overLine = false;
+
+                Array<GameAsset<?>> selectedGameAssets = paletteData.getResource().selectedGameAssets;
+                ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+                // check if hovering over line
+                for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
+                    GameObject gameObject = gameObjects.get(selectedGameAsset);
+                    if (gameObject != null) {
+                        Vector3 localPoint = new Vector3(x, y, 0);
+                        getWorldFromLocal(localPoint);
+
+                        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                        x1 = transformComponent.position.x - 0.5f;
+                        y1 = tmpHeightOffset;
+                        x2 = transformComponent.position.x + 0.5f;
+                        y2 = tmpHeightOffset;
+                        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, localPoint.x, localPoint.y);
+                        if (tmpDist <= dist) {
+                            overLine = true;
+                        }
+                    }
+                }
+
+                return super.mouseMoved(event, x, y);
+            }
+
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                if (!paletteEditor.isEditMode()) {
+                    return;
+                }
+                isDragging = true;
+                if (overLine) { // line is selected, move it instead
+                    Vector2 tmp = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+                    screenToLocalCoordinates(tmp);
+                    tmp = getWorldFromLocal(tmp.x, tmp.y);
+                    tmpHeightOffset = tmp.y;
+                }
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (!paletteEditor.isEditMode()) {
+                    return;
+                }
+                super.touchUp(event, x, y, pointer, button);
+                isDragging = false;
+            }
+        });
 
         addListener(inputListener);
     }
@@ -263,6 +359,19 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         }
 
+        if (paletteEditor.isEditMode()) {
+            // draw the fake height lines
+            for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
+                GameObject gameObject = gameObjects.get(selectedGameAsset);
+                if (gameObject != null) {
+                    TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                    shapeRenderer.line(
+                            transformComponent.position.x - 0.5f, tmpHeightOffset,
+                            transformComponent.position.x + 0.5f, tmpHeightOffset
+                    );
+                }
+            }
+        }
 
         shapeRenderer.end();
 
@@ -396,15 +505,26 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     }
 
     @Override
-    protected void drawGizmos(Batch batch, float parentAlpha) {
-        if (!paletteEditor.isEditMode()) {
-            super.drawGizmos(batch, parentAlpha);
-        }
-    }
-
-    @Override
     public void act(float delta) {
         super.act(delta);
         camera.update();
+    }
+
+    public void startEditMode () {
+        Array<GameAsset<?>> selectedGameAssets = paletteData.getResource().selectedGameAssets;
+        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+        // check if hovering over line
+        for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
+            GameObject gameObject = gameObjects.get(selectedGameAsset);
+            TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+            TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+            tmpHeightOffset = transformComponent.position.y + tileDataComponent.getFakeZ();
+        }
+        lockGizmos();
+    }
+
+    public float getTmpHeightOffset () {
+        return tmpHeightOffset;
     }
 }
