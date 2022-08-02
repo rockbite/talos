@@ -962,14 +962,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		// now for properties
 
-		if (selection.size == 0) {
+		if (gameObjects.size == 0) {
 			// we select the main container then
 			if (currentContainer instanceof Scene) {
 				Scene scene = (Scene)currentContainer;
 				selectPropertyHolder(scene);
 			}
 		} else {
-			if (selection.size == 1) {
+			if (gameObjects.size == 1) {
 				selectPropertyHolder(gameObjects.first());
 			} else {
 				MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);

@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -181,6 +182,9 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     @Override
     public void onHide () {
         super.onHide();
+
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(object);
+
         SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().unregisterTarget(target);
         for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : object.getResource().gameObjects) {
             SceneEditorWorkspace.getInstance().removeGizmos(entry.value);
@@ -207,18 +211,23 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         Vector2 worldSpace = workspace.getWorldFromLocal(x, y);
 
         references.put(gameAssetUUID, gameAsset);
-        positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
 
         tilePaletteGameAsset.dependentGameAssets.add(gameAsset);
 
         if (PaletteEditor.this.currentFilterMode == PaletteFilterMode.TILE) {
             if (gameAsset.type == GameAssetType.SPRITE) {
                 addSprite(gameAsset);
+                positions.put(gameAssetUUID, new float[]{worldSpace.x, worldSpace.y});
             } else {
                 System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
             }
         } else { // PaletteEditor.this.currentFilterMode == PaletteFilterMode.ENTITY)
-            addEntity(gameAsset);
+            GameObject gameObject = addEntity(gameAsset);
+            if (gameObject != null) {
+                TransformComponent component = gameObject.getComponent(TransformComponent.class);
+                component.position.set(worldSpace.x, worldSpace.y);
+                SceneEditorWorkspace.getInstance().initGizmos(gameObject, paletteEditorWorkspace);
+            }
         }
 
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(tilePaletteGameAsset);
@@ -254,8 +263,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
         removeGameAsset(gameAsset);
     }
 
-    public void addEntity(GameAsset<?> gameAsset) {
-        object.getResource().addEntity(gameAsset);
+    public GameObject addEntity(GameAsset<?> gameAsset) {
+        return object.getResource().addEntity(gameAsset);
     }
 
     public void removeEntity(GameAsset<?> gameAsset) {

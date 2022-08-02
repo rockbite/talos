@@ -6,6 +6,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWor
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -33,7 +34,7 @@ public class TilePaletteData implements Json.Serializable{
         rootDummy.addGameObject(gameObject);
     }
 
-    public void addEntity (GameAsset<?> gameAsset) {
+    public GameObject addEntity (GameAsset<?> gameAsset) {
         //Lets create an entity from the asset
         AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
         GameObject tempParent = new GameObject();
@@ -45,9 +46,14 @@ public class TilePaletteData implements Json.Serializable{
 
         if (success) {
             GameObject first = tempParent.getGameObjects().first();
+            if (!first.hasComponent(TilePaletteData.class)) {
+                first.addComponent(new TileDataComponent());
+            }
             gameObjects.put(gameAsset, first);
             rootDummy.addGameObject(first);
+            return first;
         }
+        return null;
     }
 
     public void removeEntity (GameAsset<?> gameAsset) {
@@ -131,12 +137,12 @@ public class TilePaletteData implements Json.Serializable{
                 float x = posVal.get(0).asFloat();
                 float y = posVal.get(1).asFloat();
                 float[] position = new float[]{x, y};
-
-                this.references.put(uuid, assetForIdentifier);
                 this.positions.put(uuid, position);
 
                 addSprite(assetForIdentifier);
             }
+            this.references.put(uuid, assetForIdentifier);
+
 
             if (assetForIdentifier == null) {
                 System.out.println(type + " with identifier " + identifier + " is not found.");

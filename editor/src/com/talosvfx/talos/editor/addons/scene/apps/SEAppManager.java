@@ -48,7 +48,13 @@ public class SEAppManager {
 
             SceneEditorAddon.get().bottomTabbedPane.add(newTab);
         } else if(strategy == AEditorApp.AppOpenStrategy.WINDOW) {
-            AppWindow window = new AppWindow(editorApp);
+            AppWindow window = new AppWindow(editorApp) {
+                @Override
+                protected void close () {
+                    super.close();
+                    editorApp.onHide();
+                }
+            };
 
             editorApp.addAppListener(new AEditorApp.AppListener() {
                 @Override
