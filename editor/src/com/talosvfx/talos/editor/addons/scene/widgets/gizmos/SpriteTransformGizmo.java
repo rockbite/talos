@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -10,6 +11,21 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
     public SpriteTransformGizmo() {
         super();
+    }
+
+
+    public void getBounds (Rectangle rectangle) {
+
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+
+        rectangle.set(
+            -spriteRendererComponent.size.x/2f, -spriteRendererComponent.size.y/2f,
+            spriteRendererComponent.size.x, spriteRendererComponent.size.y
+            );
+
+        rectangle.x += transformComponent.worldPosition.x;
+        rectangle.y += transformComponent.worldPosition.y;
     }
 
     @Override
@@ -66,4 +82,6 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
         Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(spriteRendererComponent, isRapid));
     }
+
+
 }
