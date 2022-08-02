@@ -15,9 +15,12 @@ public class TransformGizmo extends Gizmo {
     private Vector2 prevTouch = new Vector2();
     private Vector2 vec1 = new Vector2();
     private boolean wasDragged = false;
+    private SpriteTransformGizmo spriteTransformGizmo;
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
+
+
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
             transform.localToWorld(gameObject, tmp.set(0, 0));
@@ -45,6 +48,12 @@ public class TransformGizmo extends Gizmo {
 
     @Override
     void getHitBox (Rectangle rectangle) {
+        if (spriteTransformGizmo != null) {
+            //Lets get the size from smart transform and pass it as the rect
+            spriteTransformGizmo.getBounds(rectangle);
+            return;
+        }
+
         float size = 30 * worldPerPixel;
         rectangle.set(getX() - size / 2f, getY() - size / 2f, size, size);
     }
@@ -92,5 +101,9 @@ public class TransformGizmo extends Gizmo {
     @Override
     public boolean isMultiSelect () {
         return true;
+    }
+
+    public void linkToSmart (SpriteTransformGizmo spriteTransformGizmo) {
+        this.spriteTransformGizmo = spriteTransformGizmo;
     }
 }

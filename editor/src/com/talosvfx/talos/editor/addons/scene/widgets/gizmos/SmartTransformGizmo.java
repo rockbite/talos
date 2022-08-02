@@ -120,15 +120,29 @@ public class SmartTransformGizmo extends Gizmo {
     public boolean hit (float x, float y) {
         if(!selected) return false;
 
-        int touchedPoint = getTouchedPoint(x, y);
-        int touchedRA = getTouchedRotationArea(x, y);
-        if(touchedPoint >= 0) {
+        if (isOnTouchedPoint(x, y)) {
             return true;
         }
-        if(touchedRA >= 0) {
+        if (isOnTouchedRotationArea(x, y)) {
             return true;
         }
 
+        return false;
+    }
+
+    protected boolean isOnTouchedRotationArea (float x, float y) {
+        int touchedRA = getTouchedRotationArea(x, y);
+
+        if(touchedRA >= 0) {
+            return true;
+        }
+        return false;
+    }
+    protected boolean isOnTouchedPoint (float x, float y) {
+        int touchedPoint = getTouchedPoint(x, y);
+        if(touchedPoint >= 0) {
+            return true;
+        }
         return false;
     }
 

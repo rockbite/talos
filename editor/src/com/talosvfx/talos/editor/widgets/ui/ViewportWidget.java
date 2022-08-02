@@ -31,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -39,6 +40,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
@@ -289,30 +292,47 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public void makeGizmosFor (GameObject gameObject, ViewportWidget parent) {
-		if (parent.gizmos.gizmoMap.containsKey(gameObject))
+		ObjectMap<GameObject, Array<Gizmo>> gizmoMap = parent.gizmos.gizmoMap;
+		Array<Gizmo> gizmoList = parent.gizmos.gizmoList;
+		if (gizmoMap.containsKey(gameObject)) {
 			return;
+		}
+
+		ObjectMap<Class<? extends Gizmo>, Gizmo> gameObjectGizmoMap = new ObjectMap<>();
 
 		Iterable<AComponent> components = gameObject.getComponents();
 		for (AComponent component : components) {
 			Array<Gizmo> gizmos = GizmoRegister.makeGizmosFor(component);
 
+
 			for (Gizmo gizmo : gizmos) {
+
+
 				if (gizmo != null) {
+					gameObjectGizmoMap.put(gizmo.getClass(), gizmo);
+
 					gizmo.setGameObject(gameObject);
 
-					Array<Gizmo> list = parent.gizmos.gizmoMap.get(gameObject);
+					Array<Gizmo> list = gizmoMap.get(gameObject);
 					if (list == null)
 						list = new Array<>();
 
-					parent.gizmos.gizmoMap.put(gameObject, list);
-
-					if (gizmo != null) {
-						parent.gizmos.gizmoList.add(gizmo);
-						list.add(gizmo);
-					}
+					gizmoMap.put(gameObject, list);
+					gizmoList.add(gizmo);
+					list.add(gizmo);
 				}
 			}
 		}
+
+		//Lets check for 'smart' linking
+		if (gameObjectGizmoMap.containsKey(TransformGizmo.class) && gameObjectGizmoMap.containsKey(SpriteTransformGizmo.class)) {
+			TransformGizmo transformGizmo = (TransformGizmo)gameObjectGizmoMap.get(TransformGizmo.class);
+			SpriteTransformGizmo smartTransformGizmo = (SpriteTransformGizmo)gameObjectGizmoMap.get(SpriteTransformGizmo.class);
+			transformGizmo.linkToSmart(smartTransformGizmo);
+		}
+
+
+
 	}
 
 	protected Gizmo hitGizmo (float x, float y) {
