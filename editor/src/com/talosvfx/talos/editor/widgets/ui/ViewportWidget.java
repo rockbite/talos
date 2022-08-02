@@ -439,7 +439,8 @@ public abstract class ViewportWidget extends Table {
 
 		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
-			gizmo.setWoldWidth(getWorldWidth() * camera.zoom);
+			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * camera.zoom);
+
 			gizmo.draw(batch, parentAlpha);
 		}
 

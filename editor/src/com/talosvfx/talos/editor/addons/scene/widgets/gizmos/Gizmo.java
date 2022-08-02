@@ -94,9 +94,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         return pos;
     }
 
-    public void setWoldWidth (float worldWidth) {
-        int screenPixels = Gdx.graphics.getWidth();
-        worldPerPixel = worldWidth / screenPixels;
+    public void setSizeForUIElements (float totalScreenSpaceParentSize, float totalWorldWidth) {
+        worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
     }
 
     void getHitBox(Rectangle rectangle) {
