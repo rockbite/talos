@@ -854,6 +854,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		currentContainer = mainScene;
 
 		// process all game objects
+		gizmos.gizmoList.clear();
+		gizmos.gizmoMap.clear();
 		initGizmos(mainScene, this);
 
 		clearSelection();
