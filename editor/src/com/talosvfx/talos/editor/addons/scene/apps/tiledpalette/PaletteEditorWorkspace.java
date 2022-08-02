@@ -227,13 +227,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
         }
         for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
-            float[] pos = positions.get(entry.key.getRootRawAsset().metaData.uuid);
 
             GameObject gameObject = entry.value;
-            if (gameObject.hasComponent(TransformComponent.class)) {
-                TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-                transform.position.set(pos[0], pos[1]);
-            }
 
             mainRenderer.update(gameObject);
             mainRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
@@ -299,13 +294,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
             GameObject gameObject = gameObjectEntry.value;
 
-            float[] pos = positions.get(gameAssetUUID);
+            TransformComponent component = gameObject.getComponent(TransformComponent.class);
 
             float minDistance = 1;
             float squaredDistance = minDistance * minDistance;
             float currentClosestDistance = squaredDistance + 1;
 
-            float squareDistanceToCheck = (float)(Math.pow(pos[0] - localPoint.x, 2) + Math.pow(pos[1] - localPoint.y, 2));
+            float squareDistanceToCheck = (float)(Math.pow(component.worldPosition.x - localPoint.x, 2) + Math.pow(component.worldPosition.y - localPoint.y, 2));
             if (squareDistanceToCheck < squaredDistance) {
                 if (squareDistanceToCheck < currentClosestDistance) {
                     closestGameAsset = gameAsset;

@@ -20,11 +20,17 @@ public class TilePaletteData implements Json.Serializable{
     //Working not for serializing
     public transient ObjectMap<GameAsset<?>, StaticTile> staticTiles;
     public transient ObjectMap<GameAsset<?>, GameObject> gameObjects;
+    public transient GameObject rootDummy;
     public transient Array<GameAsset<?>> selectedGameAssets;
 
     public void addSprite (GameAsset<?> gameAsset) {
         GridPosition gridPosition = new GridPosition(0, 0);
         staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
+    }
+
+    public void addEntity (GameAsset<?> gameAsset, GameObject gameObject) {
+        gameObjects.put(gameAsset, gameObject);
+        rootDummy.addGameObject(gameObject);
     }
 
     public void addEntity (GameAsset<?> gameAsset) {
@@ -40,11 +46,13 @@ public class TilePaletteData implements Json.Serializable{
         if (success) {
             GameObject first = tempParent.getGameObjects().first();
             gameObjects.put(gameAsset, first);
+            rootDummy.addGameObject(first);
         }
     }
 
     public void removeEntity (GameAsset<?> gameAsset) {
         GameObject gameObject = gameObjects.remove(gameAsset);
+        rootDummy.removeObject(gameObject);
         SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
     }
 
@@ -72,12 +80,18 @@ public class TilePaletteData implements Json.Serializable{
             json.writeObjectStart();
             json.writeValue("gameIdentifier", reference.nameIdentifier);
             json.writeValue("type", reference.type);
-            json.writeValue("tileOrEntity", getTileOrEntity(reference));
+            TileOrEntity tileOrEntity = getTileOrEntity(reference);
+            json.writeValue("tileOrEntity", tileOrEntity);
 
+            if (tileOrEntity == TileOrEntity.ENTITY) {
+                GameObject gameObject = gameObjects.get(reference);
+                json.writeValue("entity", gameObject);
+            } else if (tileOrEntity == TileOrEntity.TILE) {
                 json.writeObjectStart("position");
                 json.writeValue("x", position[0]);
                 json.writeValue("y", position[1]);
                 json.writeObjectEnd();
+            }
 
             json.writeObjectEnd();
         }
@@ -93,10 +107,11 @@ public class TilePaletteData implements Json.Serializable{
 
     @Override
     public void read(Json json, JsonValue jsonData) {
+        rootDummy = new GameObject();
+
         JsonValue references = jsonData.get("references");
         for (JsonValue reference : references) {
             GameAsset<Object> assetForIdentifier;
-            float[] position;
 
             String identifier = reference.getString("gameIdentifier");
             JsonValue typeVal = reference.get("type");
@@ -105,27 +120,26 @@ public class TilePaletteData implements Json.Serializable{
 
             TileOrEntity tileOrEntity = json.readValue(TileOrEntity.class, reference.get("tileOrEntity"));
 
-            JsonValue posVal = reference.get("position");
-            float x = posVal.get(0).asFloat();
-            float y = posVal.get(1).asFloat();
-            position = new float[]{x, y};
-
             UUID uuid = assetForIdentifier.getRootRawAsset().metaData.uuid;
-            if (assetForIdentifier == null) {
-                System.out.println(type + " with identifier " + identifier + " is not found.");
-            } else {
-                // TODO: add type restrictions to references' type, e. g. you cannot have palette reference inside of a palette
+
+            if (tileOrEntity == TileOrEntity.ENTITY) {
+                GameObject gameObject = json.readValue(GameObject.class, reference.get("entity"));
+                addEntity(assetForIdentifier, gameObject);
+
+            } else if (tileOrEntity == TileOrEntity.TILE) {
+                JsonValue posVal = reference.get("position");
+                float x = posVal.get(0).asFloat();
+                float y = posVal.get(1).asFloat();
+                float[] position = new float[]{x, y};
+
                 this.references.put(uuid, assetForIdentifier);
                 this.positions.put(uuid, position);
+
+                addSprite(assetForIdentifier);
             }
 
-            switch (tileOrEntity) {
-            case TILE:
-                addSprite(assetForIdentifier);
-                break;
-            case ENTITY:
-                addEntity(assetForIdentifier);
-                break;
+            if (assetForIdentifier == null) {
+                System.out.println(type + " with identifier " + identifier + " is not found.");
             }
         }
     }
