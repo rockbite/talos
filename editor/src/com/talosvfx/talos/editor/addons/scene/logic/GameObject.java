@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class GameObject implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
 
     private String name = "gameObject";
-    private UUID uuid;
+    public UUID uuid;
 
     private String prefabLink = null;
 

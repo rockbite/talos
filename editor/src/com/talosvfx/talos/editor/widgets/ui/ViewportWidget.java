@@ -21,6 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -38,15 +39,16 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
+
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 
@@ -66,6 +68,8 @@ public abstract class ViewportWidget extends Table {
 	protected float minZoom = 200f;
 
 	protected ShapeRenderer shapeRenderer;
+	protected final EntitySelectionBuffer entitySelectionBuffer;
+
 	private float gridSize;
 	private float worldWidth = 1f;
 
@@ -85,6 +89,7 @@ public abstract class ViewportWidget extends Table {
 
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
+		entitySelectionBuffer = new EntitySelectionBuffer();
 		camera = new OrthographicCamera();
 		camera.viewportWidth = 10;
 
@@ -95,7 +100,6 @@ public abstract class ViewportWidget extends Table {
 
 		addPanListener();
 		addGizmoListener();
-
 	}
 
 	public void selectGizmos (Array<GameObject> gameObjects) {
@@ -452,11 +456,14 @@ public abstract class ViewportWidget extends Table {
 
 		prevTransform.set(batch.getTransformMatrix());
 		prevProjection.set(batch.getProjectionMatrix());
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.setTransformMatrix(emptyTransform);
 
 		batch.begin();
 		drawContent(batch, parentAlpha);
+
+		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
 		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
@@ -473,7 +480,60 @@ public abstract class ViewportWidget extends Table {
 		batch.setTransformMatrix(prevTransform);
 		batch.begin();
 
+//		Texture colorBufferTexture = entitySelectionBuffer.getFrameBuffer().getColorBufferTexture();
+//		batch.setColor(1f, 1f, 1f, 1f);
+//		batch.draw(colorBufferTexture, getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
+//
+//		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+//		Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
+//
+//		float uiX = uiSpace.x;
+//		float uiY = uiSpace.y;
+//		uiSpace.x /= getWidth();
+//		uiSpace.y /= getHeight();
+//
+//		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
+//
+//		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
+//		if (root != null) {
+//			findObjectTemporyForTestingDeleteMe(color, root);
+//		}
+//
+//		batch.setColor(color);
+//		batch.draw(colorBufferTexture, getX() + uiX, getY() + uiY, 200, 200, 0, 0, 1, 1);
+
+
 		super.draw(batch, parentAlpha);
+	}
+
+	private void findObjectTemporyForTestingDeleteMe (Color color, GameObject object) {
+		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
+
+		if (rgbCompare(color, (colourForEntityUUID))) {
+			System.out.println("Found entity: " + object.uuid.toString());
+			return;
+		} else {
+			if (object.getGameObjects() != null) {
+				for (GameObject gameObject : object.getGameObjects()) {
+					findObjectTemporyForTestingDeleteMe(color, gameObject);
+				}
+			}
+		}
+	}
+
+	private boolean rgbCompare (Color color, Color colourForEntityUUID) {
+		int inR = (int)(color.r * 256);
+		int inG = (int)(color.g * 256);
+		int inB = (int)(color.b * 256);
+
+		int testR = (int)(colourForEntityUUID.r * 256);
+		int testG = (int)(colourForEntityUUID.g * 256);
+		int testB = (int)(colourForEntityUUID.b * 256);
+
+		if (inR != testR) return false;
+		if (inG != testG) return false;
+		if (inB != testB) return false;
+		return true;
 	}
 
 	protected void drawGroup (Batch batch, float parentAlpha) {
@@ -763,5 +823,17 @@ public abstract class ViewportWidget extends Table {
 		tmp.add(gameObject);
 
 		setSelection(tmp);
+	}
+
+
+	protected void beginEntitySelectionBuffer () {
+		entitySelectionBuffer.begin(camera);
+	}
+	protected void endEntitySelectionBuffer() {
+		entitySelectionBuffer.end();
+
+	}
+
+	protected void drawEntitiesForSelection () {
 	}
 }

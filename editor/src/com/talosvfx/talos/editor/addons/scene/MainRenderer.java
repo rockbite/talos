@@ -22,6 +22,8 @@ import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
+import com.talosvfx.talos.editor.addons.scene.utils.PolyBatchWithEncodingOverride;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -179,6 +181,11 @@ public class MainRenderer implements Notifications.Observer {
 
         for (int i = 0; i < state.list.size; i++) {
             GameObject gameObject = state.list.get(i);
+
+            if (batch instanceof PolyBatchWithEncodingOverride) {
+                Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(gameObject);
+                ((PolyBatchWithEncodingOverride)batch).setCustomEncodingColour(colourForEntityUUID.r, colourForEntityUUID.g, colourForEntityUUID.b, colourForEntityUUID.a);
+            }
 
             TransformComponent transformComponent = getWorldTransform(gameObject);
 
