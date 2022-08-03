@@ -45,6 +45,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizm
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -487,10 +488,9 @@ public abstract class ViewportWidget extends Table {
 		canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
 
 		if (canMoveAround) {
-			TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
 			disableClickListener();
 		} else {
-			TalosMain.Instance().setCursor(null);
 			enableClickListener();
 		}
 

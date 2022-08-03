@@ -72,7 +72,8 @@ public class ScreenshotService {
 
     public static void testForPicker(ColorPicker picker) {
         if(picker.getStage() == null) {
-            TalosMain.Instance().setCursor(null);
+
+//            TalosMain.Instance().setCursor(null);
             return;
         }
 
@@ -83,7 +84,7 @@ public class ScreenshotService {
 
         if(!hit) {
             // should be different icon
-            TalosMain.Instance().setCursor(TalosMain.Instance().pickerCursor);
+//            TalosMain.Instance().setCursor(TalosMain.Instance().pickerCursor);
 
             if (Gdx.input.justTouched()) {
                 TalosMain.Instance().Screeshot().take(Gdx.input.getX(), Gdx.input.getY(), new ScreenshotService.ScreenshotListener() {
@@ -95,7 +96,7 @@ public class ScreenshotService {
             }
         } else {
             // usual icon
-            TalosMain.Instance().setCursor(null);
+//            TalosMain.Instance().setCursor(null);
         }
     }
 

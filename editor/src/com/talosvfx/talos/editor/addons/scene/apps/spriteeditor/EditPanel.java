@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class EditPanel extends Table {
@@ -165,15 +166,7 @@ public class EditPanel extends Table {
                 bounds.width /= zoom;
                 bounds.height /= zoom;
 
-                if (isHorizontal(activeSide) && isVertical(activeSide)) {
-                    TalosMain.Instance().setCursor(TalosMain.Instance().moveAllDirections);
-                } else if (isVertical(activeSide)) {
-                    TalosMain.Instance().setCursor(TalosMain.Instance().moveVerticallyCursor);
-                } else if (isHorizontal(activeSide)) {
-                    TalosMain.Instance().setCursor(TalosMain.Instance().moveHorizontallyCursor);
-                } else {
-                    TalosMain.Instance().setCursor(null);
-                }
+
                 return super.mouseMoved(event, x, y);
             }
 
@@ -305,6 +298,14 @@ public class EditPanel extends Table {
         image.setOrigin(Align.center);
         image.setScale(zoom);
         image.setPosition(offset.x, offset.y);
+
+        if (isHorizontal(activeSide) && isVertical(activeSide)) {
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_ALL_DIRECTIONS);
+        } else if (isVertical(activeSide)) {
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_VERTICALLY);
+        } else if (isHorizontal(activeSide)) {
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_HORIZONTALLY);
+        }
     }
 
     public void show(SpriteMetadata metadata, Texture texture) {

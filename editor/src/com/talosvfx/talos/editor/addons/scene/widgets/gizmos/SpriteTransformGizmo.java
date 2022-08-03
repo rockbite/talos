@@ -11,6 +11,7 @@ import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 
 public class SpriteTransformGizmo extends SmartTransformGizmo {
 
@@ -28,12 +29,9 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
 
         if (isOnTouchedPoint(vec.x, vec.y)) {
-//            TalosMain.Instance().setCursor(TalosMain.Instance().pickerCursor);
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
         } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
-//            TalosMain.Instance().setCursor(TalosMain.Instance().moveAllDirections);
-
-        } else {
-//            TalosMain.Instance().setCursor(null);
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
         }
 
     }
