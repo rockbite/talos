@@ -67,8 +67,8 @@ public class CursorUtil {
 
 	public enum CursorType {
 		//Order is priority for dynamic
-		RESIZE(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/left-down-up.png")), 16, 16)),
-		ROTATE(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/right-rotate-up.png")), 16, 16)),
+		RESIZE(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/left-down-up.png")), 8, 8)),
+		ROTATE(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/right-rotate-up.png")), 8, 8)),
 		GRABBED(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/hand_grabbed.png")), 8, 8)),
 		PICKER(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 8, 8)),
 		MOVE_ALL_DIRECTIONS(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_all_directions.png")), 8, 8)),
