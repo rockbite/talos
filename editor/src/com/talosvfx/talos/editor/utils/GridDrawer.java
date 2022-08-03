@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -46,6 +47,30 @@ public class GridDrawer {
 		projX *= gridSizeX;
 
 		return (int)projX;
+	}
+
+	public Vector2 project (Vector2 position) {
+		float[] floats = gridProperties.sizeProvider.get();
+
+		float gridSizeX = floats[0];
+		float gridSizeY = floats[1];
+
+		final Vector3 projected = widget.getTouchToLocal(position.x, position.y);
+
+		// find cell x axis
+		float projX = projected.x;
+		projX /= gridSizeX;
+		projX = MathUtils.floor(projX);
+
+		// find cell y axis
+		float projY = projected.y;
+		projY /= gridSizeY;
+		projY = MathUtils.floor(projY);
+
+		position.x = (int) projX;
+		position.y = (int) projY;
+
+		return position;
 	}
 
 	public int getMouseCellY () {

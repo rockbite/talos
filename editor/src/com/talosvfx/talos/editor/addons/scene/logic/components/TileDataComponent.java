@@ -44,6 +44,14 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
         return properties;
     }
 
+    public ObjectSet<GridPosition> getParentTiles() {
+        return parentTiles;
+    }
+
+    public void setParentTiles(ObjectSet<GridPosition> parentTiles) {
+        this.parentTiles = parentTiles;
+    }
+
     @Override
     public String getPropertyBoxTitle () {
         return "TileData Component";

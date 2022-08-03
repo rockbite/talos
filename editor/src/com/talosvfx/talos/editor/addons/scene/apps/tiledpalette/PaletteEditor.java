@@ -370,6 +370,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
                 editMode = false;
                 addDefaultButtons();
                 paletteEditorWorkspace.unlockGizmos();
+                paletteEditorWorkspace.revertEditChanges();
                 // add cancel logic
             }
         });

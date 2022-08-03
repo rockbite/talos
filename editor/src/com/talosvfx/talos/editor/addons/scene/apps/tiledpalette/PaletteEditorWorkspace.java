@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
@@ -38,6 +40,8 @@ import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPr
 public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
     private PaletteEditor paletteEditor;
     GameAsset<TilePaletteData> paletteData;
+
+    private GameObject editingGameObject;
 
     private GridDrawer gridDrawer;
     private SceneEditorWorkspace.GridProperties gridProperties;
@@ -220,14 +224,30 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         addCaptureListener(new InputListener() {
             private boolean isDragging = false;
             private boolean overLine = false;
-            private float y = 0;
-            Vector2 last = new Vector2(); // local vector to store last dragged position
+
+            final Vector2 dragStartPosition = new Vector2();
+
+            private TileDataComponent tileDataComponent;
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (!paletteEditor.isEditMode()) {
                     return false;
                 }
-                last.set(x, y);
+
+                if (canMoveAround) {
+                    return false;
+                }
+
+                tileDataComponent = editingGameObject.getComponent(TileDataComponent.class);
+                // TODO: figure out why null
+                if (tileDataComponent == null) {
+                    tileDataComponent = new TileDataComponent();
+                    editingGameObject.addComponent(tileDataComponent);
+                }
+                parentTilesReserve = tileDataComponent.getParentTiles();
+
+                dragStartPosition.set(x, y);
                 return true;
             }
 
@@ -286,6 +306,48 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 if (!paletteEditor.isEditMode()) {
                     return;
                 }
+
+                if (canMoveAround) {
+                    return;
+                }
+
+                if (isDragging && editingGameObject != null && paletteEditor.isEditMode() && !overLine) {
+                    final Vector2 dragStartPos = new Vector2();
+                    final Vector2 dragEndPos = new Vector2();
+
+                    dragStartPos.x = dragStartPosition.x;
+                    dragStartPos.y = dragStartPosition.y;
+
+                    dragEndPos.x = x;
+                    dragEndPos.y = y;
+
+                    // convert to screen coordinates
+                    localToScreenCoordinates(dragStartPos);
+                    localToScreenCoordinates(dragEndPos);
+
+                    // project to grid coordinates
+                    gridDrawer.project(dragStartPos);
+                    gridDrawer.project(dragEndPos);
+
+
+                    final ObjectSet<GridPosition> parentTiles = new ObjectSet<>();
+
+                    final int lowestX = (int) Math.min(dragStartPos.x, dragEndPos.x);
+                    final int highestX = (int) Math.max(dragStartPos.x, dragEndPos.x);
+
+                    final int lowestY = (int) Math.min(dragStartPos.y, dragEndPos.y);
+                    final int highestY = (int) Math.max(dragStartPos.y, dragEndPos.y);
+
+                    for (int i = lowestX; i <= highestX; i++) {
+                        for (int j = lowestY; j <= highestY; j++) {
+                            final GridPosition gridPosition = new GridPosition(i, j);
+                            parentTiles.add(gridPosition);
+                        }
+                    }
+
+                    tileDataComponent.setParentTiles(parentTiles);
+                }
+
                 super.touchUp(event, x, y, pointer, button);
                 isDragging = false;
             }
@@ -294,17 +356,38 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         addListener(inputListener);
     }
 
+    private ObjectSet<GridPosition> parentTilesReserve;
+
+    public void revertEditChanges () {
+        TileDataComponent tileDataComponent = editingGameObject.getComponent(TileDataComponent.class);
+
+        // TODO: figure out why null
+        if (tileDataComponent == null) {
+            tileDataComponent = new TileDataComponent();
+            editingGameObject.addComponent(tileDataComponent);
+        }
+
+        tileDataComponent.setParentTiles(parentTilesReserve);
+    }
+
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
         batch.end();
         gridDrawer.drawGrid();
-        batch.begin();
 
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
-        ObjectMap<UUID, GameAsset<?>> references = paletteData.getResource().references;
-
         ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+        shapeRenderer.setProjectionMatrix(camera.combined);
+
+        // render parent tiles
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
+            GameObject gameObject = entry.value;
+            renderParentTiles(gameObject);
+        }
+
+        batch.begin();
 
         TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
         float tileSizeX = 1;
@@ -333,7 +416,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
 
         batch.end();
-        shapeRenderer.setProjectionMatrix(camera.combined);
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.CYAN);
 
@@ -376,6 +459,36 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         shapeRenderer.end();
 
         batch.begin();
+    }
+
+    private void renderParentTiles (GameObject gameObject) {
+        // get tile data component if exists otherwise create
+        TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+
+        // TODO: figure out why null
+        if (tileDataComponent == null) {
+            tileDataComponent = new TileDataComponent();
+            gameObject.addComponent(tileDataComponent);
+        }
+
+        // get grid size
+        float gridSizeX = 1;
+        float gridSizeY = 1;
+        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+        if (layerSelected != null) {
+            gridSizeX = layerSelected.getTileSizeX();
+            gridSizeY = layerSelected.getTileSizeY();
+        }
+
+        // render rects
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setColor(0.5f, 0.4f, 0.5f, 0.5f);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
+            shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
+        }
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     @EventHandler
@@ -517,6 +630,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         // check if hovering over line
         for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
             GameObject gameObject = gameObjects.get(selectedGameAsset);
+            editingGameObject = gameObject;
             TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
             TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
             tmpHeightOffset = transformComponent.position.y + tileDataComponent.getFakeZ();
