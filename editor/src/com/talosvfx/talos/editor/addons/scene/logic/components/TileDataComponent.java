@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -118,5 +119,23 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
             }
         }
         return bottomLeft;
+    }
+
+    public void translateToWorldPosition (Vector2 worldFromLocal) {
+        GridPosition bottomLeftParentTile = getBottomLeftParentTile();
+
+        int newX = MathUtils.floor(worldFromLocal.x/1) * 1;
+        int newY = MathUtils.floor(worldFromLocal.y/1) * 1; //todo implement tile size
+
+        if (bottomLeftParentTile.x != newX || bottomLeftParentTile.y != newY) {
+            int deltaX = newX - bottomLeftParentTile.getIntX();
+            int deltaY = newY - bottomLeftParentTile.getIntY();
+
+            for (GridPosition parentTile : parentTiles) {
+                parentTile.x += deltaX;
+                parentTile.y += deltaY;
+            }
+        }
+
     }
 }

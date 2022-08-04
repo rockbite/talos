@@ -13,9 +13,10 @@ public class PaletteListener implements EventListener {
 
         switch (event.getType()) {
             case selected:
-                return selected(event, event.getSelectedGameAssets().get(0), event.getCurrentFilterMode()); // handle selection
+//                return selected(event, event.getSelectedGameAssets().get(0), event.getCurrentFilterMode()); // handle selection
+                return selected(event, null, event.getCurrentFilterMode()); // handle selection
             case selectedMultiple:
-                return selectedMultiple(event, event.getSelectedGameAssets().toArray(), event.getCurrentFilterMode()); // handle selection
+                return selectedMultiple(event, null, event.getCurrentFilterMode()); // handle selection
             case imported:
                 return imported(event); // handle importing
             case removed:

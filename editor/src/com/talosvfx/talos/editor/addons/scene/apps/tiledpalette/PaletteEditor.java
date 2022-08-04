@@ -247,11 +247,11 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private void addDefaultButtons () {
         Skin skin = TalosMain.Instance().getSkin();
 
-        SquareButton tile = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton tile = new SquareButton(skin, skin.getDrawable("tile_icon"));
         SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton delete = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton editParentTileAndFakeHeight = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("combined_icon"));
+        SquareButton delete = new SquareButton(skin, skin.getDrawable("eraser_icon"));
+        SquareButton editParentTileAndFakeHeight = new SquareButton(skin, skin.getDrawable("icon-edit"));
 
         tile.setDisabled(false);
         entity.setDisabled(false);
@@ -411,8 +411,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     private void addParentTileAndFakeHeightEditButtons () {
         Skin skin = TalosMain.Instance().getSkin();
 
-        SquareButton cancel = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton accept = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        SquareButton cancel = new SquareButton(skin, skin.getDrawable("ic-proc-error"));
+        SquareButton accept = new SquareButton(skin, skin.getDrawable("ic-proc-success"));
 
         cancel.addListener(new ClickListener() {
             @Override
@@ -428,8 +428,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 float tmpHeightOffset = paletteEditorWorkspace.getTmpHeightOffset();
-                GameAsset<?> gameAsset = object.getResource().selectedGameAssets.first();
-                GameObject gameObject = object.getResource().gameObjects.get(gameAsset);
+                GameObject gameObject =  paletteEditorWorkspace.getGameObjectSelected();
                 TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
                 TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
                 tileDataComponent.setFakeZ(tmpHeightOffset - transformComponent.position.y);

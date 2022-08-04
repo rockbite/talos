@@ -513,11 +513,17 @@ public abstract class ViewportWidget extends Table {
 
 		getEntityUnderMouse();
 
+		//Debug entity secltion
+//		if (entityUnderMouse != null) {
+//
+//			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
+//			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
+//		}
 
 		super.draw(batch, parentAlpha);
 	}
 
-	private void getEntityUnderMouse () {
+	protected void getEntityUnderMouse () {
 		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 		Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
 
@@ -535,7 +541,7 @@ public abstract class ViewportWidget extends Table {
 
 
 	}
-	private GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
+	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
 		if (rgbCompare(color, (colourForEntityUUID))) {
