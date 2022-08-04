@@ -10,10 +10,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
@@ -53,6 +50,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     private Pool<PaletteEvent> paletteEventPool;
 
     private float tmpHeightOffset;
+
+    private InputListener currentGizmoListener;
 
     public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
@@ -113,19 +112,18 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             boolean upWillClear = true;
             private boolean isSelectingWithDrag = false;
 
+            // locals for registering click
+            private long tapCountInterval = (long)(0.4f * 1000000000l);
+            private int tapCount;
+            private long lastTapTime;
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 if (canMoveAround) {
                     return false;
                 }
 
-                if (locked) {
-                    return true;
-                }
-                paletteData.getResource().selectedGameAssets.clear();
-
                 upWillClear = true;
-
 
                 if (button == 2 || ctrlPressed()) {
 
@@ -135,12 +133,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     startPos.set(x, y);
 
                     getStage().cancelTouchFocusExcept(this, PaletteEditorWorkspace.this);
-
-
                     event.handle();
-
-
-                    return true;
                 }
 
                 return true;
@@ -149,10 +142,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
                 if (canMoveAround) {
-                    return;
-                }
-
-                if (locked) {
                     return;
                 }
 
@@ -188,36 +177,44 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (locked) {
-                    return;
+                long time = TimeUtils.nanoTime();
+                if (time - lastTapTime > tapCountInterval) tapCount = 0;
+                tapCount++;
+                lastTapTime = time;
+                clicked(event, x, y);
+
+                selectionRect.setVisible(false);
+                isSelectingWithDrag = false;
+            }
+
+            public void clicked (InputEvent event, float x, float y) {
+                if (tapCount == 1) {
+                    //turn on the first edit mode if hitting asset
+                    paletteEditor.startFreeTranslateEditMode();
+
+                } else if (tapCount >= 2) {
+                    //turn on the second edit mode if hitting assets
+                    paletteEditor.startFreeTransformEditMode();
                 }
+
                 if (!isSelectingWithDrag) {
-                    //Find what we got on touch up and see
+                    // Find what we got on touch up and see
                     selectByPoint(x, y);
                 }
 
-
-                if(selectionRect.isVisible()) {
+                if (selectionRect.isVisible()) {
                     upWillClear = false;
                     selectByRect(rectangle);
                 } else if(upWillClear) {
                     FocusManager.resetFocus(getStage());
-//                    selectedGameAssets.clear(); //Dont need here
                 } else {
-                    if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                         // deselect all others, if they are selected
-//                        if(deselectOthers(selectedGameObject)) {/ /todo
-//                            Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
-//                        }
+                        // if (deselectOthers(selectedGameObject)) { // TODO
+                        // Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+                        // }
                     }
                 }
-
-
-
-                selectionRect.setVisible(false);
-                isSelectingWithDrag = false;
-
-                super.touchUp(event, x, y, pointer, button);
             }
         };
 
@@ -231,7 +228,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isEditMode()) {
+                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
                     return false;
                 }
 
@@ -253,7 +250,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                if (!paletteEditor.isEditMode()) {
+                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
                     return false;
                 }
 
@@ -289,7 +286,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if (!paletteEditor.isEditMode()) {
+                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
                     return;
                 }
                 isDragging = true;
@@ -303,7 +300,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isEditMode()) {
+                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
                     return;
                 }
 
@@ -311,7 +308,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging && editingGameObject != null && paletteEditor.isEditMode() && !overLine) {
+                if (isDragging && editingGameObject != null
+                        && paletteEditor.isParentTileAndFakeHeightEditMode()
+                        && !overLine) {
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -463,7 +462,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         }
 
-        if (paletteEditor.isEditMode()) {
+        if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
             // draw the fake height lines
             for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
                 GameObject gameObject = gameObjects.get(selectedGameAsset);
@@ -518,7 +517,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     @EventHandler
     public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
         Array<GameObject> gameObjects = event.get();
-        if (!paletteEditor.isEditMode()) {
+        if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
             selectGizmos(gameObjects);
         }
     }
@@ -529,69 +528,53 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         getWorldFromLocal(localPoint);
 
         // get list of entities that have their origin in the rectangle
-        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
         ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
 
         paletteData.getResource().selectedGameAssets.clear();
 
-        //find closest
-        GameAsset<?> closestGameAsset = null;
+        // find clicked game object
+//        GameAsset<?> closestGameAsset = null;
         GameObject closestGameObject = null;
-        PaletteEditor.PaletteFilterMode mode = PaletteEditor.PaletteFilterMode.NONE;
-        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObjectEntry : gameObjects) {
-            GameAsset<?> gameAsset = gameObjectEntry.key;
-            GameObject gameObject = gameObjectEntry.value;
 
-            TransformComponent component = gameObject.getComponent(TransformComponent.class);
-
-            float minDistance = 1;
-            float squaredDistance = minDistance * minDistance;
-            float currentClosestDistance = squaredDistance + 1;
-
-            float squareDistanceToCheck = (float)(Math.pow(component.worldPosition.x - localPoint.x, 2) + Math.pow(component.worldPosition.y - localPoint.y, 2));
-            if (squareDistanceToCheck < squaredDistance) {
-                if (squareDistanceToCheck < currentClosestDistance) {
-                    closestGameAsset = gameAsset;
-                    mode = PaletteEditor.PaletteFilterMode.ENTITY;
-                    closestGameObject = gameObject;
-                }
-            }
+        if (entityUnderMouse != null) {
+            closestGameObject = entityUnderMouse;
         }
-        for (ObjectMap.Entry<GameAsset<?>, StaticTile> staticTileEntry : staticTiles) {
-            GameAsset<?> gameAsset = staticTileEntry.key;
-            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
-            StaticTile staticTile = staticTileEntry.value;
 
-            float[] pos = positions.get(gameAssetUUID);
-
-            float minDistance = 1;
-            float squaredDistance = minDistance * minDistance;
-            float currentClosestDistance = squaredDistance + 1;
-
-            float squareDistanceToCheck = (float)(Math.pow(pos[0] - localPoint.x, 2) + Math.pow(pos[1] - localPoint.y, 2));
-            if (squareDistanceToCheck < squaredDistance) {
-                if (squareDistanceToCheck < currentClosestDistance) {
-                    closestGameAsset = gameAsset;
-                    mode = PaletteEditor.PaletteFilterMode.TILE;
-                }
-            }
-        }
+//        for (ObjectMap.Entry<GameAsset<?>, StaticTile> staticTileEntry : staticTiles) {
+//            GameAsset<?> gameAsset = staticTileEntry.key;
+//            UUID gameAssetUUID = gameAsset.getRootRawAsset().metaData.uuid;
+//            StaticTile staticTile = staticTileEntry.value;
+//
+//            float[] pos = positions.get(gameAssetUUID);
+//
+//            float minDistance = 1;
+//            float squaredDistance = minDistance * minDistance;
+//            float currentClosestDistance = squaredDistance + 1;
+//
+//            float squareDistanceToCheck = (float)(Math.pow(pos[0] - localPoint.x, 2) + Math.pow(pos[1] - localPoint.y, 2));
+//            if (squareDistanceToCheck < squaredDistance) {
+//                if (squareDistanceToCheck < currentClosestDistance) {
+//                    closestGameAsset = gameAsset;
+//                    mode = PaletteEditor.PaletteFilterMode.TILE;
+//                }
+//            }
+//        }
         // fire event more palette
-        if (closestGameAsset != null) {
-            paletteData.getResource().selectedGameAssets.add(closestGameAsset);
-            PaletteEvent event = paletteEventPool.obtain();
-            event.setType(PaletteEvent.Type.selected);
-            event.setSelectedGameAssets(paletteData.getResource().selectedGameAssets);
-            event.setCurrentFilterMode(mode);
-            notify(event, false);
-
-            if (closestGameObject != null) {
-                SceneEditorWorkspace.getInstance().selectPropertyHolder(closestGameObject);
-                Array<GameObject> gameObjectSelection = new Array<>();
-                gameObjectSelection.add(closestGameObject);
-                Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(gameObjectSelection));
-            }
+        if (closestGameObject != null) {
+//            paletteData.getResource().selectedGameAssets.add(closestGameAsset);
+//            PaletteEvent event = paletteEventPool.obtain();
+//            event.setType(PaletteEvent.Type.selected);
+//            event.setSelectedGameAssets(paletteData.getResource().selectedGameAssets);
+//            event.setCurrentFilterMode(mode);
+//            notify(event, false);
+//
+//            if (closestGameObject != null) {
+//                SceneEditorWorkspace.getInstance().selectPropertyHolder(closestGameObject);
+//                Array<GameObject> gameObjectSelection = new Array<>();
+//                gameObjectSelection.add(closestGameObject);
+//                Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(gameObjectSelection));
+//            }
         } else {
             PaletteEvent event = paletteEventPool.obtain();
             event.setType(PaletteEvent.Type.lostFocus);
@@ -604,6 +587,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     Vector3 lt = new Vector3();
     Vector3 rb = new Vector3();
     Vector3 rt = new Vector3();
+
     private void selectByRect(Rectangle rectangle) {
         Rectangle localRect = new Rectangle();
         lb.set(rectangle.x, rectangle.y, 0);
@@ -665,5 +649,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     public float getTmpHeightOffset () {
         return tmpHeightOffset;
+    }
+
+    @Override
+    protected InputListener addGizmoListener() {
+        currentGizmoListener = super.addGizmoListener();
+        return currentGizmoListener;
     }
 }

@@ -130,9 +130,8 @@ public abstract class ViewportWidget extends Table {
 		}
 	}
 
-	protected void addGizmoListener () {
-		addListener(new InputListener() {
-
+	protected InputListener addGizmoListener () {
+		InputListener gizmoListener = new InputListener() {
 			Gizmo touchedGizmo = null;
 
 			@Override
@@ -280,7 +279,10 @@ public abstract class ViewportWidget extends Table {
 				}
 				return super.keyDown(event, keycode);
 			}
-		});
+		};
+
+		addListener(gizmoListener);
+		return gizmoListener;
 	}
 
 	private void removeGizmos () {
