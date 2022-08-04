@@ -457,7 +457,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 float tmpHeightOffset = paletteEditorWorkspace.getTmpHeightOffset();
-                GameObject gameObject =  paletteEditorWorkspace.getGameObjectSelected();
+                GameObject gameObject =  paletteEditorWorkspace.getSelectedGameObject();
                 TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
                 TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
                 tileDataComponent.setFakeZ(tmpHeightOffset - transformComponent.position.y);
