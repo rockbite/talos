@@ -21,7 +21,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -86,6 +85,7 @@ public abstract class ViewportWidget extends Table {
 	protected Gizmos gizmos = new Gizmos();
 
 	protected Array<GameObject> selection = new Array<>();
+	protected GameObject entityUnderMouse;
 
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
@@ -140,6 +140,15 @@ public abstract class ViewportWidget extends Table {
 					return true;
 				}
 				if (canMoveAround) return false;
+
+
+				//todo
+//				if (entityUnderMouse != null) {
+//					//Entity method
+//
+//
+//					return true;
+//				}
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
@@ -480,45 +489,46 @@ public abstract class ViewportWidget extends Table {
 		batch.setTransformMatrix(prevTransform);
 		batch.begin();
 
-//		Texture colorBufferTexture = entitySelectionBuffer.getFrameBuffer().getColorBufferTexture();
-//		batch.setColor(1f, 1f, 1f, 1f);
-//		batch.draw(colorBufferTexture, getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
-//
-//		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-//		Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
-//
-//		float uiX = uiSpace.x;
-//		float uiY = uiSpace.y;
-//		uiSpace.x /= getWidth();
-//		uiSpace.y /= getHeight();
-//
-//		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
-//
-//		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
-//		if (root != null) {
-//			findObjectTemporyForTestingDeleteMe(color, root);
-//		}
-//
-//		batch.setColor(color);
-//		batch.draw(colorBufferTexture, getX() + uiX, getY() + uiY, 200, 200, 0, 0, 1, 1);
+		getEntityUnderMouse();
 
 
 		super.draw(batch, parentAlpha);
 	}
 
-	private void findObjectTemporyForTestingDeleteMe (Color color, GameObject object) {
+	private void getEntityUnderMouse () {
+		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+		Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
+
+		uiSpace.x /= getWidth();
+		uiSpace.y /= getHeight();
+
+		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
+
+		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
+		if (root != null) {
+			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
+		} else {
+			entityUnderMouse = null;
+		}
+
+
+	}
+	private GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
 		if (rgbCompare(color, (colourForEntityUUID))) {
-			System.out.println("Found entity: " + object.uuid.toString());
-			return;
+			return object;
 		} else {
 			if (object.getGameObjects() != null) {
-				for (GameObject gameObject : object.getGameObjects()) {
-					findObjectTemporyForTestingDeleteMe(color, gameObject);
+				for (GameObject childGameObject : object.getGameObjects()) {
+					GameObject childObjectFound = findEntityForColourEncodedUUID(color, childGameObject);
+					if (childObjectFound != null) {
+						return childObjectFound;
+					}
 				}
 			}
 		}
+		return null;
 	}
 
 	private boolean rgbCompare (Color color, Color colourForEntityUUID) {
