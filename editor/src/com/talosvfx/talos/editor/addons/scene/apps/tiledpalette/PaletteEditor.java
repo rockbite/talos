@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -19,6 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
@@ -146,12 +148,39 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             GameObject gameObject = addEntity(gameAsset);
             if (gameObject != null) {
                 TransformComponent component = gameObject.getComponent(TransformComponent.class);
-                component.position.set(worldSpace.x, worldSpace.y);
                 SceneEditorWorkspace.getInstance().initGizmos(gameObject, paletteEditorWorkspace);
 
                 TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-                GridPosition gridPos = new GridPosition(MathUtils.floor(worldSpace.x), MathUtils.floor(worldSpace.y));
-                tileDataComponent.getParentTiles().add(gridPos);
+
+                // if the game object has size, place parent tiles under the covering range of the sprite and center the sprite
+                if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+                    final SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+
+                    // update parent tiles
+                    final ObjectSet<GridPosition> parentTiles = new ObjectSet<>();
+
+                    final int lowestX = MathUtils.floor(worldSpace.x);
+                    final int lowestY = MathUtils.floor(worldSpace.y);
+                    final int highestX = (int) (lowestX + spriteRendererComponent.size.x);
+                    final int highestY = (int) (lowestY + spriteRendererComponent.size.y);
+
+                    for (int i = lowestX; i <= highestX; i++) {
+                        for (int j = lowestY; j <= highestY; j++) {
+                            final GridPosition gridPosition = new GridPosition(i, j);
+                            parentTiles.add(gridPosition);
+                        }
+                    }
+                    tileDataComponent.setParentTiles(parentTiles);
+
+                    // center the sprite
+                    final float xOffset = (highestX - lowestX + 1) / 2f;
+                    final float yOffset = (highestY - lowestY + 1) / 2f;
+                    component.position.set(xOffset, yOffset);
+                } else {
+                    final GridPosition gridPos = new GridPosition(MathUtils.floor(worldSpace.x), MathUtils.floor(worldSpace.y));
+                    component.position.set(0, 0);
+                    tileDataComponent.getParentTiles().add(gridPos);
+                }
             }
         }
 
