@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -20,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
@@ -136,6 +138,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
                 TransformComponent component = gameObject.getComponent(TransformComponent.class);
                 component.position.set(worldSpace.x, worldSpace.y);
                 SceneEditorWorkspace.getInstance().initGizmos(gameObject, paletteEditorWorkspace);
+
+                TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+                GridPosition gridPos = new GridPosition(MathUtils.floor(worldSpace.x), MathUtils.floor(worldSpace.y));
+                tileDataComponent.getParentTiles().add(gridPos);
             }
         }
 

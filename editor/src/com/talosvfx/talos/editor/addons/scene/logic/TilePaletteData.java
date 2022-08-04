@@ -23,7 +23,6 @@ public class TilePaletteData implements Json.Serializable{
     public transient ObjectMap<GameAsset<?>, GameObject> gameObjects;
     public transient GameObject rootDummy;
     public transient Array<GameAsset<?>> selectedGameAssets;
-    public transient Array<GameObject> selectedTiledParent;
 
     public void addSprite (GameAsset<?> gameAsset) {
         GridPosition gridPosition = new GridPosition(0, 0);
@@ -75,7 +74,6 @@ public class TilePaletteData implements Json.Serializable{
         staticTiles = new ObjectMap<>();
         gameObjects = new ObjectMap<>();
         selectedGameAssets = new Array<>();
-        selectedTiledParent = new Array<>();
     }
 
     @Override

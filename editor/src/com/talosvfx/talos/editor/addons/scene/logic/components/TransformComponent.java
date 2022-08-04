@@ -61,6 +61,8 @@ public class TransformComponent extends AComponent {
             vector.rotateDeg(transform.rotation);
 
             vector.add(transform.position);
+            vector.add(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
 
             if(gameObject.parent != null) {
                 localToWorld(gameObject.parent, vector);

@@ -102,4 +102,21 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
     public void setFakeZ(float fakeZ) {
         this.fakeZ = fakeZ;
     }
+
+    public GridPosition getBottomLeftParentTile () {
+        GridPosition bottomLeft = null;
+        for (GridPosition parentTile : parentTiles) {
+            if (bottomLeft == null) {
+                bottomLeft = parentTile;
+            } else {
+                if (parentTile.x < bottomLeft.x) {
+                    bottomLeft = parentTile;
+                }
+                if (parentTile.y < bottomLeft.y) {
+                    bottomLeft = parentTile;
+                }
+            }
+        }
+        return bottomLeft;
+    }
 }

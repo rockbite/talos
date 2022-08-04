@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -31,6 +32,9 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public GameObject parent;
 
     public static Vector2 tmpVec = new Vector2();
+
+    private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
+
 
     public GameObject () {
         uuid = UUID.randomUUID();
@@ -345,5 +349,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         boundingBox.clr();
         estimateSizeForGameObject(this, boundingBox);
         return boundingBox;
+    }
+
+
+    public Gizmo.TransformSettings getTransformSettings () {
+        return transformSettings;
     }
 }

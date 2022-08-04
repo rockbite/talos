@@ -1,9 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -18,6 +20,19 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
+
+    public static class TransformSettings  {
+        public float gridSizeX = 1;
+        public float gridSizeY = 1;
+
+        public float offsetX = 0;
+        public float offsetY = 0;
+
+        public void setOffset (float storedX, float storedY) {
+            this.offsetX = storedX;
+            this.offsetY = storedY;
+        }
+    }
 
     protected AComponent component;
     protected GameObject gameObject;
@@ -131,6 +146,25 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     public void keyDown (InputEvent event, int keycode) {
 
+    }
+
+    public void snapIfRequired () {
+        boolean hasTransform = gameObject.hasComponent(TransformComponent.class);
+
+        if (hasTransform) {
+            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                TransformSettings transformSettings = gameObject.getTransformSettings();
+                TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                snapToGrid(transformSettings.gridSizeX, transformSettings.gridSizeY, transformComponent.position, new Vector2());
+            }
+        }
+
+    }
+    protected void snapToGrid (float gridSizeX, float gridSizeY, Vector2 position, Vector2 offset) {
+        float positionX = MathUtils.round(position.x/gridSizeX) * gridSizeX;
+        float positionY = MathUtils.round(position.y/gridSizeY) * gridSizeY;
+        position.x = positionX;
+        position.y = positionY;
     }
 
     @Override
