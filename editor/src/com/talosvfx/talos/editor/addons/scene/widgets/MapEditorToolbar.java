@@ -35,8 +35,8 @@ public class MapEditorToolbar extends Table {
 
 		toolbar.setBackground(getSkin().newDrawable("button-main-menu"));
 
-		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-new"));
-		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-delete"));
+		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"));
+		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"));
 
 		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
 		buttonButtonGroup.setMaxCheckCount(1);
