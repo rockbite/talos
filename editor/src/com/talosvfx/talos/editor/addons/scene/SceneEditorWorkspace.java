@@ -1242,15 +1242,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.setCamera(camera);
 		drawMainRenderer(customBatch, 1f);
 
-		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-		pixmap.setColor(Color.WHITE);
-		pixmap.fill();
-		Texture texture = new Texture(pixmap);
-		pixmap.dispose();
-
-		customBatch.setCustomEncodingColour(1, 1, 1,1);
-		customBatch.draw(texture, 0, 0, 1, 1);
-
 		customBatch.end();
 
 	}
