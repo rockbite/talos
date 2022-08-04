@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
@@ -548,6 +549,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         // render rects
         Gdx.gl.glEnable(GL20.GL_BLEND);
+        // TODO: change into some flag when implemented double click
+        if (gameObject == editingGameObject) {
+            renderParentTilesHighlight(gameObject);
+        }
         shapeRenderer.setColor(0.5f, 0.4f, 0.5f, 0.5f);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -556,6 +561,42 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    private void renderParentTilesHighlight (GameObject gameObject) {
+        final TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+        final ObjectSet<GridPosition> parentTiles = tileDataComponent.getParentTiles();
+
+        // find the highest and lowest positions
+        int firstX = parentTiles.first().getIntX();
+        int firstY = parentTiles.first().getIntY();
+
+        int lowestX = firstX;
+        int highestX = firstX;
+        int lowestY = firstY;
+        int highestY = firstY;
+
+        for (GridPosition parentTile : parentTiles) {
+            if (parentTile.x < lowestX) lowestX = (int) parentTile.x;
+            if (parentTile.y < lowestY) lowestY = (int) parentTile.y;
+            if (parentTile.x > highestX) highestX = (int) parentTile.x;
+            if (parentTile.y > highestY) highestY = (int) parentTile.y;
+        }
+
+        // get grid size
+        float gridSizeX = 1;
+        float gridSizeY = 1;
+        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+        if (layerSelected != null) {
+            gridSizeX = layerSelected.getTileSizeX();
+            gridSizeY = layerSelected.getTileSizeY();
+        }
+
+        // render highlight
+        shapeRenderer.setColor(1f, 1f, 0.5f, 1f);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.rect(lowestX, lowestY, gridSizeX * (highestX - lowestX) + 1, gridSizeY * (highestY - lowestY) + 1);
+        shapeRenderer.end();
     }
 
     @EventHandler
