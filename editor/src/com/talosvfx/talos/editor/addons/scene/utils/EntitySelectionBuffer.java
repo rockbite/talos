@@ -23,7 +23,7 @@ public class EntitySelectionBuffer {
 
 	public EntitySelectionBuffer () {
 		float scale = 1;
-		frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)(Gdx.graphics.getWidth() * scale), (int)(Gdx.graphics.getHeight() * scale), false);
+		frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 1024, 1024, false);
 		ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/entity/entity.vert.glsl"), Gdx.files.internal("shaders/entity/entity.frag.glsl"));
 		customBatch = new PolygonSpriteBatchMultiTexture(10000, shaderProgram);
 	}

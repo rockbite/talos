@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
+import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.GridDrawer;
@@ -53,6 +54,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     private Pool<PaletteEvent> paletteEventPool;
 
     private float tmpHeightOffset;
+
+    private boolean translatingMode = true;
+    private GameObject gameObjectSelected = null;
 
     public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
@@ -113,15 +117,35 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             boolean upWillClear = true;
             private boolean isSelectingWithDrag = false;
 
+            private Vector2 startOffsetFromParentTile = new Vector2();
+            private boolean touchedDownOnEntityForParentDrag = false;
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 if (canMoveAround) {
                     return false;
                 }
-
                 if (locked) {
                     return true;
                 }
+                if (translatingMode) {
+                    if (!selection.isEmpty()) {
+                        if (entityUnderMouse == selection.first()) { //Setup translating if we are clicked on the entity we wanted
+                            //Maybe we expand this later to include the parent tiles too
+
+                            TileDataComponent tileDataComponent = selection.first().getComponent(TileDataComponent.class);
+                            GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+
+                            Vector2 worldFromLocal = getWorldFromLocal(x, y);
+                            worldFromLocal.sub(bottomLeftParentTile.x, bottomLeftParentTile.y);
+
+                            startOffsetFromParentTile.set(worldFromLocal.x, worldFromLocal.y);
+                            touchedDownOnEntityForParentDrag = true;
+                            return true;
+                        }
+                    }
+                }
+
                 paletteData.getResource().selectedGameAssets.clear();
 
                 upWillClear = true;
@@ -158,6 +182,18 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                 super.touchDragged(event, x, y, pointer);
 
+                if (touchedDownOnEntityForParentDrag) {
+                    //We are dragging, work out our current position, add it to the offset we stored, and snap it to the grid
+
+                    Vector2 worldFromLocal = getWorldFromLocal(x, y);
+                    worldFromLocal.sub(startOffsetFromParentTile);
+
+                    TileDataComponent tileDataComponent = selection.first().getComponent(TileDataComponent.class);
+                    tileDataComponent.translateToWorldPosition(worldFromLocal);
+
+                    return;
+                }
+
                 if(selectionRect.isVisible()) {
                     vec.set(x, y);
                     vec.sub(startPos);
@@ -184,6 +220,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                touchedDownOnEntityForParentDrag = false;
+
                 if (canMoveAround) {
                     return;
                 }
@@ -479,6 +517,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         shapeRenderer.end();
 
+
+        beginEntitySelectionBuffer();
+        drawEntitiesForSelection();
+        endEntitySelectionBuffer();
+
         batch.begin();
     }
 
@@ -665,5 +708,76 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     public float getTmpHeightOffset () {
         return tmpHeightOffset;
+    }
+
+
+    @Override
+    protected void drawEntitiesForSelection () {
+        super.drawEntitiesForSelection();
+
+        PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
+        customBatch.setUsingCustomColourEncoding(true);
+        customBatch.setProjectionMatrix(camera.combined);
+
+        customBatch.begin();
+
+        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
+
+            //Calculate the position from parent tile bottom left + transform
+
+            GameObject gameObject = entry.value;
+
+            TransformComponent component = gameObject.getComponent(TransformComponent.class);
+            Vector2 position = component.position;
+
+            float storedX = position.x;
+            float storedY = position.y;
+
+
+            TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+            GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+
+            gameObject.getTransformSettings().setOffset(bottomLeftParentTile.x, bottomLeftParentTile.y);
+
+
+            position.set(storedX + bottomLeftParentTile.x, storedY + bottomLeftParentTile.y);
+
+            //Set the transform to the temporary position which is bottom left parent tile + transform
+
+            mainRenderer.update(gameObject);
+            mainRenderer.render(customBatch, new MainRenderer.RenderState(), gameObject);
+
+            position.set(storedX, storedY);
+        }
+
+        customBatch.end();
+    }
+
+    @Override
+    protected void getEntityUnderMouse () {
+        Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
+
+        uiSpace.x /= getWidth();
+        uiSpace.y /= getHeight();
+
+        Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
+
+        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : paletteData.getResource().gameObjects) {
+
+            GameObject value = entry.value;
+
+            GameObject entityForColourEncodedUUID = findEntityForColourEncodedUUID(color, value);
+            if (entityForColourEncodedUUID != null) {
+                entityUnderMouse = entityForColourEncodedUUID;
+                return;
+            }
+        }
+
+        entityUnderMouse = null;
+
     }
 }
