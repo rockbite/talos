@@ -4,8 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -37,6 +40,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
@@ -767,6 +771,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.setCamera(camera);
 		drawMainRenderer(batch, parentAlpha);
 
+		batch.end();
+
+		beginEntitySelectionBuffer();
+		drawEntitiesForSelection();
+		endEntitySelectionBuffer();
+
+		batch.begin();
+
 	}
 
 	private void drawMainRenderer (Batch batch, float parentAlpha) {
@@ -1218,4 +1230,28 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return currentContainer;
 	}
 
+	@Override
+	protected void drawEntitiesForSelection () {
+		super.drawEntitiesForSelection();
+
+		PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
+		customBatch.setUsingCustomColourEncoding(true);
+		customBatch.setProjectionMatrix(camera.combined);
+
+		customBatch.begin();
+		renderer.setCamera(camera);
+		drawMainRenderer(customBatch, 1f);
+
+		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		pixmap.setColor(Color.WHITE);
+		pixmap.fill();
+		Texture texture = new Texture(pixmap);
+		pixmap.dispose();
+
+		customBatch.setCustomEncodingColour(1, 1, 1,1);
+		customBatch.draw(texture, 0, 0, 1, 1);
+
+		customBatch.end();
+
+	}
 }

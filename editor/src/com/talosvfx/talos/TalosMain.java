@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
@@ -109,13 +110,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
-	public Cursor pickerCursor;
-	public Cursor moveHorizontallyCursor;
-	public Cursor moveVerticallyCursor;
-	public Cursor moveAllDirections;
-	public Cursor handGrabbed;
-	private Cursor currentCursor;
-
 	public TalosMain () {
 
 	}
@@ -172,12 +166,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		VisUI.load(skin);
 
-		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
-		moveHorizontallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_horizontally.png")), 8, 8);
-		moveVerticallyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_vertically.png")), 8, 8);
-		moveAllDirections = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/move_all_directions.png")), 8, 8);
-		handGrabbed = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/hand_grabbed.png")), 8, 8);
-
 		uiStage = new UIStage(skin);
 
 		errorReporting = new ErrorReporting();
@@ -215,15 +203,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
-	public void setCursor(Cursor cursor) {
-		if(currentCursor != cursor) {
-			if(cursor != null) {
-				Gdx.graphics.setCursor(cursor);
-			} else {
-				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
-			}
-			currentCursor = cursor;
-		}
+
+	public void setPerFrameCursorTypeEnabled () {
+
 	}
 
 	public void disableNodeStage() {
@@ -247,6 +229,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		CursorUtil.checkAndReset();
+
+
 		try {
 			Thread.sleep(16);
 		} catch (InterruptedException e) {
@@ -291,7 +276,6 @@ public class TalosMain extends ApplicationAdapter {
 		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
 			currentWorkplaceStage.getStage().dispose();
 		}
-		pickerCursor.dispose();
 		uiStage.getStage().dispose();
 	}
 

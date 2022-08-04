@@ -37,14 +37,16 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
+
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 
@@ -64,6 +66,8 @@ public abstract class ViewportWidget extends Table {
 	protected float minZoom = 200f;
 
 	protected ShapeRenderer shapeRenderer;
+	protected final EntitySelectionBuffer entitySelectionBuffer;
+
 	private float gridSize;
 	private float worldWidth = 1f;
 
@@ -80,11 +84,13 @@ public abstract class ViewportWidget extends Table {
 	protected Gizmos gizmos = new Gizmos();
 
 	protected Array<GameObject> selection = new Array<>();
+	protected GameObject entityUnderMouse;
 
 	protected boolean locked;
 
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
+		entitySelectionBuffer = new EntitySelectionBuffer();
 		camera = new OrthographicCamera();
 		camera.viewportWidth = 10;
 
@@ -95,7 +101,6 @@ public abstract class ViewportWidget extends Table {
 
 		addPanListener();
 		addGizmoListener();
-
 	}
 
 	public void selectGizmos (Array<GameObject> gameObjects) {
@@ -141,6 +146,15 @@ public abstract class ViewportWidget extends Table {
 				if (locked) {
 					return true;
 				}
+
+
+				//todo
+//				if (entityUnderMouse != null) {
+//					//Entity method
+//
+//
+//					return true;
+//				}
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
@@ -473,11 +487,14 @@ public abstract class ViewportWidget extends Table {
 
 		prevTransform.set(batch.getTransformMatrix());
 		prevProjection.set(batch.getProjectionMatrix());
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.setTransformMatrix(emptyTransform);
 
 		batch.begin();
 		drawContent(batch, parentAlpha);
+
+		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
 		if (!locked) {
 			drawGizmos(batch, parentAlpha);
@@ -491,7 +508,61 @@ public abstract class ViewportWidget extends Table {
 		batch.setTransformMatrix(prevTransform);
 		batch.begin();
 
+		getEntityUnderMouse();
+
+
 		super.draw(batch, parentAlpha);
+	}
+
+	private void getEntityUnderMouse () {
+		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+		Vector2 uiSpace = screenToLocalCoordinates(touchSpace);
+
+		uiSpace.x /= getWidth();
+		uiSpace.y /= getHeight();
+
+		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
+
+		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
+		if (root != null) {
+			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
+		} else {
+			entityUnderMouse = null;
+		}
+
+
+	}
+	private GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
+		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
+
+		if (rgbCompare(color, (colourForEntityUUID))) {
+			return object;
+		} else {
+			if (object.getGameObjects() != null) {
+				for (GameObject childGameObject : object.getGameObjects()) {
+					GameObject childObjectFound = findEntityForColourEncodedUUID(color, childGameObject);
+					if (childObjectFound != null) {
+						return childObjectFound;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean rgbCompare (Color color, Color colourForEntityUUID) {
+		int inR = (int)(color.r * 256);
+		int inG = (int)(color.g * 256);
+		int inB = (int)(color.b * 256);
+
+		int testR = (int)(colourForEntityUUID.r * 256);
+		int testG = (int)(colourForEntityUUID.g * 256);
+		int testB = (int)(colourForEntityUUID.b * 256);
+
+		if (inR != testR) return false;
+		if (inG != testG) return false;
+		if (inB != testB) return false;
+		return true;
 	}
 
 	protected void drawGroup (Batch batch, float parentAlpha) {
@@ -506,10 +577,9 @@ public abstract class ViewportWidget extends Table {
 		canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
 
 		if (canMoveAround) {
-			TalosMain.Instance().setCursor(TalosMain.Instance().handGrabbed);
+			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
 			disableClickListener();
 		} else {
-			TalosMain.Instance().setCursor(null);
 			enableClickListener();
 		}
 
@@ -799,5 +869,17 @@ public abstract class ViewportWidget extends Table {
 
 	public void unlockGizmos () {
 		locked = false;
+	}
+
+
+	protected void beginEntitySelectionBuffer () {
+		entitySelectionBuffer.begin(camera);
+	}
+	protected void endEntitySelectionBuffer() {
+		entitySelectionBuffer.end();
+
+	}
+
+	protected void drawEntitiesForSelection () {
 	}
 }

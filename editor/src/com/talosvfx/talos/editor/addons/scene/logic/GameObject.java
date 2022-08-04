@@ -12,11 +12,13 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GameObject implements GameObjectContainer, Json.Serializable, IPropertyHolder, IPropertyProvider {
 
     private String name = "gameObject";
+    public UUID uuid;
 
     private String prefabLink = null;
 
@@ -29,6 +31,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public GameObject parent;
 
     public static Vector2 tmpVec = new Vector2();
+
+    public GameObject () {
+        uuid = UUID.randomUUID();
+    }
 
     @Override
     public Array<GameObject> getGameObjects () {
@@ -53,6 +59,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void write (Json json) {
         json.writeValue("name", name);
+        json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
 
         json.writeArrayStart("components");
@@ -73,6 +80,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void read (Json json, JsonValue jsonData) {
         name = jsonData.getString("name");
+        if (jsonData.has("uuid")) {
+            uuid = UUID.fromString(jsonData.getString("uuid"));
+        } else {
+            uuid = UUID.randomUUID();
+        }
         prefabLink = jsonData.getString("prefabLink", null);
 
         JsonValue componentsJson = jsonData.get("components");
