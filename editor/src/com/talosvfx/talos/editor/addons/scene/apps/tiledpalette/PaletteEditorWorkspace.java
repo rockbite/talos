@@ -306,25 +306,26 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 float tmpDist;
                 overLine = false;
 
-                Array<GameAsset<?>> selectedGameAssets = paletteData.getResource().selectedGameAssets;
-                ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
-
                 // check if hovering over line
-                for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
-                    GameObject gameObject = gameObjects.get(selectedGameAsset);
-                    if (gameObject != null) {
-                        Vector3 localPoint = new Vector3(x, y, 0);
-                        getWorldFromLocal(localPoint);
+                if (selectedGameObject != null) {
+                    final Vector3 localPoint = new Vector3(x, y, 0);
+                    getWorldFromLocal(localPoint);
 
-                        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-                        x1 = transformComponent.position.x - 0.5f;
-                        y1 = tmpHeightOffset;
-                        x2 = transformComponent.position.x + 0.5f;
-                        y2 = tmpHeightOffset;
-                        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, localPoint.x, localPoint.y);
-                        if (tmpDist <= dist) {
-                            overLine = true;
-                        }
+                    // get x position
+                    final TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
+                    final TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
+                    final GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+                    float xPos = bottomLeftParentTile.x + transformComponent.position.x;
+
+                    x1 = xPos - 0.5f;
+                    y1 = tmpHeightOffset;
+                    x2 = xPos + 0.5f;
+                    y2 = tmpHeightOffset;
+
+                    tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, localPoint.x, localPoint.y);
+
+                    if (tmpDist <= dist) {
+                        overLine = true;
                     }
                 }
 
