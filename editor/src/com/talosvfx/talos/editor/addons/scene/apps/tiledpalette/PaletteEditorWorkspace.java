@@ -355,9 +355,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging
-                        && paletteEditor.isParentTileAndFakeHeightEditMode()
-                        && !overLine) {
+                if (isDragging && paletteEditor.isParentTileAndFakeHeightEditMode() && !overLine) {
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -504,7 +502,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
             // draw the fake height lines
-            if (selectedGameObject == null) {
+            if (selectedGameObject != null) {
                 final TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
                 final TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
                 final GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
