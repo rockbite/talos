@@ -55,6 +55,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     private InputListener currentGizmoListener;
 
+    private static final Color parentTilesColor = Color.valueOf("#4A6DE5");
+
     public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
         this.paletteEditor = paletteEditor;
@@ -542,13 +544,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         // render rects
         Gdx.gl.glEnable(GL20.GL_BLEND);
-        Color color = Color.valueOf("459534");
-        color.a = 0.5f;
+        parentTilesColor.a = 0.5f;
         if (gameObject == selectedGameObject) {
             renderParentTilesHighlight(gameObject);
-            color.a = 0.8f;
+            parentTilesColor.a = 0.8f;
         }
-        shapeRenderer.setColor(color);
+        shapeRenderer.setColor(parentTilesColor);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
