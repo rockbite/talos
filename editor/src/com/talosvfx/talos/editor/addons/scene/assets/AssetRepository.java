@@ -640,6 +640,13 @@ public class AssetRepository {
 		rootRawAsset.handle.writeString(jsonString, false);
 	}
 
+	public GameObject copyGameObject (GameObject gameObject) {
+		String serialized = json.toJson(gameObject);
+		GameObject newObject = json.fromJson(GameObject.class, serialized);
+		newObject.uuid = UUID.randomUUID();
+		return newObject;
+	}
+
 	private void collectRawResourceFromDirectory (FileHandle dir, boolean checkGameResources) {
 
 		if (!dir.isDirectory()) {

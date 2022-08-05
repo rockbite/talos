@@ -104,6 +104,10 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
         this.fakeZ = fakeZ;
     }
 
+    public Vector2 getVisualOffset () {
+        return visualOffset;
+    }
+
     public GridPosition getBottomLeftParentTile () {
         GridPosition bottomLeft = null;
         for (GridPosition parentTile : parentTiles) {

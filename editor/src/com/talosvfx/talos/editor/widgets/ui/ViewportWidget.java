@@ -38,6 +38,9 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
+import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
+import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
@@ -136,17 +139,13 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				boolean handled = super.touchDown(event, x, y, pointer, button);
-				if (handled) {
-					return true;
-				}
+				if (event.isCancelled()) return false;
 
 				if (canMoveAround) return false;
 
 				if (locked) {
 					return true;
 				}
-
 
 				//todo
 //				if (entityUnderMouse != null) {
@@ -177,7 +176,7 @@ public abstract class ViewportWidget extends Table {
 						}
 					}
 
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
 
 
 					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
@@ -196,7 +195,7 @@ public abstract class ViewportWidget extends Table {
 					requestSelectionClear();
 				}
 
-				return handled;
+				return super.touchDown(event, x, y, pointer, button);
 			}
 
 			@Override
@@ -513,7 +512,7 @@ public abstract class ViewportWidget extends Table {
 
 		getEntityUnderMouse();
 
-		//Debug entity secltion
+//		Debug entity secltion
 //		if (entityUnderMouse != null) {
 //
 //			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
@@ -544,6 +543,7 @@ public abstract class ViewportWidget extends Table {
 	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
+
 		if (rgbCompare(color, (colourForEntityUUID))) {
 			return object;
 		} else {
@@ -556,6 +556,24 @@ public abstract class ViewportWidget extends Table {
 				}
 			}
 		}
+
+		if (object.hasComponent(MapComponent.class)) {
+			MapComponent mapComponent = object.getComponent(MapComponent.class);
+			for (int i = 0; i < mapComponent.getLayers().size; i++) {
+				TalosLayer talosLayer = mapComponent.getLayers().get(i);
+				if (talosLayer.getType() == LayerType.DYNAMIC_ENTITY) {
+					Array<GameObject> layerRootEntities = talosLayer.getRootEntities();
+					for (int j = 0; j < layerRootEntities.size; j++) {
+						GameObject gameObject = layerRootEntities.get(j);
+						GameObject mapEntityForColourEncodedUUID = findEntityForColourEncodedUUID(color, gameObject);
+						if (mapEntityForColourEncodedUUID != null) {
+							return mapEntityForColourEncodedUUID;
+						}
+					}
+				}
+			}
+		}
+
 		return null;
 	}
 
@@ -746,7 +764,7 @@ public abstract class ViewportWidget extends Table {
 		return vec;
 	}
 
-	public Vector3 getTouchToLocal (float x, float y) {
+	public Vector3 getTouchToWorld (float x, float y) {
 		Vector3 vec = new Vector3(x, y, 0);
 
 		getViewportBounds(Rectangle.tmp);
@@ -773,7 +791,7 @@ public abstract class ViewportWidget extends Table {
 
 	public void requestSelectionClear () {
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	protected void clearSelection () {
@@ -805,14 +823,14 @@ public abstract class ViewportWidget extends Table {
 
 	public void removeFromSelection (GameObject gameObject) {
 		selection.removeValue(gameObject, true);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	public void addToSelection (GameObject gameObject) {
 		if (!selection.contains(gameObject, true)) {
 			selection.add(gameObject);
 		}
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	protected void setSelection (Array<GameObject> gameObjects) {
@@ -851,7 +869,7 @@ public abstract class ViewportWidget extends Table {
 			return;
 
 		selectGameObject(gameObject);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	private void selectGameObject (GameObject gameObject) {

@@ -41,6 +41,8 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	IntMap<IntMap<StaticTile>> staticTiles = new IntMap<IntMap<StaticTile>>();
 	Array<GameObject> rootEntities = new Array<>();
 
+	public transient GameObject entityPlacing;
+
 
 	protected TalosLayer () {}
 
@@ -257,5 +259,9 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		if (target != null) {
 			getRootEntities().removeValue(target, true);
 		}
+	}
+
+	public void removeEntity (GameObject entityUnderMouse) {
+		getRootEntities().removeValue(entityUnderMouse, true);
 	}
 }

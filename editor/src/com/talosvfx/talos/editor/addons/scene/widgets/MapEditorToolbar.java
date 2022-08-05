@@ -22,6 +22,11 @@ public class MapEditorToolbar extends Table {
 		super.draw(batch, parentAlpha);
 	}
 
+	@Override
+	public boolean remove () {
+		return super.remove();
+	}
+
 	public void build () {
 
 		clearChildren();
@@ -35,8 +40,8 @@ public class MapEditorToolbar extends Table {
 
 		toolbar.setBackground(getSkin().newDrawable("button-main-menu"));
 
-		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"));
-		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"));
+		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"), true);
+		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true);
 
 		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
 		buttonButtonGroup.setMaxCheckCount(1);
@@ -46,30 +51,54 @@ public class MapEditorToolbar extends Table {
 
 		paint.addListener(new ClickListener() {
 
+			@Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				event.cancel();
+				return super.touchDown(event, x, y, pointer, button);
+			}
 
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
+
 				super.clicked(event, x, y);
-				paint.setChecked(!paint.isChecked());
 
-				SceneEditorWorkspace.getInstance().mapEditorState.erasing = false;
-				SceneEditorWorkspace.getInstance().mapEditorState.painting = false;
+				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
 
-				SceneEditorWorkspace.getInstance().mapEditorState.painting = paint.isChecked();
+				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
+
+				//Lock gizmos and also lock seleection
+				if (paint.isChecked() || erase.isChecked()) {
+					SceneEditorWorkspace.getInstance().lockGizmos();
+				} else {
+					SceneEditorWorkspace.getInstance().unlockGizmos();
+				}
 			}
 		});
 		erase.addListener(new ClickListener() {
 
+			@Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				event.cancel();
+				return super.touchDown(event, x, y, pointer, button);
+			}
+
 
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				erase.setChecked(!erase.isChecked());
 
-				SceneEditorWorkspace.getInstance().mapEditorState.erasing = false;
-				SceneEditorWorkspace.getInstance().mapEditorState.painting = false;
+				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
 
-				SceneEditorWorkspace.getInstance().mapEditorState.erasing = erase.isChecked();
+				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(erase.isChecked());
+
+				//Lock gizmos and also lock seleection
+				if (paint.isChecked() || erase.isChecked()) {
+					SceneEditorWorkspace.getInstance().lockGizmos();
+				} else {
+					SceneEditorWorkspace.getInstance().unlockGizmos();
+				}
 			}
 		});
 

@@ -1,16 +1,13 @@
 package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
@@ -38,7 +35,7 @@ public class GridDrawer {
 
 		int x = Gdx.input.getX();
 		int y = Gdx.input.getY();
-		Vector3 projected = widget.getTouchToLocal(x, y);
+		Vector3 projected = widget.getTouchToWorld(x, y);
 
 		//Find the 'cell'
 		float projX = projected.x;
@@ -55,7 +52,7 @@ public class GridDrawer {
 		float gridSizeX = floats[0];
 		float gridSizeY = floats[1];
 
-		final Vector3 projected = widget.getTouchToLocal(position.x, position.y);
+		final Vector3 projected = widget.getTouchToWorld(position.x, position.y);
 
 		// find cell x axis
 		float projX = projected.x;
@@ -81,7 +78,7 @@ public class GridDrawer {
 
 		int x = Gdx.input.getX();
 		int y = Gdx.input.getY();
-		Vector3 projected = widget.getTouchToLocal(x, y);
+		Vector3 projected = widget.getTouchToWorld(x, y);
 
 		float projY = projected.y;
 		projY /= gridSizeY;
