@@ -522,7 +522,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Vector2 worldFromLocal = getWorldFromLocal(x, y);
 		TalosLayer layerSelected = mapEditorState.getLayerSelected();
 		if (layerSelected != null) {
-			layerSelected.removeEntity(worldFromLocal.x, worldFromLocal.y);
+			if (entityUnderMouse != null) {
+				layerSelected.removeEntity(entityUnderMouse);
+			}
 		}
 	}
 

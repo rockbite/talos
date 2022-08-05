@@ -260,4 +260,8 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 			getRootEntities().removeValue(target, true);
 		}
 	}
+
+	public void removeEntity (GameObject entityUnderMouse) {
+		getRootEntities().removeValue(entityUnderMouse, true);
+	}
 }
