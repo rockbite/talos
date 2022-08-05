@@ -2,11 +2,13 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -25,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolyBatchWithEncodingOverride;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -57,9 +60,12 @@ public class MainRenderer implements Notifications.Observer {
     private SkeletonRenderer spineRenderer;
 
     private TalosMapRenderer mapRenderer;
+    private ShapeRenderer shapeRenderer;
 
     private TextureRegion textureRegion = new TextureRegion();
     private OrthographicCamera camera;
+
+    private boolean renderParentTiles = false;
 
     public static class RenderState {
         private Array<GameObject> list = new Array<>();
@@ -75,6 +81,7 @@ public class MainRenderer implements Notifications.Observer {
         talosRenderer = new SpriteBatchParticleRenderer();
         spineRenderer = new SkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
+        shapeRenderer = new ShapeRenderer();
 
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
@@ -179,8 +186,76 @@ public class MainRenderer implements Notifications.Observer {
         fillRenderableEntities(rootObjects, state.list);
         sort(state.list);
 
+        batch.end();
+        if (renderParentTiles) {
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Color color = Color.valueOf("459534");
+            color.a = 0.5f;
+            shapeRenderer.setColor(color);
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+
+            for (int i = 0; i < state.list.size; i++) {
+                GameObject gameObject = state.list.get(i);
+                if (gameObject.hasComponent(TileDataComponent.class)) {
+
+                    TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+
+                    Gizmo.TransformSettings transformSettings = gameObject.getTransformSettings();
+
+                    TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+                    GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+
+                    for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
+
+                        if (gameObject.isPlacing) {
+                            float posY = parentTile.getIntY();
+                            float posX = parentTile.getIntX();
+
+                            posX -= transformSettings.transformOffsetX;
+                            posY -= transformSettings.transformOffsetY;
+
+                            posX += transformComponent.worldPosition.x;
+                            posY += transformComponent.worldPosition.y;
+
+                            posX -= transformSettings.offsetX;
+                            posY -= transformSettings.offsetY;
+
+                            shapeRenderer.rect(posX, posY, 1,1);
+
+                        } else {
+                            float posY = parentTile.getIntY();
+                            float posX = parentTile.getIntX();
+
+                            posX -= tileDataComponent.getVisualOffset().x;
+                            posY -= tileDataComponent.getVisualOffset().y;
+
+                            posX += transformComponent.worldPosition.x;
+                            posY += transformComponent.worldPosition.y;
+
+                            posX -= bottomLeftParentTile.getIntX();
+                            posY -= bottomLeftParentTile.getIntY();
+
+                            shapeRenderer.rect(posX, posY, 1,1);
+
+                        }
+
+
+
+                    }
+                }
+
+            }
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        }
+        batch.begin();
+
         for (int i = 0; i < state.list.size; i++) {
             GameObject gameObject = state.list.get(i);
+
 
             if (batch instanceof PolyBatchWithEncodingOverride) {
                 Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(gameObject);
@@ -414,5 +489,7 @@ public class MainRenderer implements Notifications.Observer {
         return camera;
     }
 
-
+    public void setRenderParentTiles (boolean renderParentTiles) {
+        this.renderParentTiles = renderParentTiles;
+    }
 }

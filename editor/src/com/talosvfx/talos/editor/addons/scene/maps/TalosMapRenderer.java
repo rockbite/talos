@@ -118,7 +118,16 @@ public class TalosMapRenderer {
 				for (GameObject rootEntity : rootEntities) {
 					mainRenderer.update(rootEntity);
 				}
-				mainRenderer.render(batch, state, rootEntities);
+
+				Array<GameObject> temp = new Array<>();
+				if (layer.entityPlacing != null) {
+					mainRenderer.update(layer.entityPlacing);
+					temp.add(layer.entityPlacing);
+				}
+				temp.addAll(rootEntities);
+
+
+				mainRenderer.render(batch, state, temp);
 
 				mainRenderer.setActiveSorter(mainRenderer.layerAndDrawOrderComparator);
 

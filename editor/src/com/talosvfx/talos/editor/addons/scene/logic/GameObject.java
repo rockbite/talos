@@ -34,7 +34,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public static Vector2 tmpVec = new Vector2();
 
     private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
-
+    public transient boolean isPlacing = false;
 
     public GameObject () {
         uuid = UUID.randomUUID();

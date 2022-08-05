@@ -136,17 +136,13 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				boolean handled = super.touchDown(event, x, y, pointer, button);
-				if (handled) {
-					return true;
-				}
+				if (event.isCancelled()) return false;
 
 				if (canMoveAround) return false;
 
 				if (locked) {
 					return true;
 				}
-
 
 				//todo
 //				if (entityUnderMouse != null) {
@@ -177,7 +173,7 @@ public abstract class ViewportWidget extends Table {
 						}
 					}
 
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
 
 
 					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
@@ -196,7 +192,7 @@ public abstract class ViewportWidget extends Table {
 					requestSelectionClear();
 				}
 
-				return handled;
+				return super.touchDown(event, x, y, pointer, button);
 			}
 
 			@Override
@@ -746,7 +742,7 @@ public abstract class ViewportWidget extends Table {
 		return vec;
 	}
 
-	public Vector3 getTouchToLocal (float x, float y) {
+	public Vector3 getTouchToWorld (float x, float y) {
 		Vector3 vec = new Vector3(x, y, 0);
 
 		getViewportBounds(Rectangle.tmp);
@@ -773,7 +769,7 @@ public abstract class ViewportWidget extends Table {
 
 	public void requestSelectionClear () {
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	protected void clearSelection () {
@@ -805,14 +801,14 @@ public abstract class ViewportWidget extends Table {
 
 	public void removeFromSelection (GameObject gameObject) {
 		selection.removeValue(gameObject, true);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	public void addToSelection (GameObject gameObject) {
 		if (!selection.contains(gameObject, true)) {
 			selection.add(gameObject);
 		}
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	protected void setSelection (Array<GameObject> gameObjects) {
@@ -851,7 +847,7 @@ public abstract class ViewportWidget extends Table {
 			return;
 
 		selectGameObject(gameObject);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	private void selectGameObject (GameObject gameObject) {

@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -28,9 +27,17 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         public float offsetX = 0;
         public float offsetY = 0;
 
+        public float transformOffsetX = 0;
+        public float transformOffsetY = 0;
+
         public void setOffset (float storedX, float storedY) {
             this.offsetX = storedX;
             this.offsetY = storedY;
+        }
+
+        public void setStoredTransformOffset (Vector2 position) {
+            this.transformOffsetX = position.x;
+            this.transformOffsetY = position.y;
         }
     }
 

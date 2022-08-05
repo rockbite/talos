@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -33,6 +31,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
@@ -49,7 +48,6 @@ import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -325,12 +323,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
 				if (mapEditorState.isEditing()) {
-					if (mapEditorState.painting) {
+					if (mapEditorState.isPainting()) {
 						//Place a tile and return
 						paintTileAt(x, y);
 						painting = true;
 						return true;
-					} else if (mapEditorState.erasing) {
+					} else if (mapEditorState.isErasing()) {
 						TalosLayer layerSelected = mapEditorState.getLayerSelected();
 						if (layerSelected != null) {
 							if (layerSelected.getType() == LayerType.STATIC) {
@@ -379,7 +377,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				super.touchDragged(event, x, y, pointer);
 
 				if (mapEditorState.isEditing()) {
-					if (mapEditorState.painting) {
+					if (mapEditorState.isPainting()) {
 
 						//Check to see if we are in static tile first
 
@@ -391,7 +389,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						}
 						return;
 
-					} else if (mapEditorState.erasing) {
+					} else if (mapEditorState.isPainting()) {
 						if (mapEditorState.getLayerSelected() != null) {
 							if (mapEditorState.getLayerSelected().getType() == LayerType.STATIC) {
 								//Place a tile and return
@@ -449,16 +447,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (selectionRect.isVisible()) {
 					upWillClear = false;
 					selectGizmosByRect(rectangle);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				} else if (upWillClear) {
 					FocusManager.resetFocus(getStage());
 					clearSelection();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				} else {
 					if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 						// deselect all others, if they are selected
 						if (deselectOthers(selectedGameObject)) {
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 						}
 					}
 				}
@@ -476,7 +474,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					deleteList.addAll(selection);
 					clearSelection();
 					deleteGameObjects(deleteList);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.C && ctrlPressed()) {
@@ -489,7 +487,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (keycode == Input.Keys.A && ctrlPressed()) {
 					selectAll();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -508,7 +506,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	private void eraseTileAt (float x, float y) {
-		if (mapEditorState.erasing) {
+		if (mapEditorState.isErasing()) {
 			int mouseCellX = gridDrawer.getMouseCellX();
 			int mouseCellY = gridDrawer.getMouseCellY();
 			//Targets
@@ -531,7 +529,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private void paintTileAt (float x, float y) {
 		Vector2 worldFromLocal = getWorldFromLocal(x, y);
 
-		if (mapEditorState.painting) {
+		if (mapEditorState.isPainting()) {
 			int mouseCellX = gridDrawer.getMouseCellX();
 			int mouseCellY = gridDrawer.getMouseCellY();
 			//Targets
@@ -541,43 +539,58 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				GameAsset<TilePaletteData> gameResource = layerSelected.getGameResource();
 				TilePaletteData palette = gameResource.getResource();
 
+
+				//Need to redo this to support tile selection. For now we can check speficailyl what we are painting
+				LayerType type = layerSelected.getType();
+
+				GameObject gameObjectWeArePainting = mapEditorState.getGameObjectWeArePainting();
+				if (gameObjectWeArePainting != null) {
+					if (type == LayerType.DYNAMIC_ENTITY) {
+						GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
+						Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+						TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+						tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
+						layerSelected.getRootEntities().add(gameObject);
+					} else {
+						System.out.println("Can't paint entity into static layer");
+					}
+				}
+
 				Array<GameAsset<?>> selectedGameAssets = palette.selectedGameAssets;
 
-				if (selectedGameAssets.size > 1) {
-					System.out.println("Multi stamp not supported yet");
-				} else if (selectedGameAssets.size == 1) {
-					GameAsset<?> gameAssetToPaint = selectedGameAssets.first();
-
-					//Paint it into the layer
-					LayerType type = layerSelected.getType();
-					if (type == LayerType.STATIC) {
-						if (gameAssetToPaint.type != GameAssetType.SPRITE) {
-							System.out.println("Trying to paint a non sprite into a static layer");
-							return;
-						}
-
-						StaticTile staticTile = new StaticTile(gameAssetToPaint, new GridPosition(mouseCellX, mouseCellY));
-						layerSelected.setStaticTile(staticTile);
-
-					} else {
-						//Always do it like entities
-
-						AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-						GameObject tempParent = new GameObject();
-						boolean success = AssetImporter.createAssetInstance(gameAssetToPaint, tempParent);
-						if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
-							success = false;
-						}
-						AssetImporter.fromDirectoryView = false;
-
-						if (success) {
-							//We can add this to layer entities
-							layerSelected.getRootEntities().add(tempParent.getGameObjects().first());
-						}
-
-					}
-
-				}
+//				if (selectedGameAssets.size > 1) {
+//					System.out.println("Multi stamp not supported yet");
+//				} else if (selectedGameAssets.size == 1) {
+//					GameAsset<?> gameAssetToPaint = selectedGameAssets.first();
+//
+//					//Paint it into the layer
+//					if (type == LayerType.STATIC) {
+//						if (gameAssetToPaint.type != GameAssetType.SPRITE) {
+//							System.out.println("Trying to paint a non sprite into a static layer");
+//							return;
+//						}
+//
+//						StaticTile staticTile = new StaticTile(gameAssetToPaint, new GridPosition(mouseCellX, mouseCellY));
+//						layerSelected.setStaticTile(staticTile);
+//
+//					} else {
+//						//Always do it like entities
+//
+//						AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+//						GameObject tempParent = new GameObject();
+//						boolean success = AssetImporter.createAssetInstance(gameAssetToPaint, tempParent);
+//						if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
+//							success = false;
+//						}
+//						AssetImporter.fromDirectoryView = false;
+//
+//						if (success) {
+//							//We can add this to layer entities
+//							layerSelected.getRootEntities().add(tempParent.getGameObjects().first());
+//						}
+//
+//					}
+//				}
 			}
 
 		}
@@ -681,7 +694,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 		} catch (Exception e) {
 
 		}
@@ -744,6 +757,53 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		super.act(delta);
 
+		if (mapEditorState.isEditing()) {
+			boolean painting = mapEditorState.isPainting();
+			if (painting) {
+				if (mapEditorState.getLayerSelected() != null) {
+
+					GameObject gameObjectWeArePainting = mapEditorState.getGameObjectWeArePainting();
+
+					if (gameObjectWeArePainting != null) {
+
+						//We need to place this at the cursor position, snap with shift
+						Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
+
+						TransformComponent transformComponent = gameObjectWeArePainting.getComponent(TransformComponent.class);
+
+						if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+
+							float gridSizeX = 1;
+							float gridSizeY = 1;
+							if (mapEditorState.getLayerSelected() != null) {
+								gridSizeX = mapEditorState.getLayerSelected().getTileSizeX();
+								gridSizeY = mapEditorState.getLayerSelected().getTileSizeY();
+							}
+
+							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+
+							float transformOffsetModX = transformSettings.transformOffsetX % gridSizeX;
+							float transformOffsetModY = transformSettings.transformOffsetY % gridSizeY;
+
+							touchToLocal.x /= gridSizeX;
+							touchToLocal.x = MathUtils.floor(touchToLocal.x);
+							touchToLocal.x *= gridSizeX;
+
+							touchToLocal.y /= gridSizeY;
+							touchToLocal.y = MathUtils.floor(touchToLocal.y);
+							touchToLocal.y *= gridSizeY;
+
+							transformComponent.position.set(touchToLocal.x + transformOffsetModX, touchToLocal.y + transformOffsetModY);
+
+						} else {
+							transformComponent.position.set(touchToLocal.x, touchToLocal.y);
+						}
+					}
+				}
+
+			}
+		}
+
 		if (reloadScheduled > 0) {
 			reloadScheduled -= delta;
 			if (reloadScheduled <= 0) {
@@ -762,8 +822,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (mapEditorState.isEditing()) {
 			gridDrawer.highlightCursorHover = true;
 			gridDrawer.drawGrid();
+			renderer.setRenderParentTiles(true);
 		} else {
 			drawGrid(batch, parentAlpha);
+			renderer.setRenderParentTiles(false);
 		}
 
 		batch.begin();
@@ -883,6 +945,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
+		if (mapEditorState.isEditing()) return;
 		if (propertyHolder == null)
 			return;
 
@@ -970,6 +1033,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
 		mapEditorState.update(event);
+
+		if (event.getContext() != this) return; //If this didn't come from scene editor ignore it
+
 		Array<GameObject> gameObjects = event.get();
 
 		selectGizmos(gameObjects);
@@ -1224,6 +1290,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public void hideMapEditToolbar () {
 		mapEditorToolbar.addAction(Actions.sequence(Actions.fadeOut(0.3f), Actions.removeActor()));
+		unlockGizmos();
 	}
 
 	public SavableContainer getCurrentContainer () {
