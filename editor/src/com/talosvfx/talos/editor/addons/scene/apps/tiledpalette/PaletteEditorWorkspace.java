@@ -504,15 +504,17 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
             // draw the fake height lines
-            for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
-                GameObject gameObject = gameObjects.get(selectedGameAsset);
-                if (gameObject != null) {
-                    TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-                    shapeRenderer.line(
-                            transformComponent.position.x - 0.5f, tmpHeightOffset,
-                            transformComponent.position.x + 0.5f, tmpHeightOffset
-                    );
-                }
+            if (selectedGameObject == null) {
+                final TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
+                final TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
+                final GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+
+                float xPos = bottomLeftParentTile.x + transformComponent.position.x;
+
+                shapeRenderer.line(
+                        xPos - 0.5f, tmpHeightOffset,
+                        xPos + 0.5f, tmpHeightOffset
+                );
             }
         }
 
@@ -528,13 +530,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     private void renderParentTiles (GameObject gameObject) {
         // get tile data component if exists otherwise create
-        TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-
-        // TODO: figure out why null
-        if (tileDataComponent == null) {
-            tileDataComponent = new TileDataComponent();
-            gameObject.addComponent(tileDataComponent);
-        }
+        final TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 
         // get grid size
         float gridSizeX = 1;
