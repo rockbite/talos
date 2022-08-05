@@ -732,7 +732,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     public void startEditMode () {
         TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
         TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
-        tmpHeightOffset = transformComponent.position.y + tileDataComponent.getFakeZ();
+        tmpHeightOffset = tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y + tileDataComponent.getFakeZ();
 
         lockGizmos();
     }
@@ -756,6 +756,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         customBatch.setUsingCustomColourEncoding(true);
         customBatch.setProjectionMatrix(camera.combined);
 
+        customBatch.disableBlending();
         customBatch.begin();
 
         ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
