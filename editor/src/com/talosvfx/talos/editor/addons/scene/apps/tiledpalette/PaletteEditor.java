@@ -460,7 +460,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
                 GameObject gameObject =  paletteEditorWorkspace.getGameObjectSelected();
                 TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
                 TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-                tileDataComponent.setFakeZ(tmpHeightOffset - transformComponent.position.y);
+                tileDataComponent.setFakeZ(tmpHeightOffset - (tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y));
 
                 AssetRepository.getInstance().saveGameAssetResourceJsonToFile(object);
 
