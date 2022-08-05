@@ -306,25 +306,26 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 float tmpDist;
                 overLine = false;
 
-                Array<GameAsset<?>> selectedGameAssets = paletteData.getResource().selectedGameAssets;
-                ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
-
                 // check if hovering over line
-                for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
-                    GameObject gameObject = gameObjects.get(selectedGameAsset);
-                    if (gameObject != null) {
-                        Vector3 localPoint = new Vector3(x, y, 0);
-                        getWorldFromLocal(localPoint);
+                if (selectedGameObject != null) {
+                    final Vector3 localPoint = new Vector3(x, y, 0);
+                    getWorldFromLocal(localPoint);
 
-                        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-                        x1 = transformComponent.position.x - 0.5f;
-                        y1 = tmpHeightOffset;
-                        x2 = transformComponent.position.x + 0.5f;
-                        y2 = tmpHeightOffset;
-                        tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, localPoint.x, localPoint.y);
-                        if (tmpDist <= dist) {
-                            overLine = true;
-                        }
+                    // get x position
+                    final TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
+                    final TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
+                    final GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+                    float xPos = bottomLeftParentTile.x + transformComponent.position.x;
+
+                    x1 = xPos - 0.5f;
+                    y1 = tmpHeightOffset;
+                    x2 = xPos + 0.5f;
+                    y2 = tmpHeightOffset;
+
+                    tmpDist = Intersector.distanceLinePoint(x1, y1, x2, y2, localPoint.x, localPoint.y);
+
+                    if (tmpDist <= dist) {
+                        overLine = true;
                     }
                 }
 
@@ -355,9 +356,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging
-                        && paletteEditor.isParentTileAndFakeHeightEditMode()
-                        && !overLine) {
+                if (isDragging && paletteEditor.isParentTileAndFakeHeightEditMode() && !overLine) {
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -504,15 +503,17 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
             // draw the fake height lines
-            for (GameAsset<?> selectedGameAsset : selectedGameAssets) {
-                GameObject gameObject = gameObjects.get(selectedGameAsset);
-                if (gameObject != null) {
-                    TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-                    shapeRenderer.line(
-                            transformComponent.position.x - 0.5f, tmpHeightOffset,
-                            transformComponent.position.x + 0.5f, tmpHeightOffset
-                    );
-                }
+            if (selectedGameObject != null) {
+                final TransformComponent transformComponent = selectedGameObject.getComponent(TransformComponent.class);
+                final TileDataComponent tileDataComponent = selectedGameObject.getComponent(TileDataComponent.class);
+                final GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
+
+                float xPos = bottomLeftParentTile.x + transformComponent.position.x;
+
+                shapeRenderer.line(
+                        xPos - 0.5f, tmpHeightOffset,
+                        xPos + 0.5f, tmpHeightOffset
+                );
             }
         }
 
@@ -528,13 +529,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     private void renderParentTiles (GameObject gameObject) {
         // get tile data component if exists otherwise create
-        TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-
-        // TODO: figure out why null
-        if (tileDataComponent == null) {
-            tileDataComponent = new TileDataComponent();
-            gameObject.addComponent(tileDataComponent);
-        }
+        final TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 
         // get grid size
         float gridSizeX = 1;
