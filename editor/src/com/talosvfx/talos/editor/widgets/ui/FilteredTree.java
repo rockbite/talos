@@ -155,6 +155,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
                 Node<T> node = getNodeAt(y);
                 if (itemListeners.size > 0) {
                     if (button == 1) {
@@ -215,6 +216,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
                 for (ItemListener<T> itemListener : itemListeners) {
                     itemListener.chosen(node);
+                    selection.add(node);
                 }
                 if (!selection.isEmpty())
                     rangeStart = node;
