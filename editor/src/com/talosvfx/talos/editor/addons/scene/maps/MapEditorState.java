@@ -49,6 +49,7 @@ public class MapEditorState implements Notifications.Observer {
 
 	public void setErasing (boolean erasing) {
 		this.erasing = erasing;
+		hideDrawingObject();
 	}
 
 	public void update (GameObjectSelectionChanged event) {
