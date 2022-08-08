@@ -513,10 +513,10 @@ public abstract class ViewportWidget extends Table {
 		getEntityUnderMouse();
 
 //		Debug entity secltion
-		if (entityUnderMouse != null) {
-			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
-			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
-		}
+//		if (entityUnderMouse != null) {
+//			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
+//			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
+//		}
 
 		super.draw(batch, parentAlpha);
 	}
@@ -530,8 +530,6 @@ public abstract class ViewportWidget extends Table {
 
 		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
 
-		System.out.println("----");
-		System.out.println("Searching  " + color + " " + getClass().getSimpleName());
 
 		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
 		if (root != null) {
@@ -540,14 +538,10 @@ public abstract class ViewportWidget extends Table {
 			entityUnderMouse = null;
 		}
 
-		System.out.println("---");
-
-
 	}
 	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
-		System.out.println("Testing " + colourForEntityUUID);
 
 		if (rgbCompare(color, (colourForEntityUUID))) {
 			return object;
@@ -563,8 +557,6 @@ public abstract class ViewportWidget extends Table {
 		}
 
 		if (object.hasComponent(MapComponent.class)) {
-
-			System.out.println("MAP");
 			MapComponent mapComponent = object.getComponent(MapComponent.class);
 			for (int i = 0; i < mapComponent.getLayers().size; i++) {
 				TalosLayer talosLayer = mapComponent.getLayers().get(i);
@@ -582,8 +574,6 @@ public abstract class ViewportWidget extends Table {
 					}
 				}
 			}
-
-			System.out.println("END MAP");
 		}
 
 		return null;
