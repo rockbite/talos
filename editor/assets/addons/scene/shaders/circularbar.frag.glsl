@@ -41,9 +41,9 @@
          float ratio = step(alphaVal, pixelAngle); // if ratio is 1 it's background if 0 we fill with green
 
          vec3 tempFill = fillColor.rgb;
-         tempFill *= (1.0 / alphaCount);
+         tempFill *= (1.0 / float(alphaCount));
          vec3 tempBg = bgColor.rgb;
-         tempBg *= (1.0 / alphaCount);
+         tempBg *= (1.0 / float(alphaCount));
 
          vec3 fill = mix(tempFill, tempBg, ratio);
 
