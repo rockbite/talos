@@ -20,7 +20,7 @@ public class TilePaletteData implements Json.Serializable{
 
     //Working not for serializing
     public transient ObjectMap<GameAsset<?>, StaticTile> staticTiles;
-    public transient ObjectMap<GameAsset<?>, GameObject> gameObjects;
+    public transient OrderedMap<GameAsset<?>, GameObject> gameObjects;
     public transient GameObject rootDummy;
     public transient Array<GameAsset<?>> selectedGameAssets;
 
@@ -46,6 +46,7 @@ public class TilePaletteData implements Json.Serializable{
 
         if (success) {
             GameObject first = tempParent.getGameObjects().first();
+            first.parent = null;
             if (!first.hasComponent(TilePaletteData.class)) {
                 first.addComponent(new TileDataComponent());
             }
@@ -72,7 +73,7 @@ public class TilePaletteData implements Json.Serializable{
         positions = new ObjectMap<>();
 
         staticTiles = new ObjectMap<>();
-        gameObjects = new ObjectMap<>();
+        gameObjects = new OrderedMap<>();
         selectedGameAssets = new Array<>();
     }
 

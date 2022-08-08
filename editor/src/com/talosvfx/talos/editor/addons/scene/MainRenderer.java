@@ -87,37 +87,22 @@ public class MainRenderer implements Notifications.Observer {
             @Override
             public int compare (GameObject o1, GameObject o2) {
 
-                RendererComponent o1c = o1.getComponentSlow(RendererComponent.class);
-                RendererComponent o2c = o2.getComponentSlow(RendererComponent.class);
+                float aSort = MainRenderer.getDrawOrderSafe(o1);
+                float bSort = MainRenderer.getDrawOrderSafe(o2);
 
-                if (o1c == null) return -1;
-                if (o2c == null) return 1;
-
-                int o1l = layerOrderLookup.get(o1c.sortingLayer);
-                int o2l = layerOrderLookup.get(o2c.sortingLayer);
-                int o1i = o1c.orderingInLayer;
-                int o2i = o2c.orderingInLayer;
-
-                if(o1l < o2l) {
-                    return -1;
-                }
-                if(o1l > o2l) {
-                    return 1;
-                }
-                if(o1l == o2l) {
-                    if(o1i < o2i) {
-                        return -1;
-                    }
-                    if(o1i > o2i) {
-                        return 1;
-                    }
-                }
-
-                return 0;
+                return Float.compare(aSort, bSort);
             }
         };
 
         activeSorter = layerAndDrawOrderComparator;
+    }
+
+    public static float getDrawOrderSafe (GameObject gameObject) {
+        if (gameObject.hasComponentType(RendererComponent.class)) {
+            RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+            return rendererComponent.orderingInLayer;
+        }
+        return -55;
     }
 
     public void setActiveSorter (Comparator<GameObject> customSorter) {

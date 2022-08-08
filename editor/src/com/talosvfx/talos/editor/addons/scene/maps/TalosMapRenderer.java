@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 import java.util.Comparator;
@@ -27,18 +28,37 @@ public class TalosMapRenderer {
 	private interface RenderFunction {
 		void render (MainRenderer mainRenderer, Batch batch, GameObject entityThatHasTheMap, MapComponent map);
 	}
+
 	private ObjectMap<MapType, RenderFunction> renderModes = new ObjectMap<>();
+
 
 	private Comparator<GameObject> orthoTopDownSorter = new Comparator<GameObject>() {
 		@Override
-		public int compare (GameObject o1, GameObject o2) {
+		public int compare (GameObject a, GameObject b) {
 
-			TransformComponent o1c = o1.getComponent(TransformComponent.class);
-			TransformComponent o2c = o2.getComponent(TransformComponent.class);
+			//do z sorting on elements at the top level
+			if (a.parent == null && b.parent == null) {
+				TransformComponent ATransform = a.getComponent(TransformComponent.class);
+				TransformComponent BTransform = b.getComponent(TransformComponent.class);
 
-			//Y only
+				float AworldPosY = ATransform.worldPosition.y;
+				float BworldPosY = BTransform.worldPosition.y;
 
-			return -Float.compare(o1c.position.y, o2c.position.y);
+				if (a.hasComponent(TileDataComponent.class)) {
+					AworldPosY += (a.getComponent(TileDataComponent.class).getFakeZ());
+				}
+				if (b.hasComponent(TileDataComponent.class)) {
+					BworldPosY += (b.getComponent(TileDataComponent.class).getFakeZ());
+				}
+
+				return -Float.compare(AworldPosY, BworldPosY);
+			} else {
+				float aSort = MainRenderer.getDrawOrderSafe(a);
+				float bSort = MainRenderer.getDrawOrderSafe(b);
+
+				return Float.compare(aSort, bSort);
+			}
+
 		}
 	};
 
@@ -68,8 +88,8 @@ public class TalosMapRenderer {
 				float viewportWidth = camera.viewportWidth * zoom;
 				float viewportHeight = camera.viewportHeight * zoom;
 
-				float startX = position.x - viewportWidth/2;
-				float startY = position.y + viewportHeight/2;
+				float startX = position.x - viewportWidth / 2;
+				float startY = position.y + viewportHeight / 2;
 
 				//Top down left to right
 
@@ -126,7 +146,6 @@ public class TalosMapRenderer {
 				}
 				temp.addAll(rootEntities);
 
-
 				mainRenderer.render(batch, state, temp);
 
 				mainRenderer.setActiveSorter(mainRenderer.layerAndDrawOrderComparator);
@@ -144,6 +163,5 @@ public class TalosMapRenderer {
 		MapType mapType = map.getMapType();
 		renderModes.get(mapType).render(mainRenderer, batch, entityThatHasTheMap, map);
 	}
-
 
 }

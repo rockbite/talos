@@ -23,7 +23,6 @@ import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -33,10 +32,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComp
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
@@ -1166,7 +1163,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		list = currentContainer.getSelfObject().getChildrenByComponent(RendererComponent.class, list);
 
 		for (GameObject gameObject : list) {
-			RendererComponent component = gameObject.getComponentSlow(RendererComponent.class);
+			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
 			String sortingLayer = component.getSortingLayer();
 			if (!layerList.contains(sortingLayer, false)) {
 				component.setSortingLayer("Default");

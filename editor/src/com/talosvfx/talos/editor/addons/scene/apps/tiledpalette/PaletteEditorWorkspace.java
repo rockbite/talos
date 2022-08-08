@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -54,6 +55,50 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     private GameObject selectedGameObject = null;
 
     private InputListener currentGizmoListener;
+
+    private Comparator<GameObject> orthoTopDownSorter = new Comparator<GameObject>() {
+        @Override
+        public int compare (GameObject a, GameObject b) {
+
+            GameObject rootDummy = paletteData.getResource().rootDummy;
+
+
+            //do z sorting on elements at the top level
+            if ((a.parent == null && b.parent == null) || (a.parent == rootDummy && b.parent == rootDummy)) {
+                TransformComponent ATransform = a.getComponent(TransformComponent.class);
+                TransformComponent BTransform = b.getComponent(TransformComponent.class);
+
+                float AworldPosY = ATransform.worldPosition.y;
+                float BworldPosY = BTransform.worldPosition.y;
+
+                if (a.hasComponent(TileDataComponent.class)) {
+                    AworldPosY += (a.getComponent(TileDataComponent.class).getFakeZ());
+                }
+                if (b.hasComponent(TileDataComponent.class)) {
+                    BworldPosY += (b.getComponent(TileDataComponent.class).getFakeZ());
+                }
+
+                return -Float.compare(AworldPosY, BworldPosY);
+            } else {
+                float aSort = MainRenderer.getDrawOrderSafe(a);
+                float bSort = MainRenderer.getDrawOrderSafe(b);
+
+                return Float.compare(aSort, bSort);
+            }
+
+        }
+    };
+    private Comparator<GameAsset<?>> gameObjectRenderOrderComparator = new Comparator<GameAsset<?>>() {
+        @Override
+        public int compare (GameAsset<?> o1, GameAsset<?> o2) {
+            OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+            GameObject a = gameObjects.get(o1);
+            GameObject b = gameObjects.get(o2);
+
+            return orthoTopDownSorter.compare(a, b);
+        }
+    };
 
     private static final Color parentTilesColor = Color.valueOf("#4A6DE5");
 
@@ -418,7 +463,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         ObjectMap<UUID, float[]> positions = paletteData.getResource().positions;
         ObjectMap<GameAsset<?>, StaticTile> staticTiles = paletteData.getResource().staticTiles;
-        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+
+
+        //Sort the game objects
+        gameObjects.orderedKeys().sort(gameObjectRenderOrderComparator);
+
 
         shapeRenderer.setProjectionMatrix(camera.combined);
 
@@ -448,34 +498,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
         }
-        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
 
-            //Calculate the position from parent tile bottom left + transform
-
-            GameObject gameObject = entry.value;
-
-            TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            Vector2 position = component.position;
-
-            float storedX = position.x;
-            float storedY = position.y;
-
-
-            TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-            GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
-
-            gameObject.getTransformSettings().setOffset(bottomLeftParentTile.x, bottomLeftParentTile.y);
-
-
-            position.set(storedX + bottomLeftParentTile.x, storedY + bottomLeftParentTile.y);
-
-            //Set the transform to the temporary position which is bottom left parent tile + transform
-
-            mainRenderer.update(gameObject);
-            mainRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
-
-            position.set(storedX, storedY);
-        }
+        drawAllGameObjects(batch, gameObjects);
 
         batch.end();
 
@@ -760,14 +784,19 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         customBatch.disableBlending();
         customBatch.begin();
 
-        ObjectMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
+        OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
 
+        drawAllGameObjects(customBatch, gameObjects);
 
-        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
+        customBatch.end();
+    }
+
+    private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {
+        Array<GameAsset<?>> gameAssets = gameObjects.orderedKeys();
+        for (GameAsset<?> gameAsset : gameAssets) {
+            GameObject gameObject = gameObjects.get(gameAsset);
 
             //Calculate the position from parent tile bottom left + transform
-
-            GameObject gameObject = entry.value;
 
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
             Vector2 position = component.position;
@@ -787,12 +816,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             //Set the transform to the temporary position which is bottom left parent tile + transform
 
             mainRenderer.update(gameObject);
-            mainRenderer.render(customBatch, new MainRenderer.RenderState(), gameObject);
+            mainRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
 
             position.set(storedX, storedY);
         }
-
-        customBatch.end();
     }
 
     @Override

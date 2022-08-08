@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
@@ -316,7 +315,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return list;
     }
 
-    public <T extends AComponent> T getComponentSlow (Class<? extends T> clazz) {
+    public <T extends AComponent> T getComponentAssignableFrom (Class<? extends T> clazz) {
         for(Class clazzToCheck: componentClasses.keys()) {
             if(clazz.isAssignableFrom(clazzToCheck)) {
                 return (T) componentClasses.get(clazzToCheck);
