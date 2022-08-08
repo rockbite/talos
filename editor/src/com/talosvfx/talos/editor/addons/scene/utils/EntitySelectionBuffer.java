@@ -31,7 +31,7 @@ public class EntitySelectionBuffer {
 	public void begin (Camera camera) {
 		frameBuffer.begin();
 		Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
-		Gdx.gl.glClearColor(0, 0, 0, 1f);
+		Gdx.gl.glClearColor(0f, 0, 0, 0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -59,6 +59,7 @@ public class EntitySelectionBuffer {
 		int hash = uuid.hashCode();
 
 		Color color = new Color(hash);
+		color.a = 1.0f;
 		return color;
 	}
 
@@ -82,6 +83,6 @@ public class EntitySelectionBuffer {
 		if (g < 0) g += 256;
 		if (b < 0) b += 256;
 		if (a < 0) a += 256;
-		return new Color(r/256f, g/256f, b/256f, a/256f);
+		return new Color(r/255f, g/255f, b/255f, a/255f);
 	}
 }

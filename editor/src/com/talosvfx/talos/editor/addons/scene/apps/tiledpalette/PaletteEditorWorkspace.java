@@ -98,6 +98,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         gridDrawer = new GridDrawer(this, camera, gridProperties);
         gridDrawer.highlightCursorHover = true;
+        gridDrawer.drawAxis = false;
 
         selectionRect = new Image(TalosMain.Instance().getSkin().getDrawable("orange_row"));
         selectionRect.setSize(0, 0);

@@ -14,5 +14,5 @@
      vec4 color = texture2D(u_texture, v_texCoords);
      float alpha = color.a * v_color.a;
 
-     gl_FragColor = vec4(vec3(v_color), step(0.05, alpha));
+     gl_FragColor = vec4(vec3(v_color), alpha);
  }

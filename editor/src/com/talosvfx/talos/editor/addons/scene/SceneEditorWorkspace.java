@@ -1303,6 +1303,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	protected void drawEntitiesForSelection () {
 		super.drawEntitiesForSelection();
 
+		renderer.setRenderParentTiles(false);
+
 		PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
 		customBatch.setUsingCustomColourEncoding(true);
 		customBatch.setProjectionMatrix(camera.combined);

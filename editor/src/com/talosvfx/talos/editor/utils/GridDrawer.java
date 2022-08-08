@@ -18,6 +18,7 @@ public class GridDrawer {
 	private final SceneEditorWorkspace.GridProperties gridProperties;
 	private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
+	public boolean drawAxis = true;
 	public boolean highlightCursorHover = false;
 	public boolean highlightCursorSelect = false;
 
@@ -141,10 +142,12 @@ public class GridDrawer {
 			}
 		}
 
-		shapeRenderer.setColor(Color.GREEN);
-		shapeRenderer.line(camera.position.x - totalWidth/2, 0, camera.position.x + totalWidth, 0);
-		shapeRenderer.setColor(Color.RED);
-		shapeRenderer.line(0, camera.position.y - totalHeight, 0, camera.position.y + totalHeight);
+		if (drawAxis) {
+			shapeRenderer.setColor(Color.GREEN);
+			shapeRenderer.line(camera.position.x - totalWidth / 2, 0, camera.position.x + totalWidth, 0);
+			shapeRenderer.setColor(Color.RED);
+			shapeRenderer.line(0, camera.position.y - totalHeight, 0, camera.position.y + totalHeight);
+		}
 
 		shapeRenderer.setColor(color);
 
