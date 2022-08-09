@@ -18,6 +18,9 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     public String sortingLayer = "Default";
     public int orderingInLayer;
 
+    public boolean visible = true;
+    public boolean childrenVisible = true;
+
     public String getSortingLayer () {
         return sortingLayer;
     }
@@ -30,6 +33,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
+        PropertyWidget visibleWidget = WidgetFactory.generate(this, "visible", "Visible");
+        PropertyWidget childrenVisibleWidget = WidgetFactory.generate(this, "childrenVisible", "Children Visible");
         PropertyWidget orderingInLayerWidget = WidgetFactory.generate(this, "orderingInLayer", "Ordering");
 
         SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer", new Supplier<String>() {
@@ -49,6 +54,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
             }
         });
 
+        properties.add(visibleWidget);
+        properties.add(childrenVisibleWidget);
         properties.add(orderingInLayerWidget);
         properties.add(layerWidget);
 
@@ -59,6 +66,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     public void write (Json json) {
         json.writeValue("sortingLayer", sortingLayer);
         json.writeValue("orderingInLayer", orderingInLayer);
+        json.writeValue("visible", visible);
+        json.writeValue("childrenVisible", childrenVisible);
 
     }
 
@@ -66,6 +75,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     public void read (Json json, JsonValue jsonData) {
         sortingLayer = jsonData.getString("sortingLayer", "Default");
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
+        visible = jsonData.getBoolean("visible", true);
+        childrenVisible = jsonData.getBoolean("childrenVisible", true);
     }
 
     public abstract void minMaxBounds (GameObject parentEntity, BoundingBox rectangle);

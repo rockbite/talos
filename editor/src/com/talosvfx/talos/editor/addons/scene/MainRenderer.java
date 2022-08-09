@@ -146,11 +146,18 @@ public class MainRenderer implements Notifications.Observer {
 
     private void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
         for (GameObject root : rootObjects) {
+            boolean childrenVisibleFlag = true;
             if (root.hasComponentType(RendererComponent.class)) {
-                list.add(root);
+                RendererComponent rendererComponent = root.getComponentAssignableFrom(RendererComponent.class);
+                childrenVisibleFlag = rendererComponent.childrenVisible;
+                if (rendererComponent.visible) {
+                    list.add(root);
+                }
             }
-            if (root.getGameObjects() != null) {
-                fillRenderableEntities(root.getGameObjects(), list);
+            if (childrenVisibleFlag) {
+                if (root.getGameObjects() != null) {
+                    fillRenderableEntities(root.getGameObjects(), list);
+                }
             }
         }
 
