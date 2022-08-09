@@ -110,7 +110,7 @@ public class SceneEditorProject implements IProject {
         TalosMain.Instance().ProjectController().saveProject(projectFile);
 
         sceneEditorAddon.workspace.reloadProjectExplorer();
-        sceneEditorAddon.projectExplorer.select(mainScene.path);
+        sceneEditorAddon.projectExplorer.select(projectDir.path());
 
         Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
     }
