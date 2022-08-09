@@ -619,6 +619,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		scene.path = fileHandle.path();
 		scene.loadFromPath();
 		openSavableContainer(scene);
+		TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
 	public void openScene (FileHandle fileHandle) {
@@ -629,6 +630,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		scene.path = fileHandle.path();
 		scene.loadFromPath();
 		openSavableContainer(scene);
+		TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
 	public void convertToPrefab (GameObject gameObject) {
