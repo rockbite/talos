@@ -1141,8 +1141,32 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		parentToMoveTo.addGameObject(childThatHasMoved);
+		projectInParentSpace(parentToMoveTo, childThatHasMoved);
+		//for updating left panel values
+		SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+		sceneEditorAddon.workspace.selectGameObjectExternally(childThatHasMoved);
 
 		TalosMain.Instance().ProjectController().setDirty();
+	}
+
+	private void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved) {
+		if (childThatHasMoved.hasComponent(TransformComponent.class)) {
+			TransformComponent childPositionComponent = childThatHasMoved.getComponent(TransformComponent.class);
+			TransformComponent parentPositionComponent = new TransformComponent();
+			if (parentToMoveTo.hasComponent(TransformComponent.class)) {
+				 parentPositionComponent = parentToMoveTo.getComponent(TransformComponent.class);
+			}
+
+			Vector2 tmp = TransformComponent.vec;
+			tmp.set(childPositionComponent.worldPosition);
+			tmp.sub(parentPositionComponent.worldPosition);
+			childPositionComponent.position.set(tmp);
+			childPositionComponent.rotation -= parentPositionComponent.rotation;
+
+			tmp.set(childPositionComponent.worldScale);
+			tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
+			childPositionComponent.scale.set(tmp);
+		}
 	}
 
 	public Array<String> getLayerList () {
