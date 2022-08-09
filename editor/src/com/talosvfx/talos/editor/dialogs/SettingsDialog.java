@@ -68,6 +68,7 @@ public class SettingsDialog extends VisWindow {
 
         inputTable.add(new Label(name, getSkin())).width(220);
         final TextField inputPathField = new TextField("", getSkin());
+        inputPathField.setDisabled(true);
         inputTable.add(inputPathField).padLeft(13).width(270);
         TextButton browseInputBtn = new TextButton("Browse", getSkin());
         inputTable.add(browseInputBtn).padLeft(3);
