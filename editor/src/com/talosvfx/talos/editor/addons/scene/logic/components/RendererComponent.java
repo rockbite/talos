@@ -18,8 +18,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     public String sortingLayer = "Default";
     public int orderingInLayer;
 
-    public boolean visible;
-    public boolean childrenVisible;
+    public boolean visible = true;
+    public boolean childrenVisible = true;
 
     public String getSortingLayer () {
         return sortingLayer;
