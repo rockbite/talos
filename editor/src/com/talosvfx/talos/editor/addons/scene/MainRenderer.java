@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.esotericsoftware.spine.SkeletonRenderer;
+import com.esotericsoftware.spine.TalosSkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -57,7 +57,7 @@ public class MainRenderer implements Notifications.Observer {
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
-    private SkeletonRenderer spineRenderer;
+    private TalosSkeletonRenderer spineRenderer;
 
     private TalosMapRenderer mapRenderer;
     private ShapeRenderer shapeRenderer;
@@ -66,6 +66,8 @@ public class MainRenderer implements Notifications.Observer {
     private OrthographicCamera camera;
 
     private boolean renderParentTiles = false;
+
+    public boolean skipUpdates = false;
 
     public static class RenderState {
         private Array<GameObject> list = new Array<>();
@@ -79,7 +81,7 @@ public class MainRenderer implements Notifications.Observer {
         Notifications.registerObserver(this);
 
         talosRenderer = new SpriteBatchParticleRenderer();
-        spineRenderer = new SkeletonRenderer();
+        spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
 
@@ -293,8 +295,11 @@ public class MainRenderer implements Notifications.Observer {
 
         spineRendererComponent.skeleton.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
         spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
-        spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
-        spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+
+        if (!skipUpdates) {
+            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+        }
         spineRendererComponent.skeleton.updateWorldTransform();
 
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
@@ -306,7 +311,10 @@ public class MainRenderer implements Notifications.Observer {
 
         ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.gameAsset.getResource());
         instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
-        instance.update(Gdx.graphics.getDeltaTime()); // todo: we so hacky hacky
+
+        if (!skipUpdates) {
+            instance.update(Gdx.graphics.getDeltaTime());
+        }
         talosRenderer.setBatch(batch);
         talosRenderer.render(instance);
     }

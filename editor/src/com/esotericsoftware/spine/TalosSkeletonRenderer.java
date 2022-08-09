@@ -32,6 +32,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
@@ -46,19 +47,14 @@ import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
-import com.talosvfx.talos.editor.addons.bvb.BoundEffect;
-import com.talosvfx.talos.editor.addons.bvb.SkeletonContainer;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
-public class BVBSkeletonRenderer {
+public class TalosSkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
 	private boolean pmaColors, pmaBlendModes;
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
-	private @Null
-	TalosSkeletonRenderer.VertexEffect vertexEffect;
+	private @Null VertexEffect vertexEffect;
 	private final Vector2 temp = new Vector2();
 	private final Vector2 temp2 = new Vector2();
 	private final Color temp3 = new Color();
@@ -66,26 +62,26 @@ public class BVBSkeletonRenderer {
 	private final Color temp5 = new Color();
 	private final Color temp6 = new Color();
 
-	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(SpriteBatchParticleRenderer, PolygonSpriteBatch, SkeletonContainer, Skeleton)} is
-	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(SpriteBatchParticleRenderer, TwoColorPolygonBatch, SkeletonContainer, Skeleton)} is called. Otherwise the
+	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(PolygonSpriteBatch, Skeleton)} is
+	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(TwoColorPolygonBatch, Skeleton)} is called. Otherwise the
 	 * skeleton is rendered without two color tinting and any mesh attachments will throw an exception.
 	 * <p>
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
-	public void draw (SpriteBatchParticleRenderer particleRenderer, Batch batch, SkeletonContainer skeletonContainer, Skeleton skeleton) {
+	public void draw (Batch batch, Skeleton skeleton) {
 		if (batch instanceof TwoColorPolygonBatch) {
-			draw(particleRenderer, (TwoColorPolygonBatch)batch, skeletonContainer, skeleton);
+			draw((TwoColorPolygonBatch)batch, skeleton);
 			return;
 		}
-		if (batch instanceof PolygonSpriteBatch) {
-			draw(particleRenderer, (PolygonSpriteBatch)batch, skeletonContainer, skeleton);
+		if (batch instanceof PolygonBatch) {
+			draw((PolygonBatch)batch, skeleton);
 			return;
 		}
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
-		if (skeletonContainer == null) throw new IllegalArgumentException("skeleton cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -143,9 +139,7 @@ public class BVBSkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) {
-					draw(particleRenderer, batch, skeletonContainer, attachmentSkeleton); //This is messed up
-				}
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			clipper.clipEnd(slot);
@@ -159,14 +153,14 @@ public class BVBSkeletonRenderer {
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
-	public void draw (SpriteBatchParticleRenderer particleRenderer, PolygonSpriteBatch batch, SkeletonContainer skeletonContainer, Skeleton skeleton) {
+	public void draw (PolygonBatch batch, Skeleton skeleton) {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -183,15 +177,6 @@ public class BVBSkeletonRenderer {
 				clipper.clipEnd(slot);
 				continue;
 			}
-
-			BoundEffect boundEffect = skeletonContainer.findEffect(skeleton, slot);
-
-			if (boundEffect != null && boundEffect.isNested() && boundEffect.isBehind()) {
-				for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
-					particleRenderer.render(particleEffectInstance);
-				}
-			}
-
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Attachment attachment = slot.attachment;
@@ -223,7 +208,7 @@ public class BVBSkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) draw(particleRenderer, batch, skeletonContainer, attachmentSkeleton);
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			if (texture != null) {
@@ -283,12 +268,6 @@ public class BVBSkeletonRenderer {
 			}
 
 			clipper.clipEnd(slot);
-
-			if (boundEffect != null && boundEffect.isNested() && !boundEffect.isBehind()) {
-				for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
-					particleRenderer.render(particleEffectInstance);
-				}
-			}
 		}
 		clipper.clipEnd();
 		if (vertexEffect != null) vertexEffect.end();
@@ -299,14 +278,14 @@ public class BVBSkeletonRenderer {
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
-	public void draw (SpriteBatchParticleRenderer particleRenderer, TwoColorPolygonBatch batch, SkeletonContainer skeletonContainer, Skeleton skeleton) {
+	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -355,7 +334,7 @@ public class BVBSkeletonRenderer {
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) draw(particleRenderer, batch, skeletonContainer, attachmentSkeleton);
+				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
 
 			if (texture != null) {
@@ -383,8 +362,8 @@ public class BVBSkeletonRenderer {
 				Color darkColor = slot.getDarkColor();
 				float dark = darkColor == null ? 0
 					: NumberUtils.intToFloatColor((int)(blue * darkColor.b) << 16 //
-					| (int)(green * darkColor.g) << 8 //
-					| (int)(red * darkColor.r));
+						| (int)(green * darkColor.g) << 8 //
+						| (int)(red * darkColor.r));
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
@@ -434,7 +413,7 @@ public class BVBSkeletonRenderer {
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		VertexEffect vertexEffect = this.vertexEffect;
 		tempLight1.set(NumberUtils.floatToIntColor(light));
 		tempDark1.set(NumberUtils.floatToIntColor(dark));
 		if (stride == 5) {
@@ -497,12 +476,11 @@ public class BVBSkeletonRenderer {
 		pmaBlendModes = pmaColorsAndBlendModes;
 	}
 
-	public @Null
-	TalosSkeletonRenderer.VertexEffect getVertexEffect () {
+	public @Null VertexEffect getVertexEffect () {
 		return vertexEffect;
 	}
 
-	public void setVertexEffect (@Null TalosSkeletonRenderer.VertexEffect vertexEffect) {
+	public void setVertexEffect (@Null VertexEffect vertexEffect) {
 		this.vertexEffect = vertexEffect;
 	}
 

@@ -777,6 +777,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     protected void drawEntitiesForSelection () {
         super.drawEntitiesForSelection();
 
+        mainRenderer.skipUpdates = true;
+
         PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
         customBatch.setUsingCustomColourEncoding(true);
         customBatch.setProjectionMatrix(camera.combined);
@@ -789,6 +791,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         drawAllGameObjects(customBatch, gameObjects);
 
         customBatch.end();
+
+        mainRenderer.skipUpdates = false;
+
     }
 
     private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {
