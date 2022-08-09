@@ -20,8 +20,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -50,13 +48,11 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -635,46 +631,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		scene.loadFromPath();
 		openSavableContainer(scene);
 		TalosMain.Instance().UIStage().saveProjectAction();
-	}
-
-	public void saveCurrentScene () {
-//		if(!TalosMain.Instance().ProjectController().isBoundToFile()) {
-//			IProject projectType = TalosMain.Instance().ProjectController().getProject();
-//			String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
-//			fileChooser.setDirectory(defaultLocation);
-//
-//			final String ext = projectType.getExtension();
-//			fileChooser.setMode(FileChooser.Mode.SAVE);
-//			fileChooser.setMultiSelectionEnabled(false);
-//			fileChooser.setFileFilter(new FileFilter() {
-//				@Override
-//				public boolean accept(File pathname) {
-//					return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
-//				}
-//			});
-//			fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-//
-//			fileChooser.setListener(new FileChooserAdapter() {
-//				@Override
-//				public void selected(Array<FileHandle> file) {
-//					String path = file.first().file().getAbsolutePath();
-//					if(!path.endsWith(ext)) {
-//						if(path.indexOf(".") > 0) {
-//							path = path.substring(0, path.indexOf("."));
-//						}
-//						path += ext;
-//					}
-//					FileHandle handle = Gdx.files.absolute(path);
-//					TalosMain.Instance().ProjectController().saveProject(handle);
-//				}
-//			});
-//
-//			fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.getFileName());
-//
-//			stage.addActor(fileChooser.fadeIn());
-//		} else {
-//			TalosMain.Instance().ProjectController().saveProject();
-//		}
 	}
 
 	public void convertToPrefab (GameObject gameObject) {
