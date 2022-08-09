@@ -1299,6 +1299,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@Override
 	protected void drawEntitiesForSelection () {
 		super.drawEntitiesForSelection();
+		renderer.skipUpdates = true;
 
 		renderer.setRenderParentTiles(false);
 
@@ -1311,6 +1312,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		drawMainRenderer(customBatch, 1f);
 
 		customBatch.end();
+		renderer.skipUpdates = false;
 
 	}
 }

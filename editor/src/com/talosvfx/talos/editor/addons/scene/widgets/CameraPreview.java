@@ -106,13 +106,19 @@ public class CameraPreview extends Actor {
     }
 
     private void drawPreview () {
+
+
         SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
         GameObject rootGO = workspace.getRootGO();
         MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
 
+        renderer.skipUpdates = true;
+
         renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
         renderer.update(rootGO);
         renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
+
+        renderer.skipUpdates = false;
     }
 
     public void setViewport (float worldWidth, float worldHeight, float width, float height) {
