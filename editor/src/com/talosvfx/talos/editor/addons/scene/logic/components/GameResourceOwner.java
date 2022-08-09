@@ -14,6 +14,7 @@ public interface GameResourceOwner<U> {
 
 	static <U> void writeGameAsset (Json json, GameResourceOwner<U> owner) {
 		json.writeValue("gameResource", owner.getGameResource().nameIdentifier);
+		json.writeValue("gameResourceExtension", owner.getGameResource().getRootRawAsset().handle.extension());
 	}
 
 	static String readGameResourceFromComponent (JsonValue component) {
