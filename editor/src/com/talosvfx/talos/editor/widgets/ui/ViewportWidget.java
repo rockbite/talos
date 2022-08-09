@@ -139,6 +139,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				Vector2 hitCords = getWorldFromLocal(x, y);
 				if (event.isCancelled()) return false;
 
 				if (canMoveAround) return false;
@@ -147,37 +148,23 @@ public abstract class ViewportWidget extends Table {
 					return true;
 				}
 
-				//todo
-//				if (entityUnderMouse != null) {
-//					//Entity method
-//
-//
-//					return true;
-//				}
-
-				Vector2 hitCords = getWorldFromLocal(x, y);
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
-
-				if (gizmo != null) {
+				if (entityUnderMouse != null && gizmo != null) {
 					touchedGizmo = gizmo;
-
-					GameObject gameObject = touchedGizmo.getGameObject();
-
 					if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !touchedGizmo.catchesShift()) {
 						// toggling
-						if (selection.contains(gameObject, true)) {
-							removeFromSelection(gameObject);
+						if (selection.contains(entityUnderMouse, true)) {
+							removeFromSelection(entityUnderMouse);
 						} else {
-							addToSelection(gameObject);
+							addToSelection(entityUnderMouse);
 						}
 					} else {
-						if (!selection.contains(gameObject, true)) {
-							selectGameObject(gameObject);
+						if (!selection.contains(entityUnderMouse, true)) {
+							selectGameObject(entityUnderMouse);
 						}
 					}
 
 					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
-
 
 					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
 
