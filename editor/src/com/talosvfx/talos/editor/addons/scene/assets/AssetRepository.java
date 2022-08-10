@@ -53,7 +53,9 @@ public class AssetRepository {
 				return (GameAsset<T>)identifierGameAssetMap.get(type).get(identifier);
 			}
 		}
-		return null;
+		GameAsset<T> brokenAsset = new GameAsset<>(identifier, type);
+		brokenAsset.setBroken(new Exception("No asset found"));
+		return brokenAsset;
 	}
 
 	private <T> void putAssetForIdentifier (String identifier, GameAssetType type, GameAsset<T> asset) {

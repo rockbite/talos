@@ -293,9 +293,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Class clazz = ClassReflection.forName(classPath + "." + className);
 				Object instance = ClassReflection.newInstance(clazz);
 				AComponent component = (AComponent)instance;
+				// TOM SAYS TO DO THIS IT"S NOT ME I SWEAR
+				Json json = new Json();
+				String s = json.toJson(component);
+				component = json.fromJson(component.getClass(), s);
 				gameObject.addComponent(component);
 			} catch (Exception e) {
-
+				e.printStackTrace();
 			}
 		}
 	}

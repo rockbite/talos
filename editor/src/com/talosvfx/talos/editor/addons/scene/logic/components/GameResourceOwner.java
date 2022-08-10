@@ -7,18 +7,24 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 
 public interface GameResourceOwner<U> {
 
-	GameAssetType getGameAssetType();
+    GameAssetType getGameAssetType ();
 
-	GameAsset<U> getGameResource ();
-	void setGameAsset (GameAsset<U> gameAsset);
+    GameAsset<U> getGameResource ();
 
-	static <U> void writeGameAsset (Json json, GameResourceOwner<U> owner) {
-		json.writeValue("gameResource", owner.getGameResource().nameIdentifier);
-		json.writeValue("gameResourceExtension", owner.getGameResource().getRootRawAsset().handle.extension());
-	}
+    void setGameAsset (GameAsset<U> gameAsset);
 
-	static String readGameResourceFromComponent (JsonValue component) {
-		return component.getString("gameResource", "broken");
-	}
+    static <U> void writeGameAsset (Json json, GameResourceOwner<U> owner) {
+        GameAsset<U> gameResource = owner.getGameResource();
+        if (gameResource != null) {
+            json.writeValue("gameResource", gameResource.nameIdentifier);
+            if (!gameResource.isBroken()) {
+                json.writeValue("gameResourceExtension", gameResource.getRootRawAsset().handle.extension());
+            }
+        }
+    }
+
+    static String readGameResourceFromComponent (JsonValue component) {
+        return component.getString("gameResource", "broken");
+    }
 
 }
