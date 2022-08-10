@@ -483,4 +483,9 @@ public class SmartTransformGizmo extends Gizmo {
 
         }
     }
+
+    @Override
+    public int getPriority () {
+        return 1;
+    }
 }

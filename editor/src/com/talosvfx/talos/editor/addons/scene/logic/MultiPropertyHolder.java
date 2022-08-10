@@ -2,23 +2,24 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.util.function.Supplier;
 
-public class MultiPropertyHolder implements IPropertyHolder {
+public class MultiPropertyHolder<T extends IPropertyHolder> implements IPropertyHolder {
 
-    Array<IPropertyHolder> holderArray = new Array<>();
+    ObjectSet<T> holderArray = new ObjectSet<>();
     private ObjectMap<Class<? extends IPropertyProvider>, MultiPropertyProvider>  mainMap;
 
-    public MultiPropertyHolder(Array<? extends IPropertyHolder> holderArray) {
+    public MultiPropertyHolder(ObjectSet<T> holderArray) {
         this.holderArray.addAll(holderArray);
 
         generateLists();
     }
 
-    public Array<IPropertyHolder> getHolders() {
+    public ObjectSet<T> getHolders() {
         return holderArray;
     }
 

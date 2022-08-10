@@ -719,7 +719,7 @@ public class DirectoryViewWidget extends Table {
                 }
 
             } else if (selected.size > 1) {
-                Array<AMetadata> list = new Array<AMetadata>();
+                ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
                 for (ItemView item : selected) {
                     if (item.gameAsset != null) {
                         RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();

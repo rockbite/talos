@@ -201,4 +201,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     public void mouseMoved(float x, float y) {
 
     }
+
+    public int getPriority () {
+        return 0;
+    }
 }
