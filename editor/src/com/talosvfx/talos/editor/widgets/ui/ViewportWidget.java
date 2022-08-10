@@ -149,21 +149,22 @@ public abstract class ViewportWidget extends Table {
 				}
 
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
-				if (entityUnderMouse != null && gizmo != null) {
+				if (gizmo != null) {
 					touchedGizmo = gizmo;
-					if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !touchedGizmo.catchesShift()) {
-						// toggling
-						if (selection.contains(entityUnderMouse, true)) {
-							removeFromSelection(entityUnderMouse);
+					if (entityUnderMouse != null && entityUnderMouse == touchedGizmo.getGameObject()) {
+						if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !touchedGizmo.catchesShift()) {
+							// toggling
+							if (selection.contains(entityUnderMouse, true)) {
+								removeFromSelection(entityUnderMouse);
+							} else {
+								addToSelection(entityUnderMouse);
+							}
 						} else {
-							addToSelection(entityUnderMouse);
-						}
-					} else {
-						if (!selection.contains(entityUnderMouse, true)) {
-							selectGameObject(entityUnderMouse);
+							if (!selection.contains(entityUnderMouse, true)) {
+								selectGameObject(entityUnderMouse);
+							}
 						}
 					}
-
 					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
 
 					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
