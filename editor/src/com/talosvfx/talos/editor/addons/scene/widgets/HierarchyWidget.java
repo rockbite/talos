@@ -247,26 +247,12 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         tree.getSelection().clear();
         tree.getSelection().add(nodeMap.get(gameObject));
-        focusKeyboard(gameObject);
     }
 
     private void addToSelection (GameObject gameObject) {
         if(gameObject == null) return;
 
         tree.getSelection().add(nodeMap.get(gameObject));
-        focusKeyboard(gameObject);
-    }
-
-    private void focusKeyboard(GameObject gameObject){
-        Actor actor = nodeMap.get(gameObject).getActor();
-        if(actor instanceof EditableLabel) {
-            EditableLabel editableLabel = (EditableLabel) actor;
-            if(!editableLabel.isEditMode()) {
-                getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
-            }
-        } else {
-            getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
-        }
     }
 
     public void loadEntityContainer(GameObjectContainer entityContainer) {
@@ -293,6 +279,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         for(int i = 0; i < gameObjects.size; i++) {
             final GameObject gameObject = gameObjects.get(i);
             EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
+            editableLabel.setStage(getStage());
             FilteredTree.Node newNode = new FilteredTree.Node(gameObject.getName(), editableLabel);
             newNode.draggable = true;
             node.add(newNode);

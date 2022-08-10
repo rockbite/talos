@@ -524,10 +524,6 @@ public class DirectoryViewWidget extends Table {
             row();
             add().colspan(colCount).expand().grow();
         }
-
-        if(getStage() != null) {
-            getStage().setKeyboardFocus(DirectoryViewWidget.this);
-        }
     }
 
     @Override
