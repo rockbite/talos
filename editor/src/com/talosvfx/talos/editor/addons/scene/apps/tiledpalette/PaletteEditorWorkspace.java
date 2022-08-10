@@ -627,7 +627,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         //Check if its this palettes object
         if (event.getContext() != this) return;
 
-        Array<GameObject> gameObjects = event.get();
+        ObjectSet<GameObject> gameObjects = event.get();
         if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
             selectGizmos(gameObjects);
         }
@@ -682,7 +682,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 selectedGameObject = activeGameObject;
 
                 SceneEditorWorkspace.getInstance().selectPropertyHolder(selectedGameObject);
-                Array<GameObject> gameObjectSelection = new Array<>();
+                ObjectSet<GameObject> gameObjectSelection = new ObjectSet<>();
                 gameObjectSelection.add(activeGameObject);
                 Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, gameObjectSelection));
                 notify(event, false);
@@ -690,7 +690,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 paletteEventPool.free(event);
                 selectedGameObject = null;
 
-                Array<GameObject> gameObjectSelection = new Array<>();
+                ObjectSet<GameObject> gameObjectSelection = new ObjectSet<>();
                 Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, gameObjectSelection));
             }
         } else {
@@ -700,7 +700,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             notify(event, false);
             selectedGameObject = null;
 
-            Array<GameObject> gameObjectSelection = new Array<>();
+            ObjectSet<GameObject> gameObjectSelection = new ObjectSet<>();
             Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, gameObjectSelection));
         }
     }

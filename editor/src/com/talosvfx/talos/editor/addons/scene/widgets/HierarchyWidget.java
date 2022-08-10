@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
@@ -88,7 +89,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
             @Override
             public void delete (Array<FilteredTree.Node<Object>> nodes) {
-                Array<GameObject> gameObjects = new Array<>();
+                ObjectSet<GameObject> gameObjects = new ObjectSet<>();
                 for(FilteredTree.Node node: nodes) {
                     if(objectMap.containsKey(node.getName())) {
                         GameObject gameObject = objectMap.get(node.getName());
@@ -157,7 +158,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                Array<GameObject> gameObjects= new Array<>();
+                ObjectSet<GameObject> gameObjects= new ObjectSet<>();
                 for(Object nodeObject: tree.getSelection()) {
                     FilteredTree.Node node = (FilteredTree.Node) nodeObject;
                     if(objectMap.containsKey(node.getName())) {
@@ -219,7 +220,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     @EventHandler
     public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
         if(currentContainer != null) {
-            Array<GameObject> gameObjects = event.get();
+            ObjectSet<GameObject> gameObjects = event.get();
             Array<FilteredTree.Node> nodes = new Array<>();
             for(GameObject gameObject: gameObjects) {
                 boolean hasNode = nodeMap.containsKey(gameObject);
