@@ -64,10 +64,10 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         list.addItemListener(new FilteredTree.ItemListener<T>() {
             @Override
-            public void chosen (FilteredTree.Node<T> node) {
+            public void selected (FilteredTree.Node<T> node) {
+                super.selected(node);
                 list.getSelection().clear();
                 list.getSelection().add(node);
-
             }
 
             @Override

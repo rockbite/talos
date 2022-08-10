@@ -1039,7 +1039,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
 		mapEditorState.update(event);
 
-		if (event.getContext() != this) return; //If this didn't come from scene editor ignore it
+//		if (event.getContext() != this) return; //If this didn't come from scene editor ignore it
 
 		Array<GameObject> gameObjects = event.get();
 

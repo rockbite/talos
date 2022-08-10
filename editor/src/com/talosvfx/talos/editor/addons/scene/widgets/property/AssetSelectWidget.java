@@ -79,7 +79,7 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
                 assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
 
                     @Override
-                    public void chosen (FilteredTree.Node<GameAsset<T>> node) {
+                    public void selected (FilteredTree.Node<GameAsset<T>> node) {
                         GameAsset<T> gameAsset = node.getObject();
                         if (gameAsset == null || gameAsset.isBroken()) {
                             // facing a directory or bad asset

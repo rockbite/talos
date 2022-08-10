@@ -47,16 +47,20 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         tree.addItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
-            public void chosen (FilteredTree.Node node) {
+            public void selected (FilteredTree.Node<Object> node) {
+                super.selected(node);
                 GameObject gameObject = objectMap.get(node.getName());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                if(SceneEditorWorkspace.ctrlPressed()){
-                    addToSelection(gameObject);
-                    sceneEditorAddon.workspace.addToSelection(gameObject);
-                }else{
-                    select(gameObject);
-                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
-                }
+                focusKeyboard(gameObject);
+                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+            }
+
+            @Override
+            public void addedIntoSelection (FilteredTree.Node<Object> node) {
+                super.addedIntoSelection(node);
+                GameObject gameObject = objectMap.get(node.getName());
+                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+                sceneEditorAddon.workspace.addToSelection(gameObject);
             }
 
             @Override
@@ -76,7 +80,6 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
                 GameObject gameObject = objectMap.get(node.getName());
 
                 if(!tree.getSelection().contains(node)) {
-                    select(gameObject);
                     sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
                 }
 
@@ -219,16 +222,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             Array<GameObject> gameObjects = event.get();
             Array<FilteredTree.Node> nodes = new Array<>();
             for(GameObject gameObject: gameObjects) {
-                boolean hasNode = nodeMap.containsValue(gameObject, true);
+                boolean hasNode = nodeMap.containsKey(gameObject);
                 if (hasNode) {
                     nodes.add(nodeMap.get(gameObject));
                 }
 
             }
-            tree.getSelection().clear();
-            if (nodes.size > 0) {
-                tree.getSelection().addAll(nodes);
-            }
+
+            tree.clearSelection(false);
+            tree.addNodesToSelection(nodes, false);
         }
     }
 
@@ -239,21 +241,6 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         objectMap.put(event.newName, gameObject);
 
         nodeMap.get(gameObject).name = event.newName;
-    }
-
-    private void select (GameObject gameObject) {
-        if(gameObject == null) return;
-
-        tree.getSelection().clear();
-        tree.getSelection().add(nodeMap.get(gameObject));
-        focusKeyboard(gameObject);
-    }
-
-    private void addToSelection (GameObject gameObject) {
-        if(gameObject == null) return;
-
-        tree.getSelection().add(nodeMap.get(gameObject));
-        focusKeyboard(gameObject);
     }
 
     private void focusKeyboard(GameObject gameObject){
