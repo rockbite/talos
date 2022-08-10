@@ -32,6 +32,10 @@ public class AssetListPopup<T> extends VisWindow {
     private FilteredTree.Node<GameAsset<T>> rootNode;
     private FilteredTree.ItemListener<GameAsset<T>> filterTreeListener;
 
+    public void resetSelection () {
+        tree.getSelection().clear();
+    }
+
     public interface ListListener {
         void chosen(XmlReader.Element template, float x, float y);
     }
@@ -63,7 +67,7 @@ public class AssetListPopup<T> extends VisWindow {
         createListeners();
     }
 
-    private void loadTree() {
+    private void loadTree(Predicate<FilteredTree.Node<GameAsset<T>>> predicate) {
         String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
         FileHandle rootHandle = Gdx.files.absolute(rootPath);
         tree.clearChildren();
@@ -73,7 +77,7 @@ public class AssetListPopup<T> extends VisWindow {
         rootNode.setObject(null);
         tree.add(rootNode);
 
-        traversePath(root, 0, 10, rootNode);
+        traversePath(root, 0, 10, rootNode, predicate);
 
         rootNode.setExpanded(true);
     }
@@ -116,7 +120,7 @@ public class AssetListPopup<T> extends VisWindow {
     }
 
     public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<GameAsset<T>>> filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
-        loadTree();
+        loadTree(filter);
 
         setPosition(location.x, location.y - getHeight());
         if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
@@ -130,41 +134,11 @@ public class AssetListPopup<T> extends VisWindow {
 
         if(getHeight() < 200) {
             setHeight(200);
-        }
-
-        if(filter != null) {
-            tree.filterAll(filter);
         }
 
         tree.expandAll();
 
         tree.addItemListener(listener);
-    }
-    public void showPopup(Stage stage, Vector2 location, String filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
-        loadTree();
-
-        setPosition(location.x, location.y - getHeight());
-        if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
-        ActorUtils.keepWithinStage(stage, this);
-        stage.addActor(this);
-
-        searchFilteredTree.reset();
-        getStage().setKeyboardFocus(searchFilteredTree.textField);
-        getStage().setScrollFocus(searchFilteredTree.scrollPane);
-        tree.collapseAll();
-
-        if(getHeight() < 200) {
-            setHeight(200);
-        }
-
-        if(filter != null) {
-            tree.filter("." + filter, true);
-        }
-
-        tree.expandAll();
-
-        this.filterTreeListener = listener;
-        tree.addItemListener(this.filterTreeListener);
     }
 
     @Override
@@ -174,7 +148,7 @@ public class AssetListPopup<T> extends VisWindow {
         return super.remove();
     }
 
-    private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node<GameAsset<T>> node) {
+    private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node<GameAsset<T>> node, Predicate<FilteredTree.Node<GameAsset<T>>> predicate) {
         if(path.isDirectory() && currDepth <= maxDepth) {
             FileHandle[] list = path.list(ProjectExplorerWidget.fileFilter);
             for(int i = 0; i < list.length; i++) {
@@ -185,9 +159,12 @@ public class AssetListPopup<T> extends VisWindow {
                 final FilteredTree.Node<GameAsset<T>> newNode = new FilteredTree.Node<>(listItemHandle.path(), widget);
                 GameAsset<T> assetForPath = (GameAsset<T>)AssetRepository.getInstance().getAssetForPath(listItemHandle, false);
                 newNode.setObject(assetForPath);
-                node.add(newNode);
+                if (predicate.evaluate(newNode)) {
+                    node.add(newNode);
+                }
                 if(listItemHandle.isDirectory()) {
-                    traversePath(list[i], currDepth++, maxDepth, newNode);
+                    node.add(newNode);
+                    traversePath(list[i], currDepth++, maxDepth, newNode, predicate);
                 }
             }
         }
