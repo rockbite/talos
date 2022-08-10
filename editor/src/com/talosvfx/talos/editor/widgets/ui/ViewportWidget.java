@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -51,6 +52,7 @@ import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 
+import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 
@@ -87,7 +89,7 @@ public abstract class ViewportWidget extends Table {
 
 	protected Gizmos gizmos = new Gizmos();
 
-	protected Array<GameObject> selection = new Array<>();
+	protected ObjectSet<GameObject> selection = new ObjectSet<>();
 	protected GameObject entityUnderMouse;
 
 	protected boolean locked;
@@ -107,13 +109,13 @@ public abstract class ViewportWidget extends Table {
 		addGizmoListener();
 	}
 
-	public void selectGizmos (Array<GameObject> gameObjects) {
+	public void selectGizmos (ObjectSet<GameObject> gameObjects) {
 		for (Gizmo gizmo : this.gizmos.gizmoList) {
 			gizmo.setSelected(false);
 		}
 
 		if (gameObjects.size == 1) {
-			Array<Gizmo> gizmos = this.gizmos.gizmoMap.get(gameObjects.get(0));
+			Array<Gizmo> gizmos = this.gizmos.gizmoMap.get(gameObjects.first());
 			if (gizmos != null) {
 				for (Gizmo gizmo : gizmos) {
 					gizmo.setSelected(true);
@@ -135,7 +137,8 @@ public abstract class ViewportWidget extends Table {
 
 	protected InputListener addGizmoListener () {
 		InputListener gizmoListener = new InputListener() {
-			Gizmo touchedGizmo = null;
+
+			Gizmo hitGizmo = null;
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -148,38 +151,72 @@ public abstract class ViewportWidget extends Table {
 					return true;
 				}
 
-				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
-				if (entityUnderMouse != null && gizmo != null) {
-					touchedGizmo = gizmo;
-					if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !touchedGizmo.catchesShift()) {
-						// toggling
-						if (selection.contains(entityUnderMouse, true)) {
-							removeFromSelection(entityUnderMouse);
-						} else {
-							addToSelection(entityUnderMouse);
+
+				boolean hasSelection = selection.size > 0;
+				boolean hasEntityUnderMouse = entityUnderMouse != null;
+
+				if (hasSelection) {
+					//Check if we keep selection
+					if (hasEntityUnderMouse && entityUnderMouse == selection.first()) {
+						//Same shit, but lets update our gizmo
+
+						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
+
+						if (hitGizmo != null) {
+							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 						}
+
+						return true;
 					} else {
-						if (!selection.contains(entityUnderMouse, true)) {
-							selectGameObject(entityUnderMouse);
+						Gizmo testGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
+
+						//We aren't over the pixel for entity, but we hit its gizmo
+						if (testGizmo != null) {
+							hitGizmo = testGizmo;
+
+							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							return true;
+
+						} else {
+							//We aren't over the pixel or the gizmo, unselect
+							requestSelectionClear();
 						}
 					}
-
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
-
-					touchedGizmo.touchDown(hitCords.x, hitCords.y, button);
-
-					for (int i = 0; i < ViewportWidget.this.gizmos.gizmoList.size; i++) {
-						Gizmo item = ViewportWidget.this.gizmos.gizmoList.get(i);
-						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
-							item.touchDown(hitCords.x, hitCords.y, button);
-						}
-					}
-
-					getStage().setKeyboardFocus(ViewportWidget.this);
-					event.handle();
-					return true;
 				} else {
-					requestSelectionClear();
+					//We don't have a selection so we just add if we are under or if we hit a gizmo
+
+					GameObject touchDownedGameObject = null;
+
+					if (hasEntityUnderMouse) {
+						touchDownedGameObject = entityUnderMouse;
+						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, touchDownedGameObject);
+						selectGameObject(touchDownedGameObject);
+
+						if (hitGizmo != null) {
+							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+						}
+
+						Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
+
+						getStage().setKeyboardFocus(ViewportWidget.this);
+						event.handle();
+						return true;
+
+					} else {
+						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
+						if (hitGizmo != null) {
+							selectGameObject(hitGizmo.getGameObject());
+
+							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+
+							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
+
+							getStage().setKeyboardFocus(ViewportWidget.this);
+							event.handle();
+							return true;
+						}
+					}
+
 				}
 
 				return super.touchDown(event, x, y, pointer, button);
@@ -192,45 +229,35 @@ public abstract class ViewportWidget extends Table {
 				if (locked) {
 					return;
 				}
-
-				super.touchDragged(event, x, y, pointer);
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
-				if (touchedGizmo != null) {
-					touchedGizmo.touchDragged(hitCords.x, hitCords.y);
-					for (int i = 0; i < ViewportWidget.this.gizmos.gizmoList.size; i++) {
-						Gizmo item = ViewportWidget.this.gizmos.gizmoList.get(i);
-						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
-							item.touchDragged(hitCords.x, hitCords.y);
-						}
+				for (Gizmo gizmo : gizmos.gizmoList) {
+					if (gizmo.isSelected() && gizmo == hitGizmo) {
+						gizmo.touchDragged(hitCords.x, hitCords.y);
 					}
 				}
+
+				super.touchDragged(event, x, y, pointer);
 
 			}
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				if (hitGizmo != null) {
+					Vector2 hitCords = getWorldFromLocal(x, y);
+					hitGizmo.touchUp(hitCords.x, hitCords.y);
+				}
+
+				hitGizmo = null;
+
 				if (canMoveAround) return;
 
 				if (locked) {
 					return;
 				}
 
+
 				super.touchUp(event, x, y, pointer, button);
-
-				Vector2 hitCords = getWorldFromLocal(x, y);
-
-				if (touchedGizmo != null) {
-					touchedGizmo.touchUp(hitCords.x, hitCords.y);
-					for (int i = 0; i < ViewportWidget.this.gizmos.gizmoList.size; i++) {
-						Gizmo item = ViewportWidget.this.gizmos.gizmoList.get(i);
-						if (item.isSelected() && item.getClass().equals(touchedGizmo.getClass()) && item != touchedGizmo) {
-							item.touchUp(hitCords.x, hitCords.y);
-						}
-					}
-				}
-
-				touchedGizmo = null;
 			}
 
 			@Override
@@ -360,7 +387,31 @@ public abstract class ViewportWidget extends Table {
 
 	}
 
+	protected Gizmo hitGizmoGameObject (float x, float y, GameObject gameObject) {
+		gizmos.gizmoList.sort(new Comparator<Gizmo>() {
+			@Override
+			public int compare (Gizmo o1, Gizmo o2) {
+				return -Integer.compare(o1.getPriority(), o2.getPriority());
+			}
+		});
+
+		for (Gizmo gizmo : gizmos.gizmoList) {
+			if (gizmo.getGameObject() != gameObject) continue;
+			if (gizmo.hit(x, y))
+				return gizmo;
+		}
+
+		return null;
+	}
+
 	protected Gizmo hitGizmo (float x, float y) {
+		gizmos.gizmoList.sort(new Comparator<Gizmo>() {
+			@Override
+			public int compare (Gizmo o1, Gizmo o2) {
+				return -Integer.compare(o1.getPriority(), o2.getPriority());
+			}
+		});
+
 		for (Gizmo gizmo : gizmos.gizmoList) {
 			if (gizmo.hit(x, y))
 				return gizmo;
@@ -779,6 +830,14 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public void requestSelectionClear () {
+		for (GameObject gameObject : selection) {
+			if (gizmos.gizmoMap.containsKey(gameObject)) {
+				Array<Gizmo> gizmo = gizmos.gizmoMap.get(gameObject);
+				for (int j = 0; j < gizmo.size; j++) {
+					gizmo.get(j).setSelected(false);
+				}
+			}
+		}
 		clearSelection();
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
@@ -811,12 +870,12 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public void removeFromSelection (GameObject gameObject) {
-		selection.removeValue(gameObject, true);
+		selection.remove(gameObject);
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	public void addToSelection (GameObject gameObject) {
-		if (!selection.contains(gameObject, true)) {
+		if (!selection.contains(gameObject)) {
 			selection.add(gameObject);
 		}
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
@@ -843,7 +902,7 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	protected boolean deselectOthers (GameObject exceptThis) {
-		if (selection.size > 1 && selection.contains(exceptThis, true)) {
+		if (selection.size > 1 && selection.contains(exceptThis)) {
 			selection.clear();
 			selection.add(exceptThis);
 

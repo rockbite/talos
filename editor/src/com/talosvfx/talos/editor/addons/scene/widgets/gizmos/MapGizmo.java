@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 
 import java.util.function.Supplier;
 
-public class MapGizmo extends TransformGizmo {
+public class MapGizmo extends Gizmo {
 
     public MapGizmo () {
         super();

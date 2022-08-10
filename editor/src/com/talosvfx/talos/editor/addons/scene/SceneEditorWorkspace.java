@@ -467,7 +467,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			public boolean keyDown (InputEvent event, int keycode) {
 
 				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-					Array<GameObject> deleteList = new Array<>();
+					ObjectSet<GameObject> deleteList = new ObjectSet<>();
 					deleteList.addAll(selection);
 					clearSelection();
 					deleteGameObjects(deleteList);
@@ -658,7 +658,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public static class ClipboardPayload {
-		public Array<GameObject> objects = new Array<>();
+		public ObjectSet<GameObject> objects = new ObjectSet<>();
 		public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
 	}
 
@@ -963,7 +963,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void deleteGameObjects (Array<GameObject> gameObjects) {
+	public void deleteGameObjects (ObjectSet<GameObject> gameObjects) {
 		if (currentContainer != null) {
 			for (GameObject gameObject : gameObjects) {
 
@@ -1037,9 +1037,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (event.getContext() != this) return; //If this didn't come from scene editor ignore it
 
-		Array<GameObject> gameObjects = event.get();
+		ObjectSet<GameObject> gameObjects = event.get();
 
-		selectGizmos(gameObjects);
+		if (event.get().size == 1) { //Only select gizmos if one is selected
+			selectGizmos(gameObjects);
+		} else {
+			//Multi transform gizmo todo
+			System.out.println("Multi gizmo transform todo");
+		}
 
 		// now for properties
 
@@ -1247,7 +1252,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
 		if (currentHolder != null) {
 			if (currentHolder instanceof MultiPropertyHolder) {
-				Array<IPropertyHolder> holders = ((MultiPropertyHolder)currentHolder).getHolders();
+				ObjectSet<IPropertyHolder> holders = ((MultiPropertyHolder)currentHolder).getHolders();
 				boolean setDirty = false;
 				for (IPropertyHolder holder : holders) {
 					if (holder instanceof AMetadata) {

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -53,7 +54,7 @@ public class MapEditorState implements Notifications.Observer {
 	}
 
 	public void update (GameObjectSelectionChanged event) {
-		Array<GameObject> gameObjects = event.get();
+		ObjectSet<GameObject> gameObjects = event.get();
 
 		if (event.getContext() instanceof SceneEditorWorkspace) {
 			//Changed selection in main window
@@ -74,7 +75,7 @@ public class MapEditorState implements Notifications.Observer {
 			if (gameObjects.size == 1) {
 				//We have something new to paint, make a new instance of the game object
 
-				GameObject copied = AssetRepository.getInstance().copyGameObject(gameObjects.get(0));
+				GameObject copied = AssetRepository.getInstance().copyGameObject(gameObjects.first());
 				TileDataComponent tileDataComponent = copied.getComponent(TileDataComponent.class);
 				TransformComponent transformComponent = copied.getComponent(TransformComponent.class);
 				GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
