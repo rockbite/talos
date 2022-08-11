@@ -951,7 +951,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
 		if (mapEditorState.isEditing()) return;
-		if (propertyHolder == null)
+		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
+		if (propertyHolder == null || currentHolder == propertyHolder)
 			return;
 
 		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));

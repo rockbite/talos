@@ -262,6 +262,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         nodeMap.clear();
 
         FilteredTree.Node parent = new FilteredTree.Node("root", new Label(entityContainer.getName(), TalosMain.Instance().getSkin()));
+        parent.setSelectable(false);
 
         traverseEntityContainer(entityContainer, parent);
 

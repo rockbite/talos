@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -275,7 +276,6 @@ public class FilteredTree<T> extends WidgetGroup {
                     selectSingleNode(node);
                 }
 
-                // TODO: 8/10/2022 handle this
                 if (!selection.isEmpty())
                     rangeStart = node;
 
@@ -350,11 +350,19 @@ public class FilteredTree<T> extends WidgetGroup {
             DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
+
+                    if (!selection.contains(node)) {
+                        if (!SceneEditorWorkspace.ctrlPressed()) {
+                            clearSelection(true);
+                        }
+                        addNodeToSelection(node);
+                    }
+
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
                     Actor dragging;
                     if (selection.size() > 0) {
-                        dragging = new Label(selection.size() + " objects", skin);
+                        dragging = createPayloadFor(selection);
                     } else if (node.actor instanceof ActorCloneable) {
                         dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
                     } else {
@@ -537,6 +545,32 @@ public class FilteredTree<T> extends WidgetGroup {
         for (Node child : node.children) {
             addSource(child);
         }
+    }
+
+    private Actor createPayloadFor (Selection<Node<T>> selection) {
+        Table mainTable = new Table();
+        mainTable.defaults().left().pad(1);
+
+        int i = 0;
+        for (Node<T> item : selection.items()) {
+            if (i > 10) {
+                break;
+            }
+            Table nameTable = new Table(skin);
+            nameTable.defaults().padLeft(4).padRight(4);
+            nameTable.setBackground("panel_button_bg");
+            Label name = new Label(item.getName(), skin);
+            if (i > 5) {
+                nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-5) / 5f);
+            }
+            nameTable.add(name).grow();
+
+            mainTable.add(nameTable);
+            mainTable.row();
+            i++;
+        }
+
+        return mainTable;
     }
 
     protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
