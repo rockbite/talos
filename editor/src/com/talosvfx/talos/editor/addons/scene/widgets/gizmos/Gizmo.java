@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -142,9 +141,6 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     public void setSelected (boolean selected) {
         this.selected = selected;
-        if (selected) {
-            SceneEditorWorkspace.getInstance().getStage().setKeyboardFocus(this);
-        }
     }
 
     public boolean isSelected () {

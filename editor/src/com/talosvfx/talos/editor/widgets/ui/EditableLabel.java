@@ -25,11 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
@@ -43,11 +40,11 @@ public class EditableLabel extends Table implements ActorCloneable {
 
     private Vector2 tmpVec = new Vector2();
 
-    private final InputListener stageListener;
     private boolean editMode = false;
     private boolean editable = true;
 
     private Cell<Label> labelCell;
+    private Actor keyboardFocus;
 
     public void setEditable (boolean editable) {
         this.editable = editable;
@@ -109,32 +106,6 @@ public class EditableLabel extends Table implements ActorCloneable {
             }
         });
 
-        textField.addListener(new FocusListener() {
-            @Override
-            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-                super.keyboardFocusChanged(event, actor, focused);
-                if(!focused) {
-                    setStaticMode();
-                    if(listener != null) {
-                        //listener.changed(label.getText().toString());
-                    }
-                }
-            }
-        });
-
-        stageListener = new InputListener() {
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tmpVec.set(x, y);
-                EditableLabel.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = EditableLabel.this.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null && getStage() != null) {
-                    getStage().setKeyboardFocus(null);
-                }
-
-                return false;
-            }
-        };
-
         pack();
 
         setStaticMode();
@@ -145,14 +116,15 @@ public class EditableLabel extends Table implements ActorCloneable {
     }
 
     @Override
-    protected void setStage(Stage stage) {
+    public void setStage(Stage stage) {
         super.setStage(stage);
-        if (stage != null) {
-            getStage().getRoot().addCaptureListener(stageListener);
-        }
     }
 
     public void setEditMode() {
+        if (getStage() != null) {
+            keyboardFocus = getStage().getKeyboardFocus();
+        }
+
         editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
@@ -172,6 +144,10 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         label.setText(textField.getText());
         textField.clearSelection();
+
+        if (getStage() != null) {
+            getStage().setKeyboardFocus(keyboardFocus);
+        }
     }
 
     @Override

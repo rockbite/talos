@@ -918,6 +918,7 @@ public abstract class ViewportWidget extends Table {
 
 		selectGameObject(gameObject);
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		getStage().setKeyboardFocus(this);
 	}
 
 	private void selectGameObject (GameObject gameObject) {
