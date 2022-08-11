@@ -150,27 +150,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     }
 
-    // Selects this node while discarding all active selected nodes
-//    public void chooseNode (Node<T> node) {
-//        selection.clear();
-//        selection.add(node);
-//        for (int i = 0; i < itemListeners.size; i++) {
-//            ItemListener<T> tItemListener = itemListeners.get(i);
-//            tItemListener.chosen(node);
-//        }
-//        selection.fireChangeEvent();
-//    }
-//
-//    public void unchooseNode (Node<T> node) {
-//        selection.clear();
-//        for (int i = 0; i < itemListeners.size; i++) {
-//            ItemListener<T> tItemListener = itemListeners.get(i);
-//            tItemListener.deselect(node);
-//        }
-//        selection.fireChangeEvent();
-//    }
-
-
+    // Discards all selected nodes
     public void clearSelection (boolean notifyListeners) {
         if (selection.isEmpty()) {
             return;
