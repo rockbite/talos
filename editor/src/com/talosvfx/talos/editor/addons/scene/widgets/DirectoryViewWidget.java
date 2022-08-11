@@ -651,7 +651,7 @@ public class DirectoryViewWidget extends Table {
                     basicGameObject = parent;
 
                     AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-                    boolean success = AssetImporter.createAssetInstance(assetForPath, parent);
+                    boolean success = AssetImporter.createAssetInstance(assetForPath, parent) != null;
                     if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
                         success = false;
                     }

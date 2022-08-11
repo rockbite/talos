@@ -1,18 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.AtlasMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
-
-import java.io.File;
 
 public class AtlasImporter extends AbstractImporter {
     @Override
-    public void makeInstance (GameAsset asset, GameObject parent) {
-
+    public GameObject makeInstance (GameAsset asset, GameObject parent) {
+        return null;
     }
 
 //    @Override

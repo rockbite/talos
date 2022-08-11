@@ -12,7 +12,7 @@ public class SpineImporter extends AbstractImporter<SkeletonData> {
 
 
     @Override
-    public void makeInstance (GameAsset<SkeletonData> asset, GameObject parent) {
+    public GameObject makeInstance (GameAsset<SkeletonData> asset, GameObject parent) {
 
         SpineMetadata metaData = (SpineMetadata)asset.getRootRawAsset().metaData;
 
@@ -20,5 +20,6 @@ public class SpineImporter extends AbstractImporter<SkeletonData> {
         Vector2 sceneCords = workspace.getMouseCordsOnScene();
         GameObject gameObject = workspace.createSpineObject(asset, sceneCords, parent);
 
+        return gameObject;
     }
 }

@@ -125,8 +125,8 @@ public class SEPropertyPanel extends PropertyPanel{
 
             tree.addItemListener(new FilteredTree.ItemListener() {
                 @Override
-                public void chosen(FilteredTree.Node node) {
-
+                public void selected (FilteredTree.Node node) {
+                    super.selected(node);
                     String name = node.getName();
 
                     if(name.equals("script")) {

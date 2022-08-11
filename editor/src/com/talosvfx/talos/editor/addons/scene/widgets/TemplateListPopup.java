@@ -97,7 +97,7 @@ public class TemplateListPopup extends VisWindow {
 
         tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void chosen(FilteredTree.Node node) {
+            public void selected(FilteredTree.Node node) {
                 if(node.children.size == 0) {
 
                     String name = node.getName();
@@ -110,8 +110,8 @@ public class TemplateListPopup extends VisWindow {
             }
 
             @Override
-            public void selected(FilteredTree.Node node) {
-
+            public void addedIntoSelection (FilteredTree.Node node) {
+                super.addedIntoSelection(node);
             }
         });
     }

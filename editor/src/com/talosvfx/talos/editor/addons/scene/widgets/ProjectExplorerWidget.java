@@ -77,13 +77,13 @@ public class ProjectExplorerWidget extends Table {
         directoryTree.addItemListener(new FilteredTree.ItemListener<Object>() {
             @Override
             public void selected (FilteredTree.Node node) {
+                select(node);
                 directoryViewWidget.setDirectory((String) node.getObject());
             }
 
             @Override
-            public void chosen (FilteredTree.Node node) {
-                select(node);
-                directoryViewWidget.setDirectory((String) node.getObject());
+            public void addedIntoSelection (FilteredTree.Node<Object> node) {
+                super.addedIntoSelection(node);
             }
 
             @Override

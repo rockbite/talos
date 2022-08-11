@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -64,10 +65,11 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         list.addItemListener(new FilteredTree.ItemListener<T>() {
             @Override
-            public void chosen (FilteredTree.Node<T> node) {
+            public void selected (FilteredTree.Node<T> node) {
+                super.selected(node);
                 list.getSelection().clear();
                 list.getSelection().add(node);
-
+                SceneEditorWorkspace.getInstance().requestSelectionClear();
             }
 
             @Override
@@ -174,7 +176,6 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         });
         FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
-        node.draggableInLayerOnly = true;
         node.setObject(t);
 
         return node;
