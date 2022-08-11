@@ -638,14 +638,18 @@ public class DirectoryViewWidget extends Table {
 
             if (assetForPath != null) {
                 //Lets add something to the icon so it shows
-                Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
-                iconContainer.addActor(image);
                 if (assetForPath.isBroken()) {
+                    Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
                     image.setColor(Color.RED);
                     image.setVisible(true);
+                    iconContainer.addActor(image);
+                } else if (!assetForPath.canBeImportedToScene()){
+                    // TODO: replace the icon with the new icon that Boris will provide
+                    Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-save"));
+                    image.setColor(Color.GRAY);
+                    image.setVisible(true);
+                    iconContainer.addActor(image);
                 } else {
-                    image.setVisible(false);
-
                     //Game asset is legit, lets try to make one
                     GameObject parent = new GameObject();
                     parent.addComponent(new TransformComponent());

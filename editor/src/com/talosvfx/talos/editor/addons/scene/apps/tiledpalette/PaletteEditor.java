@@ -227,11 +227,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
     }
 
     public static boolean validForImport (GameAsset<?> gameAsset) {
-        boolean valid = (gameAsset.type == GameAssetType.SPRITE) ||
-                (gameAsset.type == GameAssetType.SKELETON) ||
-                (gameAsset.type == GameAssetType.VFX) ||
-                (gameAsset.type == GameAssetType.PREFAB);
-        return valid;
+        return gameAsset.canBeImportedToScene();
     }
 
     private class PaletteDragAndDropTarget extends DragAndDrop.Target {

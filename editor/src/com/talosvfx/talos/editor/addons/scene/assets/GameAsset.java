@@ -44,6 +44,13 @@ public class GameAsset<T> {
 		return broken;
 	}
 
+	public boolean canBeImportedToScene() {
+		return type == GameAssetType.SPRITE
+				|| type == GameAssetType.SKELETON
+				|| type == GameAssetType.VFX
+				|| type == GameAssetType.PREFAB;
+	}
+
 	public void setBroken (Exception e) {
 		this.broken = true;
 		this.brokenReason = e;
