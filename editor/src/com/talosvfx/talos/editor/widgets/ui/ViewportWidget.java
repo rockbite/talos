@@ -913,6 +913,7 @@ public abstract class ViewportWidget extends Table {
 			return;
 
 		selectGameObject(gameObject);
+		getStage().setKeyboardFocus(this);
 	}
 
 	private void selectGameObject (GameObject gameObject) {

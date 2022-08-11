@@ -281,6 +281,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         for(int i = 0; i < gameObjects.size; i++) {
             final GameObject gameObject = gameObjects.get(i);
             EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
+            editableLabel.setStage(getStage());
             FilteredTree.Node newNode = new FilteredTree.Node(gameObject.getName(), editableLabel);
             newNode.draggable = true;
             node.add(newNode);

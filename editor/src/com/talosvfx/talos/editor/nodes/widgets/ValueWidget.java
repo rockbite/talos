@@ -23,7 +23,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
-    private Stage stageRef;
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -41,7 +40,6 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private boolean showProgress;
 
-    private EventListener stageListener;
     private Vector2 tmpVec = new Vector2();
 
     private boolean isDragging = false;
@@ -180,33 +178,6 @@ public class ValueWidget extends AbstractWidget<Float> {
                 }
             }
         });
-
-        stageListener = new InputListener() {
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tmpVec.set(x, y);
-                ValueWidget.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = ValueWidget.this.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null) {
-                        getStage().setKeyboardFocus(null);
-                }
-
-                return false;
-            }
-        };
-    }
-
-    @Override
-    protected void setStage(Stage stage) {
-        super.setStage(stage);
-        if (stage != null) {
-            getStage().getRoot().addCaptureListener(stageListener);
-            stageRef = getStage();
-        } else {
-            if(stageRef != null) {
-                stageRef.getRoot().removeCaptureListener(stageListener);
-                stageRef = null;
-            }
-        }
     }
 
     private void showEditMode() {
