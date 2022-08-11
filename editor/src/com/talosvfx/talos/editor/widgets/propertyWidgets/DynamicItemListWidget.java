@@ -174,7 +174,6 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         });
         FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
-        node.draggableInLayerOnly = true;
         node.setObject(t);
 
         return node;

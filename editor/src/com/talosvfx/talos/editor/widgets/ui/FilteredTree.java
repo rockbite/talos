@@ -205,7 +205,7 @@ public class FilteredTree<T> extends WidgetGroup {
         selection.add(node);
         for (int i = 0; i < itemListeners.size; i++) {
             ItemListener<T> tItemListener = itemListeners.get(i);
-            tItemListener.selected(node);
+            tItemListener.addedIntoSelection(node);
         }
 
         selection.fireChangeEvent();
@@ -245,7 +245,9 @@ public class FilteredTree<T> extends WidgetGroup {
 
                 // Range selection with shift
                 if (selection.getMultiple() && selection.notEmpty() && UIUtils.shift()) {
-                    rangeStart = node;
+                    if (rangeStart == null) {
+                        rangeStart = node;
+                    }
                     Node<T> rangeStart = FilteredTree.this.rangeStart;
                     selection.clear();
                     float start = rangeStart.actor.getY(), end = node.actor.getY();
@@ -273,6 +275,12 @@ public class FilteredTree<T> extends WidgetGroup {
                 // Non selectable node
                 if (!node.isSelectable())
                     return;
+
+                // Add node to the already selected ones
+                if (!selection.contains(node) && SceneEditorWorkspace.ctrlPressed()) {
+                    addNodeToSelection(node);
+                    return;
+                }
 
                 // Deselect node from already selected ones but keep others
                 if (selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
@@ -365,16 +373,15 @@ public class FilteredTree<T> extends WidgetGroup {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
                     Actor dragging;
-                    if(selection.size()>0){
-                        dragging = new Label("multiple", skin);
-                    }else if (node.actor instanceof ActorCloneable) {
+                    if (selection.size() > 0) {
+                        dragging = new Label(selection.size() + " objects", skin);
+                    } else if (node.actor instanceof ActorCloneable) {
                         dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
                     } else {
                         dragging = new Label("Dragging label", skin);
                     }
 
                     payload.setDragActor(dragging);
-                    // TODO: 8/10/2022 fix this shit
                     payload.setObject(node);
 
                     return payload;
@@ -441,7 +448,10 @@ public class FilteredTree<T> extends WidgetGroup {
                         return;
                     }
 
-                    for (Node<T> item : selection.items()) {
+                    Array<Node<T>> selectedNodesCopy = new Array<>();
+                    selectedNodesCopy.addAll(selection.items().orderedItems());
+                    for (int i = 0; i < selectedNodesCopy.size; i++) {
+                        Node<T> item = selectedNodesCopy.get(i);
                         Node<T> targetNodeToDrop = item;
 
                         int indexInParent = -1;
