@@ -642,8 +642,9 @@ public class DirectoryViewWidget extends Table {
                 iconContainer.addActor(image);
                 if (assetForPath.isBroken()) {
                     image.setColor(Color.RED);
+                    image.setVisible(true);
                 } else {
-                    image.setColor(Color.GREEN);
+                    image.setVisible(false);
 
                     //Game asset is legit, lets try to make one
                     GameObject parent = new GameObject();
