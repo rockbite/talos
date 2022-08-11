@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -38,8 +39,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
@@ -59,6 +58,7 @@ public class FilteredTree<T> extends WidgetGroup {
     TreeStyle style;
     final Array<Node<T>> rootNodes = new Array();
     final Selection<Node<T>> selection;
+
     float ySpacing = 4, iconSpacingLeft = 2, iconSpacingRight = 2, padding = 0, indentSpacing;
     private float leftColumnWidth, prefWidth, prefHeight;
     private boolean sizeInvalid = true;
@@ -89,17 +89,19 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public static abstract class ItemListener<T> {
-        public void chosen(Node<T> node) {
-
-        }
         public void selected(Node<T> node) {
 
         }
-        public void rightClick (Node<T> node) {
+
+        public void addedIntoSelection(Node<T> node) {
 
         }
 
-        public void deselect(Node<T> node){
+        public void removedFromSelection (Node<T> node) {
+
+        }
+
+        public void rightClick (Node<T> node) {
 
         }
 
@@ -108,6 +110,10 @@ public class FilteredTree<T> extends WidgetGroup {
         }
 
         public void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+
+        }
+
+        public void clearSelection () {
 
         }
     }
@@ -145,17 +151,147 @@ public class FilteredTree<T> extends WidgetGroup {
         if(result.size == 0) return;
 
         for (ItemListener<T> itemListener : itemListeners) {
-            itemListener.chosen(result.get(autoSelectionIndex));
+            itemListener.selected(result.get(autoSelectionIndex));
         }
 
     }
 
+    // Discards all selected nodes
+    public void clearSelection (boolean notifyListeners) {
+        if (selection.isEmpty()) {
+            return;
+        }
+
+        if (notifyListeners) {
+            for (int i = 0; i < itemListeners.size; i++) {
+                ItemListener<T> tItemListener = itemListeners.get(i);
+                tItemListener.clearSelection();
+            }
+        }
+        selection.clear();
+        selection.fireChangeEvent();
+    }
+
+    // Adds multiple nodes to already selected ones
+    public void addNodesToSelection (Array<Node<T>> nodes, boolean notify) {
+        for (Node<T> node : nodes) {
+            selection.add(node);
+            if (notify) {
+                for (int i = 0; i < itemListeners.size; i++) {
+                    ItemListener<T> tItemListener = itemListeners.get(i);
+                    tItemListener.selected(node);
+                }
+            }
+        }
+        selection.fireChangeEvent();
+    }
+
+    // Adds a single node to the selection
+    public void addNodeToSelection (Node<T> node) {
+        selection.add(node);
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.addedIntoSelection(node);
+        }
+
+        selection.fireChangeEvent();
+    }
+
+    // Removes a single node from selection
+    public void removeNodeFromSelection (Node<T> node) {
+        if (!selection.contains(node)) {
+            return;
+        }
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.removedFromSelection(node);
+        }
+        selection.remove(node);
+        selection.fireChangeEvent();
+    }
+
+
+    private void selectSingleNode (Node<T> node) {
+        clearSelection(true);
+        addNodeToSelection(node);
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.selected(node);
+        }
+    }
+
     private void initialize () {
         addListener(clickListener = new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                // No node found, bye bye
+                Node<T> node = getNodeAt(y);
+                if (node == null) {
+                    clearSelection(true);
+                    return;
+                }
+
+                // Range selection with shift
+                if (selection.getMultiple() && selection.notEmpty() && UIUtils.shift()) {
+                    if (rangeStart == null) {
+                        rangeStart = node;
+                    }
+                    Node<T> rangeStart = FilteredTree.this.rangeStart;
+                    selection.clear();
+                    float start = rangeStart.actor.getY(), end = node.actor.getY();
+                    if (start > end)
+                        findAndSelectNodes(rootNodes, end, start);
+                    else {
+                        findAndSelectNodes(rootNodes, start, end);
+                        selection.items().orderedItems().reverse();
+                    }
+
+                    return;
+                }
+
+                // Toggle expanded.
+                if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
+                    float rowX = node.actor.getX();
+                    if (node.icon != null)
+                        rowX -= iconSpacingRight + node.icon.getMinWidth();
+                    if (x < rowX) {
+                        node.setExpanded(!node.expanded);
+                        return;
+                    }
+                }
+
+                // Non selectable node
+                if (!node.isSelectable())
+                    return;
+
+                // Add node to the already selected ones
+                if (!selection.contains(node) && SceneEditorWorkspace.ctrlPressed()) {
+                    addNodeToSelection(node);
+                    return;
+                }
+
+                // Deselect node from already selected ones but keep others
+                if (selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
+                    removeNodeFromSelection(node);
+                    return;
+                }
+
+                // Just handle this node
+                if (selection.contains(node)) {
+                    clearSelection(true);
+                } else {
+                    selectSingleNode(node);
+                }
+
+                if (!selection.isEmpty())
+                    rangeStart = node;
+
+            }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-
                 Node<T> node = getNodeAt(y);
                 if (itemListeners.size > 0) {
                     if (button == 1) {
@@ -166,61 +302,6 @@ public class FilteredTree<T> extends WidgetGroup {
                         return true;
                     }
                 }
-
-                if (node == null)
-                    return false;
-                if (selection.getMultiple() && selection.hasItems() && UIUtils.shift()) {
-                    // Select range (shift).
-                    if (rangeStart == null)
-                        rangeStart = node;
-                    Node<T> rangeStart = FilteredTree.this.rangeStart;
-                    if (!UIUtils.ctrl())
-                        selection.clear();
-                    float start = rangeStart.actor.getY(), end = node.actor.getY();
-                    if (start > end)
-                        selectNodes(rootNodes, end, start);
-                    else {
-                        selectNodes(rootNodes, start, end);
-                        selection.items().orderedItems().reverse();
-                    }
-
-                    selection.fireChangeEvent();
-                    FilteredTree.this.rangeStart = rangeStart;
-                    return false;
-                }
-                if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
-                    // Toggle expanded.
-                    float rowX = node.actor.getX();
-                    if (node.icon != null)
-                        rowX -= iconSpacingRight + node.icon.getMinWidth();
-                    if (x < rowX) {
-                        node.setExpanded(!node.expanded);
-                        return false;
-                    }
-                }
-                if (!node.isSelectable())
-                    return false;
-                if(selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
-                    selection.remove(node);
-                    for (ItemListener<T> itemListener : itemListeners) {
-                        itemListener.deselect(node);
-                    }
-                    return false;
-                }else if (selection.contains(node)) {
-                    for (ItemListener<T> itemListener : itemListeners) {
-                        itemListener.chosen(node);
-                    }
-                    return false;
-                    //return false;
-                }
-
-                for (ItemListener<T> itemListener : itemListeners) {
-                    itemListener.chosen(node);
-                    selection.add(node);
-                }
-                if (!selection.isEmpty())
-                    rangeStart = node;
-
                 return super.touchDown(event, x, y, pointer, button);
             }
 
@@ -278,12 +359,20 @@ public class FilteredTree<T> extends WidgetGroup {
             DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
+
+                    if (!selection.contains(node)) {
+                        if (!SceneEditorWorkspace.ctrlPressed()) {
+                            clearSelection(true);
+                        }
+                        addNodeToSelection(node);
+                    }
+
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
                     Actor dragging;
-                    if(selection.size()>0){
-                        dragging = new Label("multiple", skin);
-                    }else if (node.actor instanceof ActorCloneable) {
+                    if (selection.size() > 0) {
+                        dragging = createPayloadFor(selection);
+                    } else if (node.actor instanceof ActorCloneable) {
                         dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
                     } else {
                         dragging = new Label("Dragging label", skin);
@@ -356,7 +445,10 @@ public class FilteredTree<T> extends WidgetGroup {
                         return;
                     }
 
-                    for (Node<T> item : selection.items()) {
+                    Array<Node<T>> selectedNodesCopy = new Array<>();
+                    selectedNodesCopy.addAll(selection.items().orderedItems());
+                    for (int i = 0; i < selectedNodesCopy.size; i++) {
+                        Node<T> item = selectedNodesCopy.get(i);
                         Node<T> targetNodeToDrop = item;
 
                         int indexInParent = -1;
@@ -462,6 +554,32 @@ public class FilteredTree<T> extends WidgetGroup {
         for (Node child : node.children) {
             addSource(child);
         }
+    }
+
+    private Actor createPayloadFor (Selection<Node<T>> selection) {
+        Table mainTable = new Table();
+        mainTable.defaults().left().pad(1);
+
+        int i = 0;
+        for (Node<T> item : selection.items()) {
+            if (i > 6) {
+                break;
+            }
+            Table nameTable = new Table(skin);
+            nameTable.defaults().padLeft(4).padRight(4);
+            nameTable.setBackground("panel_button_bg");
+            Label name = new Label(item.getName(), skin);
+            if (i > 3) {
+                nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-3) / 3f);
+            }
+            nameTable.add(name).grow();
+
+            mainTable.add(nameTable);
+            mainTable.row();
+            i++;
+        }
+
+        return mainTable;
     }
 
     protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
@@ -620,15 +738,9 @@ public class FilteredTree<T> extends WidgetGroup {
         if(autoSelectionIndex < 0) autoSelectionIndex = result.size - 1;
         if(autoSelectionIndex > result.size - 1) autoSelectionIndex = 0;
 
-        selection.clear();
         Node node = result.get(autoSelectionIndex);
-        selection.add(node);
+        selectSingleNode(node);
         if(node.parent != null) node.parent.setExpanded(true);
-
-        for (ItemListener<T> itemListener : itemListeners) {
-            itemListener.selected(node);
-
-        }
     }
 
     public void collectFilteredNodes(Array<Node<T>> nodes, Array<Node<T>> result) {
@@ -892,19 +1004,21 @@ public class FilteredTree<T> extends WidgetGroup {
         return rowY;
     }
 
-    void selectNodes (Array<Node<T>> nodes, float low, float high) {
+    void findAndSelectNodes (Array<Node<T>> nodes, float low, float high) {
         for (int i = 0, n = nodes.size; i < n; i++) {
             Node<T> node = nodes.get(i);
             if (node.actor.getY() < low)
                 break;
+            if (node.expanded)
+                findAndSelectNodes(node.children, low, high);
             if (!node.isSelectable())
                 continue;
             if (node.actor.getY() <= high)
-                selection.add(node);
-            if (node.expanded)
-                selectNodes(node.children, low, high);
+                addNodeToSelection(node);
+
         }
     }
+
 
     public Selection<Node<T>> getSelection () {
         return selection;

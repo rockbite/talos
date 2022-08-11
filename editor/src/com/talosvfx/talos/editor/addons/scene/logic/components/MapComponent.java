@@ -84,8 +84,8 @@ public class MapComponent extends RendererComponent {
         });
         itemListWidget.list.addItemListener(new FilteredTree.ItemListener<TalosLayer>() {
             @Override
-            public void chosen (FilteredTree.Node<TalosLayer> node) {
-                super.chosen(node);
+            public void selected (FilteredTree.Node<TalosLayer> node) {
+                super.selected(node);
                 selectedLayer = node.getObject();
                 TalosLayerSelectEvent talosLayerSelectEvent = Notifications.obtainEvent(TalosLayerSelectEvent.class);
                 talosLayerSelectEvent.layer = selectedLayer;

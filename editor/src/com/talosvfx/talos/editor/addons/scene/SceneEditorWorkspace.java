@@ -240,6 +240,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		String name = getUniqueGOName(prefab.name, true);
 		gameObject.setName(name);
 
+		randomizeChildrenUUID(gameObject);
 		if (parent == null) {
 			currentContainer.addGameObject(gameObject);
 		} else {
@@ -255,6 +256,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return gameObject;
+	}
+
+	private static void randomizeChildrenUUID(GameObject parent) {
+		parent.uuid = UUID.randomUUID();
+		Array<GameObject> gameObjects = parent.getGameObjects();
+		if (gameObjects != null) {
+			for (GameObject gameObject : gameObjects) {
+				randomizeChildrenUUID(gameObject);
+			}
+		}
 	}
 
 	private String getUniqueGOName (String nameTemplate) {
@@ -448,17 +459,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (selectionRect.isVisible()) {
 					upWillClear = false;
 					selectGizmosByRect(rectangle);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				} else if (upWillClear) {
 					FocusManager.resetFocus(getStage());
-					clearSelection();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
+					requestSelectionClear();
 				} else {
 					if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 						// deselect all others, if they are selected
-						if (deselectOthers(selectedGameObject)) {
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
-						}
+						deselectOthers(selectedGameObject);
 					}
 				}
 
@@ -473,9 +480,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
 					ObjectSet<GameObject> deleteList = new ObjectSet<>();
 					deleteList.addAll(selection);
-					clearSelection();
+					requestSelectionClear();
 					deleteGameObjects(deleteList);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.C && ctrlPressed()) {
@@ -488,7 +494,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (keycode == Input.Keys.A && ctrlPressed()) {
 					selectAll();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -699,7 +704,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 		} catch (Exception e) {
 
 		}
@@ -951,7 +955,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
 		if (mapEditorState.isEditing()) return;
-		if (propertyHolder == null)
+		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
+		if (propertyHolder == null || currentHolder == propertyHolder)
 			return;
 
 		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
@@ -1062,8 +1067,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			if (gameObjects.size == 1) {
 				selectPropertyHolder(gameObjects.first());
 			} else {
-				MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);
-				selectPropertyHolder(multiPropertyHolder);
+				// TODO: 8/11/2022 implement multi object behavior
+//				MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);
+				if (currentContainer instanceof Scene) {
+					Scene scene = (Scene)currentContainer;
+					selectPropertyHolder(scene);
+				}
 			}
 		}
 	}
@@ -1173,6 +1182,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			tmp.sub(parentPositionComponent.worldPosition);
 			childPositionComponent.position.set(tmp);
 			childPositionComponent.rotation -= parentPositionComponent.rotation;
+
+			tmp.set(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
+			childPositionComponent.position.scl(tmp);
 
 			tmp.set(childPositionComponent.worldScale);
 			tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);

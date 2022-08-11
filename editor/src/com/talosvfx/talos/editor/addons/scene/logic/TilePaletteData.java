@@ -37,7 +37,7 @@ public class TilePaletteData implements Json.Serializable{
         //Lets create an entity from the asset
         AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
         GameObject tempParent = new GameObject();
-        boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent);
+        boolean success = AssetImporter.createAssetInstance(gameAsset, tempParent) != null;
         if (tempParent.getGameObjects() == null || tempParent.getGameObjects().size == 0) {
             success = false;
         }
