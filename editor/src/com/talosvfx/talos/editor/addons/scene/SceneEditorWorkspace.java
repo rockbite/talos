@@ -1051,6 +1051,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (event.get().size == 1) { //Only select gizmos if one is selected
 			selectGizmos(gameObjects);
 		} else {
+			unselectGizmos();
+
 			//Multi transform gizmo todo
 			System.out.println("Multi gizmo transform todo");
 		}

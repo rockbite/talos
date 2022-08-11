@@ -112,6 +112,10 @@ public abstract class ViewportWidget extends Table {
 		addGizmoListener();
 	}
 
+	public void unselectGizmos () {
+		selectGizmos(new ObjectSet<>());
+	}
+
 	public void selectGizmos (ObjectSet<GameObject> gameObjects) {
 		for (Gizmo gizmo : this.gizmos.gizmoList) {
 			gizmo.setSelected(false);
