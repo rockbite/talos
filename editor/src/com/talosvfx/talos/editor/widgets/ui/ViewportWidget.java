@@ -553,7 +553,7 @@ public abstract class ViewportWidget extends Table {
 //			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
 //		}
 
-		boolean debugEntityIDS = true;
+		boolean debugEntityIDS = false;
 
 		if (debugEntityIDS) {
 			BitmapFont bitmapFont = new BitmapFont();
