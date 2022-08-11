@@ -2,8 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -20,7 +18,6 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.TlsMetadata;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -239,7 +236,6 @@ public class ProjectExplorerWidget extends Table {
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
                             select(newNode.getParent());
-                            RowWidget widget = (RowWidget) newNode.getActor();
                             directoryViewWidget.reload();
                             directoryViewWidget.startRenameFor(newHandle);
                         }
@@ -358,7 +354,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void select (FilteredTree.Node node) {
-        if(SceneEditorWorkspace.ctrlPressed()){
+        if (SceneEditorWorkspace.ctrlPressed()){
             directoryTree.getSelection().add(node);
         }else {
             directoryTree.getSelection().clear();
@@ -414,13 +410,12 @@ public class ProjectExplorerWidget extends Table {
         rootNode.expandAll();
 
         directoryViewWidget.setDirectory(root.path());
-        directoryViewWidget.reload();
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
         if(path.isDirectory() && currDepth <= maxDepth) {
             FileHandle[] list = path.list(fileFilter);
-            for(int i = 0; i < list.length; i++) {
+            for (int i = 0; i < list.length; i++) {
                 FileHandle listItemHandle = list[i];
 
                 if(!listItemHandle.isDirectory()) continue;

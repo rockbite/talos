@@ -6,9 +6,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -64,6 +61,8 @@ public class DirectoryViewWidget extends Table {
     private boolean preventDeselect = false;
 
     private Array<DragAndDrop.Target> externalTargets;
+
+    private boolean renaming = false;
 
     public DirectoryViewWidget() {
         build();
@@ -307,7 +306,7 @@ public class DirectoryViewWidget extends Table {
         dragAndDrop.clear();
         clearChildren();
         items.clear();
-
+        renaming = false;
         for (DragAndDrop.Target externalTarget : externalTargets) {
             dragAndDrop.addTarget(externalTarget);
         }
@@ -530,7 +529,7 @@ public class DirectoryViewWidget extends Table {
     protected void sizeChanged () {
         super.sizeChanged();
 
-        if(boxWidth > 0) {
+        if (!renaming && boxWidth > 0) {
 
             int newColCount = (int) (getWidth() / boxWidth);
 
@@ -538,6 +537,7 @@ public class DirectoryViewWidget extends Table {
                 rebuild();
             }
         }
+        renaming = false; // consume the flag
     }
 
     public void reload () {
@@ -549,9 +549,10 @@ public class DirectoryViewWidget extends Table {
     }
 
     public void startRenameFor(FileHandle handle) {
-        for(ItemView itemView: items) {
+        for (ItemView itemView: items) {
             if(itemView.fileHandle.path().equals(handle.path())) {
                 itemView.setToRename();
+                renaming = true;
             }
         }
     }
