@@ -448,17 +448,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (selectionRect.isVisible()) {
 					upWillClear = false;
 					selectGizmosByRect(rectangle);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				} else if (upWillClear) {
 					FocusManager.resetFocus(getStage());
-					clearSelection();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
+					requestSelectionClear();
 				} else {
 					if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 						// deselect all others, if they are selected
-						if (deselectOthers(selectedGameObject)) {
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
-						}
+						deselectOthers(selectedGameObject);
 					}
 				}
 
@@ -473,9 +469,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
 					ObjectSet<GameObject> deleteList = new ObjectSet<>();
 					deleteList.addAll(selection);
-					clearSelection();
+					requestSelectionClear();
 					deleteGameObjects(deleteList);
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.C && ctrlPressed()) {
@@ -488,7 +483,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (keycode == Input.Keys.A && ctrlPressed()) {
 					selectAll();
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 				}
 
 				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -699,7 +693,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(SceneEditorWorkspace.this, selection));
 		} catch (Exception e) {
 
 		}

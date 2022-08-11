@@ -195,9 +195,6 @@ public abstract class ViewportWidget extends Table {
 						if (hitGizmo != null) {
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 						}
-
-						Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
-
 						getStage().setKeyboardFocus(ViewportWidget.this);
 						event.handle();
 						return true;
@@ -208,9 +205,6 @@ public abstract class ViewportWidget extends Table {
 							selectGameObject(hitGizmo.getGameObject());
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
-
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(ViewportWidget.this, selection));
-
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
 							return true;
@@ -885,6 +879,7 @@ public abstract class ViewportWidget extends Table {
 		selection.clear();
 
 		selection.addAll(gameObjects);
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 
@@ -905,6 +900,7 @@ public abstract class ViewportWidget extends Table {
 		if (selection.size > 1 && selection.contains(exceptThis)) {
 			selection.clear();
 			selection.add(exceptThis);
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 
 			return true;
 		}
@@ -917,7 +913,6 @@ public abstract class ViewportWidget extends Table {
 			return;
 
 		selectGameObject(gameObject);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 
 	private void selectGameObject (GameObject gameObject) {
