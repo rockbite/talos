@@ -14,10 +14,8 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -65,10 +63,18 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             }
 
             @Override
-            public void deselect(FilteredTree.Node<GameObject> node){
+            public void removedFromSelection (FilteredTree.Node<GameObject> node) {
+                super.removedFromSelection(node);
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
                 sceneEditorAddon.workspace.removeFromSelection(gameObject);
+            }
+
+            @Override
+            public void clearSelection () {
+                super.clearSelection();
+                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+                sceneEditorAddon.workspace.requestSelectionClear();
             }
 
             @Override
@@ -253,6 +259,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", new Label(entityContainer.getName(), TalosMain.Instance().getSkin()));
         parent.setSelectable(false);
+        parent.setObject(new GameObject());
 
         traverseEntityContainer(entityContainer, parent);
 

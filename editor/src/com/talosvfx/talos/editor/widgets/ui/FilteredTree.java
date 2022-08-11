@@ -96,11 +96,12 @@ public class FilteredTree<T> extends WidgetGroup {
         public void addedIntoSelection(Node<T> node) {
 
         }
-        public void rightClick (Node<T> node) {
+
+        public void removedFromSelection (Node<T> node) {
 
         }
 
-        public void deselect(Node<T> node){
+        public void rightClick (Node<T> node) {
 
         }
 
@@ -109,6 +110,10 @@ public class FilteredTree<T> extends WidgetGroup {
         }
 
         public void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+
+        }
+
+        public void clearSelection () {
 
         }
     }
@@ -160,7 +165,7 @@ public class FilteredTree<T> extends WidgetGroup {
         if (notifyListeners) {
             for (int i = 0; i < itemListeners.size; i++) {
                 ItemListener<T> tItemListener = itemListeners.get(i);
-                tItemListener.deselect(selection.first());
+                tItemListener.clearSelection();
             }
         }
         selection.clear();
@@ -196,6 +201,10 @@ public class FilteredTree<T> extends WidgetGroup {
     public void removeNodeFromSelection (Node<T> node) {
         if (!selection.contains(node)) {
             return;
+        }
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.removedFromSelection(node);
         }
         selection.remove(node);
         selection.fireChangeEvent();
@@ -553,15 +562,15 @@ public class FilteredTree<T> extends WidgetGroup {
 
         int i = 0;
         for (Node<T> item : selection.items()) {
-            if (i > 10) {
+            if (i > 6) {
                 break;
             }
             Table nameTable = new Table(skin);
             nameTable.defaults().padLeft(4).padRight(4);
             nameTable.setBackground("panel_button_bg");
             Label name = new Label(item.getName(), skin);
-            if (i > 5) {
-                nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-5) / 5f);
+            if (i > 3) {
+                nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-3) / 3f);
             }
             nameTable.add(name).grow();
 
@@ -1000,12 +1009,13 @@ public class FilteredTree<T> extends WidgetGroup {
             Node<T> node = nodes.get(i);
             if (node.actor.getY() < low)
                 break;
+            if (node.expanded)
+                findAndSelectNodes(node.children, low, high);
             if (!node.isSelectable())
                 continue;
             if (node.actor.getY() <= high)
                 addNodeToSelection(node);
-            if (node.expanded)
-                findAndSelectNodes(node.children, low, high);
+
         }
     }
 
