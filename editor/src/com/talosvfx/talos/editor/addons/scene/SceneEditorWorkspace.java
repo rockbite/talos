@@ -559,7 +559,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					}
 				}
 
-				Array<GameAsset<?>> selectedGameAssets = palette.selectedGameAssets;
+//				Array<GameAsset<?>> selectedGameAssets = palette.selectedGameAssets;
 
 //				if (selectedGameAssets.size > 1) {
 //					System.out.println("Multi stamp not supported yet");

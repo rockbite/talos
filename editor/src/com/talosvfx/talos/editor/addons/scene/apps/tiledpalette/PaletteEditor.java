@@ -192,7 +192,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
         TilePaletteData paletteData = tilePaletteGameAsset.getResource();
         // first remove from selections
-        paletteData.selectedGameAssets.removeValue(gameAsset, true);
+
 
         ObjectMap<UUID, GameAsset<?>> references = paletteData.references;
         ObjectMap<UUID, float[]> positions = paletteData.positions;
@@ -323,18 +323,19 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                for (GameAsset<?> selectedGameAsset : object.getResource().selectedGameAssets) {
-                    if (currentFilterMode == PaletteFilterMode.TILE) {
-                        removeSprite(selectedGameAsset);
-                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
-                        removeEntity(selectedGameAsset);
-                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
-                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
-                            removeSprite(selectedGameAsset);
-                        } else {
-                            removeEntity(selectedGameAsset);
-                        }
-                    }
+                for (GameObject selectedGameAsset : paletteEditorWorkspace.selection) {
+
+//                    if (currentFilterMode == PaletteFilterMode.TILE) {
+//                        removeSprite(selectedGameAsset);
+//                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
+//                        removeEntity(selectedGameAsset);
+//                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
+//                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
+//                            removeSprite(selectedGameAsset);
+//                        } else {
+//                            removeEntity(selectedGameAsset);
+//                        }
+//                    }
                 }
             }
         });
@@ -386,7 +387,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             }
         });
 
-        if (object.getResource().selectedGameAssets.isEmpty()) {
+        if (paletteEditorWorkspace.selection.isEmpty()) {
             editParentTileAndFakeHeight.setDisabled(true);
         }
 

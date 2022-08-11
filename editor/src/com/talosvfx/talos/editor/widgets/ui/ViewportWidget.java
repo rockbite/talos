@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -89,7 +90,7 @@ public abstract class ViewportWidget extends Table {
 
 	protected Gizmos gizmos = new Gizmos();
 
-	protected ObjectSet<GameObject> selection = new ObjectSet<>();
+	public OrderedSet<GameObject> selection = new OrderedSet<>();
 	protected GameObject entityUnderMouse;
 
 	protected boolean locked;
