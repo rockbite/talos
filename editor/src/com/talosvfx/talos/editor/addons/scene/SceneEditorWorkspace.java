@@ -237,6 +237,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
 
 		GameObject gameObject = prefab.root.getGameObjects().first();
+		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+		transformComponent.position.set(position);
+
 		String name = getUniqueGOName(prefab.name, true);
 		gameObject.setName(name);
 
