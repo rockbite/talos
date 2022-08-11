@@ -240,6 +240,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		String name = getUniqueGOName(prefab.name, true);
 		gameObject.setName(name);
 
+		randomizeChildrenUUID(gameObject);
 		if (parent == null) {
 			currentContainer.addGameObject(gameObject);
 		} else {
@@ -255,6 +256,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return gameObject;
+	}
+
+	private static void randomizeChildrenUUID(GameObject parent) {
+		parent.uuid = UUID.randomUUID();
+		Array<GameObject> gameObjects = parent.getGameObjects();
+		if (gameObjects != null) {
+			for (GameObject gameObject : gameObjects) {
+				randomizeChildrenUUID(gameObject);
+			}
+		}
 	}
 
 	private String getUniqueGOName (String nameTemplate) {

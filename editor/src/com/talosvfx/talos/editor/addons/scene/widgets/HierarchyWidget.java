@@ -29,11 +29,11 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 public class HierarchyWidget extends Table implements Notifications.Observer {
 
-    private FilteredTree tree;
+    private FilteredTree<GameObject> tree;
 
     private ObjectMap<String, GameObject> objectMap = new ObjectMap<>();
     private GameObjectContainer currentContainer;
-    private ObjectMap<GameObject, FilteredTree.Node> nodeMap = new ObjectMap<>();
+    private ObjectMap<GameObject, FilteredTree.Node<GameObject>> nodeMap = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
 
@@ -46,39 +46,39 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         contextualMenu = new ContextualMenu();
 
-        tree.addItemListener(new FilteredTree.ItemListener<Object>() {
+        tree.addItemListener(new FilteredTree.ItemListener<GameObject>() {
             @Override
-            public void selected (FilteredTree.Node<Object> node) {
+            public void selected (FilteredTree.Node<GameObject> node) {
                 super.selected(node);
-                GameObject gameObject = objectMap.get(node.getName());
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
                 focusKeyboard(gameObject);
                 sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
             }
 
             @Override
-            public void addedIntoSelection (FilteredTree.Node<Object> node) {
+            public void addedIntoSelection (FilteredTree.Node<GameObject> node) {
                 super.addedIntoSelection(node);
-                GameObject gameObject = objectMap.get(node.getName());
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
                 sceneEditorAddon.workspace.addToSelection(gameObject);
             }
 
             @Override
-            public void deselect(FilteredTree.Node node){
-                GameObject gameObject = objectMap.get(node.getName());
+            public void deselect(FilteredTree.Node<GameObject> node){
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
                 sceneEditorAddon.workspace.removeFromSelection(gameObject);
             }
 
             @Override
-            public void rightClick (FilteredTree.Node node) {
+            public void rightClick (FilteredTree.Node<GameObject> node) {
                 if (node == null) {
                     return;
                 }
                 SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
 
-                GameObject gameObject = objectMap.get(node.getName());
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
                 if(!tree.getSelection().contains(node)) {
                     sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
@@ -88,11 +88,11 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             }
 
             @Override
-            public void delete (Array<FilteredTree.Node<Object>> nodes) {
+            public void delete (Array<FilteredTree.Node<GameObject>> nodes) {
                 ObjectSet<GameObject> gameObjects = new ObjectSet<>();
-                for(FilteredTree.Node node: nodes) {
-                    if(objectMap.containsKey(node.getName())) {
-                        GameObject gameObject = objectMap.get(node.getName());
+                for(FilteredTree.Node<GameObject> node: nodes) {
+                    if(objectMap.containsKey(node.getObject().uuid.toString())) {
+                        GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                         gameObjects.add(gameObject);
                     }
 
@@ -101,10 +101,10 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             }
 
             @Override
-            public void onNodeMove (FilteredTree.Node parentToMoveTo, FilteredTree.Node childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+            public void onNodeMove (FilteredTree.Node<GameObject> parentToMoveTo, FilteredTree.Node<GameObject> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
                 if(parentToMoveTo != null) {
-                    GameObject parent = objectMap.get(parentToMoveTo.getName());
-                    GameObject child = objectMap.get(childThatHasMoved.getName());
+                    GameObject parent = objectMap.get(parentToMoveTo.getObject().uuid.toString());
+                    GameObject child = objectMap.get(childThatHasMoved.getObject().uuid.toString());
                     SceneEditorAddon.get().workspace.repositionGameObject(parent, child);
                 }
             }
@@ -118,8 +118,8 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         contextualMenu.addItem("Convert to Prefab", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                FilteredTree.Node item = (FilteredTree.Node) tree.getSelection().first();
-                GameObject gameObject = objectMap.get(item.getName());
+                FilteredTree.Node<GameObject> item = tree.getSelection().first();
+                GameObject gameObject = objectMap.get(item.getObject().uuid.toString());
                 SceneEditorAddon.get().workspace.convertToPrefab(gameObject);
             }
         });
@@ -159,10 +159,9 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 ObjectSet<GameObject> gameObjects= new ObjectSet<>();
-                for(Object nodeObject: tree.getSelection()) {
-                    FilteredTree.Node node = (FilteredTree.Node) nodeObject;
-                    if(objectMap.containsKey(node.getName())) {
-                        GameObject gameObject = objectMap.get(node.getName());
+                for(FilteredTree.Node<GameObject> nodeObject: tree.getSelection()) {
+                    if(objectMap.containsKey(nodeObject.getObject().uuid.toString())) {
+                        GameObject gameObject = objectMap.get(nodeObject.getObject().uuid.toString());
                         gameObjects.add(gameObject);
                     }
 
@@ -221,7 +220,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
         if(currentContainer != null) {
             ObjectSet<GameObject> gameObjects = event.get();
-            Array<FilteredTree.Node> nodes = new Array<>();
+            Array<FilteredTree.Node<GameObject>> nodes = new Array<>();
             for(GameObject gameObject: gameObjects) {
                 boolean hasNode = nodeMap.containsKey(gameObject);
                 if (hasNode) {
@@ -233,15 +232,6 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             tree.clearSelection(false);
             tree.addNodesToSelection(nodes, false);
         }
-    }
-
-    @EventHandler
-    public void onGameObjectNameChanged(GameObjectNameChanged event) {
-        GameObject gameObject = objectMap.get(event.oldName);
-        objectMap.remove(event.oldName);
-        objectMap.put(event.newName, gameObject);
-
-        nodeMap.get(gameObject).name = event.newName;
     }
 
     private void focusKeyboard(GameObject gameObject){
@@ -261,7 +251,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         objectMap.clear();
         nodeMap.clear();
 
-        FilteredTree.Node parent = new FilteredTree.Node("root", new Label(entityContainer.getName(), TalosMain.Instance().getSkin()));
+        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", new Label(entityContainer.getName(), TalosMain.Instance().getSkin()));
         parent.setSelectable(false);
 
         traverseEntityContainer(entityContainer, parent);
@@ -273,7 +263,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         currentContainer = entityContainer;
     }
 
-    private void traverseEntityContainer(GameObjectContainer entityContainer, FilteredTree.Node node) {
+    private void traverseEntityContainer(GameObjectContainer entityContainer, FilteredTree.Node<GameObject> node) {
         Array<GameObject> gameObjects = entityContainer.getGameObjects();
 
         if(gameObjects == null) return;
@@ -282,7 +272,8 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             final GameObject gameObject = gameObjects.get(i);
             EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
             editableLabel.setStage(getStage());
-            FilteredTree.Node newNode = new FilteredTree.Node(gameObject.getName(), editableLabel);
+            FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), editableLabel);
+            newNode.setObject(gameObject);
             newNode.draggable = true;
             node.add(newNode);
 
@@ -293,7 +284,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
                 }
             });
 
-            objectMap.put(gameObject.getName(), gameObject);
+            objectMap.put(gameObject.uuid.toString(), gameObject);
             nodeMap.put(gameObject, newNode);
 
             if(gameObject.getGameObjects() != null) {

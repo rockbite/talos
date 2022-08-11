@@ -2,10 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonWriter;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
@@ -27,6 +24,7 @@ import com.talosvfx.talos.editor.utils.FileOpener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.StringBuilder;
 import java.security.MessageDigest;
 
 public class AssetImporter {
@@ -133,15 +131,15 @@ public class AssetImporter {
         return metadataHandle;
     }
 
-    public static boolean createAssetInstance(GameAsset<?> gameAsset, GameObject parent) {
+    public static GameObject createAssetInstance(GameAsset<?> gameAsset, GameObject parent) {
         AbstractImporter abstractImporter = importerMap.get(gameAsset.type);
 
         if (abstractImporter != null) {
-            abstractImporter.makeInstance(gameAsset, parent);
-            return true;
+            GameObject gameObject = abstractImporter.makeInstance(gameAsset, parent);
+            return gameObject;
         } else {
             System.out.println("No importer found for type " + gameAsset.type);
-            return false;
+            return null;
         }
     }
 

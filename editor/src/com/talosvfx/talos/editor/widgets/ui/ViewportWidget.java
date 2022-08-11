@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
@@ -40,6 +41,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
@@ -549,6 +551,30 @@ public abstract class ViewportWidget extends Table {
 //			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
 //			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
 //		}
+
+		boolean debugEntityIDS = true;
+
+		if (debugEntityIDS) {
+			BitmapFont bitmapFont = new BitmapFont();
+
+			for (GameObject gameObject : selection) {
+				if (gameObject.hasComponent(TransformComponent.class)) {
+					Vector2 entityPos = new Vector2();
+					TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+					entityPos.set(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
+					Vector2 localFromWorld = getLocalFromWorld(entityPos.x, entityPos.y);
+					float entityX = localFromWorld.x;
+					float entityY = localFromWorld.y;
+					bitmapFont.setColor(1, 1, 1, 1);
+					batch.setColor(1, 1, 1, 1);
+					bitmapFont.draw(batch, gameObject.getName() + " " + gameObject.uuid.toString(), entityX, entityY);
+				}
+			}
+
+			batch.flush();
+
+			bitmapFont.dispose();
+		}
 
 		super.draw(batch, parentAlpha);
 	}
