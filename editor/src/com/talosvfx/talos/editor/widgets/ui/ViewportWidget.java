@@ -54,6 +54,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
+import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -99,6 +100,8 @@ public abstract class ViewportWidget extends Table {
 
 	protected boolean locked;
 
+	protected GroupSelectionGizmo groupSelectionGizmo;
+
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
 		entitySelectionBuffer = new EntitySelectionBuffer();
@@ -112,6 +115,13 @@ public abstract class ViewportWidget extends Table {
 
 		addPanListener();
 		addGizmoListener();
+
+		groupSelectionGizmo = new GroupSelectionGizmo(this);
+		gizmos.gizmoList.add(groupSelectionGizmo);
+	}
+
+	public void unselectGizmos () {
+		selectGizmos(new ObjectSet<>());
 	}
 
 	public void selectGizmos (ObjectSet<GameObject> gameObjects) {
@@ -304,6 +314,9 @@ public abstract class ViewportWidget extends Table {
 		}
 		gizmos.gizmoList.clear();
 		gizmos.gizmoMap.clear();
+
+		//Always put this one back in
+		gizmos.gizmoList.add(groupSelectionGizmo);
 	}
 
 	public void removeGizmos (GameObject gameObject) {
@@ -395,7 +408,7 @@ public abstract class ViewportWidget extends Table {
 		});
 
 		for (Gizmo gizmo : gizmos.gizmoList) {
-			if (gizmo.getGameObject() != gameObject) continue;
+			if (!gizmo.isControllingGameObject(gameObject)) continue;
 			if (gizmo.hit(x, y))
 				return gizmo;
 		}

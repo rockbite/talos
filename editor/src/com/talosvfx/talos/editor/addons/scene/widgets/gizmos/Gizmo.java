@@ -19,6 +19,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
+
+
     public static class TransformSettings  {
         public float gridSizeX = 1;
         public float gridSizeY = 1;
@@ -63,7 +65,10 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     public void act(float delta) {
         super.act(delta);
+        updateFromGameObject();
+    }
 
+    protected void updateFromGameObject () {
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
             tmp.set(0, 0);
@@ -71,6 +76,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
             setPosition(tmp.x, tmp.y);
         }
     }
+
+
     protected void drawLine(Batch batch, Vector2 from, Vector2 to, Color color) {
         drawLine(batch, from.x, from.y, to.x, to.y, color);
     }
@@ -200,5 +207,9 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     public int getPriority () {
         return 0;
+    }
+
+    public boolean isControllingGameObject (GameObject gameObject) {
+        return this.gameObject == gameObject;
     }
 }

@@ -237,6 +237,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
 
 		GameObject gameObject = prefab.root.getGameObjects().first();
+		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+		transformComponent.position.set(position);
+
 		String name = getUniqueGOName(prefab.name, true);
 		gameObject.setName(name);
 
@@ -939,6 +942,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		// process all game objects
 		gizmos.gizmoList.clear();
 		gizmos.gizmoMap.clear();
+		gizmos.gizmoList.add(groupSelectionGizmo);
 		initGizmos(mainScene, this);
 
 		clearSelection();
@@ -1051,8 +1055,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (event.get().size == 1) { //Only select gizmos if one is selected
 			selectGizmos(gameObjects);
 		} else {
-			//Multi transform gizmo todo
-			System.out.println("Multi gizmo transform todo");
+			unselectGizmos();
+			groupSelectionGizmo.setSelected(true);
 		}
 
 		// now for properties

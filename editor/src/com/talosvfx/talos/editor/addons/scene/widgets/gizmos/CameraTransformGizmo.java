@@ -32,20 +32,22 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
-        rectPatch.scale(1f/ prevScale, 1f/prevScale);
-        rectPatch.scale(worldPerPixel, worldPerPixel);
-        prevScale = worldPerPixel;
+        if (isSelected()) {
+            rectPatch.scale(1f / prevScale, 1f / prevScale);
+            rectPatch.scale(worldPerPixel, worldPerPixel);
+            prevScale = worldPerPixel;
 
-        if(gameObject.hasComponent(TransformComponent.class)) {
-            if(selected) {
-                for (int i = 0; i < 4; i++) {
-                    drawCircle(points[i], batch);
+            if (gameObject.hasComponent(TransformComponent.class)) {
+                if (selected) {
+                    for (int i = 0; i < 4; i++) {
+                        drawCircle(points[i], batch);
+                    }
                 }
+                drawLine(batch, points[LB], points[LT], borderColor);
+                drawLine(batch, points[LT], points[RT], borderColor);
+                drawLine(batch, points[RT], points[RB], borderColor);
+                drawLine(batch, points[RB], points[LB], borderColor);
             }
-            drawLine(batch, points[LB], points[LT], borderColor);
-            drawLine(batch, points[LT], points[RT], borderColor);
-            drawLine(batch, points[RT], points[RB], borderColor);
-            drawLine(batch, points[RB], points[LB], borderColor);
         }
     }
 
