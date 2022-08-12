@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
@@ -104,14 +105,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private AssetRepository assetRepository;
 
 	public SceneEditorWorkspace () {
-
 		layers.clear();
 		layers.add("Default");
 		layers.add("UI");
 		layers.add("Misc");
 
 		setSkin(TalosMain.Instance().getSkin());
-		setWorldSize(10);
+		setWorldSize(1920);
 		mapEditorToolbar = new MapEditorToolbar(TalosMain.Instance().getSkin());
 
 		snapshotService = new SnapshotService();
@@ -140,7 +140,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer = new MainRenderer();
 		uiSceneRenderer = new MainRenderer();
 
-		Stage stage = TalosMain.Instance().UIStage().getStage();
 		Skin skin = TalosMain.Instance().getSkin();
 		selectionRect = new Image(skin.getDrawable("orange_row"));
 		selectionRect.setSize(0, 0);
@@ -148,6 +147,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(selectionRect);
 
 		gridDrawer = new GridDrawer(this, camera, gridProperties);
+		addRulers();
 	}
 
 	public void createEmpty (Vector2 position) {
