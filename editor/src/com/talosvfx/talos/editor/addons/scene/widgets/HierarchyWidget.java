@@ -40,7 +40,10 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         tree.draggable = true;
         //tree.getSelection().setMultiple(true);
 
-        add(tree).grow().pad(5).padRight(0);
+        top();
+        defaults().top();
+
+        add(tree).growX().pad(5).padRight(0);
 
         contextualMenu = new ContextualMenu();
 

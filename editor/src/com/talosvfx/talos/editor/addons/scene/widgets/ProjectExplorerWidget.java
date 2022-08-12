@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -47,13 +48,28 @@ public class ProjectExplorerWidget extends Table {
         Table container = new Table();
 
         directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
-        ScrollPane scrollPane = new ScrollPane(directoryTree);
 
+        Table directoryTreeTable = new Table();
+        directoryTreeTable.top().defaults().top();
+
+        directoryTreeTable.add(directoryTree).growX();
+
+        ScrollPane scrollPane = new ScrollPane(directoryTreeTable);
+
+        Table scrollPaneTable = new Table();
+        scrollPaneTable.top().defaults().top();
+
+        scrollPaneTable.add(scrollPane).height(0).grow();
+
+        Table directoryViewTable = new Table();
+        directoryViewTable.top().left().defaults().top().left();
         directoryViewWidget = new DirectoryViewWidget();
         ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidget);
+        directoryViewTable.add(scrollPaneRight).height(0).grow();
+
         scrollPaneRight.setScrollingDisabled(true, false);
 
-        VisSplitPane splitPane = new VisSplitPane(scrollPane, scrollPaneRight, false);
+        VisSplitPane splitPane = new VisSplitPane(scrollPaneTable, directoryViewTable, false);
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
