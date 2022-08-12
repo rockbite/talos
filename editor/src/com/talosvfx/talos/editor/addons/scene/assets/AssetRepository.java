@@ -962,7 +962,7 @@ public class AssetRepository {
 			if (destination.isDirectory()) {
 				//Moving a file into a directory
 
-				RawAsset rawAsset = fileHandleRawAssetMap.get(file);
+				RawAsset rawAsset = fileHandleRawAssetMap.remove(file);
 				fileHandleGameAssetObjectMap.remove(file);
 
 				FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
