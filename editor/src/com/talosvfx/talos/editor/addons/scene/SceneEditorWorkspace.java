@@ -942,6 +942,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		// process all game objects
 		gizmos.gizmoList.clear();
 		gizmos.gizmoMap.clear();
+		gizmos.gizmoList.add(groupSelectionGizmo);
 		initGizmos(mainScene, this);
 
 		clearSelection();
@@ -1055,9 +1056,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			selectGizmos(gameObjects);
 		} else {
 			unselectGizmos();
-
-			//Multi transform gizmo todo
-			System.out.println("Multi gizmo transform todo");
+			groupSelectionGizmo.setSelected(true);
 		}
 
 		// now for properties
