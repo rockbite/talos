@@ -66,9 +66,48 @@ public class AssetRepository {
 	}
 
 
-	private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
-	private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
-	private ObjectMap<FileHandle, RawAsset> fileHandleRawAssetMap = new ObjectMap<>();
+	static class DataMaps {
+		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
+		private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
+		private ObjectMap<FileHandle, RawAsset> fileHandleRawAssetMap = new ObjectMap<>();
+
+
+		void putFileHandleGameAsset (FileHandle handle, GameAsset<?> gameAsset) {
+			this.fileHandleGameAssetObjectMap.put(handle, gameAsset);
+
+			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
+		}
+
+		void putUUIRawAsset (UUID uuid, RawAsset rawAsset) {
+			uuidRawAssetMap.put(uuid, rawAsset);
+
+			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
+		}
+		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
+			fileHandleRawAssetMap.put(handle, rawAsset);
+
+			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
+
+		}
+
+		public GameAsset removeFileHandleGameAssetObjectMap (FileHandle handle) {
+			System.out.println("Removing file handle game asset " + handle.path());
+			return fileHandleGameAssetObjectMap.remove(handle);
+		}
+
+		public RawAsset removeFileHandleRawAsset (FileHandle handle) {
+			System.out.println("Removing file handle raw asset " + handle.path());
+			return fileHandleRawAssetMap.remove(handle);
+		}
+
+		public RawAsset removeUUIDRawAsset (UUID uuid) {
+
+			System.out.println("Removing uuid raw asset " + uuid.toString());
+			return uuidRawAssetMap.remove(uuid);
+		}
+	}
+
+	private DataMaps dataMaps = new DataMaps();
 
 	private FileHandle assetsRoot;
 	private Json json;
@@ -125,7 +164,7 @@ public class AssetRepository {
 	private void checkGameAssetCreation (GameAssetType type) {
 		//We need to do multiple passes here for dependent assets
 
-		for (ObjectMap.Entry<FileHandle, RawAsset> entry : fileHandleRawAssetMap) {
+		for (ObjectMap.Entry<FileHandle, RawAsset> entry : dataMaps.fileHandleRawAssetMap) {
 			FileHandle key = entry.key;
 			RawAsset value = entry.value;
 
@@ -298,7 +337,7 @@ public class AssetRepository {
 			} else {
 				if (handle.extension().equals("prefab")) {
 					//Get the raw asset
-					GameAsset<Prefab> gameAsset = fileHandleGameAssetObjectMap.get(handle);
+					GameAsset<Prefab> gameAsset = dataMaps.fileHandleGameAssetObjectMap.get(handle);
 					if (gameAsset != null) {
 						identifiersBeingUsedByComponents.add(new TypeIdentifierPair(GameAssetType.PREFAB, gameAsset.nameIdentifier));
 
@@ -404,7 +443,7 @@ public class AssetRepository {
 		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
 
 		putAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension, gameAsset);
-		fileHandleGameAssetObjectMap.put(key, gameAsset);
+		dataMaps.putFileHandleGameAsset(key, gameAsset);
 	}
 
 	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
@@ -443,11 +482,11 @@ public class AssetRepository {
 
 					for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
 						FileHandle textureFile = page.textureFile;
-						if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+						if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
 							throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
 						}
 
-						RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+						RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
 
 						rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
 						textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
@@ -483,16 +522,16 @@ public class AssetRepository {
 						value.gameAssetReferences.add(skeletonDataGameAsset);
 						skeletonDataGameAsset.dependentRawAssets.add(value);
 
-						RawAsset skeleAtlasRawAsset = fileHandleRawAssetMap.get(atlasFile);
+						RawAsset skeleAtlasRawAsset = dataMaps.fileHandleRawAssetMap.get(atlasFile);
 						skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
 
 						for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
 							FileHandle textureFile = page.textureFile;
-							if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+							if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
 								throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
 							}
 
-							RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+							RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
 							rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
 							skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 						}
@@ -545,7 +584,7 @@ public class AssetRepository {
 					throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
 				}
 
-				RawAsset rawAssetPFile = fileHandleRawAssetMap.get(pFile);
+				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(pFile);
 
 				try {
 					particleEffectDescriptor.load(rawAssetPFile.handle);
@@ -662,7 +701,7 @@ public class AssetRepository {
 				collectRawResourceFromDirectory(fileHandle, checkGameResources);
 			} else if (shouldIgnoreAsset(fileHandle)) {
 				continue;
-			} else if (!fileHandleRawAssetMap.containsKey(fileHandle)) {
+			} else if (!dataMaps.fileHandleRawAssetMap.containsKey(fileHandle)) {
 				rawAssetCreated(fileHandle, checkGameResources);
 			}
 		}
@@ -717,8 +756,8 @@ public class AssetRepository {
 		}
 
 
-		uuidRawAssetMap.put(rawAsset.metaData.uuid, rawAsset);
-		fileHandleRawAssetMap.put(fileHandle, rawAsset);
+		dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
+		dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
 		System.out.println("Raw asset created" + rawAsset.handle.path());
 
@@ -748,8 +787,8 @@ public class AssetRepository {
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {
-		if (fileHandleGameAssetObjectMap.containsKey(file)) {
-			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
+		if (dataMaps.fileHandleGameAssetObjectMap.containsKey(file)) {
+			GameAsset<?> gameAsset = dataMaps.fileHandleGameAssetObjectMap.get(file);
 			if (ignoreBroken) {
 				return gameAsset;
 			} else {
@@ -771,8 +810,8 @@ public class AssetRepository {
 		handle.delete();
 		Array<GameAsset> gameAssetsToUpdate = new Array<>();
 
-		if (fileHandleRawAssetMap.containsKey(handle)) {
-			RawAsset rawAsset = fileHandleRawAssetMap.get(handle);
+		if (dataMaps.fileHandleRawAssetMap.containsKey(handle)) {
+			RawAsset rawAsset = dataMaps.fileHandleRawAssetMap.get(handle);
 			gameAssetsToUpdate.addAll(rawAsset.gameAssetReferences);
 
 
@@ -786,14 +825,14 @@ public class AssetRepository {
 				} else {
 					gameAsset.setBroken(new Exception("Game Asset Removed"));
 					gameAsset.setUpdated();
-					fileHandleGameAssetObjectMap.remove(rawAsset.handle);
+					dataMaps.removeFileHandleGameAssetObjectMap(rawAsset.handle);
 					identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
 				}
 
 			}
 
-			fileHandleRawAssetMap.remove(handle);
-			uuidRawAssetMap.remove(rawAsset.metaData.uuid);
+			dataMaps.removeFileHandleRawAsset(handle);
+			dataMaps.removeUUIDRawAsset(rawAsset.metaData.uuid);
 		}
 	}
 	public void deleteRawAsset (FileHandle handle) {
@@ -890,14 +929,14 @@ public class AssetRepository {
 
 
 			if (!newHandle.isDirectory()) {
-				RawAsset rawAsset = fileHandleRawAssetMap.remove(oldHandle);
+				RawAsset rawAsset = dataMaps.removeFileHandleRawAsset(oldHandle);
 
 				if (rawAsset == null) {
 					System.out.println();
 				}
 				rawAsset.handle = newHandle;
 
-				fileHandleRawAssetMap.put(newHandle, rawAsset);
+				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
 				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
 				assetPathChanged.oldRelativePath = relative(oldHandle);
@@ -909,8 +948,8 @@ public class AssetRepository {
 				}
 
 				if (isRootGameResource(rawAsset)) {
-					GameAsset gameAsset = fileHandleGameAssetObjectMap.remove(oldHandle);
-					fileHandleGameAssetObjectMap.put(newHandle, gameAsset);
+					GameAsset gameAsset = dataMaps.removeFileHandleGameAssetObjectMap(oldHandle);
+					dataMaps.putFileHandleGameAsset(newHandle, gameAsset);
 
 					gameAsset.setUpdated();
 				}
@@ -948,6 +987,11 @@ public class AssetRepository {
 				throw new GdxRuntimeException("Trying to move a directory to a file");
 			}
 
+			if (!destination.name().equals(file.name())) {
+				//Make sure to preserve the file structure when copying folders
+				destination = destination.child(file.name());
+			}
+
 			MovingDirNode rootNode = new MovingDirNode();
 			rootNode.oldHandle = file;
 			rootNode.newHandle = destination;
@@ -962,8 +1006,8 @@ public class AssetRepository {
 			if (destination.isDirectory()) {
 				//Moving a file into a directory
 
-				RawAsset rawAsset = fileHandleRawAssetMap.remove(file);
-				fileHandleGameAssetObjectMap.remove(file);
+				RawAsset rawAsset = dataMaps.removeFileHandleRawAsset(file);
+				dataMaps.removeFileHandleGameAssetObjectMap(file);
 
 				FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
 
@@ -988,7 +1032,7 @@ public class AssetRepository {
 				assetPathChanged.newRelativePath = relative(newHandle);
 				Notifications.fireEvent(assetPathChanged);
 
-				fileHandleRawAssetMap.put(newHandle, rawAsset);
+				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
 				rawAsset.handle = newHandle;
 
@@ -998,9 +1042,9 @@ public class AssetRepository {
 
 			} else {
 				//Its a rename
-				if (fileHandleRawAssetMap.containsKey(file)) {
-					RawAsset rawAsset = fileHandleRawAssetMap.get(file);
-					fileHandleRawAssetMap.remove(file);
+				if (dataMaps.fileHandleRawAssetMap.containsKey(file)) {
+					RawAsset rawAsset = dataMaps.fileHandleRawAssetMap.get(file);
+					dataMaps.removeFileHandleRawAsset(file);
 
 					FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
 
@@ -1040,7 +1084,7 @@ public class AssetRepository {
 						}
 					}
 
-					fileHandleRawAssetMap.put(destination, rawAsset);
+					dataMaps.putFileHandleRawAsset(destination, rawAsset);
 
 					rawAsset.handle = destination;
 

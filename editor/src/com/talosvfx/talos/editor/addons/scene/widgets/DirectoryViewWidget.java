@@ -362,7 +362,7 @@ public class DirectoryViewWidget extends Table {
             }
         });
 
-        for (ObjectMap.Entry<String, FilteredTree.Node> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
+        for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
             dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
                 @Override
                 public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {

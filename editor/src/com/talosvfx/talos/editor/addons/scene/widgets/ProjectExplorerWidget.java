@@ -16,6 +16,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -29,13 +30,13 @@ import java.io.FileFilter;
 
 public class ProjectExplorerWidget extends Table {
 
-    private final FilteredTree<Object> directoryTree;
+    private final FilteredTree<String> directoryTree;
     public static FileFilter fileFilter;
     private final DirectoryViewWidget directoryViewWidget;
-    private ObjectMap<String, FilteredTree.Node> nodes = new ObjectMap<>();
+    private ObjectMap<String, FilteredTree.Node<String>> nodes = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
-    private FilteredTree.Node rootNode;
+    private FilteredTree.Node<String> rootNode;
 
     private DragAndDrop dragAndDrop;
 
@@ -90,7 +91,27 @@ public class ProjectExplorerWidget extends Table {
             }
         };
 
-        directoryTree.addItemListener(new FilteredTree.ItemListener<Object>() {
+        directoryTree.addItemListener(new FilteredTree.ItemListener<String>() {
+
+            @Override
+            public void onNodeMove (FilteredTree.Node<String> parentToMoveTo, FilteredTree.Node<String> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+                if(parentToMoveTo != null) {
+                    String parentPath = parentToMoveTo.getObject();
+                    String childPath = childThatHasMoved.getObject();
+
+                    System.out.println("Moving " + childPath + " " + " to " + parentPath);
+
+                    FileHandle parentHandle = Gdx.files.absolute(parentPath);
+                    FileHandle childHandle = Gdx.files.absolute(childPath);
+
+
+                    //Its always folders
+
+                    AssetRepository.getInstance().moveFile(childHandle, parentHandle);
+
+                }
+            }
+
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
@@ -98,7 +119,7 @@ public class ProjectExplorerWidget extends Table {
             }
 
             @Override
-            public void addedIntoSelection (FilteredTree.Node<Object> node) {
+            public void addedIntoSelection (FilteredTree.Node<String> node) {
                 super.addedIntoSelection(node);
             }
 
@@ -111,7 +132,7 @@ public class ProjectExplorerWidget extends Table {
             }
 
             @Override
-            public void delete (Array<FilteredTree.Node<Object>> nodes) {
+            public void delete (Array<FilteredTree.Node<String>> nodes) {
                 String path = (String) nodes.first().getObject();
                 Array<String> paths = new Array<>();
                 paths.add(path);
@@ -125,7 +146,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     private String getCurrSelectedPath() {
-        Selection<FilteredTree.Node<Object>> selection = directoryTree.getSelection();
+        Selection<FilteredTree.Node<String>> selection = directoryTree.getSelection();
         if(selection.size() > 0) {
             return (String) selection.first().getObject();
         }
@@ -163,14 +184,14 @@ public class ProjectExplorerWidget extends Table {
         }
     }
 
-    public  ObjectMap<String, FilteredTree.Node> getNodes(){
+    public  ObjectMap<String, FilteredTree.Node<String>> getNodes(){
         return nodes;
     }
 
     public void showContextMenu (boolean directoryView) {
         Array<FileHandle> list = new Array<>();
-        Array<FilteredTree.Node<Object>> nodes = directoryTree.getSelection().toArray();
-        for (FilteredTree.Node<Object> node: nodes) {
+        Array<FilteredTree.Node<String>> nodes = directoryTree.getSelection().toArray();
+        for (FilteredTree.Node<String> node: nodes) {
             String path = (String) node.getObject();
             FileHandle handle = Gdx.files.absolute(path);
             list.add(handle);
