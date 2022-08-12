@@ -55,7 +55,6 @@ public class GroupSelectionGizmo extends Gizmo {
 				TransformComponent transformComponent = object.getComponent(TransformComponent.class);
 				selectionBounds.ext(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 
-				System.out.println(object.getName() + "  Expanding world position with " + transformComponent.worldPosition);
 
 				if (object.hasComponent(SpriteRendererComponent.class)) {
 					SpriteRendererComponent spriteRendererComponent = object.getComponent(SpriteRendererComponent.class);
@@ -68,7 +67,6 @@ public class GroupSelectionGizmo extends Gizmo {
 					float halfWidth = spriteWidth / 2;
 					float halfHeight = spriteHeight / 2;
 
-					System.out.println(object.getName()  + " Expanding width and height  " + spriteWidth + " " + spriteHeight);
 					selectionBounds.ext(x - halfWidth, y - halfHeight, 0);
 					selectionBounds.ext(x - halfWidth, y + halfHeight, 0);
 					selectionBounds.ext(x + halfWidth, y - halfHeight, 0);
