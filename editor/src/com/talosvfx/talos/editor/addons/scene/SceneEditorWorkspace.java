@@ -700,6 +700,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			for (GameObject gameObject : payload.objects) {
 				String name = getUniqueGOName(gameObject.getName(), false);
 				gameObject.setName(name);
+				randomizeChildrenUUID(gameObject);
 				currentContainer.addGameObject(gameObject);
 				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 				transformComponent.position.add(offset);
