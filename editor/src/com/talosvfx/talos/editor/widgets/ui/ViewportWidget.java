@@ -55,6 +55,8 @@ import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -731,48 +733,64 @@ public abstract class ViewportWidget extends Table {
 	protected void drawGrid (Batch batch, float parentAlpha) {
 		Gdx.gl.glLineWidth(1f);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
+
 		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		Color gridColor = new Color(Color.GRAY);
 
-		int minCount = 3;
-		int maxCount = 100;
+		int unitWidthDivisor = 20;
+		int cameraLinesOffset = 10;
+		int abstractGridXLines = MathUtils.ceil(unitWidthDivisor * worldWidth);
 
-		float width = camera.viewportWidth * camera.zoom;
-		float height = camera.viewportHeight * camera.zoom;
-
-		float x = camera.position.x;
-		float y = camera.position.y;
-
-		int countX = MathUtils.ceil(width / gridSize);
-		int countY = MathUtils.ceil(height / gridSize);
-
-		float falloff = ((float)(MathUtils.clamp(countX, minCount, maxCount) - minCount)) / (maxCount - minCount);
-		float brightAlpha = (1f - falloff * 0.95f) * 0.3f * parentAlpha;
-		float dimAlpha = gridColor.a * 0.1f * parentAlpha;
-
-		// camera offsets
-		x = x - x % (gridSize * 8f);
-		y = y - y % (gridSize * 8f);
 
 		float thickness = pixelToWorld(1.2f);
+		float distanceThatLinesShouldBe = pixelToWorld(5f);
+		int ignoredLinesCount = 1;
 
-		for (int i = -countX / 2 - 8; i <= countX / 2 + 8; i++) {
-			if (i % 4 == 0)
-				gridColor.a = brightAlpha;
-			else
-				gridColor.a = dimAlpha;
-			shapeRenderer.setColor(gridColor);
-			shapeRenderer.rectLine(i * gridSize + x, -height / 2f + y - gridSize * 8f, i * gridSize + x, height / 2f + y + gridSize * 8f, thickness);
-		}
-		for (int i = -countY / 2 - 8; i <= countY / 2 + 8; i++) {
-			if (i % 4 == 0)
-				gridColor.a = brightAlpha;
-			else
-				gridColor.a = dimAlpha;
-			shapeRenderer.setColor(gridColor);
-			shapeRenderer.rectLine(-width / 2f + x - gridSize * 8f, i * gridSize + y, width / 2f + x + gridSize * 8f, i * gridSize + y, thickness);
-		}
+		float visibleWidth = camera.viewportWidth * camera.zoom;
+		float visibleHeight = camera.viewportHeight * camera.zoom;
+
+		float cameraX = camera.position.x;
+		float cameraY = camera.position.y;
+
+		gridColor.a =  parentAlpha;
+		shapeRenderer.setColor(gridColor);
+		shapeRenderer.rectLine(0, cameraY - visibleHeight / 2, 0, cameraY + visibleHeight / 2, thickness);
+		shapeRenderer.rectLine(cameraX - visibleWidth / 2, 0, cameraX + visibleWidth / 2, 0, thickness);
+
+//		// drawing right lines
+//		for (float i = 0; i < abstractGridXLines / 2f; i += 1 + ignoredLinesCount) {
+//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
+//			gridColor.a =  alpha * parentAlpha;
+//			shapeRenderer.setColor(gridColor);
+//			shapeRenderer.rectLine(i, -100, i, 100, thickness);
+//		}
+
+//		// drawing upper lines
+//		for (float i = ignoredLinesCount; i < abstractGridXLines / 2f; i += ignoredLinesCount) {
+//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
+//			gridColor.a =  alpha * parentAlpha;
+//			shapeRenderer.setColor(gridColor);
+//			shapeRenderer.rectLine(-100, i, 100, i, thickness);
+//		}
+//
+//		// drawing left lines
+//		for (float i = -ignoredLinesCount; i > -abstractGridXLines / 2f; i -= ignoredLinesCount) {
+//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
+//			gridColor.a =  alpha * parentAlpha;
+//			shapeRenderer.setColor(gridColor);
+//			shapeRenderer.rectLine(i, -100, i, 100, thickness);
+//		}
+//
+//		// drawing upper lines
+//		for (float i = -ignoredLinesCount; i > -abstractGridXLines / 2f; i -= ignoredLinesCount) {
+//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
+//			gridColor.a =  alpha * parentAlpha;
+//			shapeRenderer.setColor(gridColor);
+//			shapeRenderer.rectLine(-100, i, 100, i, thickness);
+//		}
+
+
 
 		shapeRenderer.end();
 	}

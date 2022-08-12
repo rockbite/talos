@@ -87,9 +87,10 @@ public class FileTracker {
         entries.put(fileHandle, new FileEntry(fileHandle, tracker));
     }
 
-    public void update() {
-        Array<FileHandle> filesToRemove = new Array<>();
+    Array<FileHandle> filesToRemove = new Array<>();
 
+    public void update() {
+        filesToRemove.clear();
         final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
 
         for (ObjectMap.Entry<FileTab, ObjectMap<FileHandle, FileEntry>> tabMapEntry : tabMaps) {
