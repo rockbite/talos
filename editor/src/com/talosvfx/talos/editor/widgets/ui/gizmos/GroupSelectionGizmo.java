@@ -165,6 +165,6 @@ public class GroupSelectionGizmo extends Gizmo {
 
 	@Override
 	public int getPriority () {
-		return 10;
+		return -1;
 	}
 }
