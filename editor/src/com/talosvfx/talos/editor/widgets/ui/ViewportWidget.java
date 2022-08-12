@@ -747,18 +747,23 @@ public abstract class ViewportWidget extends Table {
 		Gdx.gl.glLineWidth(1f);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
+		float zeroAlpha = 1f;
+		float mainLinesAlpha = 0.5f;
+		float smallLinesAlpha = 0.2f;
+
+
 		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		Color gridColor = new Color(Color.GRAY);
 
-		int unitWidthDivisor = 20;
-		int cameraLinesOffset = 10;
-		int abstractGridXLines = MathUtils.ceil(unitWidthDivisor * worldWidth);
-
-
 		float thickness = pixelToWorld(1.2f);
-		float distanceThatLinesShouldBe = pixelToWorld(5f);
-		int ignoredLinesCount = 1;
+
+		float distanceThatLinesShouldBe = pixelToWorld(150f);
+		float unit = nextPowerOfTwo(distanceThatLinesShouldBe);
+
+//		mainLinesAlpha = MathUtils.lerp(0, mainLinesAlpha, (distanceThatLinesShouldBe - unit) / unit);
+
+		int baseLineDivisor = 4;
 
 		float visibleWidth = camera.viewportWidth * camera.zoom;
 		float visibleHeight = camera.viewportHeight * camera.zoom;
@@ -766,46 +771,92 @@ public abstract class ViewportWidget extends Table {
 		float cameraX = camera.position.x;
 		float cameraY = camera.position.y;
 
-		gridColor.a =  parentAlpha;
+		float visibleStartX = cameraX - visibleWidth / 2;
+		float visibleStartY = cameraY - visibleHeight / 2;
+		float visibleEndX = cameraX + visibleWidth / 2;
+		float visibleEndY = cameraY + visibleHeight / 2;
+
+
+		gridColor.a =  zeroAlpha * parentAlpha;
 		shapeRenderer.setColor(gridColor);
-		shapeRenderer.rectLine(0, cameraY - visibleHeight / 2, 0, cameraY + visibleHeight / 2, thickness);
-		shapeRenderer.rectLine(cameraX - visibleWidth / 2, 0, cameraX + visibleWidth / 2, 0, thickness);
-
-//		// drawing right lines
-//		for (float i = 0; i < abstractGridXLines / 2f; i += 1 + ignoredLinesCount) {
-//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
-//			gridColor.a =  alpha * parentAlpha;
-//			shapeRenderer.setColor(gridColor);
-//			shapeRenderer.rectLine(i, -100, i, 100, thickness);
-//		}
-
-//		// drawing upper lines
-//		for (float i = ignoredLinesCount; i < abstractGridXLines / 2f; i += ignoredLinesCount) {
-//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
-//			gridColor.a =  alpha * parentAlpha;
-//			shapeRenderer.setColor(gridColor);
-//			shapeRenderer.rectLine(-100, i, 100, i, thickness);
-//		}
-//
-//		// drawing left lines
-//		for (float i = -ignoredLinesCount; i > -abstractGridXLines / 2f; i -= ignoredLinesCount) {
-//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
-//			gridColor.a =  alpha * parentAlpha;
-//			shapeRenderer.setColor(gridColor);
-//			shapeRenderer.rectLine(i, -100, i, 100, thickness);
-//		}
-//
-//		// drawing upper lines
-//		for (float i = -ignoredLinesCount; i > -abstractGridXLines / 2f; i -= ignoredLinesCount) {
-//			float alpha = (i % unitWidthDivisor == 0) ? 0.9f : 0.4f;
-//			gridColor.a =  alpha * parentAlpha;
-//			shapeRenderer.setColor(gridColor);
-//			shapeRenderer.rectLine(-100, i, 100, i, thickness);
-//		}
+		drawLine(batch, 0, cameraY - visibleHeight / 2, 0, cameraY + visibleHeight / 2, thickness, 0);
+		drawLine(batch, visibleStartX, 0, visibleEndX, 0, thickness, 0);
 
 
+		float startX = unit * MathUtils.floor(visibleStartX / unit);
+
+		// drawing vertical lines
+		for (float i = startX - unit; i < visibleEndX; i += unit) {
+			for (int j = 1; j <= baseLineDivisor; j++) {
+				float smallUnitSize = unit / baseLineDivisor;
+
+				gridColor.a =  smallLinesAlpha * parentAlpha;
+				shapeRenderer.setColor(gridColor);
+				drawLine(batch, i + j * smallUnitSize, cameraY - visibleHeight / 2, i + j * smallUnitSize, cameraY + visibleHeight / 2, thickness, i);
+			}
+
+			if (i == 0) continue;
+			gridColor.a =  mainLinesAlpha * parentAlpha;
+			shapeRenderer.setColor(gridColor);
+			drawLine(batch, i, cameraY - visibleHeight / 2, i, cameraY + visibleHeight / 2, thickness, i);
+		}
+
+		float startY = unit * MathUtils.floor(visibleStartY / unit);
+
+		// drawing vertical lines
+		for (float i = startY - unit; i < visibleEndY; i += unit) {
+			for (int j = 1; j <= baseLineDivisor; j++) {
+				float smallUnitSize = unit / baseLineDivisor;
+
+				gridColor.a =  smallLinesAlpha * parentAlpha;
+				shapeRenderer.setColor(gridColor);
+				drawLine(batch, cameraX - visibleWidth / 2, i + j * smallUnitSize, cameraX + visibleWidth / 2,  i + j * smallUnitSize , thickness, i);
+			}
+
+			if (i == 0) continue;
+			gridColor.a =  mainLinesAlpha * parentAlpha;
+			shapeRenderer.setColor(gridColor);
+			drawLine(batch, cameraX - visibleWidth / 2, i, cameraX + visibleWidth / 2,  i,  thickness, i);
+		}
 
 		shapeRenderer.end();
+	}
+
+	private float nextPowerOfTwo (float value) {
+		boolean negative = false;
+		boolean smallerOne = false;
+		if (value < 0) {
+			negative = true;
+			value *= -1;
+		}
+
+		if (value < 1 ) {
+			value = 1 / value;
+			smallerOne = true;
+		}
+
+		float unit = MathUtils.nextPowerOfTwo(negative ? MathUtils.ceil(value) : MathUtils.floor(value));
+		if (smallerOne) {
+			unit = 1 / unit;
+			unit *= 2;
+		}
+
+		return unit;
+	}
+
+	private void drawLine (Batch batch, float x1, float y1, float x2, float y2, float thickness, float coord) {
+
+		shapeRenderer.rectLine(x1, y1, x2, y2, thickness);
+//
+//		BitmapFont bitmapFont = new BitmapFont();
+//		bitmapFont.getData().scale(1.5f);
+//		bitmapFont.setColor(1, 1, 1, 1);
+//		batch.begin();
+//		bitmapFont.draw(batch, " " + coord, x1, y1 + 30f);
+//		bitmapFont.draw(batch, " " + coord, x2 - 70f, y2);
+//		batch.flush();
+//		batch.end();
+//		bitmapFont.dispose();
 	}
 
 	private void getViewportBounds (Rectangle out) {
