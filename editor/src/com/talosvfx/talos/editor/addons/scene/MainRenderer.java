@@ -256,7 +256,6 @@ public class MainRenderer implements Notifications.Observer {
                 ((PolyBatchWithEncodingOverride)batch).setCustomEncodingColour(colourForEntityUUID.r, colourForEntityUUID.g, colourForEntityUUID.b, colourForEntityUUID.a);
             }
 
-            TransformComponent transformComponent = getWorldTransform(gameObject);
 
             GameResourceOwner<?> resourceComponent = gameObject.getRenderResourceComponent();
             if (resourceComponent != null) {
@@ -266,7 +265,7 @@ public class MainRenderer implements Notifications.Observer {
                 if (gameResource == null || gameResource.isBroken()) {
                     //Render the broken sprite
 
-                    renderBrokenComponent(batch, gameObject, transformComponent);
+                    renderBrokenComponent(batch, gameObject, gameObject.getComponent(TransformComponent.class));
                     continue;
                 }
             }
