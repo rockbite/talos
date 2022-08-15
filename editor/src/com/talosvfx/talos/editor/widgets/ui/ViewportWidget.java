@@ -941,17 +941,20 @@ public abstract class ViewportWidget extends Table {
 
 	private void drawLine (Batch batch, float x1, float y1, float x2, float y2, float thickness, float coord) {
 
+		boolean debug = false;
 		shapeRenderer.rectLine(x1, y1, x2, y2, thickness);
-//
-//		BitmapFont bitmapFont = new BitmapFont();
-//		bitmapFont.getData().scale(1.5f);
-//		bitmapFont.setColor(1, 1, 1, 1);
-//		batch.begin();
-//		bitmapFont.draw(batch, " " + coord, x1, y1 + 30f);
-//		bitmapFont.draw(batch, " " + coord, x2 - 70f, y2);
-//		batch.flush();
-//		batch.end();
-//		bitmapFont.dispose();
+
+		if (debug) {
+			BitmapFont bitmapFont = new BitmapFont();
+			bitmapFont.getData().scale(1.5f);
+			bitmapFont.setColor(1, 1, 1, 1);
+			batch.begin();
+			bitmapFont.draw(batch, " " + coord, x1, y1 + 30f);
+			bitmapFont.draw(batch, " " + coord, x2 - 70f, y2);
+			batch.flush();
+			batch.end();
+			bitmapFont.dispose();
+		}
 	}
 
 	private void getViewportBounds (Rectangle out) {

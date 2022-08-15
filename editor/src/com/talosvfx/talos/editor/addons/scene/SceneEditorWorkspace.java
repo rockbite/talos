@@ -148,7 +148,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		gridDrawer = new GridDrawer(this, camera, gridProperties);
 		addRulers();
-		bgColor = Color.valueOf("#272727");
 	}
 
 	public void createEmpty (Vector2 position) {
@@ -950,11 +949,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		selectPropertyHolder(mainScene);
 
-//		if (mainScene instanceof Scene) {
-//			bgColor.set(Color.BLACK);
-//		} else {
-//			bgColor.set(Color.valueOf("#241a00"));
-//		}
+		if (mainScene instanceof Scene) {
+			bgColor.set(Color.valueOf("#272727"));
+		} else {
+			bgColor.set(Color.valueOf("#241a00"));
+		}
 	}
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
