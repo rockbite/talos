@@ -66,8 +66,9 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
         nameLabel.setEllipsis(true);
         nameLabel.setAlignment(Align.right);
 
+        table.right();
         table.add(nameLabel).growX().maxWidth(130).padRight(2);
-        table.add(button).right().padRight(-2);
+        table.add(button);
 
         button.addListener(new ClickListener() {
             @Override
@@ -94,7 +95,6 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
                 });
             }
         });
-
         return table;
     }
 
