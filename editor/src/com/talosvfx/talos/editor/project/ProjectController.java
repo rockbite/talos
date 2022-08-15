@@ -355,6 +355,7 @@ public class ProjectController {
     }
 
     public void undo() {
+        System.out.println("UNDO WAS PRESSED");
         boolean changed = snapshotTracker.moveBack();
         if (changed) {
             getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
