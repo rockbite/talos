@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -215,6 +216,17 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     @EventHandler
     public void gameActiveChanged (GameObjectActiveChanged event) {
         updateColourForActive(event.target);
+    }
+
+    @EventHandler
+    public void gameObjectNameChanged (GameObjectNameChanged event) {
+        FilteredTree.Node<GameObject> node = tree.findNode(event.target);
+        if (node != null) {
+            if (node.getActor() instanceof EditableLabel) {
+                EditableLabel actor = (EditableLabel)node.getActor();
+                actor.setText(event.newName);
+            }
+        }
     }
 
     private void updateColourForActive (GameObject gameObject) {
