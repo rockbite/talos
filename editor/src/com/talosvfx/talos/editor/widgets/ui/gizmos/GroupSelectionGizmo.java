@@ -1,10 +1,11 @@
 package com.talosvfx.talos.editor.widgets.ui.gizmos;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -18,6 +19,8 @@ public class GroupSelectionGizmo extends Gizmo {
 
 	private BoundingBox selectionBounds = new BoundingBox();
 
+	private ObjectMap<GameObject, Vector2> worldSpaceStartingOffsets = new ObjectMap<>();
+
 	public GroupSelectionGizmo (ViewportWidget widget) {
 		this.viewportWidget = widget;
 	}
@@ -30,6 +33,11 @@ public class GroupSelectionGizmo extends Gizmo {
 	}
 
 	@Override
+	public boolean hit (float x, float y) {
+		return selectionBounds.contains(new Vector3(x, y, 0));
+	}
+
+	@Override
 	public void setSelected (boolean selected) {
 		super.setSelected(selected);
 
@@ -38,22 +46,62 @@ public class GroupSelectionGizmo extends Gizmo {
 	@Override
 	public void touchDown (float x, float y, int button) {
 		super.touchDown(x, y, button);
+
+		worldSpaceStartingOffsets.clear();
+		for (GameObject object : viewportWidget.selection) {
+			if (object.hasComponent(TransformComponent.class)) {
+				TransformComponent transformComponent = object.getComponent(TransformComponent.class);
+				Vector2 worldPosition = transformComponent.worldPosition;
+
+				worldSpaceStartingOffsets.put(object, new Vector2().set(x, y).sub(worldPosition));
+			}
+		}
+
 	}
 
 	@Override
 	public void touchDragged (float x, float y) {
 		super.touchDragged(x, y);
+
+		for (GameObject object : viewportWidget.selection) {
+			if (object.hasComponent(TransformComponent.class)) {
+				Vector2 worldSpaceOffset = worldSpaceStartingOffsets.get(object);
+
+				Vector2 newWorldSpace = new Vector2(x, y).sub(worldSpaceOffset);
+
+				GameObject.setPositionFromWorldPosition(object, newWorldSpace);
+			}
+		}
+	}
+
+	@Override
+	public void touchUp (float x, float y) {
+
 	}
 
 	private void calculateSelectionBounds () {
 		selectionBounds.clr();
+
+		boolean first = true;
+
 		for (GameObject object : viewportWidget.selection) {
 			//Do da bounds on the transforms or widgets
+
+
 
 			if (object.hasComponent(TransformComponent.class)) {
 
 				TransformComponent transformComponent = object.getComponent(TransformComponent.class);
-				selectionBounds.ext(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
+				if (first) {
+					first = false;
+					Vector3 minMaxDefault = new Vector3(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
+					selectionBounds.set(minMaxDefault, minMaxDefault);
+				} else {
+					selectionBounds.ext(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
+
+				}
+
+
 
 
 				if (object.hasComponent(SpriteRendererComponent.class)) {
@@ -117,6 +165,6 @@ public class GroupSelectionGizmo extends Gizmo {
 
 	@Override
 	public int getPriority () {
-		return 10;
+		return -1;
 	}
 }

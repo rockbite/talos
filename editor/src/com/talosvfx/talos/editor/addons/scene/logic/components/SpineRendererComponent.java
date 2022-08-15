@@ -127,7 +127,6 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             if (animations.size > 0) {
                 animationState.setAnimation(0, animations.peek(), true);
             }
-
         }
     }
 

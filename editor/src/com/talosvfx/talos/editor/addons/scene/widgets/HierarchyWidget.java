@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -40,7 +41,12 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         tree.draggable = true;
         //tree.getSelection().setMultiple(true);
 
-        add(tree).grow().pad(5).padRight(0);
+        top();
+        defaults().top();
+
+        ScrollPane scrollPane= new ScrollPane(tree);
+
+        add(scrollPane).height(0).grow().pad(5).padRight(0);
 
         contextualMenu = new ContextualMenu();
 

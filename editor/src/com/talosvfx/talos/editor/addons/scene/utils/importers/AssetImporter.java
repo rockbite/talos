@@ -302,7 +302,7 @@ public class AssetImporter {
 
         SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
 
-        SceneEditorAddon.get().projectExplorer.select(currentFolder.path());
+        SceneEditorAddon.get().projectExplorer.select(directory.path());
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {

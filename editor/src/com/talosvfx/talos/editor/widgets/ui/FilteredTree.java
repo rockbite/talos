@@ -658,16 +658,21 @@ public class FilteredTree<T> extends WidgetGroup {
         sizeInvalid = true;
     }
 
+    @Override
+    protected void sizeChanged () {
+        super.sizeChanged();
+    }
+
     private void computeSize () {
         sizeInvalid = false;
         prefWidth = style.plus.getMinWidth();
         prefWidth = Math.max(prefWidth, style.minus.getMinWidth());
-        prefHeight = getHeight();
+
         leftColumnWidth = 0;
+        prefHeight = 0;
         computeSize(rootNodes, indentSpacing);
         leftColumnWidth += iconSpacingLeft + padding;
         prefWidth += leftColumnWidth + padding;
-        prefHeight = getHeight() - prefHeight;
     }
 
     private void computeSize (Array<Node<T>> nodes, float indent) {
@@ -695,7 +700,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 node.height = Math.max(node.height, node.icon.getMinHeight());
             }
             prefWidth = Math.max(prefWidth, rowWidth);
-            prefHeight -= node.height + ySpacing;
+            prefHeight += node.height + ySpacing;
             if (node.expanded)
                 computeSize(node.children, indent + indentSpacing);
         }
