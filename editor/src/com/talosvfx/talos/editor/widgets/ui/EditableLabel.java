@@ -96,10 +96,7 @@ public class EditableLabel extends Table implements ActorCloneable {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.ENTER) {
-                    setStaticMode();
-                    if(listener != null) {
-                        listener.changed(label.getText().toString());
-                    }
+                    finishTextEdit();
                 }
 
                 return super.keyDown(event, keycode);
@@ -109,6 +106,13 @@ public class EditableLabel extends Table implements ActorCloneable {
         pack();
 
         setStaticMode();
+    }
+
+    public void finishTextEdit () {
+        setStaticMode();
+        if(listener != null) {
+            listener.changed(label.getText().toString());
+        }
     }
 
     public void setListener(EditableLabelChangeListener listener) {
@@ -146,7 +150,9 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.clearSelection();
 
         if (getStage() != null) {
-            getStage().setKeyboardFocus(keyboardFocus);
+            if (getStage().getKeyboardFocus() == this) {
+                getStage().setKeyboardFocus(keyboardFocus);
+            }
         }
     }
 
