@@ -211,12 +211,14 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
 
-    private void selectSingleNode (Node<T> node) {
-        clearSelection(true);
+    private void selectSingleNode (Node<T> node, boolean notifyListeners) {
+        clearSelection(notifyListeners);
         addNodeToSelection(node);
-        for (int i = 0; i < itemListeners.size; i++) {
-            ItemListener<T> tItemListener = itemListeners.get(i);
-            tItemListener.selected(node);
+        if (notifyListeners) {
+            for (int i = 0; i < itemListeners.size; i++) {
+                ItemListener<T> tItemListener = itemListeners.get(i);
+                tItemListener.selected(node);
+            }
         }
     }
 
@@ -282,7 +284,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 if (selection.contains(node)) {
                     clearSelection(true);
                 } else {
-                    selectSingleNode(node);
+                    selectSingleNode(node, true);
                 }
 
                 if (!selection.isEmpty())
@@ -744,7 +746,7 @@ public class FilteredTree<T> extends WidgetGroup {
         if(autoSelectionIndex > result.size - 1) autoSelectionIndex = 0;
 
         Node node = result.get(autoSelectionIndex);
-        selectSingleNode(node);
+        selectSingleNode(node, false);
         if(node.parent != null) node.parent.setExpanded(true);
     }
 
