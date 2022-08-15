@@ -835,6 +835,7 @@ public abstract class ViewportWidget extends Table {
 
 		float previousUnit = gridUnit / 2;
 		linesToAppearAlpha = MathUtils.lerp(smallLinesAlpha, linesToAppearAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
+		smallLinesAlpha = MathUtils.lerp(mainLinesAlpha, smallLinesAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
 
 		int baseLineDivisor = 4;
 
