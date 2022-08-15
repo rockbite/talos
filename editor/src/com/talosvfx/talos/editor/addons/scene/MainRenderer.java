@@ -112,6 +112,7 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     public void update (GameObject root) {
+        if (!root.active) return;
         if (root.hasComponent(TransformComponent.class)) {
             TransformComponent transform = root.getComponent(TransformComponent.class);
 
@@ -146,6 +147,8 @@ public class MainRenderer implements Notifications.Observer {
 
     private void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
         for (GameObject root : rootObjects) {
+            if (!root.active) continue;
+
             boolean childrenVisibleFlag = true;
             if (root.hasComponentType(RendererComponent.class)) {
                 RendererComponent rendererComponent = root.getComponentAssignableFrom(RendererComponent.class);

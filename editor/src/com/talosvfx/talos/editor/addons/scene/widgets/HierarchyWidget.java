@@ -15,6 +15,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -212,6 +213,22 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     }
 
     @EventHandler
+    public void gameActiveChanged (GameObjectActiveChanged event) {
+        updateColourForActive(event.target);
+    }
+
+    private void updateColourForActive (GameObject gameObject) {
+        FilteredTree.Node<GameObject> node = tree.findNode(gameObject);
+        if (node != null) {
+            if (gameObject.active) {
+                node.getActor().setColor(1, 1, 1, 1);
+            } else {
+                node.getActor().setColor(1, 0, 0, 1);
+            }
+        }
+    }
+
+    @EventHandler
     public void onGameObjectCreated(GameObjectCreated event) {
         GameObject gameObject = event.getTarget();
         if(currentContainer != null) {
@@ -289,6 +306,13 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             newNode.setObject(gameObject);
             newNode.draggable = true;
             node.add(newNode);
+
+
+            if (gameObject.active) {
+                editableLabel.setColor(1, 1, 1, 1);
+            } else {
+                editableLabel.setColor(1, 0, 0, 1);
+            }
 
             editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
                 @Override

@@ -155,6 +155,11 @@ public class EditableLabel extends Table implements ActorCloneable {
         label.setColor(color);
     }
 
+    @Override
+    public void setColor (float r, float g, float b, float a) {
+        label.setColor(r, g, b, a);
+    }
+
     public String getText() {
         return label.getText().toString();
     }
