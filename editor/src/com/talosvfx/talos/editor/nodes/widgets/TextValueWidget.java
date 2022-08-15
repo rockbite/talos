@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class TextValueWidget extends AbstractWidget<String> {
@@ -120,7 +121,7 @@ public class TextValueWidget extends AbstractWidget<String> {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 

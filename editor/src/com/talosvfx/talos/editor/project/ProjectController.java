@@ -96,9 +96,10 @@ public class ProjectController {
         try {
             loading = true;
             currentProject.loadProject(null, string, fromMemory);
-            loading = false;
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
+        } finally {
+            loading = false;
         }
     }
 
@@ -355,14 +356,14 @@ public class ProjectController {
 
     public void undo() {
         boolean changed = snapshotTracker.moveBack();
-        if(changed) {
+        if (changed) {
             getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }
 
     public void redo() {
         boolean changed = snapshotTracker.moveForward();
-        if(changed) {
+        if (changed) {
             getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }

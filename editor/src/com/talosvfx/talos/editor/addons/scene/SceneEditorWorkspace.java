@@ -90,6 +90,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
 
+	public static boolean isEnterPressed (int keycode) {
+		switch (keycode) {
+			case Input.Keys.ENTER:
+			case Input.Keys.NUMPAD_ENTER:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	public MainRenderer getUISceneRenderer () {
 		return uiSceneRenderer;
 	}
@@ -609,7 +619,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public static boolean isRenamePressed (int keycode) {
 		if (TalosMain.Instance().isOsX()) {
-			return keycode == Input.Keys.ENTER;
+			return isEnterPressed(keycode);
 		} else {
 			return keycode == Input.Keys.F2;
 		}

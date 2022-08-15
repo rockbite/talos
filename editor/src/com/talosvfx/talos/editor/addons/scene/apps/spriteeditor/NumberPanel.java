@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class NumberPanel extends Table {
@@ -138,7 +139,7 @@ public class NumberPanel extends Table {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 

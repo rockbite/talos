@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
@@ -95,7 +96,7 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     setStaticMode();
                     if(listener != null) {
                         listener.changed(label.getText().toString());

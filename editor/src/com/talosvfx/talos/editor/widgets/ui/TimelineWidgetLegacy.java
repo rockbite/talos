@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.runtime.ParticleEmitterInstance;
 
 @Deprecated
@@ -273,7 +274,7 @@ public class TimelineWidgetLegacy extends Table {
             textField.addListener(new InputListener() {
                 @Override
                 public boolean keyDown(InputEvent event, int keycode) {
-                    if(keycode == Input.Keys.ENTER) {
+                    if(SceneEditorWorkspace.isEnterPressed(keycode)) {
                         EmitterRow.this.setStaticMode();
                     }
 
