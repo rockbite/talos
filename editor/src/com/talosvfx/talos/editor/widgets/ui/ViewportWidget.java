@@ -819,10 +819,10 @@ public abstract class ViewportWidget extends Table {
 		Gdx.gl.glLineWidth(1f);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
-		float zeroAlpha = 1f;
-		float mainLinesAlpha = 0.5f;
-		float smallLinesAlpha = 0.2f;
-
+		float zeroAlpha = 0.8f;
+		float mainLinesAlpha = 0.2f;
+		float smallLinesAlpha = 0.1f;
+		float linesToAppearAlpha = 0.01f;
 
 		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -833,7 +833,8 @@ public abstract class ViewportWidget extends Table {
 		float distanceThatLinesShouldBe = pixelToWorld(150f);
 		gridUnit = nextPowerOfTwo(distanceThatLinesShouldBe);
 
-//		mainLinesAlpha = MathUtils.lerp(0, mainLinesAlpha, (distanceThatLinesShouldBe - unit) / unit);
+		float previousUnit = gridUnit / 2;
+		linesToAppearAlpha = MathUtils.lerp(smallLinesAlpha, linesToAppearAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
 
 		int baseLineDivisor = 4;
 
@@ -861,11 +862,22 @@ public abstract class ViewportWidget extends Table {
 		for (float i = gridXStart; i < visibleEndX; i += gridUnit) {
 			for (int j = 1; j <= baseLineDivisor; j++) {
 				float smallUnitSize = gridUnit / baseLineDivisor;
+				float x1 = i + j * smallUnitSize;
+
+				for (int k = 1; k <= baseLineDivisor; k++) {
+					float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
+
+					gridColor.a =  linesToAppearAlpha * parentAlpha;
+					shapeRenderer.setColor(gridColor);
+					drawLine(batch, x1 + k * nextUnitSize, cameraY - visibleHeight / 2, x1 + k * nextUnitSize, cameraY + visibleHeight / 2, thickness, j);
+				}
 
 				gridColor.a =  smallLinesAlpha * parentAlpha;
 				shapeRenderer.setColor(gridColor);
-				drawLine(batch, i + j * smallUnitSize, cameraY - visibleHeight / 2, i + j * smallUnitSize, cameraY + visibleHeight / 2, thickness, i);
+
+				drawLine(batch, x1, cameraY - visibleHeight / 2, x1, cameraY + visibleHeight / 2, thickness, i);
 			}
+
 
 			if (i == 0) continue;
 			gridColor.a =  mainLinesAlpha * parentAlpha;
@@ -880,10 +892,19 @@ public abstract class ViewportWidget extends Table {
 		for (float i = gridYStart; i < visibleEndY; i += gridUnit) {
 			for (int j = 1; j <= baseLineDivisor; j++) {
 				float smallUnitSize = gridUnit / baseLineDivisor;
+				float y1 = i + j * smallUnitSize;
+
+				for (int k = 1; k <= baseLineDivisor; k++) {
+					float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
+
+					gridColor.a =  linesToAppearAlpha * parentAlpha;
+					shapeRenderer.setColor(gridColor);
+					drawLine(batch, cameraX - visibleWidth / 2, y1 + k * nextUnitSize, cameraX + visibleWidth / 2, y1 + k * nextUnitSize, thickness, i);
+				}
 
 				gridColor.a =  smallLinesAlpha * parentAlpha;
 				shapeRenderer.setColor(gridColor);
-				drawLine(batch, cameraX - visibleWidth / 2, i + j * smallUnitSize, cameraX + visibleWidth / 2,  i + j * smallUnitSize , thickness, i);
+				drawLine(batch, cameraX - visibleWidth / 2, y1, cameraX + visibleWidth / 2, y1, thickness, i);
 			}
 
 			if (i == 0) continue;
@@ -909,7 +930,7 @@ public abstract class ViewportWidget extends Table {
 			smallerOne = true;
 		}
 
-		float unit = MathUtils.nextPowerOfTwo(negative ? MathUtils.ceil(value) : MathUtils.floor(value));
+		float unit = MathUtils.nextPowerOfTwo(MathUtils.ceil(value));
 		if (smallerOne) {
 			unit = 1 / unit;
 			unit *= 2;

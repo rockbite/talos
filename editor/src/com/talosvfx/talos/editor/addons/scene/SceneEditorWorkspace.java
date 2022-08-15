@@ -111,7 +111,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		layers.add("Misc");
 
 		setSkin(TalosMain.Instance().getSkin());
-		setWorldSize(1920);
+		setWorldSize(10);
 		mapEditorToolbar = new MapEditorToolbar(TalosMain.Instance().getSkin());
 
 		snapshotService = new SnapshotService();
@@ -148,6 +148,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		gridDrawer = new GridDrawer(this, camera, gridProperties);
 		addRulers();
+		bgColor = Color.valueOf("#272727");
 	}
 
 	public void createEmpty (Vector2 position) {
@@ -949,12 +950,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		selectPropertyHolder(mainScene);
 
-		if (mainScene instanceof Scene) {
-			bgColor.set(Color.BLACK);
-		} else {
-
-			bgColor.set(Color.valueOf("#241a00"));
-		}
+//		if (mainScene instanceof Scene) {
+//			bgColor.set(Color.BLACK);
+//		} else {
+//			bgColor.set(Color.valueOf("#241a00"));
+//		}
 	}
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
