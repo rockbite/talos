@@ -81,6 +81,11 @@ public class SearchFilteredTree<T> extends Table {
 
     }
 
+    @Override
+    public boolean remove () {
+        return super.remove();
+    }
+
     public void reset() {
         textField.setText("");
         filteredTree.filter(textField.getText());
