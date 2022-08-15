@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -31,7 +30,8 @@ public class ProjectExplorerWidget extends Table {
 
     private final FilteredTree<Object> directoryTree;
     public static FileFilter fileFilter;
-    private final DirectoryViewWidget directoryViewWidget;
+    private final DirectoryWidgetTrash directoryViewWidget;
+    private final DirectoryViewWidget directoryViewWidgetNew;
     private ObjectMap<String, FilteredTree.Node> nodes = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
@@ -63,8 +63,9 @@ public class ProjectExplorerWidget extends Table {
 
         Table directoryViewTable = new Table();
         directoryViewTable.top().left().defaults().top().left();
-        directoryViewWidget = new DirectoryViewWidget();
-        ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidget);
+        directoryViewWidget = new DirectoryWidgetTrash();
+        directoryViewWidgetNew = new DirectoryViewWidget();
+        ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidgetNew);
         directoryViewTable.add(scrollPaneRight).height(0).grow();
 
         scrollPaneRight.setScrollingDisabled(true, false);
@@ -95,6 +96,7 @@ public class ProjectExplorerWidget extends Table {
             public void selected (FilteredTree.Node node) {
                 select(node);
                 directoryViewWidget.setDirectory((String) node.getObject());
+                directoryViewWidgetNew.openDirectory((String) node.getObject());
             }
 
             @Override
@@ -564,7 +566,7 @@ public class ProjectExplorerWidget extends Table {
         select(destination.path());
     }
 
-    public DirectoryViewWidget getDirectoryViewWidget() {
+    public DirectoryWidgetTrash getDirectoryViewWidget() {
         return directoryViewWidget;
     }
 }

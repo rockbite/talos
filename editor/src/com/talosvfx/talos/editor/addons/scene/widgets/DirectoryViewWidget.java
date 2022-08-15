@@ -1,566 +1,315 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.*;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Layout;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
-import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
 public class DirectoryViewWidget extends Table {
+    private static final DirectoryViewFileComparator DIRECTORY_VIEW_FILE_COMPARATOR = new DirectoryViewFileComparator();
+    private static final FileFilter DIRECTORY_VIEW_FILE_FILTER = new DirectoryViewFileFilter();
 
-    private Array<ItemView> items = new Array<>();
-    private FileHandle fileHandle;
-    private int colCount = 0;
-    private float boxWidth = 0;
+    private ItemGroup items;
 
-    private ItemView overItem;
-    private Array<ItemView> selected = new Array<>();
-    private ItemView selectCandidate;
-    private int selectionStart = -1;
+    public DirectoryViewWidget () {
+        items = new ItemGroup();
+        items.pad(20);
+        items.space(5);
+        items.wrapSpace(5);
 
-    private Vector2 tmp = new Vector2();
-
-    private DragAndDrop dragAndDrop;
-
-    private boolean preventDeselect = false;
-
-    private Array<DragAndDrop.Target> externalTargets;
-
-    private boolean renaming = false;
-
-    public DirectoryViewWidget() {
-        build();
-        externalTargets = new Array<>();
+        add(items).grow();
     }
 
-    private void build () {
-
-        dragAndDrop = new DragAndDrop();
-
-        addListener(new ClickListener() {
-
-            long timeClicked;
-            Vector2 prevPos = new Vector2();
-
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-
-                ItemView selectCandidate = getSelectCandidate();
-                if(selectCandidate != null && SceneEditorWorkspace.isRenamePressed(keycode)) {
-                    for(ItemView item: items) {
-                        if(item.fileHandle.path().equals(selectCandidate.fileHandle.path())) {
-                            // found it
-                            item.setToRename();
-                        }
-                    }
-                }
-
-                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-
-                if(keycode == Input.Keys.X && SceneEditorWorkspace.ctrlPressed()) {
-                    projectExplorer.invokeCut(convertToFileArray(selected));
-                }
-
-                if(keycode == Input.Keys.C && SceneEditorWorkspace.ctrlPressed()) {
-                    projectExplorer.invokeCopy(convertToFileArray(selected));
-                }
-
-                if(keycode == Input.Keys.V && SceneEditorWorkspace.ctrlPressed()) {
-                    projectExplorer.invokePaste(getCurrentFolder());
-                }
-
-                if(keycode == Input.Keys.FORWARD_DEL) {
-                    Array<String> paths = new Array<>();
-                    for(ItemView file: selected) {
-                        paths.add(file.fileHandle.path());
-                    }
-                    projectExplorer.deletePath(paths);
-                }
-
-                if(keycode == Input.Keys.A && SceneEditorWorkspace.ctrlPressed()) {
-                    selectAllFiles();
-                    reportSelectionChanged();
-                }
-
-                return super.keyDown(event, keycode);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button);
-
-                if(preventDeselect) {
-                    preventDeselect = false;
-                    return;
-                }
-
-                ItemView itemViewAt = getFileAt(x, y);
-
-                if(button == 1) {
-                    if(itemViewAt != null) {
-                        if (!selected.contains(itemViewAt, true)) {
-                            selectFile(itemViewAt);
-                            reportSelectionChanged();
-                        }
-                        SceneEditorAddon.get().projectExplorer.showContextMenu(convertToFileArray(selected), true);
-                    } else {
-                        Array<FileHandle> list = new Array<>();
-                        list.add(fileHandle);
-                        SceneEditorAddon.get().projectExplorer.showContextMenu(list, true);
-                    }
-                } else if(button == 0) {
-                    float diff = TimeUtils.millis() - timeClicked;
-                    ItemView fileToSelect = getFileAt(x, y);
-
-                    if(fileToSelect != null) {
-                        if(SceneEditorWorkspace.ctrlPressed()) {
-                            if(selected.contains(fileToSelect, true)) {
-                                removeFromSelection(fileToSelect);
-                            } else {
-                                addToSelection(fileToSelect);
-                            }
-                            reportSelectionChanged();
-                            selectionStart = items.indexOf(fileToSelect, true);
-                        } else {
-                            if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                                if(selectionStart >= 0) {
-                                    int aPoint = items.indexOf(fileToSelect, true);
-                                    int bPoint = selectionStart;
-                                    int min = Math.min(aPoint, bPoint);
-                                    int max = Math.max(aPoint, bPoint);
-                                    unselectFiles();
-                                    for(int i = min; i <= max; i++) {
-                                        addToSelection(items.get(i));
-                                    }
-                                    reportSelectionChanged();
-                                }
-                            } else {
-                                selectionStart = items.indexOf(fileToSelect, true);
-                                selectFile(fileToSelect);
-                                reportSelectionChanged();
-                            }
-                        }
-                    } else {
-                        selectionStart = -1;
-                        unselectFiles();
-                        reportSelectionChanged();
-                    }
-
-                    if(diff < 500 && prevPos.dst(x, y) < 40) {
-                        timeClicked = 0;
-                        prevPos.set(0, 0);
-                        ItemView fileAt = getFileAt(x, y);
-                        if(fileAt != null) {
-                            AssetImporter.fileOpen(fileAt.fileHandle);
-                        } else {
-                            // go up
-                            if(fileHandle != null) {
-                                FileHandle parent = fileHandle.parent();
-                                FileHandle projectFolder = SceneEditorAddon.get().workspace.getProjectFolder();
-                                if(parent.path().startsWith(projectFolder.path())) {
-                                    SceneEditorAddon.get().projectExplorer.select(parent.path());
-                                }
-
-                            }
-                        }
-                    }
-
-                    timeClicked = TimeUtils.millis();
-                    prevPos.set(x, y);
-                }
-
-                if(getStage() != null) {
-                    getStage().setKeyboardFocus(DirectoryViewWidget.this);
-                }
-            }
-
-            @Override
-            public boolean mouseMoved(InputEvent event, float x, float y) {
-
-                ItemView item = getFileAt(x, y);
-
-                overItem = item;
-
-                return super.mouseMoved(event, x, y);
-            }
-        });
-
-        setTouchable(Touchable.enabled);
-    }
-
-    private Array<FileHandle> convertToFileArray (Array<ItemView> selected) {
-        Array<FileHandle> handles = new Array<>();
-        for (ItemView itemView : selected) {
-            handles.add(itemView.fileHandle);
-        }
-        return handles;
-    }
-
-    private void removeFromSelection(ItemView itemView) {
-        selected.removeValue(itemView, true);
-    }
-
-    private void addToSelection(ItemView itemView) {
-        selected.add(itemView);
-        selectCandidate = itemView;
-        getStage().setKeyboardFocus(this);
-    }
-
-    private void selectFile(ItemView itemView) {
-        selected.clear();
-        selected.add(itemView);
-        selectCandidate = itemView;
-        getStage().setKeyboardFocus(this);
-    }
-
-    private ItemView getSelectCandidate() {
-        if(selectCandidate != null) return selectCandidate;
-
-        if(selected.size > 0) {
-            return selected.first();
-        }
-
-        return null;
-    }
-
-    private void selectAllFiles() {
-        selected.clear();
-        for(ItemView view: items) {
-            selected.add(view);
-        }
-    }
-
-    private void unselectFiles() {
-        selected.clear();
-        selectCandidate = null;
-    }
-
-
-    private ItemView getFileAt(float x, float y) {
-        for(ItemView view: items) {
-            tmp.set(x, y);
-            localToStageCoordinates(tmp);
-            view.stageToLocalCoordinates(tmp);
-
-            if(view.hit(tmp.x, tmp.y, false) != null) {
-                return view;
-            }
-        }
-        return null;
-    }
-
-    public void setDirectory(String path) {
-        fileHandle = Gdx.files.absolute(path);
-        if (fileHandle == null || !fileHandle.exists()) {
-            System.out.println("Error setting dir " + path);
+    /**
+     * Open directory in current view.
+     * @param path Path of the current folder. Can be both absolute or relative.
+     */
+    public void openDirectory (String path) {
+        FileHandle directory = Gdx.files.absolute(path);
+        if (!directory.exists()) { // check if file exists
+            System.out.println("Error opening directory: " + path);
             return;
-        };
+        }
 
-        rebuild();
+        if (!directory.isDirectory()) { // check if it's a folder
+            System.out.println("Error provided path is not directory: " + path);
+        }
+
+        fillItems(directory);
     }
 
-    private void rebuild () {
-        if(fileHandle == null || !fileHandle.exists()) return;
-
-        dragAndDrop.clear();
-        clearChildren();
+    /**
+     * Clears old items and populates the view with items in current directory.
+     * Indicates if the folder is empty.
+     * @param directory directory exists and it's directory.
+     */
+    private void fillItems (FileHandle directory) {
         items.clear();
-        renaming = false;
-        for (DragAndDrop.Target externalTarget : externalTargets) {
-            dragAndDrop.addTarget(externalTarget);
-        }
 
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+        FileHandle[] content = directory.list();
+        Arrays.sort(content, DIRECTORY_VIEW_FILE_COMPARATOR);
 
-                Actor actor = getActor();
-
-                return true;
+        for (FileHandle fileHandle : content) {
+            if (!DIRECTORY_VIEW_FILE_FILTER.accept(fileHandle.file())) {
+                continue; // skip over unwanted files
             }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-
-                Object object = payload.getObject();
-                if(object instanceof Array) {
-
-                    //its a selection of File handles
-
-                    Array<ItemView> array = (Array<ItemView>) object;
-
-                    for (ItemView itemView : array) {
-                        if (itemView.gameAsset != null) {
-                            AssetImporter.createAssetInstance(itemView.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
-                        }
-                    }
-                } else {
-                    if (object instanceof GameAsset) {
-                        AssetImporter.createAssetInstance((GameAsset) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
-                    }
-                    if (object instanceof FileHandle) {
-                        //Do nothing here anymore
-                    }
-                }
-
-                unselectFiles();
-            }
-        });
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor actor = getActor();
-
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-            }
-        });
-
-        for (ObjectMap.Entry<String, FilteredTree.Node> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
-            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
-                @Override
-                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                    return true;
-                }
-
-                @Override
-                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                    //Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
-
-                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-
-                    Object object = payload.getObject();
-                    if (object instanceof Array) {
-                        Array<ItemView> array = (Array<ItemView>) object;
-                        for (ItemView sourceItem : array) {
-                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle);
-                            }
-                        }
-                    } else if (object instanceof GameAsset) {
-                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
-                        FileHandle handle = sourceItem.getRootRawAsset().handle;
-                        if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
-                        }
-                    } else if (object instanceof FileHandle) {
-                        FileHandle handle = (FileHandle) payload.getObject();
-                        if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
-                        }
-                    }
-                    rebuild();
-                }
-            });
-        }
-
-        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                ItemView fileAt = getFileAt(x, y);
-
-                if(fileAt != null) {
-                    overItem = fileAt;
-                    return true;
-                }
-
-                return false;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                ItemView targetItem = getFileAt(x, y);
-
-                if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
-
-                    Object object = payload.getObject();
-                    if (object instanceof Array) {
-                        Array<ItemView> array = (Array<ItemView>) object;
-                        for (ItemView sourceItem : array) {
-                            if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle);
-                            }
-                        }
-                    } else if (object instanceof GameAsset) {
-                        GameAsset sourceItem = (GameAsset) payload.getObject();
-                        FileHandle handle = sourceItem.getRootRawAsset().handle;
-                        if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
-                        }
-                    } else if (object instanceof FileHandle) {
-                        FileHandle handle = (FileHandle) payload.getObject();
-                        if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
-                        }
-                    }
-
-                    unselectFiles();
-                }
-            }
-        });
-
-
-
-        if (fileHandle.isDirectory()) {
-            int count = 0;
-            FileHandle[] list = fileHandle.list();
-            Array<FileHandle> sortedList = new Array<>();
-            sortedList.addAll(list);
-            sortedList.sort(new Comparator<FileHandle>() {
-                @Override
-                public int compare (FileHandle o1, FileHandle o2) {
-                    if (o1.isDirectory() && !o2.isDirectory()) {
-                        return -1;
-                    } else if (o2.isDirectory() && !o1.isDirectory()) {
-                        return 1;
-                    }
-
-                    return o1.name().compareTo(o2.name());
-                }
-            });
-            for (FileHandle child : sortedList) {
-                if(!ProjectExplorerWidget.fileFilter.accept(child.file())) {
-                    continue;
-                }
-
-                ItemView itemView = new ItemView();
-                itemView.setFile(child);
-
-                items.add(itemView);
-                itemView.pack();
-                boxWidth = itemView.getWidth();
-
-                dragAndDrop.addSource(new DragAndDrop.Source(itemView) {
-                    @Override
-                    public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
-
-                        preventDeselect = true;
-
-                        if(!selected.contains(itemView, true)) {
-                            selected.clear();
-                            selected.add(itemView);
-                        }
-
-                        if(selected.size == 1) {
-                            ItemView newView = new ItemView();
-                            Actor dragging = ((ActorCloneable) newView).copyActor(itemView);
-                            payload.setDragActor(dragging);
-                            if (newView.gameAsset != null) {
-                                payload.setObject(newView.gameAsset);
-                            } else {
-                                payload.setObject(child);
-                            }
-                        } else {
-                            Label dragging = new Label("Multiple selection", TalosMain.Instance().getSkin());
-                            payload.setDragActor(dragging);
-                            payload.setObject(selected);
-                        }
-
-                        return payload;
-                    }
-                });
-
-                colCount = (int) (getWidth() / (boxWidth + 10)) - 1;
-
-                add(itemView).top().left().width(120).padLeft(10).padTop(10);
-                count++;
-                if (count >= colCount) {
-                    count = 0;
-                    add().expandX().growX();
-                    row();
-                }
-            }
-            add().colspan(colCount-count).expandX().growX();
-            row();
-            add().colspan(colCount).expand().grow();
+            Item item = new Item();
+            item.setFile(fileHandle);
+            item.debug();
+            items.addActor(item);
         }
     }
 
     @Override
-    protected void sizeChanged () {
+    protected void sizeChanged() {
         super.sizeChanged();
+    }
 
-        if (!renaming && boxWidth > 0) {
+    /**
+     * Compares two FileHandles and sorts them in alphabetical order based on their names. Gives priority to
+     * directory if names are equal.
+     */
+    private static class DirectoryViewFileComparator implements Comparator<FileHandle> {
 
-            int newColCount = (int) (getWidth() / boxWidth);
+        @Override
+        public int compare(FileHandle o1, FileHandle o2) {
+            String name1 = o1.nameWithoutExtension();
+            String name2 = o2.nameWithoutExtension();
 
-            if(colCount != newColCount) {
-                rebuild();
+            boolean isDirectory1 = o1.isDirectory();
+            boolean isDirectory2 = o2.isDirectory();
+            if (name1.compareTo(name2) > 0) { // name1, name2
+                return 1;
+            } else if (name1.compareTo(name2) < 0) { // name2, name1
+                return -1;
+            } else if (isDirectory1 && !isDirectory2) { // dir, file
+                return 1;
+            } else if (!isDirectory1 && isDirectory2) { // file, dir
+                return -1;
+            }
+            return 0;
+        }
+    }
+
+
+    /**
+     * Hides unnecessary files.
+     */
+    private static class DirectoryViewFileFilter implements FileFilter {
+
+        @Override
+        public boolean accept (File pathname) {
+
+            if(pathname.getName().endsWith(".tse")) return false;
+            if(pathname.getName().equals(".DS_Store")) return false;
+            if(pathname.getName().endsWith(".meta")) return false;
+            if(pathname.getName().endsWith(".p")) return false;
+
+            return true;
+        }
+    }
+
+    private static class ItemGroup extends WidgetGroup {
+        private float prefWidth, prefHeight, lastPrefHeight;
+        private boolean sizeInvalid = true;
+        private FloatArray rowSizes; // row width, row height, ...
+
+        private boolean round = true;
+        private float space, wrapSpace, padTop, padLeft, padBottom, padRight;
+
+        public ItemGroup () {
+            setTouchable(Touchable.childrenOnly);
+        }
+
+        @Override
+        public void invalidate() {
+            super.invalidate();
+            sizeInvalid = true;
+        }
+
+        private void computeSize () {
+            sizeInvalid = false;
+            SnapshotArray<Actor> children = getChildren();
+            int n = children.size;
+            prefHeight = 0;
+            prefWidth = 0;
+            if (rowSizes == null)
+                rowSizes = new FloatArray();
+            else
+                rowSizes.clear();
+            FloatArray rowSizes = this.rowSizes;
+            float space = this.space, wrapSpace = this.wrapSpace;
+            float pad = padLeft + padRight, groupWidth = getWidth() - pad, x = 0, y = 0, rowHeight = 0;
+            int i = 0, incr = 1;
+            for (; i != n; i += incr) {
+                Actor child = children.get(i);
+
+                float width, height;
+                if (child instanceof Layout) {
+                    Layout layout = (Layout)child;
+                    width = layout.getPrefWidth();
+                    if (width > groupWidth) width = Math.max(groupWidth, layout.getMinWidth());
+                    height = layout.getPrefHeight();
+                } else {
+                    width = child.getWidth();
+                    height = child.getHeight();
+                }
+
+                float incrX = width + (x > 0 ? space : 0);
+                if (x + incrX > groupWidth && x > 0) {
+                    rowSizes.add(x);
+                    rowSizes.add(rowHeight);
+                    prefWidth = Math.max(prefWidth, x + pad);
+                    if (y > 0) y += wrapSpace;
+                    y += rowHeight;
+                    rowHeight = 0;
+                    x = 0;
+                    incrX = width;
+                }
+                x += incrX;
+                rowHeight = Math.max(rowHeight, height);
+            }
+            rowSizes.add(x);
+            rowSizes.add(rowHeight);
+            prefWidth = Math.max(prefWidth, x + pad);
+            if (y > 0) y += wrapSpace;
+            prefHeight = Math.max(prefHeight, y + rowHeight);
+            prefHeight += padTop + padBottom;
+            if (round) {
+                prefWidth = Math.round(prefWidth);
+                prefHeight = Math.round(prefHeight);
+            }
+            if (hasParent()) {
+                prefWidth = Math.max(getParent().getWidth(), prefWidth);
             }
         }
-        renaming = false; // consume the flag
-    }
 
-    public void reload () {
-        rebuild();
-    }
+        public void layout () {
+            if (sizeInvalid) computeSize();
 
-    public FileHandle getCurrentFolder () {
-        return fileHandle;
-    }
-
-    public void startRenameFor(FileHandle handle) {
-        for (ItemView itemView: items) {
-            if(itemView.fileHandle.path().equals(handle.path())) {
-                itemView.setToRename();
-                renaming = true;
+            float prefHeight = getPrefHeight();
+            if (prefHeight != lastPrefHeight) {
+                lastPrefHeight = prefHeight;
+                invalidateHierarchy();
             }
+
+            boolean round = this.round;
+            float space = this.space, wrapSpace = this.wrapSpace;
+            float rowY = prefHeight - padTop, groupWidth = getWidth(), xStart = padLeft, x = 0, rowHeight = 0, rowDir = -1;
+
+            rowY += getHeight() - prefHeight; // align top
+
+            xStart += (groupWidth - prefWidth) / 2; // align the whole group to center
+
+            groupWidth -= padRight;
+
+            FloatArray rowSizes = this.rowSizes;
+            SnapshotArray<Actor> children = getChildren();
+            int i = 0, n = children.size, incr = 1;
+            for (int r = 0; i != n; i += incr) {
+                Actor child = children.get(i);
+
+                float width, height;
+                Layout layout = null;
+                if (child instanceof Layout) {
+                    layout = (Layout)child;
+                    width = layout.getPrefWidth();
+                    if (width > groupWidth) width = Math.max(groupWidth, layout.getMinWidth());
+                    height = layout.getPrefHeight();
+                } else {
+                    width = child.getWidth();
+                    height = child.getHeight();
+                }
+
+                if (x + width > groupWidth || r == 0) {
+                    r = Math.min(r, rowSizes.size - 2); // In case an actor changed size without invalidating this layout.
+                    x = xStart;
+                    rowHeight = rowSizes.get(r + 1);
+                    if (r > 0) rowY += wrapSpace * rowDir;
+                    rowY += rowHeight * rowDir;
+                    r += 2;
+                }
+
+                if (layout != null) {
+                    height = Math.max(height, layout.getMinHeight());
+                    float maxHeight = layout.getMaxHeight();
+                    if (maxHeight > 0 && height > maxHeight) height = maxHeight;
+                }
+
+                float y = rowY;
+                y += rowHeight - height; // align top
+
+                if (round)
+                    child.setBounds(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
+                else
+                    child.setBounds(x, y, width, height);
+                x += width + space;
+
+                if (layout != null) layout.validate();
+            }
+        }
+
+        /** Sets the padTop, padLeft, padBottom, and padRight to the specified value. */
+        public ItemGroup pad (float pad) {
+            padTop = pad;
+            padLeft = pad;
+            padBottom = pad;
+            padRight = pad;
+            return this;
+        }
+
+        /** Sets the horizontal space between children. */
+        public ItemGroup space (float space) {
+            this.space = space;
+            return this;
+        }
+
+        /** Sets the vertical space between rows when wrap is enabled. */
+        public ItemGroup wrapSpace (float wrapSpace) {
+            this.wrapSpace = wrapSpace;
+            return this;
+        }
+
+        protected void drawDebugBounds (ShapeRenderer shapes) {
+            super.drawDebugBounds(shapes);
+            if (!getDebug()) return;
+            shapes.set(ShapeRenderer.ShapeType.Line);
+            if (getStage() != null) shapes.setColor(getStage().getDebugColor());
+            shapes.rect(getX() + padLeft, getY() + padBottom, getOriginX(), getOriginY(), getWidth() - padLeft - padRight,
+                    getHeight() - padBottom - padTop, getScaleX(), getScaleY(), getRotation());
         }
     }
 
-    public class ItemView extends Table implements ActorCloneable<ItemView> {
-
-        private Table iconContainer;
+    private static class Item extends Widget implements ActorCloneable<Item> {
         private Image icon;
+        private Image brokenStatus;
         private EditableLabel label;
 
         private FileHandle fileHandle;
@@ -568,60 +317,27 @@ public class DirectoryViewWidget extends Table {
 
         private GameObject basicGameObject;
 
-        public ItemView() {
-            build();
-        }
-
-        private void build() {
+        public Item () {
             Skin skin = TalosMain.Instance().getSkin();
             icon = new Image();
+            brokenStatus = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
             label = new EditableLabel("text", skin);
-            label.setAlignment(Align.center);
-            label.getLabel().setWrap(true);
-            label.getLabelCell().width(100);
-
-            label.setListener(new EditableLabel.EditableLabelChangeListener() {
-                @Override
-                public void changed(String newText) {
-                    if(newText.isEmpty()) {
-                        newText = fileHandle.nameWithoutExtension();
-                    }
-                    FileHandle newHandle = AssetImporter.renameFile(fileHandle, newText);
-                    if(newHandle.isDirectory()) {
-                        SceneEditorAddon.get().projectExplorer.notifyRename(fileHandle, newHandle);
-                    }
-                    fileHandle = newHandle;
-                    setFile(fileHandle);
-                }
-            });
-
-            iconContainer = new Table();
-            iconContainer.add(icon).grow();
-
-            add(iconContainer).size(90).pad(10);
-            row();
-            add(label).width(70).center().pad(5);
 
             setTouchable(Touchable.enabled);
         }
 
-        public void setToRename() {
-            label.setEditMode();
-        }
-
         private void setFile (FileHandle fileHandle) {
-
             String name = fileHandle.name();
             label.setText(name);
             label.getLabel().setWrap(true);
             label.getLabel().setEllipsis(true);
 
-            if(fileHandle.isDirectory()) {
+            if (fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
                 String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+                if (extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
                     Texture texture = new Texture(fileHandle);
                     TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
                     icon.setDrawable(drawable);
@@ -637,110 +353,55 @@ public class DirectoryViewWidget extends Table {
             }
 
             if (assetForPath != null) {
-                //Lets add something to the icon so it shows
-                Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
-                iconContainer.addActor(image);
-                if (assetForPath.isBroken()) {
-                    image.setColor(Color.RED);
-                } else {
-                    image.setColor(Color.GREEN);
+                GameObject parent = new GameObject();
+                parent.addComponent(new TransformComponent());
+                basicGameObject = parent;
 
+                AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+                boolean success = AssetImporter.createAssetInstance(assetForPath, parent) != null;
+                if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
+                    success = false;
+                }
+                AssetImporter.fromDirectoryView = false;
+
+                if (success) {
                     //Game asset is legit, lets try to make one
-                    GameObject parent = new GameObject();
-                    parent.addComponent(new TransformComponent());
-                    basicGameObject = parent;
+                    GameObject copy = new GameObject();
+                    copy.addComponent(new TransformComponent());
 
                     AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-                    boolean success = AssetImporter.createAssetInstance(assetForPath, parent) != null;
-                    if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
-                        success = false;
-                    }
+                    AssetImporter.createAssetInstance(assetForPath, copy);
                     AssetImporter.fromDirectoryView = false;
 
-
-                    if (success) {
-
-                        //Game asset is legit, lets try to make one
-                        GameObject copy = new GameObject();
-                        copy.addComponent(new TransformComponent());
-
-                        AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-                        AssetImporter.createAssetInstance(assetForPath, copy);
-                        AssetImporter.fromDirectoryView = false;
-
-                        MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
-                        Stage stage = SceneEditorWorkspace.getInstance().getStage();
-                        uiSceneRenderer.setCamera((OrthographicCamera)stage.getCamera());
-                        GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
-                        gameObjectActor.setFillParent(true);
-//                        iconContainer.addActor(gameObjectActor);
-                    }
+                    MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
+                    Stage stage = SceneEditorWorkspace.getInstance().getStage();
+                    uiSceneRenderer.setCamera((OrthographicCamera)stage.getCamera());
+                    GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
+                    gameObjectActor.setFillParent(true);
                 }
             }
         }
 
         @Override
-        public void act(float delta) {
-            Skin skin = TalosMain.Instance().getSkin();
-            super.act(delta);
-
-            for(ItemView view: items) {
-                if(view != overItem) {
-                    view.setBackground((Drawable) (null));
-                }
-
-                if(selected.contains(view, true)) {
-                    view.setBackground(ColorLibrary.obtainBackground(skin, "white", ColorLibrary.BackgroundColor.DARK_GRAY));
-                }
-            }
-
-            if(overItem != null) {
-                overItem.setBackground(ColorLibrary.obtainBackground(skin, "white", ColorLibrary.BackgroundColor.LIGHT_GRAY));
-            }
+        public void draw(Batch batch, float parentAlpha) {
+            icon.setSize(100, 100);
+            icon.setPosition(getX() - 50 + 125/2f, getY() - 50 + 125/2f);
+            icon.draw(batch, parentAlpha);
         }
 
         @Override
-        public ItemView copyActor(ItemView copyFrom) {
-            setFile(copyFrom.fileHandle);
-            return this;
+        public Item copyActor(Item copyFrom) {
+            return null;
         }
-    }
 
-    private void reportSelectionChanged() {
-        if(!selected.isEmpty()) {
-            IPropertyHolder holder = null;
-            if (selected.size == 1) {
-                ItemView item = selected.first();
-                if (item.gameAsset != null) {
-                    holder = item.gameAsset.getRootRawAsset().metaData;
-                }
-
-            } else if (selected.size > 1) {
-                ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
-                for (ItemView item : selected) {
-                    if (item.gameAsset != null) {
-                        RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
-                        list.add(rootRawAsset.metaData);
-                    }
-                }
-                holder = new MultiPropertyHolder(list);
-            }
-
-            if(holder != null) {
-                Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(holder));
-            }
+        @Override
+        public float getPrefWidth() {
+            return 125;
         }
-    }
 
-    public void registerTarget(DragAndDrop.Target externalTarget) {
-        externalTargets.add(externalTarget);
-        dragAndDrop.addTarget(externalTarget);
-    }
-
-    public void unregisterTarget(DragAndDrop.Target externalTarget) {
-        externalTargets.removeValue(externalTarget, true);
-        dragAndDrop.removeTarget(externalTarget);
+        @Override
+        public float getPrefHeight() {
+            return 125;
+        }
     }
 }
-
-
