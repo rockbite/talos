@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
@@ -323,20 +324,19 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                for (GameObject selectedGameAsset : paletteEditorWorkspace.selection) {
-
-//                    if (currentFilterMode == PaletteFilterMode.TILE) {
-//                        removeSprite(selectedGameAsset);
-//                    } else if (currentFilterMode == PaletteFilterMode.ENTITY) {
-//                        removeEntity(selectedGameAsset);
-//                    } else { // currentFilterMode == PaletteFilterMode.TILE_ENTITY
-//                        if (object.getResource().staticTiles.containsKey(selectedGameAsset)) {
-//                            removeSprite(selectedGameAsset);
-//                        } else {
-//                            removeEntity(selectedGameAsset);
-//                        }
-//                    }
+                Array<GameAsset> markedForDeletion = new Array<>();
+                for (GameObject selectedGameObject : paletteEditorWorkspace.selection) {
+                    for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObject : object.getResource().gameObjects) {
+                        if (gameObject.value == selectedGameObject) {
+                            markedForDeletion.add(gameObject.key);
+                        }
+                    }
                 }
+                for (GameAsset gameAsset : markedForDeletion) {
+                    removeEntity(gameAsset);
+                }
+                paletteEditorWorkspace.requestSelectionClear();
+                editParentTileAndFakeHeight.setDisabled(true);
             }
         });
 
