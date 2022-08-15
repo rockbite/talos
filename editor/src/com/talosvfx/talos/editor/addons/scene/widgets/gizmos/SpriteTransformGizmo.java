@@ -92,7 +92,19 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
         }
 
-        tmp.set(nextPoints[RT]).sub(nextPoints[LB]).scl(0.5f).add(nextPoints[LB]); // this is midpoint
+
+        if (touchedPoint == RT) {
+            transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
+        } else if (touchedPoint == LT) {
+            transform.position.set(nextPoints[RB]).add(-spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
+        } else if (touchedPoint == LB) {
+            transform.position.set(nextPoints[RT]).add(-spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+        } else if (touchedPoint == RB) {
+            transform.position.set(nextPoints[LT]).add(spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+        }
+
+//        transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
+
         transform.position = lowerPrecision(transform.position);
     }
 
