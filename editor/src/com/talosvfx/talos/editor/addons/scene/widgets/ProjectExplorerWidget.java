@@ -61,16 +61,10 @@ public class ProjectExplorerWidget extends Table {
 
         scrollPaneTable.add(scrollPane).height(0).grow();
 
-        Table directoryViewTable = new Table();
-        directoryViewTable.top().left().defaults().top().left();
         directoryViewWidget = new DirectoryWidgetTrash();
         directoryViewWidgetNew = new DirectoryViewWidget();
-        ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidgetNew);
-        directoryViewTable.add(scrollPaneRight).height(0).grow();
 
-        scrollPaneRight.setScrollingDisabled(true, false);
-
-        VisSplitPane splitPane = new VisSplitPane(scrollPaneTable, directoryViewTable, false);
+        VisSplitPane splitPane = new VisSplitPane(scrollPaneTable, directoryViewWidgetNew, false);
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
