@@ -5,8 +5,10 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 
 public class PropertyHolderEdited implements Notifications.Event {
 
+    public boolean fastChange = false;
+
     @Override
     public void reset () {
-
+        fastChange = false;
     }
 }
