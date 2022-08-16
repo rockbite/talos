@@ -24,7 +24,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
-    private Actor focusedKeyboard;
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -188,7 +187,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private void showEditMode() {
         if(editing.isVisible()) return;
 
-        focusedKeyboard = getStage().getKeyboardFocus();
         getStage().setKeyboardFocus(textField);
         textField.selectAll();
 

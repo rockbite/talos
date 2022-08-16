@@ -13,20 +13,17 @@ public class SnapshotTracker {
     }
 
     public void addSnapshot(String data) {
-         if(cursor + 1 <= snapshots.size - 1) {
+        if(cursor + 1 <= snapshots.size - 1) {
             snapshots.removeRange(cursor + 1, snapshots.size - 1);
         }
 
         snapshots.add(data);
         cursor = snapshots.size - 1;
-
-        System.out.println("Snapshot was added");
     }
 
     public boolean moveBack() {
         if(cursor > 0) {
             cursor--;
-            System.out.println("Snapshot cursor moved back");
             return true;
         } else {
             return false;
@@ -36,8 +33,6 @@ public class SnapshotTracker {
     public boolean moveForward() {
         if(cursor < snapshots.size - 1) {
             cursor++;
-            System.out.println("Snapshot cursor moved forward");
-
             return true;
         } else {
             return false;
