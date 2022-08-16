@@ -618,15 +618,6 @@ public class DirectoryViewWidget extends Table {
 
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
-            } else {
-                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-                    Texture texture = new Texture(fileHandle);
-                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-                    icon.setDrawable(drawable);
-                    icon.setScaling(Scaling.fit);
-                }
             }
 
             this.fileHandle = fileHandle;
@@ -637,6 +628,22 @@ public class DirectoryViewWidget extends Table {
             }
 
             if (assetForPath != null) {
+                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+
+                if (!assetForPath.isBroken()) {
+                    if (!fileHandle.isDirectory()) {
+                        String extension = fileHandle.extension();
+                        if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+                            Texture texture = new Texture(fileHandle);
+                            TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+                            icon.setDrawable(drawable);
+                            icon.setScaling(Scaling.fit);
+                        }
+                    }
+                }
+
+
+
                 //Lets add something to the icon so it shows
                 Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
                 iconContainer.addActor(image);
@@ -712,7 +719,9 @@ public class DirectoryViewWidget extends Table {
             if (selected.size == 1) {
                 ItemView item = selected.first();
                 if (item.gameAsset != null) {
-                    holder = item.gameAsset.getRootRawAsset().metaData;
+                    if (!item.gameAsset.isBroken()) {
+                        holder = item.gameAsset.getRootRawAsset().metaData;
+                    }
                 }
 
             } else if (selected.size > 1) {

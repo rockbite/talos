@@ -460,12 +460,14 @@ public class AssetRepository {
 				GameAsset<Texture> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 				gameAssetOut = textureGameAsset;
 
-				textureGameAsset.setResourcePayload(new Texture(value.handle));
 
 				if (createLinks) {
 					value.gameAssetReferences.add(textureGameAsset);
 					textureGameAsset.dependentRawAssets.add(value);
 				}
+
+				textureGameAsset.setResourcePayload(new Texture(value.handle));
+
 
 				break;
 			case ATLAS:
