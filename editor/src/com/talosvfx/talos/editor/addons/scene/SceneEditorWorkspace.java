@@ -520,7 +520,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	private void convertSelectedIntoGroup () {
-		if (selection.isEmpty()) {
+		if (selection.isEmpty() || selection.size == 1) {
 			return;
 		}
 
@@ -529,10 +529,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		GameObject rootGO = getRootGO();
 		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
-		if (topestLevelObjectsParentFor == null) {
-			throw new RuntimeException("OLLLLAAAAAAAAA COMOSTAAAAAS");
-		}
-
 		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		Gdx.app.postRunnable(new Runnable() {
@@ -543,6 +539,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				}
 
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(dummyParent));
+
+				selectGameObjectExternally(dummyParent);
 			}
 		});
 	}
