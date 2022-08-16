@@ -1142,7 +1142,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
 			}
 
-//			openSavableContainer(container);
+			openSavableContainer(container);
 		}
 
 		if (!fromMemory) {
