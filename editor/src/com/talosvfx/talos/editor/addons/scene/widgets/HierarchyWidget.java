@@ -160,7 +160,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         contextualMenu.addItem("Rename", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                if (tree.getSelection().size() == 1) {
+                    FilteredTree.Node<GameObject> node = tree.findNode(tree.getSelection().first().getObject());
+                    if (node != null) {
+                        if (node.getActor() instanceof EditableLabel) {
+                            EditableLabel actor = (EditableLabel)node.getActor();
+                            actor.setEditMode();
+                        }
+                    }
+                }
             }
         });
         contextualMenu.addItem("Duplicate", new ClickListener() {
