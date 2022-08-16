@@ -2,18 +2,17 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.talosvfx.talos.TalosMain;
@@ -26,6 +25,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -40,9 +40,10 @@ public class DirectoryViewWidget extends Table {
 
     public DirectoryViewWidget () {
         items = new ItemGroup();
+        items.setCellSize(125);
         items.pad(20);
-        items.space(5);
-        items.wrapSpace(5);
+        items.wrapSpace(10);
+        items.space(10);
 
         add(items).grow();
     }
@@ -136,12 +137,13 @@ public class DirectoryViewWidget extends Table {
         }
     }
 
+    /**
+     * Completely ignores the pref size of its children.
+     */
     private static class ItemGroup extends WidgetGroup {
-        private float prefWidth, prefHeight, lastPrefHeight;
         private boolean sizeInvalid = true;
-        private FloatArray rowSizes; // row width, row height, ...
+        private float cellWidth, cellHeight;
 
-        private boolean round = true;
         private float space, wrapSpace, padTop, padLeft, padBottom, padRight;
 
         public ItemGroup () {
@@ -156,123 +158,204 @@ public class DirectoryViewWidget extends Table {
 
         private void computeSize () {
             sizeInvalid = false;
-            SnapshotArray<Actor> children = getChildren();
-            int n = children.size;
-            prefHeight = 0;
-            prefWidth = 0;
-            if (rowSizes == null)
-                rowSizes = new FloatArray();
-            else
-                rowSizes.clear();
-            FloatArray rowSizes = this.rowSizes;
-            float space = this.space, wrapSpace = this.wrapSpace;
-            float pad = padLeft + padRight, groupWidth = getWidth() - pad, x = 0, y = 0, rowHeight = 0;
-            int i = 0, incr = 1;
-            for (; i != n; i += incr) {
-                Actor child = children.get(i);
-
-                float width, height;
-                if (child instanceof Layout) {
-                    Layout layout = (Layout)child;
-                    width = layout.getPrefWidth();
-                    if (width > groupWidth) width = Math.max(groupWidth, layout.getMinWidth());
-                    height = layout.getPrefHeight();
-                } else {
-                    width = child.getWidth();
-                    height = child.getHeight();
-                }
-
-                float incrX = width + (x > 0 ? space : 0);
-                if (x + incrX > groupWidth && x > 0) {
-                    rowSizes.add(x);
-                    rowSizes.add(rowHeight);
-                    prefWidth = Math.max(prefWidth, x + pad);
-                    if (y > 0) y += wrapSpace;
-                    y += rowHeight;
-                    rowHeight = 0;
-                    x = 0;
-                    incrX = width;
-                }
-                x += incrX;
-                rowHeight = Math.max(rowHeight, height);
-            }
-            rowSizes.add(x);
-            rowSizes.add(rowHeight);
-            prefWidth = Math.max(prefWidth, x + pad);
-            if (y > 0) y += wrapSpace;
-            prefHeight = Math.max(prefHeight, y + rowHeight);
-            prefHeight += padTop + padBottom;
-            if (round) {
-                prefWidth = Math.round(prefWidth);
-                prefHeight = Math.round(prefHeight);
-            }
-            if (hasParent()) {
-                prefWidth = Math.max(getParent().getWidth(), prefWidth);
-            }
+            return;
+//            SnapshotArray<Actor> children = getChildren();
+//            int n = children.size;
+//            prefHeight = 0;
+//            prefWidth = 0;
+//            if (rowSizes == null)
+//                rowSizes = new FloatArray();
+//            else
+//                rowSizes.clear();
+//            FloatArray rowSizes = this.rowSizes;
+//            float wrapSpace = this.wrapSpace; //space = this.space,
+//            float pad = padLeft + padRight, groupWidth = getWidth() - pad, x = 0, y = 0, rowHeight = 0;
+//
+//            float width = cellWidth, height = cellHeight;
+//
+//            float space = 0;
+//            if (n > 2) {
+//                int canFit = (int) (groupWidth / width);
+//                space = (groupWidth - canFit * width) / (canFit - 1);
+//            }
+//
+//            int i = 0, incr = 1;
+//            for (; i != n; i += incr) {
+////                Actor child = children.get(i);
+////                child.setSize(width, height);
+////                float width, height;
+////                if (child instanceof Layout) {
+////                    Layout layout = (Layout)child;
+////                    width = layout.getPrefWidth();
+////                    if (width > groupWidth) width = Math.max(groupWidth, layout.getMinWidth());
+////                    height = layout.getPrefHeight();
+////                } else {
+////                    width = child.getWidth();
+////                    height = child.getHeight();
+////                }
+//
+//                float incrX = width + (x > 0 ? space : 0);
+//                if (x + incrX > groupWidth && x > 0) {
+//                    rowSizes.add(x);
+//                    rowSizes.add(rowHeight);
+//                    prefWidth = Math.max(prefWidth, x + pad);
+//                    if (y > 0) y += wrapSpace;
+//                    y += rowHeight;
+//                    rowHeight = 0;
+//                    x = 0;
+//                    incrX = width;
+//                }
+//                x += incrX;
+//                rowHeight = Math.max(rowHeight, height);
+//            }
+//            rowSizes.add(x);
+//            rowSizes.add(rowHeight);
+//            prefWidth = Math.max(prefWidth, x + pad);
+//            if (y > 0) y += wrapSpace;
+//            prefHeight = Math.max(prefHeight, y + rowHeight);
+//            prefHeight += padTop + padBottom;
+//            this.space = space;
+////            if (round) {
+////                prefWidth = Math.round(prefWidth);
+////                prefHeight = Math.round(prefHeight);
+////            }
         }
 
         public void layout () {
-            if (sizeInvalid) computeSize();
+            wrappedLayout();
+//            float prefWidth = getWidth();
+//            float prefHeight = getHeight();
+//            float wrapSpace = this.wrapSpace;
+//            float padLeft = this.padLeft, padRight = this.padRight;
+//            float maxWidth = prefWidth - padLeft - padRight;
+//
+//            SnapshotArray<Actor> children = getChildren();
+//            int n = children.size;
+//            float space = minSpace;
+//            float width = cellWidth, height = cellHeight;
+//            int canFit = 0;
+//            if (n > 2) {
+//                canFit = (int) (maxWidth / width);
+//                space = MathUtils.clamp((maxWidth - canFit * width) / (canFit - 1), minSpace, maxSpace);
+//            }
+//
+//            float rowY = prefHeight - padTop, groupWidth = getWidth(), xStart = padLeft, x = 0, rowHeight = 0, rowDir = -1;
+//
+//            rowY += getHeight() - prefHeight;
+//
+//            groupWidth -= padRight;
+//
+//            int i = 0, incr = 1;
+//            for (int r = 0; i != n; i += incr) {
+//                Actor child = children.get(i);
+//
+//                if (x + width - 20 > groupWidth || r == 0) {
+//                    x = xStart;
+//                    float rowWidth = canFit * width + (canFit - 1) * space;
+//                    x += (maxWidth - rowWidth) / 2;
+//                    rowHeight = height;
+//                    if (r > 0) rowY += wrapSpace * rowDir;
+//                    rowY += rowHeight * rowDir;
+//                    r += 2;
+//                }
+//
+//                float y = rowY;
+//                y += rowHeight - height;
+//
+//                child.setBounds(x, y, width, height);
+//                x += width + space;
+//            }
+        }
 
-            float prefHeight = getPrefHeight();
-            if (prefHeight != lastPrefHeight) {
-                lastPrefHeight = prefHeight;
-                invalidateHierarchy();
+        private void wrappedLayout () {
+            float padLeft = this.padLeft, padRight = this.padRight, pad = padLeft + padRight, space = this.space, wrapSpace = this.wrapSpace;
+            float width = cellWidth, height = cellHeight;
+            float maxWidth = getWidth() - pad;
+            SnapshotArray<Actor> children = getChildren();
+            int n = children.size;
+            if (n < 1) {
+                return;
             }
 
-            boolean round = this.round;
-            float space = this.space, wrapSpace = this.wrapSpace;
-            float rowY = prefHeight - padTop, groupWidth = getWidth(), xStart = padLeft, x = 0, rowHeight = 0, rowDir = -1;
+            if (n * width + (n - 1) * space <= maxWidth) { // strategy 1 - align.topLeft and fixed space
+                System.out.println("case 1");
+                float rowHeight = height, x = padLeft;
 
-            rowY += getHeight() - prefHeight; // align top
-
-            xStart += (groupWidth - prefWidth) / 2; // align the whole group to center
-
-            groupWidth -= padRight;
-
-            FloatArray rowSizes = this.rowSizes;
-            SnapshotArray<Actor> children = getChildren();
-            int i = 0, n = children.size, incr = 1;
-            for (int r = 0; i != n; i += incr) {
-                Actor child = children.get(i);
-
-                float width, height;
-                Layout layout = null;
-                if (child instanceof Layout) {
-                    layout = (Layout)child;
-                    width = layout.getPrefWidth();
-                    if (width > groupWidth) width = Math.max(groupWidth, layout.getMinWidth());
-                    height = layout.getPrefHeight();
-                } else {
-                    width = child.getWidth();
-                    height = child.getHeight();
-                }
-
-                if (x + width > groupWidth || r == 0) {
-                    r = Math.min(r, rowSizes.size - 2); // In case an actor changed size without invalidating this layout.
-                    x = xStart;
-                    rowHeight = rowSizes.get(r + 1);
-                    if (r > 0) rowY += wrapSpace * rowDir;
-                    rowY += rowHeight * rowDir;
-                    r += 2;
-                }
-
-                if (layout != null) {
-                    height = Math.max(height, layout.getMinHeight());
-                    float maxHeight = layout.getMaxHeight();
-                    if (maxHeight > 0 && height > maxHeight) height = maxHeight;
-                }
-
-                float y = rowY;
-                y += rowHeight - height; // align top
-
-                if (round)
-                    child.setBounds(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
-                else
+                float startY = getHeight() - padTop - rowHeight;
+                int i = 0, incr = 1;
+                for (; i != n; i += incr) {
+                    Actor child = children.get(i);
+                    Layout layout = null;
+                    if (child instanceof Layout) {
+                        layout = (Layout) child;
+                    }
+                    float y = startY;
+                    y += rowHeight - height;
                     child.setBounds(x, y, width, height);
-                x += width + space;
+                    x += width + space;
+                    if (layout != null) layout.validate();
+                }
+            } else if (n > 1) { // strategy 2 - align.topCenter and dynamic space between
+                float rowY = getHeight() - padTop, groupWidth = getWidth(), xStart = padLeft, x = 0, rowHeight = 0, rowDir = -1;
 
-                if (layout != null) layout.validate();
+                int canFit = (int) ((maxWidth - space) / (width + space));
+                if (canFit > 1 && n > 1) {
+                    System.out.println("case 2");
+                    space = Math.max(space, (maxWidth - canFit * width) / (canFit - 1));
+
+                    groupWidth -= padRight;
+
+                    int i = 0, incr = 1;
+                    for (int r = 0; i != n; i += incr) {
+                        Actor child = children.get(i);
+
+                        Layout layout = null;
+                        if (child instanceof Layout) {
+                            layout = (Layout)child;
+                        }
+
+                        if ((i % canFit) == 0 || r == 0) {
+                            x = xStart;
+                            rowHeight = height;
+                            if (r > 0) rowY += wrapSpace * rowDir;
+                            rowY += rowHeight * rowDir;
+                            r += 1;
+                        }
+
+                        float y = rowY;
+                        y += rowHeight - height;
+
+                        child.setBounds(x, y, width, height);
+                        x += width + space;
+
+                        if (layout != null) layout.validate();
+                    }
+                } else { // one item per row
+                    int i = 0, incr = 1;
+                    for (int r = 0; i != n; i += incr) {
+                        Actor child = children.get(r);
+
+                        Layout layout = null;
+                        if (child instanceof Layout) {
+                            layout = (Layout)child;
+                        }
+
+                        x = xStart;
+                        x += (maxWidth - width) / 2;
+                        rowHeight = height;
+                        if (r > 0) rowY += wrapSpace * rowDir;
+                        rowY += rowHeight * rowDir;
+                        r += 1;
+
+                        float y = rowY;
+                        y += rowHeight - height;
+
+                        child.setBounds(x, y, width, height);
+                        x += width + space;
+
+                        if (layout != null) layout.validate();
+                    }
+                }
             }
         }
 
@@ -289,6 +372,23 @@ public class DirectoryViewWidget extends Table {
         public ItemGroup space (float space) {
             this.space = space;
             return this;
+        }
+
+        public void setCellWidth (float width) {
+            this.cellWidth = width;
+        }
+
+        public void setCellHeight (float height) {
+            this.cellHeight = height;
+        }
+
+        public void setCellSize (float size) {
+            setCellSize(size, size);
+        }
+
+        public void setCellSize (float width, float height) {
+            setCellWidth(width);
+            setCellHeight(height);
         }
 
         /** Sets the vertical space between rows when wrap is enabled. */
@@ -384,24 +484,16 @@ public class DirectoryViewWidget extends Table {
 
         @Override
         public void draw(Batch batch, float parentAlpha) {
-            icon.setSize(100, 100);
-            icon.setPosition(getX() - 50 + 125/2f, getY() - 50 + 125/2f);
+            float w = getWidth(), h = getHeight();
+            float iw = (4.0f/5.0f) * w, ih = (4.0f/5.0f) * h;
+            icon.setSize(iw, ih);
+            icon.setPosition(getX() - iw / 2f + w / 2f, getY() - ih / 2f + h / 2f);
             icon.draw(batch, parentAlpha);
         }
 
         @Override
         public Item copyActor(Item copyFrom) {
             return null;
-        }
-
-        @Override
-        public float getPrefWidth() {
-            return 125;
-        }
-
-        @Override
-        public float getPrefHeight() {
-            return 125;
         }
     }
 }
