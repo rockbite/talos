@@ -379,19 +379,19 @@ public class DirectoryViewWidget extends Table {
                         Array<ItemView> array = (Array<ItemView>) object;
                         for (ItemView sourceItem : array) {
                             if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle);
+                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
                             }
                         }
                     } else if (object instanceof GameAsset) {
                         GameAsset<?> sourceItem = (GameAsset) payload.getObject();
                         FileHandle handle = sourceItem.getRootRawAsset().handle;
                         if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
+                            AssetImporter.moveFile(handle, fileHandle, false);
                         }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
+                            AssetImporter.moveFile(handle, fileHandle, false);
                         }
                     }
                     rebuild();
@@ -424,19 +424,19 @@ public class DirectoryViewWidget extends Table {
                         Array<ItemView> array = (Array<ItemView>) object;
                         for (ItemView sourceItem : array) {
                             if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle);
+                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
                             }
                         }
                     } else if (object instanceof GameAsset) {
                         GameAsset sourceItem = (GameAsset) payload.getObject();
                         FileHandle handle = sourceItem.getRootRawAsset().handle;
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     }
 
@@ -616,15 +616,6 @@ public class DirectoryViewWidget extends Table {
 
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
-            } else {
-                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-                    Texture texture = new Texture(fileHandle);
-                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-                    icon.setDrawable(drawable);
-                    icon.setScaling(Scaling.fit);
-                }
             }
 
             this.fileHandle = fileHandle;
@@ -635,6 +626,22 @@ public class DirectoryViewWidget extends Table {
             }
 
             if (assetForPath != null) {
+                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+
+                if (!assetForPath.isBroken()) {
+                    if (!fileHandle.isDirectory()) {
+                        String extension = fileHandle.extension();
+                        if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+                            Texture texture = new Texture(fileHandle);
+                            TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+                            icon.setDrawable(drawable);
+                            icon.setScaling(Scaling.fit);
+                        }
+                    }
+                }
+
+
+
                 //Lets add something to the icon so it shows
                 Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
                 iconContainer.addActor(image);
@@ -710,7 +717,9 @@ public class DirectoryViewWidget extends Table {
             if (selected.size == 1) {
                 ItemView item = selected.first();
                 if (item.gameAsset != null) {
-                    holder = item.gameAsset.getRootRawAsset().metaData;
+                    if (!item.gameAsset.isBroken()) {
+                        holder = item.gameAsset.getRootRawAsset().metaData;
+                    }
                 }
 
             } else if (selected.size > 1) {

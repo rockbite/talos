@@ -310,12 +310,14 @@ public class FilteredTree<T> extends WidgetGroup {
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
 
-                if (keycode == Input.Keys.DEL && false) {//todo removed this feature, editing text messes this up
+                if (keycode == Input.Keys.DEL) {
                     if(!selection.isEmpty()) {
                         Array<FilteredTree.Node<T>> nodes = new Array<>();
                         for(Object nodeObject: selection) {
                             FilteredTree.Node<T> node = (FilteredTree.Node<T>) nodeObject;
-                            nodes.add(node);
+                            if (node.canDelete) {
+                                nodes.add(node);
+                            }
                         }
                         for (ItemListener<T> itemListener : itemListeners) {
                             itemListener.delete(nodes);
@@ -1223,6 +1225,8 @@ public class FilteredTree<T> extends WidgetGroup {
         float yAlpha = 0f;
         public boolean draggable;
         public boolean draggableInLayerOnly;
+
+        public boolean canDelete = true;
 
         public Node (String name, Actor actor) {
             if (actor == null)
