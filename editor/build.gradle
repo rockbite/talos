@@ -142,7 +142,7 @@ task distLegacyTest(type: Jar) {
     with jar
 }
 
-dist.dependsOn classes
+dist.dependsOn classes, genBuildFile
 
 
 
