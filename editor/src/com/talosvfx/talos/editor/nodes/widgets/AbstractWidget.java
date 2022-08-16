@@ -86,6 +86,14 @@ public abstract class AbstractWidget<T> extends Table {
 
     public abstract T getValue();
 
+    public boolean isChanged (T newValue) {
+        T value = getValue();
+        if (value == null) {
+            return newValue == null;
+        }
+        return !value.equals(newValue);
+    };
+
     public abstract void read (Json json, JsonValue jsonValue);
     public abstract void write (Json json, String name);
 }

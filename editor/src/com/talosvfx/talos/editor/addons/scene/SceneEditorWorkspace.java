@@ -12,11 +12,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
@@ -58,6 +56,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.talosvfx.talos.editor.TalosInputProcessor.ctrlPressed;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
@@ -89,6 +88,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public GridProperties gridProperties = new GridProperties();
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
+
+	public static boolean isEnterPressed (int keycode) {
+		switch (keycode) {
+			case Input.Keys.ENTER:
+			case Input.Keys.NUMPAD_ENTER:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	public MainRenderer getUISceneRenderer () {
 		return uiSceneRenderer;
@@ -499,14 +508,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					selectAll();
 				}
 
-				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().undo();
-				}
-
-				if (keycode == Input.Keys.Z && ctrlPressed() && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().redo();
-				}
-
 				return super.keyDown(event, keycode);
 			}
 		};
@@ -609,19 +610,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public static boolean isRenamePressed (int keycode) {
 		if (TalosMain.Instance().isOsX()) {
-			return keycode == Input.Keys.ENTER;
+			return isEnterPressed(keycode);
 		} else {
 			return keycode == Input.Keys.F2;
 		}
 	}
 
-	public static boolean ctrlPressed () {
-		if (TalosMain.Instance().isOsX()) {
-			return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		} else {
-			return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		}
-	}
+
 
 	public void openPrefab (FileHandle fileHandle) {
 		if (currentContainer != null) {
@@ -1147,7 +1142,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
 			}
 
-//			openSavableContainer(container);
+			openSavableContainer(container);
 		}
 
 		if (!fromMemory) {
@@ -1260,14 +1255,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						setDirty = true;
 					}
 				}
-				if (setDirty) {
+				if (setDirty && !event.fastChange) {
 					TalosMain.Instance().ProjectController().setDirty();
 				}
 			} else {
 				if (currentHolder instanceof AMetadata) {
 					AssetImporter.saveMetadata((AMetadata)currentHolder);
 				} else {
-					TalosMain.Instance().ProjectController().setDirty();
+					if (!event.fastChange) {
+						TalosMain.Instance().ProjectController().setDirty();
+					}
 				}
 			}
 		}

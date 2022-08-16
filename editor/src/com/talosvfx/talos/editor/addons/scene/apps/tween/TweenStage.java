@@ -12,9 +12,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
@@ -23,7 +23,6 @@ import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
-import com.talosvfx.talos.editor.project.IProject;
 
 public class TweenStage extends DynamicNodeStage {
 
@@ -41,7 +40,7 @@ public class TweenStage extends DynamicNodeStage {
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.S && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.S && TalosInputProcessor.ctrlPressed()) {
                     writeData(tweenEditor.targetFileHandle);
                 }
                 return super.keyDown(event, keycode);

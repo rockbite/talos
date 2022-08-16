@@ -21,12 +21,12 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
@@ -117,6 +117,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
+	private TalosInputProcessor talosInputProcessor;
+
 	public TalosMain () {
 
 	}
@@ -191,7 +193,9 @@ public class TalosMain extends ApplicationAdapter {
 
 		addonController.initAll();
 
-		inputMultiplexer = new InputMultiplexer(uiStage.getStage(), currentWorkplaceStage.getStage());
+		talosInputProcessor = new TalosInputProcessor();
+
+		inputMultiplexer = new InputMultiplexer(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -259,12 +263,12 @@ public class TalosMain extends ApplicationAdapter {
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputMultiplexer.setProcessors(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 	}
 
 	public void enableNodeStage() {
 		currentWorkplaceStage = nodeStage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputMultiplexer.setProcessors(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 	}
 
 	public InputMultiplexer getInputMultiplexer() {
