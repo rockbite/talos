@@ -113,7 +113,13 @@ public abstract class PropertyWidget<T> extends Table {
 
 	protected void callValueChanged (T value) {
 		valueChanged(value);
-		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderEdited.class));
+		PropertyHolderEdited event = Notifications.obtainEvent(PropertyHolderEdited.class);
+		event.fastChange = isFastChange(this);
+		Notifications.fireEvent(event);
+	}
+
+	protected boolean  isFastChange (PropertyWidget<?> propertyWidget) {
+		return false;
 	}
 
 	public void valueChanged(T value) {

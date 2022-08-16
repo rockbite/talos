@@ -147,7 +147,10 @@ public class ValueWidget extends AbstractWidget<Float> {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                isDragging = false;
+                if (isDragging) {
+                    isDragging = false;
+                    setValue(value, true);
+                }
                 setBackgrounds();
             }
 
@@ -316,6 +319,10 @@ public class ValueWidget extends AbstractWidget<Float> {
         setValue(defaultValue);
 
         setLabel(text);
+    }
+
+    public boolean isFastChange () {
+        return isDragging;
     }
 
     @Override

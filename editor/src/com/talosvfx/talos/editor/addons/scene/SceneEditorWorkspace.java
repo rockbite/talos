@@ -1255,14 +1255,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						setDirty = true;
 					}
 				}
-				if (setDirty) {
+				if (setDirty && !event.fastChange) {
 					TalosMain.Instance().ProjectController().setDirty();
 				}
 			} else {
 				if (currentHolder instanceof AMetadata) {
 					AssetImporter.saveMetadata((AMetadata)currentHolder);
 				} else {
-					TalosMain.Instance().ProjectController().setDirty();
+					if (!event.fastChange) {
+						TalosMain.Instance().ProjectController().setDirty();
+					}
 				}
 			}
 		}
