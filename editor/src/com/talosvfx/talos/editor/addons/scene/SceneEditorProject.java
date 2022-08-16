@@ -28,6 +28,7 @@ public class SceneEditorProject implements IProject {
         if (!fromMemory) {
             sceneEditorAddon.workspace.setProjectPath(projectFileHandle.parent().path());
         }
+
         sceneEditorAddon.workspace.loadFromData(json, jsonValue, fromMemory);
     }
 

@@ -18,14 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.TalosInputListener;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
@@ -39,8 +38,6 @@ import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.Comparator;
 
 public class DirectoryViewWidget extends Table {
@@ -94,15 +91,15 @@ public class DirectoryViewWidget extends Table {
 
                 ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
 
-                if(keycode == Input.Keys.X && TalosInputListener.ctrlPressed()) {
+                if(keycode == Input.Keys.X && TalosInputProcessor.ctrlPressed()) {
                     projectExplorer.invokeCut(convertToFileArray(selected));
                 }
 
-                if(keycode == Input.Keys.C && TalosInputListener.ctrlPressed()) {
+                if(keycode == Input.Keys.C && TalosInputProcessor.ctrlPressed()) {
                     projectExplorer.invokeCopy(convertToFileArray(selected));
                 }
 
-                if(keycode == Input.Keys.V && TalosInputListener.ctrlPressed()) {
+                if(keycode == Input.Keys.V && TalosInputProcessor.ctrlPressed()) {
                     projectExplorer.invokePaste(getCurrentFolder());
                 }
 
@@ -114,7 +111,7 @@ public class DirectoryViewWidget extends Table {
                     projectExplorer.deletePath(paths);
                 }
 
-                if(keycode == Input.Keys.A && TalosInputListener.ctrlPressed()) {
+                if(keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
                     selectAllFiles();
                     reportSelectionChanged();
                 }
@@ -155,7 +152,7 @@ public class DirectoryViewWidget extends Table {
                     ItemView fileToSelect = getFileAt(x, y);
 
                     if(fileToSelect != null) {
-                        if(TalosInputListener.ctrlPressed()) {
+                        if(TalosInputProcessor.ctrlPressed()) {
                             if(selected.contains(fileToSelect, true)) {
                                 removeFromSelection(fileToSelect);
                             } else {

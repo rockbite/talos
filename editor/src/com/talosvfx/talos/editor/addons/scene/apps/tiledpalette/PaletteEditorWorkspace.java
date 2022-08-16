@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.TalosInputListener;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -208,7 +208,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                 upWillClear = true;
 
-                if (button == 2 || TalosInputListener.ctrlPressed()) {
+                if (button == 2 || TalosInputProcessor.ctrlPressed()) {
 
                     isSelectingWithDrag = true;
                     selectionRect.setVisible(true);

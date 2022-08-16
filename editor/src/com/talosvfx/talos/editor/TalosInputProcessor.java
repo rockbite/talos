@@ -3,11 +3,9 @@ package com.talosvfx.talos.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.talosvfx.talos.TalosMain;
 
-public class TalosInputListener implements InputProcessor {
+public class TalosInputProcessor implements InputProcessor {
 
     public static boolean ctrlPressed () {
         if (TalosMain.Instance().isOsX()) {

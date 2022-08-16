@@ -13,7 +13,7 @@ public class SnapshotTracker {
     }
 
     public void addSnapshot(String data) {
-        if(cursor + 1 <= snapshots.size - 1) {
+         if(cursor + 1 <= snapshots.size - 1) {
             snapshots.removeRange(cursor + 1, snapshots.size - 1);
         }
 

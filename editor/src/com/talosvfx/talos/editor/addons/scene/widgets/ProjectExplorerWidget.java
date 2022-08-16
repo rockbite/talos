@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -13,11 +12,9 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.TalosInputListener;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -392,7 +389,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void select (FilteredTree.Node node) {
-        if (TalosInputListener.ctrlPressed()){
+        if (TalosInputProcessor.ctrlPressed()){
             directoryTree.getSelection().add(node);
         }else {
             directoryTree.getSelection().clear();
