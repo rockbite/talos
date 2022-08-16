@@ -237,8 +237,8 @@ public class TalosMain extends ApplicationAdapter {
 
 					title += " " + sdf.format(date);
 				}
-				if (props.containsKey("hash")) {
-					title += " " + props.getProperty("hash");
+				if (props.containsKey("buildHash")) {
+					title += " " + props.getProperty("buildHash");
 				}
 				Gdx.graphics.setTitle(title);
 

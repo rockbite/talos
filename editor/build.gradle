@@ -113,7 +113,9 @@ task genBuildFile () {
 
         def file = rootProject.file("editor/assets/talos-version.properties");
         Properties properties = new Properties();
-        properties.load(file.newReader());
+        if (file.exists()) {
+            properties.load(file.newReader());
+        }
         properties.setProperty("version", project.version);
         properties.setProperty("buildHash", getGitHash());
         properties.setProperty("buildTime", System.currentTimeMillis() + "");
