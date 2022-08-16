@@ -159,16 +159,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addRulers();
 	}
 
-	public void createEmpty (Vector2 position) {
-		createObjectByTypeName("empty", position, null);
+	public GameObject createEmpty (Vector2 position) {
+		return createObjectByTypeName("empty", position, null);
 	}
 
-	public void createEmpty (GameObject parent) {
-		createObjectByTypeName("empty", null, parent);
+	public GameObject createEmpty (GameObject parent) {
+		return createObjectByTypeName("empty", null, parent);
 	}
 
-	public void createEmpty (Vector2 position, GameObject parent) {
-		createObjectByTypeName("empty", position, parent);
+	public GameObject createEmpty (Vector2 position, GameObject parent) {
+		return createObjectByTypeName("empty", position, parent);
 	}
 
 	public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
@@ -341,7 +341,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			GameObject selectedGameObject;
 
 			private boolean painting = false;
-			private boolean erasing = true;
+			private boolean erasing = false;
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -508,11 +508,65 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					selectAll();
 				}
 
+				if (keycode == Input.Keys.G && ctrlPressed()) {
+					convertSelectedIntoGroup();
+				}
+
 				return super.keyDown(event, keycode);
 			}
 		};
 
 		addListener(inputListener);
+	}
+
+	private void convertSelectedIntoGroup () {
+		if (selection.isEmpty()) {
+			return;
+		}
+
+		Array<GameObject> selectedObjects = new Array<>();
+		selectedObjects.addAll(selection.orderedItems());
+
+		GameObject rootGO = getRootGO();
+		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
+		if (topestLevelObjectsParentFor == null) {
+			throw new RuntimeException("OLLLLAAAAAAAAA COMOSTAAAAAS");
+		}
+
+		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
+
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				for (GameObject gameObject : selectedObjects) {
+					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
+				}
+
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(dummyParent));
+			}
+		});
+	}
+
+	private GameObject getTopestLevelObjectsParentFor (GameObject gameObject, Array<GameObject> gameObjects) {
+		Array<GameObject> childGameObjects = gameObject.getGameObjects();
+		if (childGameObjects == null) {
+			return null;
+		}
+
+		for (GameObject object : gameObjects) {
+			if (childGameObjects.contains(object, true)) {
+				return gameObject;
+			}
+		}
+
+		for (GameObject object : childGameObjects) {
+			GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(object, gameObjects);
+			if (topestLevelObjectsParentFor != null) {
+				return topestLevelObjectsParentFor;
+			}
+		}
+
+		return null;
 	}
 
 	private void eraseTileAt (float x, float y) {
