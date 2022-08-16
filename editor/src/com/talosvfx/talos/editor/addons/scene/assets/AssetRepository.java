@@ -171,11 +171,16 @@ public class AssetRepository {
 
 			if (key.isDirectory()) continue;
 
-			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
-			if (type != assetTypeFromExtension) continue;
+			try {
+				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+				if (type != assetTypeFromExtension)
+					continue;
 
-			if (assetTypeFromExtension.isRootGameAsset()) {
-				createGameAsset(key, value);
+				if (assetTypeFromExtension.isRootGameAsset()) {
+					createGameAsset(key, value);
+				}
+			} catch (GameAssetType.NoAssetTypeException e) {
+				//Its not an asset
 			}
 		}
 	}
@@ -193,9 +198,10 @@ public class AssetRepository {
 		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
 
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
 
 		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
 			GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rootRawAsset, false);
 			gameAssetReference.setResourcePayload(gameAsset.getResource());
 			gameAssetReference.setUpdated();
@@ -389,9 +395,12 @@ public class AssetRepository {
 	private void createGameAsset (FileHandle key, RawAsset value) {
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(value);
 
-
-
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+		GameAssetType assetTypeFromExtension = null;
+		try {
+			assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+		} catch (GameAssetType.NoAssetTypeException e) {
+			throw new RuntimeException(e);
+		}
 
 		boolean shouldUpdate = false;
 		if (getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension) != null) {
@@ -733,38 +742,41 @@ public class AssetRepository {
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
+		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
-		RawAsset rawAsset = new RawAsset(fileHandle);
+			RawAsset rawAsset = new RawAsset(fileHandle);
 
-		if (assetTypeFromExtension == GameAssetType.VFX) {
-			updateVFXTLS(rawAsset, checkGameResources);
-		}
+			if (assetTypeFromExtension == GameAssetType.VFX) {
+				updateVFXTLS(rawAsset, checkGameResources);
+			}
 
-		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
-		if (metadataHandleFor.exists()) {
-			try {
-				Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
-				rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
-				rawAsset.metaData.setLinkRawAsset(rawAsset);
-			} catch (Exception e) {
-				e.printStackTrace();
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
+			if (metadataHandleFor.exists()) {
+				try {
+					Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
+					rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
+					rawAsset.metaData.setLinkRawAsset(rawAsset);
+				} catch (Exception e) {
+					e.printStackTrace();
 
-				System.out.println("Error reading meta for " + metadataHandleFor.path() + " " + metadataHandleFor.readString());
+					System.out.println("Error reading meta for " + metadataHandleFor.path() + " " + metadataHandleFor.readString());
+					rawAsset.metaData = createMetaDataForAsset(rawAsset);
+				}
+			} else {
 				rawAsset.metaData = createMetaDataForAsset(rawAsset);
 			}
-		} else {
-			rawAsset.metaData = createMetaDataForAsset(rawAsset);
-		}
 
+			dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
+			dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
-		dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
-		dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
+			System.out.println("Raw asset created" + rawAsset.handle.path());
 
-		System.out.println("Raw asset created" + rawAsset.handle.path());
-
-		if (checkGameResources) {
-			checkAllGameAssetCreation();
+			if (checkGameResources) {
+				checkAllGameAssetCreation();
+			}
+		} catch (GameAssetType.NoAssetTypeException noAssetTypeException) {
+			//Its not an asset
 		}
 	}
 
@@ -775,7 +787,12 @@ public class AssetRepository {
 
 			String extension = rawAsset.handle.extension();
 
-			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
+			GameAssetType assetTypeFromExtension = null;
+			try {
+				assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
+			} catch (GameAssetType.NoAssetTypeException e) {
+				throw new RuntimeException(e);
+			}
 			T metaForType = (T)GameAssetType.createMetaForType(assetTypeFromExtension);
 
 			//Save the meta data
@@ -1072,7 +1089,12 @@ public class AssetRepository {
 					if (isRootGameResource(rawAsset)) {
 						//We need to update the game assets identifier
 						String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
-						GameAssetType typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+						GameAssetType typeFromExtension = null;
+						try {
+							typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+						} catch (GameAssetType.NoAssetTypeException e) {
+							throw new RuntimeException(e);
+						}
 
 						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
 
@@ -1109,7 +1131,12 @@ public class AssetRepository {
 
 
 	private boolean isRootGameResource (RawAsset rawAsset) {
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+		GameAssetType assetTypeFromExtension = null;
+		try {
+			assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+		} catch (GameAssetType.NoAssetTypeException e) {
+			throw new RuntimeException(e);
+		}
 		return assetTypeFromExtension.isRootGameAsset();
 	}
 

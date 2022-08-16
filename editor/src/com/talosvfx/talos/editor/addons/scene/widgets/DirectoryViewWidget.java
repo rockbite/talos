@@ -627,8 +627,9 @@ public class DirectoryViewWidget extends Table {
                 gameAsset = assetForPath;
             }
 
+            icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+
             if (assetForPath != null) {
-                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
 
                 if (!assetForPath.isBroken()) {
                     if (!fileHandle.isDirectory()) {
@@ -728,8 +729,10 @@ public class DirectoryViewWidget extends Table {
                 ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
                 for (ItemView item : selected) {
                     if (item.gameAsset != null) {
-                        RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
-                        list.add(rootRawAsset.metaData);
+                        if (!item.gameAsset.isBroken()) {
+                            RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
+                            list.add(rootRawAsset.metaData);
+                        }
                     }
                 }
                 holder = new MultiPropertyHolder(list);
