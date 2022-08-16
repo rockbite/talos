@@ -13,6 +13,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputListener;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -391,7 +392,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void select (FilteredTree.Node node) {
-        if (SceneEditorWorkspace.ctrlPressed()){
+        if (TalosInputListener.ctrlPressed()){
             directoryTree.getSelection().add(node);
         }else {
             directoryTree.getSelection().clear();

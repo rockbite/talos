@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.talosvfx.talos.editor.TalosInputListener.ctrlPressed;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
@@ -509,14 +510,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					selectAll();
 				}
 
-				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().undo();
-				}
-
-				if (keycode == Input.Keys.Z && ctrlPressed() && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().redo();
-				}
-
 				return super.keyDown(event, keycode);
 			}
 		};
@@ -625,13 +618,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public static boolean ctrlPressed () {
-		if (TalosMain.Instance().isOsX()) {
-			return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		} else {
-			return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		}
-	}
+
 
 	public void openPrefab (FileHandle fileHandle) {
 		if (currentContainer != null) {

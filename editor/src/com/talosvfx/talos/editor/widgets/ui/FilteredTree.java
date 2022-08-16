@@ -38,6 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
+import com.talosvfx.talos.editor.TalosInputListener;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
@@ -269,13 +270,13 @@ public class FilteredTree<T> extends WidgetGroup {
                     return;
 
                 // Add node to the already selected ones
-                if (!selection.contains(node) && SceneEditorWorkspace.ctrlPressed()) {
+                if (!selection.contains(node) && TalosInputListener.ctrlPressed()) {
                     addNodeToSelection(node);
                     return;
                 }
 
                 // Deselect node from already selected ones but keep others
-                if (selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
+                if (selection.contains(node) && TalosInputListener.ctrlPressed()){
                     removeNodeFromSelection(node);
                     return;
                 }
@@ -363,7 +364,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
 
                     if (!selection.contains(node)) {
-                        if (!SceneEditorWorkspace.ctrlPressed()) {
+                        if (!TalosInputListener.ctrlPressed()) {
                             clearSelection(true);
                         }
                         addNodeToSelection(node);

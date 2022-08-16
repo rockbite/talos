@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
+import com.talosvfx.talos.editor.TalosInputListener;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
@@ -180,7 +181,7 @@ public class TalosMain extends ApplicationAdapter {
 
 		addonController.initAll();
 
-		inputMultiplexer = new InputMultiplexer(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputMultiplexer = new InputMultiplexer(new TalosInputListener(), uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 

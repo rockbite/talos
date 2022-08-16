@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputListener;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -41,7 +42,7 @@ public class TweenStage extends DynamicNodeStage {
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.S && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.S && TalosInputListener.ctrlPressed()) {
                     writeData(tweenEditor.targetFileHandle);
                 }
                 return super.keyDown(event, keycode);

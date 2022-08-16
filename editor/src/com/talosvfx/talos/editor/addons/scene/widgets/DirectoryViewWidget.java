@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputListener;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -93,15 +94,15 @@ public class DirectoryViewWidget extends Table {
 
                 ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
 
-                if(keycode == Input.Keys.X && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.X && TalosInputListener.ctrlPressed()) {
                     projectExplorer.invokeCut(convertToFileArray(selected));
                 }
 
-                if(keycode == Input.Keys.C && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.C && TalosInputListener.ctrlPressed()) {
                     projectExplorer.invokeCopy(convertToFileArray(selected));
                 }
 
-                if(keycode == Input.Keys.V && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.V && TalosInputListener.ctrlPressed()) {
                     projectExplorer.invokePaste(getCurrentFolder());
                 }
 
@@ -113,7 +114,7 @@ public class DirectoryViewWidget extends Table {
                     projectExplorer.deletePath(paths);
                 }
 
-                if(keycode == Input.Keys.A && SceneEditorWorkspace.ctrlPressed()) {
+                if(keycode == Input.Keys.A && TalosInputListener.ctrlPressed()) {
                     selectAllFiles();
                     reportSelectionChanged();
                 }
@@ -154,7 +155,7 @@ public class DirectoryViewWidget extends Table {
                     ItemView fileToSelect = getFileAt(x, y);
 
                     if(fileToSelect != null) {
-                        if(SceneEditorWorkspace.ctrlPressed()) {
+                        if(TalosInputListener.ctrlPressed()) {
                             if(selected.contains(fileToSelect, true)) {
                                 removeFromSelection(fileToSelect);
                             } else {
