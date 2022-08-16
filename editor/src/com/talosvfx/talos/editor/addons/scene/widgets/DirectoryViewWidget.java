@@ -381,19 +381,19 @@ public class DirectoryViewWidget extends Table {
                         Array<ItemView> array = (Array<ItemView>) object;
                         for (ItemView sourceItem : array) {
                             if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle);
+                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
                             }
                         }
                     } else if (object instanceof GameAsset) {
                         GameAsset<?> sourceItem = (GameAsset) payload.getObject();
                         FileHandle handle = sourceItem.getRootRawAsset().handle;
                         if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
+                            AssetImporter.moveFile(handle, fileHandle, false);
                         }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle);
+                            AssetImporter.moveFile(handle, fileHandle, false);
                         }
                     }
                     rebuild();
@@ -426,19 +426,19 @@ public class DirectoryViewWidget extends Table {
                         Array<ItemView> array = (Array<ItemView>) object;
                         for (ItemView sourceItem : array) {
                             if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle);
+                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
                             }
                         }
                     } else if (object instanceof GameAsset) {
                         GameAsset sourceItem = (GameAsset) payload.getObject();
                         FileHandle handle = sourceItem.getRootRawAsset().handle;
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     }
 

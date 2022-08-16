@@ -975,10 +975,10 @@ public class AssetRepository {
 	}
 
 	//Could be a rename or a move
-	public void moveFile (FileHandle file, FileHandle destination) {
-		AssetImporter.moveFile(file, destination, true);
+	public void moveFile (FileHandle file, FileHandle destination, boolean rename) {
+		AssetImporter.moveFile(file, destination, true, rename);
 	}
-	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets) {
+	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets, boolean rename) {
 
 
 		if (file.isDirectory()) {
@@ -987,7 +987,7 @@ public class AssetRepository {
 				throw new GdxRuntimeException("Trying to move a directory to a file");
 			}
 
-			if (!destination.name().equals(file.name())) {
+			if (!rename && !destination.name().equals(file.name())) {
 				//Make sure to preserve the file structure when copying folders
 				destination = destination.child(file.name());
 			}
@@ -1020,7 +1020,7 @@ public class AssetRepository {
 					FileHandle pFile = file.parent().child(file.nameWithoutExtension() + ".p");
 					if (pFile.exists()) {
 						//Copy this too,
-						AssetImporter.moveFile(pFile, destination, false);
+						AssetImporter.moveFile(pFile, destination, false, false);
 					}
 				}
 

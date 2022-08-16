@@ -107,7 +107,7 @@ public class ProjectExplorerWidget extends Table {
 
                     //Its always folders
 
-                    AssetRepository.getInstance().moveFile(childHandle, parentHandle);
+                    AssetRepository.getInstance().moveFile(childHandle, parentHandle, false);
 
                 }
             }
@@ -116,6 +116,7 @@ public class ProjectExplorerWidget extends Table {
             public void selected (FilteredTree.Node node) {
                 select(node);
                 directoryViewWidget.setDirectory((String) node.getObject());
+                getStage().setKeyboardFocus(directoryTree);
             }
 
             @Override
@@ -133,6 +134,8 @@ public class ProjectExplorerWidget extends Table {
 
             @Override
             public void delete (Array<FilteredTree.Node<String>> nodes) {
+                if (nodes.isEmpty()) return;
+
                 String path = (String) nodes.first().getObject();
                 Array<String> paths = new Array<>();
                 paths.add(path);
@@ -442,6 +445,8 @@ public class ProjectExplorerWidget extends Table {
         traversePath(root, 0, 10, rootNode);
         directoryTree.add(rootNode);
 
+        rootNode.canDelete = false;
+
         rootNode.setExpanded(true);
 
         rootNode.expandAll();
@@ -460,6 +465,13 @@ public class ProjectExplorerWidget extends Table {
                 RowWidget widget = new RowWidget(listItemHandle);
                 EditableLabel label = widget.getLabel();
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
+
+                if (listItemHandle.isDirectory()) {
+                    if (listItemHandle.name().equals("assets") || listItemHandle.name().equals("scenes")) {
+                        newNode.canDelete = false;
+                    }
+                }
+
                 newNode.setObject(listItemHandle.path());
                 newNode.draggable = true;
                 node.add(newNode);
@@ -570,7 +582,7 @@ public class ProjectExplorerWidget extends Table {
         if(destination.isDirectory()) {
             for(FileHandle file: filesToManipulate) {
                 if(isCutting) {
-                    AssetImporter.moveFile(file, destination);
+                    AssetImporter.moveFile(file, destination, false);
                 } else {
                     AssetImporter.copyFile(file, destination);
                 }
