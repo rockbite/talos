@@ -38,7 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
@@ -211,12 +211,14 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
 
-    private void selectSingleNode (Node<T> node) {
-        clearSelection(true);
+    private void selectSingleNode (Node<T> node, boolean notifyListeners) {
+        clearSelection(notifyListeners);
         addNodeToSelection(node);
-        for (int i = 0; i < itemListeners.size; i++) {
-            ItemListener<T> tItemListener = itemListeners.get(i);
-            tItemListener.selected(node);
+        if (notifyListeners) {
+            for (int i = 0; i < itemListeners.size; i++) {
+                ItemListener<T> tItemListener = itemListeners.get(i);
+                tItemListener.selected(node);
+            }
         }
     }
 
@@ -267,13 +269,13 @@ public class FilteredTree<T> extends WidgetGroup {
                     return;
 
                 // Add node to the already selected ones
-                if (!selection.contains(node) && SceneEditorWorkspace.ctrlPressed()) {
+                if (!selection.contains(node) && TalosInputProcessor.ctrlPressed()) {
                     addNodeToSelection(node);
                     return;
                 }
 
                 // Deselect node from already selected ones but keep others
-                if (selection.contains(node) && SceneEditorWorkspace.ctrlPressed()){
+                if (selection.contains(node) && TalosInputProcessor.ctrlPressed()){
                     removeNodeFromSelection(node);
                     return;
                 }
@@ -282,7 +284,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 if (selection.contains(node)) {
                     clearSelection(true);
                 } else {
-                    selectSingleNode(node);
+                    selectSingleNode(node, true);
                 }
 
                 if (!selection.isEmpty())
@@ -308,12 +310,14 @@ public class FilteredTree<T> extends WidgetGroup {
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
 
-                if (keycode == Input.Keys.DEL && false) {//todo removed this feature, editing text messes this up
+                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
                     if(!selection.isEmpty()) {
                         Array<FilteredTree.Node<T>> nodes = new Array<>();
                         for(Object nodeObject: selection) {
                             FilteredTree.Node<T> node = (FilteredTree.Node<T>) nodeObject;
-                            nodes.add(node);
+                            if (node.canDelete) {
+                                nodes.add(node);
+                            }
                         }
                         for (ItemListener<T> itemListener : itemListeners) {
                             itemListener.delete(nodes);
@@ -361,7 +365,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
 
                     if (!selection.contains(node)) {
-                        if (!SceneEditorWorkspace.ctrlPressed()) {
+                        if (!TalosInputProcessor.ctrlPressed()) {
                             clearSelection(true);
                         }
                         addNodeToSelection(node);
@@ -744,7 +748,7 @@ public class FilteredTree<T> extends WidgetGroup {
         if(autoSelectionIndex > result.size - 1) autoSelectionIndex = 0;
 
         Node node = result.get(autoSelectionIndex);
-        selectSingleNode(node);
+        selectSingleNode(node, false);
         if(node.parent != null) node.parent.setExpanded(true);
     }
 
@@ -1221,6 +1225,8 @@ public class FilteredTree<T> extends WidgetGroup {
         float yAlpha = 0f;
         public boolean draggable;
         public boolean draggableInLayerOnly;
+
+        public boolean canDelete = true;
 
         public Node (String name, Actor actor) {
             if (actor == null)

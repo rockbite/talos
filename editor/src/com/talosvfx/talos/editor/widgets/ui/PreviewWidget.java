@@ -45,8 +45,6 @@ import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
-import static com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace.ctrlPressed;
-
 public class PreviewWidget extends ViewportWidget {
 
     Vector2 mid = new Vector2();

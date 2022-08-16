@@ -64,6 +64,7 @@ public class SceneEditorAddon implements IAddon {
         Notifications.addEventToPool(PropertyHolderSelected.class);
         Notifications.addEventToPool(GameObjectSelectionChanged.class);
         Notifications.addEventToPool(GameObjectCreated.class);
+        Notifications.addEventToPool(GameObjectActiveChanged.class);
         Notifications.addEventToPool(ComponentUpdated.class);
         Notifications.addEventToPool(GameObjectDeleted.class);
         Notifications.addEventToPool(GameObjectNameChanged.class);

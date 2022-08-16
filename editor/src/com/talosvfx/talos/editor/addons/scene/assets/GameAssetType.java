@@ -30,6 +30,12 @@ public enum GameAssetType {
 		this.isRootGameAsset = isRootGameAsset;
 	}
 
+	public static class NoAssetTypeException extends Exception {
+		public NoAssetTypeException (String message) {
+			super(message);
+		}
+	}
+
 	public static GameAssetType getAssetTypeFromGameResourceOwner (Class<? extends GameResourceOwner> aClass) {
 		try {
 			return ClassReflection.newInstance(aClass).getGameAssetType();
@@ -42,14 +48,14 @@ public enum GameAssetType {
 		return this.isRootGameAsset;
 	}
 
-	public static GameAssetType getAssetTypeFromExtension (String extension) {
+	public static GameAssetType getAssetTypeFromExtension (String extension) throws NoAssetTypeException {
 		for (GameAssetType value : GameAssetType.values()) {
 			if (value.extensions.contains(extension)) {
 				return value;
 			}
 		}
 
-		throw new GdxRuntimeException("No asset found for extension: " + extension);
+		throw new NoAssetTypeException("No asset found for extension: " + extension);
 	}
 
 	public static Class<? extends AMetadata> getMetaClassForType (GameAssetType type) {

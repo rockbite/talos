@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -24,6 +25,16 @@ public class EditableLabelWidget extends PropertyWidget<String> {
     public Actor getSubWidget() {
         propertyValue = new EditableLabel("", TalosMain.Instance().getSkin());
         propertyValue.setAlignment(Align.right);
+
+        propertyValue.addListener(new FocusListener() {
+            @Override
+            public void keyboardFocusChanged (FocusEvent event, Actor actor, boolean focused) {
+                super.keyboardFocusChanged(event, actor, focused);
+                if (!propertyValue.hasKeyboardFocus()) {
+                    propertyValue.finishTextEdit();
+                }
+            }
+        });
 
         propertyValue.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override

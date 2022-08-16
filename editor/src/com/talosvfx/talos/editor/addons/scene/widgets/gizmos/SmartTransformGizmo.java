@@ -36,7 +36,7 @@ public class SmartTransformGizmo extends Gizmo {
     protected static final int LT = 1;
     protected static final int RT = 2;
     protected static final int RB = 3;
-    private int touchedPoint = -1;
+    protected int touchedPoint = -1;
     private int touchedRA = -1;
 
     private Vector2 touchedDownLocation = new Vector2();

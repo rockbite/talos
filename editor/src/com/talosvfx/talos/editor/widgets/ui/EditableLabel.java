@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
@@ -71,7 +72,9 @@ public class EditableLabel extends Table implements ActorCloneable {
         label.setEllipsis(true);
         labelCell = labelTable.add(label).growX();
 
-        textField = new TextField(text, getSkin(), "no-bg");
+		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
+		TextField.TextFieldStyle style = new TextField.TextFieldStyle(textFieldStyle);
+		textField = new TextField(text, style);
         inputTable.add(textField).growX();
 
         addListener(new ClickListener() {
@@ -95,11 +98,8 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
-                    setStaticMode();
-                    if(listener != null) {
-                        listener.changed(label.getText().toString());
-                    }
+                if(SceneEditorWorkspace.isEnterPressed(keycode)) {
+                    finishTextEdit();
                 }
 
                 return super.keyDown(event, keycode);
@@ -109,6 +109,13 @@ public class EditableLabel extends Table implements ActorCloneable {
         pack();
 
         setStaticMode();
+    }
+
+    public void finishTextEdit () {
+        setStaticMode();
+        if(listener != null) {
+            listener.changed(label.getText().toString());
+        }
     }
 
     public void setListener(EditableLabelChangeListener listener) {
@@ -146,14 +153,28 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.clearSelection();
 
         if (getStage() != null) {
-            getStage().setKeyboardFocus(keyboardFocus);
+            if (getStage().getKeyboardFocus() == this) {
+                getStage().setKeyboardFocus(keyboardFocus);
+            }
         }
     }
 
     @Override
     public void setColor (Color color) {
+        super.setColor(color);
+        textField.setColor(color);
         label.setColor(color);
+		textField.getStyle().fontColor.set(color);
     }
+
+    @Override
+    public void setColor (float r, float g, float b, float a) {
+        super.setColor(r, g, b, a);
+        textField.setColor(r, g, b, a);
+        label.setColor(r, g, b, a);
+		textField.getStyle().fontColor.set(r, g, b, a);
+
+	}
 
     public String getText() {
         return label.getText().toString();

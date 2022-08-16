@@ -25,7 +25,10 @@ public class SceneEditorProject implements IProject {
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
 
-        sceneEditorAddon.workspace.setProjectPath(projectFileHandle.parent().path());
+        if (!fromMemory) {
+            sceneEditorAddon.workspace.setProjectPath(projectFileHandle.parent().path());
+        }
+
         sceneEditorAddon.workspace.loadFromData(json, jsonValue, fromMemory);
     }
 
@@ -51,7 +54,7 @@ public class SceneEditorProject implements IProject {
 
     @Override
     public String getProjectNameTemplate () {
-        return "scene";
+        return "sceneproject";
     }
 
     @Override

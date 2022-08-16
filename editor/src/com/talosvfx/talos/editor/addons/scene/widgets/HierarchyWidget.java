@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -14,8 +15,10 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -43,7 +46,9 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         top();
         defaults().top();
 
-        add(tree).growX().pad(5).padRight(0);
+        ScrollPane scrollPane= new ScrollPane(tree);
+
+        add(scrollPane).height(0).grow().pad(5).padRight(0);
 
         contextualMenu = new ContextualMenu();
 
@@ -155,7 +160,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         contextualMenu.addItem("Rename", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                if (tree.getSelection().size() == 1) {
+                    FilteredTree.Node<GameObject> node = tree.findNode(tree.getSelection().first().getObject());
+                    if (node != null) {
+                        if (node.getActor() instanceof EditableLabel) {
+                            EditableLabel actor = (EditableLabel)node.getActor();
+                            actor.setEditMode();
+                        }
+                    }
+                }
             }
         });
         contextualMenu.addItem("Duplicate", new ClickListener() {
@@ -206,6 +219,33 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         createMenu.setSubMenu(popupMenu);
 
         contextualMenu.show(getStage());
+    }
+
+    @EventHandler
+    public void gameActiveChanged (GameObjectActiveChanged event) {
+        updateColourForActive(event.target);
+    }
+
+    @EventHandler
+    public void gameObjectNameChanged (GameObjectNameChanged event) {
+        FilteredTree.Node<GameObject> node = tree.findNode(event.target);
+        if (node != null) {
+            if (node.getActor() instanceof EditableLabel) {
+                EditableLabel actor = (EditableLabel)node.getActor();
+                actor.setText(event.newName);
+            }
+        }
+    }
+
+    private void updateColourForActive (GameObject gameObject) {
+        FilteredTree.Node<GameObject> node = tree.findNode(gameObject);
+        if (node != null) {
+            if (gameObject.active) {
+                node.getActor().setColor(1, 1, 1, 1);
+            } else {
+                node.getActor().setColor(1, 0, 0, 1);
+            }
+        }
     }
 
     @EventHandler
@@ -286,6 +326,13 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             newNode.setObject(gameObject);
             newNode.draggable = true;
             node.add(newNode);
+
+
+            if (gameObject.active) {
+                editableLabel.setColor(1, 1, 1, 1);
+            } else {
+                editableLabel.setColor(1, 0, 0, 1);
+            }
 
             editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
                 @Override

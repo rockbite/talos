@@ -18,14 +18,15 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
@@ -42,6 +43,12 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWDropCallback;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
 
 import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -110,6 +117,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
+	private TalosInputProcessor talosInputProcessor;
+
 	public TalosMain () {
 
 	}
@@ -122,6 +131,10 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+
+		//Check for properties
+		loadFromProperties();
+
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
@@ -180,7 +193,9 @@ public class TalosMain extends ApplicationAdapter {
 
 		addonController.initAll();
 
-		inputMultiplexer = new InputMultiplexer(uiStage.getStage(), currentWorkplaceStage.getStage());
+		talosInputProcessor = new TalosInputProcessor();
+
+		inputMultiplexer = new InputMultiplexer(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -203,6 +218,39 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
+	private void loadFromProperties () {
+		FileHandle properties = Gdx.files.internal("talos-version.properties");
+		if (properties.exists()) {
+			Properties props = new Properties();
+			try {
+				props.load(properties.read());
+
+				String title = "Talos";
+				//buildHash=cac0e98
+				//buildTime=1660634881583
+				//version=1.4.2-SNAPSHOT
+
+				if (props.containsKey("version")) {
+					title = props.getProperty("version");
+				}
+				if (props.containsKey("buildTime")) {
+					String buildTime = props.getProperty("buildTime");
+					Date date = new Date(Long.parseLong(buildTime));
+
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
+					title += " " + sdf.format(date);
+				}
+				if (props.containsKey("buildHash")) {
+					title += " " + props.getProperty("buildHash");
+				}
+				Gdx.graphics.setTitle(title);
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
 	public void setPerFrameCursorTypeEnabled () {
 
@@ -215,12 +263,12 @@ public class TalosMain extends ApplicationAdapter {
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputMultiplexer.setProcessors(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 	}
 
 	public void enableNodeStage() {
 		currentWorkplaceStage = nodeStage;
-		inputMultiplexer.setProcessors(uiStage.getStage(), currentWorkplaceStage.getStage());
+		inputMultiplexer.setProcessors(talosInputProcessor, uiStage.getStage(), currentWorkplaceStage.getStage());
 	}
 
 	public InputMultiplexer getInputMultiplexer() {

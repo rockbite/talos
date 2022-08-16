@@ -28,8 +28,6 @@ public class TransformGizmo extends Gizmo {
             // drawing position point
             if(selected) {
                 drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.ORANGE, 30);
-            } else {
-                drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.WHITE, 30);
             }
         }
 

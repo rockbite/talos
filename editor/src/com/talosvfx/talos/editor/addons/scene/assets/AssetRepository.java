@@ -66,9 +66,48 @@ public class AssetRepository {
 	}
 
 
-	private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
-	private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
-	private ObjectMap<FileHandle, RawAsset> fileHandleRawAssetMap = new ObjectMap<>();
+	static class DataMaps {
+		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
+		private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
+		private ObjectMap<FileHandle, RawAsset> fileHandleRawAssetMap = new ObjectMap<>();
+
+
+		void putFileHandleGameAsset (FileHandle handle, GameAsset<?> gameAsset) {
+			this.fileHandleGameAssetObjectMap.put(handle, gameAsset);
+
+			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
+		}
+
+		void putUUIRawAsset (UUID uuid, RawAsset rawAsset) {
+			uuidRawAssetMap.put(uuid, rawAsset);
+
+			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
+		}
+		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
+			fileHandleRawAssetMap.put(handle, rawAsset);
+
+			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
+
+		}
+
+		public GameAsset removeFileHandleGameAssetObjectMap (FileHandle handle) {
+			System.out.println("Removing file handle game asset " + handle.path());
+			return fileHandleGameAssetObjectMap.remove(handle);
+		}
+
+		public RawAsset removeFileHandleRawAsset (FileHandle handle) {
+			System.out.println("Removing file handle raw asset " + handle.path());
+			return fileHandleRawAssetMap.remove(handle);
+		}
+
+		public RawAsset removeUUIDRawAsset (UUID uuid) {
+
+			System.out.println("Removing uuid raw asset " + uuid.toString());
+			return uuidRawAssetMap.remove(uuid);
+		}
+	}
+
+	private DataMaps dataMaps = new DataMaps();
 
 	private FileHandle assetsRoot;
 	private Json json;
@@ -125,18 +164,23 @@ public class AssetRepository {
 	private void checkGameAssetCreation (GameAssetType type) {
 		//We need to do multiple passes here for dependent assets
 
-		for (ObjectMap.Entry<FileHandle, RawAsset> entry : fileHandleRawAssetMap) {
+		for (ObjectMap.Entry<FileHandle, RawAsset> entry : dataMaps.fileHandleRawAssetMap) {
 			FileHandle key = entry.key;
 			RawAsset value = entry.value;
 
 
 			if (key.isDirectory()) continue;
 
-			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
-			if (type != assetTypeFromExtension) continue;
+			try {
+				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+				if (type != assetTypeFromExtension)
+					continue;
 
-			if (assetTypeFromExtension.isRootGameAsset()) {
-				createGameAsset(key, value);
+				if (assetTypeFromExtension.isRootGameAsset()) {
+					createGameAsset(key, value);
+				}
+			} catch (GameAssetType.NoAssetTypeException e) {
+				//Its not an asset
 			}
 		}
 	}
@@ -154,9 +198,10 @@ public class AssetRepository {
 		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
 
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
 
 		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
 			GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rootRawAsset, false);
 			gameAssetReference.setResourcePayload(gameAsset.getResource());
 			gameAssetReference.setUpdated();
@@ -298,7 +343,7 @@ public class AssetRepository {
 			} else {
 				if (handle.extension().equals("prefab")) {
 					//Get the raw asset
-					GameAsset<Prefab> gameAsset = fileHandleGameAssetObjectMap.get(handle);
+					GameAsset<Prefab> gameAsset = dataMaps.fileHandleGameAssetObjectMap.get(handle);
 					if (gameAsset != null) {
 						identifiersBeingUsedByComponents.add(new TypeIdentifierPair(GameAssetType.PREFAB, gameAsset.nameIdentifier));
 
@@ -350,9 +395,12 @@ public class AssetRepository {
 	private void createGameAsset (FileHandle key, RawAsset value) {
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(value);
 
-
-
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+		GameAssetType assetTypeFromExtension = null;
+		try {
+			assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+		} catch (GameAssetType.NoAssetTypeException e) {
+			throw new RuntimeException(e);
+		}
 
 		boolean shouldUpdate = false;
 		if (getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension) != null) {
@@ -404,7 +452,7 @@ public class AssetRepository {
 		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
 
 		putAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension, gameAsset);
-		fileHandleGameAssetObjectMap.put(key, gameAsset);
+		dataMaps.putFileHandleGameAsset(key, gameAsset);
 	}
 
 	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
@@ -421,12 +469,14 @@ public class AssetRepository {
 				GameAsset<Texture> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 				gameAssetOut = textureGameAsset;
 
-				textureGameAsset.setResourcePayload(new Texture(value.handle));
 
 				if (createLinks) {
 					value.gameAssetReferences.add(textureGameAsset);
 					textureGameAsset.dependentRawAssets.add(value);
 				}
+
+				textureGameAsset.setResourcePayload(new Texture(value.handle));
+
 
 				break;
 			case ATLAS:
@@ -443,11 +493,11 @@ public class AssetRepository {
 
 					for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
 						FileHandle textureFile = page.textureFile;
-						if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+						if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
 							throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
 						}
 
-						RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+						RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
 
 						rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
 						textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
@@ -483,16 +533,16 @@ public class AssetRepository {
 						value.gameAssetReferences.add(skeletonDataGameAsset);
 						skeletonDataGameAsset.dependentRawAssets.add(value);
 
-						RawAsset skeleAtlasRawAsset = fileHandleRawAssetMap.get(atlasFile);
+						RawAsset skeleAtlasRawAsset = dataMaps.fileHandleRawAssetMap.get(atlasFile);
 						skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
 
 						for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
 							FileHandle textureFile = page.textureFile;
-							if (!fileHandleRawAssetMap.containsKey(textureFile)) {
+							if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
 								throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
 							}
 
-							RawAsset rawAssetForPage = fileHandleRawAssetMap.get(textureFile);
+							RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
 							rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
 							skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 						}
@@ -545,7 +595,7 @@ public class AssetRepository {
 					throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
 				}
 
-				RawAsset rawAssetPFile = fileHandleRawAssetMap.get(pFile);
+				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(pFile);
 
 				try {
 					particleEffectDescriptor.load(rawAssetPFile.handle);
@@ -662,7 +712,7 @@ public class AssetRepository {
 				collectRawResourceFromDirectory(fileHandle, checkGameResources);
 			} else if (shouldIgnoreAsset(fileHandle)) {
 				continue;
-			} else if (!fileHandleRawAssetMap.containsKey(fileHandle)) {
+			} else if (!dataMaps.fileHandleRawAssetMap.containsKey(fileHandle)) {
 				rawAssetCreated(fileHandle, checkGameResources);
 			}
 		}
@@ -692,38 +742,41 @@ public class AssetRepository {
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
+		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
-		RawAsset rawAsset = new RawAsset(fileHandle);
+			RawAsset rawAsset = new RawAsset(fileHandle);
 
-		if (assetTypeFromExtension == GameAssetType.VFX) {
-			updateVFXTLS(rawAsset, checkGameResources);
-		}
+			if (assetTypeFromExtension == GameAssetType.VFX) {
+				updateVFXTLS(rawAsset, checkGameResources);
+			}
 
-		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
-		if (metadataHandleFor.exists()) {
-			try {
-				Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
-				rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
-				rawAsset.metaData.setLinkRawAsset(rawAsset);
-			} catch (Exception e) {
-				e.printStackTrace();
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
+			if (metadataHandleFor.exists()) {
+				try {
+					Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(assetTypeFromExtension);
+					rawAsset.metaData = json.fromJson(metaClassForType, metadataHandleFor);
+					rawAsset.metaData.setLinkRawAsset(rawAsset);
+				} catch (Exception e) {
+					e.printStackTrace();
 
-				System.out.println("Error reading meta for " + metadataHandleFor.path() + " " + metadataHandleFor.readString());
+					System.out.println("Error reading meta for " + metadataHandleFor.path() + " " + metadataHandleFor.readString());
+					rawAsset.metaData = createMetaDataForAsset(rawAsset);
+				}
+			} else {
 				rawAsset.metaData = createMetaDataForAsset(rawAsset);
 			}
-		} else {
-			rawAsset.metaData = createMetaDataForAsset(rawAsset);
-		}
 
+			dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
+			dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
-		uuidRawAssetMap.put(rawAsset.metaData.uuid, rawAsset);
-		fileHandleRawAssetMap.put(fileHandle, rawAsset);
+			System.out.println("Raw asset created" + rawAsset.handle.path());
 
-		System.out.println("Raw asset created" + rawAsset.handle.path());
-
-		if (checkGameResources) {
-			checkAllGameAssetCreation();
+			if (checkGameResources) {
+				checkAllGameAssetCreation();
+			}
+		} catch (GameAssetType.NoAssetTypeException noAssetTypeException) {
+			//Its not an asset
 		}
 	}
 
@@ -734,7 +787,12 @@ public class AssetRepository {
 
 			String extension = rawAsset.handle.extension();
 
-			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
+			GameAssetType assetTypeFromExtension = null;
+			try {
+				assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(extension);
+			} catch (GameAssetType.NoAssetTypeException e) {
+				throw new RuntimeException(e);
+			}
 			T metaForType = (T)GameAssetType.createMetaForType(assetTypeFromExtension);
 
 			//Save the meta data
@@ -748,8 +806,8 @@ public class AssetRepository {
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {
-		if (fileHandleGameAssetObjectMap.containsKey(file)) {
-			GameAsset<?> gameAsset = fileHandleGameAssetObjectMap.get(file);
+		if (dataMaps.fileHandleGameAssetObjectMap.containsKey(file)) {
+			GameAsset<?> gameAsset = dataMaps.fileHandleGameAssetObjectMap.get(file);
 			if (ignoreBroken) {
 				return gameAsset;
 			} else {
@@ -771,8 +829,8 @@ public class AssetRepository {
 		handle.delete();
 		Array<GameAsset> gameAssetsToUpdate = new Array<>();
 
-		if (fileHandleRawAssetMap.containsKey(handle)) {
-			RawAsset rawAsset = fileHandleRawAssetMap.get(handle);
+		if (dataMaps.fileHandleRawAssetMap.containsKey(handle)) {
+			RawAsset rawAsset = dataMaps.fileHandleRawAssetMap.get(handle);
 			gameAssetsToUpdate.addAll(rawAsset.gameAssetReferences);
 
 
@@ -786,14 +844,14 @@ public class AssetRepository {
 				} else {
 					gameAsset.setBroken(new Exception("Game Asset Removed"));
 					gameAsset.setUpdated();
-					fileHandleGameAssetObjectMap.remove(rawAsset.handle);
+					dataMaps.removeFileHandleGameAssetObjectMap(rawAsset.handle);
 					identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
 				}
 
 			}
 
-			fileHandleRawAssetMap.remove(handle);
-			uuidRawAssetMap.remove(rawAsset.metaData.uuid);
+			dataMaps.removeFileHandleRawAsset(handle);
+			dataMaps.removeUUIDRawAsset(rawAsset.metaData.uuid);
 		}
 	}
 	public void deleteRawAsset (FileHandle handle) {
@@ -890,14 +948,14 @@ public class AssetRepository {
 
 
 			if (!newHandle.isDirectory()) {
-				RawAsset rawAsset = fileHandleRawAssetMap.remove(oldHandle);
+				RawAsset rawAsset = dataMaps.removeFileHandleRawAsset(oldHandle);
 
 				if (rawAsset == null) {
 					System.out.println();
 				}
 				rawAsset.handle = newHandle;
 
-				fileHandleRawAssetMap.put(newHandle, rawAsset);
+				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
 				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
 				assetPathChanged.oldRelativePath = relative(oldHandle);
@@ -909,8 +967,8 @@ public class AssetRepository {
 				}
 
 				if (isRootGameResource(rawAsset)) {
-					GameAsset gameAsset = fileHandleGameAssetObjectMap.remove(oldHandle);
-					fileHandleGameAssetObjectMap.put(newHandle, gameAsset);
+					GameAsset gameAsset = dataMaps.removeFileHandleGameAssetObjectMap(oldHandle);
+					dataMaps.putFileHandleGameAsset(newHandle, gameAsset);
 
 					gameAsset.setUpdated();
 				}
@@ -936,16 +994,21 @@ public class AssetRepository {
 	}
 
 	//Could be a rename or a move
-	public void moveFile (FileHandle file, FileHandle destination) {
-		AssetImporter.moveFile(file, destination, true);
+	public void moveFile (FileHandle file, FileHandle destination, boolean rename) {
+		AssetImporter.moveFile(file, destination, true, rename);
 	}
-	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets) {
+	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets, boolean rename) {
 
 
 		if (file.isDirectory()) {
 			//Moving a folder
 			if (destination.exists() && !destination.isDirectory()) {
 				throw new GdxRuntimeException("Trying to move a directory to a file");
+			}
+
+			if (!rename && !destination.name().equals(file.name())) {
+				//Make sure to preserve the file structure when copying folders
+				destination = destination.child(file.name());
 			}
 
 			MovingDirNode rootNode = new MovingDirNode();
@@ -962,13 +1025,22 @@ public class AssetRepository {
 			if (destination.isDirectory()) {
 				//Moving a file into a directory
 
-				RawAsset rawAsset = fileHandleRawAssetMap.remove(file);
-				fileHandleGameAssetObjectMap.remove(file);
+				RawAsset rawAsset = dataMaps.removeFileHandleRawAsset(file);
+				dataMaps.removeFileHandleGameAssetObjectMap(file);
 
 				FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
 
-				oldMeta.moveTo(destination);
+				if (oldMeta.exists()) {
+					oldMeta.moveTo(destination);
+				}
+
 				file.moveTo(destination);
+
+				if (rawAsset == null) {
+					//It wasn't something we were tracking, must be broken so we just ignore it
+
+					return;
+				}
 
 				//Lets check to see if its a tls for special case
 				if (file.extension().equals("tls")) {
@@ -976,7 +1048,7 @@ public class AssetRepository {
 					FileHandle pFile = file.parent().child(file.nameWithoutExtension() + ".p");
 					if (pFile.exists()) {
 						//Copy this too,
-						AssetImporter.moveFile(pFile, destination, false);
+						AssetImporter.moveFile(pFile, destination, false, false);
 					}
 				}
 
@@ -988,7 +1060,7 @@ public class AssetRepository {
 				assetPathChanged.newRelativePath = relative(newHandle);
 				Notifications.fireEvent(assetPathChanged);
 
-				fileHandleRawAssetMap.put(newHandle, rawAsset);
+				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
 				rawAsset.handle = newHandle;
 
@@ -998,9 +1070,9 @@ public class AssetRepository {
 
 			} else {
 				//Its a rename
-				if (fileHandleRawAssetMap.containsKey(file)) {
-					RawAsset rawAsset = fileHandleRawAssetMap.get(file);
-					fileHandleRawAssetMap.remove(file);
+				if (dataMaps.fileHandleRawAssetMap.containsKey(file)) {
+					RawAsset rawAsset = dataMaps.fileHandleRawAssetMap.get(file);
+					dataMaps.removeFileHandleRawAsset(file);
 
 					FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
 
@@ -1026,7 +1098,12 @@ public class AssetRepository {
 					if (isRootGameResource(rawAsset)) {
 						//We need to update the game assets identifier
 						String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
-						GameAssetType typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+						GameAssetType typeFromExtension = null;
+						try {
+							typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+						} catch (GameAssetType.NoAssetTypeException e) {
+							throw new RuntimeException(e);
+						}
 
 						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
 
@@ -1040,7 +1117,7 @@ public class AssetRepository {
 						}
 					}
 
-					fileHandleRawAssetMap.put(destination, rawAsset);
+					dataMaps.putFileHandleRawAsset(destination, rawAsset);
 
 					rawAsset.handle = destination;
 
@@ -1049,7 +1126,9 @@ public class AssetRepository {
 					}
 
 				} else {
-					System.out.println("We moved something we were not tracking");
+					//Just move it
+					file.moveTo(destination);
+
 					collectRawResourceFromDirectory(file, true);
 				}
 			}
@@ -1063,7 +1142,12 @@ public class AssetRepository {
 
 
 	private boolean isRootGameResource (RawAsset rawAsset) {
-		GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+		GameAssetType assetTypeFromExtension = null;
+		try {
+			assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+		} catch (GameAssetType.NoAssetTypeException e) {
+			throw new RuntimeException(e);
+		}
 		return assetTypeFromExtension.isRootGameAsset();
 	}
 

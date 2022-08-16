@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -57,6 +56,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.talosvfx.talos.editor.TalosInputProcessor.ctrlPressed;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
@@ -89,6 +89,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
 
+	public static boolean isEnterPressed (int keycode) {
+		switch (keycode) {
+			case Input.Keys.ENTER:
+			case Input.Keys.NUMPAD_ENTER:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	public MainRenderer getUISceneRenderer () {
 		return uiSceneRenderer;
 	}
@@ -104,7 +114,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private AssetRepository assetRepository;
 
 	public SceneEditorWorkspace () {
-
 		layers.clear();
 		layers.add("Default");
 		layers.add("UI");
@@ -140,7 +149,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer = new MainRenderer();
 		uiSceneRenderer = new MainRenderer();
 
-		Stage stage = TalosMain.Instance().UIStage().getStage();
 		Skin skin = TalosMain.Instance().getSkin();
 		selectionRect = new Image(skin.getDrawable("orange_row"));
 		selectionRect.setSize(0, 0);
@@ -148,18 +156,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(selectionRect);
 
 		gridDrawer = new GridDrawer(this, camera, gridProperties);
+		addRulers();
 	}
 
-	public void createEmpty (Vector2 position) {
-		createObjectByTypeName("empty", position, null);
+	public GameObject createEmpty (Vector2 position) {
+		return createObjectByTypeName("empty", position, null);
 	}
 
-	public void createEmpty (GameObject parent) {
-		createObjectByTypeName("empty", null, parent);
+	public GameObject createEmpty (GameObject parent) {
+		return createObjectByTypeName("empty", null, parent);
 	}
 
-	public void createEmpty (Vector2 position, GameObject parent) {
-		createObjectByTypeName("empty", position, parent);
+	public GameObject createEmpty (Vector2 position, GameObject parent) {
+		return createObjectByTypeName("empty", position, parent);
 	}
 
 	public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
@@ -332,7 +341,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			GameObject selectedGameObject;
 
 			private boolean painting = false;
-			private boolean erasing = true;
+			private boolean erasing = false;
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -499,12 +508,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					selectAll();
 				}
 
-				if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().undo();
-				}
-
-				if (keycode == Input.Keys.Z && ctrlPressed() && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-					TalosMain.Instance().ProjectController().redo();
+				if (keycode == Input.Keys.G && ctrlPressed()) {
+					convertSelectedIntoGroup();
 				}
 
 				return super.keyDown(event, keycode);
@@ -512,6 +517,55 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		};
 
 		addListener(inputListener);
+	}
+
+	private void convertSelectedIntoGroup () {
+		if (selection.isEmpty() || selection.size == 1) {
+			return;
+		}
+
+		Array<GameObject> selectedObjects = new Array<>();
+		selectedObjects.addAll(selection.orderedItems());
+
+		GameObject rootGO = getRootGO();
+		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
+		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
+
+		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				for (GameObject gameObject : selectedObjects) {
+					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
+				}
+
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(dummyParent));
+
+				selectGameObjectExternally(dummyParent);
+			}
+		});
+	}
+
+	private GameObject getTopestLevelObjectsParentFor (GameObject gameObject, Array<GameObject> gameObjects) {
+		Array<GameObject> childGameObjects = gameObject.getGameObjects();
+		if (childGameObjects == null) {
+			return null;
+		}
+
+		for (GameObject object : gameObjects) {
+			if (childGameObjects.contains(object, true)) {
+				return gameObject;
+			}
+		}
+
+		for (GameObject object : childGameObjects) {
+			GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(object, gameObjects);
+			if (topestLevelObjectsParentFor != null) {
+				return topestLevelObjectsParentFor;
+			}
+		}
+
+		return null;
 	}
 
 	private void eraseTileAt (float x, float y) {
@@ -609,19 +663,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public static boolean isRenamePressed (int keycode) {
 		if (TalosMain.Instance().isOsX()) {
-			return keycode == Input.Keys.ENTER;
+			return isEnterPressed(keycode);
 		} else {
 			return keycode == Input.Keys.F2;
 		}
 	}
 
-	public static boolean ctrlPressed () {
-		if (TalosMain.Instance().isOsX()) {
-			return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		} else {
-			return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-		}
-	}
+
 
 	public void openPrefab (FileHandle fileHandle) {
 		if (currentContainer != null) {
@@ -700,6 +748,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			for (GameObject gameObject : payload.objects) {
 				String name = getUniqueGOName(gameObject.getName(), false);
 				gameObject.setName(name);
+				randomizeChildrenUUID(gameObject);
 				currentContainer.addGameObject(gameObject);
 				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 				transformComponent.position.add(offset);
@@ -950,9 +999,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		selectPropertyHolder(mainScene);
 
 		if (mainScene instanceof Scene) {
-			bgColor.set(Color.BLACK);
+			bgColor.set(Color.valueOf("#272727"));
 		} else {
-
 			bgColor.set(Color.valueOf("#241a00"));
 		}
 	}
@@ -1147,7 +1195,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
 			}
 
-//			openSavableContainer(container);
+			openSavableContainer(container);
 		}
 
 		if (!fromMemory) {
@@ -1260,14 +1308,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						setDirty = true;
 					}
 				}
-				if (setDirty) {
+				if (setDirty && !event.fastChange) {
 					TalosMain.Instance().ProjectController().setDirty();
 				}
 			} else {
 				if (currentHolder instanceof AMetadata) {
 					AssetImporter.saveMetadata((AMetadata)currentHolder);
 				} else {
-					TalosMain.Instance().ProjectController().setDirty();
+					if (!event.fastChange) {
+						TalosMain.Instance().ProjectController().setDirty();
+					}
 				}
 			}
 		}

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -145,7 +146,10 @@ public class ValueWidget extends AbstractWidget<Float> {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                isDragging = false;
+                if (isDragging) {
+                    isDragging = false;
+                    setValue(value, true);
+                }
                 setBackgrounds();
             }
 
@@ -161,7 +165,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 
@@ -250,7 +254,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
-        setValue(value, true);
+        setValue(value, isChanged(value));
     }
 
     public void setValue(float value, boolean notify) {
@@ -313,6 +317,10 @@ public class ValueWidget extends AbstractWidget<Float> {
         setValue(defaultValue);
 
         setLabel(text);
+    }
+
+    public boolean isFastChange () {
+        return isDragging;
     }
 
     @Override

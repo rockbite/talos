@@ -2,16 +2,22 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -22,6 +28,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public UUID uuid;
 
     private String prefabLink = null;
+
+    public boolean active = true;
 
     private Array<GameObject> children;
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
@@ -65,6 +73,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         json.writeValue("name", name);
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
+        json.writeValue("active", active);
 
         json.writeArrayStart("components");
         for(AComponent component: components) {
@@ -90,6 +99,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             uuid = UUID.randomUUID();
         }
         prefabLink = jsonData.getString("prefabLink", null);
+        active = jsonData.getBoolean("active", this.active);
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
@@ -230,6 +240,17 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         });
 
         properties.add(labelWidget);
+
+        PropertyWidget activeWidget = WidgetFactory.generate(this, "active", "Active");
+        activeWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                GameObjectActiveChanged activeChanged = Notifications.obtainEvent(GameObjectActiveChanged.class);
+                activeChanged.target = GameObject.this;
+                Notifications.fireEvent(activeChanged);
+            }
+        });
+        properties.add(activeWidget);
 
         return properties;
     }
