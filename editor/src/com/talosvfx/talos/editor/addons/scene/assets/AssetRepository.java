@@ -1030,8 +1030,17 @@ public class AssetRepository {
 
 				FileHandle oldMeta = AssetImporter.getMetadataHandleFor(file);
 
-				oldMeta.moveTo(destination);
+				if (oldMeta.exists()) {
+					oldMeta.moveTo(destination);
+				}
+
 				file.moveTo(destination);
+
+				if (rawAsset == null) {
+					//It wasn't something we were tracking, must be broken so we just ignore it
+
+					return;
+				}
 
 				//Lets check to see if its a tls for special case
 				if (file.extension().equals("tls")) {
