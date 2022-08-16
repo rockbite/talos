@@ -144,8 +144,7 @@ task distLegacyTest(type: Jar) {
     with jar
 }
 
-dist.dependsOn classes, genBuildFile
-
+dist.dependsOn classes
 
 
 modifyPom {

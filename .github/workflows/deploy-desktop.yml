@@ -18,7 +18,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew clean editor:dist
+        run: |
+          ./gradlew clean editor:genBuildFile
+          ./gradlew editor:dist
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
