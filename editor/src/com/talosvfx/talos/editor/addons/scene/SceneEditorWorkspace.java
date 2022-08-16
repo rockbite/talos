@@ -531,6 +531,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
 		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
+		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
 			public void run () {
