@@ -1117,7 +1117,9 @@ public class AssetRepository {
 					}
 
 				} else {
-					System.out.println("We moved something we were not tracking");
+					//Just move it
+					file.moveTo(destination);
+
 					collectRawResourceFromDirectory(file, true);
 				}
 			}

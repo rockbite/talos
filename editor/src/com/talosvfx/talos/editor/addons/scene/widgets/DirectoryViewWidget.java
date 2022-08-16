@@ -616,6 +616,8 @@ public class DirectoryViewWidget extends Table {
 
             if(fileHandle.isDirectory()) {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
+            } else {
+                icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
             }
 
             this.fileHandle = fileHandle;
@@ -624,8 +626,6 @@ public class DirectoryViewWidget extends Table {
             if (assetForPath != null) {
                 gameAsset = assetForPath;
             }
-
-            icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
 
             if (assetForPath != null) {
 

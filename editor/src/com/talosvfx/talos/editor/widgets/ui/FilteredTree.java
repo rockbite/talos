@@ -310,7 +310,7 @@ public class FilteredTree<T> extends WidgetGroup {
             @Override
             public boolean keyDown (InputEvent event, int keycode) {
 
-                if (keycode == Input.Keys.DEL) {
+                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
                     if(!selection.isEmpty()) {
                         Array<FilteredTree.Node<T>> nodes = new Array<>();
                         for(Object nodeObject: selection) {

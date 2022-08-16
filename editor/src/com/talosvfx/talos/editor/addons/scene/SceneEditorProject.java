@@ -54,7 +54,7 @@ public class SceneEditorProject implements IProject {
 
     @Override
     public String getProjectNameTemplate () {
-        return "scene";
+        return "sceneproject";
     }
 
     @Override

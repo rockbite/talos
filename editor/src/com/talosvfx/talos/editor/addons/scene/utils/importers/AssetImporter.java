@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -297,7 +298,23 @@ public class AssetImporter {
         if(file.path().equals(projectPath + File.separator + "assets")) return;
         if(file.path().equals(projectPath + File.separator + "scenes")) return;
 
+
+        //Are we moving the actual scene editting?
+
+        String path = SceneEditorWorkspace.getInstance().getCurrentContainer().path;
+        if (file.path().equals(path)) {
+            //moving the scene that we are editing
+            if (directory.isDirectory()) {
+                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.child(file.name()).path();
+            } else {
+                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.path();
+            }
+
+            SceneEditorWorkspace.getInstance().getCurrentContainer().setName(file.name());
+        }
+
         AssetRepository.getInstance().moveFile(file, directory, checkGameAssets, rename);
+
 
 
         SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
@@ -309,6 +326,7 @@ public class AssetImporter {
         FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
 
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+        if(file.path().equals(projectPath + File.separator + "scenes")) return file;
         if(file.path().equals(projectPath + File.separator + "assets")) return file;
 
         if(!file.isDirectory()) {
