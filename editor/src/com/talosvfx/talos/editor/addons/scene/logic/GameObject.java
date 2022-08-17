@@ -197,6 +197,12 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
+    public void removeComponent (AComponent component) {
+        components.remove(component);
+        componentClasses.remove(component.getClass());
+    }
+
+    @Override
     public boolean hasGOWithName (String name) {
         if(children == null) return false;
 
