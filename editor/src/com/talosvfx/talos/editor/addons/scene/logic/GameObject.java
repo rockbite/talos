@@ -411,4 +411,16 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             childPositionComponent.scale.set(tmp);
         }
     }
+
+    public int getParentCount () {
+        int count = 0;
+        GameObject par = getParent();
+
+        while (par != null) {
+            par = par.getParent();
+            count++;
+        }
+
+        return count;
+    }
 }
