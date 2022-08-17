@@ -143,8 +143,14 @@ public class GroupSelectionGizmo extends Gizmo {
 			drawLine(batch, centerX - boundsWidth/2, centerY + boundsHeight/2, centerX + boundsWidth/2, centerY + boundsHeight/2, ColorLibrary.ORANGE);
 			drawLine(batch, centerX - boundsWidth/2, centerY - boundsHeight/2, centerX + boundsWidth/2, centerY - boundsHeight/2, ColorLibrary.ORANGE);
 		}
+	}
 
+	public float getCenterX () {
+		return selectionBounds.getCenterX();
+	}
 
+	public float getCenterY () {
+		return selectionBounds.getCenterY();
 	}
 
 
