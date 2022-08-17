@@ -46,6 +46,16 @@ public class Scene extends SavableContainer implements IPropertyProvider {
         return list;
     }
 
+    private String getNextAvailableLayerName (String base) {
+        String newLayer = base;
+        int count = 1;
+        while (SceneEditorAddon.get().workspace.layers.contains(newLayer, false)) {
+            newLayer = base + count++;
+        }
+
+        return newLayer;
+    }
+
     @Override
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
@@ -64,7 +74,10 @@ public class Scene extends SavableContainer implements IPropertyProvider {
         Supplier<ItemData> newItemDataSupplier = new Supplier<ItemData>() {
             @Override
             public ItemData get () {
-                return new ItemData("NewLayer", "NewLayer");
+                String base = "NewLayer";
+                String newLayer = getNextAvailableLayerName(base);
+
+                return new ItemData(newLayer, newLayer);
             }
         };
         DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers", new Supplier<Array<ItemData>>() {
@@ -102,8 +115,10 @@ public class Scene extends SavableContainer implements IPropertyProvider {
             }
 
             @Override
-            public void updateName (ItemData itemData, String newText) {
+            public String updateName (ItemData itemData, String newText) {
+                newText = getNextAvailableLayerName(newText);
                 itemData.updateName(newText);
+                return newText;
             }
         });
 
