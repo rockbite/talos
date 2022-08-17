@@ -63,8 +63,7 @@ public class ProjectExplorerWidget extends Table {
 
         directoryViewWidget = new DirectoryWidgetTrash();
         directoryViewWidgetNew = new DirectoryViewWidget();
-
-        VisSplitPane splitPane = new VisSplitPane(scrollPaneTable, directoryViewWidgetNew, false);
+        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidgetNew, false, TalosMain.Instance().getSkin());
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
@@ -109,7 +108,6 @@ public class ProjectExplorerWidget extends Table {
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
-                directoryViewWidget.setDirectory((String) node.getObject());
                 directoryViewWidgetNew.openDirectory((String) node.getObject());
             }
 
@@ -398,17 +396,17 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void select (String path) {
-        if(nodes.containsKey(path)) {
+        if (nodes.containsKey(path)) {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
             String pathToSet = (String)nodes.get(path).getObject();
-            directoryViewWidget.setDirectory(pathToSet);
+            directoryViewWidgetNew.openDirectory(pathToSet);
         } else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(rootNode);
             expand(path);
-            directoryViewWidget.setDirectory(path);
+            directoryViewWidgetNew.openDirectory(path);
         }
     }
 
