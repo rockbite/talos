@@ -73,6 +73,11 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     @Override
+    public void removeComponent (AComponent component) {
+
+    }
+
+    @Override
     public boolean hasGOWithName (String name) {
         return root.hasGOWithName(name);
     }

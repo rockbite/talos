@@ -14,6 +14,8 @@ public interface GameObjectContainer {
     void removeObject(GameObject gameObject);
     void addComponent(AComponent component);
 
+    void removeComponent (AComponent component);
+
     boolean hasGOWithName (String name);
 
     void clearChildren (Array<GameObject> tmp);

@@ -130,12 +130,17 @@ public class SEPropertyPanel extends PropertyPanel{
                     String name = node.getName();
 
                     if(name.equals("script")) {
-                        ScriptComponent scriptComponent = new ScriptComponent();
-                        gameObject.addComponent(scriptComponent);
-                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                        projectExplorer.reload();
+                        if (!gameObject.hasComponent(ScriptComponent.class)) {
+                            ScriptComponent scriptComponent = new ScriptComponent();
+                            gameObject.addComponent(scriptComponent);
+                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+                            projectExplorer.reload();
 
-                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+                        } else {
+                            System.out.println("Trying to add duplicate");
+                        }
                     }
 
                     remove();

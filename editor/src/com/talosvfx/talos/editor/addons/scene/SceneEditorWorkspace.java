@@ -103,6 +103,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return uiSceneRenderer;
 	}
 
+
 	public static class GridProperties {
 		public Supplier<float[]> sizeProvider;
 		public int subdivisions = 0;

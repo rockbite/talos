@@ -197,6 +197,12 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     @Override
+    public void removeComponent (AComponent component) {
+        components.remove(component);
+        componentClasses.remove(component.getClass());
+    }
+
+    @Override
     public boolean hasGOWithName (String name) {
         if(children == null) return false;
 
@@ -404,5 +410,17 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
             childPositionComponent.scale.set(tmp);
         }
+    }
+
+    public int getParentCount () {
+        int count = 0;
+        GameObject par = getParent();
+
+        while (par != null) {
+            par = par.getParent();
+            count++;
+        }
+
+        return count;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -13,6 +14,8 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
+import java.util.Comparator;
+
 public class GroupSelectionGizmo extends Gizmo {
 
 	private final ViewportWidget viewportWidget;
@@ -20,9 +23,19 @@ public class GroupSelectionGizmo extends Gizmo {
 	private BoundingBox selectionBounds = new BoundingBox();
 
 	private ObjectMap<GameObject, Vector2> worldSpaceStartingOffsets = new ObjectMap<>();
+	private Comparator<GameObject> parentHierarchySorter;
 
 	public GroupSelectionGizmo (ViewportWidget widget) {
 		this.viewportWidget = widget;
+
+		parentHierarchySorter = new Comparator<GameObject>() {
+			@Override
+			public int compare (GameObject o1, GameObject o2) {
+				int o1Count = o1.getParentCount();
+				int o2Count = o2.getParentCount();
+				return Integer.compare(o1Count, o2Count);
+			}
+		};
 	}
 
 	@Override
@@ -48,7 +61,13 @@ public class GroupSelectionGizmo extends Gizmo {
 		super.touchDown(x, y, button);
 
 		worldSpaceStartingOffsets.clear();
-		for (GameObject object : viewportWidget.selection) {
+
+		//Sort the selection by parent hierarchy becuase its impportant to do parents first
+
+		Array<GameObject> gameObjects = viewportWidget.selection.orderedItems();
+
+		gameObjects.sort(parentHierarchySorter);
+		for (GameObject object : gameObjects) {
 			if (object.hasComponent(TransformComponent.class)) {
 				TransformComponent transformComponent = object.getComponent(TransformComponent.class);
 				Vector2 worldPosition = transformComponent.worldPosition;

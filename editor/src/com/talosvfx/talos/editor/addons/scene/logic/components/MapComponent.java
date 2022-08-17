@@ -67,8 +67,9 @@ public class MapComponent extends RendererComponent {
             }
 
             @Override
-            public void updateName (TalosLayer talosLayer, String newText) {
+            public String updateName (TalosLayer talosLayer, String newText) {
                 talosLayer.setName(newText);
+                return newText;
             }
         });
 

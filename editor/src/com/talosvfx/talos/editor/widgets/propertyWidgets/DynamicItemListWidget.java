@@ -27,7 +27,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         Supplier<T> newInstanceCreator ();
         String getID (T t);
 
-        void updateName (T t, String newText);
+        String updateName (T t, String newText);
     }
 
 
@@ -170,7 +170,8 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
             public void changed (String newText) {
-                interaction.updateName(t, newText);
+                String checkedName = interaction.updateName(t, newText);
+                editableLabel.setText(checkedName);
                 callValueChanged(makeDataArray());
             }
         });
