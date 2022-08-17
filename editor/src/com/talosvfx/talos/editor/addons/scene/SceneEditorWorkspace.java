@@ -956,6 +956,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 							pb.start();
 						} else {
 							ProcessBuilder pb = new ProcessBuilder(command);
+//							ProcessBuilder pb = new ProcessBuilder("node C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project/buildscript.js", "\"C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project\"", "\"C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project.se\"");
 							pb.inheritIO();
 							pb.start();
 						}
