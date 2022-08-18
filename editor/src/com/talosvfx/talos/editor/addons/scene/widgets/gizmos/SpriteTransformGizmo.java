@@ -76,6 +76,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 
+
         // bring old next points to local space
         for(int i = 0; i < 4; i++) {
             TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
@@ -92,18 +93,26 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
         }
 
+        if (spriteRendererComponent.fixAspectRatio) {
 
-        if (touchedPoint == RT) {
+
+
+            if (touchedPoint == RT) {
+                transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
+            } else if (touchedPoint == LT) {
+                transform.position.set(nextPoints[RB]).add(-spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
+            } else if (touchedPoint == LB) {
+                transform.position.set(nextPoints[RT]).add(-spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+            } else if (touchedPoint == RB) {
+                transform.position.set(nextPoints[LT]).add(spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+            }
+
+            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+        } else {
             transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == LT) {
-            transform.position.set(nextPoints[RB]).add(-spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == LB) {
-            transform.position.set(nextPoints[RT]).add(-spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == RB) {
-            transform.position.set(nextPoints[LT]).add(spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
         }
-
-//        transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
 
         transform.position = lowerPrecision(transform.position);
     }

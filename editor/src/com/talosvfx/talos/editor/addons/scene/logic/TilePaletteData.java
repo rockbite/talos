@@ -1,8 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.TileGameObjectProxy;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -15,17 +18,21 @@ import java.util.UUID;
 
 public class TilePaletteData implements Json.Serializable{
     public ObjectMap<UUID, GameAsset<?>> references;
-    public ObjectMap<UUID, float[]> positions;
 
 
     //Working not for serializing
-    public transient ObjectMap<GameAsset<?>, StaticTile> staticTiles;
     public transient OrderedMap<GameAsset<?>, GameObject> gameObjects;
     public transient GameObject rootDummy;
 
-    public void addSprite (GameAsset<?> gameAsset) {
-        GridPosition gridPosition = new GridPosition(0, 0);
-        staticTiles.put(gameAsset, new StaticTile(gameAsset, gridPosition));
+    public void addSprite (GameAsset<?> gameAsset, Vector2 position) {
+        GridPosition gridPosition = new GridPosition(MathUtils.round(position.x), MathUtils.round(position.y));
+        StaticTile staticTile = new StaticTile(gameAsset, gridPosition);
+        TileGameObjectProxy tileGameObjectProxy = new TileGameObjectProxy();
+        tileGameObjectProxy.staticTile = staticTile;
+        TileDataComponent component = new TileDataComponent();
+        component.getParentTiles().add(staticTile.getGridPosition());
+        tileGameObjectProxy.addComponent(component);
+        gameObjects.put(gameAsset, tileGameObjectProxy);
     }
 
     public void addEntity (GameAsset<?> gameAsset, GameObject gameObject) {
@@ -69,9 +76,7 @@ public class TilePaletteData implements Json.Serializable{
 
     public TilePaletteData () {
         references = new ObjectMap<>();
-        positions = new ObjectMap<>();
 
-        staticTiles = new ObjectMap<>();
         gameObjects = new OrderedMap<>();
     }
 
@@ -80,7 +85,6 @@ public class TilePaletteData implements Json.Serializable{
         json.writeArrayStart("references");
         for (UUID uuid: references.keys()) {
             GameAsset<?> reference = references.get(uuid);
-            float[] position = positions.get(uuid);
 
             json.writeObjectStart();
             json.writeValue("gameIdentifier", reference.nameIdentifier);
@@ -93,8 +97,12 @@ public class TilePaletteData implements Json.Serializable{
                 json.writeValue("entity", gameObject);
             } else if (tileOrEntity == TileOrEntity.TILE) {
                 json.writeObjectStart("position");
-                json.writeValue("x", position[0]);
-                json.writeValue("y", position[1]);
+
+                TileGameObjectProxy gameObject = (TileGameObjectProxy)gameObjects.get(reference);
+                GridPosition position = gameObject.staticTile.getGridPosition();
+
+                json.writeValue("x", position.getIntX());
+                json.writeValue("y", position.getIntY());
                 json.writeObjectEnd();
             }
 
@@ -104,7 +112,7 @@ public class TilePaletteData implements Json.Serializable{
     }
 
     private TileOrEntity getTileOrEntity (GameAsset<?> reference) {
-        if (gameObjects.containsKey(reference)) {
+        if (gameObjects.containsKey(reference) && !(gameObjects.get(reference) instanceof TileGameObjectProxy)) {
             return TileOrEntity.ENTITY;
         }
         return TileOrEntity.TILE;
@@ -136,9 +144,8 @@ public class TilePaletteData implements Json.Serializable{
                 float x = posVal.get(0).asFloat();
                 float y = posVal.get(1).asFloat();
                 float[] position = new float[]{x, y};
-                this.positions.put(uuid, position);
 
-                addSprite(assetForIdentifier);
+                addSprite(assetForIdentifier, new Vector2(position[0], position[1]));
             }
             this.references.put(uuid, assetForIdentifier);
 

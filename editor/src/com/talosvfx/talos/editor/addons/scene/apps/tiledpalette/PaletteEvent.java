@@ -7,12 +7,12 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 public class PaletteEvent extends Event {
     private Type type;
     private Array<GameAsset<?>> selectedGameAssets;
-    private PaletteEditor.PaletteFilterMode currentMode;
+    private PaletteEditor.PaletteImportMode currentMode;
 
     public void reset () {
         super.reset();
         selectedGameAssets = null;
-        currentMode = PaletteEditor.PaletteFilterMode.TILE_ENTITY;
+        currentMode = PaletteEditor.PaletteImportMode.TILE_ENTITY;
     }
 
     public void setSelectedGameAssets(Array<GameAsset<?>> gameAssets) {
@@ -31,11 +31,11 @@ public class PaletteEvent extends Event {
         this.type = type;
     }
 
-    public PaletteEditor.PaletteFilterMode getCurrentFilterMode () {
+    public PaletteEditor.PaletteImportMode getCurrentFilterMode () {
         return currentMode;
     }
 
-    public void setCurrentFilterMode (PaletteEditor.PaletteFilterMode mode) {
+    public void setCurrentFilterMode (PaletteEditor.PaletteImportMode mode) {
         this.currentMode = mode;
     }
 

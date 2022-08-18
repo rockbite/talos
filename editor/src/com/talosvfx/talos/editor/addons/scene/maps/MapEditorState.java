@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.TileGameObjectProxy;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
@@ -72,7 +73,7 @@ public class MapEditorState implements Notifications.Observer {
 
 		} else if (event.getContext() instanceof PaletteEditorWorkspace) {
 			//Changed what we want to paint
-			if (gameObjects.size == 1) {
+			if (gameObjects.size == 1 && !(gameObjects.first() instanceof TileGameObjectProxy)) {
 				//We have something new to paint, make a new instance of the game object
 
 				GameObject copied = AssetRepository.getInstance().copyGameObject(gameObjects.first());

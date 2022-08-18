@@ -423,4 +423,12 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
         return count;
     }
+
+    public GameObject getTopParent (GameObject parentToIgnore) {
+        GameObject topParent = this;
+        while (topParent.getParent() != null && topParent.getParent() != parentToIgnore) {
+            topParent = topParent.getParent();
+        }
+        return topParent;
+    }
 }
