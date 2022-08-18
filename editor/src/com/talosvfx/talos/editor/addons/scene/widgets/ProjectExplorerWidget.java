@@ -225,7 +225,7 @@ public class ProjectExplorerWidget extends Table {
                 if(path != null) {
                     FileHandle handle = Gdx.files.absolute(path);
                     if (directory) {
-                        directoryViewWidget.startRenameFor(handle);
+//                        directoryViewWidgetNew.startRenameFor(handle);
                     } else {
                         if (handle.isDirectory()) {
                             if (nodes.get(path) != null) {

@@ -18,13 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
@@ -38,8 +38,6 @@ import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.Comparator;
 
 public class DirectoryWidgetTrash extends Table {
@@ -93,17 +91,17 @@ public class DirectoryWidgetTrash extends Table {
 
                 ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
 
-//                if(keycode == Input.Keys.X && SceneEditorWorkspace.ctrlPressed()) {
-//                    projectExplorer.invokeCut(convertToFileArray(selected));
-//                }
-//
-//                if(keycode == Input.Keys.C && SceneEditorWorkspace.ctrlPressed()) {
-//                    projectExplorer.invokeCopy(convertToFileArray(selected));
-//                }
-//
-//                if(keycode == Input.Keys.V && SceneEditorWorkspace.ctrlPressed()) {
-//                    projectExplorer.invokePaste(getCurrentFolder());
-//                }
+                if(keycode == Input.Keys.X && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokeCut(convertToFileArray(selected));
+                }
+
+                if(keycode == Input.Keys.C && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokeCopy(convertToFileArray(selected));
+                }
+
+                if(keycode == Input.Keys.V && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokePaste(getCurrentFolder());
+                }
 
                 if(keycode == Input.Keys.FORWARD_DEL) {
                     Array<String> paths = new Array<>();
@@ -113,10 +111,10 @@ public class DirectoryWidgetTrash extends Table {
                     projectExplorer.deletePath(paths);
                 }
 
-//                if(keycode == Input.Keys.A && SceneEditorWorkspace.ctrlPressed()) {
-//                    selectAllFiles();
-//                    reportSelectionChanged();
-//                }
+                if(keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
+                    selectAllFiles();
+                    reportSelectionChanged();
+                }
 
                 return super.keyDown(event, keycode);
             }
@@ -154,15 +152,15 @@ public class DirectoryWidgetTrash extends Table {
                     ItemView fileToSelect = getFileAt(x, y);
 
                     if(fileToSelect != null) {
-//                        if(SceneEditorWorkspace.ctrlPressed()) {
-//                            if(selected.contains(fileToSelect, true)) {
-//                                removeFromSelection(fileToSelect);
-//                            } else {
-//                                addToSelection(fileToSelect);
-//                            }
-//                            reportSelectionChanged();
-//                            selectionStart = items.indexOf(fileToSelect, true);
-//                        } else {
+                        if(TalosInputProcessor.ctrlPressed()) {
+                            if(selected.contains(fileToSelect, true)) {
+                                removeFromSelection(fileToSelect);
+                            } else {
+                                addToSelection(fileToSelect);
+                            }
+                            reportSelectionChanged();
+                            selectionStart = items.indexOf(fileToSelect, true);
+                        } else {
                             if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                                 if(selectionStart >= 0) {
                                     int aPoint = items.indexOf(fileToSelect, true);
@@ -174,7 +172,7 @@ public class DirectoryWidgetTrash extends Table {
                                         addToSelection(items.get(i));
                                     }
                                     reportSelectionChanged();
-//                                }
+                                }
                             } else {
                                 selectionStart = items.indexOf(fileToSelect, true);
                                 selectFile(fileToSelect);
@@ -362,44 +360,44 @@ public class DirectoryWidgetTrash extends Table {
             }
         });
 
-//        for (ObjectMap.Entry<String, FilteredTree.Node> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
-//            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
-//                @Override
-//                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//                    return true;
-//                }
-//
-//                @Override
-//                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//
-//                    //Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
-//
-//                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-//
-//                    Object object = payload.getObject();
-//                    if (object instanceof Array) {
-//                        Array<ItemView> array = (Array<ItemView>) object;
-//                        for (ItemView sourceItem : array) {
-//                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
-////                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle);
-//                            }
-//                        }
-//                    } else if (object instanceof GameAsset) {
-//                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
-//                        FileHandle handle = sourceItem.getRootRawAsset().handle;
-//                        if (!handle.path().equals(fileHandle.path())) {
-////                            AssetImporter.moveFile(handle, fileHandle);
-//                        }
-//                    } else if (object instanceof FileHandle) {
-//                        FileHandle handle = (FileHandle) payload.getObject();
-//                        if (!handle.path().equals(fileHandle.path())) {
-////                            AssetImporter.moveFile(handle, fileHandle);
-//                        }
-//                    }
-//                    rebuild();
-//                }
-//            });
-//        }
+        for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
+            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
+                @Override
+                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    return true;
+                }
+
+                @Override
+                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                    //Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
+
+                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+
+                    Object object = payload.getObject();
+                    if (object instanceof Array) {
+                        Array<ItemView> array = (Array<ItemView>) object;
+                        for (ItemView sourceItem : array) {
+                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
+                            }
+                        }
+                    } else if (object instanceof GameAsset) {
+                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
+                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle, false);
+                        }
+                    } else if (object instanceof FileHandle) {
+                        FileHandle handle = (FileHandle) payload.getObject();
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle, false);
+                        }
+                    }
+                    rebuild();
+                }
+            });
+        }
 
         dragAndDrop.addTarget(new DragAndDrop.Target(this) {
             @Override
@@ -426,19 +424,19 @@ public class DirectoryWidgetTrash extends Table {
                         Array<ItemView> array = (Array<ItemView>) object;
                         for (ItemView sourceItem : array) {
                             if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
-//                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle);
+                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
                             }
                         }
                     } else if (object instanceof GameAsset) {
                         GameAsset sourceItem = (GameAsset) payload.getObject();
                         FileHandle handle = sourceItem.getRootRawAsset().handle;
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-//                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     } else if (object instanceof FileHandle) {
                         FileHandle handle = (FileHandle) payload.getObject();
                         if (!handle.path().equals(targetItem.fileHandle.path())) {
-//                            AssetImporter.moveFile(handle, targetItem.fileHandle);
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
                         }
                     }
 
@@ -620,13 +618,6 @@ public class DirectoryWidgetTrash extends Table {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
             } else {
                 icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
-                String extension = fileHandle.extension();
-                if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
-                    Texture texture = new Texture(fileHandle);
-                    TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-                    icon.setDrawable(drawable);
-                    icon.setScaling(Scaling.fit);
-                }
             }
 
             this.fileHandle = fileHandle;
@@ -637,6 +628,21 @@ public class DirectoryWidgetTrash extends Table {
             }
 
             if (assetForPath != null) {
+
+                if (!assetForPath.isBroken()) {
+                    if (!fileHandle.isDirectory()) {
+                        String extension = fileHandle.extension();
+                        if(extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+                            Texture texture = new Texture(fileHandle);
+                            TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+                            icon.setDrawable(drawable);
+                            icon.setScaling(Scaling.fit);
+                        }
+                    }
+                }
+
+
+
                 //Lets add something to the icon so it shows
                 Image image = new Image(TalosMain.Instance().getSkin().getDrawable("ic-fileset-file"));
                 iconContainer.addActor(image);
@@ -712,15 +718,19 @@ public class DirectoryWidgetTrash extends Table {
             if (selected.size == 1) {
                 ItemView item = selected.first();
                 if (item.gameAsset != null) {
-                    holder = item.gameAsset.getRootRawAsset().metaData;
+                    if (!item.gameAsset.isBroken()) {
+                        holder = item.gameAsset.getRootRawAsset().metaData;
+                    }
                 }
 
             } else if (selected.size > 1) {
                 ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
                 for (ItemView item : selected) {
                     if (item.gameAsset != null) {
-                        RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
-                        list.add(rootRawAsset.metaData);
+                        if (!item.gameAsset.isBroken()) {
+                            RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
+                            list.add(rootRawAsset.metaData);
+                        }
                     }
                 }
                 holder = new MultiPropertyHolder(list);

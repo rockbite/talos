@@ -130,17 +130,18 @@ public class EditableLabel extends Table implements ActorCloneable {
     public void setEditMode() {
         if (getStage() != null) {
             keyboardFocus = getStage().getKeyboardFocus();
+            getStage().setKeyboardFocus(textField);
         }
 
         editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        //textField.setWidth(label.getPrefWidth() + 10);
+
         textField.setText(label.getText().toString());
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();
         }
-        getStage().setKeyboardFocus(textField);
+
         textField.selectAll();
     }
 
