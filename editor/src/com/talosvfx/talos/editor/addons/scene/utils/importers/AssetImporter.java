@@ -250,9 +250,9 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("tw")) {
             SceneEditorAddon.get().openApp(new TweenEditor(fileHandle), AEditorApp.AppOpenStrategy.BOTTOM_TAB);
             return;
+        } else {
+            FileOpener.open(fileHandle.file());
         }
-
-        FileOpener.open(fileHandle.file());
     }
 
     public static FileHandle get(String path) {
