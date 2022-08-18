@@ -8,7 +8,6 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,9 +67,17 @@ public class ScriptMetadataParser {
             if (keyWordsCount % 2 != 0) {
                 throw new ScriptMetadataParserException("Invalid contruction of type or arguments");
             }
-            if (keyWordsCount < 2) {
-                throw new ScriptMetadataParserException("The field should have at least one [type] parameter");
+            if (keyWordsCount < 4) {
+                throw new ScriptMetadataParserException("The field should have at least one [type] and [name] parameters");
             }
+
+            String nameParameter = attributes.first();
+            if (!nameParameter.equals("name")) {
+                throw new ScriptMetadataParserException("First parameter must be [name]");
+            }
+
+            String parameterName = attributes.get(1);
+            attributes.removeRange(0, 1);
 
             String typeParameter = attributes.first();
             if (!typeParameter.equals("type")) {
@@ -90,6 +97,7 @@ public class ScriptMetadataParser {
                 ScriptPropertyWrapper<?> scriptPropertyWrapper = typeClass.newInstance();
                 scriptPropertyWrapper.collectAttributes(attributes);
                 metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
+                scriptPropertyWrapper.propertyName = parameterName;
             } catch (InstantiationException | IllegalAccessException e) {
                 // probably you are screwed
                 e.printStackTrace();

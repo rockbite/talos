@@ -17,7 +17,9 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.FileOpener;
@@ -48,7 +50,6 @@ public class AssetImporter {
         importerMap.put(GameAssetType.SKELETON, new SpineImporter());
         importerMap.put(GameAssetType.ATLAS, new AtlasImporter());
         importerMap.put(GameAssetType.PREFAB, new PrefabImporter());
-        importerMap.put(GameAssetType.SCRIPT, new ScriptImporter());
 
     }
 

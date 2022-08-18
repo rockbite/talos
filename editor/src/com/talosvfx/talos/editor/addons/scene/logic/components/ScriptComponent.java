@@ -9,17 +9,24 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyFloatWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
 public class ScriptComponent extends AComponent implements Json.Serializable, GameResourceOwner<String> {
 
-
     GameAsset<String> scriptResource;
+
+    Array<ScriptPropertyWrapper<?>> scriptProperties = new Array<>();
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -38,6 +45,26 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         });
 
         properties.add(widget);
+
+        for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
+            if (scriptProperty instanceof ScriptPropertyFloatWrapper) {
+                ScriptPropertyFloatWrapper floatProperty = (ScriptPropertyFloatWrapper) scriptProperty;
+                FloatPropertyWidget floatWidget = new FloatPropertyWidget(floatProperty.propertyName, new Supplier<Float>() {
+                    @Override
+                    public Float get () {
+                        return floatProperty.value;
+                    }
+                }, new PropertyWidget.ValueChanged<Float>() {
+                    @Override
+                    public void report(Float value) {
+                        // TODO: 8/18/2022 handle backward thingie
+                        floatProperty.value = value;
+                    }
+                });
+
+                properties.add(floatWidget);
+            }
+        }
 
         return properties;
     }
@@ -70,11 +97,16 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     @Override
     public void setGameAsset (GameAsset<String> gameAsset) {
         this.scriptResource = gameAsset;
+        scriptProperties.clear();
+        if (gameAsset != null) {
+            importScriptPropertiesFromMeta(((ScriptMetadata) gameAsset.getRootRawAsset().metaData));
+        }
     }
 
     @Override
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
+        json.writeValue("properties", scriptProperties);
 
     }
 
@@ -83,11 +115,20 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         loadScriptFromIdentifier(gameResourceIdentifier);
-
+        JsonValue propertiesJson = jsonData.get("properties");
+        for (JsonValue jsonValue : propertiesJson) {
+            jsonValue
+        }
     }
 
     private void loadScriptFromIdentifier (String gameResourceIdentifier) {
         GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SCRIPT);
         setGameAsset(assetForIdentifier);
+    }
+
+    public void importScriptPropertiesFromMeta (ScriptMetadata metadata) {
+        for (ScriptPropertyWrapper<?> scriptPropertyWrapper : metadata.scriptPropertyWrappers) {
+            scriptProperties.add(scriptPropertyWrapper.copy());
+        }
     }
 }

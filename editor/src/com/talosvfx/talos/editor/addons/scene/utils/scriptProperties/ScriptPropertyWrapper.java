@@ -7,9 +7,13 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public abstract class ScriptPropertyWrapper<T> {
 
-    T value;
+    public String propertyName;
+
+    public T value;
 
     public abstract String getTypeName();
 
     public abstract void collectAttributes (Array<String> attributes);
+
+    public abstract ScriptPropertyWrapper<T> copy();
 }
