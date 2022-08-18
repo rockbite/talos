@@ -48,6 +48,7 @@ public class AssetImporter {
         importerMap.put(GameAssetType.SKELETON, new SpineImporter());
         importerMap.put(GameAssetType.ATLAS, new AtlasImporter());
         importerMap.put(GameAssetType.PREFAB, new PrefabImporter());
+        importerMap.put(GameAssetType.SCRIPT, new ScriptImporter());
 
     }
 
@@ -225,11 +226,7 @@ public class AssetImporter {
         } else if (fileHandle.extension().equals("js") || fileHandle.extension().equals("ts")) {
             //Try to find script if it exists in export
 
-            String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
-
-
-            FileHandle scriptsDir = Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
-            FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
+            FileHandle targetScriptInSrc = AssetRepository.getRealScriptPath(fileHandle);
             if (targetScriptInSrc.exists()) {
                 FileOpener.open(targetScriptInSrc.file());
             } else {

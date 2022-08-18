@@ -949,14 +949,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					Runtime rt = Runtime.getRuntime();
 
 					try {
-						String command = "node " + handle.path() + " \"" + projectPath + "\" \"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
+						String nodeCommand = "node";
+						String buildScriptPath = handle.path();
+						String projectDirectoryPath = "\"" + projectPath  + "\"";
+						String projectFilePath = "\"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
+
 						if (TalosMain.Instance().isOsX()) {
-							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", command);
+							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePath);
 							pb.inheritIO();
 							pb.start();
 						} else {
-							ProcessBuilder pb = new ProcessBuilder(command);
-//							ProcessBuilder pb = new ProcessBuilder("node C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project/buildscript.js", "\"C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project\"", "\"C:/Users/vuvka/WebstormProjects/tinygdx-ts/se_project.se\"");
+							ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePath);
 							pb.inheritIO();
 							pb.start();
 						}

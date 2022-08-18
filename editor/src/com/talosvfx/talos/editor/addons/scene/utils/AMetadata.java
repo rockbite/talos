@@ -18,7 +18,7 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
 
     public UUID uuid;
 
-    public AMetadata() {
+    public AMetadata () {
         uuid = UUID.randomUUID();
     }
 
@@ -47,13 +47,16 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
         return getClass();
     }
 
+    public void postProcessForHandle (FileHandle handle) {
+    }
+
     @Override
     public Iterable<IPropertyProvider> getPropertyProviders () {
         Array<IPropertyProvider> propertyProviders = new Array<>();
 
         propertyProviders.add(new FilePropertyProvider(link.handle));
 
-        if(getPropertyBoxTitle() != null) {
+        if (getPropertyBoxTitle() != null) {
             propertyProviders.add(this);
         }
 

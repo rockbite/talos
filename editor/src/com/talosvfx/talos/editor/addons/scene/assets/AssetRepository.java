@@ -75,18 +75,18 @@ public class AssetRepository {
 		void putFileHandleGameAsset (FileHandle handle, GameAsset<?> gameAsset) {
 			this.fileHandleGameAssetObjectMap.put(handle, gameAsset);
 
-			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
+//			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
 		}
 
 		void putUUIRawAsset (UUID uuid, RawAsset rawAsset) {
 			uuidRawAssetMap.put(uuid, rawAsset);
 
-			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
+//			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
 		}
 		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
 			fileHandleRawAssetMap.put(handle, rawAsset);
 
-			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
+//			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
 
 		}
 
@@ -449,7 +449,7 @@ public class AssetRepository {
 
 
 		if (gameAsset == null) return;
-		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
+//		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
 
 		putAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension, gameAsset);
 		dataMaps.putFileHandleGameAsset(key, gameAsset);
@@ -770,7 +770,7 @@ public class AssetRepository {
 			dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
 			dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
-			System.out.println("Raw asset created" + rawAsset.handle.path());
+//			System.out.println("Raw asset created" + rawAsset.handle.path());
 
 			if (checkGameResources) {
 				checkAllGameAssetCreation();
@@ -785,7 +785,8 @@ public class AssetRepository {
 			return (T)new DirectoryMetadata();
 		} else {
 
-			String extension = rawAsset.handle.extension();
+			FileHandle rawAssetHandle = rawAsset.handle;
+			String extension = rawAssetHandle.extension();
 
 			GameAssetType assetTypeFromExtension = null;
 			try {
@@ -795,14 +796,25 @@ public class AssetRepository {
 			}
 			T metaForType = (T)GameAssetType.createMetaForType(assetTypeFromExtension);
 
+			metaForType.postProcessForHandle(rawAssetHandle);
+
 			//Save the meta data
-			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(rawAsset.handle);
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(rawAssetHandle);
 			metadataHandleFor.writeString(json.prettyPrint(metaForType), false);
 
 			metaForType.setLinkRawAsset(rawAsset);
 
 			return metaForType;
 		}
+	}
+
+	public static FileHandle getRealScriptPath (FileHandle fileHandle) {
+		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
+
+		FileHandle scriptsDir = Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
+		FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
+
+		return targetScriptInSrc;
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {
