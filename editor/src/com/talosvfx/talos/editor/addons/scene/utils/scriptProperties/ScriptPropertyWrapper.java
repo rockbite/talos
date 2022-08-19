@@ -10,6 +10,7 @@ public abstract class ScriptPropertyWrapper<T> {
     public String propertyName;
 
     public T value;
+    public T defaultValue;
 
     public abstract String getTypeName();
 

@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 
 public class ScriptPropertyFloatWrapper extends ScriptPropertyWrapper<Float> {
 
-    float defaultValue;
     float minValue;
     float maxValue;
 
