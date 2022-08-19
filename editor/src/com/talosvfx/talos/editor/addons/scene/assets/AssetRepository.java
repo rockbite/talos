@@ -21,6 +21,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
@@ -31,11 +32,14 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -43,7 +47,7 @@ import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImport
 import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
 import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
-public class AssetRepository {
+public class AssetRepository implements Notifications.Observer {
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 
@@ -121,6 +125,7 @@ public class AssetRepository {
 	}
 	public static void init () {
 		AssetRepository assetRepository = new AssetRepository();
+		Notifications.registerObserver(assetRepository);
 		AssetRepository.instance = assetRepository;
 	}
 
@@ -780,6 +785,29 @@ public class AssetRepository {
 		}
 	}
 
+	@EventHandler
+	public void onScriptFileChanged (ScriptFileChangedEvent event) {
+//		FileHandle realScriptHandle = event.file;
+//		WatchEvent.Kind<?> eventType = event.eventType;
+//		FileHandle proxyScriptHandle = getProxyScriptHandle(realScriptHandle);
+//		if (!proxyScriptHandle.exists()) {
+//			return;
+//		}
+//
+//		deleteRawAsset(proxyScriptHandle);
+//
+//		if (eventType == StandardWatchEventKinds.ENTRY_MODIFY) {
+//			copyRawAsset(realScriptHandle, SceneEditorWorkspace.getInstance().getProjectScriptsFolder());
+//		}
+	}
+
+	private FileHandle getProxyScriptHandle (FileHandle realScriptHandle) {
+		// TODO: 8/19/2022 make this generic once we have the option to have project outside of tiny
+		FileHandle proxyFile = SceneEditorWorkspace.getInstance().getProjectScriptsFolder().child(realScriptHandle.name());
+		return proxyFile;
+	}
+
+
 	private <T extends AMetadata> T createMetaDataForAsset (RawAsset rawAsset) {
 		if (rawAsset.handle.isDirectory()) {
 			return (T)new DirectoryMetadata();
@@ -809,12 +837,15 @@ public class AssetRepository {
 	}
 
 	public static FileHandle getRealScriptPath (FileHandle fileHandle) {
-		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
-
-		FileHandle scriptsDir = Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
+		FileHandle scriptsDir = getExportedScriptsFolderHandle();
 		FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
 
 		return targetScriptInSrc;
+	}
+
+	public static FileHandle getExportedScriptsFolderHandle () {
+		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
+		return Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {

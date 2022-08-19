@@ -53,6 +53,8 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -1268,6 +1270,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public FileHandle getProjectFolder () {
 		return Gdx.files.absolute(projectPath);
+	}
+
+	public FileHandle getProjectScriptsFolder() {
+		return Gdx.files.absolute(projectPath + File.separator + "assets" + File.separator + "scripts");
 	}
 
 	public FileHandle getAssetsFolder () {

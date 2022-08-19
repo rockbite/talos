@@ -98,9 +98,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     public void setGameAsset (GameAsset<String> gameAsset) {
         this.scriptResource = gameAsset;
         scriptProperties.clear();
-        if (gameAsset != null) {
-            importScriptPropertiesFromMeta(((ScriptMetadata) gameAsset.getRootRawAsset().metaData));
-        }
+        importScriptPropertiesFromMeta();
     }
 
     @Override
@@ -115,9 +113,13 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         loadScriptFromIdentifier(gameResourceIdentifier);
+
+        scriptProperties.clear();
         JsonValue propertiesJson = jsonData.get("properties");
-        for (JsonValue jsonValue : propertiesJson) {
-            jsonValue
+        if (propertiesJson != null) {
+            for (JsonValue propertyJson : propertiesJson) {
+                scriptProperties.add(json.readValue(ScriptPropertyWrapper.class, propertyJson));
+            }
         }
     }
 
@@ -126,9 +128,13 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         setGameAsset(assetForIdentifier);
     }
 
-    public void importScriptPropertiesFromMeta (ScriptMetadata metadata) {
-        for (ScriptPropertyWrapper<?> scriptPropertyWrapper : metadata.scriptPropertyWrappers) {
-            scriptProperties.add(scriptPropertyWrapper.copy());
+    public void importScriptPropertiesFromMeta () {
+        scriptProperties.clear();
+        if (getGameResource() != null) {
+            ScriptMetadata metadata = ((ScriptMetadata) getGameResource().getRootRawAsset().metaData);
+            for (ScriptPropertyWrapper<?> scriptPropertyWrapper : metadata.scriptPropertyWrappers) {
+                scriptProperties.add(scriptPropertyWrapper.copy());
+            }
         }
     }
 }
