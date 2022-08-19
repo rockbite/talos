@@ -30,7 +30,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 class Item extends Widget implements ActorCloneable<Item> {
 	private Image icon;
 	private Image brokenStatus;
-	private EditableLabel label;
+	EditableLabel label;
 
 	FileHandle fileHandle;
 	GameAsset<?> gameAsset;
@@ -190,6 +190,9 @@ class Item extends Widget implements ActorCloneable<Item> {
 
 	public void deselect () {
 		selected = false;
+		if (label.isEditMode()) {
+			label.finishTextEdit();
+		}
 	}
 
 	public void setMouseover (boolean over) {

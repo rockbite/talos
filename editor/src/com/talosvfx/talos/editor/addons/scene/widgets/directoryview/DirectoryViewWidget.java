@@ -20,6 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
+import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 import java.io.File;
@@ -515,6 +516,25 @@ public class DirectoryViewWidget extends Table {
                 }
             });
             item.setFile(fileHandle);
+
+            EditableLabel itemEditableLabel = item.label;
+
+            itemEditableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+
+                @Override
+                public void changed(String newText) {
+                    if(newText.isEmpty()) {
+                        newText = item.fileHandle.nameWithoutExtension();
+                    }
+                    FileHandle newHandle = AssetImporter.renameFile(item.fileHandle, newText);
+                    if(newHandle.isDirectory()) {
+                        SceneEditorAddon.get().projectExplorer.notifyRename(item.fileHandle, newHandle);
+                    }
+                    item.fileHandle = newHandle;
+                    item.setFile(item.fileHandle);
+                }
+            });
+
             items.addActor(item);
 
             dragAndDrop.addSource(new DragAndDrop.Source(item) {
