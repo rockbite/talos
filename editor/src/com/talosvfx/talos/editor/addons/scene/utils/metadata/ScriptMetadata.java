@@ -41,11 +41,8 @@ public class ScriptMetadata extends AMetadata {
     @Override
     public void postProcessForHandle (FileHandle handle) {
         super.postProcessForHandle(handle);
-
-        FileHandle realScriptPath = AssetRepository.getRealScriptPath(handle);
-        if (realScriptPath.exists()) {
-            ScriptMetadataParser scriptMetadataParser = new ScriptMetadataParser();
-            scriptMetadataParser.processHandle(handle, this);
-        }
+        scriptPropertyWrappers.clear();
+        ScriptMetadataParser scriptMetadataParser = new ScriptMetadataParser();
+        scriptMetadataParser.processHandle(handle, this);
     }
 }
