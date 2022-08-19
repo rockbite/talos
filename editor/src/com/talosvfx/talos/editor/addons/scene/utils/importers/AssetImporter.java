@@ -225,15 +225,7 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
             return;
         } else if (fileHandle.extension().equals("js") || fileHandle.extension().equals("ts")) {
-            //Try to find script if it exists in export
-
-            FileHandle targetScriptInSrc = AssetRepository.getRealScriptPath(fileHandle);
-            if (targetScriptInSrc.exists()) {
-                FileOpener.open(targetScriptInSrc.file());
-            } else {
-                FileOpener.open(fileHandle.file());
-            }
-
+            FileOpener.open(fileHandle.file());
             return;
         } else if (fileHandle.extension().equals("json")) {
             FileOpener.open(fileHandle.file());

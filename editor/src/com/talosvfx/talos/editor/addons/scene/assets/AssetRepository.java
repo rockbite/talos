@@ -794,15 +794,26 @@ public class AssetRepository implements Notifications.Observer {
 	@EventHandler
 	public void onScriptFileChanged (ScriptFileChangedEvent event) {
 		FileHandle realScriptHandle = event.file;
-		FileHandle proxyScriptHandle = getProxyScriptHandle(realScriptHandle);
-		if (!proxyScriptHandle.exists()) {
+		String proxyMetaPath = realScriptHandle.path() + ".meta";
+		FileHandle proxyMetaFileHandle = new FileHandle(proxyMetaPath);
+		if (!proxyMetaFileHandle.exists()) {
 			return;
 		}
-		RawAsset rawAsset = dataMaps.fileHandleRawAssetMap.get(proxyScriptHandle);
+
+		Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(GameAssetType.SCRIPT);
+		ScriptMetadata metadata = (ScriptMetadata) json.fromJson(metaClassForType, proxyMetaFileHandle);
+
+		RawAsset rawAsset = dataMaps.uuidRawAssetMap.get(metadata.uuid);
+		FileHandle proxyScriptHandle = dataMaps.fileHandleRawAssetMap.findKey(rawAsset, true);
+		realScriptHandle.copyTo(proxyScriptHandle);
+		if (rawAsset == null) {
+			// CASE: someone put file handle externally in project folder
+			return;
+		}
+
 		AMetadata metaData = rawAsset.metaData;
 		if (metaData instanceof ScriptMetadata) {
 			metaData.postProcessForHandle(realScriptHandle);
-
 
 			//Save the meta data
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(proxyScriptHandle);
@@ -835,18 +846,12 @@ public class AssetRepository implements Notifications.Observer {
 
 		Array<GameObject> children = gameObject.getGameObjects();
 		if (children != null) {
-			for (GameObject child : children) {
+			for (int i = 0; i < children.size; i++) {
+				GameObject child = children.get(i);
 				updateScriptComponentsForNewMeta(child, metaData, updatedComponents);
 			}
 		}
 	}
-
-	private FileHandle getProxyScriptHandle (FileHandle realScriptHandle) {
-		// TODO: 8/19/2022 make this generic once we have the option to have project outside of tiny
-		FileHandle proxyFile = SceneEditorWorkspace.getInstance().getProjectScriptsFolder().child(realScriptHandle.name());
-		return proxyFile;
-	}
-
 
 	private <T extends AMetadata> T createMetaDataForAsset (RawAsset rawAsset) {
 		if (rawAsset.handle.isDirectory()) {
@@ -865,10 +870,7 @@ public class AssetRepository implements Notifications.Observer {
 			T metaForType = (T)GameAssetType.createMetaForType(assetTypeFromExtension);
 
 			if (metaForType instanceof ScriptMetadata) {
-				FileHandle realScriptPath = getRealScriptPath(rawAssetHandle);
-				if (realScriptPath.exists()) {
-					metaForType.postProcessForHandle(realScriptPath);
-				}
+				metaForType.postProcessForHandle(rawAssetHandle);
 			}
 
 			//Save the meta data
@@ -879,13 +881,6 @@ public class AssetRepository implements Notifications.Observer {
 
 			return metaForType;
 		}
-	}
-
-	public static FileHandle getRealScriptPath (FileHandle fileHandle) {
-		FileHandle scriptsDir = getExportedScriptsFolderHandle();
-		FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
-
-		return targetScriptInSrc;
 	}
 
 	public static FileHandle getExportedScriptsFolderHandle () {

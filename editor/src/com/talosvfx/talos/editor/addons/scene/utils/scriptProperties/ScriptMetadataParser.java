@@ -67,10 +67,11 @@ public class ScriptMetadataParser {
             if (keyWordsCount % 2 != 0) {
                 throw new ScriptMetadataParserException("Invalid contruction of type or arguments");
             }
-            if (keyWordsCount < 4) {
-                throw new ScriptMetadataParserException("The field should have at least one [type] and [name] parameters");
+            if (keyWordsCount < 6) {
+                throw new ScriptMetadataParserException("The field musy have  [name], [type] and [defaultValue] parameters");
             }
 
+            // define name
             String nameParameter = attributes.first();
             if (!nameParameter.equals("name")) {
                 throw new ScriptMetadataParserException("First parameter must be [name]");
@@ -79,9 +80,10 @@ public class ScriptMetadataParser {
             String parameterName = attributes.get(1);
             attributes.removeRange(0, 1);
 
+            // define type
             String typeParameter = attributes.first();
             if (!typeParameter.equals("type")) {
-                throw new ScriptMetadataParserException("First parameter must be [type]");
+                throw new ScriptMetadataParserException("Second parameter must be [type]");
             }
 
             String parameterClassName = attributes.get(1);
@@ -94,10 +96,10 @@ public class ScriptMetadataParser {
             attributes.removeRange(0, 1);
 
             try {
-                ScriptPropertyWrapper<?> scriptPropertyWrapper = typeClass.newInstance();
+                ScriptPropertyWrapper scriptPropertyWrapper = typeClass.newInstance();
                 scriptPropertyWrapper.collectAttributes(attributes);
-                metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
                 scriptPropertyWrapper.propertyName = parameterName;
+                metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
             } catch (InstantiationException | IllegalAccessException e) {
                 // probably you are screwed
                 e.printStackTrace();

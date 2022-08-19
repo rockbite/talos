@@ -1266,10 +1266,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return Gdx.files.absolute(projectPath);
 	}
 
-	public FileHandle getProjectScriptsFolder() {
-		return Gdx.files.absolute(projectPath + File.separator + "assets" + File.separator + "scripts");
-	}
-
 	public FileHandle getAssetsFolder () {
 		return Gdx.files.absolute(projectPath + File.separator + "assets");
 	}

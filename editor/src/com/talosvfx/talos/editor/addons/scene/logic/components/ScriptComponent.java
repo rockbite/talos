@@ -15,10 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyFloatWrapper;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
@@ -52,16 +49,16 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
                 FloatPropertyWidget floatWidget = new FloatPropertyWidget(floatProperty.propertyName, new Supplier<Float>() {
                     @Override
                     public Float get () {
-                        return floatProperty.value;
+                        return floatProperty.getValue();
                     }
                 }, new PropertyWidget.ValueChanged<Float>() {
                     @Override
                     public void report(Float value) {
-                        // TODO: 8/18/2022 handle backward thingie
-                        floatProperty.value = value;
+                        floatProperty.setValue(value);
                     }
                 });
 
+                floatWidget.configureFromValues(floatProperty.minValue, floatProperty.maxValue, floatProperty.step);
                 properties.add(floatWidget);
             }
         }
@@ -129,12 +126,36 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     }
 
     public void importScriptPropertiesFromMeta (boolean tryToMerge) {
-        // TODO: 8/19/2022 implement try to merge
+        Array<ScriptPropertyWrapper<?>> copyWrappers = new Array<>();
+        copyWrappers.addAll(scriptProperties);
+
         scriptProperties.clear();
         if (getGameResource() != null) {
             ScriptMetadata metadata = ((ScriptMetadata) getGameResource().getRootRawAsset().metaData);
             for (ScriptPropertyWrapper<?> scriptPropertyWrapper : metadata.scriptPropertyWrappers) {
-                scriptProperties.add(scriptPropertyWrapper.copy());
+                scriptProperties.add(scriptPropertyWrapper.clone());
+            }
+        }
+
+        if (tryToMerge) {
+            for (ScriptPropertyWrapper copyWrapper : copyWrappers) {
+                for (ScriptPropertyWrapper scriptProperty : scriptProperties) {
+                    if (copyWrapper.propertyName.equals(scriptProperty.propertyName) && copyWrapper.getClass().equals(scriptProperty.getClass())) {
+                        scriptProperty.setValue(copyWrapper.getValue());
+                        break;
+                    }
+                }
+            }
+
+            for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
+                if (scriptProperty.getValue() == null) {
+                    scriptProperty.setDefault();
+                }
+            }
+
+        } else {
+            for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
+                scriptProperty.setDefault();
             }
         }
     }

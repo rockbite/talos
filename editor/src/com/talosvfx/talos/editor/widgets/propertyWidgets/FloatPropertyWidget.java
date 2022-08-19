@@ -83,6 +83,11 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
         this.annotation = annotation;
     }
 
+    public void configureFromValues (float min, float max, float step) {
+        valueWidget.setRange(min, max);
+        valueWidget.setStep(step);
+    }
+
 
     @Override
     public PropertyWidget clone() {
