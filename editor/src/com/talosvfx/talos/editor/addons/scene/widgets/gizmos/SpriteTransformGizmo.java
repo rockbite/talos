@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
@@ -105,7 +106,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
                 transform.position.set(nextPoints[LB]).add(tempVec2.x, tempVec2.y);
             } else if (touchedPoint == LT) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
 
                 transform.position.set(nextPoints[RB]).add(-tempVec2.x, tempVec2.y);
             } else if (touchedPoint == LB) {
@@ -113,7 +114,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
                 transform.position.set(nextPoints[RT]).add(-tempVec2.x, -tempVec2.y);
             } else if (touchedPoint == RB) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
 
                 transform.position.set(nextPoints[LT]).add(tempVec2.x, -tempVec2.y);
             }
