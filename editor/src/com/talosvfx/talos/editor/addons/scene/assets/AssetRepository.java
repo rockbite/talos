@@ -43,10 +43,13 @@ import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
 import java.beans.PropertyChangeEvent;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.getMetadataHandleFor;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
@@ -155,7 +158,46 @@ public class AssetRepository implements Notifications.Observer {
 		//Game resources need to be able to search for the raw assets to link
 
 		checkAllGameAssetCreation();
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				loadChangesFromScripts(AssetRepository.this::fileVisit);
+			}
+		});
 	}
+
+	private void loadChangesFromScripts(Function<Path, FileVisitResult> function) {
+
+		FileHandle exportedScriptsFolderHandle = getExportedScriptsFolderHandle();
+		try {
+			Files.walkFileTree(exportedScriptsFolderHandle.file().toPath(), new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile (Path file, BasicFileAttributes attrs) throws IOException {
+					return function.apply(file);
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public FileVisitResult fileVisit (Path dir) {
+		File file = dir.toFile();
+		if (file.isDirectory()) {
+			return FileVisitResult.CONTINUE;
+		}
+		FileHandle fileHandle = new FileHandle(file);
+		if (fileHandle.extension().equals("meta")) {
+			return FileVisitResult.CONTINUE;
+		}
+
+		if (fileHandle.extension().equals("ts")) {
+			// Found a script
+			Notifications.fireEvent(Notifications.obtainEvent(ScriptFileChangedEvent.class).set(StandardWatchEventKinds.ENTRY_MODIFY, fileHandle));
+		}
+		return FileVisitResult.CONTINUE;
+	}
+
 
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);

@@ -85,6 +85,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
 
+	public boolean exporting = false;
+
 	public static boolean isEnterPressed (int keycode) {
 		switch (keycode) {
 			case Input.Keys.ENTER:
@@ -925,7 +927,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public String writeExport () {
-
+		exporting = true;
 		AssetRepository.getInstance().exportToFile();
 
 		// write rest of files
@@ -965,6 +967,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				}
 			}
 		}
+		exporting = false;
 
 		return "";
 	}
