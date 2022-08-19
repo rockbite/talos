@@ -218,25 +218,14 @@ public class ProjectExplorerWidget extends Table {
             }
         });
         contextualMenu.addSeparator();
-        contextualMenu.addItem("Rename", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                String path = files.first().path();
-                if(path != null) {
-                    FileHandle handle = Gdx.files.absolute(path);
-                    if (directory) {
-//                        directoryViewWidgetNew.startRenameFor(handle);
-                    } else {
-                        if (handle.isDirectory()) {
-                            if (nodes.get(path) != null) {
-                                RowWidget widget = (RowWidget) nodes.get(path).getActor();
-                                widget.label.setEditMode();
-                            }
-                        }
-                    }
+        if (files.size == 1) {
+            contextualMenu.addItem("Rename", new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    directoryViewWidgetNew.rename();
                 }
-            }
-        });
+            });
+        }
         contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {

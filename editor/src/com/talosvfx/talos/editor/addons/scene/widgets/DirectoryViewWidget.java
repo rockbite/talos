@@ -8,15 +8,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -50,192 +49,126 @@ public class DirectoryViewWidget extends Table {
         emptyFolderTable.add(emptyFolder).expand().center().top().padTop(20);
 
         items = new ItemGroup();
+
+        addCaptureListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (getStage() != null) {
+                    getStage().setKeyboardFocus(DirectoryViewWidget.this);
+                }
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (selected.size == 1) {
+                    int i = selected.first();
+                    Item item = (Item) items.getChild(i);
+                    item.rename();
+                }
+
+                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+
+                if (keycode == Input.Keys.X && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokeCut(convertToFileArray(selected));
+                }
+
+                if (keycode == Input.Keys.C && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokeCopy(convertToFileArray(selected));
+                }
+
+                if (keycode == Input.Keys.V && TalosInputProcessor.ctrlPressed()) {
+                    projectExplorer.invokePaste(fileHandle);
+                }
+
+                if (keycode == Input.Keys.FORWARD_DEL) {
+                    Array<String> paths = new Array<>();
+                    for (int i = 0; i < selected.size; i++) {
+                        int entry = selected.get(i);
+                        Item item = (Item) items.getChild(entry);
+                        paths.add(item.getFileHandle().path());
+                    }
+                    projectExplorer.deletePath(paths);
+                }
+
+                if (keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
+                    for (Actor child : items.getChildren()) {
+                        Item item = (Item) child;
+                        int i = items.getChildren().indexOf(item, true);
+                        if (!selected.contains(i)) {
+                            item.select();
+                            selected.add(i);
+                        }
+                    }
+                }
+
+                return true;
+            }
+        });
+
         addListener(new ClickListener() {
             int selectionStart;
 
             @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-//                DirectoryWidgetTrash.ItemView selectCandidate = getSelectCandidate();
-//                if(selectCandidate != null && SceneEditorWorkspace.isRenamePressed(keycode)) {
-//                    for(DirectoryWidgetTrash.ItemView item: items) {
-//                        if(item.fileHandle.path().equals(selectCandidate.fileHandle.path())) {
-//                            // found it
-//                            item.setToRename();
-//                        }
-//                    }
-//                }
-//
-//                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-//
-//                if(keycode == Input.Keys.X && TalosInputProcessor.ctrlPressed()) {
-//                    projectExplorer.invokeCut(convertToFileArray(selected));
-//                }
-//
-//                if(keycode == Input.Keys.C && TalosInputProcessor.ctrlPressed()) {
-//                    projectExplorer.invokeCopy(convertToFileArray(selected));
-//                }
-//
-//                if(keycode == Input.Keys.V && TalosInputProcessor.ctrlPressed()) {
-//                    projectExplorer.invokePaste(getCurrentFolder());
-//                }
-//
-//                if(keycode == Input.Keys.FORWARD_DEL) {
-//                    Array<String> paths = new Array<>();
-//                    for(DirectoryWidgetTrash.ItemView file: selected) {
-//                        paths.add(file.fileHandle.path());
-//                    }
-//                    projectExplorer.deletePath(paths);
-//                }
-//
-//                if(keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
-//                    selectAllFiles();
-//                    reportSelectionChanged();
-//                }
-//
-                return super.keyDown(event, keycode);
-            }
-
-            @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button);
-
-                if (button == 1) {
-                    // logic for right click
-                    // 1. if no item is under mouse, open context menu for current folder
-                    // 2. else, if old selection contains item under mouse open context menu with current selection
-                    //          else open context menu with only the item under mouse in it
-                } else if (button == 0) {
-                    // logic for left click
-                    // Track last item selected not by shift-click. On shift-click, select all items between
-                    // that item and the current click inclusive.
-                    if (overItem >= 0) {
-                        Item item = (Item) items.getChild(overItem);
-                        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                            if (selected.contains(overItem)) {
-                                item.deselect();
-                                selected.removeValue(overItem);
-                            } else {
-                                item.select();
-                                selected.add(overItem);
-                            }
-                            selectionStart = overItem;
-                        } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                            int start = Math.min(selected.first(), overItem);
-                            int end = Math.max(selected.peek(), overItem);
-                            for (int i = start; i <= end; i++) {
-                                Item toSelect = (Item) items.getChild(i);
-                                toSelect.select();
-                                selected.add(i);
-                            }
-                        } else {
-                            for (int i : selected.items) {
-                                Item selectedItem = (Item) items.getChild(i);
-                                selectedItem.deselect();
-                            }
-                            selected.clear();
-                            item.select();
-                            selected.add(overItem);
-                            selectionStart = overItem;
-                        }
-                    } else {
-                        for (int i : selected.items) {
+                // TODO: make it, so if you click anywhere outside of this place it will clean up all selection
+                if (overItem == -1) {
+                    for (int i : selected.items) {
+                        if (selected.contains(i)) {
                             Item item = (Item) items.getChild(i);
                             item.deselect();
                         }
-                        selected.clear();
-                        selectionStart = -1;
+                    }
+                    selected.clear();
+                    selectionStart = -1;
+                } else {
+                    if (button == 1) {
+                        // logic for right click
+                        // 1. if no item is under mouse, open context menu for current folder
+                        // 2. else, if old selection contains item under mouse open context menu with current selection
+                        //          else open context menu with only the item under mouse in it
+                        if (overItem < 0) {
+
+                        }
+                    } else if (button == 0) {
+                        if (overItem >= 0) {
+                            Item item = (Item) items.getChild(overItem);
+                            if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                                if (selected.contains(overItem)) {
+                                    item.deselect();
+                                    selected.removeValue(overItem);
+                                } else {
+                                    item.select();
+                                    selected.add(overItem);
+                                    selectionStart = overItem;
+                                }
+                            } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && selectionStart >= 0) {
+                                int start = Math.min(selectionStart, overItem);
+                                int end = Math.max(selectionStart, overItem);
+                                for (int i = start; i <= end; i++) {
+                                    if (!selected.contains(i)) {
+                                        Item toSelect = (Item) items.getChild(i);
+                                        toSelect.select();
+                                        selected.add(i);
+                                    }
+                                }
+                                selectionStart = overItem;
+                            } else {
+                                for (int i : selected.items) {
+                                    if (selected.contains(i)) {
+                                        Item selectedItem = (Item) items.getChild(i);
+                                        selectedItem.deselect();
+                                    }
+                                }
+                                selected.clear();
+                                item.select();
+                                selected.add(overItem);
+                                selectionStart = overItem;
+                            }
+                        }
                     }
                 }
-//                super.touchUp(event, x, y, pointer, button);
-//
-//                if(preventDeselect) {
-//                    preventDeselect = false;
-//                    return;
-//                }
-//
-//                DirectoryWidgetTrash.ItemView itemViewAt = getFileAt(x, y);
-//
-//                if(button == 1) {
-//                    if(itemViewAt != null) {
-//                        if (!selected.contains(itemViewAt, true)) {
-//                            selectFile(itemViewAt);
-//                            reportSelectionChanged();
-//                        }
-//                        SceneEditorAddon.get().projectExplorer.showContextMenu(convertToFileArray(selected), true);
-//                    } else {
-//                        Array<FileHandle> list = new Array<>();
-//                        list.add(fileHandle);
-//                        SceneEditorAddon.get().projectExplorer.showContextMenu(list, true);
-//                    }
-//                } else if(button == 0) {
-//                    float diff = TimeUtils.millis() - timeClicked;
-//                    DirectoryWidgetTrash.ItemView fileToSelect = getFileAt(x, y);
-//
-//                    if(fileToSelect != null) {
-//                        if(TalosInputProcessor.ctrlPressed()) {
-//                            if(selected.contains(fileToSelect, true)) {
-//                                removeFromSelection(fileToSelect);
-//                            } else {
-//                                addToSelection(fileToSelect);
-//                            }
-//                            reportSelectionChanged();
-//                            selectionStart = items.indexOf(fileToSelect, true);
-//                        } else {
-//                            if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-//                                if(selectionStart >= 0) {
-//                                    int aPoint = items.indexOf(fileToSelect, true);
-//                                    int bPoint = selectionStart;
-//                                    int min = Math.min(aPoint, bPoint);
-//                                    int max = Math.max(aPoint, bPoint);
-//                                    unselectFiles();
-//                                    for(int i = min; i <= max; i++) {
-//                                        addToSelection(items.get(i));
-//                                    }
-//                                    reportSelectionChanged();
-//                                }
-//                            } else {
-//                                selectionStart = items.indexOf(fileToSelect, true);
-//                                selectFile(fileToSelect);
-//                                reportSelectionChanged();
-//                            }
-//                        }
-//                    } else {
-//                        selectionStart = -1;
-//                        unselectFiles();
-//                        reportSelectionChanged();
-//                    }
-//
-//                    if(diff < 500 && prevPos.dst(x, y) < 40) {
-//                        timeClicked = 0;
-//                        prevPos.set(0, 0);
-//                        DirectoryWidgetTrash.ItemView fileAt = getFileAt(x, y);
-//                        if(fileAt != null) {
-//                            AssetImporter.fileOpen(fileAt.fileHandle);
-//                        } else {
-//                            // go up
-//                            if(fileHandle != null) {
-//                                FileHandle parent = fileHandle.parent();
-//                                FileHandle projectFolder = SceneEditorAddon.get().workspace.getProjectFolder();
-//                                if(parent.path().startsWith(projectFolder.path())) {
-//                                    SceneEditorAddon.get().projectExplorer.select(parent.path());
-//                                }
-//
-//                            }
-//                        }
-//                    }
-//
-//                    timeClicked = TimeUtils.millis();
-//                    prevPos.set(x, y);
-//                }
-//
-//                if(getStage() != null) {
-//                    getStage().setKeyboardFocus(DirectoryWidgetTrash.this);
-//                }
+                return true;
             }
         });
 
@@ -258,6 +191,14 @@ public class DirectoryViewWidget extends Table {
         add(slider).width(125).pad(5, 10, 5, 10).expandX().right();
     }
 
+    public void rename () {
+        if (selected.size == 1) {
+            int i = selected.first();
+            Item item = (Item) items.getChild(i);
+            item.rename();
+        }
+    }
+
     /**
      * Open directory in current view.
      * @param path Path of the current folder. Can be both absolute or relative.
@@ -278,12 +219,26 @@ public class DirectoryViewWidget extends Table {
         fillItems(directory);
     }
 
+    private Array<FileHandle> convertToFileArray (IntArray selected) {
+        Array<FileHandle> handles = new Array<>();
+        for (int i = 0; i < selected.size; i++) {
+            int entry = selected.get(i);
+            Item item = (Item) items.getChild(entry);
+            handles.add(item.getFileHandle());
+        }
+
+        return handles;
+    }
+
     /**
      * Clears old items and populates the view with items in current directory.
      * Indicates if the folder is empty.
      * @param directory directory exists and it's directory.
      */
     private void fillItems (FileHandle directory) {
+        // reset state
+        overItem = -1;
+        selected.clear();
         items.clear();
 
         FileHandle[] content = directory.list();
@@ -314,6 +269,22 @@ public class DirectoryViewWidget extends Table {
                 public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                     overItem = -1;
                     item.setMouseover(false);
+                }
+
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (getTapCount() == 2) {
+                        for (int i : selected.items) {
+                            if (selected.contains(i)) {
+                                Item to = (Item) items.getChild(i);
+                                to.deselect();
+                            }
+                        }
+                        selected.clear();
+                        selected.add(items.getChildren().indexOf(item, true));
+                        item.select();
+                        AssetImporter.fileOpen(item.getFileHandle());
+                    }
                 }
             });
             item.setFile(fileHandle);
@@ -655,6 +626,7 @@ public class DirectoryViewWidget extends Table {
             float lw = w, lh = label.getLabel().getHeight();
             float lx = getX() + padLeft, ly = getY() + padBottom;
             label.getLabel().setWidth(lw);
+            label.getTextField().setWidth(lw);
             label.setPosition(lx, ly);
             label.draw(batch, parentAlpha);
 
@@ -692,6 +664,15 @@ public class DirectoryViewWidget extends Table {
 
         public void setMouseover(boolean over) {
             mouseover = over;
+        }
+
+        public FileHandle getFileHandle() {
+            return fileHandle;
+        }
+
+        public void rename() {
+            label.setStage(getStage());
+            label.setEditMode();
         }
     }
 }

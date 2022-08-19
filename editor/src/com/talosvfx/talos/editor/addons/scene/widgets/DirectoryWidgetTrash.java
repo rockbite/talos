@@ -103,9 +103,9 @@ public class DirectoryWidgetTrash extends Table {
                     projectExplorer.invokePaste(getCurrentFolder());
                 }
 
-                if(keycode == Input.Keys.FORWARD_DEL) {
+                if (keycode == Input.Keys.FORWARD_DEL) {
                     Array<String> paths = new Array<>();
-                    for(ItemView file: selected) {
+                    for (ItemView file: selected) {
                         paths.add(file.fileHandle.path());
                     }
                     projectExplorer.deletePath(paths);
@@ -208,7 +208,7 @@ public class DirectoryWidgetTrash extends Table {
                     prevPos.set(x, y);
                 }
 
-                if(getStage() != null) {
+                if (getStage() != null) {
                     getStage().setKeyboardFocus(DirectoryWidgetTrash.this);
                 }
             }
