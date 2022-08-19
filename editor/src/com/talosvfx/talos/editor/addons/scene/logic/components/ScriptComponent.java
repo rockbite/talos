@@ -98,7 +98,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     public void setGameAsset (GameAsset<String> gameAsset) {
         this.scriptResource = gameAsset;
         scriptProperties.clear();
-        importScriptPropertiesFromMeta();
+        importScriptPropertiesFromMeta(false);
     }
 
     @Override
@@ -128,7 +128,8 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         setGameAsset(assetForIdentifier);
     }
 
-    public void importScriptPropertiesFromMeta () {
+    public void importScriptPropertiesFromMeta (boolean tryToMerge) {
+        // TODO: 8/19/2022 implement try to merge
         scriptProperties.clear();
         if (getGameResource() != null) {
             ScriptMetadata metadata = ((ScriptMetadata) getGameResource().getRootRawAsset().metaData);

@@ -9,6 +9,7 @@ import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -122,7 +123,12 @@ public class PropertyPanel extends Table implements Notifications.Observer {
 
     public void propertyProviderUpdated (IPropertyProvider propertyProvider) {
         if(providerPanelMap.containsKey(propertyProvider)) {
-            providerPanelMap.get(propertyProvider).updateValues();
+            PropertiesPanel propertiesPanel = providerPanelMap.get(propertyProvider);
+            if (propertyProvider instanceof ScriptComponent) {
+                propertiesPanel.reconstruct();
+            } else {
+                propertiesPanel.updateValues();
+            }
         }
     }
 
