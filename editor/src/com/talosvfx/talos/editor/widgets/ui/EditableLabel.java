@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -130,17 +129,18 @@ public class EditableLabel extends Table implements ActorCloneable {
     public void setEditMode() {
         if (getStage() != null) {
             keyboardFocus = getStage().getKeyboardFocus();
+            getStage().setKeyboardFocus(textField);
         }
 
         editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        //textField.setWidth(label.getPrefWidth() + 10);
+
         textField.setText(label.getText().toString());
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();
         }
-        getStage().setKeyboardFocus(textField);
+
         textField.selectAll();
     }
 
@@ -201,6 +201,8 @@ public class EditableLabel extends Table implements ActorCloneable {
     public Label getLabel() {
         return label;
     }
+
+    public TextField getTextField() { return textField; }
 
     public Cell<Label> getLabelCell() {
         return labelCell;
