@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 
 public class PaletteListener implements EventListener {
@@ -29,11 +28,11 @@ public class PaletteListener implements EventListener {
         return false;
     }
 
-    public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteEditor.PaletteFilterMode mode) { // game asset of the selected item
+    public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteEditor.PaletteImportMode mode) { // game asset of the selected item
         return false;
     }
 
-    public boolean selectedMultiple(PaletteEvent e, GameAsset<?>[] gameAssets, PaletteEditor.PaletteFilterMode mode) { // game assets of selected items
+    public boolean selectedMultiple(PaletteEvent e, GameAsset<?>[] gameAssets, PaletteEditor.PaletteImportMode mode) { // game assets of selected items
         return false;
     }
 

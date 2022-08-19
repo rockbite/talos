@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.IntArray;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
@@ -14,6 +15,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 
 public class SpriteTransformGizmo extends SmartTransformGizmo {
+
+    private Vector2 tempVec2 = new Vector2();
 
     public SpriteTransformGizmo() {
         super();
@@ -76,6 +79,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 
+
         // bring old next points to local space
         for(int i = 0; i < 4; i++) {
             TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
@@ -92,18 +96,35 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
         }
 
+        if (spriteRendererComponent.fixAspectRatio) {
 
-        if (touchedPoint == RT) {
-            transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == LT) {
-            transform.position.set(nextPoints[RB]).add(-spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == LB) {
-            transform.position.set(nextPoints[RT]).add(-spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
-        } else if (touchedPoint == RB) {
-            transform.position.set(nextPoints[LT]).add(spriteRendererComponent.size.x / 2f, -spriteRendererComponent.size.y / 2f);
+
+
+            if (touchedPoint == RT) {
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+
+                transform.position.set(nextPoints[LB]).add(tempVec2.x, tempVec2.y);
+            } else if (touchedPoint == LT) {
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+
+                transform.position.set(nextPoints[RB]).add(-tempVec2.x, tempVec2.y);
+            } else if (touchedPoint == LB) {
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+
+                transform.position.set(nextPoints[RT]).add(-tempVec2.x, -tempVec2.y);
+            } else if (touchedPoint == RB) {
+                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+
+                transform.position.set(nextPoints[LT]).add(tempVec2.x, -tempVec2.y);
+            }
+
+            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+        } else {
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+            transform.position.set(nextPoints[LB]).add(tempVec2);
+            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
         }
-
-//        transform.position.set(nextPoints[LB]).add(spriteRendererComponent.size.x / 2f, spriteRendererComponent.size.y / 2f);
 
         transform.position = lowerPrecision(transform.position);
     }
