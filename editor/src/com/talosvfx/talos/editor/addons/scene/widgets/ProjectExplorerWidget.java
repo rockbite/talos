@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
@@ -30,8 +29,7 @@ public class ProjectExplorerWidget extends Table {
 
     private final FilteredTree<String> directoryTree;
     public static FileFilter fileFilter;
-    private final DirectoryWidgetTrash directoryViewWidget;
-    private final DirectoryViewWidget directoryViewWidgetNew;
+    private final DirectoryViewWidget directoryViewWidget;
     private ObjectMap<String, FilteredTree.Node<String>> nodes = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
@@ -61,9 +59,8 @@ public class ProjectExplorerWidget extends Table {
 
         scrollPaneTable.add(scrollPane).height(0).grow();
 
-        directoryViewWidget = new DirectoryWidgetTrash();
-        directoryViewWidgetNew = new DirectoryViewWidget();
-        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidgetNew, false, TalosMain.Instance().getSkin());
+        directoryViewWidget = new DirectoryViewWidget();
+        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, TalosMain.Instance().getSkin());
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
@@ -108,7 +105,7 @@ public class ProjectExplorerWidget extends Table {
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
-                directoryViewWidgetNew.openDirectory((String) node.getObject());
+                directoryViewWidget.openDirectory((String) node.getObject());
             }
 
             @Override
@@ -187,7 +184,7 @@ public class ProjectExplorerWidget extends Table {
         Array<FileHandle> list = new Array<>();
         Array<FilteredTree.Node<String>> nodes = directoryTree.getSelection().toArray();
         for (FilteredTree.Node<String> node: nodes) {
-            String path = (String) node.getObject();
+            String path = node.getObject();
             FileHandle handle = Gdx.files.absolute(path);
             list.add(handle);
         }
@@ -218,14 +215,25 @@ public class ProjectExplorerWidget extends Table {
             }
         });
         contextualMenu.addSeparator();
-        if (files.size == 1) {
-            contextualMenu.addItem("Rename", new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    directoryViewWidgetNew.rename();
+        contextualMenu.addItem("Rename", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                String path = files.first().path();
+                if(path != null) {
+                    FileHandle handle = Gdx.files.absolute(path);
+                    if (directory) {
+                        directoryViewWidget.rename();
+                    } else {
+                        if (handle.isDirectory()) {
+                            if (nodes.get(path) != null) {
+                                RowWidget widget = (RowWidget) nodes.get(path).getActor();
+                                widget.label.setEditMode();
+                            }
+                        }
+                    }
                 }
-            });
-        }
+            }
+        });
         contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -257,8 +265,8 @@ public class ProjectExplorerWidget extends Table {
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
                             select(newNode.getParent());
-                            directoryViewWidget.reload();
-                            directoryViewWidget.startRenameFor(newHandle);
+//                            directoryViewWidgetNew.reload();
+//                            directoryViewWidgetNew.startRenameFor(newHandle);
                         }
                     }
                 }
@@ -271,7 +279,7 @@ public class ProjectExplorerWidget extends Table {
                     FileHandle sceneDestination = AssetImporter.suggestNewName(path, "New Scene", "scn");
                     Scene mainScene = new Scene(sceneDestination.path());
                     mainScene.save();
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -295,7 +303,7 @@ public class ProjectExplorerWidget extends Table {
 
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -315,7 +323,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -331,7 +339,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -348,7 +356,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newPaletteDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -380,7 +388,7 @@ public class ProjectExplorerWidget extends Table {
         }else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(node);
-            directoryViewWidget.setDirectory((String) node.getObject());
+            directoryViewWidget.openDirectory((String) node.getObject());
         }
     }
 
@@ -390,12 +398,12 @@ public class ProjectExplorerWidget extends Table {
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
             String pathToSet = (String)nodes.get(path).getObject();
-            directoryViewWidgetNew.openDirectory(pathToSet);
+            directoryViewWidget.openDirectory(pathToSet);
         } else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(rootNode);
             expand(path);
-            directoryViewWidgetNew.openDirectory(path);
+            directoryViewWidget.openDirectory(path);
         }
     }
 
@@ -432,7 +440,7 @@ public class ProjectExplorerWidget extends Table {
 
         rootNode.expandAll();
 
-        directoryViewWidget.setDirectory(root.path());
+        directoryViewWidget.openDirectory(root.path());
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
@@ -497,7 +505,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void reload () {
-        directoryViewWidget.reload();
+//        directoryViewWidgetNew.reload();
     }
 
     public static class RowWidget extends Table implements ActorCloneable<RowWidget> {
@@ -578,7 +586,7 @@ public class ProjectExplorerWidget extends Table {
         select(destination.path());
     }
 
-    public DirectoryWidgetTrash getDirectoryViewWidget() {
+    public DirectoryViewWidget getDirectoryViewWidget() {
         return directoryViewWidget;
     }
 }

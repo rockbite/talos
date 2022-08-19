@@ -19,11 +19,18 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.io.File;
@@ -43,12 +50,20 @@ public class DirectoryViewWidget extends Table {
 
     private FileHandle fileHandle;
 
+    private DragAndDrop dragAndDrop;
+    private Array<DragAndDrop.Target> externalTargets;
+
+    private boolean preventDeselect = false;
+
     public DirectoryViewWidget () {
         emptyFolderTable = new Table();
         Label emptyFolder = new Label("This folder is empty.", TalosMain.Instance().getSkin());
         emptyFolderTable.add(emptyFolder).expand().center().top().padTop(20);
 
         items = new ItemGroup();
+
+        dragAndDrop = new DragAndDrop();
+        externalTargets = new Array<>();
 
         addCaptureListener(new InputListener() {
             @Override
@@ -100,6 +115,7 @@ public class DirectoryViewWidget extends Table {
                             selected.add(i);
                         }
                     }
+                    reportSelectionChanged();
                 }
 
                 return true;
@@ -111,25 +127,40 @@ public class DirectoryViewWidget extends Table {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
                 // TODO: make it, so if you click anywhere outside of this place it will clean up all selection
                 if (overItem == -1) {
-                    for (int i : selected.items) {
-                        if (selected.contains(i)) {
-                            Item item = (Item) items.getChild(i);
-                            item.deselect();
+                    if (button == 0) {
+                        for (int i : selected.items) {
+                            if (selected.contains(i)) {
+                                Item item = (Item) items.getChild(i);
+                                item.deselect();
+                            }
                         }
+                        selected.clear();
+                        selectionStart = -1;
+                        reportSelectionChanged();
+                    }  else {
+                        Array<FileHandle> current = new Array<>(1);
+                        current.add(fileHandle);
+                        projectExplorer.showContextMenu(current, true);
                     }
-                    selected.clear();
-                    selectionStart = -1;
                 } else {
                     if (button == 1) {
-                        // logic for right click
-                        // 1. if no item is under mouse, open context menu for current folder
-                        // 2. else, if old selection contains item under mouse open context menu with current selection
-                        //          else open context menu with only the item under mouse in it
-                        if (overItem < 0) {
-
+                        if (!selected.contains(overItem)) {
+                            for (int i = 0; i < selected.size; i++) {
+                                int entry = selected.get(i);
+                                Item item = (Item) items.getChild(entry);
+                                item.deselect();
+                            }
+                            selected.clear();
+                            Item item = (Item) items.getChild(overItem);
+                            item.select();
+                            selected.add(overItem);
+                            reportSelectionChanged();
                         }
+                        Array<FileHandle> selection = convertToFileArray(selected);
+                        projectExplorer.showContextMenu(selection, true);
                     } else if (button == 0) {
                         if (overItem >= 0) {
                             Item item = (Item) items.getChild(overItem);
@@ -142,6 +173,7 @@ public class DirectoryViewWidget extends Table {
                                     selected.add(overItem);
                                     selectionStart = overItem;
                                 }
+                                reportSelectionChanged();
                             } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && selectionStart >= 0) {
                                 int start = Math.min(selectionStart, overItem);
                                 int end = Math.max(selectionStart, overItem);
@@ -153,6 +185,7 @@ public class DirectoryViewWidget extends Table {
                                     }
                                 }
                                 selectionStart = overItem;
+                                reportSelectionChanged();
                             } else {
                                 for (int i : selected.items) {
                                     if (selected.contains(i)) {
@@ -164,11 +197,20 @@ public class DirectoryViewWidget extends Table {
                                 item.select();
                                 selected.add(overItem);
                                 selectionStart = overItem;
+                                reportSelectionChanged();
                             }
                         }
                     }
                 }
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(preventDeselect) {
+                    preventDeselect = false;
+                    return;
+                }
             }
         });
 
@@ -189,6 +231,38 @@ public class DirectoryViewWidget extends Table {
             }
         });
         add(slider).width(125).pad(5, 10, 5, 10).expandX().right();
+    }
+
+    private void reportSelectionChanged() {
+        if(!selected.isEmpty()) {
+            IPropertyHolder holder = null;
+            if (selected.size == 1) {
+                int i = selected.first();
+                Item item = (Item) items.getChild(i);
+                if (item.gameAsset != null) {
+                    if (!item.gameAsset.isBroken()) {
+                        holder = item.gameAsset.getRootRawAsset().metaData;
+                    }
+                }
+            } else if (selected.size > 1) {
+                ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
+                for (int i = 0; i < selected.size; i ++) {
+                    int entry = selected.get(i);
+                    Item item = (Item) items.getChild(entry);
+                    if (item.gameAsset != null) {
+                        if (!item.gameAsset.isBroken()) {
+                            RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
+                            list.add(rootRawAsset.metaData);
+                        }
+                    }
+                }
+                holder = new MultiPropertyHolder(list);
+            }
+
+            if(holder != null) {
+                Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(holder));
+            }
+        }
     }
 
     public void rename () {
@@ -240,6 +314,157 @@ public class DirectoryViewWidget extends Table {
         overItem = -1;
         selected.clear();
         items.clear();
+        dragAndDrop.clear();
+        for (DragAndDrop.Target externalTarget : externalTargets) {
+            dragAndDrop.addTarget(externalTarget);
+        }
+
+        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                Actor actor = getActor();
+
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Object object = payload.getObject();
+                if(object instanceof Array) {
+
+                    Array<DirectoryWidgetTrash.ItemView> array = (Array<DirectoryWidgetTrash.ItemView>) object;
+
+                    for (int i = 0; i < selected.size; i++) {
+                        int entry = selected.get(i);
+                        Item item = (Item) items.getChild(entry);
+                        if (item.gameAsset != null) {
+                            AssetImporter.createAssetInstance(item.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
+                        }
+                    }
+                } else {
+                    if (object instanceof GameAsset) {
+                        AssetImporter.createAssetInstance((GameAsset) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+                    }
+                    if (object instanceof FileHandle) {
+                        //Do nothing here anymore
+                    }
+                }
+
+                for (int i : selected.items) {
+                    if (selected.contains(i)) {
+                        Item item = (Item) items.getChild(i);
+                        item.deselect();
+                    }
+                }
+                selected.clear();
+                reportSelectionChanged();
+            }
+        });
+
+        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor targetActor = getActor();
+            }
+        });
+
+        for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
+            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
+                @Override
+                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    return true;
+                }
+
+                @Override
+                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                    // Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
+
+                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+
+                    Object object = payload.getObject();
+                    if (object instanceof Array) {
+                        Array<Item> array = (Array<Item>) object;
+                        for (Item sourceItem : array) {
+                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
+                            }
+                        }
+                    } else if (object instanceof GameAsset) {
+                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
+                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle, false);
+                        }
+                    } else if (object instanceof FileHandle) {
+                        FileHandle handle = (FileHandle) payload.getObject();
+                        if (!handle.path().equals(fileHandle.path())) {
+                            AssetImporter.moveFile(handle, fileHandle, false);
+                        }
+                    }
+                }
+            });
+        }
+
+        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                if(overItem >= 0) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                if (overItem == -1) {
+                    return;
+                }
+
+                Item targetItem = (Item) items.getChild(overItem);
+
+                if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
+
+                    Object object = payload.getObject();
+                    if (object instanceof Array) {
+                        Array<Item> array = (Array<Item>) object;
+                        for (Item sourceItem : array) {
+                            if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
+                                AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
+                            }
+                        }
+                    } else if (object instanceof GameAsset) {
+                        GameAsset sourceItem = (GameAsset) payload.getObject();
+                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+                        if (!handle.path().equals(targetItem.fileHandle.path())) {
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
+                        }
+                    } else if (object instanceof FileHandle) {
+                        FileHandle handle = (FileHandle) payload.getObject();
+                        if (!handle.path().equals(targetItem.fileHandle.path())) {
+                            AssetImporter.moveFile(handle, targetItem.fileHandle, false);
+                        }
+                    }
+
+                    for (int i : selected.items) {
+                        if (selected.contains(i)) {
+                            Item item = (Item) items.getChild(i);
+                            item.deselect();
+                        }
+                    }
+                    selected.clear();
+                    reportSelectionChanged();
+                }
+            }
+        });
 
         FileHandle[] content = directory.list();
         if (content.length == 0) {
@@ -289,6 +514,38 @@ public class DirectoryViewWidget extends Table {
             });
             item.setFile(fileHandle);
             items.addActor(item);
+
+            dragAndDrop.addSource(new DragAndDrop.Source(item) {
+                @Override
+                public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+
+                    preventDeselect = true;
+
+                    int i = items.getChildren().indexOf(item, true);
+                    if(!selected.contains(i)) {
+                        selected.clear();
+                        selected.add(i);
+                    }
+
+                    if(selected.size == 1) {
+                        Item newView = new Item();
+                        Actor dragging = ((ActorCloneable) newView).copyActor(item);
+                        payload.setDragActor(dragging);
+                        if (newView.gameAsset != null) {
+                            payload.setObject(newView.gameAsset);
+                        } else {
+                            payload.setObject(fileHandle);
+                        }
+                    } else {
+                        Label dragging = new Label("Multiple selection", TalosMain.Instance().getSkin());
+                        payload.setDragActor(dragging);
+                        payload.setObject(selected);
+                    }
+
+                    return payload;
+                }
+            });
         }
     }
 
@@ -498,6 +755,20 @@ public class DirectoryViewWidget extends Table {
         }
     }
 
+    public FileHandle getCurrentFolder () {
+        return fileHandle;
+    }
+
+    public void registerTarget(DragAndDrop.Target externalTarget) {
+        externalTargets.add(externalTarget);
+        dragAndDrop.addTarget(externalTarget);
+    }
+
+    public void unregisterTarget(DragAndDrop.Target externalTarget) {
+        externalTargets.removeValue(externalTarget, true);
+        dragAndDrop.removeTarget(externalTarget);
+    }
+
     private class Item extends Widget implements ActorCloneable<Item> {
         private Image icon;
         private Image brokenStatus;
@@ -647,7 +918,8 @@ public class DirectoryViewWidget extends Table {
 
         @Override
         public Item copyActor(Item copyFrom) {
-            return null;
+            setFile(copyFrom.fileHandle);
+            return this;
         }
 
         public boolean isSelected () {
