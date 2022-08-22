@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -1193,7 +1194,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		AssetRepository.init();
 		AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath).child("assets"));
 
+		String currentFolderPath = null;
+		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
+		if (projectExplorer.getCurrentFolder() != null) {
+			currentFolderPath = projectExplorer.getCurrentFolder().path();
+		}
+
 		read(json, jsonData);
+
+		if (fromMemory && currentFolderPath != null) {
+			projectExplorer.select(currentFolderPath);
+		}
 
 		FileHandle sceneFileHandle = AssetImporter.get(path);
 		if (sceneFileHandle.exists()) {
@@ -1216,6 +1227,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (!fromMemory) {
 			Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
+		}else{
+			Toast toast = Toast.makeToast("last action reversed", Toast.LENGTH_SHORT, Align.bottomRight);
+			toast.show();
 		}
 	}
 

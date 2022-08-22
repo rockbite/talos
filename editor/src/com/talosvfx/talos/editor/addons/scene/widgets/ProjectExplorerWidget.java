@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -10,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -60,15 +61,8 @@ public class ProjectExplorerWidget extends Table {
 
         scrollPaneTable.add(scrollPane).height(0).grow();
 
-        Table directoryViewTable = new Table();
-        directoryViewTable.top().left().defaults().top().left();
         directoryViewWidget = new DirectoryViewWidget();
-        ScrollPane scrollPaneRight = new ScrollPane(directoryViewWidget);
-        directoryViewTable.add(scrollPaneRight).height(0).grow();
-
-        scrollPaneRight.setScrollingDisabled(true, false);
-
-        VisSplitPane splitPane = new VisSplitPane(scrollPaneTable, directoryViewTable, false);
+        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, TalosMain.Instance().getSkin());
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
@@ -113,8 +107,7 @@ public class ProjectExplorerWidget extends Table {
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
-                directoryViewWidget.setDirectory((String) node.getObject());
-                getStage().setKeyboardFocus(directoryTree);
+                directoryViewWidget.openDirectory((String) node.getObject());
             }
 
             @Override
@@ -169,20 +162,40 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void deletePath(Array<String> paths) {
-        FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
-        for(String path: paths) {
-            FileHandle handle = Gdx.files.absolute(path);
-            AssetImporter.deleteFile(handle);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run () {
+                FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
+                for(String path: paths) {
+                    FileHandle handle = Gdx.files.absolute(path);
+                    AssetImporter.deleteFile(handle);
 
-            parent = handle.parent();
-        }
+                    parent = handle.parent();
+                }
 
-        loadDirectoryTree((String) rootNode.getObject());
+                loadDirectoryTree((String) rootNode.getObject());
 
-        if(!parent.path().equals(parent)) {
-            expand(parent.path());
-            select(parent.path());
-        }
+                if(!parent.path().equals(parent)) {
+                    expand(parent.path());
+                    select(parent.path());
+                }
+            }
+        };
+
+		String pathString = "";
+		for (String path : paths) {
+			pathString += path + "\n";
+		}
+
+        TalosMain.Instance().UIStage().showYesNoDialog("Delete files?", "Are you sure you want to delete the paths: \n" + pathString, runnable, new Runnable() {
+            @Override
+            public void run () {
+
+            }
+        });
+
+
+
     }
 
     public  ObjectMap<String, FilteredTree.Node<String>> getNodes(){
@@ -193,7 +206,7 @@ public class ProjectExplorerWidget extends Table {
         Array<FileHandle> list = new Array<>();
         Array<FilteredTree.Node<String>> nodes = directoryTree.getSelection().toArray();
         for (FilteredTree.Node<String> node: nodes) {
-            String path = (String) node.getObject();
+            String path = node.getObject();
             FileHandle handle = Gdx.files.absolute(path);
             list.add(handle);
         }
@@ -231,7 +244,7 @@ public class ProjectExplorerWidget extends Table {
                 if(path != null) {
                     FileHandle handle = Gdx.files.absolute(path);
                     if (directory) {
-                        directoryViewWidget.startRenameFor(handle);
+                        directoryViewWidget.rename();
                     } else {
                         if (handle.isDirectory()) {
                             if (nodes.get(path) != null) {
@@ -274,8 +287,8 @@ public class ProjectExplorerWidget extends Table {
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
                             select(newNode.getParent());
-                            directoryViewWidget.reload();
-                            directoryViewWidget.startRenameFor(newHandle);
+//                            directoryViewWidgetNew.reload();
+//                            directoryViewWidgetNew.startRenameFor(newHandle);
                         }
                     }
                 }
@@ -288,7 +301,7 @@ public class ProjectExplorerWidget extends Table {
                     FileHandle sceneDestination = AssetImporter.suggestNewName(path, "New Scene", "scn");
                     Scene mainScene = new Scene(sceneDestination.path());
                     mainScene.save();
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -312,7 +325,7 @@ public class ProjectExplorerWidget extends Table {
 
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -332,7 +345,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -348,7 +361,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -365,7 +378,7 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newPaletteDestination, true);
 
 
-                    directoryViewWidget.reload();
+//                    directoryViewWidgetNew.reload();
                 }
             });
 
@@ -397,22 +410,22 @@ public class ProjectExplorerWidget extends Table {
         }else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(node);
-            directoryViewWidget.setDirectory((String) node.getObject());
+            directoryViewWidget.openDirectory((String) node.getObject());
         }
     }
 
     public void select (String path) {
-        if(nodes.containsKey(path)) {
+        if (nodes.containsKey(path)) {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
             String pathToSet = (String)nodes.get(path).getObject();
-            directoryViewWidget.setDirectory(pathToSet);
+            directoryViewWidget.openDirectory(pathToSet);
         } else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(rootNode);
             expand(path);
-            directoryViewWidget.setDirectory(path);
+            directoryViewWidget.openDirectory(path);
         }
     }
 
@@ -449,7 +462,7 @@ public class ProjectExplorerWidget extends Table {
 
         rootNode.expandAll();
 
-        directoryViewWidget.setDirectory(root.path());
+        directoryViewWidget.openDirectory(root.path());
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
@@ -514,7 +527,7 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void reload () {
-        directoryViewWidget.reload();
+//        directoryViewWidgetNew.reload();
     }
 
     public static class RowWidget extends Table implements ActorCloneable<RowWidget> {

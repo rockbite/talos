@@ -54,8 +54,8 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.DARK_GRAY));
-        SquareButton newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-        SquareButton deleteBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-delete"));
+        SquareButton newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"), "New item");
+        SquareButton deleteBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-delete"), "Delete item");
         topBar.add().expandX();
         topBar.add(newBtn).padRight(2);
         topBar.add(deleteBtn).padRight(2);
