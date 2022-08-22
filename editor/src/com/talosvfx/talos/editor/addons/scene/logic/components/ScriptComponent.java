@@ -9,12 +9,14 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyFloatWrapper;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
@@ -31,12 +33,12 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
         AssetSelectWidget<String> widget = new AssetSelectWidget<String>("Script", GameAssetType.SCRIPT, new Supplier<GameAsset<String>>() {
             @Override
-            public GameAsset<String> get() {
+            public GameAsset<String> get () {
                 return scriptResource;
             }
         }, new PropertyWidget.ValueChanged<GameAsset<String>>() {
             @Override
-            public void report(GameAsset<String> value) {
+            public void report (GameAsset<String> value) {
                 setGameAsset(value);
             }
         });
@@ -81,6 +83,12 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         this.scriptResource = gameAsset;
         scriptProperties.clear();
         importScriptPropertiesFromMeta(false);
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run () {
+                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false));
+            }
+        });
     }
 
     @Override
