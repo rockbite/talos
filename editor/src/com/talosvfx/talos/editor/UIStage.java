@@ -50,6 +50,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
@@ -610,5 +611,10 @@ public class UIStage {
 
 	public void setFileChooserVisibility(boolean visible) {
 		fileChooser.setVisible(visible);
+	}
+
+	public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
+		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
+		stage.addActor(yesNoDialog.fadeIn());
 	}
 }

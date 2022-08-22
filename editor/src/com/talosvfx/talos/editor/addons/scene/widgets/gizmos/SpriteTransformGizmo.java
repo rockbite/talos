@@ -27,15 +27,17 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
     public void draw (Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+        if (isSelected()) {
+            Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
-        SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
-        vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
+            SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
+            vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
 
-        if (isOnTouchedPoint(vec.x, vec.y)) {
-            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-        } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
-            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
+            if (isOnTouchedPoint(vec.x, vec.y)) {
+                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+            } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
+                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
+            }
         }
 
     }

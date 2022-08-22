@@ -40,7 +40,7 @@ public class SEPropertyPanel extends PropertyPanel{
 
             Table table = new Table();
             Label label = new Label("Add Component", TalosMain.Instance().getSkin());
-            SquareButton button = new SquareButton(TalosMain.Instance().getSkin(), label);
+            SquareButton button = new SquareButton(TalosMain.Instance().getSkin(), label, "Add Component to entity");
 
             button.addListener(new ClickListener() {
                 @Override
