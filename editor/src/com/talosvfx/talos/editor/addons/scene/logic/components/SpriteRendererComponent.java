@@ -28,7 +28,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public Color color = new Color(Color.WHITE);
     public boolean flipX;
     public boolean flipY;
-    public boolean fixAspectRatio;
+    public boolean fixAspectRatio = true;
     public RenderMode renderMode = RenderMode.simple;
 
     @ValueProperty(prefix = {"W", "H"})
@@ -201,7 +201,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
         flipX = jsonData.getBoolean("flipX", false);
         flipY = jsonData.getBoolean("flipY", false);
-        fixAspectRatio = jsonData.getBoolean("fixAspectRatio", false);
+        fixAspectRatio = jsonData.getBoolean("fixAspectRatio", fixAspectRatio);
         renderMode = json.readValue(RenderMode.class, jsonData.get("renderMode"));
         JsonValue size = jsonData.get("size");
         if (size != null) {
