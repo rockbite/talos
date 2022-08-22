@@ -59,7 +59,7 @@ public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
     public Actor getSubWidget () {
         Table table = new Table();
         Skin skin = TalosMain.Instance().getSkin();
-        final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"));
+        final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select game object");
 
         nameLabel = new Label("", skin);
         nameLabel.setEllipsis(true);
