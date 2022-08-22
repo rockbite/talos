@@ -31,6 +31,7 @@ public class ScriptPropertyFloatWrapper extends ScriptPropertyWrapper<Float> {
             }
         }
     }
+
     @Override
     public ScriptPropertyFloatWrapper clone () {
         ScriptPropertyFloatWrapper clone = (ScriptPropertyFloatWrapper) super.clone();
