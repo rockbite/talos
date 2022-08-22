@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -161,20 +162,40 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void deletePath(Array<String> paths) {
-        FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
-        for(String path: paths) {
-            FileHandle handle = Gdx.files.absolute(path);
-            AssetImporter.deleteFile(handle);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run () {
+                FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
+                for(String path: paths) {
+                    FileHandle handle = Gdx.files.absolute(path);
+                    AssetImporter.deleteFile(handle);
 
-            parent = handle.parent();
-        }
+                    parent = handle.parent();
+                }
 
-        loadDirectoryTree((String) rootNode.getObject());
+                loadDirectoryTree((String) rootNode.getObject());
 
-        if(!parent.path().equals(parent)) {
-            expand(parent.path());
-            select(parent.path());
-        }
+                if(!parent.path().equals(parent)) {
+                    expand(parent.path());
+                    select(parent.path());
+                }
+            }
+        };
+
+		String pathString = "";
+		for (String path : paths) {
+			pathString += path + "\n";
+		}
+
+        TalosMain.Instance().UIStage().showYesNoDialog("Delete files?", "Are you sure you want to delete the paths: \n" + pathString, runnable, new Runnable() {
+            @Override
+            public void run () {
+
+            }
+        });
+
+
+
     }
 
     public  ObjectMap<String, FilteredTree.Node<String>> getNodes(){
