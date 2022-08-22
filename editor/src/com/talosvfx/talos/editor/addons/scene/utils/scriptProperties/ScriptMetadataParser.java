@@ -86,6 +86,10 @@ public class ScriptMetadataParser {
 
     private void registerSupportedClasses () {
         scriptPropertyWrappers.registerPropertyWrapper(Float.class, ScriptPropertyFloatWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(Boolean.class, ScriptPropertyBooleanWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(Integer.class, ScriptPropertyIntegerWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(String.class, ScriptPropertyStringWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(GameObject.class, ScriptPropertyGameObjectWrapper.class);
     }
 
     public void processHandle(FileHandle handle, ScriptMetadata metadata) {

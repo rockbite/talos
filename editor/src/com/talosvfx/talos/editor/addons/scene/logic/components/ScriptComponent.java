@@ -44,23 +44,8 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         properties.add(widget);
 
         for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
-            if (scriptProperty instanceof ScriptPropertyFloatWrapper) {
-                ScriptPropertyFloatWrapper floatProperty = (ScriptPropertyFloatWrapper) scriptProperty;
-                FloatPropertyWidget floatWidget = new FloatPropertyWidget(floatProperty.propertyName, new Supplier<Float>() {
-                    @Override
-                    public Float get () {
-                        return floatProperty.getValue();
-                    }
-                }, new PropertyWidget.ValueChanged<Float>() {
-                    @Override
-                    public void report(Float value) {
-                        floatProperty.setValue(value);
-                    }
-                });
-
-                floatWidget.configureFromValues(floatProperty.minValue, floatProperty.maxValue, floatProperty.step);
-                properties.add(floatWidget);
-            }
+            PropertyWidget generate = WidgetFactory.generateForScriptProperty(scriptProperty);
+            properties.add(generate);
         }
 
         return properties;

@@ -847,11 +847,11 @@ public class AssetRepository implements Notifications.Observer {
 
 		RawAsset rawAsset = dataMaps.uuidRawAssetMap.get(metadata.uuid);
 		FileHandle proxyScriptHandle = dataMaps.fileHandleRawAssetMap.findKey(rawAsset, true);
-		realScriptHandle.copyTo(proxyScriptHandle);
 		if (rawAsset == null) {
 			// CASE: someone put file handle externally in project folder
 			return;
 		}
+		realScriptHandle.copyTo(proxyScriptHandle);
 
 		AMetadata metaData = rawAsset.metaData;
 		if (metaData instanceof ScriptMetadata) {
