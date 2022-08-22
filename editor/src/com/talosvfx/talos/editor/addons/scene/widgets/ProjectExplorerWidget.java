@@ -78,7 +78,9 @@ public class ProjectExplorerWidget extends Table {
 
                 while (!stack.isEmpty()) {
                     FileHandle file = stack.pop();
-                    if (similar.similarity(text, file.nameWithoutExtension()) > 0.9) {
+                    if (file.name().contains(text)) {
+                        similarFiles.add(file);
+                    } else if (similar.similarity(text, file.nameWithoutExtension()) > 0.9) {
                         similarFiles.add(file);
                     }
 
