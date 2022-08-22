@@ -423,4 +423,26 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
         return count;
     }
+
+    public GameObject getChildByUUID (String uuid) {
+        if (children == null) {
+            return null;
+        }
+
+        for (int i = 0; i < children.size; i++) {
+            GameObject child = children.get(i);
+            if (child.uuid.toString().equals(uuid)) {
+                return child;
+            }
+
+            if (child.getGameObjects() != null) {
+                GameObject childByUUID = child.getChildByUUID(uuid);
+                if (childByUUID != null) {
+                    return childByUUID;
+                }
+            }
+        }
+
+        return null;
+    }
 }

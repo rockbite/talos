@@ -6,11 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyFloatWrapper;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyIntegerWrapper;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyNumberWrapper;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 import java.lang.reflect.Field;
@@ -22,19 +23,17 @@ public class WidgetFactory {
 
     public static PropertyWidget generateForScriptProperty(ScriptPropertyWrapper wrapper) {
         try {
-            Object proeprtyValue = wrapper.value;
-
             Field value = wrapper.getClass().getField("value");
-            if(proeprtyValue instanceof Boolean) {
+            if (wrapper instanceof ScriptPropertyBooleanWrapper) {
                 return generateForBoolean(wrapper, value, null, wrapper.propertyName, false);
-            } else if(proeprtyValue instanceof Integer) {
+            } else if (wrapper instanceof ScriptPropertyIntegerWrapper) {
                 return generateForInt(wrapper, value, null, wrapper.propertyName, false);
-            } else if(proeprtyValue instanceof Float) {
+            } else if(wrapper instanceof ScriptPropertyFloatWrapper) {
                 return generateForFloat(wrapper, value, null, wrapper.propertyName, false);
-            }  else if(proeprtyValue instanceof String) {
+            }  else if(wrapper instanceof ScriptPropertyStringWrapper) {
                 return generateForString(wrapper, value, null, wrapper.propertyName);
-            } else if (proeprtyValue instanceof GameObject) {
-
+            } else if (wrapper instanceof ScriptPropertyGameObjectWrapper) {
+                return generateForGameObject((ScriptPropertyGameObjectWrapper) wrapper);
             }
 
         } catch (NoSuchFieldException e) {
@@ -237,6 +236,23 @@ public class WidgetFactory {
 
         return widget;
     }
+
+    private static GameObjectSelectWidget generateForGameObject (ScriptPropertyGameObjectWrapper wrapper) {
+        GameObjectSelectWidget widget = new GameObjectSelectWidget(wrapper.propertyName, new Supplier<GameObject>() {
+            @Override
+            public GameObject get() {
+                return wrapper.getValue();
+            }
+        }, new PropertyWidget.ValueChanged<GameObject>() {
+            @Override
+            public void report(GameObject value) {
+                wrapper.setValue(value);
+            }
+        });
+
+        return widget;
+    }
+
 
     private static FloatPropertyWidget generateForFloat (Object parent, Field field, Object object, String title, boolean primitive) {
         FloatPropertyWidget widget = new FloatPropertyWidget(title, new Supplier<Float>() {

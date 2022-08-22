@@ -2,12 +2,14 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
-public abstract class ScriptPropertyWrapper<T> implements Cloneable  {
+public abstract class ScriptPropertyWrapper<T> implements Cloneable, Json.Serializable {
 
     public String propertyName;
 
-    private T value;
+    public T value;
 
     public T defaultValue;
 
@@ -41,6 +43,16 @@ public abstract class ScriptPropertyWrapper<T> implements Cloneable  {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+       propertyName = jsonData.getString("propertyName");
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("propertyName", propertyName);
     }
 
     public abstract T parseValueFromString (String value);

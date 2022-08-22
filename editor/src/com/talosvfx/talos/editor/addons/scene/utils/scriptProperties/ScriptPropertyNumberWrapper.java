@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 public abstract class ScriptPropertyNumberWrapper<T> extends ScriptPropertyWrapper<T> {
 
@@ -32,5 +33,13 @@ public abstract class ScriptPropertyNumberWrapper<T> extends ScriptPropertyWrapp
         clone.minValue = this.minValue;
         clone.step = this.step;
         return clone;
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("minValue", minValue);
+        json.writeValue("maxValue", maxValue);
+        json.writeValue("step", step);
     }
 }

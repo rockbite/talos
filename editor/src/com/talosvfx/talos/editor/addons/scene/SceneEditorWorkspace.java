@@ -32,10 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
-import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
-import com.talosvfx.talos.editor.addons.scene.widgets.MapEditorToolbar;
-import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
-import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
+import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -73,6 +70,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private SnapshotService snapshotService;
 
 	private AssetListPopup assetListPopup;
+	private GameObjectListPopup gameObjectListPopup;
 
 	private FileTracker fileTracker = new FileTracker();
 	private FileWatching fileWatching = new FileWatching();
@@ -134,6 +132,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GizmoRegister.init(root);
 
 		assetListPopup = new AssetListPopup<>();
+		gameObjectListPopup = new GameObjectListPopup();
 		templateListPopup = new TemplateListPopup(root);
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
@@ -543,6 +542,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				selectGameObjectExternally(dummyParent);
 			}
 		});
+	}
+
+	public GameObject getGameObjectForUUID (String uuid) {
+		GameObject rootGO = getRootGO();
+		if (rootGO == null) {
+			return null;
+		}
+
+		if (rootGO.uuid.toString().equals(uuid)) {
+			return rootGO;
+		}
+
+		return rootGO.getChildByUUID(uuid);
 	}
 
 	private GameObject getTopestLevelObjectsParentFor (GameObject gameObject, Array<GameObject> gameObjects) {
@@ -1263,6 +1275,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public AssetListPopup getAssetListPopup () {
 		return assetListPopup;
+	}
+
+	public GameObjectListPopup getGameObjectListPopup () {
+		return gameObjectListPopup;
 	}
 
 	public FileHandle getProjectFolder () {
