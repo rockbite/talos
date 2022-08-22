@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
@@ -13,6 +15,7 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
@@ -22,6 +25,9 @@ import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import info.debatty.java.stringsimilarity.JaroWinkler;
+import info.debatty.java.stringsimilarity.interfaces.StringSimilarity;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -42,6 +48,49 @@ public class ProjectExplorerWidget extends Table {
     public Array<FileHandle> filesToManipulate = new Array<>();
 
     public ProjectExplorerWidget() {
+        Skin skin = TalosMain.Instance().getSkin();
+
+        Table horizontalPanel = new Table();
+        horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+        add(horizontalPanel).growX().row();
+
+        SearchWidget searchWidget = new SearchWidget();
+        horizontalPanel.add(searchWidget).pad(2).expandX().right();
+
+        TextField searchField = searchWidget.getTextField();
+        searchField.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String text = searchField.getText();
+                if (text.length() == 0) {
+                    directoryViewWidget.openDirectory(getCurrentFolder().path());
+                    return;
+                }
+                FileHandle root = SceneEditorWorkspace.getInstance().getProjectFolder();
+                Array<FileHandle> stack = new Array<>();
+                Array<FileHandle> similarFiles = new Array<>();
+                StringSimilarity similar = new JaroWinkler();
+
+                for (FileHandle fileHandle : root.list()) {
+                    stack.add(fileHandle);
+                }
+
+                while (!stack.isEmpty()) {
+                    FileHandle file = stack.pop();
+                    if (similar.similarity(text, file.nameWithoutExtension()) > 0.9) {
+                        similarFiles.add(file);
+                    }
+
+                    if (file.isDirectory()) {
+                        for (FileHandle child : file.list()) {
+                            stack.add(child);
+                        }
+                    }
+                }
+                directoryViewWidget.fillItems(similarFiles);
+            }
+        });
+
         contextualMenu = new ContextualMenu();
 
         Table container = new Table();

@@ -308,12 +308,16 @@ public class DirectoryViewWidget extends Table {
      * Indicates if the folder is empty.
      * @param directory directory exists and it's directory.
      */
-    private void fillItems (FileHandle directory) {
+    private void fillItems (FileHandle[] directory) {
         // reset state
         overItem = -1;
         selected.clear();
         items.clear();
         dragAndDrop.clear();
+
+        if (directory.length == 0) {
+            return;
+        }
 
         //BEGIN DRAG AND DROP
         for (DragAndDrop.Target externalTarget : externalTargets) {
@@ -469,7 +473,7 @@ public class DirectoryViewWidget extends Table {
 
         ////END DRAG AND DROP
 
-        FileHandle[] content = directory.list();
+        FileHandle[] content = directory;
         if (content.length == 0) {
             emptyFolderTable.setVisible(true);
             items.setVisible(false);
@@ -570,6 +574,14 @@ public class DirectoryViewWidget extends Table {
                 }
             });
         }
+    }
+
+    public void fillItems (FileHandle directory) {
+        fillItems(directory.list());
+    }
+
+    public void fillItems (Array<FileHandle> directory) {
+        fillItems(directory.toArray(FileHandle.class));
     }
 
     /**
