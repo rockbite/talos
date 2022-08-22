@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 
 import java.io.BufferedReader;
@@ -23,6 +24,10 @@ public class ScriptMetadataParser {
 
         ScriptPropertyWrappers () {
             primitiveReplacementMap.put("float", Float.class.getName());
+            primitiveReplacementMap.put("int", Integer.class.getName());
+            primitiveReplacementMap.put("boolean", Boolean.class.getName());
+            primitiveReplacementMap.put("GameObject", GameObject.class.getName());
+            primitiveReplacementMap.put("String", String.class.getName());
         }
 
         <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends ScriptPropertyWrapper<T>> wrapperClazz) {

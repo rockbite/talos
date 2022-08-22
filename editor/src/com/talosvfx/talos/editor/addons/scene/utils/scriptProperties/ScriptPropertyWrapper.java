@@ -13,7 +13,6 @@ public abstract class ScriptPropertyWrapper<T> implements Cloneable  {
 
 
     public void collectAttributes (Array<String> attributes) {
-        // TODO: 8/18/2022 do this with annotations and nice reflection :(
         for (int i = 0; i < attributes.size; i+=2) {
             String type = attributes.get(i);
             if (type.equals("defaultValue")) {
