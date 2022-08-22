@@ -34,7 +34,6 @@ public class ScriptMetadata extends AMetadata {
     @Override
     public void write (Json json) {
         super.write(json);
-        // TODO: 8/18/2022 is this how we do?
         json.writeValue("scriptProperties", scriptPropertyWrappers);
     }
 
