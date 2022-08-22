@@ -69,12 +69,12 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         label = new Label(text, getSkin(), "default");
         label.setEllipsis(true);
-        labelCell = labelTable.add(label).growX();
+        labelCell = labelTable.add(label).width(0).growX();
 
 		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
 		TextField.TextFieldStyle style = new TextField.TextFieldStyle(textFieldStyle);
 		textField = new TextField(text, style);
-        inputTable.add(textField).growX();
+        inputTable.add(textField).width(0).growX();
 
         addListener(new ClickListener() {
 
@@ -206,5 +206,10 @@ public class EditableLabel extends Table implements ActorCloneable {
 
     public Cell<Label> getLabelCell() {
         return labelCell;
+    }
+
+    @Override
+    public float getPrefWidth () {
+        return Math.max(getTextField().getPrefWidth(), getLabelCell().getPrefWidth());
     }
 }

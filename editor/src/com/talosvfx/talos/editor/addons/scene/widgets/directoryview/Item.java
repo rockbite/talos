@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.directoryview;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -88,32 +89,32 @@ class Item extends Widget implements ActorCloneable<Item> {
 		}
 
 		if (assetForPath != null) {
-			GameObject parent = new GameObject();
-			parent.addComponent(new TransformComponent());
-			basicGameObject = parent;
-
-			AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-			boolean success = AssetImporter.createAssetInstance(assetForPath, parent) != null;
-			if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
-				success = false;
-			}
-			AssetImporter.fromDirectoryView = false;
-
-			if (success) {
-				//Game asset is legit, lets try to make one
-				GameObject copy = new GameObject();
-				copy.addComponent(new TransformComponent());
-
-				AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
-				AssetImporter.createAssetInstance(assetForPath, copy);
-				AssetImporter.fromDirectoryView = false;
-
-				MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
-				Stage stage = SceneEditorWorkspace.getInstance().getStage();
-				uiSceneRenderer.setCamera((OrthographicCamera)stage.getCamera());
-				GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
-				gameObjectActor.setFillParent(true);
-			}
+//			GameObject parent = new GameObject();
+//			parent.addComponent(new TransformComponent());
+//			basicGameObject = parent;
+////
+////			AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+////			boolean success = AssetImporter.createAssetInstance(assetForPath, parent) != null;
+////			if (parent.getGameObjects() == null || parent.getGameObjects().size == 0) {
+////				success = false;
+////			}
+////			AssetImporter.fromDirectoryView = false;
+////
+////			if (success) {
+////				//Game asset is legit, lets try to make one
+////				GameObject copy = new GameObject();
+////				copy.addComponent(new TransformComponent());
+////
+////				AssetImporter.fromDirectoryView = true; //tom is very naughty dont be like tom
+////				AssetImporter.createAssetInstance(assetForPath, copy);
+////				AssetImporter.fromDirectoryView = false;
+////
+////				MainRenderer uiSceneRenderer = SceneEditorWorkspace.getInstance().getUISceneRenderer();
+////				Stage stage = SceneEditorWorkspace.getInstance().getStage();
+////				uiSceneRenderer.setCamera((OrthographicCamera)stage.getCamera());
+////				GameObjectActor gameObjectActor = new GameObjectActor(uiSceneRenderer, basicGameObject, copy, true);
+////				gameObjectActor.setFillParent(true);
+////			}
 		}
 	}
 
@@ -154,9 +155,9 @@ class Item extends Widget implements ActorCloneable<Item> {
 
 		float lw = w, lh = label.getLabel().getHeight();
 		float lx = getX() + padLeft, ly = getY() + padBottom;
-		label.getLabel().setWidth(lw);
-		label.getTextField().setWidth(lw);
 		label.setPosition(lx, ly);
+		label.setWidth(lw);
+		label.act(Gdx.graphics.getDeltaTime());
 		label.draw(batch, parentAlpha);
 
 		float iw = w, ih = h - lh - space - padTop;
