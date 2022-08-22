@@ -11,7 +11,6 @@ public abstract class ScriptPropertyWrapper<T> implements Cloneable  {
 
     public T defaultValue;
 
-    public abstract String getTypeName();
 
     public void collectAttributes (Array<String> attributes) {
         // TODO: 8/18/2022 do this with annotations and nice reflection :(

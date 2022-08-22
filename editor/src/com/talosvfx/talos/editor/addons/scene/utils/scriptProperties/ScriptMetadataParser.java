@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 
 import java.io.BufferedReader;
@@ -13,28 +15,72 @@ import java.util.regex.Pattern;
 
 public class ScriptMetadataParser {
 
-    private final Array<Class<? extends ScriptPropertyWrapper<?>>> registeredTypes = new Array<>();
-    private final ObjectMap<String, Class<? extends ScriptPropertyWrapper<?>>> typeObjectMap = new ObjectMap<>();
+
+    private static class ScriptPropertyWrappers {
+        private final ObjectMap<Class, Class<? extends ScriptPropertyWrapper<?>>> registeredTypes = new ObjectMap<>();
+
+        private ObjectMap<String, String> primitiveReplacementMap = new ObjectMap<>();
+
+        ScriptPropertyWrappers () {
+            primitiveReplacementMap.put("float", Float.class.getName());
+        }
+
+        <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends ScriptPropertyWrapper<T>> wrapperClazz) {
+            this.registeredTypes.put(clazz, wrapperClazz);
+        }
+
+        String parseName (String className) {
+            if (primitiveReplacementMap.containsKey(className)) {
+                className = primitiveReplacementMap.get(className);
+            }
+            return className;
+        }
+
+        boolean supportsProperty (String property) {
+            property = parseName(property);
+            try {
+                Class classForName = ClassReflection.forName(property);
+                return registeredTypes.containsKey(classForName);
+            } catch (ReflectionException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+        }
+
+        @SuppressWarnings("unchecked")
+        <T> ScriptPropertyWrapper<T> createPropertyWrapperForClazz (Class<T> clazz) {
+            Class<ScriptPropertyWrapper<T>> aClass = (Class<ScriptPropertyWrapper<T>>)registeredTypes.get(clazz);
+            try {
+                return ClassReflection.newInstance(aClass);
+            } catch (ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public <T> ScriptPropertyWrapper<T> createPropertyWrapperForClazzName (String parameterClassName) {
+            String clazzName = parseName(parameterClassName);
+            Class aClass = null;
+            try {
+                aClass = ClassReflection.forName(clazzName);
+            } catch (ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+            return createPropertyWrapperForClazz(aClass);
+        }
+    }
+
+    private ScriptPropertyWrappers scriptPropertyWrappers = new ScriptPropertyWrappers();
+
 
     BufferedReader reader;
 
     public ScriptMetadataParser () {
         registerSupportedClasses();
-        fillObjectParsingData();
     }
 
     private void registerSupportedClasses () {
-        registeredTypes.add(ScriptPropertyFloatWrapper.class);
-    }
-
-    private void fillObjectParsingData () {
-        for (Class<? extends ScriptPropertyWrapper<?>> registeredType : registeredTypes) {
-            try {
-                typeObjectMap.put(registeredType.newInstance().getTypeName(), registeredType);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        scriptPropertyWrappers.registerPropertyWrapper(Float.class, ScriptPropertyFloatWrapper.class);
     }
 
     public void processHandle(FileHandle handle, ScriptMetadata metadata) {
@@ -87,23 +133,17 @@ public class ScriptMetadataParser {
             }
 
             String parameterClassName = attributes.get(1);
-            Class<? extends ScriptPropertyWrapper<?>> typeClass = typeObjectMap.get(parameterClassName);
-            if (typeClass == null) {
+            if (!scriptPropertyWrappers.supportsProperty(parameterClassName)) {
                 throw new ScriptMetadataParserException("Unsupported type - " + parameterClassName);
             }
 
             //remove type and leave only arguments
             attributes.removeRange(0, 1);
 
-            try {
-                ScriptPropertyWrapper scriptPropertyWrapper = typeClass.newInstance();
-                scriptPropertyWrapper.collectAttributes(attributes);
-                scriptPropertyWrapper.propertyName = parameterName;
-                metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
-            } catch (InstantiationException | IllegalAccessException e) {
-                // probably you are screwed
-                e.printStackTrace();
-            }
+            ScriptPropertyWrapper<?> scriptPropertyWrapper = scriptPropertyWrappers.createPropertyWrapperForClazzName(parameterClassName);
+            scriptPropertyWrapper.collectAttributes(attributes);
+            scriptPropertyWrapper.propertyName = parameterName;
+            metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
         }
     }
 

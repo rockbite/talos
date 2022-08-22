@@ -9,10 +9,6 @@ public class ScriptPropertyFloatWrapper extends ScriptPropertyWrapper<Float> {
     public float minValue;
     public float maxValue;
     public float step;
-    @Override
-    public String getTypeName () {
-        return "float";
-    }
 
     @Override
     public void collectAttributes (Array<String> attributes) {
