@@ -125,6 +125,7 @@ public abstract class ViewportWidget extends Table {
 
 		cameraController = new CameraController(camera);
 		cameraController.setInvert(true);
+		cameraController.setBoundsProvider(this);
 
 		addPanListener();
 		addGizmoListener();
