@@ -269,11 +269,11 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private void addDefaultButtons () {
 		Skin skin = TalosMain.Instance().getSkin();
 
-		SquareButton tile = new SquareButton(skin, skin.getDrawable("tile_icon"));
-		SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
-		SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("combined_icon"));
-		SquareButton delete = new SquareButton(skin, skin.getDrawable("eraser_icon"));
-		SquareButton editParentTileAndFakeHeight = new SquareButton(skin, skin.getDrawable("icon-edit"));
+		SquareButton tile = new SquareButton(skin, skin.getDrawable("tile_icon"), "Tile mode");
+		SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"), "Entity mode");
+		SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("combined_icon"), "TileEntity mode");
+		SquareButton delete = new SquareButton(skin, skin.getDrawable("eraser_icon"), "Eraser");
+		SquareButton editParentTileAndFakeHeight = new SquareButton(skin, skin.getDrawable("icon-edit"), "Edit entity");
 
 		tile.setDisabled(false);
 		entity.setDisabled(false);
@@ -435,8 +435,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private void addParentTileAndFakeHeightEditButtons () {
 		Skin skin = TalosMain.Instance().getSkin();
 
-		SquareButton cancel = new SquareButton(skin, skin.getDrawable("ic-proc-error"));
-		SquareButton accept = new SquareButton(skin, skin.getDrawable("ic-proc-success"));
+		SquareButton cancel = new SquareButton(skin, skin.getDrawable("ic-proc-error"), "Cancel");
+		SquareButton accept = new SquareButton(skin, skin.getDrawable("ic-proc-success"), "Accept");
 
 		cancel.addListener(new ClickListener() {
 			@Override
