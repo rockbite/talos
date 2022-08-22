@@ -24,13 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
@@ -38,10 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
-import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
-import com.talosvfx.talos.editor.addons.scene.widgets.MapEditorToolbar;
-import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
-import com.talosvfx.talos.editor.addons.scene.widgets.TemplateListPopup;
+import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.utils.Toast;
@@ -54,6 +45,8 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -78,6 +71,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private SnapshotService snapshotService;
 
 	private AssetListPopup assetListPopup;
+	private GameObjectListPopup gameObjectListPopup;
 
 	private FileTracker fileTracker = new FileTracker();
 	private FileWatching fileWatching = new FileWatching();
@@ -89,6 +83,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public GridProperties gridProperties = new GridProperties();
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
+
+	public boolean exporting = false;
 
 	public static boolean isEnterPressed (int keycode) {
 		switch (keycode) {
@@ -137,6 +133,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GizmoRegister.init(root);
 
 		assetListPopup = new AssetListPopup<>();
+		gameObjectListPopup = new GameObjectListPopup();
 		templateListPopup = new TemplateListPopup(root);
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
@@ -548,6 +545,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		});
 	}
 
+	public GameObject getGameObjectForUUID (String uuid) {
+		GameObject rootGO = getRootGO();
+		if (rootGO == null) {
+			return null;
+		}
+
+		if (rootGO.uuid.toString().equals(uuid)) {
+			return rootGO;
+		}
+
+		return rootGO.getChildByUUID(uuid);
+	}
+
 	private GameObject getTopestLevelObjectsParentFor (GameObject gameObject, Array<GameObject> gameObjects) {
 		Array<GameObject> childGameObjects = gameObject.getGameObjects();
 		if (childGameObjects == null) {
@@ -930,7 +940,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public String writeExport () {
-
+		exporting = true;
 		AssetRepository.getInstance().exportToFile();
 
 		// write rest of files
@@ -950,13 +960,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					Runtime rt = Runtime.getRuntime();
 
 					try {
-						String command = "node " + handle.path() + " \"" + projectPath + "\" \"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
+						String nodeCommand = "node";
+						String buildScriptPath = handle.path();
+						String projectDirectoryPath = "\"" + projectPath  + "\"";
+						String projectFilePath = "\"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
+
 						if (TalosMain.Instance().isOsX()) {
-							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", command);
+							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePath);
 							pb.inheritIO();
 							pb.start();
 						} else {
-							ProcessBuilder pb = new ProcessBuilder(command);
+							ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePath);
 							pb.inheritIO();
 							pb.start();
 						}
@@ -966,6 +980,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				}
 			}
 		}
+		exporting = false;
 
 		return "";
 	}
@@ -1274,6 +1289,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public AssetListPopup getAssetListPopup () {
 		return assetListPopup;
+	}
+
+	public GameObjectListPopup getGameObjectListPopup () {
+		return gameObjectListPopup;
 	}
 
 	public FileHandle getProjectFolder () {

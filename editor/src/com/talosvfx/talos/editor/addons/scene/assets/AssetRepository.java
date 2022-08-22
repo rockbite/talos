@@ -21,29 +21,42 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.serialization.MetaData;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
+import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
+import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.getMetadataHandleFor;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
 import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
 import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
-public class AssetRepository {
+public class AssetRepository implements Notifications.Observer {
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 
@@ -121,6 +134,7 @@ public class AssetRepository {
 	}
 	public static void init () {
 		AssetRepository assetRepository = new AssetRepository();
+		Notifications.registerObserver(assetRepository);
 		AssetRepository.instance = assetRepository;
 	}
 
@@ -144,7 +158,46 @@ public class AssetRepository {
 		//Game resources need to be able to search for the raw assets to link
 
 		checkAllGameAssetCreation();
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				loadChangesFromScripts(AssetRepository.this::fileVisit);
+			}
+		});
 	}
+
+	private void loadChangesFromScripts(Function<Path, FileVisitResult> function) {
+
+		FileHandle exportedScriptsFolderHandle = getExportedScriptsFolderHandle();
+		try {
+			Files.walkFileTree(exportedScriptsFolderHandle.file().toPath(), new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile (Path file, BasicFileAttributes attrs) throws IOException {
+					return function.apply(file);
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public FileVisitResult fileVisit (Path dir) {
+		File file = dir.toFile();
+		if (file.isDirectory()) {
+			return FileVisitResult.CONTINUE;
+		}
+		FileHandle fileHandle = new FileHandle(file);
+		if (fileHandle.extension().equals("meta")) {
+			return FileVisitResult.CONTINUE;
+		}
+
+		if (fileHandle.extension().equals("ts")) {
+			// Found a script
+			Notifications.fireEvent(Notifications.obtainEvent(ScriptFileChangedEvent.class).set(StandardWatchEventKinds.ENTRY_MODIFY, fileHandle));
+		}
+		return FileVisitResult.CONTINUE;
+	}
+
 
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
@@ -780,12 +833,75 @@ public class AssetRepository {
 		}
 	}
 
+	@EventHandler
+	public void onScriptFileChanged (ScriptFileChangedEvent event) {
+		FileHandle realScriptHandle = event.file;
+		String proxyMetaPath = realScriptHandle.path() + ".meta";
+		FileHandle proxyMetaFileHandle = new FileHandle(proxyMetaPath);
+		if (!proxyMetaFileHandle.exists()) {
+			return;
+		}
+
+		Class<? extends AMetadata> metaClassForType = GameAssetType.getMetaClassForType(GameAssetType.SCRIPT);
+		ScriptMetadata metadata = (ScriptMetadata) json.fromJson(metaClassForType, proxyMetaFileHandle);
+
+		RawAsset rawAsset = dataMaps.uuidRawAssetMap.get(metadata.uuid);
+		FileHandle proxyScriptHandle = dataMaps.fileHandleRawAssetMap.findKey(rawAsset, true);
+		if (rawAsset == null) {
+			// CASE: someone put file handle externally in project folder
+			return;
+		}
+		realScriptHandle.copyTo(proxyScriptHandle);
+
+		AMetadata metaData = rawAsset.metaData;
+		if (metaData instanceof ScriptMetadata) {
+			metaData.postProcessForHandle(realScriptHandle);
+
+			//Save the meta data
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(proxyScriptHandle);
+			metadataHandleFor.writeString(json.prettyPrint(metaData), false);
+
+			GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+			Array<ScriptComponent> updatedComponents = new Array<>();
+			updateScriptComponentsForNewMeta(rootGO, (ScriptMetadata) metaData, updatedComponents);
+
+			Gdx.app.postRunnable(new Runnable() {
+				@Override
+				public void run () {
+					for (ScriptComponent updatedComponent : updatedComponents) {
+						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+					}
+				}
+			});
+		}
+	}
+
+	private void updateScriptComponentsForNewMeta (GameObject gameObject, ScriptMetadata metaData, Array<ScriptComponent> updatedComponents) {
+		if (gameObject.hasComponent(ScriptComponent.class)) {
+			ScriptComponent component = gameObject.getComponent(ScriptComponent.class);
+			AMetadata componentMeta = component.getGameResource().getRootRawAsset().metaData;
+			if (componentMeta.uuid == metaData.uuid) {
+				component.importScriptPropertiesFromMeta(true);
+				updatedComponents.add(component);
+			}
+		}
+
+		Array<GameObject> children = gameObject.getGameObjects();
+		if (children != null) {
+			for (int i = 0; i < children.size; i++) {
+				GameObject child = children.get(i);
+				updateScriptComponentsForNewMeta(child, metaData, updatedComponents);
+			}
+		}
+	}
+
 	private <T extends AMetadata> T createMetaDataForAsset (RawAsset rawAsset) {
 		if (rawAsset.handle.isDirectory()) {
 			return (T)new DirectoryMetadata();
 		} else {
 
-			String extension = rawAsset.handle.extension();
+			FileHandle rawAssetHandle = rawAsset.handle;
+			String extension = rawAssetHandle.extension();
 
 			GameAssetType assetTypeFromExtension = null;
 			try {
@@ -795,14 +911,23 @@ public class AssetRepository {
 			}
 			T metaForType = (T)GameAssetType.createMetaForType(assetTypeFromExtension);
 
+			if (metaForType instanceof ScriptMetadata) {
+				metaForType.postProcessForHandle(rawAssetHandle);
+			}
+
 			//Save the meta data
-			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(rawAsset.handle);
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(rawAssetHandle);
 			metadataHandleFor.writeString(json.prettyPrint(metaForType), false);
 
 			metaForType.setLinkRawAsset(rawAsset);
 
 			return metaForType;
 		}
+	}
+
+	public static FileHandle getExportedScriptsFolderHandle () {
+		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
+		return Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {
