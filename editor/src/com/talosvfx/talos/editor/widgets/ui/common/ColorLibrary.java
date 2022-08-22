@@ -21,6 +21,8 @@ public class ColorLibrary {
     public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
 
     public static String SHAPE_SQUIRCLE = "squircle-6";
+    public static String SHAPE_SQUIRCLE_LEFT = "squircle-l-6";
+    public static String SHAPE_SQUIRCLE_RIGHT = "squircle-r-6";
     public static String SHAPE_SQUIRCLE_TOP = "squircle-t-6";
     public static String SHAPE_SQUIRCLE_BOTTOM = "squircle-b-6";
     public static String SHAPE_CIRCLE = "circle";
