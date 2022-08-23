@@ -103,7 +103,7 @@ public class SceneEditorProject implements IProject {
         FileHandle projectFile = Gdx.files.absolute(projectDir.path() + File.separator + name + SceneEditorAddon.SE.getExtension());
 
         // create new scene
-        Scene mainScene = new Scene(projectDir.path() + File.separator + "scenes" + File.separator + "main_scene.scn");
+        Scene mainScene = new Scene(projectDir.path() + File.separator + "scenes" + File.separator + "main.scn");
         mainScene.save();
         sceneEditorAddon.workspace.openSavableContainer(mainScene);
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
@@ -435,6 +436,28 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             topParent = topParent.getParent();
         }
         return topParent;
+    }
+
+    public GameObject getChildByUUID (String uuid) {
+        if (children == null) {
+            return null;
+        }
+
+        for (int i = 0; i < children.size; i++) {
+            GameObject child = children.get(i);
+            if (child.uuid.toString().equals(uuid)) {
+                return child;
+            }
+
+            if (child.getGameObjects() != null) {
+                GameObject childByUUID = child.getChildByUUID(uuid);
+                if (childByUUID != null) {
+                    return childByUUID;
+                }
+            }
+        }
+
+        return null;
     }
 
     public void setVisible(boolean visible){

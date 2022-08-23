@@ -58,6 +58,8 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -123,6 +125,7 @@ public abstract class ViewportWidget extends Table {
 
 		cameraController = new CameraController(camera);
 		cameraController.setInvert(true);
+		cameraController.setBoundsProvider(this);
 
 		addPanListener();
 		addGizmoListener();
@@ -179,6 +182,8 @@ public abstract class ViewportWidget extends Table {
 
 			Gizmo hitGizmo = null;
 
+			int countOfSameTouchDown = 0;
+
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				Vector2 hitCords = getWorldFromLocal(x, y);
@@ -199,6 +204,8 @@ public abstract class ViewportWidget extends Table {
 					if (hasEntityUnderMouse && entityUnderMouse == selection.first()) {
 						//Same shit, but lets update our gizmo
 
+						countOfSameTouchDown++;
+
 						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
 
 						if (hitGizmo != null) {
@@ -211,12 +218,16 @@ public abstract class ViewportWidget extends Table {
 
 						//We aren't over the pixel for entity, but we hit its gizmo
 						if (testGizmo != null && testGizmo.getGameObject().isVisible() && !testGizmo.getGameObject().isLocked()) {
+							countOfSameTouchDown++;
+
 							hitGizmo = testGizmo;
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 							return true;
 
 						} else {
+							countOfSameTouchDown = 0;
+
 							//We aren't over the pixel or the gizmo, unselect
 							requestSelectionClear();
 						}
@@ -265,11 +276,13 @@ public abstract class ViewportWidget extends Table {
 				if (locked) {
 					return;
 				}
-				Vector2 hitCords = getWorldFromLocal(x, y);
+				if (hitGizmo instanceof GroupSelectionGizmo || countOfSameTouchDown >= 1) {
+					Vector2 hitCords = getWorldFromLocal(x, y);
 
-				for (Gizmo gizmo : gizmos.gizmoList) {
-					if (gizmo.isSelected() && gizmo == hitGizmo) {
-						gizmo.touchDragged(hitCords.x, hitCords.y);
+					for (Gizmo gizmo : gizmos.gizmoList) {
+						if (gizmo.isSelected() && gizmo == hitGizmo) {
+							gizmo.touchDragged(hitCords.x, hitCords.y);
+						}
 					}
 				}
 

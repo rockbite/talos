@@ -6,6 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 import java.lang.reflect.Field;
@@ -14,6 +20,28 @@ import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 public class WidgetFactory {
+
+    public static PropertyWidget generateForScriptProperty(ScriptPropertyWrapper wrapper) {
+        try {
+            Field value = wrapper.getClass().getField("value");
+            if (wrapper instanceof ScriptPropertyBooleanWrapper) {
+                return generateForBoolean(wrapper, value, null, wrapper.propertyName, false);
+            } else if (wrapper instanceof ScriptPropertyIntegerWrapper) {
+                return generateForInt(wrapper, value, null, wrapper.propertyName, false);
+            } else if(wrapper instanceof ScriptPropertyFloatWrapper) {
+                return generateForFloat(wrapper, value, null, wrapper.propertyName, false);
+            }  else if(wrapper instanceof ScriptPropertyStringWrapper) {
+                return generateForString(wrapper, value, null, wrapper.propertyName);
+            } else if (wrapper instanceof ScriptPropertyGameObjectWrapper) {
+                return generateForGameObject((ScriptPropertyGameObjectWrapper) wrapper);
+            }
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static PropertyWidget generate(Object parent, String fieldName, String title) {
         try {
@@ -29,13 +57,13 @@ public class WidgetFactory {
             Object object = field.get(parent);
 
             if(field.getType().equals(boolean.class)) {
-                return generateForBoolean(parent, field, object, title);
+                return generateForBoolean(parent, field, object, title, true);
             } else if (field.getType().isEnum()) {
                 return generateForEnum(parent, field, object, title);
             } else if(field.getType().equals(int.class)) {
-                return generateForInt(parent, field, object, title);
+                return generateForInt(parent, field, object, title, true);
             } else if(field.getType().equals(float.class)) {
-                return generateForFloat(parent, field, object, title);
+                return generateForFloat(parent, field, object, title, true);
             } else if(field.getType().equals(Color.class)) {
                 return generateForColor(parent, field, object, title);
             } else if(field.getType().equals(Vector2.class)) {
@@ -119,14 +147,13 @@ public class WidgetFactory {
         return widget;
     }
 
-    private static CheckboxWidget generateForBoolean (Object parent, Field field, Object object, String title) {
+    private static CheckboxWidget generateForBoolean (Object parent, Field field, Object object, String title, boolean primitive) {
 
         CheckboxWidget widget = new CheckboxWidget(title, new Supplier<Boolean>() {
             @Override
             public Boolean get() {
                 try {
-                    Boolean val = field.getBoolean(parent);
-                    return val;
+                    return primitive ? field.getBoolean(parent) : (Boolean) field.get(parent);
                 } catch (IllegalAccessException e) {
                     return false;
                 }
@@ -186,13 +213,12 @@ public class WidgetFactory {
         return widget;
     }
 
-    private static IntPropertyWidget generateForInt (Object parent, Field field, Object object, String title) {
+    private static IntPropertyWidget generateForInt (Object parent, Field field, Object object, String title, boolean primitive) {
         IntPropertyWidget widget = new IntPropertyWidget(title, new Supplier<Integer>() {
             @Override
             public Integer get() {
                 try {
-                    Integer val = field.getInt(parent);
-                    return val;
+                    return primitive ? field.getInt(parent) : (Integer) field.get(parent);
                 } catch (IllegalAccessException e) {
                     return 0;
                 }
@@ -211,13 +237,29 @@ public class WidgetFactory {
         return widget;
     }
 
-    private static FloatPropertyWidget generateForFloat (Object parent, Field field, Object object, String title) {
+    private static GameObjectSelectWidget generateForGameObject (ScriptPropertyGameObjectWrapper wrapper) {
+        GameObjectSelectWidget widget = new GameObjectSelectWidget(wrapper.propertyName, new Supplier<GameObject>() {
+            @Override
+            public GameObject get() {
+                return wrapper.getValue();
+            }
+        }, new PropertyWidget.ValueChanged<GameObject>() {
+            @Override
+            public void report(GameObject value) {
+                wrapper.setValue(value);
+            }
+        });
+
+        return widget;
+    }
+
+
+    private static FloatPropertyWidget generateForFloat (Object parent, Field field, Object object, String title, boolean primitive) {
         FloatPropertyWidget widget = new FloatPropertyWidget(title, new Supplier<Float>() {
             @Override
-            public Float get() {
+            public Float get () {
                 try {
-                    Float val = field.getFloat(parent);
-                    return val;
+                    return primitive ? field.getFloat(parent) : (Float) field.get(parent);
                 } catch (IllegalAccessException e) {
                     return 0f;
                 }
@@ -233,7 +275,12 @@ public class WidgetFactory {
             }
         });
 
-        widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
+        if (parent instanceof ScriptPropertyFloatWrapper) {
+            ScriptPropertyFloatWrapper numberWrapper = (ScriptPropertyFloatWrapper) parent;
+            widget.configureFromValues(numberWrapper.minValue, numberWrapper.maxValue, numberWrapper.step);
+        } else {
+            widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
+        }
 
         return widget;
     }

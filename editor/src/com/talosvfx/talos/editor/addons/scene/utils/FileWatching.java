@@ -1,9 +1,10 @@
 package com.talosvfx.talos.editor.addons.scene.utils;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.events.ProjectDirectoryContentsChanged;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
 import java.io.File;
@@ -63,6 +64,7 @@ public class FileWatching {
 
             Path project = Paths.get(SceneEditorAddon.get().workspace.getProjectPath());
             directoryModification(project, this::registerDirectory);
+            directoryModification(AssetRepository.getExportedScriptsFolderHandle().file().toPath(), this::registerDirectory);
         }
     }
 
@@ -193,6 +195,14 @@ public class FileWatching {
 
     private void registerWatchActivities (WatchEvent<Path> event, File file) {
         FileHandle handle = pathToFileHandle(file);
+        String scriptFolderPath = AssetRepository.getExportedScriptsFolderHandle().path();
+
+        if (handle.path().contains(scriptFolderPath)) {
+            // a script file is changed
+            if (!SceneEditorWorkspace.getInstance().exporting) {
+                Notifications.fireEvent(Notifications.obtainEvent(ScriptFileChangedEvent.class).set(event.kind(), handle));
+            }
+        }
 
         if (changes != null) {
             if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
