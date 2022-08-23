@@ -58,8 +58,6 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -212,7 +210,7 @@ public abstract class ViewportWidget extends Table {
 						Gizmo testGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
 
 						//We aren't over the pixel for entity, but we hit its gizmo
-						if (testGizmo != null) {
+						if (testGizmo != null && testGizmo.getGameObject().isVisible() && !testGizmo.getGameObject().isLocked()) {
 							hitGizmo = testGizmo;
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
@@ -230,6 +228,9 @@ public abstract class ViewportWidget extends Table {
 
 					if (hasEntityUnderMouse) {
 						touchDownedGameObject = entityUnderMouse;
+						if(!touchDownedGameObject.active || touchDownedGameObject.isLocked()){
+							return true;
+						}
 						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, touchDownedGameObject);
 						selectGameObject(touchDownedGameObject);
 
@@ -242,7 +243,7 @@ public abstract class ViewportWidget extends Table {
 
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
-						if (hitGizmo != null) {
+						if (hitGizmo != null && hitGizmo.getGameObject().isVisible() && !hitGizmo.getGameObject().isLocked()) {
 							selectGameObject(hitGizmo.getGameObject());
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
