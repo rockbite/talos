@@ -120,27 +120,33 @@ public class GroupSelectionGizmo extends Gizmo {
 
 				}
 
-
-
-
-				if (object.hasComponent(SpriteRendererComponent.class)) {
-					SpriteRendererComponent spriteRendererComponent = object.getComponent(SpriteRendererComponent.class);
-					float x = transformComponent.worldPosition.x;
-					float y = transformComponent.worldPosition.y;
-
-					Vector2 spriteSize = spriteRendererComponent.size;
-					float spriteHeight = spriteSize.y * transformComponent.worldScale.x;
-					float spriteWidth = spriteSize.x * transformComponent.worldScale.y;
-					float halfWidth = spriteWidth / 2;
-					float halfHeight = spriteHeight / 2;
-
-					selectionBounds.ext(x - halfWidth, y - halfHeight, 0);
-					selectionBounds.ext(x - halfWidth, y + halfHeight, 0);
-					selectionBounds.ext(x + halfWidth, y - halfHeight, 0);
-					selectionBounds.ext(x + halfWidth, y + halfHeight, 0);
-				}
+				setBounds(object);
 			}
 
+		}
+	}
+
+	private void setBounds(GameObject object){
+		TransformComponent transformComponent = object.getComponent(TransformComponent.class);
+		if (object.hasComponent(SpriteRendererComponent.class)) {
+			SpriteRendererComponent spriteRendererComponent = object.getComponent(SpriteRendererComponent.class);
+			float x = transformComponent.worldPosition.x;
+			float y = transformComponent.worldPosition.y;
+
+			Vector2 spriteSize = spriteRendererComponent.size;
+			float spriteHeight = spriteSize.y * transformComponent.worldScale.x;
+			float spriteWidth = spriteSize.x * transformComponent.worldScale.y;
+			float halfWidth = spriteWidth / 2;
+			float halfHeight = spriteHeight / 2;
+
+			selectionBounds.ext(x - halfWidth, y - halfHeight, 0);
+			selectionBounds.ext(x - halfWidth, y + halfHeight, 0);
+			selectionBounds.ext(x + halfWidth, y - halfHeight, 0);
+			selectionBounds.ext(x + halfWidth, y + halfHeight, 0);
+		}else if(object.getGameObjects() !=null) {
+			for (GameObject childObject : object.getGameObjects()) {
+				setBounds(childObject);
+			}
 		}
 	}
 

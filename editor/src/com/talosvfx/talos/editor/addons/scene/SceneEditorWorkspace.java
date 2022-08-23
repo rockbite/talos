@@ -1101,7 +1101,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		ObjectSet<GameObject> gameObjects = event.get();
 
-		if (event.get().size == 1) { //Only select gizmos if one is selected
+		if (event.get().size == 1 && gameObjects.first().hasComponentType(RendererComponent.class)) { //Only select gizmos if one is selected
 			selectGizmos(gameObjects);
 		} else {
 			unselectGizmos();
