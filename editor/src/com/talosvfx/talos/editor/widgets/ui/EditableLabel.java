@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -70,12 +69,12 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         label = new Label(text, getSkin(), "default");
         label.setEllipsis(true);
-        labelCell = labelTable.add(label).growX();
+        labelCell = labelTable.add(label).width(0).growX();
 
 		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
 		TextField.TextFieldStyle style = new TextField.TextFieldStyle(textFieldStyle);
 		textField = new TextField(text, style);
-        inputTable.add(textField).growX();
+        inputTable.add(textField).width(0).growX();
 
         addListener(new ClickListener() {
 
@@ -130,17 +129,18 @@ public class EditableLabel extends Table implements ActorCloneable {
     public void setEditMode() {
         if (getStage() != null) {
             keyboardFocus = getStage().getKeyboardFocus();
+            getStage().setKeyboardFocus(textField);
         }
 
         editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        //textField.setWidth(label.getPrefWidth() + 10);
+
         textField.setText(label.getText().toString());
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();
         }
-        getStage().setKeyboardFocus(textField);
+
         textField.selectAll();
     }
 
@@ -202,7 +202,14 @@ public class EditableLabel extends Table implements ActorCloneable {
         return label;
     }
 
+    public TextField getTextField() { return textField; }
+
     public Cell<Label> getLabelCell() {
         return labelCell;
+    }
+
+    @Override
+    public float getPrefWidth () {
+        return Math.max(getTextField().getPrefWidth(), getLabelCell().getPrefWidth());
     }
 }

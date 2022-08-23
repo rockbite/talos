@@ -17,7 +17,9 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.FileOpener;
@@ -223,19 +225,13 @@ public class AssetImporter {
             TalosMain.Instance().ProjectController().loadProject(fileHandle);
             return;
         } else if (fileHandle.extension().equals("js") || fileHandle.extension().equals("ts")) {
-            //Try to find script if it exists in export
-
-            String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
-
-
-            FileHandle scriptsDir = Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
-            FileHandle targetScriptInSrc = scriptsDir.child(fileHandle.name());
+            FileHandle exportedScriptsFolderHandle = AssetRepository.getExportedScriptsFolderHandle();
+            FileHandle targetScriptInSrc = exportedScriptsFolderHandle.child(fileHandle.name());
             if (targetScriptInSrc.exists()) {
                 FileOpener.open(targetScriptInSrc.file());
             } else {
                 FileOpener.open(fileHandle.file());
             }
-
             return;
         } else if (fileHandle.extension().equals("json")) {
             FileOpener.open(fileHandle.file());
@@ -250,9 +246,9 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("tw")) {
             SceneEditorAddon.get().openApp(new TweenEditor(fileHandle), AEditorApp.AppOpenStrategy.BOTTOM_TAB);
             return;
+        } else {
+            FileOpener.open(fileHandle.file());
         }
-
-        FileOpener.open(fileHandle.file());
     }
 
     public static FileHandle get(String path) {

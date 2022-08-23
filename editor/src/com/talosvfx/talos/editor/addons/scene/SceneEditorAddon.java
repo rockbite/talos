@@ -71,6 +71,7 @@ public class SceneEditorAddon implements IAddon {
         Notifications.addEventToPool(LayerListUpdated.class);
         Notifications.addEventToPool(ProjectOpened.class);
         Notifications.addEventToPool(ProjectDirectoryContentsChanged.class);
+        Notifications.addEventToPool(ScriptFileChangedEvent.class);
         Notifications.addEventToPool(PropertyHolderEdited.class);
         Notifications.addEventToPool(AssetPathChanged.class);
     }

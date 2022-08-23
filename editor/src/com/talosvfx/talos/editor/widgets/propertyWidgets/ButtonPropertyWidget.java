@@ -75,7 +75,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         Table table = new Table();
 
         buttonLabel = new Label("Edit", skin);
-        button = new SquareButton(skin, buttonLabel);
+        button = new SquareButton(skin, buttonLabel, "Edit");
 
         table.add(button).expand().right().growX();
 

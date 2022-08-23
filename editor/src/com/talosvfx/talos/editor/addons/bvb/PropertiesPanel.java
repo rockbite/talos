@@ -50,7 +50,7 @@ public class PropertiesPanel extends Table {
         reconstruct();
     }
 
-    private void reconstruct () {
+    public void reconstruct () {
         propertyGroup.clear();
         propertyWidgets.clear();
         propertyGroup.top().left();
