@@ -30,6 +30,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private String prefabLink = null;
 
     public boolean active = true;
+    private boolean locked = false;
+    private boolean visible = true;
 
     private Array<GameObject> children;
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
@@ -74,6 +76,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
         json.writeValue("active", active);
+        json.writeValue("visible", visible);
+        json.writeValue("locked", locked);
 
         json.writeArrayStart("components");
         for(AComponent component: components) {
@@ -100,6 +104,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
         prefabLink = jsonData.getString("prefabLink", null);
         active = jsonData.getBoolean("active", this.active);
+        locked = jsonData.getBoolean("locked", this.locked);
+        visible = jsonData.getBoolean("visible", this.visible);
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
@@ -452,5 +458,31 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         return null;
+    }
+
+    public void setVisible(boolean visible){
+        this.visible = visible;
+        if(children !=null) {
+            for (GameObject child : children) {
+                child.setVisible(visible);
+            }
+        }
+    }
+
+    public boolean isVisible(){
+        return visible;
+    }
+
+    public void setLocked(boolean locked){
+        this.locked = locked;
+        if(children !=null) {
+            for (GameObject child : children) {
+                child.setLocked(locked);
+            }
+        }
+    }
+
+    public boolean isLocked(){
+        return locked;
     }
 }

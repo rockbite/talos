@@ -105,6 +105,10 @@ public class FilteredTree<T> extends WidgetGroup {
 
         }
 
+        public void mouseMoved (Node<T> node) {
+
+        }
+
         public void delete (Array<FilteredTree.Node<T>> nodes) {
 
         }
@@ -329,7 +333,11 @@ public class FilteredTree<T> extends WidgetGroup {
 
             public boolean mouseMoved (InputEvent event, float x, float y) {
                 setOverNode(getNodeAt(y));
-                return false;
+                for (ItemListener<T> itemListener : itemListeners) {
+                    itemListener.mouseMoved(getNodeAt(y));
+                }
+
+                return true;
             }
 
             public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
