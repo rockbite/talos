@@ -24,6 +24,8 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.nodes.NodeBoard;
+import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 
@@ -42,6 +44,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     private Array<String> removeList = new Array<>();
     protected ObjectMap<String, GenericTweenData> dataMap = new ObjectMap<>();
+    private boolean minimized = false;
 
     protected class GenericTweenData {
         public float chunkIndex;
@@ -328,6 +331,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     public void animateShow() {
 
+        minimized = false;
+
         setTransform(true);
         setVisible(true);
         clearActions();
@@ -359,6 +364,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
     }
 
     public void animateHide() {
+
+        minimized = true;
 
         setTransform(true);
         setVisible(true);
@@ -774,6 +781,24 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         public void setLabel(String string) {
             label.setText(string);
         }
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonValue) {
+        super.read(json, jsonValue);
+
+        minimized = jsonValue.getBoolean("minimized", false);
+
+        if(minimized) {
+            setMini();
+        }
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+
+        json.writeValue("minimized", minimized);
     }
 }
 
