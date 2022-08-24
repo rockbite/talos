@@ -526,6 +526,7 @@ public class ProjectExplorerWidget extends Table {
 
                 RowWidget widget = new RowWidget(listItemHandle);
                 EditableLabel label = widget.getLabel();
+                label.getTextField().setTextFieldFilter(AssetRepository.ASSET_NAME_FIELD_FILTER);
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
 
                 if (listItemHandle.isDirectory()) {

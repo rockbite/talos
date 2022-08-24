@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
@@ -37,12 +38,10 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.serialization.MetaData;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -50,13 +49,16 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.getMetadataHandleFor;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
 import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
 import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
 public class AssetRepository implements Notifications.Observer {
+
+	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 
@@ -990,48 +992,29 @@ public class AssetRepository implements Notifications.Observer {
 	}
 
 	public void copyRawAsset (FileHandle file, FileHandle directory) {
+		String fileName = file.name();
+		if (directory.child(fileName).exists()) {
+			fileName = suggestNewName(file, directory);
+		}
+		// do not allow stupid characters
+		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
+		Matcher matcher = pattern.matcher(fileName);
+		fileName = matcher.replaceAll("_");
+		FileHandle dest = directory.child(fileName);
+		if (file.isDirectory()) { // recursively copy directory and its contents
+			FileHandle[] list = file.list();
+			//Change the destination and copy all its children into the new destination
+			dest.mkdirs();
+			for (FileHandle fileHandle : list) {
+				if (fileHandle.extension().equals("meta")) continue; //Don't copy meta
 
-		if (directory.child(file.name()).exists()) {
-
-			//The file needs to be renamed before copying
-			String name = suggestNewName(file, directory);
-
-			if (file.isDirectory()) {
-				FileHandle[] list = file.list();
-
-				//Change the destination and copy all its children into the new destination
-				directory = directory.child(name);
-				directory.mkdirs();
-
-				for (FileHandle fileHandle : list) {
-					if (fileHandle.extension().equals("meta")) continue; //Don't copy meta
-
-					fileHandle.copyTo(directory);
-				}
-
-			} else {
-				directory = directory.child(name);
-
-				//Its a file, so we just change the name and use copyTo
-				file.copyTo(directory);
+				copyRawAsset(fileHandle, dest);
 			}
-		} else {
-			//Its just a copy to destination
-
-			if (file.isDirectory()) {
-				FileHandle[] list = file.list();//Get the list before making the directory to make sure its excluded
-				FileHandle dest = directory.child(file.name());
-				dest.mkdirs();
-				for (FileHandle fileHandle : list) {
-					if (fileHandle.extension().equals("meta")) continue; //Don't copy meta
-					fileHandle.copyTo(dest);
-				}
-			} else {
-				file.copyTo(directory);
-			}
+		} else { // single file
+			file.copyTo(dest);
 		}
 
-		collectRawResourceFromDirectory(directory, true);
+		collectRawResourceFromDirectory(dest, true);
 	}
 
 	private static String suggestNewName (FileHandle file, FileHandle directory) {
@@ -1274,6 +1257,22 @@ public class AssetRepository implements Notifications.Observer {
 			throw new RuntimeException(e);
 		}
 		return assetTypeFromExtension.isRootGameAsset();
+	}
+
+	private static class AssetNameFieldFilter implements TextField.TextFieldFilter {
+
+		@Override
+		public boolean acceptChar(TextField textField, char c) {
+			return !(c == '/'
+					|| c == '?'
+					|| c == '<'
+					|| c == '>'
+					|| c == '\\'
+					|| c == ':'
+					|| c == '*'
+					|| c == '|'
+					|| c == '"');
+		}
 	}
 
 }
