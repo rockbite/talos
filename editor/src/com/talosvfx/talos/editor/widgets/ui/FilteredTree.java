@@ -298,6 +298,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
                 Node<T> node = getNodeAt(y);
                 if (itemListeners.size > 0) {
                     if (button == 1) {
@@ -842,12 +843,12 @@ public class FilteredTree<T> extends WidgetGroup {
         for (int i = 0; i < nodes.size; i++) {
             if (nodes.get(i).filterPositive()) {
                 nodes.get(i).node.filtered = false;
-                nodes.get(i).node.actor.setVisible(true);
+                nodes.get(i).node.setVisible(true);
                 setAllParentsNotFiltered(nodes.get(i).node);
                 setAllChildrenNotFiltered(nodes.get(i).node);
             } else {
                 nodes.get(i).node.filtered = true;
-                nodes.get(i).node.actor.setVisible(false);
+                nodes.get(i).node.setVisible(false);
             }
         }
     }
@@ -867,12 +868,12 @@ public class FilteredTree<T> extends WidgetGroup {
             if (predicate.evaluate(testNode)) {
                 filter(testNode.children, predicate);
                 testNode.filtered = false;
-                testNode.actor.setVisible(true);
+                testNode.setVisible(true);
                 setAllParentsNotFiltered(nodes.get(i));
                 setAllChildrenNotFiltered(nodes.get(i));
             } else {
                 testNode.filtered = true;
-                testNode.actor.setVisible(false);
+                testNode.setVisible(false);
                 filter(testNode.children, predicate);
             }
         }
@@ -887,12 +888,12 @@ public class FilteredTree<T> extends WidgetGroup {
                 filter(nodes.get(i).children, filter, endsWithLogic);
 
                 nodes.get(i).filtered = false;
-                nodes.get(i).actor.setVisible(true);
+                nodes.get(i).setVisible(true);
                 setAllParentsNotFiltered(nodes.get(i));
                 setAllChildrenNotFiltered(nodes.get(i));
             } else {
                 nodes.get(i).filtered = true;
-                nodes.get(i).actor.setVisible(false);
+                nodes.get(i).setVisible(false);
                 filter(nodes.get(i).children, filter, endsWithLogic);
             }
 
@@ -902,7 +903,7 @@ public class FilteredTree<T> extends WidgetGroup {
     private void setAllChildrenNotFiltered (Node<T> node) {
         for (int i = 0; i < node.children.size; i++) {
             node.children.get(i).filtered = false;
-            node.children.get(i).actor.setVisible(true);
+            node.children.get(i).setVisible(true);
             setAllChildrenNotFiltered(node.children.get(i));
         }
     }
@@ -911,7 +912,7 @@ public class FilteredTree<T> extends WidgetGroup {
         Node parent;
         while ((parent = node.parent) != null) {
             parent.filtered = false;
-            parent.actor.setVisible(true);
+            parent.setVisible(true);
             node = parent;
         }
     }
@@ -923,13 +924,20 @@ public class FilteredTree<T> extends WidgetGroup {
             if (node.filtered)
                 continue;
             float x = indent;
-            if (node.icon != null)
+            if (node.icon != null) {
                 x += node.icon.getMinWidth();
+            }
             y -= node.height;
+
+            if (node.companionActor != null) {
+                node.companionActor.setPosition(0, y); //Always left aligned
+                x += node.companionActor.getWidth();
+            }
             node.actor.setPosition(x, y);
             y -= ySpacing;
-            if (node.expanded)
+            if (node.expanded) {
                 y = layout(node.children, indent + indentSpacing, y);
+            }
         }
         return y;
     }
@@ -937,8 +945,21 @@ public class FilteredTree<T> extends WidgetGroup {
     public void draw (Batch batch, float parentAlpha) {
         Color color = getColor();
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
-        if (style.background != null)
+        if (style.background != null) {
             style.background.draw(batch, getX(), getY(), getWidth(), getHeight());
+        }
+        //If we got a companion, lets draw its background
+        if (!rootNodes.isEmpty()) {
+            if (rootNodes.first().companionActor != null) {
+                float companionWidth = rootNodes.first().companionActor.getWidth();
+
+                if (style.companionBackground != null) {
+                    style.companionBackground.draw(batch, getX(), getY(), companionWidth, getHeight());
+                }
+
+            }
+        }
+
         draw(batch, rootNodes, leftColumnWidth);
         super.draw(batch, parentAlpha); // Draw actors.
     }
@@ -986,7 +1007,11 @@ public class FilteredTree<T> extends WidgetGroup {
 
             Drawable expandIcon = node.expanded ? minus : plus;
             float iconY = actor.getY() + Math.round((node.height - expandIcon.getMinHeight()) / 2);
-            expandIcon.draw(batch, x + indent - iconSpacingLeft, y + iconY, expandIcon.getMinWidth(), expandIcon.getMinHeight());
+            float offsetDueToCompanion = 0;
+            if (node.companionActor != null) {
+                offsetDueToCompanion += node.companionActor.getWidth();
+            }
+            expandIcon.draw(batch, x + indent - iconSpacingLeft + offsetDueToCompanion, y + iconY, expandIcon.getMinWidth(), expandIcon.getMinHeight());
             if (node.expanded)
                 draw(batch, node.children, indent + indentSpacing);
         }
@@ -1069,7 +1094,13 @@ public class FilteredTree<T> extends WidgetGroup {
      * @param overNode May be null.
      */
     public void setOverNode (Node overNode) {
+        if (this.overNode != null) {
+            this.overNode.over = false;
+        }
         this.overNode = overNode;
+        if (this.overNode != null) {
+            this.overNode.over = true;
+        }
     }
 
     /**
@@ -1220,6 +1251,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     static public class Node<T> {
         final Actor actor;
+        Actor companionActor;
         Node<T> parent;
         public final Array<Node<T>> children = new Array<>(0);
         boolean selectable = true;
@@ -1235,12 +1267,17 @@ public class FilteredTree<T> extends WidgetGroup {
         public boolean draggableInLayerOnly;
 
         public boolean canDelete = true;
+        public boolean over;
 
         public Node (String name, Actor actor) {
             if (actor == null)
                 throw new IllegalArgumentException("actor cannot be null.");
             this.name = name;
             this.actor = actor;
+        }
+
+        public void setCompanionActor (Actor companionActor) {
+            this.companionActor = companionActor;
         }
 
         public void setExpanded (boolean expanded) {
@@ -1267,6 +1304,9 @@ public class FilteredTree<T> extends WidgetGroup {
          */
         protected void addToTree (FilteredTree tree) {
             tree.addActor(actor);
+            if (companionActor != null) {
+                tree.addActor(companionActor);
+            }
             if (!expanded)
                 return;
             for (int i = 0, n = children.size; i < n; i++)
@@ -1278,6 +1318,9 @@ public class FilteredTree<T> extends WidgetGroup {
          */
         protected void removeFromTree (FilteredTree tree) {
             tree.removeActor(actor);
+            if (companionActor != null) {
+                tree.removeActor(companionActor);
+            }
             if (!expanded)
                 return;
             Object[] children = this.children.items;
@@ -1468,6 +1511,13 @@ public class FilteredTree<T> extends WidgetGroup {
         public String getName () {
             return name;
         }
+
+        public void setVisible (boolean visible) {
+            this.actor.setVisible(visible);
+            if (this.companionActor != null) {
+                this.companionActor.setVisible(visible);
+            }
+        }
     }
 
     /**
@@ -1480,7 +1530,7 @@ public class FilteredTree<T> extends WidgetGroup {
         /**
          * Optional.
          */
-        public Drawable over, selection, background, underline;
+        public Drawable over, selection, background, companionBackground, underline;
 
         public TreeStyle () {
         }

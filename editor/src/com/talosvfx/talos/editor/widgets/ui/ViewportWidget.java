@@ -58,8 +58,6 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -239,7 +237,7 @@ public abstract class ViewportWidget extends Table {
 
 					if (hasEntityUnderMouse) {
 						touchDownedGameObject = entityUnderMouse;
-						if(!touchDownedGameObject.active || touchDownedGameObject.isLocked()){
+						if(!touchDownedGameObject.active || touchDownedGameObject.isEditorTransformLocked()){
 							return true;
 						}
 						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, touchDownedGameObject);
@@ -351,8 +349,8 @@ public abstract class ViewportWidget extends Table {
 		if (testGizmo == null) return false;
 		if (testGizmo instanceof GroupSelectionGizmo) return true;
 
-		if (!testGizmo.getGameObject().isVisible()) return false;
-		if (testGizmo.getGameObject().isLocked()) return false;
+		if (!testGizmo.getGameObject().isEditorVisible()) return false;
+		if (testGizmo.getGameObject().isEditorTransformLocked()) return false;
 
 		return true;
 	}

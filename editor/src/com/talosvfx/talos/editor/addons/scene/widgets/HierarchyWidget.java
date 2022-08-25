@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -37,10 +38,6 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
     private ContextualMenu contextualMenu;
 
-    private FilteredTree.Node<GameObject> lastOveredNode;
-    private final Table toolsWidget;
-    private final ImageButton eyeButton;
-    private final ImageButton handButton;
 
     public HierarchyWidget() {
         tree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
@@ -129,63 +126,103 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
             @Override
             public void mouseMoved(FilteredTree.Node<GameObject> node) {
-                if (lastOveredNode != null) {
-                    ((Table) lastOveredNode.getActor()).getChild(0).remove();
-                    lastOveredNode = null;
-                }
 
-                if (node != null) {
-                    Table table = (Table) node.getActor();
-                    Actor editableLabel = table.getChild(0);
-                    table.clearChildren();
-                    table.add(toolsWidget);
-                    table.add(editableLabel);
-                    eyeButton.getColor().a = (!node.getObject().isVisible()) ? 0.3f : 1f;
-                    handButton.getColor().a = (node.getObject().isLocked()) ? 0.3f : 1f;
-                    lastOveredNode = node;
-                }
             }
         });
 
         Notifications.registerObserver(this);
 
 
-        toolsWidget = new Table();
-        eyeButton = new ImageButton(TalosMain.Instance().getSkin().getDrawable("timeline-icon-eye"));
+    }
+
+    private Actor createToolsForNode (FilteredTree.Node<GameObject> node) {
+        GameObject gameObject = node.getObject();
+        Table toolsWidget;
+        ImageButton eyeButton;
+        ImageButton handButton;
+
+        Drawable openEyeDrawable = TalosMain.Instance().getSkin().getDrawable("timeline-icon-eye");
+        Drawable closedEyeDrawable = TalosMain.Instance().getSkin().getDrawable("timeline-icon-eye-closed");
+
+        eyeButton = new ImageButton(openEyeDrawable);
         eyeButton.setColor(new Color(Color.WHITE));
 
         handButton = new ImageButton(TalosMain.Instance().getSkin().getDrawable("hand-cursor"));
         handButton.setColor(new Color(Color.WHITE));
 
+        toolsWidget = new Table() {
+            @Override
+            public void act (float delta) {
+                super.act(delta);
+                //Update from game object
+
+                boolean hovered = node.over;
+
+                if (!gameObject.isEditorVisible()) {
+                    eyeButton.getStyle().imageUp = closedEyeDrawable;
+
+                    if (eyeButton.isOver()) {
+                        eyeButton.getColor().a = 1;
+                    } else {
+                        eyeButton.getColor().a = 1;
+                    }
+                } else {
+                    if (eyeButton.isOver() || hovered) {
+                        eyeButton.getStyle().imageUp = openEyeDrawable;
+                        eyeButton.getColor().a = 1f;
+                    } else {
+                        eyeButton.getColor().a = 0;
+                    }
+                }
+
+                if (gameObject.isEditorTransformLocked()) {
+                    if (handButton.isOver() || hovered) {
+                        handButton.getColor().a = 0.6f;
+                    } else {
+                        handButton.getColor().a = 0.3f;
+                    }
+                } else {
+                    if (handButton.isOver() || hovered) {
+                        handButton.getColor().a = 1f;
+                    } else {
+                        handButton.getColor().a = 0;
+                    }
+                }
+
+
+            }
+        };
+
         toolsWidget.add(eyeButton).size(15,15).padRight(2);
         toolsWidget.add(handButton).size(15,15).padRight(5);
 
 
-        eyeButton.addListener(new ClickListener(){
+        eyeButton.addListener(new ClickListener() {
+
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if(lastOveredNode != null){
-                    lastOveredNode.getObject().setVisible(!lastOveredNode.getObject().isVisible());
-                    eyeButton.getColor().a = (!lastOveredNode.getObject().isVisible()) ? 0.3f : 1f;
-                    boolean isLabelVisible = lastOveredNode.getObject().isVisible() && !lastOveredNode.getObject().isLocked();
-                    ((Table) lastOveredNode.getActor()).getChild(1).getColor().a = (isLabelVisible) ? 1 : 0.5f;
-                }
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                event.stop();
+                gameObject.setEditorVisible(!gameObject.isEditorVisible());
+
+                return true;
+            }
+
+
+        });
+
+        handButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                event.stop();
+                gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
+
+                return true;
             }
         });
 
-        handButton.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if(lastOveredNode != null){
-                    lastOveredNode.getObject().setLocked(!lastOveredNode.getObject().isLocked());
-                    handButton.getColor().a = (lastOveredNode.getObject().isLocked()) ? 0.3f : 1f;
-                    boolean isLabelVisible = lastOveredNode.getObject().isVisible() && !lastOveredNode.getObject().isLocked();
-                    ((Table) lastOveredNode.getActor()).getChild(1).getColor().a = (isLabelVisible) ? 1 : 0.5f;
-                }
-            }
-        });
+        toolsWidget.pack();
+
+        return toolsWidget;
     }
 
     private void showContextMenu (GameObject gameObject) {
@@ -361,9 +398,10 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         objectMap.clear();
         nodeMap.clear();
 
-        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root",makeHierarchyWidgetActor( new Label(entityContainer.getName(), TalosMain.Instance().getSkin()), entityContainer.getSelfObject()));
-        parent.setSelectable(false);
+        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(entityContainer.getName(), TalosMain.Instance().getSkin()), entityContainer.getSelfObject()));
         parent.setObject(new GameObject());
+        parent.setCompanionActor(createToolsForNode(parent));
+        parent.setSelectable(false);
 
         traverseEntityContainer(entityContainer, parent);
 
@@ -386,6 +424,8 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
             FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), makeHierarchyWidgetActor(editableLabel, gameObject));
             newNode.setObject(gameObject);
+            newNode.setCompanionActor(createToolsForNode(newNode));
+
             newNode.draggable = true;
             node.add(newNode);
 
@@ -414,7 +454,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             editableLabel.setColor(1, 0, 0, 1);
         }
 
-        if(!gameObject.isVisible() || gameObject.isLocked()){
+        if(!gameObject.isEditorVisible() || gameObject.isEditorTransformLocked()){
             editableLabel.getColor().a = 0.5f;
         }else{
             editableLabel.getColor().a = 1f;
