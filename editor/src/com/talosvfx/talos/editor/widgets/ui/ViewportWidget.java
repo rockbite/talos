@@ -217,7 +217,7 @@ public abstract class ViewportWidget extends Table {
 						Gizmo testGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
 
 						//We aren't over the pixel for entity, but we hit its gizmo
-						if (testGizmo != null && testGizmo.getGameObject().isVisible() && !testGizmo.getGameObject().isLocked()) {
+						if (canTouchGizmo(testGizmo)) {
 							countOfSameTouchDown++;
 
 							hitGizmo = testGizmo;
@@ -254,7 +254,7 @@ public abstract class ViewportWidget extends Table {
 
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
-						if (hitGizmo != null && hitGizmo.getGameObject().isVisible() && !hitGizmo.getGameObject().isLocked()) {
+						if (canTouchGizmo(hitGizmo)) {
 							selectGameObject(hitGizmo.getGameObject());
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
@@ -345,6 +345,16 @@ public abstract class ViewportWidget extends Table {
 
 		addListener(gizmoListener);
 		return gizmoListener;
+	}
+
+	private boolean canTouchGizmo (Gizmo testGizmo) {
+		if (testGizmo == null) return false;
+		if (testGizmo instanceof GroupSelectionGizmo) return true;
+
+		if (!testGizmo.getGameObject().isVisible()) return false;
+		if (testGizmo.getGameObject().isLocked()) return false;
+
+		return true;
 	}
 
 	private void removeGizmos () {
