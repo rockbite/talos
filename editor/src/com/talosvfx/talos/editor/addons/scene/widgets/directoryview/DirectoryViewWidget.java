@@ -222,6 +222,7 @@ public class DirectoryViewWidget extends Table {
         Stack stack = new Stack(scrollPane, emptyFolderTable);
         add(stack).grow().height(0).row();
         Slider slider = new Slider(50, 125, 1, false, TalosMain.Instance().getSkin());
+
         slider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -230,6 +231,10 @@ public class DirectoryViewWidget extends Table {
             }
         });
         add(slider).width(125).pad(5, 10, 5, 10).expandX().right();
+
+        slider.setValue(50f + (125 - 50)/2f);
+        items.setCellSize(slider.getValue());
+        items.invalidateHierarchy();
     }
 
     private void reportSelectionChanged() {
