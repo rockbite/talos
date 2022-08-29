@@ -1406,7 +1406,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			@Override
 			public void run () {
 				for (AComponent component : list) {
-					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false, true));
+					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
 				}
 			}
 		});

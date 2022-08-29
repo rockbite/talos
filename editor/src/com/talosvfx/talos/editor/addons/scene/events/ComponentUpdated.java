@@ -33,6 +33,10 @@ public class ComponentUpdated implements Notifications.Event {
         return set(component, false, true);
     }
 
+    public Notifications.Event set (AComponent component, boolean rapid) {
+        return set(component, rapid, true);
+    }
+
     public AComponent getComponent () {
         return component;
     }

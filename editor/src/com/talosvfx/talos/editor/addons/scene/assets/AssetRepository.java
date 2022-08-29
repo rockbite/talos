@@ -875,7 +875,7 @@ public class AssetRepository implements Notifications.Observer {
 				@Override
 				public void run () {
 					for (ScriptComponent updatedComponent : updatedComponents) {
-						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false, true));
+						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
 					}
 				}
 			});

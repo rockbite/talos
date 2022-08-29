@@ -135,7 +135,7 @@ public class TransformGizmo extends Gizmo {
 
         wasDragged = true;
 
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, true, true));
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, true));
     }
 
     @Override

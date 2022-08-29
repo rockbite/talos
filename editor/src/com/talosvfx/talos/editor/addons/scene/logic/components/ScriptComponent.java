@@ -87,7 +87,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run () {
-                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false, true));
+                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false));
             }
         });
     }
