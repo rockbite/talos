@@ -338,7 +338,8 @@ public class ProjectExplorerWidget extends Table {
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
                             select(newNode.getParent());
-//                            directoryViewWidgetNew.reload();
+                            // TODO: refactor directory view widget to update itself
+                            select(getCurrentFolder().path());
 //                            directoryViewWidgetNew.startRenameFor(newHandle);
                         }
                     }
@@ -352,7 +353,8 @@ public class ProjectExplorerWidget extends Table {
                     FileHandle sceneDestination = AssetImporter.suggestNewName(path, "New Scene", "scn");
                     Scene mainScene = new Scene(sceneDestination.path());
                     mainScene.save();
-//                    directoryViewWidgetNew.reload();
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
                 }
             });
 
@@ -376,7 +378,8 @@ public class ProjectExplorerWidget extends Table {
 
 
 
-//                    directoryViewWidgetNew.reload();
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
                 }
             });
 
@@ -396,7 +399,8 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-//                    directoryViewWidgetNew.reload();
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
                 }
             });
 
@@ -412,7 +416,8 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
 
 
-//                    directoryViewWidgetNew.reload();
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
                 }
             });
 
@@ -429,7 +434,8 @@ public class ProjectExplorerWidget extends Table {
                     AssetRepository.getInstance().rawAssetCreated(newPaletteDestination, true);
 
 
-//                    directoryViewWidgetNew.reload();
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
                 }
             });
 
@@ -579,7 +585,8 @@ public class ProjectExplorerWidget extends Table {
     }
 
     public void reload () {
-//        directoryViewWidgetNew.reload();
+        // TODO: refactor directory view widget to update itself
+        select(getCurrentFolder().path());
     }
 
     public static class RowWidget extends Table implements ActorCloneable<RowWidget> {
