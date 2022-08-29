@@ -14,14 +14,23 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.socket.SocketServer;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IntPropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.io.File;
+import java.net.Socket;
+import java.util.function.Supplier;
 
 public class SettingsDialog extends VisWindow {
 
     private Table exportInlineContainer;
     private TextField exportScriptPathField;
     private SelectBox<String> selectBox;
+
+    private int serverPort = SocketServer.SERVER_PORT;
+
+    private IntPropertyWidget serverPortWidget;
 
     public SettingsDialog() {
         super("Project Settings");
@@ -108,10 +117,14 @@ public class SettingsDialog extends VisWindow {
         String[] labels = new String[] {"Default", "Custom Script"};
         selectBox.setItems(labels);
         add(selectBox).width(400).pad(10);
+
         row();
 
         exportInlineContainer = new Table();
         add(exportInlineContainer);
+        row();
+
+        addServerPortSettings();
         row();
 
         TextButton saveButton = new TextButton("Save", getSkin());
@@ -142,11 +155,35 @@ public class SettingsDialog extends VisWindow {
         });
     }
 
+    @Override
+    public VisWindow fadeIn (float fadeTime) {
+        serverPort = SocketServer.SERVER_PORT;
+        serverPortWidget.setValue(serverPort);
+        return super.fadeIn(fadeTime);
+    }
+
+    private void addServerPortSettings () {
+        serverPortWidget = new IntPropertyWidget("Server Port", new Supplier<Integer>() {
+            @Override
+            public Integer get () {
+                return serverPort;
+            }
+        }, new PropertyWidget.ValueChanged<Integer>() {
+            @Override
+            public void report (Integer value) {
+                serverPort = value;
+            }
+        });
+
+        add(serverPortWidget).pad(5).growX();
+    }
+
 
     private void save() {
         String selected = selectBox.getSelected();
 
         TalosMain.Instance().Prefs().putString("exportType", selected);
+        TalosMain.Instance().Prefs().putInteger("serverPort", serverPort);
 
         if(selected.equals("Default")) {
             TalosMain.Instance().Prefs().remove("sceneEditorExportScriptPath");
@@ -170,6 +207,11 @@ public class SettingsDialog extends VisWindow {
                     TalosMain.Instance().Prefs().putString("sceneEditorExportScriptPath", path);
                 }
             }
+        }
+
+        if (serverPort != SocketServer.SERVER_PORT) {
+            SocketServer.SERVER_PORT = serverPort;
+            SocketServer.restartServer();
         }
 
         TalosMain.Instance().Prefs().flush();

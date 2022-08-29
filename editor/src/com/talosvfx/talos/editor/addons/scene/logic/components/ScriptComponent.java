@@ -47,6 +47,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
         for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
             PropertyWidget generate = WidgetFactory.generateForScriptProperty(scriptProperty);
+            generate.setParent(this);
             properties.add(generate);
         }
 
@@ -86,7 +87,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run () {
-                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false));
+                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false, true));
             }
         });
     }

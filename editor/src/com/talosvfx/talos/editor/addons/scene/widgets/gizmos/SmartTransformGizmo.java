@@ -225,7 +225,7 @@ public class SmartTransformGizmo extends Gizmo {
 
     protected void reportResizeUpdated(boolean isRapid) {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid, true));
     }
 
     private void applyRotationChange(float x, float y) {
@@ -470,12 +470,12 @@ public class SmartTransformGizmo extends Gizmo {
                     gameObject.getComponent(SpriteRendererComponent.class).orderingInLayer = otherOrder;
                     objectToSwap.getComponent(SpriteRendererComponent.class).orderingInLayer = tempSwap;
 
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(objectToSwap.getComponent(SpriteRendererComponent.class), false));
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false, true));
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(objectToSwap.getComponent(SpriteRendererComponent.class), false, true));
                 } else {
                     //Nothing found, so we can just set it
                     component.orderingInLayer = MathUtils.clamp(currentOrderInLayer + direction, 0, list.size);
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false, true));
                 }
 
 

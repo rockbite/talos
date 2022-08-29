@@ -89,10 +89,10 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 	@Override
 	protected void reportResizeUpdated (boolean isRapid) {
 		TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid, true));
 
 		CameraComponent camera = gameObject.getComponent(CameraComponent.class);
-		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(camera, isRapid));
+		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(camera, isRapid, true));
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
@@ -43,6 +44,7 @@ import com.talosvfx.talos.editor.utils.GridDrawer;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardWatchEventKinds;
@@ -98,6 +100,35 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public MainRenderer getUISceneRenderer () {
 		return uiSceneRenderer;
+	}
+
+	public GameObject getGOWith (AComponent component) {
+		return getChildHavingComponent(getRootGO(), component);
+	}
+
+	public GameObject getChildHavingComponent (GameObject root, AComponent component) {
+		if (root.hasComponent(component.getClass())) {
+			AComponent aComponent = root.getComponent(component.getClass());
+			if (aComponent == component) {
+				return root;
+			}
+		}
+
+		Array<GameObject> children = root.getGameObjects();
+
+		if (children == null) {
+			return null;
+		}
+
+		for (int i = 0; i < children.size; i++) {
+			GameObject child = children.get(i);
+			GameObject childHavingComponent = getChildHavingComponent(child, component);
+			if (childHavingComponent != null) {
+				return childHavingComponent;
+			}
+		}
+
+		return null;
 	}
 
 
@@ -1086,10 +1117,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onComponentUpdated (ComponentUpdated event) {
 		AComponent component = event.getComponent();
-		sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
+		if (event.isNotifyUI()) {
+			sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
 
-		if (!event.wasRapid()) {
-			TalosMain.Instance().ProjectController().setDirty();
+			if (!event.wasRapid()) {
+				TalosMain.Instance().ProjectController().setDirty();
+			}
 		}
 	}
 
@@ -1330,6 +1363,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onPropertyHolderEdited (PropertyHolderEdited event) {
+		Object parentOfPropertyHolder = event.parentOfPropertyHolder;
+		if (parentOfPropertyHolder instanceof AComponent) {
+			ComponentUpdated componentUpdatedEvent = Notifications.obtainEvent(ComponentUpdated.class);
+			componentUpdatedEvent.set(((AComponent) parentOfPropertyHolder), event.fastChange, false);
+			Notifications.fireEvent(componentUpdatedEvent);
+		}
+
 		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
 		if (currentHolder != null) {
 			if (currentHolder instanceof MultiPropertyHolder) {
@@ -1366,7 +1406,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			@Override
 			public void run () {
 				for (AComponent component : list) {
-					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false, true));
 				}
 			}
 		});

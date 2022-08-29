@@ -135,10 +135,10 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
     @Override
     protected void reportResizeUpdated (boolean isRapid) {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid, true));
 
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(spriteRendererComponent, isRapid));
+        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(spriteRendererComponent, isRapid, true));
     }
 
 

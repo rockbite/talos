@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {

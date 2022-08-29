@@ -169,8 +169,12 @@ public class AssetRepository implements Notifications.Observer {
 	private void loadChangesFromScripts(Function<Path, FileVisitResult> function) {
 
 		FileHandle exportedScriptsFolderHandle = getExportedScriptsFolderHandle();
+		if (!exportedScriptsFolderHandle.exists()) {
+			return;
+		}
 		try {
-			Files.walkFileTree(exportedScriptsFolderHandle.file().toPath(), new SimpleFileVisitor<Path>() {
+			Path exportPath = exportedScriptsFolderHandle.file().toPath();
+			Files.walkFileTree(exportPath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile (Path file, BasicFileAttributes attrs) throws IOException {
 					return function.apply(file);
@@ -869,7 +873,7 @@ public class AssetRepository implements Notifications.Observer {
 				@Override
 				public void run () {
 					for (ScriptComponent updatedComponent : updatedComponents) {
-						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false, true));
 					}
 				}
 			});

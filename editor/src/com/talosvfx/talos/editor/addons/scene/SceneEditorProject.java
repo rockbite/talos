@@ -9,8 +9,10 @@ import com.talosvfx.talos.editor.addons.scene.events.ProjectOpened;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.socket.SocketServer;
 
 import java.io.File;
+import java.net.Socket;
 
 public class SceneEditorProject implements IProject {
 
@@ -22,6 +24,7 @@ public class SceneEditorProject implements IProject {
 
     @Override
     public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
+        SocketServer.getInstance();
         Json json = new Json();
         JsonValue jsonValue = new JsonReader().parse(data);
 
