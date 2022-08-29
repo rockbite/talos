@@ -6,8 +6,6 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
-import java.awt.geom.NoninvertibleTransformException;
-
 public class ComponentUpdated implements Notifications.Event {
 
     private AComponent component;
