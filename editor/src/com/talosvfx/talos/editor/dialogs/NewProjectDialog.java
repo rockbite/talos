@@ -70,7 +70,9 @@ public class NewProjectDialog extends VisWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if (parentPathField.getText().isEmpty()) {
+                String pathText = parentPathField.getText();
+                FileHandle fileHandle = new FileHandle(pathText);
+                if (!fileHandle.exists()) {
                     showFolderSelect();
                 } else {
                     save();
@@ -104,7 +106,6 @@ public class NewProjectDialog extends VisWindow {
 
         inputTable.add(new Label("Create project directory in: ", getSkin())).width(220);
         parentPathField = new TextField("", getSkin());
-        parentPathField.setDisabled(true);
         inputTable.add(parentPathField).padLeft(13).width(270);
         TextButton browseInputBtn = new TextButton("Browse", getSkin());
         inputTable.add(browseInputBtn).padLeft(3);
