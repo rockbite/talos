@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOption;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.util.UUID;
@@ -71,5 +72,10 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
     @Override
     public void read (Json json, JsonValue jsonData) {
         uuid = UUID.fromString(jsonData.getString("uuid"));
+    }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
     }
 }

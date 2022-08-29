@@ -143,4 +143,9 @@ public class Scene extends SavableContainer implements IPropertyProvider {
     public int getPriority () {
         return 0;
     }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
+    }
 }

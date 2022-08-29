@@ -20,12 +20,15 @@ import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOptionType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.util.function.Supplier;
 
 public class ParticleComponent extends RendererComponent implements GameResourceOwner<ParticleEffectDescriptor> {
+
+    private GameAsset<ParticleEffectDescriptor> defaultGameAsset;
 
     public GameAsset<ParticleEffectDescriptor> gameAsset;
     @Override
@@ -134,6 +137,8 @@ public class ParticleComponent extends RendererComponent implements GameResource
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+        }else{
+            this.defaultGameAsset = newGameAsset;
         }
 
         this.gameAsset = newGameAsset;
@@ -155,6 +160,21 @@ public class ParticleComponent extends RendererComponent implements GameResource
 
             boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
             boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+        }
+    }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        if(defaultGameAsset!=null) {
+            setGameAsset(defaultGameAsset);
+        }else{
+            gameAsset = null;
         }
     }
 }

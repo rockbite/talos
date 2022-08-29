@@ -664,4 +664,9 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         }
         return null;
     }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
+    }
 }

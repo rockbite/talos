@@ -549,4 +549,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
     public boolean isContinuous () {
         return particleEffectDescriptor.isContinuous();
     }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
+    }
 }

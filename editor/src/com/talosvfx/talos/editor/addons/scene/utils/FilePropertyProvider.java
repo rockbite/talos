@@ -4,10 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -90,5 +87,10 @@ public class FilePropertyProvider implements IPropertyProvider {
     @Override
     public Class<? extends IPropertyProvider> getType () {
         return getClass();
+    }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
     }
 }

@@ -3,10 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 public class CameraComponent extends AComponent {
 
@@ -46,5 +43,18 @@ public class CameraComponent extends AComponent {
     @Override
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
+    }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        zoom = 1;
+        size.set(6,6);
+        backgroundColor.set(Color.valueOf("1e3357ff"));
     }
 }

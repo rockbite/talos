@@ -1,10 +1,15 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOption;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOptionType;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 
 public class PropertiesPanel extends Table {
 
@@ -26,16 +31,51 @@ public class PropertiesPanel extends Table {
         titleLabel = new Label("", getSkin());
         titleLabel.setEllipsis(true);
         Table titleContainer = new Table();
-        titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left().width(0).row();
+        titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left();
+
+        ImageButton settingButton = new ImageButton(TalosMain.Instance().getSkin().getDrawable( "icon-edit"));
+        settingButton.setSize(17,17);
+        titleContainer.add(settingButton).padTop(-titleLabel.getPrefHeight()-3).right().row();
+
+        ContextualMenu contextualMenu = new ContextualMenu();
+
+        if (propertyProvider.getOptionsList() != null) {
+            for (PropertyOption propertyOption : propertyProvider.getOptionsList()) {
+                contextualMenu.addItem(propertyOption.getLabel(), new ClickListener(){
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        propertyOption.getClickListener().clicked(event, x, y);
+                        updateValues();
+
+                        if(propertyOption.propertyOptionType == PropertyOptionType.REMOVE){
+                            PropertiesPanel.this.remove();
+                        }
+                    }
+                });
+            }
+        }else{
+            settingButton.remove();
+        }
+
+        settingButton.addListener( new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                contextualMenu.show(getStage());
+            }
+        });
+
         titleContainer.add().expandY();
 
         Stack stack = new Stack();
         stack.add(propertyGroup);
         stack.add(titleContainer);
-
         add(stack).grow();
 
         setPropertyProvider(propertyProvider);
+
+
 
         setTitle(propertyProvider.getPropertyBoxTitle());
     }

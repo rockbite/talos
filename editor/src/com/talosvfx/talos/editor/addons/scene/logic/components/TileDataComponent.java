@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -12,6 +13,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOptionType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
@@ -141,5 +143,17 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
             }
         }
 
+    }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        fakeZ = 0;
+        visualOffset.setZero();
     }
 }

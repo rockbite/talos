@@ -784,4 +784,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
         }
     }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
+    }
 }

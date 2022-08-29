@@ -1,15 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
@@ -80,4 +77,18 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     }
 
     public abstract void minMaxBounds (GameObject parentEntity, BoundingBox rectangle);
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        sortingLayer = "Default";
+        orderingInLayer = 0;
+        visible = true;
+        childrenVisible = true;
+    }
 }

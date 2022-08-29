@@ -102,4 +102,17 @@ public class TransformComponent extends AComponent {
 
         return chain;
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        position.setZero();
+        rotation = 0;
+        scale.setZero();
+    }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_OPTION;
+    }
 }

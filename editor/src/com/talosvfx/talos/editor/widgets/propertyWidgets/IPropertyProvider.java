@@ -6,6 +6,6 @@ public interface IPropertyProvider {
 	public Array<PropertyWidget> getListOfProperties ();
 	public String getPropertyBoxTitle ();
 	int getPriority();
-
+	public Array<PropertyOption> getOptionsList();
 	Class<? extends IPropertyProvider> getType();
 }

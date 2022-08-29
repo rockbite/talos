@@ -229,4 +229,19 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         }
     }
 
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        size.set(1, 1);
+        color.set(Color.WHITE);
+        flipX = false;
+        flipY = false;
+        fixAspectRatio = true;
+        renderMode = RenderMode.simple;
+    }
 }

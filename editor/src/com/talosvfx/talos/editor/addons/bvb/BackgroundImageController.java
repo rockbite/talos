@@ -47,4 +47,9 @@ public class BackgroundImageController implements IPropertyProvider {
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
     }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
+    }
 }

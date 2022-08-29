@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyOption;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.util.function.Supplier;
@@ -139,6 +140,11 @@ public class MultiPropertyHolder<T extends IPropertyHolder> implements IProperty
         @Override
         public int getPriority() {
             return providers.first().getPriority();
+        }
+
+        @Override
+        public Array<PropertyOption> getOptionsList() {
+            return null;
         }
 
         @Override

@@ -11,11 +11,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.maps.MapType;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.TalosLayerPropertiesWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 import java.util.function.Supplier;
@@ -145,5 +141,17 @@ public class MapComponent extends RendererComponent {
 
     public MapType getMapType () {
         return mapType;
+    }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        mapType = MapType.ORTHOGRAPHIC_TOPDOWN;
+        layers.clear();
     }
 }

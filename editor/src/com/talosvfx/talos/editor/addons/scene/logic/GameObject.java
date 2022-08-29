@@ -14,10 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -199,6 +196,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void addComponent (AComponent component) {
         components.add(component);
+        component.setGameObject(this);
         componentClasses.put(component.getClass(), component);
     }
 
@@ -275,6 +273,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public int getPriority () {
         return 0;
+    }
+
+    @Override
+    public Array<PropertyOption> getOptionsList() {
+        return null;
     }
 
     public boolean hasComponent(Class clazz) {

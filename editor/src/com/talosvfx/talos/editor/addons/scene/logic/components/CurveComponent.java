@@ -292,4 +292,15 @@ public class CurveComponent extends AComponent {
         }
         Pools.free(tmp);
     }
+
+    @Override
+    public PropertyOptionType[] getOptions() {
+        return PropertyOptionType.RESET_REMOVE_OPTION;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        setToNew();
+    }
 }
