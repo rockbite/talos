@@ -90,7 +90,7 @@ public class NodeStage extends WorkplaceStage {
                     startPos.set(x, y);
                 }
 
-                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
 
                 return true;
             }
@@ -123,7 +123,7 @@ public class NodeStage extends WorkplaceStage {
 
                 super.touchDragged(event, x, y, pointer);
 
-                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
+                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
             }
 
             @Override
@@ -145,7 +145,7 @@ public class NodeStage extends WorkplaceStage {
 
                 selectionRect.setVisible(false);
 
-                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
             }
 
             @Override

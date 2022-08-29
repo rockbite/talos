@@ -55,9 +55,9 @@ public abstract class WorkplaceStage {
                 TalosMain.Instance().UIStage().getStage().unfocusAll();
 
                 if(TalosMain.Instance().getCameraController() != null) {
-                    TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                    TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
                 } else {
-                    cameraController.touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                    cameraController.touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
                 }
 
                 return true;
@@ -70,9 +70,9 @@ public abstract class WorkplaceStage {
                 super.touchDragged(event, x, y, pointer);
 
                 if(TalosMain.Instance().getCameraController() != null) {
-                    TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
+                    TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
                 } else {
-                    cameraController.touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
+                    cameraController.touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
                 }
             }
 
@@ -81,9 +81,9 @@ public abstract class WorkplaceStage {
                 super.touchUp(event, x, y, pointer, button);
 
                 if(TalosMain.Instance().getCameraController() != null) {
-                    TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                    TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
                 } else {
-                    cameraController.touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                    cameraController.touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
                 }
             }
 
