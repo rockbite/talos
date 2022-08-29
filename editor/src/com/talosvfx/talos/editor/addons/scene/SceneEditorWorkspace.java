@@ -734,7 +734,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
 	}
 
-	private void copySelected () {
+	public void copySelected () {
 		ClipboardPayload payload = new ClipboardPayload();
 		payload.objects.addAll(selection);
 		Vector3 camPos = getCamera().position;
@@ -745,7 +745,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Gdx.app.getClipboard().setContents(clipboard);
 	}
 
-	private void pasteFromClipboard () {
+	public void pasteFromClipboard () {
 		String clipboard = Gdx.app.getClipboard().getContents();
 
 		Json json = new Json();
@@ -755,13 +755,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			Vector3 camPosAtPaste = getCamera().position;
 			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
 			offset.sub(payload.cameraPositionAtCopy);
+			GameObject parent = currentContainer.root;
+			if (selection.size == 1) {
+				parent = selection.first();
+			}
 
 			clearSelection();
 			for (GameObject gameObject : payload.objects) {
 				String name = getUniqueGOName(gameObject.getName(), false);
 				gameObject.setName(name);
 				randomizeChildrenUUID(gameObject);
-				currentContainer.addGameObject(gameObject);
+				parent.addGameObject(gameObject);
 				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 				transformComponent.position.add(offset);
 				initGizmos(gameObject, this);
