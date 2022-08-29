@@ -15,6 +15,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
@@ -245,13 +246,13 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                SceneEditorWorkspace.getInstance().copySelected();
             }
         });
         contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                SceneEditorWorkspace.getInstance().pasteFromClipboard();
             }
         });
         contextualMenu.addSeparator();
