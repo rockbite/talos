@@ -62,7 +62,7 @@ public class ProjectExplorerWidget extends Table {
         searchField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String text = searchField.getText();
+                String text = searchField.getText().toLowerCase();
                 if (text.length() == 0) {
                     directoryViewWidget.openDirectory(getCurrentFolder().path());
                     return;
@@ -78,9 +78,9 @@ public class ProjectExplorerWidget extends Table {
 
                 while (!stack.isEmpty()) {
                     FileHandle file = stack.pop();
-                    if (file.name().contains(text)) {
+                    if (file.name().toLowerCase().contains(text)) {
                         similarFiles.add(file);
-                    } else if (similar.similarity(text, file.nameWithoutExtension()) > 0.9) {
+                    } else if (similar.similarity(text, file.nameWithoutExtension().toLowerCase()) > 0.9) {
                         similarFiles.add(file);
                     }
 
@@ -526,6 +526,7 @@ public class ProjectExplorerWidget extends Table {
 
                 RowWidget widget = new RowWidget(listItemHandle);
                 EditableLabel label = widget.getLabel();
+                label.getTextField().setTextFieldFilter(AssetRepository.ASSET_NAME_FIELD_FILTER);
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
 
                 if (listItemHandle.isDirectory()) {

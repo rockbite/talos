@@ -5,10 +5,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class TransformGizmo extends Gizmo {
 
@@ -16,11 +22,11 @@ public class TransformGizmo extends Gizmo {
     private Vector2 vec1 = new Vector2();
     private boolean wasDragged = false;
     private SpriteTransformGizmo spriteTransformGizmo;
+    private BoundingBox selectionBounds = new BoundingBox();
+    private boolean haveBounds = false;
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
-
-
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
             transform.localToWorld(gameObject, tmp.set(0, 0));
@@ -28,11 +34,62 @@ public class TransformGizmo extends Gizmo {
             // drawing position point
             if(selected) {
                 drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.ORANGE, 30);
+                drawBoundedBoxIfNeed(batch);
             }
         }
+    }
 
+    private void updateBounds(GameObject object){
+        TransformComponent transformComponent = object.getComponent(TransformComponent.class);
+        if (object.hasComponent(SpriteRendererComponent.class)) {
+            SpriteRendererComponent spriteRendererComponent = object.getComponent(SpriteRendererComponent.class);
+            float x = transformComponent.worldPosition.x;
+            float y = transformComponent.worldPosition.y;
 
+            Vector2 spriteSize = spriteRendererComponent.size;
+            float spriteHeight = spriteSize.y * transformComponent.worldScale.x;
+            float spriteWidth = spriteSize.x * transformComponent.worldScale.y;
+            float halfWidth = spriteWidth / 2;
+            float halfHeight = spriteHeight / 2;
 
+            selectionBounds.ext(x - halfWidth, y - halfHeight, 0);
+            selectionBounds.ext(x - halfWidth, y + halfHeight, 0);
+            selectionBounds.ext(x + halfWidth, y - halfHeight, 0);
+            selectionBounds.ext(x + halfWidth, y + halfHeight, 0);
+            haveBounds = true;
+        }
+
+        if(object.getGameObjects() !=null) {
+            for (GameObject childObject : object.getGameObjects()) {
+                updateBounds(childObject);
+            }
+        }
+    }
+
+    private void drawBoundedBoxIfNeed(Batch batch){
+        if(gameObject.hasComponentType(RendererComponent.class)){
+            return;
+        }
+        haveBounds = false;
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        Vector3 minMaxDefault = new Vector3(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
+        selectionBounds.set(minMaxDefault, minMaxDefault);
+        updateBounds(gameObject);
+
+        if(!haveBounds){
+            return;
+        }
+
+        float centerX = selectionBounds.getCenterX();
+        float centerY = selectionBounds.getCenterY();
+        float boundsWidth = selectionBounds.getWidth();
+        float boundsHeight = selectionBounds.getHeight();
+
+        drawLine(batch, centerX - boundsWidth/2, centerY - boundsHeight/2, centerX - boundsWidth/2, centerY + boundsHeight/2, ColorLibrary.ORANGE);
+        drawLine(batch, centerX + boundsWidth/2, centerY - boundsHeight/2, centerX + boundsWidth/2, centerY + boundsHeight/2, ColorLibrary.ORANGE);
+
+        drawLine(batch, centerX - boundsWidth/2, centerY + boundsHeight/2, centerX + boundsWidth/2, centerY + boundsHeight/2, ColorLibrary.ORANGE);
+        drawLine(batch, centerX - boundsWidth/2, centerY - boundsHeight/2, centerX + boundsWidth/2, centerY - boundsHeight/2, ColorLibrary.ORANGE);
     }
 
     private void drawPoint(Batch batch, TextureRegion region, Vector2 pos, Color color, int size) {

@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
@@ -30,6 +29,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private String prefabLink = null;
 
     public boolean active = true;
+    private boolean editorTransformLocked = false;
+    private boolean editorVisible = true;
 
     private Array<GameObject> children;
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
@@ -74,6 +75,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
         json.writeValue("active", active);
+        json.writeValue("visible", editorVisible);
+        json.writeValue("locked", editorTransformLocked);
 
         json.writeArrayStart("components");
         for(AComponent component: components) {
@@ -100,6 +103,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
         prefabLink = jsonData.getString("prefabLink", null);
         active = jsonData.getBoolean("active", this.active);
+        editorTransformLocked = jsonData.getBoolean("locked", this.editorTransformLocked);
+        editorVisible = jsonData.getBoolean("visible", this.editorVisible);
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
@@ -452,5 +457,31 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }
 
         return null;
+    }
+
+    public void setEditorVisible (boolean editorVisible){
+        this.editorVisible = editorVisible;
+        if(children !=null) {
+            for (GameObject child : children) {
+                child.setEditorVisible(editorVisible);
+            }
+        }
+    }
+
+    public boolean isEditorVisible (){
+        return editorVisible;
+    }
+
+    public void setEditorTransformLocked (boolean editorTransformLocked){
+        this.editorTransformLocked = editorTransformLocked;
+        if(children !=null) {
+            for (GameObject child : children) {
+                child.setEditorTransformLocked(editorTransformLocked);
+            }
+        }
+    }
+
+    public boolean isEditorTransformLocked (){
+        return editorTransformLocked;
     }
 }

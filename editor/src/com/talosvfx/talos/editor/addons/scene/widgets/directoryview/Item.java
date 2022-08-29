@@ -55,6 +55,8 @@ class Item extends Widget implements ActorCloneable<Item> {
 		label = new EditableLabel("text", skin);
 		label.getLabel().setAlignment(Align.center);
 		setTouchable(Touchable.enabled);
+
+		label.getTextField().setTextFieldFilter(AssetRepository.ASSET_NAME_FIELD_FILTER);
 	}
 
 	public void setFile (FileHandle fileHandle) {

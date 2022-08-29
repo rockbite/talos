@@ -156,8 +156,8 @@
 		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
 	},
 	com.talosvfx.talos.editor.widgets.ui.FilteredTree$TreeStyle: {
-		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over },
-		modern: {minus: tree-minus, plus: tree-plus, selection: timeline-top-bar-bg, over: tree-over, underline: vis-check-down }
+		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over, companionBackground: packingItemBg },
+		modern: {minus: tree-minus, plus: tree-plus, selection: timeline-top-bar-bg, over: tree-over, underline: vis-check-down, companionBackground: packingItemBg }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 		default: {background: tooltip-pane, label: {font: default-font, fontColor: white} }
