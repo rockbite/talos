@@ -6,6 +6,7 @@ import spark.Spark;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * SocketServer is class which handles initialization, message broadcasting and basic configuration of Talos editor server.
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  */
 public class SocketServer {
 
-    private final static int DEFAULT_PORT = 5000;
+    private final static int DEFAULT_PORT = 42069;
 
     public static int SERVER_PORT;
 
@@ -22,21 +23,29 @@ public class SocketServer {
 
     public static ArrayList<Session> currentConnectedUsers = new ArrayList<>();
 
-    private SocketServer () {
+    private SocketServer() {
         SERVER_PORT = TalosMain.Instance().Prefs().getInteger("serverPort", DEFAULT_PORT);
+        Spark.initExceptionHandler(new Consumer<Exception>() {
+            @Override
+            public void accept(Exception e) {
+                e.printStackTrace();
+            }
+        });
+
         Spark.port(SERVER_PORT);
-        Spark.webSocket("/talos",  ServerHandler.class);
+        Spark.webSocket("/talos", ServerHandler.class);
         Spark.init();
+
     }
 
-    public static SocketServer getInstance () {
+    public static SocketServer getInstance() {
         if (instance == null) {
             instance = new SocketServer();
         }
         return instance;
     }
 
-    public static void broadcastPatch (String patch) {
+    public static void broadcastPatch(String patch) {
         currentConnectedUsers.stream().filter(Session::isOpen).forEach(session -> {
             try {
                 session.getRemote().sendString(patch);
@@ -46,12 +55,12 @@ public class SocketServer {
         });
     }
 
-    public static void restartServer () {
+    public static void restartServer() {
         Spark.stop();
         Spark.awaitStop();
 
         Spark.port(SERVER_PORT);
-        Spark.webSocket("/talos",  ServerHandler.class);
+        Spark.webSocket("/talos", ServerHandler.class);
         Spark.init();
     }
 }
