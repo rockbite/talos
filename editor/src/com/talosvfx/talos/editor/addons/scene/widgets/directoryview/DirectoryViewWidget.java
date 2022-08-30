@@ -110,10 +110,20 @@ public class DirectoryViewWidget extends Table {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
+                Actor hit = hit(x, y, true);
+                boolean hitItem = hit instanceof Item;
+
                 if (button != 0) {
-                    Array<FileHandle> selection = convertToFileArray(selected);
+                    Array<FileHandle> selection;
+
+                    if (selected.isEmpty()) {
+                         selection = new Array<>();
+                         selection.add(fileHandle);
+                    } else {
+                        selection = convertToFileArray(selected);
+                    }
                     ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                    projectExplorer.showContextMenu(selection, true);
+                    projectExplorer.showContextMenu(selection, !hitItem);
                     event.stop();
                     return true;
                 }
