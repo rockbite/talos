@@ -12,7 +12,7 @@ public class ScriptPropertyFloatWrapper extends ScriptPropertyNumberWrapper<Floa
     public void collectAttributes (Array<String> attributes) {
         super.collectAttributes(attributes);
         if (minValue == null) {
-            minValue = Float.MIN_VALUE;
+            minValue = -Float.MAX_VALUE;
         }
         if (maxValue == null) {
             maxValue = Float.MAX_VALUE;
