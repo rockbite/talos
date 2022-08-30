@@ -342,7 +342,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             if (gameObject.active) {
                 node.getActor().setColor(1, 1, 1, 1);
             } else {
-                node.getActor().setColor(1, 0, 0, 1);
+                node.getActor().setColor(1f, 1f, 1f, 0.5f);
             }
         }
     }
@@ -447,18 +447,23 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     }
 
     private Table makeHierarchyWidgetActor(Actor editableLabel, GameObject gameObject){
-        Table objectTable = new Table();
+        Table objectTable = new Table() {
+            @Override
+            public void setColor (Color color) {
+//                super.setColor(color);//Don't set colour for multiplied alpha
+                editableLabel.setColor(color);
+            }
 
-        if (gameObject.active) {
-            editableLabel.setColor(1, 1, 1, 1);
-        } else {
-            editableLabel.setColor(1, 0, 0, 1);
-        }
+            @Override
+            public void setColor (float r, float g, float b, float a) {
+//                super.setColor(r, g, b, a);  //DOn't set colour for multplied alpha
+                editableLabel.setColor(r, g, b, a);
 
-        if(!gameObject.isEditorVisible() || gameObject.isEditorTransformLocked()){
-            editableLabel.getColor().a = 0.5f;
-        }else{
-            editableLabel.getColor().a = 1f;
+            }
+        };
+
+        if (!gameObject.active) {
+            editableLabel.setColor(1, 1, 1, 0.5f);
         }
 
         objectTable.add(editableLabel);
