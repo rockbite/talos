@@ -757,14 +757,24 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public static class ClipboardPayload {
-		public ObjectSet<GameObject> objects = new ObjectSet<>();
+		public Array<GameObject> objects = new Array<>();
+		public Array<Vector2> objectWorldPositions = new Array<>();
 		public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
 	}
 
 	public void copySelected () {
 		ClipboardPayload payload = new ClipboardPayload();
-		payload.objects.addAll(selection);
-		Vector3 camPos = getCamera().position;
+		Array<GameObject> gameObjects = selection.orderedItems();
+		for (int i = 0; i < selection.size; i++) {
+			GameObject value = gameObjects.get(i);
+			payload.objects.add(value);
+			if (value.hasComponentType(TransformComponent.class)) {
+				payload.objectWorldPositions.add(value.getComponent(TransformComponent.class).worldPosition);
+			} else {
+				payload.objectWorldPositions.add(new Vector2());
+			}
+		}
+		Vector3 camPos = camera.position;
 		payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
 
 		Json json = new Json();
@@ -779,28 +789,34 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		try {
 			ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
-			Vector3 camPosAtPaste = getCamera().position;
+			Vector3 camPosAtPaste = camera.position;
 			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
 			offset.sub(payload.cameraPositionAtCopy);
 			GameObject parent = currentContainer.root;
-			if (selection.size == 1) {
-				parent = selection.first();
+			if (selection.size == 1 && selection.first() != currentContainer.root) {
+				parent = selection.first().parent;
 			}
 
 			clearSelection();
-			for (GameObject gameObject : payload.objects) {
+			for (int i = 0; i < payload.objects.size; i++) {
+				GameObject gameObject = payload.objects.get(i);
+
 				String name = getUniqueGOName(gameObject.getName(), false);
 				gameObject.setName(name);
 				randomizeChildrenUUID(gameObject);
 				parent.addGameObject(gameObject);
-				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-				transformComponent.position.add(offset);
+				if (gameObject.hasComponentType(TransformComponent.class)) {
+					TransformComponent component = gameObject.getComponent(TransformComponent.class);
+					component.worldPosition.set(payload.objectWorldPositions.get(i));
+					GameObject.projectInParentSpace(parent, gameObject);
+					component.position.add(offset);
+				}
 				initGizmos(gameObject, this);
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
