@@ -18,6 +18,7 @@ package com.talosvfx.talos.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -559,6 +560,12 @@ public class UIStage {
 	}
 
 	public void showColorPicker(ColorPickerListener listener) {
+		colorPicker.setListener(listener);
+		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
+	}
+
+	public void showColorPicker(Color color, ColorPickerListener listener) {
+		colorPicker.setColor(color);
 		colorPicker.setListener(listener);
 		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
 	}

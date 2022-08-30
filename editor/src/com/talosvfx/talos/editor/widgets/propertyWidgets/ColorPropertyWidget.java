@@ -38,7 +38,22 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
         box.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                TalosMain.Instance().UIStage().showColorPicker(box.getColor(), new ColorPickerAdapter() {
+                    @Override
+                    public void reset (Color previousColor, Color newColor) {
+                        super.reset(previousColor, newColor);
+
+                        callValueChanged(newColor);
+
+                    }
+
+                    @Override
+                    public void canceled (Color oldColor) {
+                        super.canceled(oldColor);
+                        callValueChanged(oldColor);
+
+                    }
+
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);
