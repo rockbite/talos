@@ -20,6 +20,10 @@ dependencies {
     implementation "info.debatty:java-string-similarity:1.2.1"
     implementation "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
     implementation "org.yaml:snakeyaml:1.21"
+    implementation 'com.sparkjava:spark-core:2.9.4'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation "ch.qos.logback:logback-core:1.2.3"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
 
     //Override LWJGL3 version
     implementation "org.lwjgl:lwjgl:$lwjgl3Version"
@@ -62,7 +66,6 @@ dependencies {
     implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-macos-arm64"
     implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows"
     implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows-x86"
-
 }
 
 sourceCompatibility = 1.8

@@ -122,8 +122,8 @@ public class ScriptMetadataParser {
             if (keyWordsCount % 2 != 0) {
                 throw new ScriptMetadataParserException("Invalid contruction of type or arguments");
             }
-            if (keyWordsCount < 6) {
-                throw new ScriptMetadataParserException("The field musy have  [name], [type] and [defaultValue] parameters");
+            if (keyWordsCount < 4) {
+                throw new ScriptMetadataParserException("The field must have  [name] and [type] parameters");
             }
 
             // define name

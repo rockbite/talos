@@ -56,28 +56,33 @@ public class WidgetFactory {
             }
             Object object = field.get(parent);
 
+            PropertyWidget generatedWidget = null;
             if(field.getType().equals(boolean.class)) {
-                return generateForBoolean(parent, field, object, title, true);
+                generatedWidget = generateForBoolean(parent, field, object, title, true);
             } else if (field.getType().isEnum()) {
-                return generateForEnum(parent, field, object, title);
+                generatedWidget = generateForEnum(parent, field, object, title);
             } else if(field.getType().equals(int.class)) {
-                return generateForInt(parent, field, object, title, true);
+                generatedWidget = generateForInt(parent, field, object, title, true);
             } else if(field.getType().equals(float.class)) {
-                return generateForFloat(parent, field, object, title, true);
+                generatedWidget = generateForFloat(parent, field, object, title, true);
             } else if(field.getType().equals(Color.class)) {
-                return generateForColor(parent, field, object, title);
+                generatedWidget = generateForColor(parent, field, object, title);
             } else if(field.getType().equals(Vector2.class)) {
-                return generateForVector2(parent, field, object, title);
+                generatedWidget = generateForVector2(parent, field, object, title);
             } else if(field.getType().equals(String.class)) {
                 ValueProperty annotation = field.getAnnotation(ValueProperty.class);
                 if(annotation != null && annotation.readOnly()) {
-                    return generateForStaticString(parent, field, object, title);
+                    generatedWidget = generateForStaticString(parent, field, object, title);
                 } else {
-                    return generateForString(parent, field, object, title);
+                    generatedWidget = generateForString(parent, field, object, title);
                 }
             }
+            if (generatedWidget == null) {
+                return null;
+            }
 
-
+            generatedWidget.setParent(parent);
+            return generatedWidget;
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
