@@ -26,6 +26,7 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import java.util.function.Supplier;
 
 public class ParticleComponent extends RendererComponent implements GameResourceOwner<ParticleEffectDescriptor> {
+    private transient GameAsset<ParticleEffectDescriptor> defaultGameAsset;
 
     public GameAsset<ParticleEffectDescriptor> gameAsset;
     @Override
@@ -136,6 +137,10 @@ public class ParticleComponent extends RendererComponent implements GameResource
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
         }
 
+        if(defaultGameAsset == null && !newGameAsset.isBroken()){
+            defaultGameAsset = newGameAsset;
+        }
+
         this.gameAsset = newGameAsset;
         this.gameAsset.listeners.add(gameAssetUpdateListener);
 
@@ -155,6 +160,14 @@ public class ParticleComponent extends RendererComponent implements GameResource
 
             boundingBox.ext(vec.x - width/2, vec.y - height/2, 0);
             boundingBox.ext(vec.x + width/2, vec.y + height/2, 0);
+        }
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        if(defaultGameAsset!=null) {
+            setGameAsset(defaultGameAsset);
         }
     }
 }

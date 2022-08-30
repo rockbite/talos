@@ -142,4 +142,11 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
         }
 
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        fakeZ = 0;
+        visualOffset.setZero();
+    }
 }

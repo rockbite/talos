@@ -47,4 +47,12 @@ public class CameraComponent extends AComponent {
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        zoom = 1;
+        size.set(6,6);
+        backgroundColor.set(Color.valueOf("1e3357ff"));
+    }
 }

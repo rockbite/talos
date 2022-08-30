@@ -146,4 +146,11 @@ public class MapComponent extends RendererComponent {
     public MapType getMapType () {
         return mapType;
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        mapType = MapType.ORTHOGRAPHIC_TOPDOWN;
+        layers.clear();
+    }
 }
