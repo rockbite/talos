@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
 
-    public GameAsset<Texture> defaultGameAsset;
+    public transient GameAsset<Texture> defaultGameAsset;
     public GameAsset<Texture> gameAsset;
 
     public Color color = new Color(Color.WHITE);
@@ -52,7 +52,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
         }
 
-        if(defaultGameAsset == null && !newGameAsset.nameIdentifier.equals("broken")){
+        if(defaultGameAsset == null && !newGameAsset.isBroken()){
             defaultGameAsset = newGameAsset;
         }
 

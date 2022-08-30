@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -56,6 +58,11 @@ public class PropertiesPanel extends Table {
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
                     component.remove();
+                    GameObject gameObject = component.getGameObject();
+                    if (gameObject != null) {
+                        SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
+                        SceneEditorWorkspace.getInstance().initGizmos(gameObject, SceneEditorWorkspace.getInstance());
+                    }
                     PropertiesPanel.this.remove();
                 }
             });

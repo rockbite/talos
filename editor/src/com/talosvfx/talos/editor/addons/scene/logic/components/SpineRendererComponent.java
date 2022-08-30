@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData> {
 
-    private GameAsset<SkeletonData> defaultGameAsset;
+    private transient GameAsset<SkeletonData> defaultGameAsset;
     private GameAsset<SkeletonData> gameAsset;
 
     public Skeleton skeleton;
@@ -135,7 +135,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public void setGameAsset (GameAsset<SkeletonData> gameAsset) {
         this.gameAsset = gameAsset;
 
-        if(defaultGameAsset == null && !gameAsset.nameIdentifier.equals("broken")){
+        if(defaultGameAsset == null && !gameAsset.isBroken()){
             defaultGameAsset = gameAsset;
         }
 

@@ -11,6 +11,10 @@ public abstract class AComponent implements IPropertyProvider {
         this.gameObject = gameObject;
     }
 
+    public GameObject getGameObject(){
+        return  gameObject;
+    }
+
     @Override
     public Class<? extends IPropertyProvider> getType () {
         return getClass();
@@ -21,8 +25,6 @@ public abstract class AComponent implements IPropertyProvider {
     public void remove() {
         if(gameObject!=null) {
             gameObject.removeComponent(this);
-            SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
-            SceneEditorWorkspace.getInstance().initGizmos(gameObject,  SceneEditorWorkspace.getInstance());
         }
     }
 
