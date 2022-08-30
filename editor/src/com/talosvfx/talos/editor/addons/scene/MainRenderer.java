@@ -312,6 +312,8 @@ public class MainRenderer implements Notifications.Observer {
         spineRendererComponent.skeleton.updateWorldTransform();
 
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
+
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private void renderParticle (Batch batch, GameObject gameObject) {
