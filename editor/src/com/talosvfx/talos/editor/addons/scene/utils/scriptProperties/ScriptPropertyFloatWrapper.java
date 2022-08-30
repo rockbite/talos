@@ -7,6 +7,24 @@ import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
 public class ScriptPropertyFloatWrapper extends ScriptPropertyNumberWrapper<Float> {
+
+    @Override
+    public void collectAttributes (Array<String> attributes) {
+        super.collectAttributes(attributes);
+        if (minValue == null) {
+            minValue = -Float.MAX_VALUE;
+        }
+        if (maxValue == null) {
+            maxValue = Float.MAX_VALUE;
+        }
+        if (step == null) {
+            step = 1f;
+        }
+        if (defaultValue == null) {
+            defaultValue = 0f;
+        }
+    }
+
     @Override
     public Float parseValueFromString (String value) {
         try {
