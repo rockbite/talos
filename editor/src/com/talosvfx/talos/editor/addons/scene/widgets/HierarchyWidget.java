@@ -342,7 +342,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             if (gameObject.active) {
                 node.getActor().setColor(1, 1, 1, 1);
             } else {
-                node.getActor().setColor(1f, 1f, 1f, 0.5f);
+                node.getActor().setColor(0.5f, 0.5f, 0.5f, 1f);
             }
         }
     }
@@ -463,7 +463,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         };
 
         if (!gameObject.active) {
-            editableLabel.setColor(1, 1, 1, 0.5f);
+            editableLabel.setColor(0.5f, 0.5f, 0.5f, 1f);
         }
 
         objectTable.add(editableLabel);
