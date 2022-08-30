@@ -181,6 +181,7 @@ public abstract class ViewportWidget extends Table {
 			Gizmo hitGizmo = null;
 
 			int countOfSameTouchDown = 0;
+			boolean dragOnFirstTime = true;
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -274,7 +275,7 @@ public abstract class ViewportWidget extends Table {
 				if (locked) {
 					return;
 				}
-				if (hitGizmo instanceof GroupSelectionGizmo || countOfSameTouchDown >= 1) {
+				if (hitGizmo instanceof GroupSelectionGizmo || (dragOnFirstTime || countOfSameTouchDown >= 1)) {
 					Vector2 hitCords = getWorldFromLocal(x, y);
 
 					for (Gizmo gizmo : gizmos.gizmoList) {
