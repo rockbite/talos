@@ -66,6 +66,9 @@ public class TemplateListPopup extends VisWindow {
         for(XmlReader.Element template: templates) {
             configurationMap.put(template.getAttribute("name"), template);
 
+            boolean hidden = template.getBooleanAttribute("hidden", false);
+            if (hidden) continue; //Don't add hidden ones
+
             FilteredTree.Node node = new FilteredTree.Node(template.getAttribute("name"), new Label(template.getAttribute("title"), getSkin()));
             tree.add(node);
         }
