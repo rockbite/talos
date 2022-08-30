@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 
 public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
 
+    public GameAsset<Texture> defaultGameAsset;
     public GameAsset<Texture> gameAsset;
 
     public Color color = new Color(Color.WHITE);
@@ -49,6 +50,10 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+        }
+
+        if(defaultGameAsset == null && !newGameAsset.nameIdentifier.equals("broken")){
+            defaultGameAsset = newGameAsset;
         }
 
         this.gameAsset = newGameAsset;
@@ -229,4 +234,17 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         }
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        size.set(1, 1);
+        color.set(Color.WHITE);
+        flipX = false;
+        flipY = false;
+        fixAspectRatio = true;
+        renderMode = RenderMode.simple;
+        if (defaultGameAsset != null) {
+            setGameAsset(defaultGameAsset);
+        }
+    }
 }

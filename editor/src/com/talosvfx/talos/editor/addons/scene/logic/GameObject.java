@@ -199,6 +199,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void addComponent (AComponent component) {
         components.add(component);
+        component.setGameObject(this);
         componentClasses.put(component.getClass(), component);
     }
 

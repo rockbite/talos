@@ -80,4 +80,13 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     }
 
     public abstract void minMaxBounds (GameObject parentEntity, BoundingBox rectangle);
+
+    @Override
+    public void reset() {
+        super.reset();
+        sortingLayer = "Default";
+        orderingInLayer = 0;
+        visible = true;
+        childrenVisible = true;
+    }
 }

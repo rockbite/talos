@@ -292,4 +292,10 @@ public class CurveComponent extends AComponent {
         }
         Pools.free(tmp);
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        setToNew();
+    }
 }
