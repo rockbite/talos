@@ -1081,6 +1081,9 @@ public abstract class ViewportWidget extends Table {
 				Vector2 worldPos = transformGizmo.getWorldPos();
 				Vector2 local = getLocalFromWorld(worldPos.x, worldPos.y);
 
+				GameObject gameObject = gizmo.getGameObject();
+				if (gameObject.isEditorTransformLocked()) continue;
+
 				if (rectangle.contains(local)) {
 					if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 						addToSelection(gizmo.getGameObject());
