@@ -28,4 +28,8 @@ public abstract class AComponent implements IPropertyProvider {
         }
     }
 
+    public boolean allowsMultipleOfTypeOnGameObject () {
+        return false;
+    }
+
 }

@@ -153,4 +153,9 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
             }
         }
     }
+
+    @Override
+    public boolean allowsMultipleOfTypeOnGameObject () {
+        return true;
+    }
 }

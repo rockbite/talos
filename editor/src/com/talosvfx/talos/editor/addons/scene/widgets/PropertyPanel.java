@@ -22,7 +22,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
     Table fakeContainer;
     ScrollPane scrollPane;
 
-    private ObjectMap<Class, IPropertyProvider> providerSet = new ObjectMap<>();
+    private Array<IPropertyProvider> providerSet = new Array<>();
     private Array<PropertiesPanel> panelList = new Array<>();
     private ObjectMap<IPropertyProvider, PropertiesPanel> providerPanelMap = new ObjectMap<>();
     private IPropertyHolder currentPropertyHolder;
@@ -63,7 +63,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
         providerSet.clear();
         for(IPropertyProvider propertyProvider: propertyProviders) {
             if(propertyProvider.getType() == null) continue;
-            providerSet.put(propertyProvider.getType(), propertyProvider);
+            providerSet.add(propertyProvider);
         }
         build();
         currentPropertyHolder = target;
@@ -74,7 +74,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
 
         Array<IPropertyProvider> list = new Array<>();
 
-        for(IPropertyProvider provider: providerSet.values()) {
+        for (IPropertyProvider provider : providerSet) {
             list.add(provider);
         }
 
@@ -102,7 +102,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
 
     public void hidePanel(IPropertyProvider propertyProvider) {
         if(propertyProvider == null) return;
-        providerSet.remove(propertyProvider.getClass());
+        providerSet.removeValue(propertyProvider, true);
         build();
 
         currentPropertyHolder = null;
