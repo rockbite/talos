@@ -262,9 +262,11 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
                 if (tree.getSelection().size() == 1) {
                     FilteredTree.Node<GameObject> node = tree.findNode(tree.getSelection().first().getObject());
                     if (node != null) {
-                        if (node.getActor() instanceof EditableLabel) {
-                            EditableLabel actor = (EditableLabel)node.getActor();
-                            actor.setEditMode();
+                        if (node.getActor() instanceof HierarchyWrapper) {
+                            HierarchyWrapper wrapper = (HierarchyWrapper)node.getActor();
+                            if (wrapper.label instanceof EditableLabel) {
+                                ((EditableLabel)wrapper.label).setEditMode();
+                            }
                         }
                     }
                 }
@@ -329,9 +331,11 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     public void gameObjectNameChanged (GameObjectNameChanged event) {
         FilteredTree.Node<GameObject> node = tree.findNode(event.target);
         if (node != null) {
-            if (node.getActor() instanceof EditableLabel) {
-                EditableLabel actor = (EditableLabel)node.getActor();
-                actor.setText(event.newName);
+            if (node.getActor() instanceof HierarchyWrapper) {
+                HierarchyWrapper wrapper = (HierarchyWrapper)node.getActor();
+                if (wrapper.label instanceof EditableLabel) {
+                    ((EditableLabel)wrapper.label).setText(event.newName);
+                }
             }
         }
     }
@@ -384,10 +388,13 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
     private void focusKeyboard(GameObject gameObject){
         Actor actor = nodeMap.get(gameObject).getActor();
-        if(actor instanceof EditableLabel) {
-            EditableLabel editableLabel = (EditableLabel) actor;
-            if(!editableLabel.isEditMode()) {
-                getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
+        if(actor instanceof HierarchyWrapper) {
+            Actor label = ((HierarchyWrapper)actor).label;
+            if (label instanceof EditableLabel) {
+                EditableLabel editableLabel = (EditableLabel) label;
+                if(!editableLabel.isEditMode()) {
+                    getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
+                }
             }
         } else {
             getStage().setKeyboardFocus(nodeMap.get(gameObject).getActor());
@@ -446,27 +453,35 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         }
     }
 
-    private Table makeHierarchyWidgetActor(Actor editableLabel, GameObject gameObject){
-        Table objectTable = new Table() {
-            @Override
-            public void setColor (Color color) {
+    private static class HierarchyWrapper extends Table {
+
+        private final Actor label;
+
+        HierarchyWrapper (Actor editableLabel) {
+            this.label = editableLabel;
+        }
+
+        @Override
+        public void setColor (Color color) {
 //                super.setColor(color);//Don't set colour for multiplied alpha
-                editableLabel.setColor(color);
-            }
+            label.setColor(color);
+        }
 
-            @Override
-            public void setColor (float r, float g, float b, float a) {
+        @Override
+        public void setColor (float r, float g, float b, float a) {
 //                super.setColor(r, g, b, a);  //DOn't set colour for multplied alpha
-                editableLabel.setColor(r, g, b, a);
+            label.setColor(r, g, b, a);
 
-            }
-        };
+        }
+    }
+    private HierarchyWrapper makeHierarchyWidgetActor(Actor editableLabel, GameObject gameObject){
+        HierarchyWrapper objectTable = new HierarchyWrapper(editableLabel);
 
         if (!gameObject.active) {
             editableLabel.setColor(0.5f, 0.5f, 0.5f, 1f);
         }
 
         objectTable.add(editableLabel);
-        return  objectTable;
+        return objectTable;
     }
 }
