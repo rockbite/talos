@@ -47,6 +47,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
         for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
             PropertyWidget generate = WidgetFactory.generateForScriptProperty(scriptProperty);
+            generate.setParent(this);
             properties.add(generate);
         }
 

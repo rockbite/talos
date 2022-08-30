@@ -1,9 +1,6 @@
 package com.talosvfx.talos.editor.notifications;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
@@ -36,6 +33,22 @@ public class Notifications {
     public interface Event extends Pool.Poolable {
         @Override
         void reset ();
+
+        default boolean notifyThroughSocket () {
+            return false;
+        }
+
+        default String getEventType () {
+            return "";
+        }
+
+        default Json getAdditionalData (Json json) {
+            return json;
+        }
+
+        default Json getMainData (Json json) {
+            return json;
+        }
     }
 
     private static Notifications getInstance() {
@@ -127,6 +140,10 @@ public class Notifications {
             for(EventRunner eventRunner: invocationMap.get(event.getClass())) {
                 eventRunner.runEvent(event);
             }
+        }
+
+        if (event.notifyThroughSocket()) {
+            NotificationMessageHandler.sendEventToSocket(event);
         }
 
         eventPoolMap.get(event.getClass()).free(event);

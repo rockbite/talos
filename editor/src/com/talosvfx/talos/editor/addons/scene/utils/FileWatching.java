@@ -64,7 +64,10 @@ public class FileWatching {
 
             Path project = Paths.get(SceneEditorAddon.get().workspace.getProjectPath());
             directoryModification(project, this::registerDirectory);
-            directoryModification(AssetRepository.getExportedScriptsFolderHandle().file().toPath(), this::registerDirectory);
+            FileHandle exportedScriptsFolderHandle = AssetRepository.getExportedScriptsFolderHandle();
+            if (exportedScriptsFolderHandle.exists()) {
+                directoryModification(exportedScriptsFolderHandle.file().toPath(), this::registerDirectory);
+            }
         }
     }
 

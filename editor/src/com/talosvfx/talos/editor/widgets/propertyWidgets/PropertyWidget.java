@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 
@@ -28,6 +29,8 @@ public abstract class PropertyWidget<T> extends Table {
 
 	private Supplier<T> supplier;
 	private ValueChanged<T> valueChanged;
+
+	private Object parent;
 
 	private boolean hasName = true;
 
@@ -48,6 +51,14 @@ public abstract class PropertyWidget<T> extends Table {
 				}
 			}
 		}
+	}
+
+	public void setParent (Object scriptProperty) {
+		this.parent = scriptProperty;
+	}
+
+	public Object getParentObject () {
+		return parent;
 	}
 
 	public interface ValueChanged<T> {
@@ -114,6 +125,7 @@ public abstract class PropertyWidget<T> extends Table {
 	protected void callValueChanged (T value) {
 		valueChanged(value);
 		PropertyHolderEdited event = Notifications.obtainEvent(PropertyHolderEdited.class);
+		event.parentOfPropertyHolder = this.parent;
 		event.fastChange = isFastChange(this);
 		Notifications.fireEvent(event);
 	}
