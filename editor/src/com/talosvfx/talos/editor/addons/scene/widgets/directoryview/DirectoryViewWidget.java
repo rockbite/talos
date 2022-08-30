@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -32,8 +33,7 @@ public class DirectoryViewWidget extends Table {
     private static final DirectoryViewFileComparator DIRECTORY_VIEW_FILE_COMPARATOR = new DirectoryViewFileComparator();
     private static final FileFilter DIRECTORY_VIEW_FILE_FILTER = new DirectoryViewFileFilter();
 
-    private IntArray selected = new IntArray();
-    private int overItem = -1;
+    private Array<Item> selected = new Array<>();
 
     private ItemGroup items;
     private Table emptyFolderTable;
@@ -43,7 +43,6 @@ public class DirectoryViewWidget extends Table {
     private DragAndDrop dragAndDrop;
     private Array<DragAndDrop.Target> externalTargets;
 
-    private boolean preventDeselect = false;
 
     public DirectoryViewWidget () {
         emptyFolderTable = new Table();
@@ -56,6 +55,7 @@ public class DirectoryViewWidget extends Table {
         externalTargets = new Array<>();
 
         addCaptureListener(new InputListener() {
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (getStage() != null) {
@@ -84,8 +84,7 @@ public class DirectoryViewWidget extends Table {
                 if (keycode == Input.Keys.FORWARD_DEL) {
                     Array<String> paths = new Array<>();
                     for (int i = 0; i < selected.size; i++) {
-                        int entry = selected.get(i);
-                        Item item = (Item) items.getChild(entry);
+                        Item item = selected.get(i);
                         paths.add(item.getFileHandle().path());
                     }
                     projectExplorer.deletePath(paths);
@@ -94,10 +93,9 @@ public class DirectoryViewWidget extends Table {
                 if (keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
                     for (Actor child : items.getChildren()) {
                         Item item = (Item) child;
-                        int i = items.getChildren().indexOf(item, true);
-                        if (!selected.contains(i)) {
+                        if (!selected.contains(item, true)) {
                             item.select();
-                            selected.add(i);
+                            selected.add(item);
                         }
                     }
                     reportSelectionChanged();
@@ -108,108 +106,28 @@ public class DirectoryViewWidget extends Table {
         });
 
         addListener(new ClickListener() {
-            int selectionStart;
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                // TODO: make it, so if you click anywhere outside of this place it will clean up all selection
-                if (overItem == -1) {
-                    if (button == 0) {
-                        for (int i : selected.items) {
-                            if (selected.contains(i)) {
-                                Item item = (Item) items.getChild(i);
-                                item.deselect();
-                            }
-                        }
-                        selected.clear();
-                        selectionStart = -1;
-                        reportSelectionChanged();
-                    }  else {
-                        Gdx.app.postRunnable(new Runnable() {
-                            @Override
-                            public void run () {
-                                Array<FileHandle> current = new Array<>(1);
-                                current.add(fileHandle);
-                                projectExplorer.showContextMenu(current, true);
-                            }
-                        });
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 
-                        return true;
-                    }
-                } else {
-                    if (button == 1) {
-                        if (!selected.contains(overItem)) {
-                            for (int i = 0; i < selected.size; i++) {
-                                int entry = selected.get(i);
-                                Item item = (Item) items.getChild(entry);
-                                item.deselect();
-                            }
-                            selected.clear();
-                            Item item = (Item) items.getChild(overItem);
-                            item.select();
-                            selected.add(overItem);
-                            reportSelectionChanged();
-                        }
-                        Gdx.app.postRunnable(new Runnable() {
-                            @Override
-                            public void run () {
-                                Array<FileHandle> selection = convertToFileArray(selected);
-                                projectExplorer.showContextMenu(selection, true);
-                            }
-                        });
-
-                    } else if (button == 0) {
-                        if (overItem >= 0) {
-                            Item item = (Item) items.getChild(overItem);
-                            if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                                if (selected.contains(overItem)) {
-                                    item.deselect();
-                                    selected.removeValue(overItem);
-                                } else {
-                                    item.select();
-                                    selected.add(overItem);
-                                    selectionStart = overItem;
-                                }
-                                reportSelectionChanged();
-                            } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && selectionStart >= 0) {
-                                int start = Math.min(selectionStart, overItem);
-                                int end = Math.max(selectionStart, overItem);
-                                for (int i = start; i <= end; i++) {
-                                    if (!selected.contains(i)) {
-                                        Item toSelect = (Item) items.getChild(i);
-                                        toSelect.select();
-                                        selected.add(i);
-                                    }
-                                }
-                                selectionStart = overItem;
-                                reportSelectionChanged();
-                            } else {
-                                for (int i : selected.items) {
-                                    if (selected.contains(i)) {
-                                        Item selectedItem = (Item) items.getChild(i);
-                                        selectedItem.deselect();
-                                    }
-                                }
-                                selected.clear();
-                                item.select();
-                                selected.add(overItem);
-                                selectionStart = overItem;
-                                reportSelectionChanged();
-                            }
-                        }
-                    }
+                if (button != 0) {
+                    Array<FileHandle> selection = convertToFileArray(selected);
+                    ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+                    projectExplorer.showContextMenu(selection, true);
+                    event.stop();
+                    return true;
                 }
-                return true;
+
+                return super.touchDown(event, x, y, pointer, button);
             }
 
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(preventDeselect) {
-                    preventDeselect = false;
-                    return;
+            public void clicked (InputEvent event, float x, float y) {
+                if (!event.isStopped()) {
+                    clearSelection();
                 }
             }
+
         });
 
         items.setCellSize(50);
@@ -235,14 +153,15 @@ public class DirectoryViewWidget extends Table {
         slider.setValue(50f + (125 - 50)/2f);
         items.setCellSize(slider.getValue());
         items.invalidateHierarchy();
+
+        setTouchable(Touchable.enabled);
     }
 
     private void reportSelectionChanged() {
         if(!selected.isEmpty()) {
             IPropertyHolder holder = null;
             if (selected.size == 1) {
-                int i = selected.first();
-                Item item = (Item) items.getChild(i);
+                Item item = selected.first();
                 if (item.gameAsset != null) {
                     if (!item.gameAsset.isBroken()) {
                         holder = item.gameAsset.getRootRawAsset().metaData;
@@ -251,8 +170,7 @@ public class DirectoryViewWidget extends Table {
             } else if (selected.size > 1) {
                 ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
                 for (int i = 0; i < selected.size; i ++) {
-                    int entry = selected.get(i);
-                    Item item = (Item) items.getChild(entry);
+                    Item item = selected.get(i);
                     if (item.gameAsset != null) {
                         if (!item.gameAsset.isBroken()) {
                             RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
@@ -260,10 +178,14 @@ public class DirectoryViewWidget extends Table {
                         }
                     }
                 }
-                holder = new MultiPropertyHolder(list);
+                if (list.isEmpty()) {
+                    holder = null;
+                } else {
+                    holder = new MultiPropertyHolder(list);
+                }
             }
 
-            if(holder != null) {
+            if (holder != null) {
                 Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(holder));
             }
         }
@@ -271,8 +193,7 @@ public class DirectoryViewWidget extends Table {
 
     public void rename () {
         if (selected.size == 1) {
-            int i = selected.first();
-            Item item = (Item) items.getChild(i);
+            Item item = selected.first();
             item.rename();
         }
     }
@@ -297,11 +218,10 @@ public class DirectoryViewWidget extends Table {
         fillItems(directory);
     }
 
-    private Array<FileHandle> convertToFileArray (IntArray selected) {
+    private Array<FileHandle> convertToFileArray (Array<Item> selected) {
         Array<FileHandle> handles = new Array<>();
         for (int i = 0; i < selected.size; i++) {
-            int entry = selected.get(i);
-            Item item = (Item) items.getChild(entry);
+            Item item = selected.get(i);
             handles.add(item.getFileHandle());
         }
 
@@ -315,7 +235,6 @@ public class DirectoryViewWidget extends Table {
      */
     private void fillItems (FileHandle[] directory) {
         // reset state
-        overItem = -1;
         selected.clear();
         items.clear();
         dragAndDrop.clear();
@@ -346,8 +265,7 @@ public class DirectoryViewWidget extends Table {
                     Array<Item> array = (Array<Item>) object;
 
                     for (int i = 0; i < selected.size; i++) {
-                        int entry = selected.get(i);
-                        Item item = (Item) items.getChild(entry);
+                        Item item = selected.get(i);
                         if (item.gameAsset != null) {
                             AssetImporter.createAssetInstance(item.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
                         }
@@ -361,11 +279,8 @@ public class DirectoryViewWidget extends Table {
                     }
                 }
 
-                for (int i : selected.items) {
-                    if (selected.contains(i)) {
-                        Item item = (Item) items.getChild(i);
-                        item.deselect();
-                    }
+                for (Item item : selected) {
+                    item.deselect();
                 }
                 selected.clear();
                 reportSelectionChanged();
@@ -425,8 +340,14 @@ public class DirectoryViewWidget extends Table {
         dragAndDrop.addTarget(new DragAndDrop.Target(this) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor hit = DirectoryViewWidget.this.hit(x, y, true);
 
-                if(overItem >= 0) {
+                for (Actor child : items.getChildren()) {
+                    ((Item)child).setMouseover(false);
+                }
+
+                if (hit instanceof Item) {
+                    ((Item)hit).setMouseover(true);
                     return true;
                 }
 
@@ -435,11 +356,18 @@ public class DirectoryViewWidget extends Table {
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                if (overItem == -1) {
+                for (Actor child : items.getChildren()) {
+                    ((Item)child).setMouseover(false);
+                }
+
+                Actor hit = DirectoryViewWidget.this.hit(x, y, true);
+
+                if (!(hit instanceof Item)) {
                     return;
                 }
 
-                Item targetItem = (Item) items.getChild(overItem);
+
+                Item targetItem = (Item)hit; //todo
 
                 if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
 
@@ -464,11 +392,8 @@ public class DirectoryViewWidget extends Table {
                         }
                     }
 
-                    for (int i : selected.items) {
-                        if (selected.contains(i)) {
-                            Item item = (Item) items.getChild(i);
-                            item.deselect();
-                        }
+                    for (Item item : selected) {
+                        item.deselect();
                     }
                     selected.clear();
                     reportSelectionChanged();
@@ -496,32 +421,20 @@ public class DirectoryViewWidget extends Table {
             }
             Item item = new Item();
             item.addListener(new ClickListener() {
-                @Override
-                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                    overItem = items.getChildren().indexOf(item, true);
-                    item.setMouseover(true);
-                }
-
-                @Override
-                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                    overItem = -1;
-                    item.setMouseover(false);
-                }
 
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (getTapCount() == 2) {
-                        for (int i : selected.items) {
-                            if (selected.contains(i)) {
-                                Item to = (Item) items.getChild(i);
-                                to.deselect();
-                            }
-                        }
-                        selected.clear();
-                        selected.add(items.getChildren().indexOf(item, true));
-                        item.select();
-                        AssetImporter.fileOpen(item.getFileHandle());
+                    event.stop();
+                    if (getTapCount() == 1) {
+                        //Report the click
+                        itemClicked(item);
+                        reportSelectionChanged();
+                    } else if (getTapCount() == 2) {
+                        //Report the double click
+                        itemDoubleClicked(item);
+                        reportSelectionChanged();
                     }
+
                 }
             });
             item.setFile(fileHandle);
@@ -551,12 +464,10 @@ public class DirectoryViewWidget extends Table {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    preventDeselect = true;
 
-                    int i = items.getChildren().indexOf(item, true);
-                    if(!selected.contains(i)) {
+                    if(!selected.contains(item, true)) {
                         selected.clear();
-                        selected.add(i);
+                        selected.add(item);
                     }
 
                     if(selected.size == 1) {
@@ -579,6 +490,81 @@ public class DirectoryViewWidget extends Table {
                 }
             });
         }
+    }
+
+    private void itemClicked (Item item) {
+        boolean addToSelection = TalosInputProcessor.ctrlPressed();
+        boolean shiftSelectRange = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
+
+
+        if (selected.contains(item, true)) {
+
+            if (!addToSelection && !shiftSelectRange) {
+                clearSelection();
+
+                //Add it back
+                selected.add(item);
+                item.select();
+
+            } else {
+
+                selected.removeValue(item, true);
+                item.deselect();
+            }
+
+        } else {
+            if (shiftSelectRange && !selected.isEmpty()) {
+                //Find the indexes and select all the range from the latest added to the selection as reerence
+                Item latestAdded = selected.peek();
+
+                SnapshotArray<Actor> children = items.getChildren();
+
+                int firstIndex = children.indexOf(latestAdded, true);
+                int indexOfTarget = children.indexOf(item, true);
+
+                //We add all these that are in the range
+                if (firstIndex > indexOfTarget) {
+                    for (int i = indexOfTarget; i < firstIndex; i++) {
+                        Item actor = (Item)children.get(i);
+                        if (!selected.contains(actor, true)) {
+                            selected.add(actor);
+                            actor.select();
+                        }
+                    }
+                } else if (firstIndex < indexOfTarget) {
+                    for (int i = firstIndex; i <= indexOfTarget; i++) {
+                        Item actor = (Item)children.get(i);
+                        if (!selected.contains(actor, true)) {
+                            selected.add(actor);
+                            actor.select();
+                        }
+                    }
+                } else {
+                    //Do nothing we selected same thing
+                }
+
+            } else {
+                if (!addToSelection) {
+                    clearSelection();
+                }
+                item.select();
+                selected.add(item);
+            }
+        }
+    }
+
+    private void clearSelection () {
+        for (Item item : selected) {
+            item.deselect();
+        }
+        selected.clear();
+    }
+
+    private void itemDoubleClicked (Item item) {
+        clearSelection();
+        selected.add(item);
+        item.select();
+        AssetImporter.fileOpen(item.getFileHandle());
     }
 
     public void fillItems (FileHandle directory) {
