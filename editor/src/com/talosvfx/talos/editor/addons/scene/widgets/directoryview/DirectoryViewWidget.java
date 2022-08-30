@@ -105,36 +105,30 @@ public class DirectoryViewWidget extends Table {
             }
         });
 
-        addListener(new ClickListener() {
 
+        addListener(new ClickListener(0) {
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-
-                Actor hit = hit(x, y, true);
-                boolean hitItem = hit instanceof Item;
-
-                if (button != 0) {
-                    Array<FileHandle> selection;
-
-                    if (selected.isEmpty()) {
-                         selection = new Array<>();
-                         selection.add(fileHandle);
-                    } else {
-                        selection = convertToFileArray(selected);
-                    }
-                    ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                    projectExplorer.showContextMenu(selection, !hitItem);
-                    event.stop();
-                    return true;
+            public void clicked (InputEvent event, float x, float y) {
+                if (!event.isStopped()) {
+                    clearSelection();
                 }
-
-                return super.touchDown(event, x, y, pointer, button);
             }
+        });
+
+        addListener(new ClickListener(1) {
+
 
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 if (!event.isStopped()) {
                     clearSelection();
+
+                    Array<FileHandle> selection = new Array<>();
+                    selection.add(fileHandle);
+
+                    ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+                    projectExplorer.showContextMenu(selection, true);
+                    event.stop();
                 }
             }
 
@@ -439,7 +433,7 @@ public class DirectoryViewWidget extends Table {
                     event.stop();
                     if (getTapCount() == 1) {
                         //Report the click
-                        itemClicked(item);
+                        itemClicked(item, false);
                         reportSelectionChanged();
                     } else if (getTapCount() == 2) {
                         //Report the double click
@@ -447,6 +441,15 @@ public class DirectoryViewWidget extends Table {
                         reportSelectionChanged();
                     }
 
+                }
+            });
+            item.addListener(new ClickListener(1) {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    event.stop();
+                    //Report the click
+                    itemClicked(item, true);
+                    reportSelectionChanged();
                 }
             });
             item.setFile(fileHandle);
@@ -504,9 +507,21 @@ public class DirectoryViewWidget extends Table {
         }
     }
 
-    private void itemClicked (Item item) {
+    private void itemClicked (Item item, boolean rightClick) {
         boolean addToSelection = TalosInputProcessor.ctrlPressed();
         boolean shiftSelectRange = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
+
+        if (rightClick) {
+            clearSelection();
+            selected.add(item);
+            item.select();
+            Array<FileHandle> handles = convertToFileArray(selected);
+
+            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+            projectExplorer.showContextMenu(handles, true);
+
+            return;
+        }
 
 
         if (selected.contains(item, true)) {

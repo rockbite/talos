@@ -298,7 +298,6 @@ public class FilteredTree<T> extends WidgetGroup {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-
                 Node<T> node = getNodeAt(y);
                 if (itemListeners.size > 0) {
                     if (button == 1) {

@@ -167,10 +167,13 @@ public class ProjectExplorerWidget extends Table {
             }
 
             @Override
-            public void rightClick (FilteredTree.Node node) {
+            public void rightClick (FilteredTree.Node<String> node) {
                 if(node != null) {
-                    select(node);
-                    showContextMenu(false);
+                    //select(node);
+                    Array<FileHandle> contextualFile = new Array<>();
+                    contextualFile.add(Gdx.files.absolute(node.getObject()));
+
+                    showContextMenu(contextualFile, false);
                 }
             }
 
