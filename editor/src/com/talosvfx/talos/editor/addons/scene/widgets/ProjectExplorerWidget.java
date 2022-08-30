@@ -341,6 +341,9 @@ public class ProjectExplorerWidget extends Table {
                             // TODO: refactor directory view widget to update itself
                             select(getCurrentFolder().path());
 //                            directoryViewWidgetNew.startRenameFor(newHandle);
+
+                            directoryViewWidget.selectForPath(newHandle);
+                            directoryViewWidget.rename();
                         }
                     }
                 }

@@ -585,6 +585,22 @@ public class DirectoryViewWidget extends Table {
         fillItems(directory.toArray(FileHandle.class));
     }
 
+    public void selectForPath (FileHandle newHandle) {
+        Item found = null;
+        for (Actor child : items.getChildren()) {
+            FileHandle testHandle = ((Item)child).getFileHandle();
+            if (testHandle.equals(newHandle)) {
+                found = (Item)child;
+                break;
+            }
+        }
+        if (found != null) {
+            clearSelection();
+            found.select();
+            selected.add(found);
+        }
+    }
+
     /**
      * Compares two FileHandles and sorts them in alphabetical order based on their names. Gives priority to
      * directory if names are equal.
