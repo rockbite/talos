@@ -347,7 +347,7 @@ public class DirectoryViewWidget extends Table {
             });
         }
 
-        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
+            dragAndDrop.addTarget(new DragAndDrop.Target(this) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 Actor hit = DirectoryViewWidget.this.hit(x, y, true);
@@ -384,7 +384,9 @@ public class DirectoryViewWidget extends Table {
                     Object object = payload.getObject();
                     if (object instanceof Array) {
                         Array<Item> array = (Array<Item>) object;
-                        for (Item sourceItem : array) {
+                        Array<Item> copy = new Array<>();
+                        copy.addAll(array);
+                        for (Item sourceItem : copy) {
                             if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
                                 AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
                             }
