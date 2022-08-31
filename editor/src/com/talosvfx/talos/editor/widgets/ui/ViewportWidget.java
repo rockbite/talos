@@ -561,8 +561,6 @@ public abstract class ViewportWidget extends Table {
 
 		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
-		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
-		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float aspect = getWidth() / getHeight();

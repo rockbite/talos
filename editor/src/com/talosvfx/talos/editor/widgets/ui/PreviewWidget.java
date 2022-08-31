@@ -310,6 +310,8 @@ public class PreviewWidget extends ViewportWidget {
 
         if (previewController.isGridVisible()) {
             batch.end();
+            gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+            ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
             gridPropertyProvider.update(camera, parentAlpha);
             gridRenderer.drawGrid(batch, shapeRenderer);
             batch.begin();
@@ -376,8 +378,6 @@ public class PreviewWidget extends ViewportWidget {
     public void initializeGridPropertyProvider () {
         gridPropertyProvider = new BaseGridPropertyProvider();
         gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
-        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
     }
 
     public GLProfiler getGLProfiler() {

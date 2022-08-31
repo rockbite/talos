@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.PaletteGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -506,6 +507,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.update(camera, parentAlpha);
         gridRenderer.drawGrid(batch, shapeRenderer);
         batch.end();
@@ -931,7 +933,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     public void initializeGridPropertyProvider () {
         gridPropertyProvider = new PaletteGridPropertyProvider();
         gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
-        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
     }
 
     private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {

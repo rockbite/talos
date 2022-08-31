@@ -297,6 +297,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public void drawContent(Batch batch, float parentAlpha) {
         batch.end();
 
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
         gridPropertyProvider.update(camera, parentAlpha);
         gridRenderer.drawGrid(batch, shapeRenderer);
         batch.begin();
@@ -320,8 +322,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public void initializeGridPropertyProvider () {
         gridPropertyProvider = new BaseGridPropertyProvider();
         gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
-        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
     }
 
     private void renderBackgroundImage(Batch batch, float parentAlpha) {

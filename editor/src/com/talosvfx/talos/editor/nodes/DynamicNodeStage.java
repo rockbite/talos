@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
@@ -85,9 +86,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     }
 
     protected void initActors() {
-        // TODO: 8/31/2022 Handle this
-//        GridRenderer gridRenderer = new GridRenderer(stage);
-//        stage.addActor(gridRenderer);
+        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
+        stage.addActor(gridRenderer);
 
         nodeBoard = new NodeBoard(skin, this);
 

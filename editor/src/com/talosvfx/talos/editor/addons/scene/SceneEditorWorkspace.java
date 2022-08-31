@@ -943,6 +943,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		batch.end();
 
+		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+		((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 		if (mapEditorState.isEditing()) {
 			gridPropertyProvider.setHighlightCursorHover(true);
 			gridPropertyProvider.update(camera, parentAlpha);
@@ -1496,8 +1498,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void initializeGridPropertyProvider () {
 		gridPropertyProvider = new BaseGridPropertyProvider();
 		gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
-		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-		((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 	}
 
 }

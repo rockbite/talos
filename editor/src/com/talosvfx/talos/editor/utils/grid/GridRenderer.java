@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -32,6 +33,8 @@ public class GridRenderer {
 	}
 
 	public void drawGrid (Batch batch, ShapeRenderer shapeRenderer) {
+		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
+		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
 		Gdx.gl.glLineWidth(1f);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
@@ -49,15 +52,19 @@ public class GridRenderer {
 		float gridSizeX = gridPropertyProvider.getUnitX();
 		float gridSizeY = gridPropertyProvider.getUnitY();
 
-		int projX = getMouseCellX();
-		int projY = getMouseCellY();
 
 		if (gridPropertyProvider.shouldHighlightCursorHover()) {
+			int projX = getMouseCellX();
+			int projY = getMouseCellY();
+
 			shapeRenderer.rect(projX, projY, gridSizeX, gridSizeY);
 		}
 
 		if (gridPropertyProvider.shouldHighlightCursorSelect()) {
 			if (Gdx.input.isTouched()) {
+				int projX = getMouseCellX();
+				int projY = getMouseCellY();
+
 				shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
 				shapeRenderer.rect(projX, projY, gridSizeX, gridSizeY);
 			}

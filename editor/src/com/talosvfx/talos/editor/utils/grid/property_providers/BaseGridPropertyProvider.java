@@ -87,12 +87,12 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
     public void update (OrthographicCamera camera, float parentAlpha) {
         gridLines.clear();
 
-        float zeroAlpha = 0.8f;
+        float zeroAlpha = 0.2f;
         float mainLinesAlpha = 0.2f;
         float smallLinesAlpha = 0.1f;
         float linesToAppearAlpha = 0.01f;
 
-        float gridUnit = nextPowerOfTwo(distanceThatLinesShouldBe);
+        gridUnit = nextPowerOfTwo(distanceThatLinesShouldBe);
 
         float previousUnit = gridUnit / 2;
         linesToAppearAlpha = MathUtils.lerp(smallLinesAlpha, linesToAppearAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
@@ -111,29 +111,35 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
         float visibleEndX = cameraX + visibleWidth / 2;
         float visibleEndY = cameraY + visibleHeight / 2;
 
-        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), Color.WHITE, thickness));
-        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), Color.WHITE, thickness));
+        Color color = new Color();
+        color.set(Color.CYAN);
+        color.a = zeroAlpha;
+        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), color, thickness));
+        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), color, thickness));
 
         gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
 
         // configure colors
-        Color gridMainLineColor = Color.GRAY;
+        Color gridMainLineColor = new Color();
+        gridMainLineColor.set(Color.GRAY);
         gridMainLineColor.a =  mainLinesAlpha * parentAlpha;
 
-        Color comingLinesColor = Color.GRAY;
+        Color comingLinesColor = new Color();
+        comingLinesColor.set(Color.GRAY);
         comingLinesColor.a =  linesToAppearAlpha * parentAlpha;
 
-        Color smallLinesColor = Color.GRAY;
+        Color smallLinesColor = new Color();
+        smallLinesColor.set(Color.GRAY);
         smallLinesColor.a =  smallLinesAlpha * parentAlpha;
 
         // creating vertical lines
         for (float i = gridXStart; i < visibleEndX; i += gridUnit) {
 
-            for (int j = 1; j <= baseLineDivisor; j++) {
+            for (int j = 0; j < baseLineDivisor; j++) {
                 float smallUnitSize = gridUnit / baseLineDivisor;
                 float x1 = i + j * smallUnitSize;
 
-                for (int k = 1; k <= baseLineDivisor; k++) {
+                for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
                     gridLines.add(new GridLine(new Vector2(x1 + k * nextUnitSize, cameraY - visibleHeight / 2),
                             new Vector2(x1 + k * nextUnitSize, cameraY + visibleHeight / 2), comingLinesColor, thickness));
@@ -143,33 +149,33 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
                         new Vector2(x1, cameraY + visibleHeight / 2), smallLinesColor, thickness));
             }
 
+            gridXEnd = i;
             if (i == 0) continue;
             gridLines.add(new GridLine(new Vector2(i, cameraY - visibleHeight / 2),
                     new Vector2(i, cameraY + visibleHeight / 2), gridMainLineColor, thickness));
-            gridXEnd = i;
         }
 
         gridYStart = gridUnit * MathUtils.floor(visibleStartY / gridUnit);
         // creating vertical lines
         for (float i = gridYStart; i < visibleEndY; i += gridUnit) {
-            for (int j = 1; j <= baseLineDivisor; j++) {
+            for (int j = 0; j < baseLineDivisor; j++) {
                 float smallUnitSize = gridUnit / baseLineDivisor;
                 float y1 = i + j * smallUnitSize;
 
-                for (int k = 1; k <= baseLineDivisor; k++) {
+                for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
                     gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1 + k * nextUnitSize),
-                            new Vector2(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), smallLinesColor, thickness));
+                            new Vector2(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), comingLinesColor, thickness));
                 }
 
                 gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1),
-                        new Vector2(cameraX + visibleWidth / 2, y1), comingLinesColor, thickness));
+                        new Vector2(cameraX + visibleWidth / 2, y1), smallLinesColor, thickness));
             }
 
+            gridYEnd = i;
             if (i == 0) continue;
             gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, i),
                     new Vector2(cameraX + visibleWidth / 2, i), gridMainLineColor, thickness));
-            gridYEnd = i;
         }
     }
 
