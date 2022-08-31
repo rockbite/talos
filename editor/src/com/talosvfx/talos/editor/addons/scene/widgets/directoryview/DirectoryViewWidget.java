@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -99,6 +98,12 @@ public class DirectoryViewWidget extends Table {
                         }
                     }
                     reportSelectionChanged();
+                }
+
+                boolean renamePressed = TalosMain.Instance().isOsX() && keycode == Input.Keys.ENTER ||
+                                        !TalosMain.Instance().isOsX() && keycode == Input.Keys.F2;
+                if (renamePressed) {
+                    rename();
                 }
 
                 return true;
