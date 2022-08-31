@@ -82,6 +82,10 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
 
     }
 
+    @Override
+    public void setHighlightCursorSelect (boolean shouldHighlight) {
+
+    }
 
     @Override
     public void update (OrthographicCamera camera, float parentAlpha) {
@@ -199,5 +203,10 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
         }
 
         return unit;
+    }
+
+    @Override
+    public boolean rulerOnBottom () {
+        return false;
     }
 }

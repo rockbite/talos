@@ -129,4 +129,14 @@ public class ParticleNodeGridPropertyProvider implements GridPropertyProvider {
     public void setHighlightCursorHover (boolean shouldHighlight) {
 
     }
+
+    @Override
+    public void setHighlightCursorSelect (boolean shouldHighlight) {
+
+    }
+
+    @Override
+    public boolean rulerOnBottom () {
+        return false;
+    }
 }

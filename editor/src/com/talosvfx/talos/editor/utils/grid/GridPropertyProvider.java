@@ -31,6 +31,9 @@ public interface GridPropertyProvider {
     boolean shouldHighlightCursorSelect ();
 
     void setHighlightCursorHover (boolean shouldHighlight);
+    void setHighlightCursorSelect (boolean shouldHighlight);
+
+    boolean rulerOnBottom ();
 }
 
 

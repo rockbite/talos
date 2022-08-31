@@ -39,13 +39,11 @@ public class RulerRenderer extends Group {
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
         float rulerHeight = 20f;
-        xRulerTable.setY(viewportWidget.getHeight() - rulerHeight);
+        xRulerTable.setY(gridPropertyProvider.rulerOnBottom() ? 0 : viewportWidget.getHeight() - rulerHeight);
         xRulerTable.setHeight(rulerHeight);
 
         float xStart = gridPropertyProvider.getGridStartX();
         while (xStart <= gridPropertyProvider.getGridEndX()) {
-            xStart += gridPropertyProvider.getUnitX();
-
             String coordText;
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
@@ -53,6 +51,7 @@ public class RulerRenderer extends Group {
             Label coordinateLabel = new Label(coordText, getSkin());
             coordinateLabel.setX(viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f);
             xRulerTable.addActor(coordinateLabel);
+            xStart += gridPropertyProvider.getUnitX();
         }
 
         yRulerTable.clearChildren();
@@ -62,7 +61,6 @@ public class RulerRenderer extends Group {
         yRulerTable.clearChildren();
         yRulerTable.setHeight(viewportWidget.getHeight());
         while (yStart <= gridPropertyProvider.getGridEndY()) {
-            yStart += gridPropertyProvider.getUnitY();
 
             String coordText;
             int testInt = (int)yStart;
@@ -74,6 +72,8 @@ public class RulerRenderer extends Group {
                 maxWidth = coordinateLabel.getWidth();
             }
             yRulerTable.addActor(coordinateLabel);
+            yStart += gridPropertyProvider.getUnitY();
+
         }
         yRulerTable.setWidth(maxWidth);
     }

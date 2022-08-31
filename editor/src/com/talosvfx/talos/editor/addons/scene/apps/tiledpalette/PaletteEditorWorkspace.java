@@ -129,8 +129,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             }
         };
 
-        gridPropertyProvider.setHighlightCursorHover(true);
-
         selectionRect = new Image(TalosMain.Instance().getSkin().getDrawable("orange_row"));
         selectionRect.setSize(0, 0);
         selectionRect.setVisible(false);
