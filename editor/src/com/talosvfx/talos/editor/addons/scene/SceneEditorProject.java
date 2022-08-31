@@ -111,7 +111,7 @@ public class SceneEditorProject implements IProject {
         sceneEditorAddon.workspace.openSavableContainer(mainScene);
 
         // now create main camera
-        sceneEditorAddon.workspace.createObjectByTypeName("camera", new Vector2(0, 0), null);
+        sceneEditorAddon.workspace.createObjectByTypeName("camera", new Vector2(0, 0), null, "camera");
 
         TalosMain.Instance().ProjectController().saveProject(projectFile);
 

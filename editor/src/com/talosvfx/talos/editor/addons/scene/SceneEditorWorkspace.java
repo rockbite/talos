@@ -168,7 +168,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			@Override
 			public void chosen (XmlReader.Element template, float x, float y) {
 				Vector2 pos = new Vector2(x, y);
-				createObjectByTypeName(template.getAttribute("name"), pos, null);
+				String templateName = template.getAttribute("name");
+				createObjectByTypeName(templateName, pos, null, templateName);
 			}
 		});
 
@@ -187,20 +188,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addRulers();
 	}
 
-	public GameObject createEmpty (Vector2 position) {
-		return createObjectByTypeName("empty", position, null);
-	}
-
-	public GameObject createEmpty (GameObject parent) {
-		return createObjectByTypeName("empty", null, parent);
-	}
-
 	public GameObject createEmpty (Vector2 position, GameObject parent) {
-		return createObjectByTypeName("empty", position, parent);
+		return createObjectByTypeName("empty", position, parent, "empty");
 	}
 
 	public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
-		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
+		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent, spriteAsset.nameIdentifier);
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
 		if (!fromDirectoryView) {
@@ -212,7 +205,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public GameObject createSpineObject (GameAsset<SkeletonData> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent);
+		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent, asset.nameIdentifier);
 		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
 
 		if (!fromDirectoryView) {
@@ -224,7 +217,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public GameObject createParticle (GameAsset<ParticleEffectDescriptor> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent);
+		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent, asset.nameIdentifier);
 		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
 
 		if (!fromDirectoryView) {
@@ -259,13 +252,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
+	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent, String nameHint) {
 		GameObject gameObject = new GameObject();
 		XmlReader.Element template = templateListPopup.getTemplate(idName);
 
 		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
 
-		String name = NamingUtils.getNewName(nameAttribute, getAllGONames());
+		String name = NamingUtils.getNewName(nameHint, getAllGONames());
 
 		gameObject.setName(name);
 		initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));

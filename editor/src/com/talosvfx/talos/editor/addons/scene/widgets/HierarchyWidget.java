@@ -306,7 +306,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             item.addListener(new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
-                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject);
+                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject, name);
                 }
             });
             popupMenu.addItem(item);
