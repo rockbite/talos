@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -46,6 +47,8 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -232,11 +235,38 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return particleObject;
 	}
 
+	private ArrayList<String> goNames = new ArrayList<>();
+	private Supplier<Collection<String>> getAllGONames () {
+		goNames.clear();
+		addNamesToList(goNames, getRootGO());
+		return new Supplier<Collection<String>>() {
+			@Override
+			public Collection<String> get () {
+				return goNames;
+			}
+		};
+	}
+
+	private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
+		goNames.add(gameObject.getName());
+		if (gameObject.getGameObjects() != null) {
+			Array<GameObject> gameObjects = gameObject.getGameObjects();
+			for (int i = 0; i < gameObjects.size; i++) {
+				GameObject child = gameObjects.get(i);
+				addNamesToList(goNames, child);
+
+			}
+		}
+	}
+
 	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
 		GameObject gameObject = new GameObject();
 		XmlReader.Element template = templateListPopup.getTemplate(idName);
 
-		String name = getUniqueGOName(template.getAttribute("nameTemplate", "gameObject"), true);
+		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
+
+		String name = NamingUtils.getNewName(nameAttribute, getAllGONames());
+
 		gameObject.setName(name);
 		initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));
 		initializeDefaultValues(gameObject, position);
@@ -288,7 +318,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		transformComponent.position.set(position);
 
-		String name = getUniqueGOName(prefab.name, true);
+		String name = NamingUtils.getNewName(prefab.name, getAllGONames());
+
 		gameObject.setName(name);
 
 		randomizeChildrenUUID(gameObject);
@@ -317,31 +348,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				randomizeChildrenUUID(gameObject);
 			}
 		}
-	}
-
-	private String getUniqueGOName (String nameTemplate) {
-		return getUniqueGOName(nameTemplate, false);
-	}
-
-	private String getUniqueGOName (String nameTemplate, boolean keepOriginal) {
-		if (fromDirectoryView) {
-			return UUID.randomUUID().toString().substring(0, 10);
-		}
-
-		int number = 0;
-
-		String name = nameTemplate;
-
-		if (!keepOriginal) {
-			name = nameTemplate + number;
-		}
-
-		while (currentContainer.hasGOWithName(name)) {
-			number++;
-			name = nameTemplate + number;
-		}
-
-		return name;
 	}
 
 	private void initComponentsFromTemplate (GameObject gameObject, XmlReader.Element template) {
@@ -816,7 +822,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
 
-				String name = getUniqueGOName(gameObject.getName(), false);
+				String name = NamingUtils.getNewName(gameObject.getName(), getAllGONames());
+
 				gameObject.setName(name);
 				randomizeChildrenUUID(gameObject);
 				parent.addGameObject(gameObject);
@@ -1214,7 +1221,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (suggestedName.equals(gameObject.getName()))
 			return;
 
-		String finalName = getUniqueGOName(suggestedName, true);
+		String finalName = NamingUtils.getNewName(suggestedName, getAllGONames());
+
 
 		String oldName = gameObject.getName();
 

@@ -361,27 +361,45 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
                 //Just add it
 
                 FilteredTree.Node<GameObject> newNode = createNodeForGameObject(gameObject);
+                processNewNode(newNode);
 
+                tree.addSource(newNode);
+            }
+        }
+
+    }
+
+    private void processNewNode (FilteredTree.Node<GameObject> newNode) {
+        GameObject gameObject = newNode.getObject();
+
+        //If our parent doesn't have a parent, our parent is the fake root
+        if (gameObject.getParent() != null && gameObject.getParent().getParent() != null) {
+            FilteredTree.Node<GameObject> parent = tree.findNode(gameObject.getParent());
+            if (parent != null) {
 
                 objectMap.put(gameObject.uuid.toString(), gameObject);
                 nodeMap.put(gameObject, newNode);
 
+                parent.add(newNode);
+            } else {
+                System.out.println("No parent found to add to node");
+            }
+        } else {
+            //Add it to the fake root
 
-                //If our parent doesn't have a parent, our parent is the fake root
-                if (gameObject.getParent() != null && gameObject.getParent().getParent() != null) {
-                    FilteredTree.Node<GameObject> parent = tree.findNode(gameObject.getParent());
-                    if (parent != null) {
-                        parent.add(newNode);
-                    } else {
-                        System.out.println("No parent found to add to node");
-                    }
-                } else {
-                    //Add it to the fake root
-                    tree.getRootNodes().first().add(newNode);
-                }
+            objectMap.put(gameObject.uuid.toString(), gameObject);
+            nodeMap.put(gameObject, newNode);
 
-                //Get the parent and add it
+            tree.getRootNodes().first().add(newNode);
+        }
 
+        if (gameObject.getGameObjects() != null) {
+            Array<GameObject> children = gameObject.getGameObjects();
+            for (int i = 0; i < children.size; i++) {
+                GameObject child = children.get(i);
+
+                FilteredTree.Node<GameObject> childNode = createNodeForGameObject(child);
+                processNewNode(childNode);
             }
         }
     }
