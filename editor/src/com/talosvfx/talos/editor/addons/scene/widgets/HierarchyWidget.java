@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -31,6 +32,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 public class HierarchyWidget extends Table implements Notifications.Observer {
 
+    private final ScrollPane scrollPane;
     private FilteredTree<GameObject> tree;
 
     private ObjectMap<String, GameObject> objectMap = new ObjectMap<>();
@@ -48,7 +50,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         top();
         defaults().top();
 
-        ScrollPane scrollPane= new ScrollPane(tree);
+        scrollPane= new ScrollPane(tree);
 
         add(scrollPane).height(0).grow().pad(5).padRight(0);
 
@@ -356,7 +358,30 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         GameObject gameObject = event.getTarget();
         if(currentContainer != null) {
             if(currentContainer.hasGOWithName(gameObject.getName())) {
-                loadEntityContainer(currentContainer);
+                //Just add it
+
+                FilteredTree.Node<GameObject> newNode = createNodeForGameObject(gameObject);
+
+
+                objectMap.put(gameObject.uuid.toString(), gameObject);
+                nodeMap.put(gameObject, newNode);
+
+
+                //If our parent doesn't have a parent, our parent is the fake root
+                if (gameObject.getParent() != null && gameObject.getParent().getParent() != null) {
+                    FilteredTree.Node<GameObject> parent = tree.findNode(gameObject.getParent());
+                    if (parent != null) {
+                        parent.add(newNode);
+                    } else {
+                        System.out.println("No parent found to add to node");
+                    }
+                } else {
+                    //Add it to the fake root
+                    tree.getRootNodes().first().add(newNode);
+                }
+
+                //Get the parent and add it
+
             }
         }
     }
@@ -383,6 +408,30 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
             tree.clearSelection(false);
             tree.addNodesToSelection(nodes, false);
+
+
+            if (!nodes.isEmpty()) {
+                //Focus on first one
+                FilteredTree.Node<GameObject> first = nodes.first();
+                //Focus on first one
+
+                first.expandTo();
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run () {
+                        //Need to do it frame layer after layut
+                        float topY = scrollPane.getScrollY();
+                        float scrollHeight = scrollPane.getScrollHeight();
+
+                        float positionInParent = tree.getHeight() - first.getActor().getY();
+
+                        if (positionInParent < topY || positionInParent > (topY + scrollHeight)) {
+                            scrollPane.setScrollY(positionInParent - scrollHeight/2f);
+                        }
+                    }
+                });
+
+            }
         }
     }
 
@@ -420,6 +469,26 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         currentContainer = entityContainer;
     }
 
+    private FilteredTree.Node<GameObject> createNodeForGameObject (GameObject gameObject) {
+        EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
+        editableLabel.setStage(getStage());
+
+        editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+            @Override
+            public void changed (String newText) {
+                SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
+            }
+        });
+
+        FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), makeHierarchyWidgetActor(editableLabel, gameObject));
+        newNode.setObject(gameObject);
+        newNode.setCompanionActor(createToolsForNode(newNode));
+
+        newNode.draggable = true;
+
+        return newNode;
+    }
+
     private void traverseEntityContainer(GameObjectContainer entityContainer, FilteredTree.Node<GameObject> node) {
         Array<GameObject> gameObjects = entityContainer.getGameObjects();
 
@@ -427,22 +496,8 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         for(int i = 0; i < gameObjects.size; i++) {
             final GameObject gameObject = gameObjects.get(i);
-            EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
-            editableLabel.setStage(getStage());
-
-            FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), makeHierarchyWidgetActor(editableLabel, gameObject));
-            newNode.setObject(gameObject);
-            newNode.setCompanionActor(createToolsForNode(newNode));
-
-            newNode.draggable = true;
+            FilteredTree.Node<GameObject> newNode = createNodeForGameObject(gameObject);
             node.add(newNode);
-
-            editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
-                @Override
-                public void changed (String newText) {
-                    SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
-                }
-            });
 
             objectMap.put(gameObject.uuid.toString(), gameObject);
             nodeMap.put(gameObject, newNode);
