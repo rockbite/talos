@@ -38,6 +38,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
@@ -46,9 +47,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1011,7 +1015,19 @@ public class AssetRepository implements Notifications.Observer {
 	public void copyRawAsset (FileHandle file, FileHandle directory) {
 		String fileName = file.name();
 		if (directory.child(fileName).exists()) {
-			fileName = suggestNewName(file, directory);
+			String baseName = file.nameWithoutExtension();
+
+			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
+				@Override
+				public Collection<String> get () {
+					ArrayList<String> fileNames = new ArrayList<>();
+					for (FileHandle fileHandle : directory.list()) {
+						fileNames.add(fileHandle.nameWithoutExtension());
+					}
+					return fileNames;
+				}
+			}) + "." + file.extension();
+
 		}
 		// do not allow stupid characters
 		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
@@ -1034,26 +1050,6 @@ public class AssetRepository implements Notifications.Observer {
 		collectRawResourceFromDirectory(dest, true);
 	}
 
-	private static String suggestNewName (FileHandle file, FileHandle directory) {
-		int i = 0;
-		String nameWithoutExtension = file.nameWithoutExtension();
-		if (nameWithoutExtension.contains("_Copy_")) {
-			nameWithoutExtension = nameWithoutExtension.split("_Copy_")[0];
-		}
-
-		while (i < 1000) {
-			String testName = nameWithoutExtension + "_Copy_" + i;
-			if (!file.isDirectory()) {
-				testName += "." + file.extension();
-			}
-			if (directory.child(testName).exists()) {
-				i++;
-			} else {
-				return testName;
-			}
-		}
-		return "Too_Many_File_Attempts";
-	}
 
 	static class MovingDirNode {
 		FileHandle oldHandle;

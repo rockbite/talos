@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -356,7 +355,7 @@ public class ProjectExplorerWidget extends Table {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
                     String path = files.first().path();
-                    FileHandle sceneDestination = AssetImporter.suggestNewName(path, "New Scene", "scn");
+                    FileHandle sceneDestination = AssetImporter.suggestNewNameForFileHandle(path, "New Scene", "scn");
                     Scene mainScene = new Scene(sceneDestination.path());
                     mainScene.save();
                     // TODO: refactor directory view widget to update itself
@@ -382,7 +381,7 @@ public class ProjectExplorerWidget extends Table {
 
                     FileHandle currentFolder = getCurrentFolder();
 
-                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Script", "ts");
+                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "New_Script", "ts");
                     FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
 
                     String templateString = templateScript.readString();
@@ -403,7 +402,7 @@ public class ProjectExplorerWidget extends Table {
 
                     FileHandle currentFolder = getCurrentFolder();
 
-                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), "Tween", "tw");
+                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Tween", "tw");
                     newScriptDestination.writeString("{}", false);
 
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
@@ -418,7 +417,7 @@ public class ProjectExplorerWidget extends Table {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
                     FileHandle currentFolder = getCurrentFolder();
-                    FileHandle newPaletteDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Palette", "ttp");
+                    FileHandle newPaletteDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "New_Palette", "ttp");
 
                     Json json = new Json(JsonWriter.OutputType.json);
                     String templateString = json.toJson(new TilePaletteData());

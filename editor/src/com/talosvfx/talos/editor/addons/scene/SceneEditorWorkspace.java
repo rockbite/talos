@@ -754,7 +754,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
 		}
 
-		FileHandle handle = AssetImporter.suggestNewName(path, name, "prefab");
+		FileHandle handle = AssetImporter.suggestNewNameForFileHandle(path, name, "prefab");
 		if (handle != null) {
 			GameObject gamePrefab = new GameObject();
 			gamePrefab.setName("Prefab");

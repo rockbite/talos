@@ -15,20 +15,21 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.FileOpener;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.StringBuilder;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 public class AssetImporter {
 
@@ -191,17 +192,24 @@ public class AssetImporter {
         return Gdx.files.absolute(path);
     }
 
-    public static FileHandle suggestNewName (String path, String filename, String extension) {
+    public static FileHandle suggestNewNameForFileHandle (String path, String filename, String extension) {
         FileHandle handle = Gdx.files.absolute(path);
 
+
         if(handle.exists() && handle.isDirectory()) {
+            filename = NamingUtils.getNewName(filename, new Supplier<Collection<String>>() {
+                @Override
+                public Collection<String> get () {
+                    ArrayList<String> fileNames = new ArrayList<>();
+                    for (FileHandle fileHandle : handle.list()) {
+                        fileNames.add(fileHandle.nameWithoutExtension());
+                    }
+                    return fileNames;
+                }
+            }) + "." + extension;
+
             String name = filename + "." + extension;
             FileHandle newFile = Gdx.files.absolute(handle.path() + File.separator + name);
-            int i = 0;
-            while (newFile.exists()) {
-                name = filename + "" + (i++) + "." + extension;
-                newFile = Gdx.files.absolute(handle.path() + File.separator + name);
-            }
 
             return newFile;
         } else {
