@@ -197,8 +197,9 @@ public class NodeStage extends WorkplaceStage {
 
 
     private void initActors() {
-        GridRenderer gridRenderer = new GridRenderer(stage);
-        stage.addActor(gridRenderer);
+        // TODO: 8/31/2022 handle this
+//        GridRenderer gridRenderer = new GridRenderer(stage);
+//        stage.addActor(gridRenderer);
 
         moduleBoardWidget = new ModuleBoardWidget(this);
 

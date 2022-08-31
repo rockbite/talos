@@ -181,7 +181,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(selectionRect);
 
 		gridDrawer = new GridDrawer(this, camera, gridProperties);
-		addRulers();
+		addActor(rulerRenderer);
 	}
 
 	public GameObject createEmpty (Vector2 position) {
@@ -957,7 +957,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			gridDrawer.drawGrid();
 			renderer.setRenderParentTiles(true);
 		} else {
-			drawGrid(batch, parentAlpha);
+			gridRenderer.drawGrid(camera, batch, shapeRenderer, parentAlpha, pixelToWorld(1.2f), pixelToWorld(150f));
 			renderer.setRenderParentTiles(false);
 		}
 

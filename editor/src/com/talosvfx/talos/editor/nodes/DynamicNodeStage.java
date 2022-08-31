@@ -86,8 +86,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     }
 
     protected void initActors() {
-        GridRenderer gridRenderer = new GridRenderer(stage);
-        stage.addActor(gridRenderer);
+        // TODO: 8/31/2022 Handle this
+//        GridRenderer gridRenderer = new GridRenderer(stage);
+//        stage.addActor(gridRenderer);
 
         nodeBoard = new NodeBoard(skin, this);
 

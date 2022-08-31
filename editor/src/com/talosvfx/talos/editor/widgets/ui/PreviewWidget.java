@@ -130,11 +130,13 @@ public class PreviewWidget extends ViewportWidget {
         gpuTimeLbl.setColor(Color.GRAY);
         cpuTimeLbl.setColor(Color.GRAY);
 
-        add(countLbl).left().top().padLeft(5).row();
-        add(trisCountLbl).left().top().padLeft(5).row();
-        add(nodeCallsLbl).left().top().padLeft(5).row();
-        add(cpuTimeLbl).left().top().padLeft(5).row();
-        add(gpuTimeLbl).left().top().padLeft(5).row();
+        addActor(rulerRenderer);
+
+        add(countLbl).left().top().padLeft(22).padTop(20).row();
+        add(trisCountLbl).left().top().padLeft(22).row();
+        add(nodeCallsLbl).left().top().padLeft(22).row();
+        add(cpuTimeLbl).left().top().padLeft(22).row();
+        add(gpuTimeLbl).left().top().padLeft(22).row();
         add().expand();
         row();
         add(previewController).bottom().left().growX();
@@ -142,6 +144,7 @@ public class PreviewWidget extends ViewportWidget {
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 
         initListeners();
+
     }
 
     private void initListeners () {
@@ -303,7 +306,7 @@ public class PreviewWidget extends ViewportWidget {
 
         if (previewController.isGridVisible()) {
             batch.end();
-            drawGrid(batch, parentAlpha * 0.5f);
+            gridRenderer.drawGrid(camera, batch, shapeRenderer, parentAlpha, pixelToWorld(1.2f), pixelToWorld(150));
             batch.begin();
         }
 

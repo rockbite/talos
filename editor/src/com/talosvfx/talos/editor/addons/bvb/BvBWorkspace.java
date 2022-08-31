@@ -111,6 +111,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         addListeners();
         addPanListener();
 
+        addActor(rulerRenderer);
         instance = this;
     }
 
@@ -292,7 +293,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
         batch.end();
-        drawGrid(batch, parentAlpha);
+        gridRenderer.drawGrid(camera, batch, shapeRenderer, parentAlpha, pixelToWorld(1.2f), pixelToWorld(150));
         batch.begin();
 
         if (backgroundImage.getDrawable() != null) {
