@@ -514,6 +514,19 @@ public class AssetRepository implements Notifications.Observer {
 		dataMaps.putFileHandleGameAsset(key, gameAsset);
 	}
 
+	public void copySampleParticleToProject (FileHandle preferredDestination) {
+		FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
+		FileHandle imageRequired = Gdx.files.internal("addons/scene/missing/white.png");
+
+		if (!preferredDestination.child(imageRequired.name()).exists()) {
+			AssetRepository.getInstance().copyRawAsset(imageRequired, preferredDestination);
+		} else {
+			System.out.println("Ignoring copying white, since we have it already");
+		}
+
+		AssetRepository.getInstance().copyRawAsset(originalTls, preferredDestination);
+	}
+
 	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
 		if (!assetTypeFromExtension.isRootGameAsset()) {
 			throw new GdxRuntimeException("Trying to load a game asset from a non root asset");
