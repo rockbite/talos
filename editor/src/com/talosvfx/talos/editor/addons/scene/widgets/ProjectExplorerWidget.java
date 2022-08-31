@@ -369,20 +369,7 @@ public class ProjectExplorerWidget extends Table {
                 public void clicked (InputEvent event, float x, float y) {
 
                     FileHandle currentFolder = getCurrentFolder();
-
-                    FileHandle tlsDestination = AssetImporter.suggestNewName(currentFolder.path(), "New_Effect", "tls");
-                    FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
-
-                    FileHandle imageRequired = Gdx.files.internal("addons/scene/missing/white.png");
-                    if (!tlsDestination.parent().child(imageRequired.name()).exists()) {
-                        AssetRepository.getInstance().copyRawAsset(imageRequired, tlsDestination.parent());
-                    } else {
-                        System.out.println("Ignoring copying white, since we have it already");
-                    }
-
-                    AssetRepository.getInstance().copyRawAsset(originalTls, tlsDestination);
-
-
+                    AssetRepository.getInstance().copySampleParticleToProject(currentFolder);
 
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());

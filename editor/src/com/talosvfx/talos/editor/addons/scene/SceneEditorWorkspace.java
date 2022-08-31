@@ -22,6 +22,7 @@ import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
@@ -136,8 +137,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	// selections
 	private Image selectionRect;
 
-	private AssetRepository assetRepository;
-
 	public SceneEditorWorkspace () {
 		layers.clear();
 		layers.add("Default");
@@ -240,12 +239,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		String name = getUniqueGOName(template.getAttribute("nameTemplate", "gameObject"), true);
 		gameObject.setName(name);
 		initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));
-
-		if (position != null && gameObject.hasComponent(TransformComponent.class)) {
-			// oh boi always special case with this fuckers
-			TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-			transformComponent.position.set(position.x, position.y);
-		}
+		initializeDefaultValues(gameObject, position);
 
 		if (parent == null) {
 			currentContainer.addGameObject(gameObject);
@@ -265,6 +259,25 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return gameObject;
+	}
+
+	private void initializeDefaultValues (GameObject gameObject, Vector2 position) {
+		if (position != null && gameObject.hasComponent(TransformComponent.class)) {
+			// oh boi always special case with this fuckers
+			TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+			transformComponent.position.set(position.x, position.y);
+		}
+
+		if (gameObject.hasComponent(ParticleComponent.class)) {
+			GameAsset<ParticleEffectDescriptor> sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
+			if (sample.isBroken()) {
+				// first time for sample
+				AssetRepository.getInstance().copySampleParticleToProject(getAssetsFolder());
+				sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
+			}
+			ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
+			particleComponent.setGameAsset(sample);
+		}
 	}
 
 	public GameObject createFromPrefab (GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
