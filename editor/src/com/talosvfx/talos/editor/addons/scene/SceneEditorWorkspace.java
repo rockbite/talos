@@ -568,6 +568,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		GameObject rootGO = getRootGO();
 		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
+
+
 		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
@@ -578,7 +580,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
 				}
 
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(dummyParent));
+				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
 
 				selectGameObjectExternally(dummyParent);
 			}

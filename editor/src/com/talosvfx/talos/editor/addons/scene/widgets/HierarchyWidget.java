@@ -508,6 +508,34 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         }
     }
 
+    public void restructureGameObjects (Array<GameObject> selectedObjects) {
+        for (GameObject gameObject : selectedObjects) {
+            FilteredTree.Node<GameObject> node = tree.findNode(gameObject);
+
+            if (node != null) {
+
+                if (gameObject.getParent() != null && gameObject.getParent().getParent() != null) {
+                    //Its not a root
+                    GameObject parent = gameObject.getParent();
+                    FilteredTree.Node<GameObject> parentNode = tree.findNode(parent);
+                    if (parentNode != null) {
+
+                        tree.remove(node);
+                        parentNode.add(node);
+                    } else {
+                        System.out.println("Couldn't find new parent");
+                    }
+                } else {
+                    tree.remove(node);
+                    //Its somehow moved into the root
+                    tree.getRootNodes().first().add(node);
+                }
+
+            }
+
+        }
+    }
+
     private static class HierarchyWrapper extends Table {
 
         private final Actor label;
