@@ -120,6 +120,8 @@ public class AssetListPopup<T> extends VisWindow {
     }
 
     public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<GameAsset<T>>> filter, FilteredTree.ItemListener<GameAsset<T>> listener) {
+        this.filterTreeListener = listener;
+
         loadTree(filter);
 
         setPosition(location.x, location.y - getHeight());
@@ -143,8 +145,9 @@ public class AssetListPopup<T> extends VisWindow {
 
     @Override
     public boolean remove () {
-        if (getStage() != null) getStage().removeListener(stageListener);
         tree.removeItemListener(filterTreeListener);
+
+        if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
     }
 

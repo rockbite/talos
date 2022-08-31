@@ -85,7 +85,7 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public void removeItemListener (ItemListener<T> filterTreeListener) {
-        itemListeners.removeValue(filterTreeListener, true);
+        boolean b = itemListeners.removeValue(filterTreeListener, true);
     }
 
     public static abstract class ItemListener<T> {
