@@ -514,6 +514,24 @@ public class AssetRepository implements Notifications.Observer {
 		dataMaps.putFileHandleGameAsset(key, gameAsset);
 	}
 
+	public void copySampleParticleToProject (FileHandle preferredDestination) {
+		FileHandle tlsDestination = AssetImporter.suggestNewName(preferredDestination.path(), "New_Effect", "tls");
+		FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
+
+		FileHandle imageRequired = Gdx.files.internal("addons/scene/missing/white.png");
+		if (!tlsDestination.parent().child(imageRequired.name()).exists()) {
+			AssetRepository.getInstance().copyRawAsset(imageRequired, tlsDestination.parent());
+		} else {
+			System.out.println("Ignoring copying white, since we have it already");
+		}
+
+		if (!tlsDestination.child(originalTls.name()).exists()) {
+			AssetRepository.getInstance().copyRawAsset(originalTls, tlsDestination);
+		} else {
+			System.out.println("Ignoring copying tls, since we have it already");
+		}
+	}
+
 	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
 		if (!assetTypeFromExtension.isRootGameAsset()) {
 			throw new GdxRuntimeException("Trying to load a game asset from a non root asset");
