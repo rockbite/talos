@@ -17,7 +17,6 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
-import com.talosvfx.talos.editor.utils.GridRenderer;
 
 public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
 

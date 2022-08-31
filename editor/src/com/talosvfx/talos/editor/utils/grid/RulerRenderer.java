@@ -1,6 +1,5 @@
-package com.talosvfx.talos.editor.utils;
+package com.talosvfx.talos.editor.utils.grid;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -12,13 +11,16 @@ import static com.kotcrab.vis.ui.VisUI.getSkin;
 
 public class RulerRenderer extends Group {
 
-    private GridRenderer gridRenderer;
+    private GridPropertyProvider gridPropertyProvider;
 
     private Table yRulerTable;
     private Table xRulerTable;
 
-    public RulerRenderer (GridRenderer gridRenderer) {
-        this.gridRenderer = gridRenderer;
+    private ViewportWidget viewportWidget;
+
+    public RulerRenderer (GridPropertyProvider gridRenderer, ViewportWidget widget) {
+        this.gridPropertyProvider = gridRenderer;
+        this.viewportWidget = widget;
         addRulers();
     }
 
@@ -33,16 +35,16 @@ public class RulerRenderer extends Group {
         addActor(yRulerTable);
     }
 
-    public void configureRulers (ViewportWidget viewportWidget) {
+    public void configureRulers () {
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
         float rulerHeight = 20f;
         xRulerTable.setY(viewportWidget.getHeight() - rulerHeight);
         xRulerTable.setHeight(rulerHeight);
 
-        float xStart = gridRenderer.gridXStart;
-        while (xStart <= gridRenderer.gridXEnd) {
-            xStart += gridRenderer.gridUnit;
+        float xStart = gridPropertyProvider.getGridStartX();
+        while (xStart <= gridPropertyProvider.getGridEndX()) {
+            xStart += gridPropertyProvider.getUnitX();
 
             String coordText;
             int testInt = (int)xStart;
@@ -54,13 +56,13 @@ public class RulerRenderer extends Group {
         }
 
         yRulerTable.clearChildren();
-        float yStart = gridRenderer.gridYStart;
+        float yStart = gridPropertyProvider.getGridStartY();
 
         float maxWidth = 0;
         yRulerTable.clearChildren();
         yRulerTable.setHeight(viewportWidget.getHeight());
-        while (yStart <= gridRenderer.gridYEnd) {
-            yStart += gridRenderer.gridUnit;
+        while (yStart <= gridPropertyProvider.getGridEndY()) {
+            yStart += gridPropertyProvider.getUnitY();
 
             String coordText;
             int testInt = (int)yStart;

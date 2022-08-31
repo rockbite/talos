@@ -28,7 +28,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.utils.GridRenderer;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 

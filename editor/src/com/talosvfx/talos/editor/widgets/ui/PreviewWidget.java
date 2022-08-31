@@ -39,11 +39,15 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
+import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+
+import java.util.function.Supplier;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -306,7 +310,8 @@ public class PreviewWidget extends ViewportWidget {
 
         if (previewController.isGridVisible()) {
             batch.end();
-            gridRenderer.drawGrid(camera, batch, shapeRenderer, parentAlpha, pixelToWorld(1.2f), pixelToWorld(150));
+            gridPropertyProvider.update(camera, parentAlpha);
+            gridRenderer.drawGrid(batch, shapeRenderer);
             batch.begin();
         }
 
@@ -365,6 +370,14 @@ public class PreviewWidget extends ViewportWidget {
             shapeRenderer.end();
             batch.begin();
         }
+    }
+
+    @Override
+    public void initializeGridPropertyProvider () {
+        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
     }
 
     public GLProfiler getGLProfiler() {

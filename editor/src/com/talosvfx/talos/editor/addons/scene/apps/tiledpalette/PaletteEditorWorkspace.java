@@ -29,22 +29,17 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.utils.GridDrawer;
+import com.talosvfx.talos.editor.utils.grid.property_providers.PaletteGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.util.Comparator;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 
 public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
     private PaletteEditor paletteEditor;
     GameAsset<TilePaletteData> paletteData;
-
-    private GridDrawer gridDrawer;
-    private SceneEditorWorkspace.GridProperties gridProperties;
-
     private Image selectionRect;
 
     private MainRenderer mainRenderer;
@@ -133,33 +128,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             }
         };
 
-        gridProperties = new SceneEditorWorkspace.GridProperties();
-        gridProperties.sizeProvider = new Supplier<float[]>() {
-            @Override
-            public float[] get () {
-                if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-                    TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-                    if (selectedLayer == null) {
-                        return new float[]{1,1};
-                    } else {
-                        return new float[]{selectedLayer.getTileSizeX(), selectedLayer.getTileSizeY()};
-                    }
-                }
-
-                return new float[]{1, 1};
-
-            }
-        };
-
-        gridDrawer = new GridDrawer(this, camera, gridProperties);
-        gridDrawer.highlightCursorHover = true;
-        gridDrawer.drawAxis = false;
+        gridPropertyProvider.setHighlightCursorHover(true);
 
         selectionRect = new Image(TalosMain.Instance().getSkin().getDrawable("orange_row"));
         selectionRect.setSize(0, 0);
         selectionRect.setVisible(false);
         addActor(selectionRect);
+        addActor(rulerRenderer);
 
         initListeners();
     }
@@ -468,8 +443,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     localToScreenCoordinates(dragEndPos);
 
                     // project to grid coordinates
-                    gridDrawer.project(dragStartPos);
-                    gridDrawer.project(dragEndPos);
+                    gridRenderer.project(dragStartPos);
+                    gridRenderer.project(dragEndPos);
 
 
                     final ObjectSet<GridPosition> parentTiles = new ObjectSet<>();
@@ -531,8 +506,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
+        gridPropertyProvider.update(camera, parentAlpha);
+        gridRenderer.drawGrid(batch, shapeRenderer);
         batch.end();
-        gridDrawer.drawGrid();
 
         OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
 
@@ -949,6 +925,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         mainRenderer.skipUpdates = false;
 
+    }
+
+    @Override
+    public void initializeGridPropertyProvider () {
+        gridPropertyProvider = new PaletteGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
     }
 
     private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {

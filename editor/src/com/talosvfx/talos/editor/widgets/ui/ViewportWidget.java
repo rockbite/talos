@@ -30,8 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -55,8 +53,9 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
-import com.talosvfx.talos.editor.utils.GridRenderer;
-import com.talosvfx.talos.editor.utils.RulerRenderer;
+import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.GridRenderer;
+import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
@@ -73,8 +72,6 @@ public abstract class ViewportWidget extends Table {
 	private Matrix4 prevProjection = new Matrix4();
 
 	public CameraController cameraController;
-
-	protected Color bgColor = new Color(Color.BLACK);
 
 	protected float maxZoom = 0.01f;
 	protected float minZoom = 200f;
@@ -102,6 +99,8 @@ public abstract class ViewportWidget extends Table {
 
 	protected boolean locked;
 
+	protected GridPropertyProvider gridPropertyProvider;
+
 	protected GridRenderer gridRenderer;
 	protected RulerRenderer rulerRenderer;
 
@@ -113,8 +112,9 @@ public abstract class ViewportWidget extends Table {
 		entitySelectionBuffer = new EntitySelectionBuffer();
 		camera = new OrthographicCamera();
 		camera.viewportWidth = 10;
-		gridRenderer = new GridRenderer();
-		rulerRenderer = new RulerRenderer(gridRenderer);
+		initializeGridPropertyProvider();
+		gridRenderer = new GridRenderer(gridPropertyProvider, this);
+		rulerRenderer = new RulerRenderer(gridPropertyProvider, this);
 
 		setTouchable(Touchable.enabled);
 
@@ -561,7 +561,8 @@ public abstract class ViewportWidget extends Table {
 
 		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
-		Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1f);
+		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
+		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float aspect = getWidth() / getHeight();
@@ -625,7 +626,7 @@ public abstract class ViewportWidget extends Table {
 			bitmapFont.dispose();
 		}
 
-		rulerRenderer.configureRulers(this);
+		rulerRenderer.configureRulers();
 
 		super.draw(batch, parentAlpha);
 	}
@@ -984,4 +985,6 @@ public abstract class ViewportWidget extends Table {
 
 	protected void drawEntitiesForSelection () {
 	}
+
+	public abstract void initializeGridPropertyProvider ();
 }

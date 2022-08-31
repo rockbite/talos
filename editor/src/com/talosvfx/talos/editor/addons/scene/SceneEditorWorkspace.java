@@ -40,7 +40,8 @@ import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.utils.GridDrawer;
+import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
@@ -77,9 +78,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private float reloadScheduled = -1;
 
 	public Array<String> layers = new Array<>();
-
-	private final GridDrawer gridDrawer;
-	public GridProperties gridProperties = new GridProperties();
 	public MapEditorState mapEditorState;
 	private MapEditorToolbar mapEditorToolbar;
 
@@ -128,12 +126,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return null;
 	}
 
-
-	public static class GridProperties {
-		public Supplier<float[]> sizeProvider;
-		public int subdivisions = 0;
-	}
-
 	// selections
 	private Image selectionRect;
 
@@ -180,7 +172,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		selectionRect.setVisible(false);
 		addActor(selectionRect);
 
-		gridDrawer = new GridDrawer(this, camera, gridProperties);
 		addActor(rulerRenderer);
 	}
 
@@ -622,8 +613,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	private void eraseTileAt (float x, float y) {
 		if (mapEditorState.isErasing()) {
-			int mouseCellX = gridDrawer.getMouseCellX();
-			int mouseCellY = gridDrawer.getMouseCellY();
+			int mouseCellX = gridRenderer.getMouseCellX();
+			int mouseCellY = gridRenderer.getMouseCellY();
 			//Targets
 			TalosLayer layerSelected = mapEditorState.getLayerSelected();
 			if (layerSelected != null) {
@@ -647,8 +638,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Vector2 worldFromLocal = getWorldFromLocal(x, y);
 
 		if (mapEditorState.isPainting()) {
-			int mouseCellX = gridDrawer.getMouseCellX();
-			int mouseCellY = gridDrawer.getMouseCellY();
+			int mouseCellX = gridRenderer.getMouseCellX();
+			int mouseCellY = gridRenderer.getMouseCellY();
 			//Targets
 
 			TalosLayer layerSelected = mapEditorState.getLayerSelected();
@@ -953,11 +944,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		batch.end();
 
 		if (mapEditorState.isEditing()) {
-			gridDrawer.highlightCursorHover = true;
-			gridDrawer.drawGrid();
+			gridPropertyProvider.setHighlightCursorHover(true);
+			gridPropertyProvider.update(camera, parentAlpha);
+			gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(true);
 		} else {
-			gridRenderer.drawGrid(camera, batch, shapeRenderer, parentAlpha, pixelToWorld(1.2f), pixelToWorld(150f));
+			gridPropertyProvider.update(camera, parentAlpha);
+			gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(false);
 		}
 
@@ -1076,9 +1069,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		selectPropertyHolder(mainScene);
 
 		if (mainScene instanceof Scene) {
-			bgColor.set(Color.valueOf("#272727"));
+			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
 		} else {
-			bgColor.set(Color.valueOf("#241a00"));
+			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#241a00"));
 		}
 	}
 
@@ -1498,4 +1491,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.skipUpdates = false;
 
 	}
+
+	@Override
+	public void initializeGridPropertyProvider () {
+		gridPropertyProvider = new BaseGridPropertyProvider();
+		gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+		((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+	}
+
 }
