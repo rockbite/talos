@@ -28,22 +28,6 @@ public class MapGizmo extends Gizmo {
 
     private void setupForCustomGrid (GameObject gameObject) {
 
-        SceneEditorWorkspace.GridProperties gridProperties = SceneEditorWorkspace.getInstance().gridProperties;
 
-        Supplier<float[]> sizeProvider = new Supplier<float[]>() {
-            @Override
-            public float[] get () {
-                MapComponent mapComponent = gameObject.getComponent(MapComponent.class);
-                TalosLayer selectedLayer = mapComponent.selectedLayer;
-
-                if (selectedLayer == null) {
-                    return new float[]{1,1};
-                } else {
-                    return new float[]{selectedLayer.getTileSizeX(), selectedLayer.getTileSizeY()};
-                }
-
-            }
-        };
-        gridProperties.sizeProvider = sizeProvider;
     }
 }

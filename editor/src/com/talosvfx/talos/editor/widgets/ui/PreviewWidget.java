@@ -39,11 +39,15 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
+import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+
+import java.util.function.Supplier;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -130,11 +134,13 @@ public class PreviewWidget extends ViewportWidget {
         gpuTimeLbl.setColor(Color.GRAY);
         cpuTimeLbl.setColor(Color.GRAY);
 
-        add(countLbl).left().top().padLeft(5).row();
-        add(trisCountLbl).left().top().padLeft(5).row();
-        add(nodeCallsLbl).left().top().padLeft(5).row();
-        add(cpuTimeLbl).left().top().padLeft(5).row();
-        add(gpuTimeLbl).left().top().padLeft(5).row();
+        addActor(rulerRenderer);
+
+        add(countLbl).left().top().padLeft(22).padTop(20).row();
+        add(trisCountLbl).left().top().padLeft(22).row();
+        add(nodeCallsLbl).left().top().padLeft(22).row();
+        add(cpuTimeLbl).left().top().padLeft(22).row();
+        add(gpuTimeLbl).left().top().padLeft(22).row();
         add().expand();
         row();
         add(previewController).bottom().left().growX();
@@ -142,6 +148,7 @@ public class PreviewWidget extends ViewportWidget {
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 
         initListeners();
+
     }
 
     private void initListeners () {
@@ -303,7 +310,10 @@ public class PreviewWidget extends ViewportWidget {
 
         if (previewController.isGridVisible()) {
             batch.end();
-            drawGrid(batch, parentAlpha * 0.5f);
+            gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+            ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+            gridPropertyProvider.update(camera, parentAlpha);
+            gridRenderer.drawGrid(batch, shapeRenderer);
             batch.begin();
         }
 
@@ -362,6 +372,12 @@ public class PreviewWidget extends ViewportWidget {
             shapeRenderer.end();
             batch.begin();
         }
+    }
+
+    @Override
+    public void initializeGridPropertyProvider () {
+        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
     }
 
     public GLProfiler getGLProfiler() {
