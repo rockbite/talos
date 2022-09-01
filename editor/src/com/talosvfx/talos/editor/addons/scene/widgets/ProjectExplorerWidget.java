@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -31,6 +32,9 @@ import info.debatty.java.stringsimilarity.interfaces.StringSimilarity;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 public class ProjectExplorerWidget extends Table {
 
@@ -201,18 +205,6 @@ public class ProjectExplorerWidget extends Table {
         return null;
     }
 
-    private FileHandle findAvailableHandleIn(FileHandle parent, String name) {
-        int i = 0;
-        String testName = name;
-        FileHandle newHandle = Gdx.files.absolute(parent.path() + File.separator + testName);
-        while(newHandle.exists()) {
-            testName = name + " (" + (++i) + ")";
-            newHandle = Gdx.files.absolute(parent.path() + File.separator + testName);
-        }
-        // if this loop continues forever, scream "sacrebleu" reevaluate mistakes you did in life, and overflow.
-
-        return newHandle;
-    }
 
     public void deletePath(Array<String> paths) {
         Runnable runnable = new Runnable() {
@@ -334,9 +326,21 @@ public class ProjectExplorerWidget extends Table {
                     if (path != null) {
                         FileHandle handle = Gdx.files.absolute(path);
                         if (handle.isDirectory()) {
-                            FileHandle newHandle = findAvailableHandleIn(handle, "New Directory");
+                            String name = NamingUtils.getNewName("New Directory", new Supplier<Collection<String>>() {
+                                @Override
+                                public Collection<String> get () {
+                                    FileHandle[] list = handle.list();
+                                    ArrayList<String> names = new ArrayList<>();
+                                    for (FileHandle fileHandle : list) {
+                                        names.add(fileHandle.name());
+                                    }
+                                    return names;
+                                }
+                            });
+                            FileHandle newHandle = handle.child(name);
+
                             newHandle.mkdirs();
-                            loadDirectoryTree((String) rootNode.getObject());
+                            loadDirectoryTree(rootNode.getObject());
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
                             expand(newHandle.path());
                             select(newNode.getParent());
@@ -346,6 +350,13 @@ public class ProjectExplorerWidget extends Table {
 
                             directoryViewWidget.selectForPath(newHandle);
                             directoryViewWidget.rename();
+
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run () {
+                                    directoryViewWidget.scrollTo(newHandle);
+                                }
+                            });
                         }
                     }
                 }
