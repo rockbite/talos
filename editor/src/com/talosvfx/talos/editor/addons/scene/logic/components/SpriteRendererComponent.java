@@ -35,6 +35,9 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 size = new Vector2(1, 1);
 
+    @ValueProperty(prefix = {"W", "H"}, min = 0.05f)
+    public Vector2 tileSize = new Vector2(1, 1);
+
     @Override
     public GameAssetType getGameAssetType () {
         return GameAssetType.SPRITE;
@@ -96,6 +99,18 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         PropertyWidget fixAspectRatioWidget = WidgetFactory.generate(this, "fixAspectRatio", "Fix Aspect Ratio");
         PropertyWidget renderModesWidget = WidgetFactory.generate(this, "renderMode", "Render Mode");
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "size", "Size");
+        PropertyWidget tileSizeWidget = WidgetFactory.generate(this, "tileSize", "Tile Size");
+
+        renderModesWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                if (renderMode == RenderMode.tiled) {
+                    tileSizeWidget.setVisible(true);
+                } else {
+                    tileSizeWidget.setVisible(false);
+                }
+            }
+        });
 
         // snap to aspect ratio
         fixAspectRatioWidget.addListener(new ChangeListener() {
@@ -152,6 +167,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
         properties.add(sizeWidget);
+        properties.add(tileSizeWidget);
 
         return properties;
     }
@@ -190,6 +206,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         json.writeValue("fixAspectRatio", fixAspectRatio);
         json.writeValue("renderMode", renderMode);
         json.writeValue("size", size);
+        json.writeValue("tileSize", tileSize);
 
         super.write(json);
 
@@ -211,6 +228,10 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         JsonValue size = jsonData.get("size");
         if (size != null) {
             this.size = json.readValue(Vector2.class, size);
+        }
+        JsonValue tileSize = jsonData.get("tileSize");
+        if (tileSize != null) {
+            this.tileSize = json.readValue(Vector2.class, tileSize);
         }
 
         if(renderMode == null) renderMode = RenderMode.simple;

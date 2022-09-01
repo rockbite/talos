@@ -44,6 +44,8 @@ public class MainRenderer implements Notifications.Observer {
 
     private TransformComponent tempTransform = new TransformComponent();
     private Vector2 vec = new Vector2();
+    private Vector2 vector2 = new Vector2();
+
     private Vector2[] points = new Vector2[4];
 
     private ObjectMap<String, Integer> layerOrderLookup = new ObjectMap<>();
@@ -363,21 +365,125 @@ public class MainRenderer implements Notifications.Observer {
                             xSign * transformComponent.worldScale.x, ySign * transformComponent.worldScale.y,
                             transformComponent.worldRotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {
-                    textureRegion.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-                    float repeatX = width / (textureRegion.getTexture().getWidth() / metadata.pixelsPerUnit);
-                    float repeatY = height / (textureRegion.getTexture().getHeight() / metadata.pixelsPerUnit);
-                    textureRegion.setRegion(0, 0, repeatX, repeatY);
 
-                    batch.draw(textureRegion,
-                        transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
-                            0.5f, 0.5f,
-                            1f, 1f,
-                            width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
-                            transformComponent.worldRotation);
+                    //Tiled mode, we draw from bottom left and fill it based on tile size
+
+                    float tileWidth = spriteRenderer.tileSize.x * transformComponent.worldScale.x;
+                    float tileHeight = spriteRenderer.tileSize.y * transformComponent.worldScale.y;
+
+                    float totalWidth = width * transformComponent.worldScale.x;
+                    float totalHeight = height * transformComponent.worldScale.y;
+
+                    float startX = transformComponent.worldPosition.x - totalWidth/2;
+                    float startY = transformComponent.worldPosition.y - totalHeight/2;
+
+                    float xCoord = 0;
+                    float yCoord = 0;
+
+                    float halfTileWidth = tileWidth / 2f;
+                    float halfTileHeight = tileHeight / 2f;
+
+                    float endX = startX + totalWidth;
+                    float endY = startY + totalHeight;
+
+                    xCoord = startX;
+                    yCoord = startX;
+
+                    for (xCoord = startX; xCoord < endX - tileWidth; xCoord += tileWidth){
+                        for (yCoord = startY; yCoord < endY - tileHeight; yCoord += tileHeight) {
+
+                            //Coord needs to be rotated from cneter
+
+                            vector2.set(xCoord + halfTileWidth, yCoord + halfTileHeight);
+                            vector2.sub(transformComponent.worldPosition);
+                            vector2.rotateDeg(transformComponent.worldRotation);
+                            vector2.add(transformComponent.worldPosition);
+
+                            //Tiny scale for artifacting, better to do with a mesh really
+                            batch.draw(textureRegion, vector2.x - halfTileWidth, vector2.y - halfTileHeight, halfTileWidth, halfTileHeight, tileWidth, tileHeight, 1.0002f, 1.002f, transformComponent.worldRotation);
+                        }
+                    }
+
+                    float remainderX = endX - xCoord;
+                    float remainderY = endY - yCoord;
+
+
+                    //Draw the remainders in x
+                    for (float yCoordRemainder = startY; yCoordRemainder < endY - tileHeight; yCoordRemainder += tileHeight) {
+
+                        //Coord needs to be rotated from cneter
+
+                        vector2.set(xCoord + halfTileWidth, yCoordRemainder + halfTileHeight);
+                        vector2.sub(transformComponent.worldPosition);
+                        vector2.rotateDeg(transformComponent.worldRotation);
+                        vector2.add(transformComponent.worldPosition);
+
+                        //clip it
+
+                        float uWidth = textureRegion.getU2() - textureRegion.getU();
+                        float uScale = uWidth * remainderX/tileWidth;
+                        float cachedU2 = textureRegion.getU2();
+                        textureRegion.setU2(textureRegion.getU() + uScale);
+                        batch.draw(textureRegion, vector2.x - halfTileWidth, vector2.y - halfTileHeight, halfTileWidth, halfTileHeight, remainderX, tileHeight, 1.002f, 1.002f, transformComponent.worldRotation);
+                        textureRegion.setU2(cachedU2);
+                    }
+
+                    //Draw the remainders in y
+                    for (float xCoordRemainder = startX; xCoordRemainder < endX - tileWidth; xCoordRemainder += tileWidth) {
+
+                        //Coord needs to be rotated from cneter
+
+                        vector2.set(xCoordRemainder + halfTileWidth, yCoord + halfTileHeight);
+                        vector2.sub(transformComponent.worldPosition);
+                        vector2.rotateDeg(transformComponent.worldRotation);
+                        vector2.add(transformComponent.worldPosition);
+
+                        //clip it
+
+                        float vWidth = textureRegion.getV2() - textureRegion.getV();
+                        float vScale = vWidth * remainderY/tileHeight;
+                        float cachedV = textureRegion.getV();
+                        textureRegion.setV(textureRegion.getV2() - vScale);
+                        batch.draw(textureRegion, vector2.x - halfTileWidth, vector2.y - halfTileHeight, halfTileWidth, halfTileHeight, tileWidth, remainderY, 1.002f, 1.002f, transformComponent.worldRotation);
+                        textureRegion.setV(cachedV);
+                    }
+
+                    //Last one
+
+                    {
+                        vector2.set(xCoord + halfTileWidth, yCoord + halfTileHeight);
+                        vector2.sub(transformComponent.worldPosition);
+                        vector2.rotateDeg(transformComponent.worldRotation);
+                        vector2.add(transformComponent.worldPosition);
+
+                        //clip it
+
+                        float uWidth = textureRegion.getU2() - textureRegion.getU();
+                        float uScale = uWidth * remainderX/tileWidth;
+                        float cachedU2 = textureRegion.getU2();
+                        textureRegion.setU2(textureRegion.getU() + uScale);
+
+
+                        float vWidth = textureRegion.getV2() - textureRegion.getV();
+                        float vScale = vWidth * remainderY/tileHeight;
+                        float cachedV = textureRegion.getV();
+                        textureRegion.setV(textureRegion.getV2() - vScale);
+
+                        batch.draw(textureRegion, vector2.x - halfTileWidth, vector2.y - halfTileHeight, halfTileWidth, halfTileHeight, remainderX, remainderY, 1.002f, 1.002f, transformComponent.worldRotation);
+                        textureRegion.setV(cachedV);
+                        textureRegion.setU2(cachedU2);
+
+                    }
+
+//
+//                    batch.draw(textureRegion,
+//                        transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
+//                            0.5f, 0.5f,
+//                            1f, 1f,
+//                            width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
+//                            transformComponent.worldRotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
-                    textureRegion.getTexture().setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-                    textureRegion.setRegion(0, 0, textureRegion.getTexture().getWidth(), textureRegion.getTexture().getHeight());
 
                     batch.draw(textureRegion,
                         transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
