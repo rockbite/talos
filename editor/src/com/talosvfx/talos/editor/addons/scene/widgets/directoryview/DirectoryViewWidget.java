@@ -81,7 +81,7 @@ public class DirectoryViewWidget extends Table {
                     projectExplorer.invokePaste(fileHandle);
                 }
 
-                if (keycode == Input.Keys.FORWARD_DEL) {
+                if (keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.DEL) {
                     Array<String> paths = new Array<>();
                     for (int i = 0; i < selected.size; i++) {
                         Item item = selected.get(i);
