@@ -908,6 +908,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     protected void drawEntitiesForSelection () {
         super.drawEntitiesForSelection();
 
+        mainRenderer.setRenderingEntitySelectionBuffer(true);
+
         mainRenderer.skipUpdates = true;
 
         PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
@@ -924,6 +926,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         customBatch.end();
 
         mainRenderer.skipUpdates = false;
+
+
+        mainRenderer.setRenderingEntitySelectionBuffer(false);
 
     }
 

@@ -33,6 +33,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import org.w3c.dom.Text;
 
 import java.util.Comparator;
 
@@ -68,8 +69,11 @@ public class MainRenderer implements Notifications.Observer {
     private OrthographicCamera camera;
 
     private boolean renderParentTiles = false;
+    private boolean renderingToEntitySelectionBuffer = false;
 
     public boolean skipUpdates = false;
+
+    private Texture white;
 
     public static class RenderState {
         private Array<GameObject> list = new Array<>();
@@ -99,6 +103,7 @@ public class MainRenderer implements Notifications.Observer {
         };
 
         activeSorter = layerAndDrawOrderComparator;
+        white = new Texture(Gdx.files.internal("white.png"));
     }
 
     public static float getDrawOrderSafe (GameObject gameObject) {
@@ -251,6 +256,29 @@ public class MainRenderer implements Notifications.Observer {
             Gdx.gl.glDisable(GL20.GL_BLEND);
         }
         batch.begin();
+
+        if (renderingToEntitySelectionBuffer) {
+            //Render with batch
+
+            for (int i = 0; i < state.list.size; i++) {
+                GameObject gameObject = state.list.get(i);
+                if (gameObject.hasComponent(TileDataComponent.class)) {
+
+                    if (batch instanceof PolyBatchWithEncodingOverride) {
+                        Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(gameObject);
+                        ((PolyBatchWithEncodingOverride)batch).setCustomEncodingColour(colourForEntityUUID.r, colourForEntityUUID.g, colourForEntityUUID.b, colourForEntityUUID.a);
+                    }
+
+                    TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+
+                    for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
+                        batch.draw(white, parentTile.x, parentTile.y, 1, 1);
+
+                    }
+                }
+
+            }
+        }
 
         for (int i = 0; i < state.list.size; i++) {
             GameObject gameObject = state.list.get(i);
@@ -608,5 +636,9 @@ public class MainRenderer implements Notifications.Observer {
 
     public void setRenderParentTiles (boolean renderParentTiles) {
         this.renderParentTiles = renderParentTiles;
+    }
+
+    public void setRenderingEntitySelectionBuffer (boolean renderingToBuffer) {
+        this.renderingToEntitySelectionBuffer = renderingToBuffer;
     }
 }
