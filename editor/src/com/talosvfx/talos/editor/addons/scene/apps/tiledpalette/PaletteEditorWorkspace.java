@@ -681,7 +681,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         if (event.get().size == 0) {
             PaletteEvent e = paletteEventPool.obtain();
             e.setType(PaletteEvent.Type.lostFocus);
-            e.setCurrentFilterMode(PaletteEditor.PaletteImportMode.TILE_ENTITY);
             notify(e, false);
         }
 

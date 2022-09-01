@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -17,6 +16,9 @@ public class ModeToggle extends Table {
     private static final ColorLibrary.BackgroundColor btnBgDown = ColorLibrary.BackgroundColor.PALETTE_TOGGLE_DOWN;
     private static final ColorLibrary.BackgroundColor btnBgChecked = ColorLibrary.BackgroundColor.PALETTE_TOGGLE_DOWN;
     private static final ColorLibrary.BackgroundColor btnBgOver = ColorLibrary.BackgroundColor.PALETTE_TOGGLE_HOVER;
+
+    private TextButton tileBtn;
+    private TextButton entityBtn;
 
     public ModeToggle () {
         Skin skin = TalosMain.Instance().getSkin();
@@ -27,7 +29,7 @@ public class ModeToggle extends Table {
         Label modeLabel = new Label("Import Mode", skin);
 
         // Left button
-        TextButton tileBtn = new TextButton("Tile", skin);
+        tileBtn = new TextButton("Tile", skin);
         TextButton.TextButtonStyle leftBtnStyle = getButtonStyle(skin);
         tileBtn.setStyle(leftBtnStyle);
 
@@ -35,7 +37,7 @@ public class ModeToggle extends Table {
         TextButton.TextButtonStyle toggleBtnStyleRight = getButtonStyle(skin);
         toggleBtnStyleRight.up = ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_RIGHT_2, btnBgUp);
         toggleBtnStyleRight.over = ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_RIGHT_2, btnBgOver);
-        TextButton entityBtn = new TextButton("Entity", skin);
+        entityBtn = new TextButton("Entity", skin);
         entityBtn.setStyle(toggleBtnStyleRight);
 
         add(modeLabel).left();
@@ -82,5 +84,13 @@ public class ModeToggle extends Table {
         toggleBtnStyle.overFontColor = btnFontOver;
 
         return toggleBtnStyle;
+    }
+
+    public TextButton getTileBtn() {
+        return tileBtn;
+    }
+
+    public TextButton getEntityBtn() {
+        return entityBtn;
     }
 }

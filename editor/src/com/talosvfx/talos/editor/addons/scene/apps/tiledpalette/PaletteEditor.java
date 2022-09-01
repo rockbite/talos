@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
@@ -45,11 +46,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	enum PaletteImportMode {
 		NONE,
 		TILE,
-		ENTITY,
-		TILE_ENTITY
+		ENTITY
 	}
 
-	protected PaletteImportMode currentImportMode = PaletteImportMode.TILE_ENTITY;
+	protected PaletteImportMode currentImportMode = PaletteImportMode.NONE;
 
 	protected PaletteEditMode currentEditMode = PaletteEditMode.NONE;
 
@@ -296,6 +296,57 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		buttonMainMenu.add(editGizmo).size(32);
 		buttonMainMenu.add(editTile).size(32);
 		buttonMainMenu.add(editLine).size(32);
+
+		// visual toggle
+		select.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (select.isChecked()) {
+					editGizmo.setChecked(false);
+					editTile.setChecked(false);
+					editLine.setChecked(false);
+				} else if (!editGizmo.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
+					event.cancel();
+				}
+			}
+		});
+		editGizmo.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (editGizmo.isChecked()) {
+					select.setChecked(false);
+					editTile.setChecked(false);
+					editLine.setChecked(false);
+				} else if (!select.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
+					event.cancel();
+				}
+			}
+		});
+		editTile.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (editTile.isChecked()) {
+					select.setChecked(false);
+					editGizmo.setChecked(false);
+					editLine.setChecked(false);
+				} else if (!select.isChecked() && !editGizmo.isChecked() && !editLine.isChecked()){
+					event.cancel();
+				}
+			}
+		});
+		editLine.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (editLine.isChecked()) {
+					select.setChecked(false);
+					editGizmo.setChecked(false);
+					editTile.setChecked(false);
+				} else if (!select.isChecked() && !editGizmo.isChecked() && !editTile.isChecked()){
+					event.cancel();
+				}
+			}
+		});
+
 //		SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"), "Entity mode");
 //		SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("combined_icon"), "TileEntity mode");
 //		SquareButton delete = new SquareButton(skin, skin.getDrawable("eraser_icon"), "Eraser");
@@ -306,38 +357,30 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 //		tileEntity.setDisabled(false);
 //		delete.setDisabled(false);
 //		editParentTileAndFakeHeight.setDisabled(false);
-//
-//		tile.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				tile.setChecked(!tile.isChecked());
-//				if (tile.isChecked()) {
-//					currentImportMode = PaletteImportMode.TILE;
-//				}
-//			}
-//		});
-//		entity.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				entity.setChecked(!entity.isChecked());
-//				if (entity.isChecked()) {
-//					currentImportMode = PaletteImportMode.ENTITY;
-//				}
-//			}
-//		});
-//		tileEntity.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				tileEntity.setChecked(!tileEntity.isChecked());
-//				if (tileEntity.isChecked()) {
-//					currentImportMode = PaletteImportMode.TILE_ENTITY;
-//				}
-//			}
-//		});
-//
+
+		modeToggle.getTileBtn().addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				TextButton btn = (TextButton) actor;
+				if (btn.isChecked()) {
+					currentImportMode = PaletteImportMode.TILE;
+				}
+			}
+		});
+
+		modeToggle.getEntityBtn().addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				TextButton btn = (TextButton) actor;
+				if (btn.isChecked()) {
+					currentImportMode = PaletteImportMode.ENTITY;
+				}
+			}
+		});
+
+		// set default import mode
+		modeToggle.getEntityBtn().toggle();
+
 //		delete.addListener(new ClickListener() {
 //			@Override
 //			public void clicked (InputEvent event, float x, float y) {

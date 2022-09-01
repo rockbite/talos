@@ -12,7 +12,7 @@ public class PaletteEvent extends Event {
     public void reset () {
         super.reset();
         selectedGameAssets = null;
-        currentMode = PaletteEditor.PaletteImportMode.TILE_ENTITY;
+        currentMode = PaletteEditor.PaletteImportMode.NONE;
     }
 
     public void setSelectedGameAssets(Array<GameAsset<?>> gameAssets) {
