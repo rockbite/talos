@@ -262,7 +262,7 @@ color-picker-bar-selector
   index: -1
 color-picker-cross
   rotate: false
-  xy: 1939, 993
+  xy: 1989, 993
   size: 5, 5
   orig: 5, 5
   offset: 0, 0
@@ -1366,7 +1366,7 @@ mini-node-bg-shadow
   index: -1
 nine-patch-gird-node
   rotate: false
-  xy: 1080, 664
+  xy: 1909, 990
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -1965,6 +1965,14 @@ square-patch
   orig: 15, 15
   offset: 0, 0
   index: -1
+squircle-2
+  rotate: false
+  xy: 1929, 990
+  size: 8, 8
+  split: 2, 2, 2, 2
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 squircle-6
   rotate: false
   xy: 1401, 983
@@ -1972,6 +1980,14 @@ squircle-6
   split: 6, 6, 6, 6
   pad: 0, 0, 0, 0
   orig: 15, 15
+  offset: 0, 0
+  index: -1
+squircle-b-2
+  rotate: false
+  xy: 1979, 990
+  size: 8, 8
+  split: 2, 2, 2, 2
+  orig: 8, 8
   offset: 0, 0
   index: -1
 squircle-b-6
@@ -1983,6 +1999,14 @@ squircle-b-6
   orig: 15, 15
   offset: 0, 0
   index: -1
+squircle-l-2
+  rotate: false
+  xy: 1080, 664
+  size: 8, 8
+  split: 2, 2, 2, 2
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 squircle-l-6
   rotate: false
   xy: 1367, 981
@@ -1992,6 +2016,14 @@ squircle-l-6
   orig: 15, 15
   offset: 0, 0
   index: -1
+squircle-r-2
+  rotate: false
+  xy: 1969, 990
+  size: 8, 8
+  split: 2, 2, 2, 2
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
 squircle-r-6
   rotate: false
   xy: 431, 445
@@ -1999,6 +2031,14 @@ squircle-r-6
   split: 6, 6, 0, 0
   pad: 0, 0, 6, 6
   orig: 15, 15
+  offset: 0, 0
+  index: -1
+squircle-t-2
+  rotate: false
+  xy: 1949, 990
+  size: 8, 8
+  split: 2, 2, 2, 2
+  orig: 8, 8
   offset: 0, 0
   index: -1
 squircle-t-6
@@ -2135,7 +2175,7 @@ timeline-btn-icon-repeat
   index: -1
 timeline-btn-icon-resize
   rotate: false
-  xy: 1929, 990
+  xy: 1959, 990
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2437,7 +2477,7 @@ transparent-light
   index: -1
 tree-minus
   rotate: false
-  xy: 1919, 990
+  xy: 1939, 990
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2451,7 +2491,7 @@ tree-over
   index: -1
 tree-plus
   rotate: false
-  xy: 1909, 990
+  xy: 1919, 990
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

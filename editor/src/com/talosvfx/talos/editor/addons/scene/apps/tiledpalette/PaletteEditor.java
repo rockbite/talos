@@ -4,10 +4,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
@@ -27,14 +26,17 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
+import java.awt.*;
 import java.util.UUID;
 
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private String title;
 	private DragAndDrop.Target target;
+	private ModeToggle modeToggle;
 	private PaletteEditorWorkspace paletteEditorWorkspace;
 
 	private PaletteListener defaultPaletteListener;
@@ -71,12 +73,15 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 	@Override
 	public void initContent () {
-		content = new Table();
-		paletteEditorWorkspace = new PaletteEditorWorkspace(this);
-
-		this.content.add(paletteEditorWorkspace).minSize(336, 696).grow();
-
 		Skin skin = TalosMain.Instance().getSkin();
+
+		content = new Table();
+
+		paletteEditorWorkspace = new PaletteEditorWorkspace(this);
+		modeToggle = new ModeToggle();
+
+		this.content.add(paletteEditorWorkspace).minSize(336, 696).grow().row();
+		this.content.add(modeToggle).growX().height(32);
 
 		Table toolbar = new Table();
 		toolbar.setFillParent(true);
@@ -84,7 +89,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 		buttonMainMenu = new Table();
 		buttonMainMenu.setBackground(skin.newDrawable("square-bordered"));
-		toolbar.add(buttonMainMenu).expandX().padTop(8);
+		toolbar.add(buttonMainMenu).expandX().padTop(RulerRenderer.RULER_SIZE + 8);
 
 		addDefaultButtons();
 
@@ -274,17 +279,17 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		Skin skin = TalosMain.Instance().getSkin();
 
 		Button.ButtonStyle buttonStyle = new Button.ButtonStyle();
-		buttonStyle.up = ColorLibrary.obtainBackground(skin, "square-patch", ColorLibrary.BackgroundColor.DARKER_GRAY);
+		buttonStyle.up = null;
 		buttonStyle.down = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
 		buttonStyle.checked = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
 
-		SquareButton select = new SquareButton(skin, skin.getDrawable("arrow-icon"), "Select mode");
+		SquareButton select = new SquareButton(skin, skin.getDrawable("arrow-icon"), true,"Select mode");
 		select.setStyle(buttonStyle);
-		SquareButton editGizmo = new SquareButton(skin, skin.getDrawable("image-transform-icon"), "Gizmo Edit mode");
+		SquareButton editGizmo = new SquareButton(skin, skin.getDrawable("image-transform-icon"), true,"Gizmo Edit mode");
 		editGizmo.setStyle(buttonStyle);
-		SquareButton editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), "Tile Edit mode");
+		SquareButton editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), true,"Tile Edit mode");
 		editTile.setStyle(buttonStyle);
-		SquareButton editLine = new SquareButton(skin, skin.getDrawable("set-line-icon"), "Line Edit mode");
+		SquareButton editLine = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
 		editLine.setStyle(buttonStyle);
 		buttonMainMenu.clearChildren();
 		buttonMainMenu.add(select).size(32);
