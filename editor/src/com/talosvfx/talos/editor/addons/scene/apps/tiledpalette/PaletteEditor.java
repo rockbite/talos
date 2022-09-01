@@ -138,7 +138,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 		if (PaletteEditor.this.currentImportMode == PaletteImportMode.TILE) {
 			if (gameAsset.type == GameAssetType.SPRITE) {
-				addSprite(gameAsset, worldSpace.x, worldSpace.y);
+
+				final int lowestX = MathUtils.floor(worldSpace.x);
+				final int lowestY = MathUtils.floor(worldSpace.y);
+				addSprite(gameAsset, lowestX, lowestY);
 			} else {
 				System.out.println("Cannot add " + gameAsset.type + " in TILE mode");
 			}

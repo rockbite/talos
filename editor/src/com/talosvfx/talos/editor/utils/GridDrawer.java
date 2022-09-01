@@ -142,7 +142,7 @@ public class GridDrawer {
 			}
 		}
 
-		if (drawAxis) {
+		if (drawAxis || true) {
 			shapeRenderer.setColor(Color.GREEN);
 			shapeRenderer.line(camera.position.x - totalWidth / 2, 0, camera.position.x + totalWidth, 0);
 			shapeRenderer.setColor(Color.RED);
