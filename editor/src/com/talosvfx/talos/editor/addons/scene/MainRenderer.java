@@ -116,7 +116,6 @@ public class MainRenderer implements Notifications.Observer {
         if (root.hasComponent(TransformComponent.class)) {
             TransformComponent transform = root.getComponent(TransformComponent.class);
 
-
             transform.worldPosition.set(transform.position);
             transform.worldScale.set(transform.scale);
             transform.worldRotation = transform.rotation;

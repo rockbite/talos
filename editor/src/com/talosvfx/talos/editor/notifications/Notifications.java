@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.notifications.events.*;
 
 import java.lang.reflect.AccessibleObject;
@@ -69,6 +71,8 @@ public class Notifications {
         addPool(NodeRemovedEvent.class);
         addPool(AssetFileDroppedEvent.class);
         addPool(TalosLayerSelectEvent.class);
+        addPool(TweenPlayedEvent.class);
+        addPool(TweenFinishedEvent.class);
     }
 
     public static void addEventToPool(Class<? extends Event> clazz) {

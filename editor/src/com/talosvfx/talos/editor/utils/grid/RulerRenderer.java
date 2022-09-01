@@ -74,7 +74,7 @@ public class RulerRenderer extends Group {
             String coordText;
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
-            coordText = tmp > 0 ? "" + xStart : "" + testInt;
+            coordText = tmp < 0 ? "" + xStart : "" + testInt;
             Label coordinateLabel = new Label(coordText, getSkin());
             float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
             coordinateLabel.setX(x);
@@ -133,7 +133,7 @@ public class RulerRenderer extends Group {
             String coordText;
             int testInt = (int)yStart;
             float tmp = yStart - testInt;
-            coordText = tmp > 0 ? "" + yStart : "" + testInt;
+            coordText = tmp < 0 ? "" + yStart : "" + testInt;
 
             Table wrapperTable = new Table();
             wrapperTable.setTransform(true);

@@ -252,7 +252,9 @@ public class AssetImporter {
                 System.out.println("Palette Asset not located");
             }
         } else if(fileHandle.extension().equals("tw")) {
-            SceneEditorAddon.get().openApp(new TweenEditor(fileHandle), AEditorApp.AppOpenStrategy.BOTTOM_TAB);
+            TweenEditor editorApp = new TweenEditor(fileHandle);
+            SceneEditorAddon.get().openApp(editorApp, AEditorApp.AppOpenStrategy.BOTTOM_TAB);
+            SceneEditorAddon.get().tweenEditor = editorApp;
             return;
         } else {
             FileOpener.open(fileHandle.file());
