@@ -22,9 +22,6 @@ public class GridRenderer {
 
 	public GridPropertyProvider gridPropertyProvider;
 
-	// TODO: 8/31/2022 implement
-	public boolean drawAxis = false;
-
 	public ViewportWidget widget;
 
 	public GridRenderer(GridPropertyProvider propertyProvider, ViewportWidget widget) {

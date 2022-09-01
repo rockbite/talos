@@ -38,7 +38,6 @@ public class RulerRenderer extends Group {
     }
 
     public void configureRulers () {
-        // TODO: 9/1/2022 make counting from zero
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
         float rulerSize = 20f;
