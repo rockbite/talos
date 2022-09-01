@@ -335,6 +335,8 @@ public class AssetImporter {
 
         if(file.path().equals(projectPath + File.separator + "scenes")) return file;
         if(file.path().equals(projectPath + File.separator + "assets")) return file;
+        if(file.path().equals(projectPath + "/assets")) return file;
+        if(file.path().equals(projectPath + "/scenes")) return file;
 
         if(!file.isDirectory()) {
             String extension = file.extension();
