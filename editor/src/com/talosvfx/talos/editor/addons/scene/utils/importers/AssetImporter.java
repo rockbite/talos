@@ -206,7 +206,7 @@ public class AssetImporter {
                     }
                     return fileNames;
                 }
-            }) + "." + extension;
+            });
 
             String name = filename + "." + extension;
             FileHandle newFile = Gdx.files.absolute(handle.path() + File.separator + name);
