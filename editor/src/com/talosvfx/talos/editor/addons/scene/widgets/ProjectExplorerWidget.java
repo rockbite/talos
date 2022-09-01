@@ -379,10 +379,17 @@ public class ProjectExplorerWidget extends Table {
                 public void clicked (InputEvent event, float x, float y) {
 
                     FileHandle currentFolder = getCurrentFolder();
-                    AssetRepository.getInstance().copySampleParticleToProject(currentFolder);
+                    FileHandle effectFileHandle = AssetRepository.getInstance().copySampleParticleToProject(currentFolder);
 
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(effectFileHandle);
+                        }
+                    });
                 }
             });
 
@@ -404,6 +411,13 @@ public class ProjectExplorerWidget extends Table {
 
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(newScriptDestination);
+                        }
+                    });
                 }
             });
 
@@ -421,6 +435,13 @@ public class ProjectExplorerWidget extends Table {
 
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(newScriptDestination);
+                        }
+                    });
                 }
             });
 
@@ -439,6 +460,13 @@ public class ProjectExplorerWidget extends Table {
 
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(newPaletteDestination);
+                        }
+                    });
                 }
             });
 
