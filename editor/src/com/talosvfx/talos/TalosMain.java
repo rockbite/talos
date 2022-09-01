@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
@@ -45,6 +46,7 @@ import org.lwjgl.glfw.GLFWDropCallback;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -325,6 +327,7 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.getStage().dispose();
 		}
 		uiStage.getStage().dispose();
+		SocketServer.dispose();
 	}
 
 	public Skin getSkin() {

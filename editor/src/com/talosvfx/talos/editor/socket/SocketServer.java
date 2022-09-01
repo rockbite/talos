@@ -35,7 +35,12 @@ public class SocketServer {
         Spark.port(SERVER_PORT);
         Spark.webSocket("/talos", ServerHandler.class);
         Spark.init();
+    }
 
+    public static void dispose () {
+        if (instance != null) {
+            Spark.stop();
+        }
     }
 
     public static SocketServer getInstance() {
