@@ -798,7 +798,8 @@ public abstract class ViewportWidget extends Table {
 	public Vector2 getLocalFromWorld (float x, float y) {
 		getViewportBounds(Rectangle.tmp);
 		camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
-		Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, (Rectangle.tmp.height - tmp.y) + Rectangle.tmp.y + 50)); // 50 is top bar height :(((((
+		tmp.y = Gdx.graphics.getHeight() - tmp.y;
+		Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, tmp.y));
 		vec2.set(vector2);
 
 		return vec2;

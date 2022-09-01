@@ -1,9 +1,11 @@
 package com.talosvfx.talos.editor.utils.grid;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
@@ -36,46 +38,127 @@ public class RulerRenderer extends Group {
     }
 
     public void configureRulers () {
+        // TODO: 9/1/2022 make counting from zero
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
-        float rulerHeight = 20f;
-        xRulerTable.setY(gridPropertyProvider.rulerOnBottom() ? 0 : viewportWidget.getHeight() - rulerHeight);
-        xRulerTable.setHeight(rulerHeight);
+        float rulerSize = 20f;
+        xRulerTable.setY(gridPropertyProvider.rulerOnBottom() ? 0 : viewportWidget.getHeight() - rulerSize);
+        xRulerTable.setHeight(rulerSize);
+        int minSpaceBetweenActors = 40;
+        int xSkipCount = 0;
 
-        float xStart = gridPropertyProvider.getGridStartX();
+        float xStart = 0;
+        float previousX = viewportWidget.getLocalFromWorld(xStart, 0).x;
+
+        for (float gap = 0; gap <= minSpaceBetweenActors; xSkipCount++){
+            xStart += gridPropertyProvider.getUnitX();
+            float x = viewportWidget.getLocalFromWorld(xStart, 0).x;
+            gap += x - previousX;
+            previousX = x;
+        }
+
+        xStart = 0;
         while (xStart <= gridPropertyProvider.getGridEndX()) {
             String coordText;
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
             coordText = tmp > 0 ? "" + xStart : "" + testInt;
             Label coordinateLabel = new Label(coordText, getSkin());
-            coordinateLabel.setX(viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f);
+            float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
+            coordinateLabel.setX(x);
             xRulerTable.addActor(coordinateLabel);
-            xStart += gridPropertyProvider.getUnitX();
+            xStart += xSkipCount * gridPropertyProvider.getUnitX();
         }
 
-        yRulerTable.clearChildren();
-        float yStart = gridPropertyProvider.getGridStartY();
+        xStart = -(xSkipCount * gridPropertyProvider.getUnitX());
+        while (xStart >= gridPropertyProvider.getGridStartX()) {
+            String coordText;
+            int testInt = (int)xStart;
+            float tmp = xStart - testInt;
+            coordText = tmp > 0 ? "" + xStart : "" + testInt;
+            Label coordinateLabel = new Label(coordText, getSkin());
+            float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
+            coordinateLabel.setX(x);
+            xRulerTable.addActor(coordinateLabel);
+            xStart -= xSkipCount * gridPropertyProvider.getUnitX();;
+        }
 
-        float maxWidth = 0;
+        int ySkipCount = 0;
+
+        float yStart = 0;
+        float previousY = viewportWidget.getLocalFromWorld(0, yStart).y;
+
+        for (float gap = 0; gap <= minSpaceBetweenActors; ySkipCount++){
+            yStart += gridPropertyProvider.getUnitY();
+            float y = viewportWidget.getLocalFromWorld(0, yStart).y;
+            gap += y - previousY;
+            previousY = y;
+        }
+
+        yStart = 0;
+
+        yRulerTable.setTransform(true);
         yRulerTable.clearChildren();
         yRulerTable.setHeight(viewportWidget.getHeight());
-        while (yStart <= gridPropertyProvider.getGridEndY()) {
 
+        while (yStart <= gridPropertyProvider.getGridEndY()) {
             String coordText;
             int testInt = (int)yStart;
             float tmp = yStart - testInt;
             coordText = tmp > 0 ? "" + yStart : "" + testInt;
-            Label coordinateLabel = new Label(coordText, getSkin());
-            coordinateLabel.setY(viewportWidget.getLocalFromWorld(0, yStart).y - coordinateLabel.getHeight() / 2f);
-            if (maxWidth < coordinateLabel.getWidth()) {
-                maxWidth = coordinateLabel.getWidth();
-            }
-            yRulerTable.addActor(coordinateLabel);
-            yStart += gridPropertyProvider.getUnitY();
 
+            Table wrapperTable = new Table();
+            wrapperTable.setTransform(true);
+            wrapperTable.setRotation(90);
+            Label coordinateLabel = new Label(coordText, getSkin());
+            float height = coordinateLabel.getHeight();
+            float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
+            wrapperTable.setY(y);
+            coordinateLabel.setAlignment(Align.center);
+            coordinateLabel.setOrigin(Align.center);
+
+            float width = coordinateLabel.getWidth();
+            wrapperTable.setSize(width, height);
+            wrapperTable.setX((rulerSize - width) / 2f);
+            wrapperTable.setOrigin(width / 2f, height / 2f);
+
+
+            wrapperTable.addActor(coordinateLabel);
+
+            yRulerTable.addActor(wrapperTable);
+            yStart += ySkipCount * gridPropertyProvider.getUnitY();
         }
-        yRulerTable.setWidth(maxWidth);
+
+        yStart = - ySkipCount * gridPropertyProvider.getUnitY();
+        while (yStart >= gridPropertyProvider.getGridStartY()) {
+            String coordText;
+            int testInt = (int)yStart;
+            float tmp = yStart - testInt;
+            coordText = tmp > 0 ? "" + yStart : "" + testInt;
+
+            Table wrapperTable = new Table();
+            wrapperTable.setTransform(true);
+            wrapperTable.setRotation(90);
+            Label coordinateLabel = new Label(coordText, getSkin());
+            float height = coordinateLabel.getHeight();
+            float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
+            wrapperTable.setY(y);
+            coordinateLabel.setAlignment(Align.center);
+            coordinateLabel.setOrigin(Align.center);
+
+            float width = coordinateLabel.getWidth();
+            wrapperTable.setSize(width, height);
+            wrapperTable.setX((rulerSize - width) / 2f);
+            wrapperTable.setOrigin(width / 2f, height / 2f);
+
+
+            wrapperTable.addActor(coordinateLabel);
+
+            yRulerTable.addActor(wrapperTable);
+            yStart -= ySkipCount * gridPropertyProvider.getUnitY();
+        }
+
+        yRulerTable.setWidth(rulerSize);
     }
 
 }

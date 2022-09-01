@@ -28,19 +28,11 @@ public class ParticleNodeGridPropertyProvider implements GridPropertyProvider {
         final float worldWidth = camera.viewportWidth * camera.zoom;
         final float worldHeight = camera.viewportHeight * camera.zoom;
 
-        final Vector3 position = camera.position;
-
-        float x = position.x - worldWidth / 2f;
-        float y = position.y - worldHeight / 2f;
-
         tmp.set(camera.position.x, camera.position.y);
 
         int lineCount = (int)(worldWidth / tileSize);
         int blackLineCount = (int)(worldWidth / (tileSize * 10));
         float width = worldWidth;
-        float height = worldHeight;
-
-        int iter = 0;
 
         Color mainColor = new Color(0.17f, 0.17f, 0.17f, 1f);
         for (int i = -lineCount / 2 - 1; i < lineCount / 2 + 1; i++) {
@@ -52,10 +44,8 @@ public class ParticleNodeGridPropertyProvider implements GridPropertyProvider {
                     new Vector2(posX, tmp.y + worldHeight/2f), mainColor, thickness));
             gridLines.add(new GridLine(new Vector2(tmp.x - worldWidth/2f, posY),
                     new Vector2(tmp.x + worldWidth/2f, posY), mainColor, thickness));
-            iter++;
         }
 
-        iter = 0;
         Color blackLinesColor = new Color(0.12f, 0.12f, 0.12f, 1f);
         for (int i = -blackLineCount / 2 - 1; i < blackLineCount / 2 + 1; i++) {
             float spacing = width / blackLineCount;
@@ -66,7 +56,6 @@ public class ParticleNodeGridPropertyProvider implements GridPropertyProvider {
                     new Vector2(posX, tmp.y + worldHeight/2f), blackLinesColor, thickness));
             gridLines.add(new GridLine(new Vector2(tmp.x - worldWidth/2f, posY),
                     new Vector2(tmp.x + worldWidth/2f, posY), blackLinesColor, thickness));
-            iter++;
         }
     }
 
@@ -134,7 +123,6 @@ public class ParticleNodeGridPropertyProvider implements GridPropertyProvider {
     public void setHighlightCursorSelect (boolean shouldHighlight) {
 
     }
-
     @Override
     public boolean rulerOnBottom () {
         return false;
