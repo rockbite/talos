@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
@@ -239,6 +240,13 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
+        LabelWidget uuidWidget = new LabelWidget("UUID", new Supplier<String>() {
+            @Override
+            public String get () {
+                return uuid.toString();
+            }
+        });
+
         EditableLabelWidget labelWidget = new EditableLabelWidget("Name", new Supplier<String>() {
             @Override
             public String get() {
@@ -252,6 +260,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         });
 
         properties.add(labelWidget);
+        properties.add(uuidWidget);
 
         PropertyWidget activeWidget = WidgetFactory.generate(this, "active", "Active");
         activeWidget.addListener(new ChangeListener() {

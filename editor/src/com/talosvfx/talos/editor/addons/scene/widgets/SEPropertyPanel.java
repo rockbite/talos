@@ -27,13 +27,11 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -324,7 +322,7 @@ public class SEPropertyPanel extends PropertyPanel{
 
                                     FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
 
-                                    FileHandle newScriptDestination = AssetImporter.suggestNewName(currentFolder.path(), newFileName, "ts");
+                                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "ts");
                                     FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
 
                                     String templateString = templateScript.readString();

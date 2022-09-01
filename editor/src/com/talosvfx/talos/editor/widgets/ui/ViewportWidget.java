@@ -30,8 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -56,6 +54,9 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.GridRenderer;
+import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 
@@ -72,8 +73,6 @@ public abstract class ViewportWidget extends Table {
 	private Matrix4 prevProjection = new Matrix4();
 
 	public CameraController cameraController;
-
-	protected Color bgColor = new Color(Color.BLACK);
 
 	protected float maxZoom = 0.01f;
 	protected float minZoom = 200f;
@@ -101,15 +100,10 @@ public abstract class ViewportWidget extends Table {
 
 	protected boolean locked;
 
-	private boolean hasRulers = false;
-	private Table yRulerTable;
-	private Table xRulerTable;
+	protected GridPropertyProvider gridPropertyProvider;
 
-	private float gridUnit;
-	private float gridXStart;
-	private float gridYStart;
-	private float gridXEnd;
-	private float gridYEnd;
+	protected GridRenderer gridRenderer;
+	protected RulerRenderer rulerRenderer;
 
 
 	protected GroupSelectionGizmo groupSelectionGizmo;
@@ -119,6 +113,9 @@ public abstract class ViewportWidget extends Table {
 		entitySelectionBuffer = new EntitySelectionBuffer();
 		camera = new OrthographicCamera();
 		camera.viewportWidth = 10;
+		initializeGridPropertyProvider();
+		gridRenderer = new GridRenderer(gridPropertyProvider, this);
+		rulerRenderer = new RulerRenderer(gridPropertyProvider, this);
 
 		setTouchable(Touchable.enabled);
 
@@ -131,19 +128,6 @@ public abstract class ViewportWidget extends Table {
 
 		groupSelectionGizmo = new GroupSelectionGizmo(this);
 		gizmos.gizmoList.add(groupSelectionGizmo);
-	}
-
-	protected void addRulers () {
-		Skin skin = TalosMain.Instance().getSkin();
-		xRulerTable = new Table(skin);
-		xRulerTable.background("panel_input_bg");
-		addActor(xRulerTable);
-
-		yRulerTable = new Table(skin);
-		yRulerTable.background("panel_input_bg");
-		addActor(yRulerTable);
-
-		hasRulers = true;
 	}
 
 	public void unselectGizmos () {
@@ -583,7 +567,6 @@ public abstract class ViewportWidget extends Table {
 
 		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
-		Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float aspect = getWidth() / getHeight();
@@ -647,53 +630,9 @@ public abstract class ViewportWidget extends Table {
 			bitmapFont.dispose();
 		}
 
-		if (hasRulers) {
-			configureRulers();
-		}
+		rulerRenderer.configureRulers();
 
 		super.draw(batch, parentAlpha);
-	}
-
-	private void configureRulers () {
-		xRulerTable.clearChildren();
-		xRulerTable.setWidth(getWidth());
-		float rulerHeight = 20f;
-		xRulerTable.setY(getHeight() - rulerHeight);
-		xRulerTable.setHeight(rulerHeight);
-		float xStart = gridXStart;
-		while (xStart <= gridXEnd) {
-			xStart += gridUnit;
-
-			String coordText;
-			int testInt = (int)xStart;
-			float tmp = xStart - testInt;
-			coordText = tmp > 0 ? "" + xStart : "" + testInt;
-			Label coordinateLabel = new Label(coordText, getSkin());
-			coordinateLabel.setX(getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f);
-			xRulerTable.addActor(coordinateLabel);
-		}
-
-		yRulerTable.clearChildren();
-		float yStart = gridYStart;
-
-		float maxWidth = 0;
-		yRulerTable.clearChildren();
-		yRulerTable.setHeight(getHeight());
-		while (yStart <= gridYEnd) {
-			yStart += gridUnit;
-
-			String coordText;
-			int testInt = (int)yStart;
-			float tmp = yStart - testInt;
-			coordText = tmp > 0 ? "" + yStart : "" + testInt;
-			Label coordinateLabel = new Label(coordText, getSkin());
-			coordinateLabel.setY(getLocalFromWorld(0, yStart).y - coordinateLabel.getHeight() / 2f);
-			if (maxWidth < coordinateLabel.getWidth()) {
-				maxWidth = coordinateLabel.getWidth();
-			}
-			yRulerTable.addActor(coordinateLabel);
-		}
-		yRulerTable.setWidth(maxWidth);
 	}
 
 	protected void getEntityUnderMouse () {
@@ -844,149 +783,6 @@ public abstract class ViewportWidget extends Table {
 		camera.zoom = worldWidth / camera.viewportWidth;
 	}
 
-	protected void drawGrid (Batch batch, float parentAlpha) {
-		Gdx.gl.glLineWidth(1f);
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-
-		float zeroAlpha = 0.8f;
-		float mainLinesAlpha = 0.2f;
-		float smallLinesAlpha = 0.1f;
-		float linesToAppearAlpha = 0.01f;
-
-		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		Color gridColor = new Color(Color.GRAY);
-
-		float thickness = pixelToWorld(1.2f);
-
-		float distanceThatLinesShouldBe = pixelToWorld(150f);
-		gridUnit = nextPowerOfTwo(distanceThatLinesShouldBe);
-
-		float previousUnit = gridUnit / 2;
-		linesToAppearAlpha = MathUtils.lerp(smallLinesAlpha, linesToAppearAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
-		smallLinesAlpha = MathUtils.lerp(mainLinesAlpha, smallLinesAlpha, (distanceThatLinesShouldBe - previousUnit) / (gridUnit - previousUnit));
-
-		int baseLineDivisor = 4;
-
-		float visibleWidth = camera.viewportWidth * camera.zoom;
-		float visibleHeight = camera.viewportHeight * camera.zoom;
-
-		float cameraX = camera.position.x;
-		float cameraY = camera.position.y;
-
-		float visibleStartX = cameraX - visibleWidth / 2;
-		float visibleStartY = cameraY - visibleHeight / 2;
-		float visibleEndX = cameraX + visibleWidth / 2;
-		float visibleEndY = cameraY + visibleHeight / 2;
-
-
-		gridColor.a =  zeroAlpha * parentAlpha;
-		shapeRenderer.setColor(gridColor);
-		drawLine(batch, 0, cameraY - visibleHeight / 2, 0, cameraY + visibleHeight / 2, thickness, 0);
-		drawLine(batch, visibleStartX, 0, visibleEndX, 0, thickness, 0);
-
-
-		gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
-
-		// drawing vertical lines
-		for (float i = gridXStart; i < visibleEndX; i += gridUnit) {
-			for (int j = 1; j <= baseLineDivisor; j++) {
-				float smallUnitSize = gridUnit / baseLineDivisor;
-				float x1 = i + j * smallUnitSize;
-
-				for (int k = 1; k <= baseLineDivisor; k++) {
-					float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
-
-					gridColor.a =  linesToAppearAlpha * parentAlpha;
-					shapeRenderer.setColor(gridColor);
-					drawLine(batch, x1 + k * nextUnitSize, cameraY - visibleHeight / 2, x1 + k * nextUnitSize, cameraY + visibleHeight / 2, thickness, j);
-				}
-
-				gridColor.a =  smallLinesAlpha * parentAlpha;
-				shapeRenderer.setColor(gridColor);
-
-				drawLine(batch, x1, cameraY - visibleHeight / 2, x1, cameraY + visibleHeight / 2, thickness, i);
-			}
-
-
-			if (i == 0) continue;
-			gridColor.a =  mainLinesAlpha * parentAlpha;
-			shapeRenderer.setColor(gridColor);
-			drawLine(batch, i, cameraY - visibleHeight / 2, i, cameraY + visibleHeight / 2, thickness, i);
-			gridXEnd = i;
-		}
-
-		gridYStart = gridUnit * MathUtils.floor(visibleStartY / gridUnit);
-
-		// drawing vertical lines
-		for (float i = gridYStart; i < visibleEndY; i += gridUnit) {
-			for (int j = 1; j <= baseLineDivisor; j++) {
-				float smallUnitSize = gridUnit / baseLineDivisor;
-				float y1 = i + j * smallUnitSize;
-
-				for (int k = 1; k <= baseLineDivisor; k++) {
-					float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
-
-					gridColor.a =  linesToAppearAlpha * parentAlpha;
-					shapeRenderer.setColor(gridColor);
-					drawLine(batch, cameraX - visibleWidth / 2, y1 + k * nextUnitSize, cameraX + visibleWidth / 2, y1 + k * nextUnitSize, thickness, i);
-				}
-
-				gridColor.a =  smallLinesAlpha * parentAlpha;
-				shapeRenderer.setColor(gridColor);
-				drawLine(batch, cameraX - visibleWidth / 2, y1, cameraX + visibleWidth / 2, y1, thickness, i);
-			}
-
-			if (i == 0) continue;
-			gridColor.a =  mainLinesAlpha * parentAlpha;
-			shapeRenderer.setColor(gridColor);
-			drawLine(batch, cameraX - visibleWidth / 2, i, cameraX + visibleWidth / 2,  i,  thickness, i);
-			gridYEnd = i;
-		}
-
-		shapeRenderer.end();
-	}
-
-	private float nextPowerOfTwo (float value) {
-		boolean negative = false;
-		boolean smallerOne = false;
-		if (value < 0) {
-			negative = true;
-			value *= -1;
-		}
-
-		if (value < 1 ) {
-			value = 1 / value;
-			smallerOne = true;
-		}
-
-		float unit = MathUtils.nextPowerOfTwo(MathUtils.ceil(value));
-		if (smallerOne) {
-			unit = 1 / unit;
-			unit *= 2;
-		}
-
-		return unit;
-	}
-
-	private void drawLine (Batch batch, float x1, float y1, float x2, float y2, float thickness, float coord) {
-
-		boolean debug = false;
-		shapeRenderer.rectLine(x1, y1, x2, y2, thickness);
-
-		if (debug) {
-			BitmapFont bitmapFont = new BitmapFont();
-			bitmapFont.getData().scale(1.5f);
-			bitmapFont.setColor(1, 1, 1, 1);
-			batch.begin();
-			bitmapFont.draw(batch, " " + coord, x1, y1 + 30f);
-			bitmapFont.draw(batch, " " + coord, x2 - 70f, y2);
-			batch.flush();
-			batch.end();
-			bitmapFont.dispose();
-		}
-	}
-
 	private void getViewportBounds (Rectangle out) {
 		localToScreenCoordinates(temp.set(0, 0));
 		int x = (int)temp.x;
@@ -1005,10 +801,11 @@ public abstract class ViewportWidget extends Table {
 		out.set(x, y, ssWidth, ssHeight);
 	}
 
-	protected Vector2 getLocalFromWorld (float x, float y) {
+	public Vector2 getLocalFromWorld (float x, float y) {
 		getViewportBounds(Rectangle.tmp);
 		camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
-		Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, (Rectangle.tmp.height - tmp.y) + Rectangle.tmp.y + 50)); // 50 is top bar height :(((((
+		tmp.y = Gdx.graphics.getHeight() - tmp.y;
+		Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, tmp.y));
 		vec2.set(vector2);
 
 		return vec2;
@@ -1193,4 +990,6 @@ public abstract class ViewportWidget extends Table {
 
 	protected void drawEntitiesForSelection () {
 	}
+
+	public abstract void initializeGridPropertyProvider ();
 }

@@ -9,6 +9,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
@@ -35,7 +36,7 @@ public class PropertiesPanel extends Table {
         Table titleContainer = new Table();
         titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left();
 
-        if(propertyProvider instanceof AComponent){
+        if (propertyProvider instanceof AComponent && !(propertyProvider instanceof TransformComponent)) {
             AComponent component = ((AComponent) propertyProvider);
 
             ImageButton settingButton = new ImageButton(TalosMain.Instance().getSkin().getDrawable("icon-edit"));
