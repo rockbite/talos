@@ -518,7 +518,7 @@ public class AssetRepository implements Notifications.Observer {
 		dataMaps.putFileHandleGameAsset(key, gameAsset);
 	}
 
-	public void copySampleParticleToProject (FileHandle preferredDestination) {
+	public FileHandle copySampleParticleToProject (FileHandle preferredDestination) {
 		FileHandle originalTls = Gdx.files.internal("addons/scene/missing/sample.tls");
 		FileHandle imageRequired = Gdx.files.internal("addons/scene/missing/white.png");
 
@@ -528,7 +528,7 @@ public class AssetRepository implements Notifications.Observer {
 			System.out.println("Ignoring copying white, since we have it already");
 		}
 
-		AssetRepository.getInstance().copyRawAsset(originalTls, preferredDestination);
+		return AssetRepository.getInstance().copyRawAsset(originalTls, preferredDestination);
 	}
 
 	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
@@ -1012,7 +1012,7 @@ public class AssetRepository implements Notifications.Observer {
 
 	}
 
-	public void copyRawAsset (FileHandle file, FileHandle directory) {
+	public FileHandle copyRawAsset (FileHandle file, FileHandle directory) {
 		String fileName = file.name();
 		if (directory.child(fileName).exists()) {
 			String baseName = file.nameWithoutExtension();
@@ -1048,6 +1048,8 @@ public class AssetRepository implements Notifications.Observer {
 		}
 
 		collectRawResourceFromDirectory(dest, true);
+
+		return dest;
 	}
 
 

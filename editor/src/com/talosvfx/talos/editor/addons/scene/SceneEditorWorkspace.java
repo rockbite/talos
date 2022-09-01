@@ -350,6 +350,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				String s = json.toJson(component);
 				component = json.fromJson(component.getClass(), s);
 				gameObject.addComponent(component);
+
+				if (component instanceof MapComponent) {
+					//Add a layer also
+					TalosLayer layer = new TalosLayer("NewLayer");
+					((MapComponent)component).getLayers().add(layer);
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
