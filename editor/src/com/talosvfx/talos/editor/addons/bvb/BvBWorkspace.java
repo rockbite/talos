@@ -22,7 +22,11 @@ import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.PaletteGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -99,7 +103,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         renderer.setPremultipliedAlpha(false); // PMA results in correct blending without outlines. (actually should be true, not sure why this ruins scene2d later, probably blend screwup, will check later)
 
         setCameraPos(0, 0);
-        bgColor.set(0.1f, 0.1f, 0.1f, 1f);
 
         hintLabel = new Label("", TalosMain.Instance().getSkin());
         add(hintLabel).left().expandX().pad(5f);
@@ -111,6 +114,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         addListeners();
         addPanListener();
 
+        addActor(rulerRenderer);
         instance = this;
     }
 
@@ -292,7 +296,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
         batch.end();
-        drawGrid(batch, parentAlpha);
+
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+        gridPropertyProvider.update(camera, parentAlpha);
+        gridRenderer.drawGrid(batch, shapeRenderer);
         batch.begin();
 
         if (backgroundImage.getDrawable() != null) {
@@ -308,6 +316,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (showingTools) {
             topUI.draw(batch, parentAlpha);
         }
+    }
+
+    @Override
+    public void initializeGridPropertyProvider () {
+        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
     }
 
     private void renderBackgroundImage(Batch batch, float parentAlpha) {
