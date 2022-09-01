@@ -291,12 +291,19 @@ public class MainRenderer implements Notifications.Observer {
 
     private void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {
 
+        float width = 1f;
+        float height = 1f;
+        if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+            SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
+            width = component.size.x;
+            height = component.size.y;
+        }
 
         batch.draw(AssetRepository.getInstance().brokenTextureRegion,
                 transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
                 0.5f, 0.5f,
                 1f, 1f,
-                transformComponent.worldScale.x, transformComponent.worldScale.y,
+                width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
                 transformComponent.worldRotation);
     }
 
