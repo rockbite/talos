@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -32,6 +31,7 @@ import java.util.Comparator;
 public class DirectoryViewWidget extends Table {
     private static final DirectoryViewFileComparator DIRECTORY_VIEW_FILE_COMPARATOR = new DirectoryViewFileComparator();
     private static final FileFilter DIRECTORY_VIEW_FILE_FILTER = new DirectoryViewFileFilter();
+    private final ScrollPane scrollPane;
 
     private Array<Item> selected = new Array<>();
 
@@ -81,7 +81,7 @@ public class DirectoryViewWidget extends Table {
                     projectExplorer.invokePaste(fileHandle);
                 }
 
-                if (keycode == Input.Keys.FORWARD_DEL) {
+                if (keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.DEL) {
                     Array<String> paths = new Array<>();
                     for (int i = 0; i < selected.size; i++) {
                         Item item = selected.get(i);
@@ -99,6 +99,12 @@ public class DirectoryViewWidget extends Table {
                         }
                     }
                     reportSelectionChanged();
+                }
+
+                boolean renamePressed = TalosMain.Instance().isOsX() && keycode == Input.Keys.ENTER ||
+                                        !TalosMain.Instance().isOsX() && keycode == Input.Keys.F2;
+                if (renamePressed) {
+                    rename();
                 }
 
                 return true;
@@ -139,7 +145,7 @@ public class DirectoryViewWidget extends Table {
         items.wrapSpace(10);
         items.space(10);
 
-        ScrollPane scrollPane = new ScrollPane(items);
+        scrollPane = new ScrollPane(items);
         scrollPane.setScrollbarsVisible(true);
         Stack stack = new Stack(scrollPane, emptyFolderTable);
         add(stack).grow().height(0).row();
@@ -615,6 +621,30 @@ public class DirectoryViewWidget extends Table {
             clearSelection();
             found.select();
             selected.add(found);
+        }
+    }
+
+    public void scrollTo (FileHandle newHandle) {
+        SnapshotArray<Actor> children = items.getChildren();
+        Item found = null;
+        for (Actor child : children) {
+            Item item = (Item)child;
+            if (item.fileHandle.equals(newHandle)) {
+                found = item;
+                break;
+            }
+        }
+        if (found != null) {
+
+            float topY = scrollPane.getScrollY();
+            float scrollHeight = scrollPane.getScrollHeight();
+
+            float positionInParent = items.getHeight() - (found.getY() + found.getHeight()/2f);
+
+            if (positionInParent < topY || positionInParent > (topY + scrollHeight)) {
+                scrollPane.setScrollY(positionInParent - scrollHeight/2f);
+            }
+
         }
     }
 

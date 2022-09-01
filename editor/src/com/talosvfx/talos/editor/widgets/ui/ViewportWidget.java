@@ -36,6 +36,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -259,6 +260,11 @@ public abstract class ViewportWidget extends Table {
 				if (locked) {
 					return;
 				}
+
+				if (TalosInputProcessor.ctrlPressed()) {
+					return;
+				}
+
 				if (hitGizmo instanceof GroupSelectionGizmo || (dragOnFirstTime || countOfSameTouchDown >= 1)) {
 					Vector2 hitCords = getWorldFromLocal(x, y);
 

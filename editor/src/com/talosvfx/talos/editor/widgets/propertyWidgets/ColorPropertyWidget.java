@@ -42,7 +42,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
                     @Override
                     public void reset (Color previousColor, Color newColor) {
                         super.reset(previousColor, newColor);
-
+                        box.setColor(newColor);
                         callValueChanged(newColor);
 
                     }
@@ -50,6 +50,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
                     @Override
                     public void canceled (Color oldColor) {
                         super.canceled(oldColor);
+                        box.setColor(oldColor);
                         callValueChanged(oldColor);
 
                     }

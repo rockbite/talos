@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -47,6 +48,8 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -157,7 +160,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			@Override
 			public void chosen (XmlReader.Element template, float x, float y) {
 				Vector2 pos = new Vector2(x, y);
-				createObjectByTypeName(template.getAttribute("name"), pos, null);
+				String templateName = template.getAttribute("name");
+				createObjectByTypeName(templateName, pos, null, templateName);
 			}
 		});
 
@@ -175,20 +179,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(rulerRenderer);
 	}
 
-	public GameObject createEmpty (Vector2 position) {
-		return createObjectByTypeName("empty", position, null);
-	}
-
-	public GameObject createEmpty (GameObject parent) {
-		return createObjectByTypeName("empty", null, parent);
-	}
-
 	public GameObject createEmpty (Vector2 position, GameObject parent) {
-		return createObjectByTypeName("empty", position, parent);
+		return createObjectByTypeName("empty", position, parent, "empty");
 	}
 
 	public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
-		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent);
+		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent, spriteAsset.nameIdentifier);
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
 		if (!fromDirectoryView) {
@@ -200,7 +196,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public GameObject createSpineObject (GameAsset<SkeletonData> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent);
+		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent, asset.nameIdentifier);
 		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
 
 		if (!fromDirectoryView) {
@@ -212,7 +208,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public GameObject createParticle (GameAsset<ParticleEffectDescriptor> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent);
+		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent, asset.nameIdentifier);
 		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
 
 		if (!fromDirectoryView) {
@@ -223,11 +219,38 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return particleObject;
 	}
 
-	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent) {
+	private ArrayList<String> goNames = new ArrayList<>();
+	private Supplier<Collection<String>> getAllGONames () {
+		goNames.clear();
+		addNamesToList(goNames, getRootGO());
+		return new Supplier<Collection<String>>() {
+			@Override
+			public Collection<String> get () {
+				return goNames;
+			}
+		};
+	}
+
+	private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
+		goNames.add(gameObject.getName());
+		if (gameObject.getGameObjects() != null) {
+			Array<GameObject> gameObjects = gameObject.getGameObjects();
+			for (int i = 0; i < gameObjects.size; i++) {
+				GameObject child = gameObjects.get(i);
+				addNamesToList(goNames, child);
+
+			}
+		}
+	}
+
+	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent, String nameHint) {
 		GameObject gameObject = new GameObject();
 		XmlReader.Element template = templateListPopup.getTemplate(idName);
 
-		String name = getUniqueGOName(template.getAttribute("nameTemplate", "gameObject"), true);
+		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
+
+		String name = NamingUtils.getNewName(nameHint, getAllGONames());
+
 		gameObject.setName(name);
 		initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));
 		initializeDefaultValues(gameObject, position);
@@ -279,7 +302,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		transformComponent.position.set(position);
 
-		String name = getUniqueGOName(prefab.name, true);
+		String name = NamingUtils.getNewName(prefab.name, getAllGONames());
+
 		gameObject.setName(name);
 
 		randomizeChildrenUUID(gameObject);
@@ -308,31 +332,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				randomizeChildrenUUID(gameObject);
 			}
 		}
-	}
-
-	private String getUniqueGOName (String nameTemplate) {
-		return getUniqueGOName(nameTemplate, false);
-	}
-
-	private String getUniqueGOName (String nameTemplate, boolean keepOriginal) {
-		if (fromDirectoryView) {
-			return UUID.randomUUID().toString().substring(0, 10);
-		}
-
-		int number = 0;
-
-		String name = nameTemplate;
-
-		if (!keepOriginal) {
-			name = nameTemplate + number;
-		}
-
-		while (currentContainer.hasGOWithName(name)) {
-			number++;
-			name = nameTemplate + number;
-		}
-
-		return name;
 	}
 
 	private void initComponentsFromTemplate (GameObject gameObject, XmlReader.Element template) {
@@ -559,6 +558,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		GameObject rootGO = getRootGO();
 		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
+
+
 		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
@@ -569,7 +570,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
 				}
 
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(dummyParent));
+				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
 
 				selectGameObjectExternally(dummyParent);
 			}
@@ -744,7 +745,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
 		}
 
-		FileHandle handle = AssetImporter.suggestNewName(path, name, "prefab");
+		FileHandle handle = AssetImporter.suggestNewNameForFileHandle(path, name, "prefab");
 		if (handle != null) {
 			GameObject gamePrefab = new GameObject();
 			gamePrefab.setName("Prefab");
@@ -805,7 +806,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
 
-				String name = getUniqueGOName(gameObject.getName(), false);
+				String name = NamingUtils.getNewName(gameObject.getName(), getAllGONames());
+
 				gameObject.setName(name);
 				randomizeChildrenUUID(gameObject);
 				parent.addGameObject(gameObject);
@@ -1207,7 +1209,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (suggestedName.equals(gameObject.getName()))
 			return;
 
-		String finalName = getUniqueGOName(suggestedName, true);
+		String finalName = NamingUtils.getNewName(suggestedName, getAllGONames());
+
 
 		String oldName = gameObject.getName();
 

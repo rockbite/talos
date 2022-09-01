@@ -85,7 +85,7 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public void removeItemListener (ItemListener<T> filterTreeListener) {
-        itemListeners.removeValue(filterTreeListener, true);
+        boolean b = itemListeners.removeValue(filterTreeListener, true);
     }
 
     public static abstract class ItemListener<T> {
@@ -363,7 +363,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private Node<T> previousSelected;
 
-    private void addSource (final Node<T> node) {
+    public void addSource (final Node<T> node) {
         if(node.draggable) {
 
             node.actor.setUserObject(node);
