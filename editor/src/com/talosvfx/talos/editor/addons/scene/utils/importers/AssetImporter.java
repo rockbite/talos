@@ -330,6 +330,9 @@ public class AssetImporter {
         FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getCurrentFolder();
 
         String projectPath = SceneEditorAddon.get().workspace.getProjectPath();
+
+        System.out.println("On delete" + file.path() + " against test "  + (projectPath + File.separator + "scenes"));
+
         if(file.path().equals(projectPath + File.separator + "scenes")) return file;
         if(file.path().equals(projectPath + File.separator + "assets")) return file;
 
