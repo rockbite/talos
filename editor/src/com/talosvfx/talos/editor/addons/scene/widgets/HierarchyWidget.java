@@ -218,6 +218,9 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 event.stop();
                 gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
+                if (SceneEditorWorkspace.getInstance().selection.contains(gameObject)) {
+                    SceneEditorWorkspace.getInstance().removeFromSelection(gameObject);
+                }
 
                 return true;
             }
