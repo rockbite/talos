@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -161,9 +162,10 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
     }
 
     private void fetchGameObjects(Array<GameObject> list, String targetString) {
-
         SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-        GameObject root = sceneEditorAddon.workspace.getCurrentContainer().root;
+        TweenEditor tweenEditor = sceneEditorAddon.tweenEditor;
+
+        GameObject root = tweenEditor.scenePreviewStage.currentScene.root;
 
         findGameObjects(list, root, targetString);
     }

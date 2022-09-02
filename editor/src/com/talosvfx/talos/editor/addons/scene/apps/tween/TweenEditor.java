@@ -10,7 +10,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 public class TweenEditor extends AEditorApp<FileHandle> {
 
@@ -19,6 +21,8 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     public AnimationTimeline animationTimeline;
 
     public FileHandle targetFileHandle;
+
+    public ScenePreviewStage scenePreviewStage;
 
     public TweenEditor(FileHandle twFileHandle) {
         super(twFileHandle);
@@ -49,7 +53,11 @@ public class TweenEditor extends AEditorApp<FileHandle> {
             System.out.println(e);
         }
 
-        content.add(tweenStage.getContainer()).grow();
+        scenePreviewStage = new ScenePreviewStage();
+        SplitPane splitPane = new SplitPane(scenePreviewStage, tweenStage.getContainer(),  false, TalosMain.Instance().getSkin());
+        splitPane.setSplitAmount(0.2f);
+
+        content.add(splitPane).grow();
 
         TalosMain.Instance().getInputMultiplexer().addProcessor(tweenStage.getStage());
 
@@ -59,4 +67,11 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public void onHide () {
+        super.onHide();
+        SceneEditorAddon.get().tweenEditor = null;
+    }
+
 }
