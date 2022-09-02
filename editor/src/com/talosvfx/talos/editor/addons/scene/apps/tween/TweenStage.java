@@ -18,6 +18,9 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
+import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -29,7 +32,6 @@ public class TweenStage extends DynamicNodeStage {
     public final TweenEditor tweenEditor;
 
     private Vector2 tmp = new Vector2();
-    private String state;
 
     private float timeScale = 1f;
 
@@ -106,9 +108,6 @@ public class TweenStage extends DynamicNodeStage {
      * keep data defaults for next time
      */
     public void playInitiated() {
-        if(state != null) loadFromSnapshot();
-        makeSnapshot();
-
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for(NodeWidget node : nodes) {
             if (node instanceof AbstractTweenNode) {
@@ -117,14 +116,16 @@ public class TweenStage extends DynamicNodeStage {
                 tweenNode.reset();
             }
         }
+
+        Notifications.fireEvent(Notifications.obtainEvent(TweenPlayedEvent.class));
+
     }
 
     /**
      * Time to reset everything to normal and reset any defaults
      */
     private void playFinished() {
-        loadFromSnapshot();
-        resetSnapshot();
+        Notifications.fireEvent(Notifications.obtainEvent(TweenFinishedEvent.class));
     }
 
     /**
@@ -149,25 +150,6 @@ public class TweenStage extends DynamicNodeStage {
             // seems like all is Complete
             playFinished();
         }
-    }
-
-    private void resetSnapshot() {
-        state = null;
-    }
-
-    private void loadFromSnapshot() {
-        SceneEditorProject project = (SceneEditorProject) TalosMain.Instance().ProjectController().getProject();
-        SceneEditorAddon sceneEditorAddon = project.sceneEditorAddon;
-
-        if(state != null) {
-            sceneEditorAddon.workspace.getCurrentContainer().load(state);
-        }
-    }
-
-    private void makeSnapshot() {
-        SceneEditorProject project = (SceneEditorProject) TalosMain.Instance().ProjectController().getProject();
-        SceneEditorAddon sceneEditorAddon = project.sceneEditorAddon;
-        state = sceneEditorAddon.workspace.getCurrentContainer().getAsString();
     }
 
     public float getDelta() {
