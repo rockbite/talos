@@ -4,17 +4,18 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.layouts.LayoutColumn;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
-import com.talosvfx.talos.editor.layouts.LayoutRow;
 
 public class LayoutTests extends ApplicationAdapter {
 
@@ -34,7 +35,7 @@ public class LayoutTests extends ApplicationAdapter {
 
 		stage = new Stage();
 
-		Gdx.input.setInputProcessor(new InputAdapter() {
+		InputAdapter debugProcessor = new InputAdapter() {
 			@Override
 			public boolean keyDown (int keycode) {
 				if (Input.Keys.SPACE == keycode) {
@@ -45,24 +46,39 @@ public class LayoutTests extends ApplicationAdapter {
 				}
 				return super.keyDown(keycode);
 			}
-		});
+		};
+		Gdx.input.setInputProcessor(new InputMultiplexer(debugProcessor, stage));
 
 		refresh();
 	}
 
 	private void newItem () {
-		layoutGrid.addContent(new LayoutContent(skin, layoutGrid));
+		LayoutContent content = new LayoutContent(skin, layoutGrid);
+
+		int random = MathUtils.random(1,3);
+		for (int i = 0; i < random; i++) {
+			content.addContent("NewApplication: " + MathUtils.random(10));
+		}
+
+		layoutGrid.addContent(content);
 	}
 	private void refresh () {
 		stage.clear();
 
 
 		layoutGrid = new LayoutGrid(skin);
-		layoutGrid.addContent(new LayoutContent(skin, layoutGrid));
+		LayoutContent content = new LayoutContent(skin, layoutGrid);
+		content.addContent("Random");
+		layoutGrid.addContent(content);
 
 		layoutGrid.setFillParent(true);
 
 		stage.addActor(layoutGrid);
+	}
+
+	@Override
+	public void resize (int width, int height) {
+		stage.getViewport().update(width, height);
 	}
 
 	@Override

@@ -4,37 +4,47 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.kotcrab.vis.ui.widget.VisLabel;
 
 public class LayoutGrid extends WidgetGroup {
 	private final DragAndDrop dragAndDrop;
 
 	//Start with a 2x2 grid with a 'root' container
 
-
 	//Todo force to rows, always root is rows
 	LayoutItem root;
 
-	LayoutItem overItem;
+	LayoutContent overItem;
 	boolean highlightEdge = true;
 	private Skin skin;
 	private Drawable edgeBackground;
+
+	private DragHitResult dragHitResult = new DragHitResult();
+
+	float horizontalPercent = 0.3f;
+	float verticalPercent = 0.3f;
 
 	public LayoutGrid (Skin skin) {
 		this.skin = skin;
 
 		edgeBackground = skin.newDrawable("white", 1f, 1f, 1f, 0.5f);
 		dragAndDrop = new DragAndDrop();
+		dragAndDrop.setKeepWithinStage(false);
 	}
-
 
 	public enum LayoutDirection {
-		UP,RIGHT,DOWN,LEFT
+		UP,
+		RIGHT,
+		DOWN,
+		LEFT,
+		TAB
 	}
-
 
 	public void addContent (LayoutItem content) {
 		if (root == null) {
@@ -54,21 +64,189 @@ public class LayoutGrid extends WidgetGroup {
 
 				root = newRow;
 				addActor(root);
-
 			}
 		}
+
+		if (content instanceof LayoutContent) {
+			registerDragTarget((LayoutContent)content);
+		}
+
+	}
+
+	void registerDragTarget (LayoutContent layoutContent) {
+		dragAndDrop.addTarget(new DragAndDrop.Target(layoutContent) {
+			@Override
+			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+				//should just always be true
+
+				return true;
+			}
+
+			@Override
+			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+			}
+		});
 	}
 
 	//Add each LayoutContent for drag and drop as a source
 	//Add each LayoutContent for drag and drop as a target
-	void registerForDragAndDrop () {
+	void registerDragSource (VisLabel actorToDrag) {
+		dragAndDrop.addSource(new DragAndDrop.Source(actorToDrag) {
+			@Override
+			public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
+				DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
+				LayoutContent layoutContent = new LayoutContent(skin, LayoutGrid.this);
+				layoutContent.setSize(200, 200);
+				layoutContent.addContent(actorToDrag.getText().toString());
+
+				payload.setDragActor(layoutContent);
+
+				return payload;
+			}
+
+			@Override
+			public void drag (InputEvent event, float x, float y, int pointer) {
+				super.drag(event, x, y, pointer);
+
+				float unhitSize = 200;
+
+				Actor dragActor = dragAndDrop.getDragActor();
+				if (dragActor != null) {
+
+					//Find out if we hit something, and if so what side
+
+					getDragHit(dragHitResult);
+
+					LayoutContent hitResult = dragHitResult.hit;
+					if (hitResult != null) {
+						switch (dragHitResult.direction) {
+						case UP:
+
+							dragActor.setSize(hitResult.getWidth(), hitResult.getHeight() * verticalPercent);
+
+							//The offset needs to be the difference between the drag x and y and the target x and y
+							Vector2 vector2 = new Vector2();
+							dragHitResult.hit.localToStageCoordinates(vector2);
+							vector2.sub(x, y);
+
+							float hitInStageX = vector2.x;
+							float hitInStageY = vector2.y;
+
+							vector2.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+							screenToLocalCoordinates(vector2);
+							localToStageCoordinates(vector2);
+
+
+							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY));
+
+							break;
+						case RIGHT:
+							dragActor.setSize(hitResult.getWidth() * horizontalPercent, hitResult.getHeight());
+							break;
+						case DOWN:
+							dragActor.setSize(hitResult.getWidth(), hitResult.getHeight() * verticalPercent);
+							break;
+						case LEFT:
+							dragActor.setSize(hitResult.getWidth() * horizontalPercent, hitResult.getHeight());
+							break;
+						case TAB:
+							Table tabTable = hitResult.getTabTable();
+							dragActor.setSize(200, tabTable.getHeight());
+							break;
+						}
+					} else {
+						dragActor.setSize(unhitSize, unhitSize);
+						dragAndDrop.setDragActorPosition(dragActor.getWidth() / 2f, -dragActor.getHeight() / 2f);
+					}
+
+				}
+
+			}
+
+			@Override
+			public void dragStop (InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+				super.dragStop(event, x, y, pointer, payload, target);
+			}
+		});
+	}
+
+	private void getDragHit (DragHitResult dragHitResult) {
+		dragHitResult.direction = null;
+		dragHitResult.hit = null;
+
+		if (overItem == null)
+			return;
+
+		//Detect the edge
+		int x = Gdx.input.getX();
+		int y = Gdx.input.getY();
+		Vector2 coords = new Vector2(x, y);
+		overItem.screenToLocalCoordinates(coords);
+
+
+
+		Vector2 localCoords = new Vector2(coords.x, coords.y);
+
+		coords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
+
+		//UNiversal coordinates
+
+		float distanceFromMiddleX = Math.abs(0.5f - coords.x);
+		float distanceFromMiddleY = Math.abs(0.5f - coords.y);
+
+		if (distanceFromMiddleX >= distanceFromMiddleY) {
+			//Its going to be an X if it exists
+
+			if (coords.x < horizontalPercent) {
+				//Left edge
+				dragHitResult.hit = overItem;
+				dragHitResult.direction = LayoutDirection.LEFT;
+			} else if (coords.x > (1 - horizontalPercent)) {
+				//Right edge
+				dragHitResult.hit = overItem;
+				dragHitResult.direction = LayoutDirection.RIGHT;
+			}
+
+		} else {
+			//its going to be Y if it exists
+			if (coords.y < verticalPercent) {
+
+				dragHitResult.hit = overItem;
+				dragHitResult.direction = LayoutDirection.DOWN;
+			} else if (coords.y > (1 - verticalPercent)) {
+				//top edge
+
+				boolean hitLabel = false;
+
+				Actor hit = null;
+				if ((hit = ((LayoutContent)overItem).hitTabTable(localCoords)) != null) {
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.TAB;
+					hitLabel = true;
+				}
+
+				if (!hitLabel) {
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.UP;
+				}
+			}
+		}
+
+	}
+
+	static class DragHitResult {
+		public LayoutContent hit;
+		public LayoutDirection direction;
 	}
 
 	@Override
 	public void layout () {
 		super.layout();
-		if (root == null) return;
+		if (root == null)
+			return;
 
 		root.setBounds(0, 0, getWidth(), getHeight());
 	}
@@ -76,7 +254,8 @@ public class LayoutGrid extends WidgetGroup {
 	@Override
 	public void act (float delta) {
 		super.act(delta);
-		if (root == null) return;
+		if (root == null)
+			return;
 
 		int x = Gdx.input.getX();
 		int y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -84,8 +263,10 @@ public class LayoutGrid extends WidgetGroup {
 		screenToLocalCoordinates(screenCoords);
 
 		Actor hit = hit(x, y, true);
-		if (hit instanceof LayoutItem) {
-			overItem = (LayoutItem)hit;
+		if (hit instanceof LayoutContent) {
+			overItem = (LayoutContent)hit;
+		} else {
+			overItem = null;
 		}
 	}
 
@@ -93,59 +274,45 @@ public class LayoutGrid extends WidgetGroup {
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 
-		if (highlightEdge && overItem != null) {
+		if (highlightEdge && overItem != null && dragHitResult.hit != null) {
 
-			//Detect the edge
 			int x = Gdx.input.getX();
 			int y = Gdx.input.getY();
 			Vector2 coords = new Vector2(x, y);
 			overItem.screenToLocalCoordinates(coords);
 
+			Vector2 localCoords = new Vector2(coords.x, coords.y);
 
-			float horizontalPercent = 0.3f;
-			float verticalPercent = 0.3f;
+			switch (dragHitResult.direction) {
+			case LEFT:
+//				edgeBackground.draw(batch, overItem.getX(), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
 
-			coords.scl(1f/overItem.getWidth(), 1f/overItem.getHeight());
+				break;
+			case RIGHT:
+//				edgeBackground.draw(batch, overItem.getX() + ((1 - horizontalPercent) * overItem.getWidth()), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
 
-			//UNiversal coordinates
+				break;
 
+			case UP:
+//				edgeBackground.draw(batch, overItem.getX(), overItem.getY() + ((1 - verticalPercent) * overItem.getHeight()), overItem.getWidth(), verticalPercent * overItem.getHeight());
 
-			float distanceFromMiddleX = Math.abs(0.5f - coords.x);
-			float distanceFromMiddleY = Math.abs(0.5f - coords.y);
+				break;
+			case DOWN:
+//				edgeBackground.draw(batch, overItem.getX(), overItem.getY(), overItem.getWidth(), verticalPercent * overItem.getHeight());
 
-			if (distanceFromMiddleX >= distanceFromMiddleY) {
-				//Its going to be an X if it exists
+				break;
 
-				if (coords.x < horizontalPercent) {
-					//Left edge
-					edgeBackground.draw(batch, overItem.getX(), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
-				} else if (coords.x > (1-horizontalPercent)) {
-					//Right edge
-					edgeBackground.draw(batch, overItem.getX() + ((1-horizontalPercent) * overItem.getWidth()), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
+			case TAB:
+
+				Actor hit = null;
+				if ((hit = ((LayoutContent)overItem).hitTabTable(localCoords)) != null) {
+					Vector2 out = new Vector2(0, 0);
+					hit.localToAscendantCoordinates(this, out);
+//					edgeBackground.draw(batch, out.x, out.y, hit.getWidth(), hit.getHeight());
 				}
 
-			} else {
-				//its going to be Y if it exists
-				if (coords.y < verticalPercent) {
-					//bottom edge
-					edgeBackground.draw(batch, overItem.getX(), overItem.getY(),  overItem.getWidth(), verticalPercent * overItem.getHeight());
-				} else if (coords.y > (1-verticalPercent)) {
-					//top edge
-
-					float pixelAmount = overItem.getHeight() - (coords.y * overItem.getHeight());
-
-					if (pixelAmount < LayoutItem.HEADER_SIZE) {
-						edgeBackground.draw(batch, overItem.getX(), overItem.getY() + overItem.getHeight() - LayoutItem.HEADER_SIZE, overItem.getWidth(), LayoutItem.HEADER_SIZE);
-
-					} else {
-						edgeBackground.draw(batch, overItem.getX(), overItem.getY() + ((1-verticalPercent) * overItem.getHeight()), overItem.getWidth(), verticalPercent * overItem.getHeight());
-					}
-
-				}
+				break;
 			}
-
-
-
 
 		}
 	}
