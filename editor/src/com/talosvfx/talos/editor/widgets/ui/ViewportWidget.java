@@ -185,7 +185,7 @@ public abstract class ViewportWidget extends Table {
 
 				if (hasSelection) {
 					//Check if we keep selection
-					if (hasEntityUnderMouse && entityUnderMouse == selection.first()) {
+					if (hasEntityUnderMouse && selection.contains(entityUnderMouse)) {
 						//Same shit, but lets update our gizmo
 
 						countOfSameTouchDown++;
@@ -212,8 +212,17 @@ public abstract class ViewportWidget extends Table {
 						} else {
 							countOfSameTouchDown = 0;
 
-							//We aren't over the pixel or the gizmo, unselect
-							requestSelectionClear();
+
+							if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+								if (entityUnderMouse != null) {
+									addToSelection(entityUnderMouse);
+								}
+
+							} else {
+								//We aren't over the pixel or the gizmo, unselect
+								requestSelectionClear();
+							}
+
 						}
 					}
 				} else {
@@ -442,7 +451,7 @@ public abstract class ViewportWidget extends Table {
 		gizmos.gizmoList.sort(new Comparator<Gizmo>() {
 			@Override
 			public int compare (Gizmo o1, Gizmo o2) {
-				return -Integer.compare(o1.getPriority(), o2.getPriority());
+				return Integer.compare(o1.getPriority(), o2.getPriority());
 			}
 		});
 
@@ -459,7 +468,7 @@ public abstract class ViewportWidget extends Table {
 		gizmos.gizmoList.sort(new Comparator<Gizmo>() {
 			@Override
 			public int compare (Gizmo o1, Gizmo o2) {
-				return -Integer.compare(o1.getPriority(), o2.getPriority());
+				return Integer.compare(o1.getPriority(), o2.getPriority());
 			}
 		});
 

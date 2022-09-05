@@ -185,7 +185,7 @@ public class GroupSelectionGizmo extends Gizmo {
 
 	@Override
 	public boolean isControllingGameObject (GameObject gameObject) {
-		return viewportWidget.selection.contains(gameObject);
+		return viewportWidget.selection.contains(gameObject) && viewportWidget.selection.size != 1;
 	}
 
 	@Override
