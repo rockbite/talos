@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.Tween;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
@@ -359,6 +360,7 @@ public class AssetRepository implements Notifications.Observer {
 		FileHandle assets = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assets");
 		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
 		findAllPrefabs(assets, identifiersBeingUsedByComponents);
+		findAllRoutines(assets, identifiersBeingUsedByComponents);
 
 
 		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
@@ -415,6 +417,23 @@ public class AssetRepository implements Notifications.Observer {
 
 						//Get all dependent assets of this prefab
 						collectGameObjectExportedAssets(identifiersBeingUsedByComponents, gameObject);
+					}
+				}
+			}
+		}
+	}
+
+	private void findAllRoutines (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {
+		FileHandle[] list = assets.list();
+		for (FileHandle handle : list) {
+			if (handle.isDirectory()) {
+				findAllRoutines(handle, identifiersBeingUsedByComponents);
+			} else {
+				if (handle.extension().equals("tw")) {
+					//Get the raw asset
+					GameAsset<Tween> gameAsset = dataMaps.fileHandleGameAssetObjectMap.get(handle);
+					if (gameAsset != null) {
+						identifiersBeingUsedByComponents.add(new TypeIdentifierPair(GameAssetType.TWEEN, gameAsset.nameIdentifier));
 					}
 				}
 			}
