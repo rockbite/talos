@@ -3,14 +3,10 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.TalosMain;
@@ -26,12 +22,12 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
-import java.awt.*;
 import java.util.UUID;
 
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
@@ -43,6 +39,11 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private PaletteListener defaultPaletteListener;
 	private Table buttonMainMenu;
 
+	private SquareButton translate;
+	private SquareButton editGizmo;
+	private SquareButton editTile;
+	private SquareButton editLine;
+
 	enum PaletteImportMode {
 		NONE,
 		TILE,
@@ -51,13 +52,13 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 	protected PaletteImportMode currentImportMode = PaletteImportMode.NONE;
 
-	protected PaletteEditMode currentEditMode = PaletteEditMode.NONE;
+	protected PaletteEditMode currentEditMode = PaletteEditMode.FREE_TRANSLATE;
 
 	enum PaletteEditMode {
-		NONE,
 		FREE_TRANSLATE, // translation of the parent tile + translation of transform
 		FREE_TRANSFORM, // free transform of transform component with gizmo
-		PARENT_TILE_AND_FAKE_HEIGHT,
+		PARENT_TILE_EDIT,
+		FAKE_HEIGHT_EDIT
 	}
 
 	public PaletteEditor (GameAsset<TilePaletteData> paletteData) {
@@ -271,8 +272,12 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		return currentEditMode == PaletteEditMode.FREE_TRANSLATE;
 	}
 
-	public boolean isParentTileAndFakeHeightEditMode () {
-		return currentEditMode == PaletteEditor.PaletteEditMode.PARENT_TILE_AND_FAKE_HEIGHT;
+	public boolean isParentTileEditMode () {
+		return currentEditMode == PaletteEditMode.PARENT_TILE_EDIT;
+	}
+
+	public boolean isFakeHeightEditMode () {
+		return currentEditMode == PaletteEditMode.FAKE_HEIGHT_EDIT;
 	}
 
 	private void addDefaultButtons () {
@@ -283,25 +288,25 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		buttonStyle.down = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
 		buttonStyle.checked = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
 
-		SquareButton select = new SquareButton(skin, skin.getDrawable("arrow-icon"), true,"Select mode");
-		select.setStyle(buttonStyle);
-		SquareButton editGizmo = new SquareButton(skin, skin.getDrawable("image-transform-icon"), true,"Gizmo Edit mode");
+		translate = new SquareButton(skin, skin.getDrawable("arrow-icon"), true,"Select mode");
+		translate.setStyle(buttonStyle);
+		editGizmo = new SquareButton(skin, skin.getDrawable("image-transform-icon"), true,"Gizmo Edit mode");
 		editGizmo.setStyle(buttonStyle);
-		SquareButton editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), true,"Tile Edit mode");
+		editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), true,"Tile Edit mode");
 		editTile.setStyle(buttonStyle);
-		SquareButton editLine = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
+		editLine = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
 		editLine.setStyle(buttonStyle);
 		buttonMainMenu.clearChildren();
-		buttonMainMenu.add(select).size(32);
+		buttonMainMenu.add(translate).size(32);
 		buttonMainMenu.add(editGizmo).size(32);
 		buttonMainMenu.add(editTile).size(32);
 		buttonMainMenu.add(editLine).size(32);
 
 		// visual toggle
-		select.addListener(new ChangeListener() {
+		translate.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				if (select.isChecked()) {
+				if (translate.isChecked()) {
 					editGizmo.setChecked(false);
 					editTile.setChecked(false);
 					editLine.setChecked(false);
@@ -314,10 +319,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (editGizmo.isChecked()) {
-					select.setChecked(false);
+					translate.setChecked(false);
 					editTile.setChecked(false);
 					editLine.setChecked(false);
-				} else if (!select.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
+				} else if (!translate.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
 					event.cancel();
 				}
 			}
@@ -326,10 +331,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (editTile.isChecked()) {
-					select.setChecked(false);
+					translate.setChecked(false);
 					editGizmo.setChecked(false);
 					editLine.setChecked(false);
-				} else if (!select.isChecked() && !editGizmo.isChecked() && !editLine.isChecked()){
+				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editLine.isChecked()){
 					event.cancel();
 				}
 			}
@@ -338,10 +343,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (editLine.isChecked()) {
-					select.setChecked(false);
+					translate.setChecked(false);
 					editGizmo.setChecked(false);
 					editTile.setChecked(false);
-				} else if (!select.isChecked() && !editGizmo.isChecked() && !editTile.isChecked()){
+				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editTile.isChecked()){
 					event.cancel();
 				}
 			}
@@ -380,6 +385,72 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 		// set default import mode
 		modeToggle.getEntityBtn().toggle();
+		// set default edit mode
+		translate.toggle();
+		editGizmo.setDisabled(true);
+		editTile.setDisabled(true);
+		editLine.setDisabled(true);
+
+		defaultPaletteListener = new PaletteListener() {
+			@Override
+			public boolean selected(PaletteEvent e, GameObject gameObject, StaticTile tle) {
+				editGizmo.setDisabled(false);
+				editTile.setDisabled(false);
+				editLine.setDisabled(false);
+				return super.selected(e, gameObject, tle);
+			}
+
+			@Override
+			public boolean lostFocus (PaletteEvent e) {
+				if (isFreeTransformEditMode()) {
+					endFreeTransformEditMode();
+				}
+				if (isFakeHeightEditMode()) {
+//					endFakeHeightEditMode();
+				}
+				if (isParentTileEditMode()) {
+//					endParenTileEditMode();
+				}
+				editGizmo.setDisabled(true);
+				editTile.setDisabled(true);
+				editLine.setDisabled(true);
+				translate.toggle();
+				currentEditMode = PaletteEditMode.FREE_TRANSLATE;
+				return super.lostFocus(e);
+			}
+
+			@Override
+			public void startTranslate(PaletteEvent e) {
+				translate.toggle();
+				return;
+			}
+
+			@Override
+			public void startGizmoEdit(PaletteEvent e) {
+				editGizmo.toggle();
+				return;
+			}
+		};
+
+		translate.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (translate.isChecked()) {
+					endFreeTransformEditMode();
+					startFreeTranslateEditMode();
+				}
+			}
+		});
+
+		editGizmo.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (editGizmo.isChecked()) {
+					startFreeTransformEditMode();
+				}
+			}
+		});
+		paletteEditorWorkspace.addListener(defaultPaletteListener);
 
 //		delete.addListener(new ClickListener() {
 //			@Override
@@ -474,21 +545,16 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		currentEditMode = PaletteEditMode.FREE_TRANSLATE;
 	}
 
-	void endFreeTranslateEditMode () {
-		currentEditMode = PaletteEditMode.NONE;
-		// extra code for exiting the mode
-	}
-
 	void startFreeTransformEditMode () {
 		currentEditMode = PaletteEditMode.FREE_TRANSFORM;
 		paletteEditorWorkspace.unlockGizmos();
 	}
 
-//	void endFreeTransformEditMode () {
-//		currentEditMode = PaletteEditMode.NONE;
-//		paletteEditorWorkspace.lockGizmos();
-//		// extra code for exiting mode
-//	}
+	void endFreeTransformEditMode () {
+		paletteEditorWorkspace.lockGizmos();
+		startFreeTranslateEditMode();
+		// extra code for exiting mode
+	}
 
 //	void startParentTileAndFakeHeightEditMode () {
 //		currentEditMode = PaletteEditMode.PARENT_TILE_AND_FAKE_HEIGHT;

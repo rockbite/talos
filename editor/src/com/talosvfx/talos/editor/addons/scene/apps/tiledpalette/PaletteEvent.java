@@ -1,26 +1,34 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 
 public class PaletteEvent extends Event {
     private Type type;
-    private Array<GameAsset<?>> selectedGameAssets;
-    private PaletteEditor.PaletteImportMode currentMode;
+    private GameObject[] selectedGameObjects;
+    private StaticTile[] selectedTiles;
 
     public void reset () {
         super.reset();
-        selectedGameAssets = null;
-        currentMode = PaletteEditor.PaletteImportMode.NONE;
+        selectedTiles = null;
+        selectedGameObjects = null;
     }
 
-    public void setSelectedGameAssets(Array<GameAsset<?>> gameAssets) {
-        this.selectedGameAssets = gameAssets;
+    public void setSelectedTiles(StaticTile[] gameAssets) {
+        this.selectedTiles = gameAssets;
     }
 
-    public Array<GameAsset<?>> getSelectedGameAssets() {
-        return selectedGameAssets;
+    public void setSelectedGameObjects(GameObject[] gameObjects) {
+        this.selectedGameObjects = gameObjects;
+    }
+
+    public GameObject[] getSelectedGameObjects() {
+        return selectedGameObjects;
+    }
+
+    public StaticTile[] getSelectedTiles() {
+        return selectedTiles;
     }
 
     public Type getType() {
@@ -31,15 +39,9 @@ public class PaletteEvent extends Event {
         this.type = type;
     }
 
-    public PaletteEditor.PaletteImportMode getCurrentFilterMode () {
-        return currentMode;
-    }
-
-    public void setCurrentFilterMode (PaletteEditor.PaletteImportMode mode) {
-        this.currentMode = mode;
-    }
-
-    static public enum Type {
+    public enum Type {
+        startTranslate,
+        startGizmoEdit,
         selected,
         selectedMultiple,
         imported,

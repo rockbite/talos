@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 
 public class PaletteListener implements EventListener {
 
@@ -12,32 +14,53 @@ public class PaletteListener implements EventListener {
 
         switch (event.getType()) {
             case selected:
-//                return selected(event, event.getSelectedGameAssets().get(0), event.getCurrentFilterMode()); // handle selection
-                return selected(event, null, event.getCurrentFilterMode()); // handle selection
+                GameObject gameObject = null;
+                if (event.getSelectedGameObjects() != null && event.getSelectedGameObjects().length > 0) {
+                    gameObject = event.getSelectedGameObjects()[0];
+                }
+                StaticTile staticTile = null;
+                if (gameObject == null &&  event.getSelectedTiles() != null && event.getSelectedTiles().length > 0) {
+                    staticTile = event.getSelectedTiles()[0];
+                }
+                return selected(event, gameObject, staticTile); // handle selection
             case selectedMultiple:
-                return selectedMultiple(event, null, event.getCurrentFilterMode()); // handle selection
+                return selectedMultiple(event, event.getSelectedGameObjects(), event.getSelectedTiles()); // handle selection
             case imported:
-                return imported(event); // handle importing
+                return imported(event);
             case removed:
-                return removed(event); // handle removal
+                return removed(event);
             case moved:
-                return moved(event); // handle movement
+                return moved(event);
             case lostFocus:
-                return lostFocus(event); // handle movement
+                return lostFocus(event);
+            case startTranslate:
+                startTranslate(event);
+                return false;
+            case startGizmoEdit:
+                startGizmoEdit(event);
+                return false;
         }
         return false;
     }
 
-    public boolean selected(PaletteEvent e, GameAsset<?> gameAsset, PaletteEditor.PaletteImportMode mode) { // game asset of the selected item
+    public boolean selected(PaletteEvent e, GameObject gameObject, StaticTile tle) { // pass selected things
         return false;
     }
 
-    public boolean selectedMultiple(PaletteEvent e, GameAsset<?>[] gameAssets, PaletteEditor.PaletteImportMode mode) { // game assets of selected items
+    public boolean selectedMultiple(PaletteEvent e, GameObject[] gameObjects, StaticTile[] staticTiles) { // pass selected things
         return false;
     }
 
     public boolean lostFocus(PaletteEvent e) { // game assets of selected items
         return false;
+    }
+
+    public void startTranslate(PaletteEvent e) { // game assets of selected items
+        return;
+    }
+
+    public void startGizmoEdit(PaletteEvent e) { // game assets of selected items
+        return;
     }
 
     public boolean imported(PaletteEvent e) {

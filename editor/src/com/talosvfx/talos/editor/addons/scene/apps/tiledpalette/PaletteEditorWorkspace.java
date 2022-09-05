@@ -29,13 +29,11 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.PaletteGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.util.Comparator;
-import java.util.function.Supplier;
 
 
 public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
@@ -164,7 +162,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return false;
                 }
 
-                if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (paletteEditor.isParentTileEditMode()) {
+                    return false;
+                }
+
+                if (paletteEditor.isFakeHeightEditMode()) {
                     return false;
                 }
 
@@ -215,7 +217,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (paletteEditor.isParentTileEditMode()) {
+                    return;
+                }
+
+                if (paletteEditor.isFakeHeightEditMode()) {
                     return;
                 }
 
@@ -282,6 +288,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             }
 
+            private GameObject entityClicked;
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 if (touchedDownOnEntityForParentDrag) {
@@ -293,15 +300,24 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (paletteEditor.isParentTileEditMode()) {
                     return;
                 }
 
+                if (paletteEditor.isFakeHeightEditMode()) {
+                    return;
+                }
+
+                // increase tap count only when tapping on the same thing
                 long time = TimeUtils.nanoTime();
                 if (time - lastTapTime > tapCountInterval) tapCount = 0;
-                tapCount++;
+                if (tapCount == 0 || entityClicked == entityUnderMouse) {
+                    tapCount++;
+                    entityClicked = entityUnderMouse;
+                } else {
+                    tapCount = 0;
+                }
 
-                System.out.println("TAP " + tapCount);
                 lastTapTime = time;
                 clicked(event, x, y);
 
@@ -310,14 +326,14 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             }
 
             public void clicked (InputEvent event, float x, float y) {
-                if (tapCount == 1 && paletteEditor.getEditMode() == PaletteEditor.PaletteEditMode.NONE) {
-                    //turn on the first edit mode if hitting asset
-                    paletteEditor.startFreeTranslateEditMode();
-
-                } else if (tapCount >= 2 && paletteEditor.isFreeTranslateEditMode()) {
-                    //turn on the second edit mode if hitting assets
-                    paletteEditor.endFreeTranslateEditMode();
-                    paletteEditor.startFreeTransformEditMode();
+                if (tapCount == 1 && entityUnderMouse != null) {
+                    PaletteEvent evn = paletteEventPool.obtain();
+                    evn.setType(PaletteEvent.Type.startTranslate);
+                    PaletteEditorWorkspace.this.notify(evn, false);
+                } else if (tapCount >= 2 && paletteEditor.isFreeTranslateEditMode() && entityUnderMouse instanceof GameObject) {
+                    PaletteEvent evn = paletteEventPool.obtain();
+                    evn.setType(PaletteEvent.Type.startGizmoEdit);
+                    PaletteEditorWorkspace.this.notify(evn, false);
                 }
 
                 if (!isSelectingWithDrag) {
@@ -351,7 +367,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (!paletteEditor.isParentTileEditMode()) {
+                    return false;
+                }
+
+                if (!paletteEditor.isFakeHeightEditMode()) {
                     return false;
                 }
 
@@ -368,7 +388,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (!paletteEditor.isParentTileEditMode()) {
+                    return false;
+                }
+
+                if (!paletteEditor.isFakeHeightEditMode()) {
                     return false;
                 }
 
@@ -405,9 +429,14 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (!paletteEditor.isParentTileEditMode()) {
                     return;
                 }
+
+                if (!paletteEditor.isFakeHeightEditMode()) {
+                    return;
+                }
+
                 isDragging = true;
                 if (overLine) { // line is selected, move it instead
                     Vector2 tmp = new Vector2(Gdx.input.getX(), Gdx.input.getY());
@@ -419,7 +448,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
+                if (!paletteEditor.isParentTileEditMode()) {
+                    return;
+                }
+
+                if (!paletteEditor.isFakeHeightEditMode()) {
                     return;
                 }
 
@@ -427,7 +460,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging && paletteEditor.isParentTileAndFakeHeightEditMode() && !overLine) {
+                if (isDragging && (paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode()) && !overLine) {
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -577,7 +610,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 //
 //        }
 
-        if (paletteEditor.isParentTileAndFakeHeightEditMode()) {
+        if (paletteEditor.isFakeHeightEditMode()) {
             // draw the fake height lines
             if (getSelectedGameObject()!= null) {
                 final TransformComponent transformComponent = getSelectedGameObject().getComponent(TransformComponent.class);
@@ -685,7 +718,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
 
         ObjectSet<GameObject> gameObjects = event.get();
-        if (!paletteEditor.isParentTileAndFakeHeightEditMode()) {
+
+        if (!(paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode())) {
             selectGizmos(gameObjects);
         }
     }
@@ -715,7 +749,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                         PaletteEvent event = paletteEventPool.obtain();
                         event.setType(PaletteEvent.Type.selected);
-                        event.setCurrentFilterMode(PaletteEditor.PaletteImportMode.TILE);
+                        event.setSelectedGameObjects(selectionObjects.toArray(TileGameObjectProxy.class));
                         notify(event, false);
                         return;
                     }
@@ -726,8 +760,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         if (activeGameObject != null) {
             PaletteEvent event = paletteEventPool.obtain();
             event.setType(PaletteEvent.Type.selected);
-            event.setCurrentFilterMode(PaletteEditor.PaletteImportMode.ENTITY);
-
 
             Array<GameObject> selectionObjects = new Array<>();
             selectionObjects.add(activeGameObject);
