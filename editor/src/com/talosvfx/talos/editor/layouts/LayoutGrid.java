@@ -186,6 +186,7 @@ public class LayoutGrid extends WidgetGroup {
 			}
 
 			LayoutContent newLayoutContent = new LayoutContent(skin, this);
+			newLayoutContent.setRandomColour(parent.getRandomColour());
 			registerDragTarget(newLayoutContent);
 			newLayoutContent.addContent(app);
 			colTarget.addRowContainer(newLayoutContent, direction == LayoutDirection.UP, isExistingColumn ? target : null);
@@ -218,6 +219,7 @@ public class LayoutGrid extends WidgetGroup {
 			}
 
 			LayoutContent newLayoutContent = new LayoutContent(skin, this);
+			newLayoutContent.setRandomColour(parent.getRandomColour());
 			registerDragTarget(newLayoutContent);
 			newLayoutContent.addContent(app);
 			rowTarget.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT, isExistingRow ? target : null);
@@ -277,6 +279,7 @@ public class LayoutGrid extends WidgetGroup {
 				DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
 				LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
+				dummy.setRandomColour(parent.getRandomColour());
 				dummy.setSize(200, 200);
 				dummy.addContent(actorToDrag.getText().toString());
 
