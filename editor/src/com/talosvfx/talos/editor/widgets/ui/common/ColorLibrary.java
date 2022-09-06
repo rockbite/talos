@@ -20,6 +20,8 @@ public class ColorLibrary {
 
     public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
 
+    public static Color BORDER_BLUE = new Color(Color.valueOf("#6f9ac1"));
+
     public static String SHAPE_SQUIRCLE = "squircle-6";
     public static String SHAPE_SQUIRCLE_2 = "squircle-2";
     public static String SHAPE_SQUIRCLE_LEFT = "squircle-l-6";

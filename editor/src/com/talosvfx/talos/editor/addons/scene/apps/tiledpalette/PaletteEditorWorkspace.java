@@ -470,6 +470,19 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     }
 
                     tileDataComponent.setParentTiles(parentTiles);
+//                    final Vector2 touchPos = new Vector2(x, y);
+//
+//                    // convert to screen coordinates
+//                    localToScreenCoordinates(touchPos);
+//
+//                    // project to grid coordinates
+//                    gridRenderer.project(touchPos);
+//
+//                    tileDataComponent.
+//                    final GridPosition gridPosition = new GridPosition(i, j);
+//                    parentTiles.add(gridPosition);
+//
+//                    tileDataComponent.setParentTiles(parentTiles);
                 } else if (isDragging && paletteEditor.isFakeHeightEditMode()) {
                     GameObject gameObject = getSelectedGameObject();
                     TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
@@ -567,7 +580,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(ColorLibrary.FONT_WHITE);
+        shapeRenderer.setColor(ColorLibrary.BORDER_BLUE);
 
 
 //        for (ObjectMap.Entry<GameAsset<?>, StaticTile> entry : staticTiles) {
@@ -600,9 +613,16 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                 float xPos = bottomLeftParentTile.x + transformComponent.position.x;
 
+                float width = 2f; // grid space
+
+                if (getSelectedGameObject().hasComponent(SpriteRendererComponent.class)) {
+                    SpriteRendererComponent spriteRendererComponent = getSelectedGameObject().getComponent(SpriteRendererComponent.class);
+                    width = spriteRendererComponent.size.x + 1f;
+                }
+
                 shapeRenderer.line(
-                        xPos - 1f, tmpHeightOffset,
-                        xPos + 1f, tmpHeightOffset
+                        xPos - width / 2f, tmpHeightOffset,
+                        xPos + width / 2f, tmpHeightOffset
                 );
 
                 shapeRenderer.end();
@@ -612,10 +632,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 float totalScreenSpaceParentSize = getWidth();
                 float totalWorldWidth = getWorldWidth() * camera.zoom;
                 float worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
-                float width = worldPerPixel * 8f;
-                float height = worldPerPixel * 16f;
-                lineAdjustIcon.draw(batch, xPos - 1f, tmpHeightOffset - height / 2f, width, height);
-                lineAdjustIcon.draw(batch, xPos + 1f, tmpHeightOffset - height / 2f, width, height);
+                float icWidth = worldPerPixel * 8f;
+                float icHeight = worldPerPixel * 16f;
+                lineAdjustIcon.draw(batch, xPos - width / 2f, tmpHeightOffset - icHeight / 2f, icWidth, icHeight);
+                lineAdjustIcon.draw(batch, xPos + width / 2f - icWidth / 2f, tmpHeightOffset - icHeight / 2f, icWidth, icHeight);
                 batch.end();
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             }
