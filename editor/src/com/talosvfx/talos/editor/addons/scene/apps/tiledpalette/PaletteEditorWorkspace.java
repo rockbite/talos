@@ -10,12 +10,15 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -162,11 +165,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return false;
                 }
 
-                if (paletteEditor.isParentTileEditMode()) {
-                    return false;
-                }
-
-                if (paletteEditor.isFakeHeightEditMode()) {
+                if (paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode()) {
                     return false;
                 }
 
@@ -217,11 +216,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (paletteEditor.isParentTileEditMode()) {
-                    return;
-                }
-
-                if (paletteEditor.isFakeHeightEditMode()) {
+                if (paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode()) {
                     return;
                 }
 
@@ -300,11 +295,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (paletteEditor.isParentTileEditMode()) {
-                    return;
-                }
-
-                if (paletteEditor.isFakeHeightEditMode()) {
+                if (paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode()) {
                     return;
                 }
 
@@ -367,11 +358,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isParentTileEditMode()) {
-                    return false;
-                }
-
-                if (!paletteEditor.isFakeHeightEditMode()) {
+                if (!(paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode())) {
                     return false;
                 }
 
@@ -388,11 +375,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
-                if (!paletteEditor.isParentTileEditMode()) {
-                    return false;
-                }
-
-                if (!paletteEditor.isFakeHeightEditMode()) {
+                if (!(paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode())) {
                     return false;
                 }
 
@@ -429,16 +412,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if (!paletteEditor.isParentTileEditMode()) {
-                    return;
-                }
-
-                if (!paletteEditor.isFakeHeightEditMode()) {
+                if (!(paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode())) {
                     return;
                 }
 
                 isDragging = true;
-                if (overLine) { // line is selected, move it instead
+                if (paletteEditor.isFakeHeightEditMode() && overLine) { // line is selected, move it instead
                     Vector2 tmp = new Vector2(Gdx.input.getX(), Gdx.input.getY());
                     screenToLocalCoordinates(tmp);
                     tmp = getWorldFromLocal(tmp.x, tmp.y);
@@ -448,11 +427,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (!paletteEditor.isParentTileEditMode()) {
-                    return;
-                }
-
-                if (!paletteEditor.isFakeHeightEditMode()) {
+                if (!(paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode())) {
                     return;
                 }
 
@@ -460,7 +435,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging && (paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode()) && !overLine) {
+                if (isDragging && paletteEditor.isParentTileEditMode()) { // TODO: refactor parent tile edit mode
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -495,6 +470,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     }
 
                     tileDataComponent.setParentTiles(parentTiles);
+                } else if (isDragging && paletteEditor.isFakeHeightEditMode()) {
+                    GameObject gameObject = getSelectedGameObject();
+                    TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+                    TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+                    tileDataComponent.setFakeZ(tmpHeightOffset - (tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y));
+                    AssetRepository.getInstance().saveGameAssetResourceJsonToFile(paletteEditor.getObject());
                 }
 
                 super.touchUp(event, x, y, pointer, button);
@@ -620,9 +601,23 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 float xPos = bottomLeftParentTile.x + transformComponent.position.x;
 
                 shapeRenderer.line(
-                        xPos - 0.5f, tmpHeightOffset,
-                        xPos + 0.5f, tmpHeightOffset
+                        xPos - 1f, tmpHeightOffset,
+                        xPos + 1f, tmpHeightOffset
                 );
+
+                shapeRenderer.end();
+                batch.begin();
+                Skin skin = TalosMain.Instance().getSkin();
+                Drawable lineAdjustIcon = skin.getDrawable("adjust-line-icon");
+                float totalScreenSpaceParentSize = getWidth();
+                float totalWorldWidth = getWorldWidth() * camera.zoom;
+                float worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
+                float width = worldPerPixel * 8f;
+                float height = worldPerPixel * 16f;
+                lineAdjustIcon.draw(batch, xPos - 1f, tmpHeightOffset - height / 2f, width, height);
+                lineAdjustIcon.draw(batch, xPos + 1f, tmpHeightOffset - height / 2f, width, height);
+                batch.end();
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             }
         }
 
@@ -916,12 +911,20 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         camera.update();
     }
 
-    public void startEditMode () {
+    public void startFakeHeightEditMode () {
         TransformComponent transformComponent = getSelectedGameObject().getComponent(TransformComponent.class);
         TileDataComponent tileDataComponent = getSelectedGameObject().getComponent(TileDataComponent.class);
         tmpHeightOffset = tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y + tileDataComponent.getFakeZ();
 
         lockGizmos();
+    }
+
+    public void startParentTileEditMode () {
+//        TransformComponent transformComponent = getSelectedGameObject().getComponent(TransformComponent.class);
+//        TileDataComponent tileDataComponent = getSelectedGameObject().getComponent(TileDataComponent.class);
+//        tmpHeightOffset = tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y + tileDataComponent.getFakeZ();
+//
+//        lockGizmos();
     }
 
     public float getTmpHeightOffset () {

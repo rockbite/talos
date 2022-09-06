@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -42,7 +43,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private SquareButton translate;
 	private SquareButton editGizmo;
 	private SquareButton editTile;
-	private SquareButton editLine;
+	private SquareButton editFakeHeight;
 
 	enum PaletteImportMode {
 		NONE,
@@ -294,13 +295,13 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		editGizmo.setStyle(buttonStyle);
 		editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), true,"Tile Edit mode");
 		editTile.setStyle(buttonStyle);
-		editLine = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
-		editLine.setStyle(buttonStyle);
+		editFakeHeight = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
+		editFakeHeight.setStyle(buttonStyle);
 		buttonMainMenu.clearChildren();
 		buttonMainMenu.add(translate).size(32);
 		buttonMainMenu.add(editGizmo).size(32);
 		buttonMainMenu.add(editTile).size(32);
-		buttonMainMenu.add(editLine).size(32);
+		buttonMainMenu.add(editFakeHeight).size(32);
 
 		// visual toggle
 		translate.addListener(new ChangeListener() {
@@ -309,8 +310,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 				if (translate.isChecked()) {
 					editGizmo.setChecked(false);
 					editTile.setChecked(false);
-					editLine.setChecked(false);
-				} else if (!editGizmo.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
+					editFakeHeight.setChecked(false);
+				} else if (!editGizmo.isChecked() && !editTile.isChecked() && !editFakeHeight.isChecked()){
 					event.cancel();
 				}
 			}
@@ -321,8 +322,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 				if (editGizmo.isChecked()) {
 					translate.setChecked(false);
 					editTile.setChecked(false);
-					editLine.setChecked(false);
-				} else if (!translate.isChecked() && !editTile.isChecked() && !editLine.isChecked()){
+					editFakeHeight.setChecked(false);
+				} else if (!translate.isChecked() && !editTile.isChecked() && !editFakeHeight.isChecked()){
 					event.cancel();
 				}
 			}
@@ -333,20 +334,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 				if (editTile.isChecked()) {
 					translate.setChecked(false);
 					editGizmo.setChecked(false);
-					editLine.setChecked(false);
-				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editLine.isChecked()){
-					event.cancel();
-				}
-			}
-		});
-		editLine.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (editLine.isChecked()) {
-					translate.setChecked(false);
-					editGizmo.setChecked(false);
-					editTile.setChecked(false);
-				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editTile.isChecked()){
+					editFakeHeight.setChecked(false);
+				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editFakeHeight.isChecked()){
 					event.cancel();
 				}
 			}
@@ -389,14 +378,14 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		translate.toggle();
 		editGizmo.setDisabled(true);
 		editTile.setDisabled(true);
-		editLine.setDisabled(true);
+		editFakeHeight.setDisabled(true);
 
 		defaultPaletteListener = new PaletteListener() {
 			@Override
 			public boolean selected(PaletteEvent e, GameObject gameObject, StaticTile tle) {
 				editGizmo.setDisabled(false);
 				editTile.setDisabled(false);
-				editLine.setDisabled(false);
+				editFakeHeight.setDisabled(false);
 				return super.selected(e, gameObject, tle);
 			}
 
@@ -413,7 +402,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 				}
 				editGizmo.setDisabled(true);
 				editTile.setDisabled(true);
-				editLine.setDisabled(true);
+				editFakeHeight.setDisabled(true);
 				translate.toggle();
 				currentEditMode = PaletteEditMode.FREE_TRANSLATE;
 				return super.lostFocus(e);
@@ -436,7 +425,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (translate.isChecked()) {
-					endFreeTransformEditMode();
+					if (isFreeTransformEditMode())
+						endFreeTransformEditMode();
+					if (isFakeHeightEditMode())
+						endFakeHeightEditMode();
 					startFreeTranslateEditMode();
 				}
 			}
@@ -450,6 +442,29 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 				}
 			}
 		});
+
+		editFakeHeight.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				OrderedSet<GameObject> selection = paletteEditorWorkspace.selection;
+				boolean singleSelection = selection.size == 1;
+				boolean selectedStaticTile = singleSelection && selection.first() instanceof TileGameObjectProxy;
+				if (editFakeHeight.isChecked() && (!singleSelection || selectedStaticTile))  {
+					event.cancel();
+					return;
+				}
+
+				if (editFakeHeight.isChecked()) {
+					translate.setChecked(false);
+					editGizmo.setChecked(false);
+					editTile.setChecked(false);
+					startFakeHeightEditMode();
+				} else {
+					endFakeHeightEditMode();
+				}
+			}
+		});
+
 		paletteEditorWorkspace.addListener(defaultPaletteListener);
 
 //		delete.addListener(new ClickListener() {
@@ -554,6 +569,16 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		paletteEditorWorkspace.lockGizmos();
 		startFreeTranslateEditMode();
 		// extra code for exiting mode
+	}
+
+	void startFakeHeightEditMode () {
+		currentEditMode = PaletteEditMode.FAKE_HEIGHT_EDIT;
+		paletteEditorWorkspace.startFakeHeightEditMode();
+	}
+
+	void endFakeHeightEditMode () {
+		// saving logic
+		translate.toggle();
 	}
 
 //	void startParentTileAndFakeHeightEditMode () {
