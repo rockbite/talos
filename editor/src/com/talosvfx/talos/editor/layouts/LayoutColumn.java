@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Null;
 
 public class LayoutColumn extends LayoutItem {
@@ -33,16 +34,36 @@ public class LayoutColumn extends LayoutItem {
 			}
 
 			rows.insert(idxRelative, newLayoutContent);
+			takeThirtyPercent(newLayoutContent, idxRelative, !up ? idxRelative + 1 : idxRelative - 1);
 
 		} else {
 			if (!up) {
 				rows.insert(0, newLayoutContent);
+				takeThirtyPercent(newLayoutContent, 0, 1);
+
 			} else {
 				rows.add(newLayoutContent);
+				takeThirtyPercent(newLayoutContent, 0, 1);
 			}
 		}
 
 		addActor(newLayoutContent);
+	}
+
+	private void takeThirtyPercent (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
+		if (otherItemIdx < 0 || otherItemIdx >= rows.size) {
+			//Just give it full width
+			rows.get(thisItemIdx).setRelativeHeight(1f);
+		} else {
+			LayoutItem layoutItem = rows.get(otherItemIdx);
+			float totalRelativeHeight = layoutItem.getRelativeHeight();
+			float totalRelativeSub = totalRelativeHeight * 0.3f;
+
+
+			newLayoutContent.setRelativeHeight(totalRelativeSub);
+			layoutItem.setRelativeHeight(totalRelativeHeight - totalRelativeSub);
+		}
+
 	}
 
 
@@ -53,25 +74,42 @@ public class LayoutColumn extends LayoutItem {
 		int size = rows.size;
 		if (size == 0) return;
 
-		float heightPerRow = getHeight()/size;
 
 		float counterY = 0;
-		//Evenly distribute for now
-		for (LayoutItem row : rows) {
-			row.setBounds(0, counterY, getWidth(), heightPerRow);
-			counterY += heightPerRow;
+
+		for (int i = 0; i < rows.size; i++) {
+			LayoutItem row = rows.get(i);
+			float heightForItem = row.getRelativeHeight() * getHeight();
+			row.setBounds(0, counterY, getWidth(), heightForItem);
+			counterY += heightForItem;
 		}
 	}
 
 	@Override
-	public void removeItem (LayoutContent content) {
+	public void removeItem (LayoutItem content) {
+		int idxOfItem = rows.indexOf(content, true);
+
+		//Lets see if there is item below, or above to give back some width
+		if (idxOfItem >= 1) {
+			LayoutItem itemToGiveWidthTo = rows.get(idxOfItem - 1);
+			itemToGiveWidthTo.setRelativeHeight(itemToGiveWidthTo.getRelativeHeight() + content.getRelativeHeight());
+		} else if (idxOfItem == 0 && rows.size >= 2) {
+			LayoutItem itemToGiveWidthTo = rows.get(1);
+			itemToGiveWidthTo.setRelativeHeight(itemToGiveWidthTo.getRelativeHeight() + content.getRelativeHeight());
+		} else {
+			if (rows.size != 1) {
+				throw new GdxRuntimeException("Invalid state");
+			}
+		}
+
+
 		rows.removeValue(content, true);
 		removeActor(content);
 		invalidate();
 	}
 
 	@Override
-	public void exchange (LayoutContent target, LayoutItem newColumn) {
+	public void exchangeItem (LayoutItem target, LayoutItem newColumn) {
 		removeActor(target);
 
 		int idx = rows.indexOf(target, true);
@@ -84,4 +122,7 @@ public class LayoutColumn extends LayoutItem {
 	public boolean isEmpty () {
 		return rows.isEmpty();
 	}
+
+
+
 }

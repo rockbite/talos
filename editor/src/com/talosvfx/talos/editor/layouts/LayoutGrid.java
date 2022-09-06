@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -57,16 +56,18 @@ public class LayoutGrid extends WidgetGroup {
 			root = null;
 			removeActor(content);
 		} else {
-
-			LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
-
-			parent.removeItem(content);
-
-			if (removeEmptyParent && parent.isEmpty()) {
-				Group parent1 = parent.getParent();
-				System.out.println("should probably remove this ting because its empty " + parent1.getClass().getSimpleName());
-			}
+			removeRecursive(content, removeEmptyParent);
 		}
+	}
+	private void removeRecursive (LayoutItem content, boolean removeEmpty) {
+		LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
+
+		parent.removeItem(content);
+
+		if (removeEmpty && parent.isEmpty()) {
+			removeRecursive(parent, removeEmpty);
+		}
+
 
 	}
 
@@ -153,7 +154,7 @@ public class LayoutGrid extends WidgetGroup {
 
 		if (parent.isEmpty()) {
 			System.out.println("Parent is empty, removing content");
-			removeContent(parent);
+			removeRecursive(parent, true);
 		}
 
 		//Target
@@ -239,7 +240,12 @@ public class LayoutGrid extends WidgetGroup {
 
 		//We need to swap this column with the parent
 		LayoutItem parent = (LayoutItem)target.getParent();
-		parent.exchange(target, newColumn);
+		parent.exchangeItem(target, newColumn);
+		newColumn.setRelativeWidth(target.getRelativeWidth());
+		newColumn.setRelativeHeight(target.getRelativeHeight());
+
+		target.setRelativeWidth(1f);
+		target.setRelativeHeight(1f);
 
 		newColumn.addRowContainer(target, false);
 	}
@@ -248,7 +254,13 @@ public class LayoutGrid extends WidgetGroup {
 
 		//We need to swap this column with the parent
 		LayoutItem parent = (LayoutItem)target.getParent();
-		parent.exchange(target, newRow);
+		parent.exchangeItem(target, newRow);
+
+		newRow.setRelativeWidth(target.getRelativeWidth());
+		newRow.setRelativeHeight(target.getRelativeHeight());
+
+		target.setRelativeWidth(1f);
+		target.setRelativeHeight(1f);
 
 		newRow.addColumnContainer(target, false);
 	}

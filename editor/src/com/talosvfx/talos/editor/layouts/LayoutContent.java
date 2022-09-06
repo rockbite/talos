@@ -98,12 +98,14 @@ public class LayoutContent extends LayoutItem {
 	}
 
 	@Override
-	public void removeItem (LayoutContent content) {
+	public void removeItem (LayoutItem item) {
 
 	}
 
 	@Override
-	public void exchange (LayoutContent target, LayoutItem newColumn) {
-		throw new UnsupportedOperationException("SHouldn't be allowed");
+	public void exchangeItem (LayoutItem target, LayoutItem newItem) {
+		throw new UnsupportedOperationException("Not supported operation");
+
 	}
+
 }
