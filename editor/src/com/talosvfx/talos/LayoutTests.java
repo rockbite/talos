@@ -57,7 +57,7 @@ public class LayoutTests extends ApplicationAdapter {
 
 		int random = MathUtils.random(1,3);
 		for (int i = 0; i < random; i++) {
-			content.addContent("NewApplication: " + MathUtils.random(10));
+			content.addContent("NewApplication: " + MathUtils.random(100));
 		}
 
 		layoutGrid.addContent(content);

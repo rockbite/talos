@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.VisLabel;
 
 public class LayoutContent extends LayoutItem {
@@ -14,8 +14,7 @@ public class LayoutContent extends LayoutItem {
 	private final Table innerContents;
 	private final Table tabBar;
 	private final Drawable headerDrawable;
-	private Array<String> contents = new Array<>();
-	private Array<Actor> barActors = new Array<>();
+	private ObjectMap<String,Actor> barActors = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
@@ -36,37 +35,43 @@ public class LayoutContent extends LayoutItem {
 		tabBar.defaults().pad(5);
 		tabBar.left();
 
-		headerDrawable = skin.newDrawable("white", 1f, 0, 0, 1f);
+		headerDrawable = skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1f);
 		tabBar.setBackground(headerDrawable);
 
 		innerContents.add(tabBar).growX();
 
 	}
 
+	void addSpacer () {
+		tabBar.add(new VisLabel("|"));
+	}
+
 	public void addContent (String content) {
-		contents.add(content);
+		addSpacer();
 
 		VisLabel label = new VisLabel(content);
 		tabBar.add(label);
 
-		barActors.add(label);
+		barActors.put(content, label);
 
-		grid.registerDragSource(label);
+		grid.registerDragSource(this, label);
 
 
 		//Register drag and drop with the Grid
 	}
 
 	public void removeContent (String content) {
-		contents.removeValue(content, true);
+		Actor remove = barActors.remove(content);
 
 		tabBar.clearChildren();
-		for (String c : contents) {
-			VisLabel label = new VisLabel(c);
-			tabBar.add(label);
+		for (ObjectMap.Entry<String, Actor> barActor : barActors) {
+			addSpacer();
+			tabBar.add(barActor.value);
 		}
 
-		//Remove drag and drop with the grid
+		invalidate();
+
+		System.out.println("Remove content " + content);
 	}
 
 	public Actor hitTabTable (Vector2 localCoords) {
@@ -76,7 +81,7 @@ public class LayoutContent extends LayoutItem {
 			return tabBar;
 		}
 
-		if (barActors.contains(hit, true)) {
+		if (barActors.containsValue(hit, true)) {
 			return tabBar;
 		}
 
@@ -85,5 +90,20 @@ public class LayoutContent extends LayoutItem {
 
 	public Table getTabTable () {
 		return tabBar;
+	}
+
+	@Override
+	public boolean isEmpty () {
+		return barActors.isEmpty();
+	}
+
+	@Override
+	public void removeItem (LayoutContent content) {
+
+	}
+
+	@Override
+	public void exchange (LayoutContent target, LayoutItem newColumn) {
+		throw new UnsupportedOperationException("SHouldn't be allowed");
 	}
 }

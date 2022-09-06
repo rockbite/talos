@@ -4,13 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.VisLabel;
+
+import java.util.Objects;
 
 public class LayoutGrid extends WidgetGroup {
 	private final DragAndDrop dragAndDrop;
@@ -21,11 +25,15 @@ public class LayoutGrid extends WidgetGroup {
 	LayoutItem root;
 
 	LayoutContent overItem;
+	LayoutContent startItem;
 	boolean highlightEdge = true;
 	private Skin skin;
 	private Drawable edgeBackground;
 
 	private DragHitResult dragHitResult = new DragHitResult();
+
+	private ObjectMap<LayoutContentApp, DragAndDrop.Source> sources = new ObjectMap<>();
+	private ObjectMap<LayoutContent, DragAndDrop.Target> targets = new ObjectMap<>();
 
 	float horizontalPercent = 0.3f;
 	float verticalPercent = 0.3f;
@@ -36,6 +44,30 @@ public class LayoutGrid extends WidgetGroup {
 		edgeBackground = skin.newDrawable("white", 1f, 1f, 1f, 0.5f);
 		dragAndDrop = new DragAndDrop();
 		dragAndDrop.setKeepWithinStage(false);
+	}
+
+	public void removeContent (LayoutContent content) {
+		removeContent(content, true);
+	}
+
+	public void removeContent (LayoutContent content, boolean removeEmptyParent) {
+		removeDragTarget(content);
+
+		if (content == root) {
+			root = null;
+			removeActor(content);
+		} else {
+
+			LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
+
+			parent.removeItem(content);
+
+			if (removeEmptyParent && parent.isEmpty()) {
+				Group parent1 = parent.getParent();
+				System.out.println("should probably remove this ting because its empty " + parent1.getClass().getSimpleName());
+			}
+		}
+
 	}
 
 	public enum LayoutDirection {
@@ -52,15 +84,15 @@ public class LayoutGrid extends WidgetGroup {
 			addActor(root);
 		} else {
 			if (root instanceof LayoutRow) {
-				((LayoutRow)root).addColumnContainer(content);
+				((LayoutRow)root).addColumnContainer(content, false);
 			} else {
 				//Exchange root
 				LayoutItem oldRoot = root;
 				removeActor(oldRoot);
 
 				LayoutRow newRow = new LayoutRow(skin, this);
-				newRow.addColumnContainer(oldRoot);
-				newRow.addColumnContainer(content);
+				newRow.addColumnContainer(oldRoot, false);
+				newRow.addColumnContainer(content, false);
 
 				root = newRow;
 				addActor(root);
@@ -74,7 +106,7 @@ public class LayoutGrid extends WidgetGroup {
 	}
 
 	void registerDragTarget (LayoutContent layoutContent) {
-		dragAndDrop.addTarget(new DragAndDrop.Target(layoutContent) {
+		DragAndDrop.Target target = new DragAndDrop.Target(layoutContent) {
 			@Override
 			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 
@@ -85,24 +117,161 @@ public class LayoutGrid extends WidgetGroup {
 
 			@Override
 			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+				DragHitResult hitResult = dragHitResult;
+				if (hitResult.hit == null)
+					return;
+				if (hitResult.hit == startItem)
+					return;
+
+				dropContainer((LayoutContentApp)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
+			}
+		};
+		dragAndDrop.addTarget(target);
+		targets.put(layoutContent, target);
+	}
+
+	public void removeDragTarget (LayoutContent content) {
+		DragAndDrop.Target remove = targets.remove(content);
+		dragAndDrop.removeTarget(remove);
+	}
+
+	private void dropContainer (LayoutContentApp source, LayoutContent target, LayoutDirection direction) {
+		//Here comes the logic
+
+		LayoutContent parent = source.layoutContent;
+		String app = source.app;
+
+		//Source
+		//Remove drag and drop
+		DragAndDrop.Source dragAndDropSource = sources.remove(source);
+		dragAndDrop.removeSource(dragAndDropSource);
+
+		System.out.println("Removed source");
+
+		//Potentially removes all the shit from hierarchy if its last one
+		parent.removeContent(app);
+
+		if (parent.isEmpty()) {
+			System.out.println("Parent is empty, removing content");
+			removeContent(parent);
+		}
+
+		//Target
+		switch (direction) {
+
+		//If its up or down we get the parent of the target and wrap it in a row, then add our content to the top or bottom
+		case UP:
+		case DOWN: {
+			LayoutItem parentItem = (LayoutItem)target.getParent();
+
+			//Check the parent item for the target. If its already a layout row, we can just add at top or bottom
+
+			LayoutColumn colTarget;
+
+			boolean isExistingColumn = false;
+			if (parentItem instanceof LayoutColumn) {
+				colTarget = (LayoutColumn)parentItem;
+				isExistingColumn = true;
+			} else {
+				//Its TIME TO WRAP
+
+				LayoutColumn newColumn = new LayoutColumn(skin, this);
+
+				//Remove the target
+				exchangeAndWrapToColumn(newColumn, target);
+
+				colTarget = newColumn;
 
 			}
-		});
+
+			LayoutContent newLayoutContent = new LayoutContent(skin, this);
+			registerDragTarget(newLayoutContent);
+			newLayoutContent.addContent(app);
+			colTarget.addRowContainer(newLayoutContent, direction == LayoutDirection.UP, isExistingColumn ? target : null);
+		}
+		break;
+
+		case RIGHT:
+		case LEFT: {
+
+			LayoutItem parentItem = (LayoutItem)target.getParent();
+
+			//Check the parent item for the target. If its already a layout row, we can just add at top or bottom
+
+			LayoutRow rowTarget;
+
+			boolean isExistingRow = false;
+			if (parentItem instanceof LayoutRow) {
+				rowTarget = (LayoutRow)parentItem;
+				isExistingRow = true;
+			} else {
+				//Its TIME TO WRAP
+
+				LayoutRow newRow = new LayoutRow(skin, this);
+
+				//Remove the target
+				exchangeAndWrapToRow(newRow, target);
+
+				rowTarget = newRow;
+
+			}
+
+			LayoutContent newLayoutContent = new LayoutContent(skin, this);
+			registerDragTarget(newLayoutContent);
+			newLayoutContent.addContent(app);
+			rowTarget.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT, isExistingRow ? target : null);
+		}
+
+		break;
+
+		case TAB:
+
+			//If its a tab, we add it to the target
+			target.addContent(app);
+			break;
+		default:
+			throw new IllegalStateException("Unexpected value: " + direction);
+		}
+
+	}
+
+	private void exchangeAndWrapToColumn (LayoutColumn newColumn, LayoutContent target) {
+
+		//We need to swap this column with the parent
+		LayoutItem parent = (LayoutItem)target.getParent();
+		parent.exchange(target, newColumn);
+
+		newColumn.addRowContainer(target, false);
+	}
+
+	private void exchangeAndWrapToRow (LayoutRow newRow, LayoutContent target) {
+
+		//We need to swap this column with the parent
+		LayoutItem parent = (LayoutItem)target.getParent();
+		parent.exchange(target, newRow);
+
+		newRow.addColumnContainer(target, false);
 	}
 
 	//Add each LayoutContent for drag and drop as a source
 	//Add each LayoutContent for drag and drop as a target
-	void registerDragSource (VisLabel actorToDrag) {
-		dragAndDrop.addSource(new DragAndDrop.Source(actorToDrag) {
+	void registerDragSource (LayoutContent parent, VisLabel actorToDrag) {
+
+		LayoutContentApp userObject = new LayoutContentApp(parent, actorToDrag.getText().toString());
+
+		DragAndDrop.Source source = new DragAndDrop.Source(actorToDrag) {
 			@Override
 			public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
 				DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-				LayoutContent layoutContent = new LayoutContent(skin, LayoutGrid.this);
-				layoutContent.setSize(200, 200);
-				layoutContent.addContent(actorToDrag.getText().toString());
+				LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
+				dummy.setSize(200, 200);
+				dummy.addContent(actorToDrag.getText().toString());
 
-				payload.setDragActor(layoutContent);
+				payload.setDragActor(dummy);
+				payload.setObject(userObject);
+
+				startItem = parent;
 
 				return payload;
 			}
@@ -124,9 +293,12 @@ public class LayoutGrid extends WidgetGroup {
 					float hitInStageX = vector2.x;
 					float hitInStageY = vector2.y;
 
-
 					LayoutContent hitResult = dragHitResult.hit;
 					if (hitResult != null) {
+						if (hitResult == startItem) {
+							return;
+						}
+
 						switch (dragHitResult.direction) {
 						case UP:
 
@@ -142,7 +314,6 @@ public class LayoutGrid extends WidgetGroup {
 
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
-
 
 							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY) + hitResult.getHeight() - dragActor.getHeight());
 
@@ -162,7 +333,6 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-
 							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY));
 							break;
 
@@ -179,7 +349,6 @@ public class LayoutGrid extends WidgetGroup {
 
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
-
 
 							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY));
 							break;
@@ -198,7 +367,6 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-
 							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + dragActor.getWidth(), y - (vector2.y - hitInStageY));
 							break;
 
@@ -216,8 +384,7 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-
-							dragAndDrop.setDragActorPosition(+dragActor.getWidth()/2f, y - (vector2.y - hitInStageY) + hitResult.getHeight() - dragActor.getHeight());
+							dragAndDrop.setDragActorPosition(+dragActor.getWidth() / 2f, y - (vector2.y - hitInStageY) + hitResult.getHeight() - dragActor.getHeight());
 
 							break;
 						}
@@ -233,8 +400,14 @@ public class LayoutGrid extends WidgetGroup {
 			@Override
 			public void dragStop (InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
 				super.dragStop(event, x, y, pointer, payload, target);
+				startItem = null;
+				dragHitResult.hit = null;
+				dragHitResult.direction = null;
 			}
-		});
+		};
+		dragAndDrop.addSource(source);
+
+		sources.put(userObject, source);
 	}
 
 	private void getDragHit (DragHitResult dragHitResult) {
@@ -249,8 +422,6 @@ public class LayoutGrid extends WidgetGroup {
 		int y = Gdx.input.getY();
 		Vector2 coords = new Vector2(x, y);
 		overItem.screenToLocalCoordinates(coords);
-
-
 
 		Vector2 localCoords = new Vector2(coords.x, coords.y);
 
@@ -299,6 +470,31 @@ public class LayoutGrid extends WidgetGroup {
 			}
 		}
 
+	}
+
+	static class LayoutContentApp {
+		public LayoutContent layoutContent;
+		public String app;
+
+		public LayoutContentApp (LayoutContent parent, String app) {
+			this.layoutContent = parent;
+			this.app = app;
+		}
+
+		@Override
+		public boolean equals (Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			LayoutContentApp that = (LayoutContentApp)o;
+			return Objects.equals(layoutContent, that.layoutContent) && Objects.equals(app, that.app);
+		}
+
+		@Override
+		public int hashCode () {
+			return Objects.hash(layoutContent, app);
+		}
 	}
 
 	static class DragHitResult {

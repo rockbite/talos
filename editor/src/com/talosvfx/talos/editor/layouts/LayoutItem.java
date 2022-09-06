@@ -2,13 +2,11 @@ package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class LayoutItem extends WidgetGroup {
+public abstract class LayoutItem extends WidgetGroup {
 
 	protected final LayoutGrid grid;
 
@@ -27,4 +25,8 @@ public class LayoutItem extends WidgetGroup {
 	}
 
 
+	public abstract boolean isEmpty ();
+	public abstract void removeItem (LayoutContent content);
+
+	public abstract void exchange (LayoutContent target, LayoutItem newColumn);
 }
