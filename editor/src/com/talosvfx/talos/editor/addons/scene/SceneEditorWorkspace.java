@@ -1202,12 +1202,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			if (gameObjects.size == 1) {
 				selectPropertyHolder(gameObjects.first());
 			} else {
-				// TODO: 8/11/2022 implement multi object behavior
-//				MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);
-				if (currentContainer instanceof Scene) {
-					Scene scene = (Scene)currentContainer;
-					selectPropertyHolder(scene);
-				}
+				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
 			}
 		}
 	}
