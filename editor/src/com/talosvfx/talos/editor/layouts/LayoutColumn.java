@@ -26,7 +26,7 @@ public class LayoutColumn extends LayoutItem {
 		addRowContainer(newLayoutContent, up, null);
 	}
 
-	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutContent relative) {
+	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative) {
 
 		if (relative != null) {
 			//We are relative to some other actor

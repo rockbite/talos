@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.layouts;
 
+import ch.qos.logback.core.Layout;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,7 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.VisLabel;
 
@@ -18,16 +19,11 @@ import java.util.Objects;
 public class LayoutGrid extends WidgetGroup {
 	private final DragAndDrop dragAndDrop;
 
-	//Start with a 2x2 grid with a 'root' container
-
-	//Todo force to rows, always root is rows
 	LayoutItem root;
 
 	LayoutContent overItem;
 	LayoutContent startItem;
-	boolean highlightEdge = true;
 	private Skin skin;
-	private Drawable edgeBackground;
 
 	private DragHitResult dragHitResult = new DragHitResult();
 
@@ -37,10 +33,12 @@ public class LayoutGrid extends WidgetGroup {
 	float horizontalPercent = 0.3f;
 	float verticalPercent = 0.3f;
 
+	float rootHorizontalPercent = 0.03f;
+	float rootVerticalPercent = 0.03f;
+
 	public LayoutGrid (Skin skin) {
 		this.skin = skin;
 
-		edgeBackground = skin.newDrawable("white", 1f, 1f, 1f, 0.5f);
 		dragAndDrop = new DragAndDrop();
 		dragAndDrop.setKeepWithinStage(false);
 	}
@@ -59,6 +57,7 @@ public class LayoutGrid extends WidgetGroup {
 			removeRecursive(content, removeEmptyParent);
 		}
 	}
+
 	private void removeRecursive (LayoutItem content, boolean removeEmpty) {
 		LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
 
@@ -67,7 +66,6 @@ public class LayoutGrid extends WidgetGroup {
 		if (removeEmpty && parent.isEmpty()) {
 			removeRecursive(parent, removeEmpty);
 		}
-
 
 	}
 
@@ -124,7 +122,12 @@ public class LayoutGrid extends WidgetGroup {
 				if (hitResult.hit == startItem)
 					return;
 
-				dropContainer((LayoutContentApp)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
+				if (hitResult.root) {
+					dropContainer((LayoutContentApp)payload.getObject(), null, dragHitResult.direction);
+				} else {
+					dropContainer((LayoutContentApp)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
+				}
+
 			}
 		};
 		dragAndDrop.addTarget(target);
@@ -136,7 +139,10 @@ public class LayoutGrid extends WidgetGroup {
 		dragAndDrop.removeTarget(remove);
 	}
 
-	private void dropContainer (LayoutContentApp source, LayoutContent target, LayoutDirection direction) {
+	/*
+	target is null when root should be used
+	 */
+	private void dropContainer (LayoutContentApp source, @Null LayoutContent target, LayoutDirection direction) {
 		//Here comes the logic
 
 		LayoutContent parent = source.layoutContent;
@@ -314,14 +320,19 @@ public class LayoutGrid extends WidgetGroup {
 							return;
 						}
 
+						float horizontalPercentToUse = dragHitResult.root ? rootHorizontalPercent : horizontalPercent;
+						float vertPercentToUse = dragHitResult.root ? rootVerticalPercent : verticalPercent;
+
+						Actor targetActor = dragHitResult.root ? LayoutGrid.this : dragHitResult.hit;
+
 						switch (dragHitResult.direction) {
 						case UP:
 
-							dragActor.setSize(hitResult.getWidth(), hitResult.getHeight() * verticalPercent);
+							dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
 
 							//The offset needs to be the difference between the drag x and y and the target x and y
 							vector2.setZero();
-							dragHitResult.hit.localToStageCoordinates(vector2);
+							targetActor.localToStageCoordinates(vector2);
 							vector2.sub(x, y);
 
 							hitInStageX = vector2.x;
@@ -330,16 +341,16 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY) + hitResult.getHeight() - dragActor.getHeight());
+							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
 
 							break;
 
 						case DOWN:
-							dragActor.setSize(hitResult.getWidth(), hitResult.getHeight() * verticalPercent);
+							dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
 
 							//The offset needs to be the difference between the drag x and y and the target x and y
 							vector2.setZero();
-							dragHitResult.hit.localToStageCoordinates(vector2);
+							targetActor.localToStageCoordinates(vector2);
 							vector2.sub(x, y);
 
 							hitInStageX = vector2.x;
@@ -348,15 +359,15 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY));
+							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
 							break;
 
 						case RIGHT:
-							dragActor.setSize(horizontalPercent * hitResult.getWidth(), hitResult.getHeight());
+							dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
 
 							//The offset needs to be the difference between the drag x and y and the target x and y
 							vector2.setZero();
-							dragHitResult.hit.localToStageCoordinates(vector2);
+							targetActor.localToStageCoordinates(vector2);
 							vector2.sub(x, y);
 
 							hitInStageX = vector2.x;
@@ -365,15 +376,15 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + hitResult.getWidth(), y - (vector2.y - hitInStageY));
+							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
 							break;
 
 						case LEFT:
-							dragActor.setSize(horizontalPercent * hitResult.getWidth(), hitResult.getHeight());
+							dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
 
 							//The offset needs to be the difference between the drag x and y and the target x and y
 							vector2.setZero();
-							dragHitResult.hit.localToStageCoordinates(vector2);
+							targetActor.localToStageCoordinates(vector2);
 							vector2.sub(x, y);
 
 							hitInStageX = vector2.x;
@@ -390,7 +401,7 @@ public class LayoutGrid extends WidgetGroup {
 							dragActor.setSize(200, tabTable.getHeight());
 
 							vector2.setZero();
-							dragHitResult.hit.localToStageCoordinates(vector2);
+							targetActor.localToStageCoordinates(vector2);
 							vector2.sub(x, y);
 
 							hitInStageX = vector2.x;
@@ -399,7 +410,7 @@ public class LayoutGrid extends WidgetGroup {
 							vector2.set(Gdx.input.getX(), Gdx.input.getY());
 							screenToLocalCoordinates(vector2);
 
-							dragAndDrop.setDragActorPosition(+dragActor.getWidth() / 2f, y - (vector2.y - hitInStageY) + hitResult.getHeight() - dragActor.getHeight());
+							dragAndDrop.setDragActorPosition(+dragActor.getWidth() / 2f, y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
 
 							break;
 						}
@@ -416,8 +427,7 @@ public class LayoutGrid extends WidgetGroup {
 			public void dragStop (InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
 				super.dragStop(event, x, y, pointer, payload, target);
 				startItem = null;
-				dragHitResult.hit = null;
-				dragHitResult.direction = null;
+				dragHitResult.reset();
 			}
 		};
 		dragAndDrop.addSource(source);
@@ -426,16 +436,63 @@ public class LayoutGrid extends WidgetGroup {
 	}
 
 	private void getDragHit (DragHitResult dragHitResult) {
-		dragHitResult.direction = null;
-		dragHitResult.hit = null;
+		dragHitResult.reset();
 
-		if (overItem == null)
-			return;
-
-		//Detect the edge
 		int x = Gdx.input.getX();
 		int y = Gdx.input.getY();
 		Vector2 coords = new Vector2(x, y);
+
+		//Check for root
+		if (root != null) {
+			//Check edges of root
+			Vector2 vecForMainGrid = new Vector2();
+			vecForMainGrid.set(coords);
+			screenToLocalCoordinates(vecForMainGrid);
+
+			vecForMainGrid.scl(1f / getWidth(), 1f / getHeight());
+
+			float distanceFromMiddleX = Math.abs(0.5f - vecForMainGrid.x);
+			float distanceFromMiddleY = Math.abs(0.5f - vecForMainGrid.y);
+
+			if (distanceFromMiddleX >= distanceFromMiddleY) {
+				//Its going to be an X if it exists
+
+				if (vecForMainGrid.x < rootHorizontalPercent) {
+					//Left edge
+					dragHitResult.root = true;
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.LEFT;
+					return;
+				} else if (vecForMainGrid.x > (1 - rootHorizontalPercent)) {
+					//Right edge
+					dragHitResult.root = true;
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.RIGHT;
+					return;
+				}
+
+
+			} else {
+				//its going to be Y if it exists
+				if (vecForMainGrid.y < rootVerticalPercent) {
+					dragHitResult.root = true;
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.DOWN;
+					return;
+				} else if (vecForMainGrid.y > (1 - rootVerticalPercent)) {
+					//top edge
+					dragHitResult.root = true;
+					dragHitResult.hit = overItem;
+					dragHitResult.direction = LayoutDirection.UP;
+					return;
+				}
+			}
+		}
+
+		if (overItem == null) {
+			return;
+		}
+
 		overItem.screenToLocalCoordinates(coords);
 
 		Vector2 localCoords = new Vector2(coords.x, coords.y);
@@ -514,7 +571,14 @@ public class LayoutGrid extends WidgetGroup {
 
 	static class DragHitResult {
 		public LayoutContent hit;
+		public boolean root;
 		public LayoutDirection direction;
+
+		void reset () {
+			hit = null;
+			root = false;
+			direction = null;
+		}
 	}
 
 	@Override
@@ -529,8 +593,9 @@ public class LayoutGrid extends WidgetGroup {
 	@Override
 	public void act (float delta) {
 		super.act(delta);
-		if (root == null)
+		if (root == null) {
 			return;
+		}
 
 		int x = Gdx.input.getX();
 		int y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -553,50 +618,4 @@ public class LayoutGrid extends WidgetGroup {
 		}
 	}
 
-	@Override
-	public void draw (Batch batch, float parentAlpha) {
-		super.draw(batch, parentAlpha);
-
-		if (highlightEdge && overItem != null && dragHitResult.hit != null) {
-
-			int x = Gdx.input.getX();
-			int y = Gdx.input.getY();
-			Vector2 coords = new Vector2(x, y);
-			overItem.screenToLocalCoordinates(coords);
-
-			Vector2 localCoords = new Vector2(coords.x, coords.y);
-
-			switch (dragHitResult.direction) {
-			case LEFT:
-//				edgeBackground.draw(batch, overItem.getX(), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
-
-				break;
-			case RIGHT:
-//				edgeBackground.draw(batch, overItem.getX() + ((1 - horizontalPercent) * overItem.getWidth()), overItem.getY(), horizontalPercent * overItem.getWidth(), overItem.getHeight());
-
-				break;
-
-			case UP:
-//				edgeBackground.draw(batch, overItem.getX(), overItem.getY() + ((1 - verticalPercent) * overItem.getHeight()), overItem.getWidth(), verticalPercent * overItem.getHeight());
-
-				break;
-			case DOWN:
-//				edgeBackground.draw(batch, overItem.getX(), overItem.getY(), overItem.getWidth(), verticalPercent * overItem.getHeight());
-
-				break;
-
-			case TAB:
-
-				Actor hit = null;
-				if ((hit = ((LayoutContent)overItem).hitTabTable(localCoords)) != null) {
-					Vector2 out = new Vector2(0, 0);
-					hit.localToAscendantCoordinates(this, out);
-//					edgeBackground.draw(batch, out.x, out.y, hit.getWidth(), hit.getHeight());
-				}
-
-				break;
-			}
-
-		}
-	}
 }
