@@ -43,11 +43,21 @@ public class LayoutColumn extends LayoutItem {
 		} else {
 			if (!up) {
 				rows.insert(0, newLayoutContent);
-				takeThirtyPercent(newLayoutContent, 0, 1);
+				if (rows.size == 1) {
+					newLayoutContent.setRelativeWidth(1f);
+					newLayoutContent.setRelativeHeight(1f);
+				} else {
+					takeThirtyPercent(newLayoutContent, 0, 1);
+				}
 
 			} else {
 				rows.add(newLayoutContent);
-				takeThirtyPercent(newLayoutContent, 0, 1);
+				if (rows.size == 1) {
+					newLayoutContent.setRelativeWidth(1f);
+					newLayoutContent.setRelativeHeight(1f);
+				} else {
+					takeThirtyPercent(newLayoutContent, 1, 0);
+				}
 			}
 		}
 

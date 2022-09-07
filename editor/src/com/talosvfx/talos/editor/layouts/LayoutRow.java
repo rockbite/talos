@@ -42,11 +42,21 @@ public class LayoutRow extends LayoutItem {
 				columns.insert(0, newLayoutContent);
 
 				//Take 30% from index 1 width
-				takeThirtyPercent(newLayoutContent, 0, 1);
+				if (columns.size == 1) {
+					newLayoutContent.setRelativeWidth(1f);
+					newLayoutContent.setRelativeHeight(1f);
+				} else {
+					takeThirtyPercent(newLayoutContent, 0, 1);
+				}
 
 			} else {
 				columns.add(newLayoutContent);
-				takeThirtyPercent(newLayoutContent, columns.size - 1, columns.size - 2);
+				if (columns.size == 1) {
+					newLayoutContent.setRelativeWidth(1f);
+					newLayoutContent.setRelativeHeight(1f);
+				} else {
+					takeThirtyPercent(newLayoutContent, 1, 0);
+				}
 			}
 		}
 
