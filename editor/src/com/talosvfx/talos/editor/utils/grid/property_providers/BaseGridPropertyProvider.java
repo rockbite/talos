@@ -22,6 +22,8 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
 
     private Array<GridLine> gridLines = new Array<>();
 
+    public boolean highlightZero = true;
+
     @Override
     public Array<GridLine> getGridLines () {
         return gridLines;
@@ -115,14 +117,6 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
         float visibleEndX = cameraX + visibleWidth / 2;
         float visibleEndY = cameraY + visibleHeight / 2;
 
-        Color color = new Color();
-        color.set(Color.CYAN);
-        color.a = zeroAlpha;
-        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), color, thickness));
-        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), color, thickness));
-
-        gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
-
         // configure colors
         Color gridMainLineColor = new Color();
         gridMainLineColor.set(Color.GRAY);
@@ -135,6 +129,15 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
         Color smallLinesColor = new Color();
         smallLinesColor.set(Color.GRAY);
         smallLinesColor.a =  smallLinesAlpha * parentAlpha;
+
+        Color zeroColor = new Color();
+        zeroColor.set(Color.CYAN);
+        zeroColor.a = zeroAlpha;
+
+        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), highlightZero ? zeroColor : gridMainLineColor, thickness));
+        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), highlightZero ? zeroColor : gridMainLineColor, thickness));
+
+        gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
 
         // creating vertical lines
         for (float i = gridXStart; i < visibleEndX; i += gridUnit) {
