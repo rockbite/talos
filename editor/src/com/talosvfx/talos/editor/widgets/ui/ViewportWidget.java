@@ -171,12 +171,11 @@ public abstract class ViewportWidget extends Table {
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				if (event.isCancelled()) return false;
 
-				if (canMoveAround()) return false;
+				if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && canMoveAround()) return false;
 
 				if (locked) {
 					return true;
 				}
-
 
 				boolean hasSelection = selection.size > 0;
 				boolean hasEntityUnderMouse = entityUnderMouse != null;
@@ -262,7 +261,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
-				if (canMoveAround()) return;
+				if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && isDragging) return;
 
 				if (locked) {
 					return;
@@ -480,6 +479,8 @@ public abstract class ViewportWidget extends Table {
 
 	protected void addPanListener () {
 		addListener(new InputListener() {
+			boolean canPan = false;
+
 			@Override
 			public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
 				float currWidth = camera.viewportWidth * camera.zoom;
@@ -495,6 +496,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				canPan = canMoveAround();
 				cameraController.touchDown((int)x, (int)y, pointer, button);
 				return !event.isHandled();
 			}
@@ -503,12 +505,14 @@ public abstract class ViewportWidget extends Table {
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				isDragging = false;
 				cameraController.touchUp((int)x, (int)y, pointer, button);
+				canPan = false;
 			}
+
 
 			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
 				// can't move around disable dragging
-				if (!canMoveAround())
+				if (!canPan)
 					return;
 
 				isDragging = true;
@@ -723,7 +727,7 @@ public abstract class ViewportWidget extends Table {
 	public void act (float delta) {
 		super.act(delta);
 
-		if (canMoveAround()) {
+		if (isDragging) {
 			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
 			disableClickListener();
 		} else {
