@@ -1226,6 +1226,28 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Notifications.fireEvent(event);
 	}
 
+	@Override
+	protected boolean canMoveAround () {
+		boolean initialMusts = isInViewPort || isDragging;
+		if (!initialMusts) {
+			return false;
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+			return true;
+		}
+
+		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
+		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
+
+		if (gizmo == null && entityUnderMouse == null) {
+			System.out.println("this is bad case");
+			return true;
+		}
+
+		return false;
+	}
+
 	public Vector2 getMouseCordsOnScene () {
 		final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 		this.screenToLocalCoordinates(vec);

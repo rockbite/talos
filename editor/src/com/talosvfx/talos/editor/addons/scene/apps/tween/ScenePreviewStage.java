@@ -57,6 +57,11 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
         renderer.skipUpdates = !isPlaying;
     }
 
+    @Override
+    protected boolean canMoveAround () {
+        return isInViewPort || isDragging;
+    }
+
     private void drawMainRenderer (Batch batch, float parentAlpha) {
         if (currentScene == null)
             return;
