@@ -87,10 +87,8 @@ public abstract class ViewportWidget extends Table {
 	private Vector2 vec2 = new Vector2();
 
 	protected InputListener inputListener;
-
-	protected boolean canMoveAround;
-	private boolean isInViewPort;
-	private boolean isDragging;
+	protected boolean isInViewPort;
+	protected boolean isDragging;
 	private boolean inputListenersEnabled = true;
 
 	protected Gizmos gizmos = new Gizmos();
@@ -173,7 +171,7 @@ public abstract class ViewportWidget extends Table {
 				Vector2 hitCords = getWorldFromLocal(x, y);
 				if (event.isCancelled()) return false;
 
-				if (canMoveAround) return false;
+				if (canMoveAround()) return false;
 
 				if (locked) {
 					return true;
@@ -264,7 +262,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
-				if (canMoveAround) return;
+				if (canMoveAround()) return;
 
 				if (locked) {
 					return;
@@ -297,7 +295,7 @@ public abstract class ViewportWidget extends Table {
 
 				hitGizmo = null;
 
-				if (canMoveAround) return;
+				if (canMoveAround()) return;
 
 				if (locked) {
 					return;
@@ -309,7 +307,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean mouseMoved (InputEvent event, float x, float y) {
-				if (canMoveAround) return super.mouseMoved(event, x, y);
+				if (canMoveAround()) return super.mouseMoved(event, x, y);
 
 				if (locked) {
 					return true;
@@ -510,7 +508,7 @@ public abstract class ViewportWidget extends Table {
 			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
 				// can't move around disable dragging
-				if (!canMoveAround)
+				if (!canMoveAround())
 					return;
 
 				isDragging = true;
@@ -725,10 +723,7 @@ public abstract class ViewportWidget extends Table {
 	public void act (float delta) {
 		super.act(delta);
 
-		// allow moving around if space bar is pressed and is in viewport or has dragged from viewport
-		canMoveAround = Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
-
-		if (canMoveAround) {
+		if (canMoveAround()) {
 			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
 			disableClickListener();
 		} else {
@@ -739,6 +734,11 @@ public abstract class ViewportWidget extends Table {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
 			gizmo.act(delta);
 		}
+	}
+
+	// allow moving around if space bar is pressed and is in viewport or has dragged from viewport
+	protected boolean canMoveAround() {
+		return Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
 	}
 
 	public abstract void drawContent (Batch batch, float parentAlpha);
