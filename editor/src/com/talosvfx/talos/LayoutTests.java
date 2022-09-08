@@ -16,9 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
-import com.talosvfx.talos.editor.layouts.LayoutColumn;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 
@@ -59,10 +57,20 @@ public class LayoutTests extends ApplicationAdapter {
 		refresh();
 	}
 
+	private Table createTab (String uuid) {
+		Table tab = new Table();
+		tab.setBackground(skin.getDrawable("tab-bg"));
+
+		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
+		tab.add(visLabel);
+
+		return tab;
+	}
 	private LayoutApp createTestLayoutApp () {
 
 		String uuid = UUID.randomUUID().toString();
-		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
+		Table tab = createTab(uuid);
+
 		return new LayoutApp() {
 			@Override
 			public String getUniqueIdentifier () {
@@ -71,12 +79,12 @@ public class LayoutTests extends ApplicationAdapter {
 
 			@Override
 			public Actor getTabWidget () {
-				return visLabel;
+				return tab;
 			}
 
 			@Override
 			public Actor copyTabWidget () {
-				return new VisLabel(uuid.substring(0, 10));
+				return createTab(uuid);
 			}
 
 			@Override

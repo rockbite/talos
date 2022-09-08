@@ -191,7 +191,6 @@ public class LayoutGrid extends WidgetGroup {
 
 					registerDragTarget(newLayoutContent);
 
-
 					newLayoutContent.setRandomColour(parent.getRandomColour());
 					newLayoutContent.addContent(app);
 					newLayoutContent.setRelativeWidth(1f);
@@ -199,7 +198,6 @@ public class LayoutGrid extends WidgetGroup {
 
 					newColumn.addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
 					addActor(newColumn);
-
 
 					root = newColumn;
 				}
@@ -237,7 +235,6 @@ public class LayoutGrid extends WidgetGroup {
 
 					registerDragTarget(newLayoutContent);
 
-
 					newLayoutContent.setRandomColour(parent.getRandomColour());
 					newLayoutContent.addContent(app);
 					newLayoutContent.setRelativeWidth(1f);
@@ -245,7 +242,6 @@ public class LayoutGrid extends WidgetGroup {
 
 					newLayoutRow.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
 					addActor(newLayoutRow);
-
 
 					root = newLayoutRow;
 				}
@@ -538,13 +534,29 @@ public class LayoutGrid extends WidgetGroup {
 
 		int x = Gdx.input.getX();
 		int y = Gdx.input.getY();
-		Vector2 coords = new Vector2(x, y);
+		Vector2 universalCoords = new Vector2(x, y);
+
+		if (overItem != null) {
+
+			overItem.screenToLocalCoordinates(universalCoords);
+			Vector2 copyOfLocalCoords = new Vector2(universalCoords.x, universalCoords.y);
+			universalCoords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
+
+
+
+			//Prioritize tab
+			Actor hit = null;
+			if ((hit = overItem.hitTabTable(copyOfLocalCoords)) != null) {
+				dragHitResult.hit = overItem;
+				dragHitResult.direction = LayoutDirection.TAB;
+				return;
+			}
+		}
 
 		//Check for root
 		if (root != null) {
 			//Check edges of root
-			Vector2 vecForMainGrid = new Vector2();
-			vecForMainGrid.set(coords);
+			Vector2 vecForMainGrid = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 			screenToLocalCoordinates(vecForMainGrid);
 
 			vecForMainGrid.scl(1f / getWidth(), 1f / getHeight());
@@ -569,7 +581,6 @@ public class LayoutGrid extends WidgetGroup {
 					return;
 				}
 
-
 			} else {
 				//its going to be Y if it exists
 				if (vecForMainGrid.y < rootVerticalPercent) {
@@ -591,52 +602,37 @@ public class LayoutGrid extends WidgetGroup {
 			return;
 		}
 
-		overItem.screenToLocalCoordinates(coords);
-
-		Vector2 localCoords = new Vector2(coords.x, coords.y);
-
-		coords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
 
 		//UNiversal coordinates
 
-		float distanceFromMiddleX = Math.abs(0.5f - coords.x);
-		float distanceFromMiddleY = Math.abs(0.5f - coords.y);
+		float distanceFromMiddleX = Math.abs(0.5f - universalCoords.x);
+		float distanceFromMiddleY = Math.abs(0.5f - universalCoords.y);
 
 		if (distanceFromMiddleX >= distanceFromMiddleY) {
 			//Its going to be an X if it exists
 
-			if (coords.x < horizontalPercent) {
+			if (universalCoords.x < horizontalPercent) {
 				//Left edge
 				dragHitResult.hit = overItem;
 				dragHitResult.direction = LayoutDirection.LEFT;
-			} else if (coords.x > (1 - horizontalPercent)) {
+			} else if (universalCoords.x > (1 - horizontalPercent)) {
 				//Right edge
 				dragHitResult.hit = overItem;
 				dragHitResult.direction = LayoutDirection.RIGHT;
 			}
 
 		} else {
+
 			//its going to be Y if it exists
-			if (coords.y < verticalPercent) {
+			if (universalCoords.y < verticalPercent) {
 
 				dragHitResult.hit = overItem;
 				dragHitResult.direction = LayoutDirection.DOWN;
-			} else if (coords.y > (1 - verticalPercent)) {
+			} else if (universalCoords.y > (1 - verticalPercent)) {
 				//top edge
 
-				boolean hitLabel = false;
-
-				Actor hit = null;
-				if ((hit = ((LayoutContent)overItem).hitTabTable(localCoords)) != null) {
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.TAB;
-					hitLabel = true;
-				}
-
-				if (!hitLabel) {
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.UP;
-				}
+				dragHitResult.hit = overItem;
+				dragHitResult.direction = LayoutDirection.UP;
 			}
 		}
 

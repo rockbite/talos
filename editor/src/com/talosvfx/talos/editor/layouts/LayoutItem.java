@@ -24,7 +24,6 @@ public abstract class LayoutItem extends WidgetGroup {
 		this.grid = grid;
 
 		randomColour = new Color(MathUtils.random(0.5f, 1f), MathUtils.random(0.5f, 1f), MathUtils.random(0.5f, 1f), 1f);
-		background = skin.newDrawable("white", randomColour);
 	}
 
 	public Color getRandomColour () {
@@ -33,12 +32,10 @@ public abstract class LayoutItem extends WidgetGroup {
 
 	public void setRandomColour (Color color) {
 		this.randomColour.set(color);
-		this.background = skin.newDrawable("white", color);
 	}
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
-		background.draw(batch, getX(), getY(), getWidth(), getHeight());
 		super.draw(batch, parentAlpha);
 	}
 

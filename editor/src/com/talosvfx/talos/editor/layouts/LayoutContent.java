@@ -5,15 +5,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.kotcrab.vis.ui.widget.VisLabel;
 
 public class LayoutContent extends LayoutItem {
 
 	private final Table innerContents;
 	private final Table tabBar;
-	private final Drawable headerDrawable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
@@ -32,33 +29,27 @@ public class LayoutContent extends LayoutItem {
 		tabBar = new Table();
 		tabBar.setTouchable(Touchable.enabled);
 
-		tabBar.defaults().pad(5);
+		tabBar.defaults().padLeft(5).padRight(5);
 		tabBar.left();
 
-		headerDrawable = skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1f);
-		tabBar.setBackground(headerDrawable);
+		tabBar.debug();
 
 		innerContents.add(tabBar).growX();
 
 	}
 
-	void addSpacer () {
-		tabBar.add(new VisLabel("|"));
-	}
 
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
 	}
 
 	public void addContent (LayoutApp layoutApp, boolean copy) {
-		addSpacer();
-
 		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
 
 		if (copy) {
-			tabBar.add(layoutApp.copyTabWidget());
+			tabBar.add(layoutApp.copyTabWidget()).growY();
 		} else {
-			tabBar.add(layoutApp.getTabWidget());
+			tabBar.add(layoutApp.getTabWidget()).growY();
 
 			grid.registerDragSource(this, layoutApp, layoutApp.getTabWidget());
 		}
@@ -72,7 +63,6 @@ public class LayoutContent extends LayoutItem {
 
 		tabBar.clearChildren();
 		for (ObjectMap.Entry<String, LayoutApp> barActor : apps) {
-			addSpacer();
 			tabBar.add(barActor.value.getTabWidget());
 		}
 
