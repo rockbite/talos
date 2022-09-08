@@ -4,13 +4,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
@@ -23,11 +21,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.UUID;
 
@@ -38,12 +33,6 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private PaletteEditorWorkspace paletteEditorWorkspace;
 
 	private PaletteListener defaultPaletteListener;
-	private Table buttonMainMenu;
-
-	private SquareButton translate;
-	private SquareButton editGizmo;
-	private SquareButton editTile;
-	private SquareButton editFakeHeight;
 
 	enum PaletteImportMode {
 		NONE,
@@ -54,6 +43,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	protected PaletteImportMode currentImportMode = PaletteImportMode.NONE;
 
 	protected PaletteEditMode currentEditMode = PaletteEditMode.FREE_TRANSLATE;
+
+	private Toolbar toolbar;
 
 	enum PaletteEditMode {
 		FREE_TRANSLATE, // translation of the parent tile + translation of transform
@@ -75,8 +66,6 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 	@Override
 	public void initContent () {
-		Skin skin = TalosMain.Instance().getSkin();
-
 		content = new Table();
 
 		paletteEditorWorkspace = new PaletteEditorWorkspace(this);
@@ -85,17 +74,15 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		this.content.add(paletteEditorWorkspace).minSize(336, 696).grow().row();
 		this.content.add(modeToggle).growX().height(32);
 
-		Table toolbar = new Table();
-		toolbar.setFillParent(true);
-		toolbar.top().left();
+		Table toolbarContainer = new Table();
+		toolbarContainer.setFillParent(true);
+		toolbarContainer.top();
+		this.content.addActor(toolbarContainer);
 
-		buttonMainMenu = new Table();
-		buttonMainMenu.setBackground(skin.newDrawable("square-bordered"));
-		toolbar.add(buttonMainMenu).expandX().padTop(RulerRenderer.RULER_SIZE + 8);
+		toolbar = new Toolbar(this);
+		toolbarContainer.add(toolbar).expandX().padTop(RulerRenderer.RULER_SIZE + 8);
 
 		addDefaultButtons();
-
-		this.content.addActor(toolbar);
 
 		// register the drag and drop target
 		target = new PaletteDragAndDropTarget(paletteEditorWorkspace);
@@ -248,13 +235,6 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			GameAsset<?> gameAsset = (GameAsset<?>)payload.getObject();
 			addGameAsset(gameAsset, x, y);
 		}
-		// keep reference of what 'GameAsset' is selected. Our reference should be GameAsset type, but algorithms to select the entities/sprites can two combined
-		// different approaches
-
-		// also, when dropping sprite snap to grid
-		// save after every edit event such as drop, remove or just move
-		// draw mode such as brush and shit
-		// main renderer
 	}
 
 	public GameAsset<TilePaletteData> getObject () {
@@ -282,75 +262,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	}
 
 	private void addDefaultButtons () {
-		Skin skin = TalosMain.Instance().getSkin();
-
-		Button.ButtonStyle buttonStyle = new Button.ButtonStyle();
-		buttonStyle.up = null;
-		buttonStyle.down = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
-		buttonStyle.checked = ColorLibrary.obtainBackground(skin, "square-bordered-selected", ColorLibrary.BackgroundColor.WHITE);
-
-		translate = new SquareButton(skin, skin.getDrawable("arrow-icon"), true,"Select mode");
-		translate.setStyle(buttonStyle);
-		editGizmo = new SquareButton(skin, skin.getDrawable("image-transform-icon"), true,"Gizmo Edit mode");
-		editGizmo.setStyle(buttonStyle);
-		editTile = new SquareButton(skin, skin.getDrawable("add-remove-tile-icon"), true,"Tile Edit mode");
-		editTile.setStyle(buttonStyle);
-		editFakeHeight = new SquareButton(skin, skin.getDrawable("set-line-icon"), true,"Line Edit mode");
-		editFakeHeight.setStyle(buttonStyle);
-		buttonMainMenu.clearChildren();
-		buttonMainMenu.add(translate).size(32);
-		buttonMainMenu.add(editGizmo).size(32);
-		buttonMainMenu.add(editTile).size(32);
-		buttonMainMenu.add(editFakeHeight).size(32);
-
 		// visual toggle
-		translate.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (translate.isChecked()) {
-					editGizmo.setChecked(false);
-					editTile.setChecked(false);
-					editFakeHeight.setChecked(false);
-				} else if (!editGizmo.isChecked() && !editTile.isChecked() && !editFakeHeight.isChecked()){
-					event.cancel();
-				}
-			}
-		});
-		editGizmo.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (editGizmo.isChecked()) {
-					translate.setChecked(false);
-					editTile.setChecked(false);
-					editFakeHeight.setChecked(false);
-				} else if (!translate.isChecked() && !editTile.isChecked() && !editFakeHeight.isChecked()){
-					event.cancel();
-				}
-			}
-		});
-		editTile.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (editTile.isChecked()) {
-					translate.setChecked(false);
-					editGizmo.setChecked(false);
-					editFakeHeight.setChecked(false);
-				} else if (!translate.isChecked() && !editGizmo.isChecked() && !editFakeHeight.isChecked()){
-					event.cancel();
-				}
-			}
-		});
 
-//		SquareButton entity = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"), "Entity mode");
-//		SquareButton tileEntity = new SquareButton(skin, skin.getDrawable("combined_icon"), "TileEntity mode");
-//		SquareButton delete = new SquareButton(skin, skin.getDrawable("eraser_icon"), "Eraser");
-//		SquareButton editParentTileAndFakeHeight = new SquareButton(skin, skin.getDrawable("icon-edit"), "Edit entity");
-//
-//		tile.setDisabled(false);
-//		entity.setDisabled(false);
-//		tileEntity.setDisabled(false);
-//		delete.setDisabled(false);
-//		editParentTileAndFakeHeight.setDisabled(false);
 
 		modeToggle.getTileBtn().addListener(new ChangeListener() {
 			@Override
@@ -372,264 +285,39 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			}
 		});
 
-		// set default import mode
+//		 set default import mode
 		modeToggle.getEntityBtn().toggle();
-		// set default edit mode
-		translate.toggle();
-		editGizmo.setDisabled(true);
-		editTile.setDisabled(true);
-		editFakeHeight.setDisabled(true);
 
-		defaultPaletteListener = new PaletteListener() {
-			@Override
-			public boolean selected(PaletteEvent e, GameObject gameObject, StaticTile tle) {
-				editGizmo.setDisabled(false);
-				editTile.setDisabled(false);
-				editFakeHeight.setDisabled(false);
-				return super.selected(e, gameObject, tle);
-			}
-
+		paletteEditorWorkspace.addListener(new PaletteListener() {
 			@Override
 			public boolean lostFocus (PaletteEvent e) {
-				if (isFreeTransformEditMode()) {
-					endFreeTransformEditMode();
-				}
-				if (isFakeHeightEditMode()) {
-//					endFakeHeightEditMode();
-				}
-				if (isParentTileEditMode()) {
-//					endParenTileEditMode();
-				}
-				editGizmo.setDisabled(true);
-				editTile.setDisabled(true);
-				editFakeHeight.setDisabled(true);
-				translate.toggle();
-				currentEditMode = PaletteEditMode.FREE_TRANSLATE;
+				toolbar.translate.toggle();
 				return super.lostFocus(e);
 			}
 
 			@Override
 			public void startTranslate(PaletteEvent e) {
-				translate.toggle();
+				toolbar.translate.toggle();
 				return;
 			}
 
 			@Override
 			public void startGizmoEdit(PaletteEvent e) {
-				editGizmo.toggle();
+				toolbar.editGizmo.toggle();
 				return;
 			}
-		};
-
-		translate.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (translate.isChecked()) {
-					if (isFreeTransformEditMode())
-						endFreeTransformEditMode();
-					if (isFakeHeightEditMode())
-						endFakeHeightEditMode();
-					startFreeTranslateEditMode();
-				}
-			}
 		});
-
-		editGizmo.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if (editGizmo.isChecked()) {
-					startFreeTransformEditMode();
-				}
-			}
-		});
-
-		editFakeHeight.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				OrderedSet<GameObject> selection = paletteEditorWorkspace.selection;
-				boolean singleSelection = selection.size == 1;
-				boolean selectedStaticTile = singleSelection && selection.first() instanceof TileGameObjectProxy;
-				if (editFakeHeight.isChecked() && (!singleSelection || selectedStaticTile))  {
-					event.cancel();
-					return;
-				}
-
-				if (editFakeHeight.isChecked()) {
-					translate.setChecked(false);
-					editGizmo.setChecked(false);
-					editTile.setChecked(false);
-					startFakeHeightEditMode();
-				} else {
-					endFakeHeightEditMode();
-				}
-			}
-		});
-
-		paletteEditorWorkspace.addListener(defaultPaletteListener);
-
-//		delete.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				Array<GameAsset> markedForDeletion = new Array<>();
-//				for (GameObject selectedGameObject : paletteEditorWorkspace.selection) {
-//					for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObject : object.getResource().gameObjects) {
-//						if (gameObject.value == selectedGameObject) {
-//							markedForDeletion.add(gameObject.key);
-//						}
-//					}
-//				}
-//				for (GameAsset gameAsset : markedForDeletion) {
-//					removeEntity(gameAsset);
-//				}
-//				paletteEditorWorkspace.requestSelectionClear();
-//				editParentTileAndFakeHeight.setDisabled(true);
-//			}
-//		});
-//
-//		// mode buttons should react on palette changes
-//		defaultPaletteListener = new PaletteListener() {
-//			@Override
-//			public boolean selected (PaletteEvent e, GameAsset<?> gameAsset, PaletteImportMode mode) {
-//				if (mode != PaletteImportMode.NONE) {
-//					currentImportMode = mode;
-//					tile.setChecked(false);
-//					entity.setChecked(false);
-//					tileEntity.setChecked(false);
-//					switch (currentImportMode) {
-//					case TILE:
-//						tile.setChecked(true);
-//						break;
-//					case ENTITY:
-//						entity.setChecked(true);
-//						break;
-//					case TILE_ENTITY:
-//						tileEntity.setChecked(true);
-//						break;
-//					}
-//				}
-//
-//				editParentTileAndFakeHeight.setDisabled(false);
-//
-//				return false;
-//			}
-//
-//			public boolean lostFocus (PaletteEvent e) {
-//				editParentTileAndFakeHeight.setDisabled(true);
-//				if (isFreeTransformEditMode())
-//					endFreeTransformEditMode();
-//				if (isFreeTranslateEditMode())
-//					endFreeTranslateEditMode();
-//				return super.lostFocus(e);
-//			}
-//		};
-//		paletteEditorWorkspace.addListener(defaultPaletteListener);
-//
-//		editParentTileAndFakeHeight.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				if (!editParentTileAndFakeHeight.isDisabled()) {
-//					paletteEditorWorkspace.removeListener(defaultPaletteListener);
-//					startParentTileAndFakeHeightEditMode();
-//				}
-//			}
-//		});
-//
-//		if (paletteEditorWorkspace.selection.isEmpty()) {
-//			editParentTileAndFakeHeight.setDisabled(true);
-//		}
-//
-//		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
-//		buttonButtonGroup.add(tile, entity, tileEntity);
-//		buttonButtonGroup.setMaxCheckCount(1);
-//		buttonButtonGroup.setMinCheckCount(1);
-//
-//		tileEntity.setChecked(true);
-//
-//		buttonMainMenu.clear();
-//		buttonMainMenu.add(tileEntity);
-//		buttonMainMenu.add(tile);
-//		buttonMainMenu.add(entity);
-//		buttonMainMenu.add().expandX();
-//		buttonMainMenu.add(editParentTileAndFakeHeight);
-//		buttonMainMenu.add(delete);
 	}
 
-	void startFreeTranslateEditMode () {
-		currentEditMode = PaletteEditMode.FREE_TRANSLATE;
+	public OrderedSet<GameObject> getSelection () {
+		return paletteEditorWorkspace.selection;
 	}
 
-	void startFreeTransformEditMode () {
-		currentEditMode = PaletteEditMode.FREE_TRANSFORM;
+	public void unlockGizmos() {
 		paletteEditorWorkspace.unlockGizmos();
 	}
 
-	void endFreeTransformEditMode () {
+	public void lockGizmos() {
 		paletteEditorWorkspace.lockGizmos();
-		startFreeTranslateEditMode();
-		// extra code for exiting mode
 	}
-
-	void startFakeHeightEditMode () {
-		currentEditMode = PaletteEditMode.FAKE_HEIGHT_EDIT;
-		paletteEditorWorkspace.startFakeHeightEditMode();
-	}
-
-	void endFakeHeightEditMode () {
-		// saving logic
-		translate.toggle();
-	}
-
-//	void startParentTileAndFakeHeightEditMode () {
-//		currentEditMode = PaletteEditMode.PARENT_TILE_AND_FAKE_HEIGHT;
-//		addParentTileAndFakeHeightEditButtons();
-//		paletteEditorWorkspace.startEditMode();
-//	}
-
-//	void endParentTileAndFakeHeightEditMode () {
-//		currentEditMode = PaletteEditMode.NONE;
-//		addDefaultButtons();
-//	}
-
-//	private void addParentTileAndFakeHeightEditButtons () {
-//		Skin skin = TalosMain.Instance().getSkin();
-//
-//		SquareButton cancel = new SquareButton(skin, skin.getDrawable("ic-proc-error"), "Cancel");
-//		SquareButton accept = new SquareButton(skin, skin.getDrawable("ic-proc-success"), "Accept");
-//
-//		cancel.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				endParentTileAndFakeHeightEditMode();
-//				paletteEditorWorkspace.revertEditChanges();
-//			}
-//		});
-//
-//		accept.addListener(new ClickListener() {
-//			@Override
-//			public void clicked (InputEvent event, float x, float y) {
-//				super.clicked(event, x, y);
-//				float tmpHeightOffset = paletteEditorWorkspace.getTmpHeightOffset();
-//				GameObject gameObject = paletteEditorWorkspace.getSelectedGameObject();
-//				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-//				TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
-//				tileDataComponent.setFakeZ(tmpHeightOffset - (tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y));
-//
-//				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(object);
-//
-//				endParentTileAndFakeHeightEditMode();
-//			}
-//		});
-//
-//		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
-//		buttonButtonGroup.add(cancel, accept);
-//		buttonButtonGroup.setMaxCheckCount(1);
-//		buttonButtonGroup.setMinCheckCount(1);
-//
-//		buttonMainMenu.clear();
-//		buttonMainMenu.add(cancel);
-//		buttonMainMenu.add(accept);
-//	}
 }

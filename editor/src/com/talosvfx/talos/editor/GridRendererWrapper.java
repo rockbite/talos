@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -27,6 +28,7 @@ public class GridRendererWrapper extends Actor {
         camera = (OrthographicCamera)this.stage.getViewport().getCamera();
         shapeRenderer = new ShapeRenderer();
         gridPropertyProvider = new ParticleNodeGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
         gridRenderer = new GridRenderer(gridPropertyProvider, null);
     }
 

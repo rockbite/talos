@@ -55,6 +55,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     private InputListener currentGizmoListener;
 
+    // info for parent tile edit mode
+    private Vector2 parentTileDragStart = new Vector2();
+    private boolean parentTileIsDragging;
+
     private Comparator<GameObject> orthoTopDownSorter = new Comparator<GameObject>() {
         @Override
         public int compare (GameObject a, GameObject b) {
@@ -107,8 +111,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
     };
 
-    private static final Color parentTilesColor = Color.valueOf("#4A6DE5");
+    private static final Color parentTilesColorBlue = Color.valueOf("#436787");
+    private static final Color parentTilesBorderColorBlue = Color.valueOf("#6f9ac1");
+    private static final Color parentTilesColorRed = Color.valueOf("#874343");
+    private static final Color parentTilesBorderColorRed = Color.valueOf("#cc6a6a");
     private static final Color parentTilesProxyColor = ColorLibrary.ORANGE;
+    private static final Color parentTileColorGray = Color.valueOf("#ffffff33");
 
     public PaletteEditorWorkspace(PaletteEditor paletteEditor) {
         super();
@@ -245,6 +253,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                                 int deltaX = newX - bottomLeftParentTile.getIntX();
                                 int deltaY = newY - bottomLeftParentTile.getIntY();
 
+                                // lookout for future, do not directly change properties of grid position
                                 bottomLeftParentTile.x += deltaX;
                                 bottomLeftParentTile.y += deltaY;
                             }
@@ -370,6 +379,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 parentTilesReserve = tileDataComponent.getParentTiles();
 
                 dragStartPosition.set(x, y);
+                PaletteEditorWorkspace.this.parentTileDragStart.set(x, y);
+                localToScreenCoordinates(parentTileDragStart);
+                gridRenderer.project(parentTileDragStart);
+                PaletteEditorWorkspace.this.parentTileIsDragging = true;
                 return true;
             }
 
@@ -427,6 +440,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                PaletteEditorWorkspace.this.parentTileIsDragging = false;
                 if (!(paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode())) {
                     return;
                 }
@@ -435,7 +449,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (isDragging && paletteEditor.isParentTileEditMode()) { // TODO: refactor parent tile edit mode
+                if (paletteEditor.isParentTileEditMode() && isDragging) {
                     final Vector2 dragStartPos = new Vector2();
                     final Vector2 dragEndPos = new Vector2();
 
@@ -453,8 +467,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     gridRenderer.project(dragStartPos);
                     gridRenderer.project(dragEndPos);
 
-
-                    final ObjectSet<GridPosition> parentTiles = new ObjectSet<>();
+                    final ObjectSet<GridPosition> parentTiles = tileDataComponent.getParentTiles();
+                    final GridPosition dummyCell = new GridPosition(dragStartPos.x, dragStartPos.y);
+                    boolean shouldAppend = !parentTiles.contains(dummyCell);
 
                     final int lowestX = (int) Math.min(dragStartPos.x, dragEndPos.x);
                     final int highestX = (int) Math.max(dragStartPos.x, dragEndPos.x);
@@ -462,28 +477,38 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     final int lowestY = (int) Math.min(dragStartPos.y, dragEndPos.y);
                     final int highestY = (int) Math.max(dragStartPos.y, dragEndPos.y);
 
-                    for (int i = lowestX; i <= highestX; i++) {
-                        for (int j = lowestY; j <= highestY; j++) {
+                    for (int i = highestX; i >= lowestX; i--) {
+                        for (int j = highestY; j >= lowestY; j--) {
                             final GridPosition gridPosition = new GridPosition(i, j);
-                            parentTiles.add(gridPosition);
+                            if (shouldAppend) {
+                                if (!parentTiles.contains(gridPosition)) {
+                                    parentTiles.add(gridPosition);
+                                }
+                            } else { // remove intersecting cells
+                                if (parentTiles.size > 1 && parentTiles.contains(gridPosition)) {
+                                    parentTiles.remove(gridPosition);
+                                }
+                            }
                         }
                     }
+                } else if (paletteEditor.isParentTileEditMode() && !isDragging) {
+                    final Vector2 touchPos = new Vector2(x, y);
 
-                    tileDataComponent.setParentTiles(parentTiles);
-//                    final Vector2 touchPos = new Vector2(x, y);
-//
-//                    // convert to screen coordinates
-//                    localToScreenCoordinates(touchPos);
-//
-//                    // project to grid coordinates
-//                    gridRenderer.project(touchPos);
-//
-//                    tileDataComponent.
-//                    final GridPosition gridPosition = new GridPosition(i, j);
-//                    parentTiles.add(gridPosition);
-//
-//                    tileDataComponent.setParentTiles(parentTiles);
-                } else if (isDragging && paletteEditor.isFakeHeightEditMode()) {
+                    // convert to screen coordinates
+                    localToScreenCoordinates(touchPos);
+
+                    // project to grid coordinates
+                    gridRenderer.project(touchPos);
+
+                    ObjectSet<GridPosition> parentTiles = tileDataComponent.getParentTiles();
+                    final GridPosition gridPosition = new GridPosition(touchPos.x, touchPos.y);
+                    GridPosition existingGridPosition = parentTiles.get(gridPosition);
+                    if (existingGridPosition == null) {
+                        parentTiles.add(gridPosition);
+                    } else if (existingGridPosition != null && parentTiles.size > 1) {
+                        parentTiles.remove(existingGridPosition);
+                    }
+                } else if (paletteEditor.isFakeHeightEditMode() && isDragging) {
                     GameObject gameObject = getSelectedGameObject();
                     TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
                     TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
@@ -532,10 +557,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
+        batch.end();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.update(camera, parentAlpha);
         gridRenderer.drawGrid(batch, shapeRenderer);
-        batch.end();
 
         OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
 
@@ -553,6 +578,92 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             GameObject topLevelParent = gameObject.getTopParent(paletteData.getResource().rootDummy);
             renderParentTiles(topLevelParent);
         }
+
+        if (paletteEditor.isParentTileEditMode()) {
+            Vector2 pointer = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+            screenToLocalCoordinates(pointer);
+            pointer = getWorldFromLocal(pointer.x, pointer.y);
+
+            pointer.x = pointer.x > 0 ? (int) pointer.x : -1 + (int) pointer.x;
+            pointer.y = pointer.y > 0 ? (int) pointer.y : -1 + (int) pointer.y;
+
+            int lowestX, highestX;
+            int lowestY, highestY;
+
+            if (parentTileIsDragging) {
+                lowestX = (int) Math.min(parentTileDragStart.x, pointer.x);
+                highestX = (int) Math.max(parentTileDragStart.x, pointer.x);
+
+                lowestY = (int) Math.min(parentTileDragStart.y, pointer.y);
+                highestY = (int) Math.max(parentTileDragStart.y, pointer.y);
+            } else {
+                lowestX = (int) pointer.x;
+                highestX = (int) pointer.x;
+
+                lowestY = (int) pointer.y;
+                highestY = (int) pointer.y;
+            }
+
+            // render rects
+            ObjectSet<GridPosition> parentTiles = getSelectedGameObject().getComponent(TileDataComponent.class).getParentTiles();
+            GridPosition dummyCell;
+            if (parentTileIsDragging) {
+                dummyCell = new GridPosition(parentTileDragStart.x, parentTileDragStart.y);
+            } else {
+                dummyCell = new GridPosition(pointer.x, pointer.y);
+            }
+
+            boolean shouldAppend = !parentTiles.contains(dummyCell);
+            if (shouldAppend) {
+                shapeRenderer.setColor(parentTilesColorBlue);
+            } else {
+                shapeRenderer.setColor(parentTilesColorRed);
+            }
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+            for (int i = lowestX; i <= highestX; i++) {
+                for (int j = lowestY; j <= highestY; j++) {
+                    shapeRenderer.rect(i, j, 1, 1);
+                }
+            }
+
+            shapeRenderer.end();
+            if (shouldAppend) {
+                shapeRenderer.setColor(parentTilesBorderColorBlue);
+            } else {
+                shapeRenderer.setColor(parentTilesBorderColorRed);
+            }
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            for (int i = lowestX; i <= highestX; i++) {
+                for (int j = lowestY; j <= highestY; j++) {
+                    shapeRenderer.rect(i, j, 1, 1);
+                }
+            }
+            shapeRenderer.end();
+
+            batch.begin();
+            Skin skin = TalosMain.Instance().getSkin();
+            Drawable appendIcon = skin.getDrawable("tile-plus-icon");
+            Drawable removeIcon = skin.getDrawable("tile-minus-icon");
+            float totalScreenSpaceParentSize = getWidth();
+            float totalWorldWidth = getWorldWidth() * camera.zoom;
+            float worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
+            float icWidth = worldPerPixel * 12f;
+            float icHeight = worldPerPixel * 12f;
+            Drawable icon;
+            if (shouldAppend) {
+                icon = appendIcon;
+            } else {
+                icon = removeIcon;
+            }
+            for (int i = lowestX; i <= highestX; i++) {
+                for (int j = lowestY; j <= highestY; j++) {
+                    icon.draw(batch,i + 0.5f - icWidth / 2f, j  + 0.5f - icHeight / 2f, icWidth, icHeight);
+                }
+            }
+            batch.end();
+        }
+
 
         batch.begin();
 
@@ -664,15 +775,14 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             gridSizeY = layerSelected.getTileSizeY();
         }
 
-        Color renderColor = gameObject instanceof TileGameObjectProxy ? parentTilesProxyColor : parentTilesColor;
-
-        // render rects
         Gdx.gl.glEnable(GL20.GL_BLEND);
-        renderColor.a = 0.5f;
+        Color renderColor =  parentTileColorGray;
+
         if (selection.contains(gameObject)) {
-            renderParentTilesHighlight(gameObject);
-            renderColor.a = 0.8f;
+            renderColor = gameObject instanceof TileGameObjectProxy ? parentTilesProxyColor : parentTilesColorBlue;
         }
+
+
         shapeRenderer.setColor(renderColor);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -680,6 +790,21 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
         }
         shapeRenderer.end();
+
+        Gdx.gl.glLineWidth(2f);
+        if (selection.contains(gameObject)) {
+            Color renderBorderColor = gameObject instanceof TileGameObjectProxy ? parentTilesProxyColor : parentTilesBorderColorBlue;
+
+            shapeRenderer.setColor(renderBorderColor);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+            for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
+                shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
+            }
+
+            shapeRenderer.end();
+        }
+        Gdx.gl.glLineWidth(1f);
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
@@ -989,7 +1114,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     @Override
     public void initializeGridPropertyProvider () {
         gridPropertyProvider = new PaletteGridPropertyProvider();
-        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+        gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
     }
 
     private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {

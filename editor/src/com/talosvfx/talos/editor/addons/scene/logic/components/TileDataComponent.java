@@ -134,10 +134,15 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
         if (bottomLeftParentTile.x != newX || bottomLeftParentTile.y != newY) {
             int deltaX = newX - bottomLeftParentTile.getIntX();
             int deltaY = newY - bottomLeftParentTile.getIntY();
-
+            ObjectSet<GridPosition> tmp = new ObjectSet<>();
             for (GridPosition parentTile : parentTiles) {
+                tmp.add(parentTile);
+            }
+            parentTiles.clear();
+            for (GridPosition parentTile: tmp) {
                 parentTile.x += deltaX;
                 parentTile.y += deltaY;
+                parentTiles.add(parentTile);
             }
         }
 
