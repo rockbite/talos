@@ -177,6 +177,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return false;
                 }
 
+                if (!isSelectingWithDrag) {
+                    // Find what we got on touch up and see
+                    selectByPoint(x, y);
+                }
+
                 if (paletteEditor.isFreeTranslateEditMode()) {
                     //If we have a selection and we are clicking on one of the selection members, we can start drag
 
@@ -334,11 +339,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     PaletteEvent evn = paletteEventPool.obtain();
                     evn.setType(PaletteEvent.Type.startGizmoEdit);
                     PaletteEditorWorkspace.this.notify(evn, false);
-                }
-
-                if (!isSelectingWithDrag) {
-                    // Find what we got on touch up and see
-                    selectByPoint(x, y);
                 }
 
                 if (selectionRect.isVisible()) {
