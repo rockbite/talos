@@ -64,7 +64,6 @@ public class LayoutRow extends LayoutItem {
 		addActor(newLayoutContent);
 
 		if (columns.size > 1) {
-			System.out.println("ADDED ONE OOPSI " + resizeWidgets.size);
 			LayoutResizeWidget resizeWidget = new LayoutResizeWidget(skin, grid, this);
 			resizeWidgets.add(resizeWidget);
 			addActor(resizeWidget);
@@ -105,7 +104,7 @@ public class LayoutRow extends LayoutItem {
 			float widthForItem = row.getRelativeWidth() * getWidth();
 
 			if(row.getRelativeWidth() <= 0f) {
-				System.out.println();
+				System.out.println("Negative width, should restrict at some point");
 			}
 
 

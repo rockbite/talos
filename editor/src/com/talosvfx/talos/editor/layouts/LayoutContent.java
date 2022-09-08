@@ -71,7 +71,6 @@ public class LayoutContent extends LayoutItem {
 
 		invalidate();
 
-		System.out.println("Remove content " + content);
 	}
 
 	public Actor hitTabTable (Vector2 localCoords) {

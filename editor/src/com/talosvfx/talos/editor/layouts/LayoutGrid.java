@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.layouts;
 
-import ch.qos.logback.core.Layout;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -153,13 +151,10 @@ public class LayoutGrid extends WidgetGroup {
 		DragAndDrop.Source dragAndDropSource = sources.remove(source);
 		dragAndDrop.removeSource(dragAndDropSource);
 
-		System.out.println("Removed source");
-
 		//Potentially removes all the shit from hierarchy if its last one
 		parent.removeContent(app);
 
 		if (parent.isEmpty()) {
-			System.out.println("Parent is empty, removing content");
 			removeRecursive(parent, true);
 		}
 
