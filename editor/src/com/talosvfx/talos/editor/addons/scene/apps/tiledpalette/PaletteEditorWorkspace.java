@@ -366,6 +366,25 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             private TileDataComponent tileDataComponent;
 
             @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (Gdx.input.isKeyPressed(Input.Keys.DEL) && !selection.isEmpty()) {
+                    Array<GameAsset> markedForDeletion = new Array<>();
+                    for (GameObject selectedGameObject : selection) {
+                        for (ObjectMap.Entry<GameAsset<?>, GameObject> gameObject : paletteData.getResource().gameObjects) {
+                            if (gameObject.value == selectedGameObject) {
+                                markedForDeletion.add(gameObject.key);
+                            }
+                        }
+                    }
+                    for (GameAsset gameAsset : markedForDeletion) {
+                        paletteEditor.removeEntity(gameAsset);
+                    }
+                    requestSelectionClear();
+                }
+                return super.keyDown(event, keycode);
+            }
+
+            @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (!(paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode())) {
                     return false;
@@ -388,6 +407,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
+                getStage().setKeyboardFocus(PaletteEditorWorkspace.this);
+
                 if (!(paletteEditor.isFakeHeightEditMode() || paletteEditor.isParentTileEditMode())) {
                     return false;
                 }
