@@ -14,7 +14,7 @@ public class LayoutContent extends LayoutItem {
 	private final Table innerContents;
 	private final Table tabBar;
 	private final Drawable headerDrawable;
-	private ObjectMap<String,Actor> barActors = new ObjectMap<>();
+	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
@@ -46,27 +46,34 @@ public class LayoutContent extends LayoutItem {
 		tabBar.add(new VisLabel("|"));
 	}
 
-	public void addContent (String content) {
-		addSpacer();
-
-		VisLabel label = new VisLabel(content);
-		tabBar.add(label);
-
-		barActors.put(content, label);
-
-		grid.registerDragSource(this, label);
-
-
-		//Register drag and drop with the Grid
+	public void addContent (LayoutApp layoutApp) {
+		addContent(layoutApp, false);
 	}
 
-	public void removeContent (String content) {
-		Actor remove = barActors.remove(content);
+	public void addContent (LayoutApp layoutApp, boolean copy) {
+		addSpacer();
+
+		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
+
+		if (copy) {
+			tabBar.add(layoutApp.copyTabWidget());
+		} else {
+			tabBar.add(layoutApp.getTabWidget());
+
+			grid.registerDragSource(this, layoutApp, layoutApp.getTabWidget());
+		}
+	}
+
+	public void removeContent (String uniqueID) {
+		removeContent(apps.get(uniqueID));
+	}
+	public void removeContent (LayoutApp app) {
+		apps.remove(app.getUniqueIdentifier());
 
 		tabBar.clearChildren();
-		for (ObjectMap.Entry<String, Actor> barActor : barActors) {
+		for (ObjectMap.Entry<String, LayoutApp> barActor : apps) {
 			addSpacer();
-			tabBar.add(barActor.value);
+			tabBar.add(barActor.value.getTabWidget());
 		}
 
 		invalidate();
@@ -80,8 +87,10 @@ public class LayoutContent extends LayoutItem {
 			return tabBar;
 		}
 
-		if (barActors.containsValue(hit, true)) {
-			return tabBar;
+		for (LayoutApp value : apps.values()) {
+			if (value.getTabWidget() == hit) {
+				return tabBar;
+			}
 		}
 
 		return null;
@@ -93,7 +102,7 @@ public class LayoutContent extends LayoutItem {
 
 	@Override
 	public boolean isEmpty () {
-		return barActors.isEmpty();
+		return apps.isEmpty();
 	}
 
 	@Override

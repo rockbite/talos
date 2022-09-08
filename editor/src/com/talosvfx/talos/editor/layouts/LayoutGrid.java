@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.kotcrab.vis.ui.widget.VisLabel;
 
 import java.util.Objects;
 
@@ -144,7 +143,7 @@ public class LayoutGrid extends WidgetGroup {
 		//Here comes the logic
 
 		LayoutContent parent = source.layoutContent;
-		String app = source.app;
+		LayoutApp app = source.app;
 
 		//Source
 		//Remove drag and drop
@@ -372,9 +371,9 @@ public class LayoutGrid extends WidgetGroup {
 
 	//Add each LayoutContent for drag and drop as a source
 	//Add each LayoutContent for drag and drop as a target
-	void registerDragSource (LayoutContent parent, VisLabel actorToDrag) {
+	void registerDragSource (LayoutContent parent, LayoutApp layoutApp, Actor actorToDrag) {
 
-		LayoutContentApp userObject = new LayoutContentApp(parent, actorToDrag.getText().toString());
+		LayoutContentApp layoutContentAppObject = new LayoutContentApp(parent, layoutApp);
 
 		DragAndDrop.Source source = new DragAndDrop.Source(actorToDrag) {
 			@Override
@@ -384,10 +383,12 @@ public class LayoutGrid extends WidgetGroup {
 				LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
 				dummy.setRandomColour(parent.getRandomColour());
 				dummy.setSize(200, 200);
-				dummy.addContent(actorToDrag.getText().toString());
+
+				dummy.addContent(layoutApp, true);
 
 				payload.setDragActor(dummy);
-				payload.setObject(userObject);
+
+				payload.setObject(layoutContentAppObject);
 
 				startItem = parent;
 
@@ -529,7 +530,7 @@ public class LayoutGrid extends WidgetGroup {
 		};
 		dragAndDrop.addSource(source);
 
-		sources.put(userObject, source);
+		sources.put(layoutContentAppObject, source);
 	}
 
 	private void getDragHit (DragHitResult dragHitResult) {
@@ -643,9 +644,9 @@ public class LayoutGrid extends WidgetGroup {
 
 	static class LayoutContentApp {
 		public LayoutContent layoutContent;
-		public String app;
+		public LayoutApp app;
 
-		public LayoutContentApp (LayoutContent parent, String app) {
+		public LayoutContentApp (LayoutContent parent, LayoutApp app) {
 			this.layoutContent = parent;
 			this.app = app;
 		}

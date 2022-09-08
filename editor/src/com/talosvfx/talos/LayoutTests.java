@@ -10,12 +10,19 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutColumn;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+
+import java.util.UUID;
 
 public class LayoutTests extends ApplicationAdapter {
 
@@ -52,12 +59,39 @@ public class LayoutTests extends ApplicationAdapter {
 		refresh();
 	}
 
+	private LayoutApp createTestLayoutApp () {
+
+		String uuid = UUID.randomUUID().toString();
+		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
+		return new LayoutApp() {
+			@Override
+			public String getUniqueIdentifier () {
+				return uuid;
+			}
+
+			@Override
+			public Actor getTabWidget () {
+				return visLabel;
+			}
+
+			@Override
+			public Actor copyTabWidget () {
+				return new VisLabel(uuid.substring(0, 10));
+			}
+
+			@Override
+			public Actor getMainContent () {
+				return new Table();
+			}
+		};
+	}
+
 	private void newItem () {
 		LayoutContent content = new LayoutContent(skin, layoutGrid);
 
 		int random = MathUtils.random(1,3);
 		for (int i = 0; i < random; i++) {
-			content.addContent("NewApplication: " + MathUtils.random(100));
+			content.addContent(createTestLayoutApp());
 		}
 
 		layoutGrid.addContent(content);
@@ -68,7 +102,7 @@ public class LayoutTests extends ApplicationAdapter {
 
 		layoutGrid = new LayoutGrid(skin);
 		LayoutContent content = new LayoutContent(skin, layoutGrid);
-		content.addContent("Random");
+		content.addContent(createTestLayoutApp());
 		layoutGrid.addContent(content);
 
 		layoutGrid.setFillParent(true);
