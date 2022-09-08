@@ -9,5 +9,6 @@ public interface LayoutApp {
 	Actor copyTabWidget ();
 
 	Actor getMainContent ();
+	Actor getCopyMainContent ();
 
 }

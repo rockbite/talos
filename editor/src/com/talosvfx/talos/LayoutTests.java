@@ -61,6 +61,8 @@ public class LayoutTests extends ApplicationAdapter {
 		Table tab = new Table();
 		tab.setBackground(skin.getDrawable("tab-bg"));
 
+		tab.padLeft(10);
+		tab.padRight(10);
 		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
 		tab.add(visLabel);
 
@@ -89,7 +91,16 @@ public class LayoutTests extends ApplicationAdapter {
 
 			@Override
 			public Actor getMainContent () {
-				return new Table();
+				Table table = new Table();
+				table.setBackground(skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1f));
+				return table;
+			}
+
+			@Override
+			public Actor getCopyMainContent () {
+				Table table = new Table();
+				table.setBackground(skin.newDrawable("white", 0.8f, 0.8f, 0.8f, 1f));
+				return table;
 			}
 		};
 	}

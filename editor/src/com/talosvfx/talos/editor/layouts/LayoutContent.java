@@ -11,6 +11,7 @@ public class LayoutContent extends LayoutItem {
 
 	private final Table innerContents;
 	private final Table tabBar;
+	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
@@ -32,9 +33,12 @@ public class LayoutContent extends LayoutItem {
 		tabBar.defaults().padLeft(5).padRight(5);
 		tabBar.left();
 
-		tabBar.debug();
+
+		contentTable = new Table();
 
 		innerContents.add(tabBar).growX();
+		innerContents.row();
+		innerContents.add(contentTable).grow();
 
 	}
 
@@ -48,10 +52,19 @@ public class LayoutContent extends LayoutItem {
 
 		if (copy) {
 			tabBar.add(layoutApp.copyTabWidget()).growY();
+
+			contentTable.clearChildren();
+			contentTable.add(layoutApp.getCopyMainContent()).grow();
 		} else {
 			tabBar.add(layoutApp.getTabWidget()).growY();
 
 			grid.registerDragSource(this, layoutApp, layoutApp.getTabWidget());
+
+			//The state of content depends on the tabs
+			if (apps.size == 1) {
+				//It was the first one
+				contentTable.add(layoutApp.getMainContent()).grow();
+			}
 		}
 	}
 
