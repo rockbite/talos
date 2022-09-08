@@ -1202,12 +1202,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			if (gameObjects.size == 1) {
 				selectPropertyHolder(gameObjects.first());
 			} else {
-				// TODO: 8/11/2022 implement multi object behavior
-//				MultiPropertyHolder multiPropertyHolder = new MultiPropertyHolder(gameObjects);
-				if (currentContainer instanceof Scene) {
-					Scene scene = (Scene)currentContainer;
-					selectPropertyHolder(scene);
-				}
+				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
 			}
 		}
 	}
@@ -1229,6 +1224,27 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		event.newName = finalName;
 
 		Notifications.fireEvent(event);
+	}
+
+	@Override
+	protected boolean canMoveAround () {
+		boolean initialMusts = isInViewPort || isDragging;
+		if (!initialMusts) {
+			return false;
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+			return true;
+		}
+
+		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
+		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
+
+		if (gizmo == null && entityUnderMouse == null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public Vector2 getMouseCordsOnScene () {

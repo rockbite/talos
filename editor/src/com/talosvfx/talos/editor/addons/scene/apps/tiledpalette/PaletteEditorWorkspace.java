@@ -165,7 +165,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                if (canMoveAround) {
+                if (canMoveAround()) {
                     return false;
                 }
 
@@ -225,7 +225,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if (canMoveAround) {
+                if (canMoveAround()) {
                     return;
                 }
 
@@ -305,7 +305,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 }
 
 
-                if (canMoveAround) {
+                if (canMoveAround()) {
                     return;
                 }
 
@@ -371,7 +371,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return false;
                 }
 
-                if (canMoveAround) {
+                if (canMoveAround()) {
                     return false;
                 }
 
@@ -445,7 +445,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     return;
                 }
 
-                if (canMoveAround) {
+                if (canMoveAround()) {
                     return;
                 }
 
