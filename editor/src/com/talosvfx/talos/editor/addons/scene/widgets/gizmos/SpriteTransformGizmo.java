@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
@@ -88,7 +89,11 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
         }
 
-        spriteRendererComponent.size.set(nextPoints[RB].dst(nextPoints[LB]), nextPoints[LB].dst(nextPoints[LT]));
+        int howMany90Rots = MathUtils.floor(transform.worldRotation / 90);
+        int howMany180Rots = MathUtils.floor(transform.worldRotation / 180f);
+        int sig = (int) Math.pow(-1, howMany90Rots + howMany180Rots);
+
+        spriteRendererComponent.size.set(nextPoints[RB].dst(nextPoints[LB]) * Math.signum(nextPoints[RB].x - nextPoints[LB].x) * sig, nextPoints[LB].dst(nextPoints[LT]) * Math.signum(nextPoints[LT].y - nextPoints[LB].y) * sig);
         spriteRendererComponent.size = lowerPrecision(spriteRendererComponent.size);
 
         // if aspect ratio is fixed set height by width

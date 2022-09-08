@@ -1241,7 +1241,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
 
 		if (gizmo == null && entityUnderMouse == null) {
-			System.out.println("this is bad case");
 			return true;
 		}
 
