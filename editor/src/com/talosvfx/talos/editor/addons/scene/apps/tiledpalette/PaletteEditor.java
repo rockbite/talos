@@ -32,8 +32,6 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 	private ModeToggle modeToggle;
 	private PaletteEditorWorkspace paletteEditorWorkspace;
 
-	private PaletteListener defaultPaletteListener;
-
 	enum PaletteImportMode {
 		NONE,
 		TILE,
@@ -319,5 +317,9 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 	public void lockGizmos() {
 		paletteEditorWorkspace.lockGizmos();
+	}
+
+	public void startFakeHeightEditMode() {
+		paletteEditorWorkspace.startFakeHeightEditMode();
 	}
 }

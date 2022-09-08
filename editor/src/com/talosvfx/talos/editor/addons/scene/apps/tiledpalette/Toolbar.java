@@ -174,6 +174,7 @@ public class Toolbar extends Table {
 
     private void startFakeHeightEditMode () {
         paletteEditor.currentEditMode = PaletteEditor.PaletteEditMode.FAKE_HEIGHT_EDIT;
+        paletteEditor.startFakeHeightEditMode();
     }
 
     private void endFreeTranslateEditMode () {

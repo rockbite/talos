@@ -1064,18 +1064,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         lockGizmos();
     }
 
-    public void startParentTileEditMode () {
-//        TransformComponent transformComponent = getSelectedGameObject().getComponent(TransformComponent.class);
-//        TileDataComponent tileDataComponent = getSelectedGameObject().getComponent(TileDataComponent.class);
-//        tmpHeightOffset = tileDataComponent.getBottomLeftParentTile().y + transformComponent.position.y + tileDataComponent.getFakeZ();
-//
-//        lockGizmos();
-    }
-
-    public float getTmpHeightOffset () {
-        return tmpHeightOffset;
-    }
-
     @Override
     protected InputListener addGizmoListener() {
         currentGizmoListener = super.addGizmoListener();
