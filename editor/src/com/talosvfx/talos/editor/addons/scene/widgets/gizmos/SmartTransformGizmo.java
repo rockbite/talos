@@ -275,62 +275,49 @@ public class SmartTransformGizmo extends Gizmo {
         setRectFromPoints(prevPoints);
         prevRotation = getRotation(prevPoints);
 
-        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        float aspect = transform.scale.x / transform.scale.y;
+        SpriteRendererComponent transform = gameObject.getComponent(SpriteRendererComponent.class);
+        float aspect = 1f;
+        if (transform != null) {
+            aspect = Math.abs(transform.size.x / transform.size.y);
+        }
 
         // tmp2 contains movement diff
         tmp2.set(x, y).sub(points[touchedPoint]);
 
         // find midpoint
         tmp3.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]);
-        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-            tmp4.set(points[touchedPoint]).sub(tmp3); // Tmp4 is the vector of touchPoint from midpoint
-            float xDirection = Math.signum(tmp2.x);
-            float yDirection = Math.signum(tmp2.y);
-            boolean xDirectionChanged = MathUtils.isEqual(xDirection, Math.signum(tmp4.x));
-            boolean yDirectionChanged = MathUtils.isEqual(yDirection, Math.signum(tmp4.y));
-            // If our movement direction changed only by one coordinate we need to change one of the directions to move properly
-            // This is the generic pattern that was visible on paper when all the possible cases where drawn.
-            if (xDirectionChanged && !yDirectionChanged || !xDirectionChanged && yDirectionChanged) {
-                yDirection *= -1;
-            }
-            // We make coordinates equal and for direction we use our previous calculations.
-            if (Math.abs(tmp2.x) < Math.abs(tmp2.y)) {
-                tmp2.x = xDirection * Math.abs(tmp2.x);
-                tmp2.y = yDirection * Math.abs(tmp2.x);
-            } else {
-                tmp2.x = xDirection * Math.abs(tmp2.y);
-                tmp2.y = yDirection * Math.abs(tmp2.y);
-            }
-        }
 
         for(int i = 0; i < 4; i++) {
             points[i].sub(tmp3);
             points[i].rotateDeg(-prevRotation);
         }
         tmp2.rotateDeg(-prevRotation);
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            tmp2.x = tmp2.y * aspect;
+            if (touchedPoint == LT || touchedPoint == RB) {
+                tmp2.x *= -1;
+            }
+        }
+
         points[touchedPoint].add(tmp2); // apply diff
 
         if(touchedPoint == LB) {
-            points[RB].x = findXPositionOnLine(points[RT],points[RB],points[LB].y);
+            points[LT].x = points[LB].x;
             points[RB].y = points[LB].y;
-            points[LT].x = points[RT].x + points[LB].x - points[RB].x;
         }
         if(touchedPoint == LT) {
-            points[RT].x = findXPositionOnLine(points[RB],points[RT],points[LT].y);
             points[RT].y = points[LT].y;
-            points[LB].x = points[RB].x + points[LT].x - points[RT].x;
+            points[LB].x = points[LT].x;
         }
         if(touchedPoint == RB) {
-            points[LB].x = findXPositionOnLine(points[LT],points[LB],points[RB].y);
             points[LB].y = points[RB].y;
-            points[RT].x = points[LT].x + points[RB].x - points[LB].x;
+            points[RT].x = points[RB].x;
         }
         if(touchedPoint == RT) {
-            points[LT].x = findXPositionOnLine(points[LB],points[LT],points[RT].y);
             points[LT].y = points[RT].y;
-            points[RB].x = points[LB].x +  points[RT].x - points[LT].x;
+            points[RB].x = points[RT].x;
         }
+
         //rotate back
         for(int i = 0; i < 4; i++) {
             points[i].rotateDeg(prevRotation);
@@ -341,10 +328,6 @@ public class SmartTransformGizmo extends Gizmo {
         nextRotation = getRotation(nextPoints);
 
         transformOldToNew();
-    }
-
-    private float findXPositionOnLine(Vector2 point1, Vector2 point2, float y){
-        return point1.x + (point2.x-point1.x)*(y-point1.y)/(point2.y-point1.y);
     }
 
     private float getPintsAngle(Vector2 p2, Vector2 p1) {

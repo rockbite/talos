@@ -13,6 +13,8 @@ import static com.kotcrab.vis.ui.VisUI.getSkin;
 
 public class RulerRenderer extends Group {
 
+    public static final float RULER_SIZE = 20f;
+
     private GridPropertyProvider gridPropertyProvider;
 
     private Table yRulerTable;
@@ -40,9 +42,8 @@ public class RulerRenderer extends Group {
     public void configureRulers () {
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
-        float rulerSize = 20f;
-        xRulerTable.setY(gridPropertyProvider.rulerOnBottom() ? 0 : viewportWidget.getHeight() - rulerSize);
-        xRulerTable.setHeight(rulerSize);
+        xRulerTable.setY(viewportWidget.getHeight() - RULER_SIZE);
+        xRulerTable.setHeight(RULER_SIZE);
         int minSpaceBetweenActors = 40;
         int xSkipCount = 0;
 
@@ -118,7 +119,7 @@ public class RulerRenderer extends Group {
 
             float width = coordinateLabel.getWidth();
             wrapperTable.setSize(width, height);
-            wrapperTable.setX((rulerSize - width) / 2f);
+            wrapperTable.setX((RULER_SIZE - width) / 2f);
             wrapperTable.setOrigin(width / 2f, height / 2f);
 
 
@@ -147,7 +148,7 @@ public class RulerRenderer extends Group {
 
             float width = coordinateLabel.getWidth();
             wrapperTable.setSize(width, height);
-            wrapperTable.setX((rulerSize - width) / 2f);
+            wrapperTable.setX((RULER_SIZE - width) / 2f);
             wrapperTable.setOrigin(width / 2f, height / 2f);
 
 
@@ -157,7 +158,7 @@ public class RulerRenderer extends Group {
             yStart -= ySkipCount * gridPropertyProvider.getUnitY();
         }
 
-        yRulerTable.setWidth(rulerSize);
+        yRulerTable.setWidth(RULER_SIZE);
     }
 
 }
