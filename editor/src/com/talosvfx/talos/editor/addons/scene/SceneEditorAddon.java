@@ -49,6 +49,9 @@ public class SceneEditorAddon implements IAddon {
 
     public SEAppManager seAppManager;
 
+    //Split pane responsible for directory view and (viewportwidget + hierarchy view)
+    public VisSplitPane verticalSplitPane;
+
     @Override
     public void init () {
         SE = new SceneEditorProject(this);
@@ -152,16 +155,16 @@ public class SceneEditorAddon implements IAddon {
 
         workspaceContainer = new Table();
         VisSplitPane horizontalPane = new VisSplitPane(leftPart, propertyPanel, false);
-        VisSplitPane verticalPane = new VisSplitPane(midPart, bottomTable, true);
+        this.verticalSplitPane = new VisSplitPane(midPart, bottomTable, true);
         VisSplitPane midPane = new VisSplitPane(hierarchy, workspaceContainer, false);
 
         createBottomTabs();
 
-        leftPart.add(verticalPane).grow();
+        leftPart.add(verticalSplitPane).grow();
         midPart.add(midPane).grow();
 
         horizontalPane.setSplitAmount(0.8f);
-        verticalPane.setSplitAmount(0.72f);
+        verticalSplitPane.setSplitAmount(0.72f);
         midPane.setSplitAmount(0.25f);
 
         Drawable workspaceBg = ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.RED);
