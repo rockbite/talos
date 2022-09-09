@@ -119,4 +119,7 @@ public class LayoutContent extends LayoutItem {
 
 	}
 
+	public ObjectMap<String, LayoutApp> getApps () {
+		return apps;
+	}
 }

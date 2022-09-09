@@ -49,6 +49,9 @@ public class LayoutTests extends ApplicationAdapter {
 				if (Input.Keys.N == keycode) {
 					newItem();
 				}
+				if (Input.Keys.W == keycode) {
+					layoutGrid.writeToJson();
+				}
 				return super.keyDown(keycode);
 			}
 		};
@@ -99,7 +102,7 @@ public class LayoutTests extends ApplicationAdapter {
 			@Override
 			public Actor getCopyMainContent () {
 				Table table = new Table();
-				table.setBackground(skin.newDrawable("white", 0.8f, 0.8f, 0.8f, 1f));
+				table.setBackground(skin.newDrawable("white", 0.5f, 0.5f, 0.5f, 1f));
 				return table;
 			}
 		};

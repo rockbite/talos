@@ -242,4 +242,8 @@ public class LayoutRow extends LayoutItem {
 	public boolean isEmpty () {
 		return columns.isEmpty();
 	}
+
+	public Array<LayoutItem> getColumns () {
+		return columns;
+	}
 }

@@ -228,6 +228,7 @@ public class LayoutColumn extends LayoutItem {
 		return rows.isEmpty();
 	}
 
-
-
+	public Array<LayoutItem> getRows () {
+		return rows;
+	}
 }

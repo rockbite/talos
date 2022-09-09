@@ -8,6 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 
@@ -711,5 +714,68 @@ public class LayoutGrid extends WidgetGroup {
 			overItem = null;
 		}
 	}
+
+	enum LayoutType {
+		ROW,
+		COLUMN,
+		CONTENT,
+		APP
+	}
+
+	static class LayoutJsonStructure {
+		LayoutType type;
+		String appID;
+		float relativeWidth;
+		float relativeHeight;
+		Array<LayoutJsonStructure> children = new Array<>();
+	}
+
+	public void writeToJson () {
+		Json json = new Json();
+
+		LayoutJsonStructure rootJson = buildJsonFromObject(root);
+
+		System.out.println(json.prettyPrint(rootJson));
+	}
+
+	private LayoutJsonStructure buildJsonFromObject (LayoutItem root) {
+		LayoutJsonStructure jsonStructure = new LayoutJsonStructure();
+
+		if (root instanceof LayoutColumn) {
+			jsonStructure.type = LayoutType.COLUMN;
+			jsonStructure.relativeWidth = root.getRelativeWidth();
+			jsonStructure.relativeHeight = root.getRelativeHeight();
+			Array<LayoutItem> rows = ((LayoutColumn)root).getRows();
+			for (LayoutItem row : rows) {
+				LayoutJsonStructure child = buildJsonFromObject(row);
+				jsonStructure.children.add(child);
+			}
+		} else if (root instanceof LayoutRow) {
+			jsonStructure.type = LayoutType.ROW;
+			jsonStructure.relativeWidth = root.getRelativeWidth();
+			jsonStructure.relativeHeight = root.getRelativeHeight();
+			Array<LayoutItem> columns = ((LayoutRow)root).getColumns();
+			for (LayoutItem column : columns) {
+				LayoutJsonStructure child = buildJsonFromObject(column);
+				jsonStructure.children.add(child);
+			}
+		} else if (root instanceof LayoutContent) {
+			jsonStructure.type = LayoutType.CONTENT;
+			jsonStructure.relativeWidth = root.getRelativeWidth();
+			jsonStructure.relativeHeight = root.getRelativeHeight();
+			ObjectMap<String, LayoutApp> apps = ((LayoutContent)root).getApps();
+
+			for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+				LayoutJsonStructure child = new LayoutJsonStructure();
+				child.type = LayoutType.APP;
+				child.appID = app.key;
+				jsonStructure.children.add(child);
+			}
+		}
+
+		return jsonStructure;
+	}
+
+
 
 }
