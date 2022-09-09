@@ -11,7 +11,7 @@ Discord Server: [https://discord.gg/EQqYGcyMfr](https://discord.gg/EQqYGcyMfr)
 
 Node based, open source VFX Editor with powerfull interface and a ready to use libGDX runtime.
 
-### Screenshot
+### Screenshot 
 
 ![screenshot](https://i.imgur.com/KYpynzB.png)
 
