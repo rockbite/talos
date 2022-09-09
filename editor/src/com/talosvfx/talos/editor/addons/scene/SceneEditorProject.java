@@ -108,6 +108,7 @@ public class SceneEditorProject implements IProject {
         // create new scene
         Scene mainScene = new Scene(projectDir.path() + File.separator + "scenes" + File.separator + "main.scn");
         mainScene.save();
+        sceneEditorAddon.workspace.reloadProjectExplorer();
         sceneEditorAddon.workspace.openSavableContainer(mainScene);
 
         // now create main camera
@@ -115,7 +116,6 @@ public class SceneEditorProject implements IProject {
 
         TalosMain.Instance().ProjectController().saveProject(projectFile);
 
-        sceneEditorAddon.workspace.reloadProjectExplorer();
         sceneEditorAddon.projectExplorer.select(projectDir.path());
 
         Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
