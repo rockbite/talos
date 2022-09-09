@@ -20,11 +20,18 @@ public class ColorLibrary {
 
     public static Color BLUE = new Color(Color.valueOf("#4f8cb6"));
 
+    public static Color BORDER_BLUE = new Color(Color.valueOf("#6f9ac1"));
+
     public static String SHAPE_SQUIRCLE = "squircle-6";
+    public static String SHAPE_SQUIRCLE_2 = "squircle-2";
     public static String SHAPE_SQUIRCLE_LEFT = "squircle-l-6";
+    public static String SHAPE_SQUIRCLE_LEFT_2 = "squircle-l-2";
     public static String SHAPE_SQUIRCLE_RIGHT = "squircle-r-6";
+    public static String SHAPE_SQUIRCLE_RIGHT_2 = "squircle-r-2";
     public static String SHAPE_SQUIRCLE_TOP = "squircle-t-6";
+    public static String SHAPE_SQUIRCLE_TOP_2 = "squircle-t-2";
     public static String SHAPE_SQUIRCLE_BOTTOM = "squircle-b-6";
+    public static String SHAPE_SQUIRCLE_BOTTOM_2 = "squircle-b-2";
     public static String SHAPE_CIRCLE = "circle";
     public static String SHAPE_SQUARE = "square-patch";
 
@@ -47,7 +54,12 @@ public class ColorLibrary {
 
         BLACK ("#202020"),
         WHITE ("#FFFFFF"),
-        BROKEN_WHITE ("#b5b5b5");
+        BROKEN_WHITE ("#b5b5b5"),
+
+        // palette mode toggle btn colors
+        PALETTE_TOGGLE_UP("#333333"),
+        PALETTE_TOGGLE_DOWN("#515151"),
+        PALETTE_TOGGLE_HOVER("#515151b3");
 
         private Color color;
 

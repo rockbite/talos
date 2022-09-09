@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.logic.SceneMetadata;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
@@ -18,6 +19,7 @@ public enum GameAssetType {
 	SCRIPT(new String[]{"ts", "js"}, true),
 	TWEEN(new String[]{"tw"}, true),
 	PREFAB(new String[]{"prefab"}, true),
+	SCENE(new String[]{"scn"}, true),
 	DIRECTORY(new String[]{}, false),
 	TILE_PALETTE(new String[]{"ttp"}, true);
 
@@ -70,6 +72,8 @@ public enum GameAssetType {
 			return TlsMetadata.class;
 		case PREFAB:
 			return PrefabMetadata.class;
+		case SCENE:
+			return SceneMetadata.class;
 		case DIRECTORY:
 			return DirectoryMetadata.class;
 		case SCRIPT:

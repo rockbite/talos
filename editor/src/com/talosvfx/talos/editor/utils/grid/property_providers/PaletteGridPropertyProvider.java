@@ -53,7 +53,7 @@ public class PaletteGridPropertyProvider implements GridPropertyProvider {
         startX = ((int)(leftSide / gridSizeX)) * gridSizeX;
         startY = ((int)(bottomSide / gridSizeY)) * gridSizeY;
 
-        Color color = new Color(1, 1, 1, 0.2f);
+        Color color = Color.valueOf("7070704D");
         Color subDivisionColour = new Color(1, 1, 1, 0.1f);
         Color zeroColor = Color.CYAN;
         zeroColor.a = 0.4f;
