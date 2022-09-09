@@ -5,7 +5,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.SceneProjectSettings;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
@@ -130,6 +137,13 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
     @Override
     protected void writeData (Json json) {
+        SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
+        String relativePath = sceneEditorWorkspace.getRelativePath(path);
+        SceneProjectSettings sceneProjectSettings = sceneEditorWorkspace.projectSettingsObjectMap.get(relativePath);
+        if (sceneProjectSettings != null) {
+            sceneProjectSettings.updateValues();
+        }
+
         json.writeValue("name", getName());
         super.writeData(json);
     }

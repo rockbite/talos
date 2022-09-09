@@ -41,7 +41,6 @@ import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
@@ -85,6 +84,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private MapEditorToolbar mapEditorToolbar;
 
 	public boolean exporting = false;
+
+	public ObjectMap<String, SceneProjectSettings> projectSettingsObjectMap = new ObjectMap<>();
 
 	public static boolean isEnterPressed (int keycode) {
 		switch (keycode) {
@@ -835,7 +836,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	public void write (Json json) {
-
 		changeVersion = UUID.randomUUID().toString();
 
 		if (projectPath != null) {
@@ -848,6 +848,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			json.writeValue("currentScene", AssetImporter.relative(currentContainer.path));
 
 			json.writeValue("changeVersion", changeVersion);
+
+			SceneProjectSettings currentSceneSetting = projectSettingsObjectMap.get(getRelativePath(currentContainer.path));
+			if (currentSceneSetting != null) {
+				currentSceneSetting.updateValues();
+			}
+			json.writeValue("projectSettings", projectSettingsObjectMap);
 		}
 	}
 
@@ -867,6 +873,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 
+		projectSettingsObjectMap.clear();
+		JsonValue projectSettings = jsonData.get("projectSettings");
+		if (projectSettings != null) {
+			for (JsonValue projectSetting : projectSettings) {
+				SceneProjectSettings value = new SceneProjectSettings();
+				value.read(json, projectSetting);
+				projectSettingsObjectMap.put(projectSetting.name, value);
+			}
+		}
+
 		String path = jsonData.getString("currentScene", "");
 		FileHandle sceneFileHandle = AssetImporter.get(path);
 		if (sceneFileHandle.exists()) {
@@ -880,6 +896,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			container.loadFromPath();
 			openSavableContainer(container);
 		}
+
+
 
 //        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
 	}
@@ -1081,6 +1099,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (mainScene instanceof Scene) {
 			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
+			updateSettingsFromSceneSettings();
 		} else {
 			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#241a00"));
 		}
@@ -1275,7 +1294,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		String path = jsonData.getString("currentScene", "");
 
 		AssetRepository.init();
-		AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath).child("assets"));
+		AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath));
 
 		String currentFolderPath = null;
 		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
@@ -1314,6 +1333,27 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			Toast toast = Toast.makeToast("last action reversed", Toast.LENGTH_SHORT, Align.bottomRight);
 			toast.show();
 		}
+	}
+
+	private void updateSettingsFromSceneSettings () {
+		Scene scene = (Scene) currentContainer;
+		String scenePath = scene.path;
+		String relativePath = getRelativePath(scenePath);
+		SceneProjectSettings sceneProjectSettings = projectSettingsObjectMap.get(relativePath);
+		if (sceneProjectSettings == null) {
+			sceneProjectSettings = new SceneProjectSettings();
+			projectSettingsObjectMap.put(relativePath, sceneProjectSettings);
+		}
+
+		camera.zoom = sceneProjectSettings.cameraZoom;
+		camera.position.set(sceneProjectSettings.cameraX, sceneProjectSettings.cameraY, camera.position.z);
+		sceneEditorAddon.projectExplorer.select(sceneProjectSettings.directoryPath);
+		sceneEditorAddon.verticalSplitPane.setSplitAmount(sceneProjectSettings.directorySize);
+	}
+
+	public String getRelativePath (String fullPath) {
+		String projectFullPath = getProjectPath();
+		return fullPath.replace(projectFullPath, "").substring(1);
 	}
 
 	public void repositionGameObject (GameObject parentToMoveTo, GameObject childThatHasMoved) {

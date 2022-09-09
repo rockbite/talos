@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
@@ -220,6 +221,7 @@ public class AssetRepository implements Notifications.Observer {
 
 		checkGameAssetCreation(GameAssetType.VFX);
 		checkGameAssetCreation(GameAssetType.PREFAB);
+		checkGameAssetCreation(GameAssetType.SCENE);
 
 		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
 	}
@@ -725,6 +727,22 @@ public class AssetRepository implements Notifications.Observer {
 				if (createLinks) {
 					value.gameAssetReferences.add(prefabGameAsset);
 					prefabGameAsset.dependentRawAssets.add(value);
+				}
+
+				break;
+			case SCENE:
+				GameAsset<Scene> sceneGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				gameAssetOut = sceneGameAsset;
+
+				Scene scene = new Scene();
+				scene.path = value.handle.path();
+				scene.loadFromPath();
+
+				sceneGameAsset.setResourcePayload(scene);
+
+				if (createLinks) {
+					value.gameAssetReferences.add(sceneGameAsset);
+					sceneGameAsset.dependentRawAssets.add(value);
 				}
 
 				break;
