@@ -26,6 +26,8 @@ public class MoveByNode extends AbstractGenericTweenNode {
         Vector2 offset = (Vector2) data.misc.get("offset");
         TransformComponent transform = (TransformComponent) data.misc.get("transform");
 
+        alpha = data.interpolation.apply(alpha);
+
         transform.position.x = original.x + offset.x * alpha;
         transform.position.y = original.y + offset.y * alpha;
     }

@@ -13,10 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
@@ -27,7 +24,10 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+
+import java.lang.reflect.Field;
 
 
 public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
@@ -46,6 +46,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
     private Array<String> removeList = new Array<>();
     protected ObjectMap<String, GenericTweenData> dataMap = new ObjectMap<>();
     private boolean minimized = false;
+    private SelectBox interpolationSelectBox;
 
     protected class GenericTweenData {
         public float chunkIndex;
@@ -53,6 +54,8 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         public float alpha;
         public float duration;
         public boolean yoyo = false;
+
+        public Interpolation interpolation = Interpolation.linear;
         public int direction = 1;
         public boolean complete = false;
         public ObjectMap<String, Object> misc;
@@ -131,6 +134,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
             data.duration = getWidgetFloatValue("duration", buildParams(targetPath));
             data.yoyo = getWidgetBooleanValue("yoyo");
+            data.interpolation = getSelectedInterpolation();
             startTween(target, data);
         }
 
@@ -138,6 +142,24 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             microNodeView.showProgressDisc();
         }
     }
+
+    private Interpolation getSelectedInterpolation() {
+        String name = (String) interpolationSelectBox.getSelection().first();
+
+        Field[] declaredFields = Interpolation.class.getDeclaredFields();
+        for(Field field: declaredFields) {
+            if(field.getName().equals(name)) {
+                try {
+                    return (Interpolation) field.get(null);
+                } catch (Exception e) {
+                    return Interpolation.linear;
+                }
+            }
+        }
+
+        return Interpolation.linear;
+    }
+
 
     private String getGameObjectPath(GameObject gameObject, String path) {
         if(path.isEmpty()) {
@@ -223,7 +245,22 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         super.constructNode(module);
 
         InterpolationTimeline widget = new InterpolationTimeline(getSkin());
-        getCustomContainer("timeline").add(widget).growX().height(58);
+        Table timeline = getCustomContainer("timeline");
+
+        Field[] declaredFields = Interpolation.class.getDeclaredFields();
+        Array<String> interpolationList = new Array<>();
+        for(Field field: declaredFields) {
+            if(field.getType().isAssignableFrom(Interpolation.class)) {
+                interpolationList.add(field.getName());
+            }
+        }
+
+        interpolationSelectBox = new SelectBox(getSkin(), "propertyValue");
+        interpolationSelectBox.setItems(interpolationList);
+        timeline.add(interpolationSelectBox).growX().row();
+
+
+        timeline.add(widget).growX().height(58).row();
 
         microNodeView = new MicroNodeView();
         microNodeView.setTouchable(Touchable.enabled);
