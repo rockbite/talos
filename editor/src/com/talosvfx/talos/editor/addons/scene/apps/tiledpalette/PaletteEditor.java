@@ -261,12 +261,14 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 	private void addDefaultButtons () {
 		// visual toggle
-
-
 		modeToggle.getTileBtn().addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				TextButton btn = (TextButton) actor;
+				if (!btn.isChecked() && !modeToggle.getEntityBtn().isChecked()) {
+					event.cancel();
+					return;
+				}
 				if (btn.isChecked()) {
 					currentImportMode = PaletteImportMode.TILE;
 				}
@@ -277,6 +279,10 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				TextButton btn = (TextButton) actor;
+				if (!btn.isChecked() && !modeToggle.getTileBtn().isChecked()) {
+					event.cancel();
+					return;
+				}
 				if (btn.isChecked()) {
 					currentImportMode = PaletteImportMode.ENTITY;
 				}
