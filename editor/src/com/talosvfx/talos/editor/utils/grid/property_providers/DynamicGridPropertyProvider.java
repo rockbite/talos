@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 
-public class BaseGridPropertyProvider implements GridPropertyProvider {
+public class DynamicGridPropertyProvider implements GridPropertyProvider {
 
     public float gridUnit;
     public float gridXStart;
@@ -42,6 +42,16 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
     @Override
     public float getUnitY () {
         return gridUnit;
+    }
+
+    @Override
+    public float getWorldHeight () {
+        return -1;
+    }
+
+    @Override
+    public float getWorldWidth () {
+        return -1;
     }
 
     @Override
@@ -206,10 +216,5 @@ public class BaseGridPropertyProvider implements GridPropertyProvider {
         }
 
         return unit;
-    }
-
-    @Override
-    public boolean rulerOnBottom () {
-        return false;
     }
 }

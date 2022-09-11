@@ -28,6 +28,10 @@ public class RulerRenderer extends Group {
         addRulers();
     }
 
+    public void setGridPropertyProvider (GridPropertyProvider gridPropertyProvider) {
+        this.gridPropertyProvider = gridPropertyProvider;
+    }
+
     protected void addRulers () {
         Skin skin = TalosMain.Instance().getSkin();
         xRulerTable = new Table(skin);

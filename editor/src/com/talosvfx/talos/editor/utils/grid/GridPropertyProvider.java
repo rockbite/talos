@@ -16,6 +16,16 @@ public interface GridPropertyProvider {
 
     float getUnitY ();
 
+    /**
+     * @return boundary for world width, where -1 indicates infinity
+     */
+    float getWorldWidth();
+
+    /**
+     * @return boundary for world height, where -1 indicates infinity
+     */
+    float getWorldHeight();
+
     float getGridStartX ();
 
     float getGridEndX ();
@@ -33,7 +43,6 @@ public interface GridPropertyProvider {
     void setHighlightCursorHover (boolean shouldHighlight);
     void setHighlightCursorSelect (boolean shouldHighlight);
 
-    boolean rulerOnBottom ();
 }
 
 

@@ -32,7 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.utils.grid.property_providers.PaletteGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -1122,7 +1122,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
     @Override
     public void initializeGridPropertyProvider () {
-        gridPropertyProvider = new PaletteGridPropertyProvider();
+        gridPropertyProvider = new StaticGridPropertyProvider();
         gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
     }
 

@@ -7,16 +7,14 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
-import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 
@@ -44,7 +42,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
         batch.end();
 
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-        ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+        ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 
         gridPropertyProvider.update(camera, parentAlpha);
         gridRenderer.drawGrid(batch, shapeRenderer);
@@ -72,7 +70,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
 
     @Override
     public void initializeGridPropertyProvider () {
-        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider = new DynamicGridPropertyProvider();
     }
 
     @EventHandler

@@ -29,6 +29,10 @@ public class GridRenderer {
 		this.widget = widget;
 	}
 
+	public void setGridPropertyProvider (GridPropertyProvider gridPropertyProvider) {
+		this.gridPropertyProvider = gridPropertyProvider;
+	}
+
 	public void drawGrid (Batch batch, ShapeRenderer shapeRenderer) {
 		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
 		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);

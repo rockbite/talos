@@ -25,7 +25,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -37,17 +36,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
-import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
-
-import java.util.function.Supplier;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -311,7 +305,7 @@ public class PreviewWidget extends ViewportWidget {
         if (previewController.isGridVisible()) {
             batch.end();
             gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-            ((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+            ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
             gridPropertyProvider.update(camera, parentAlpha);
             gridRenderer.drawGrid(batch, shapeRenderer);
             batch.begin();
@@ -376,7 +370,7 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void initializeGridPropertyProvider () {
-        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider = new DynamicGridPropertyProvider();
         gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
     }
 

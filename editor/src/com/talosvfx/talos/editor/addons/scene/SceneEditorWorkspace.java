@@ -41,7 +41,9 @@ import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
@@ -86,6 +88,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public boolean exporting = false;
 
 	public ObjectMap<String, SceneProjectSettings> projectSettingsObjectMap = new ObjectMap<>();
+
+	//for map
+	private StaticBoundedGridPropertyProvider staticGridPropertyProvider;
 
 	public static boolean isEnterPressed (int keycode) {
 		switch (keycode) {
@@ -644,18 +649,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	private void paintTileAt (float x, float y) {
-		Vector2 worldFromLocal = getWorldFromLocal(x, y);
 
 		if (mapEditorState.isPainting()) {
-			int mouseCellX = gridRenderer.getMouseCellX();
-			int mouseCellY = gridRenderer.getMouseCellY();
-			//Targets
-
 			TalosLayer layerSelected = mapEditorState.getLayerSelected();
 			if (layerSelected != null) {
 				GameAsset<TilePaletteData> gameResource = layerSelected.getGameResource();
-				TilePaletteData palette = gameResource.getResource();
-
+				if (gameResource.isBroken()) {
+					return;
+				}
 
 				//Need to redo this to support tile selection. For now we can check speficailyl what we are painting
 				LayerType type = layerSelected.getType();
@@ -970,15 +971,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		batch.end();
 
-		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-		((BaseGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+		((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 		if (mapEditorState.isEditing()) {
-			gridPropertyProvider.setHighlightCursorHover(true);
-			gridPropertyProvider.update(camera, parentAlpha);
+			staticGridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+			staticGridPropertyProvider.setHighlightCursorHover(true);
+			staticGridPropertyProvider.update(camera, parentAlpha);
+			gridRenderer.setGridPropertyProvider(staticGridPropertyProvider);
+			rulerRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(true);
 		} else {
+			gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
 			gridPropertyProvider.update(camera, parentAlpha);
+			gridRenderer.setGridPropertyProvider(gridPropertyProvider);
+			rulerRenderer.setGridPropertyProvider(gridPropertyProvider);
 			gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(false);
 		}
@@ -1562,8 +1568,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	public void initializeGridPropertyProvider () {
-		gridPropertyProvider = new BaseGridPropertyProvider();
+		gridPropertyProvider = new DynamicGridPropertyProvider();
 		gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+
+		staticGridPropertyProvider = new StaticBoundedGridPropertyProvider();
+		staticGridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
 	}
 
 }

@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.talosvfx.talos.editor.utils.grid.GridRenderer;
-import com.talosvfx.talos.editor.utils.grid.property_providers.BaseGridPropertyProvider;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 
 public class GridRendererWrapper extends Actor {
 
@@ -19,7 +19,7 @@ public class GridRendererWrapper extends Actor {
 
     GridRenderer gridRenderer;
 
-    BaseGridPropertyProvider gridPropertyProvider;
+    DynamicGridPropertyProvider gridPropertyProvider;
 
     private Vector3 tmp = new Vector3();
 
@@ -27,7 +27,7 @@ public class GridRendererWrapper extends Actor {
         this.stage = stage;
         camera = (OrthographicCamera)this.stage.getViewport().getCamera();
         shapeRenderer = new ShapeRenderer();
-        gridPropertyProvider = new BaseGridPropertyProvider();
+        gridPropertyProvider = new DynamicGridPropertyProvider();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.distanceThatLinesShouldBe = pixelToWorld(150f);
         gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));

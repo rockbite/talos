@@ -144,6 +144,7 @@ public class MapEditorState implements Notifications.Observer {
 		focusedMapObject = mapObject;
 		mapComponent = mapObject.getComponent(MapComponent.class);
 		mapFocused = true;
+		selectLayer(mapComponent.getLayers().first());
 		showDrawingObject();
 	}
 
