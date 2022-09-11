@@ -41,12 +41,13 @@ public class MapEditorToolbar extends Table {
 		toolbar.setBackground(getSkin().newDrawable("button-main-menu"));
 
 		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"), true, "Paintbrush");
+		SquareButton spray = new SquareButton(getSkin(), getSkin().getDrawable("spray_icon"), true, "Spray");
 		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
 
 		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
 		buttonButtonGroup.setMaxCheckCount(1);
 		buttonButtonGroup.setMinCheckCount(0);
-		buttonButtonGroup.add(paint, erase);
+		buttonButtonGroup.add(paint, spray, erase);
 
 
 		paint.addListener(new ClickListener() {
@@ -64,17 +65,46 @@ public class MapEditorToolbar extends Table {
 
 				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
 				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
 
 				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
 
 				//Lock gizmos and also lock seleection
-				if (paint.isChecked() || erase.isChecked()) {
+				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
 					SceneEditorWorkspace.getInstance().lockGizmos();
 				} else {
 					SceneEditorWorkspace.getInstance().unlockGizmos();
 				}
 			}
 		});
+
+		spray.addListener(new ClickListener() {
+			@Override
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				event.cancel();
+				return super.touchDown(event, x, y, pointer, button);
+			}
+
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+
+				super.clicked(event, x, y);
+
+				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
+
+				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(spray.isChecked());
+
+				//Lock gizmos and also lock seleection
+				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
+					SceneEditorWorkspace.getInstance().lockGizmos();
+				} else {
+					SceneEditorWorkspace.getInstance().unlockGizmos();
+				}
+			}
+		});
+
 		erase.addListener(new ClickListener() {
 
 			@Override
@@ -90,11 +120,12 @@ public class MapEditorToolbar extends Table {
 
 				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
 				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
 
 				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(erase.isChecked());
 
 				//Lock gizmos and also lock seleection
-				if (paint.isChecked() || erase.isChecked()) {
+				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
 					SceneEditorWorkspace.getInstance().lockGizmos();
 				} else {
 					SceneEditorWorkspace.getInstance().unlockGizmos();
@@ -103,6 +134,7 @@ public class MapEditorToolbar extends Table {
 		});
 
 		toolbar.add(paint);
+		toolbar.add(spray);
 		toolbar.add(erase);
 
 		//Add the buttons
