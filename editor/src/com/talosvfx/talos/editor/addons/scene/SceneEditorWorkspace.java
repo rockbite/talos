@@ -1054,6 +1054,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						String projectFilePath = "\"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
 
 						if (TalosMain.Instance().isOsX()) {
+							File nodeBinary = new File(nodeCommand);
+							if(!nodeBinary.exists()) {
+								nodeCommand = "/opt/homebrew/bin/node";
+							}
 							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePath);
 							pb.inheritIO();
 							pb.start();
