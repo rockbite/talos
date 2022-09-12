@@ -46,6 +46,7 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import org.lwjgl.opengl.GL20;
 
@@ -1372,6 +1373,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
 
 		if (gizmo == null && entityUnderMouse == null) {
+			return true;
+		}
+
+		if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
+			return true;
+		}
+
+		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
 			return true;
 		}
 

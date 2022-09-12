@@ -38,7 +38,7 @@ public class MapEditorToolbar extends Table {
 		top();
 
 		Table toolbar = new Table();
-		add(toolbar).top().expandX().expandX();
+		add(toolbar).top().expandX().expandX().padTop(20);
 
 		toolbar.defaults().pad(5);
 

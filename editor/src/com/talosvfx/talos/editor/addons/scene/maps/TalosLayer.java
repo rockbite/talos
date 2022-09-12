@@ -66,6 +66,10 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 		json.writeValue("type", this.type);
 		json.writeValue("name", this.name);
+
+		json.writeValue("mapWidth", mapWidth);
+		json.writeValue("mapHeight", mapHeight);
+
 		switch (type) {
 		case STATIC:
 			serializeForStatic(json);
@@ -92,8 +96,6 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	}
 
 	private void serializeForStatic (Json json) {
-		json.writeValue("mapWidth", mapWidth);
-		json.writeValue("mapHeight", mapHeight);
 		json.writeValue("tileSizeX", tileSizeX);
 		json.writeValue("tileSizeY", tileSizeY);
 
@@ -112,8 +114,6 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	}
 
 	private void deserializeForStatic (Json json, JsonValue jsonData) {
-		this.mapWidth = jsonData.getInt("mapWidth", 100);
-		this.mapHeight = jsonData.getInt("mapHeight", 100);
 		this.tileSizeX = jsonData.getFloat("tileSizeX", 1);
 		this.tileSizeY = jsonData.getFloat("tileSizeY", 1);
 
@@ -151,6 +151,9 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 		this.type = json.readValue(LayerType.class, jsonData.get("type"));
 		this.name = jsonData.getString("name");
+
+		this.mapWidth = jsonData.getInt("mapWidth", 100);
+		this.mapHeight = jsonData.getInt("mapHeight", 100);
 
 		switch (type) {
 		case STATIC:

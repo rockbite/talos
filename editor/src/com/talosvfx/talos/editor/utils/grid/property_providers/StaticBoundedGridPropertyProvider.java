@@ -20,7 +20,7 @@ public class StaticBoundedGridPropertyProvider extends StaticGridPropertyProvide
         float gridSizeY = getUnitY();
 
         float totalWidth = getWorldWidth();
-        float totalHeight = getWorldWidth();
+        float totalHeight = getWorldHeight();
 
         Color color = Color.valueOf("7070704D");
         Color zeroColor = Color.CYAN;
