@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -46,11 +47,13 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGrid
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import org.lwjgl.opengl.GL20;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -88,6 +91,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public boolean exporting = false;
 
 	public ObjectMap<String, SceneProjectSettings> projectSettingsObjectMap = new ObjectMap<>();
+
+	private float sprayInnerRadius = 10;
+	private float sprayOuterRadius = 15;
+	private int innerSprayCount = 100;
+	private int outerSprayCount = 100;
+	private Random rand;
 
 	//for map
 	private StaticBoundedGridPropertyProvider staticGridPropertyProvider;
@@ -183,6 +192,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(selectionRect);
 
 		addActor(rulerRenderer);
+
+		rand = new Random();
 	}
 
 	public GameObject createEmpty (Vector2 position, GameObject parent) {
@@ -383,6 +394,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			GameObject selectedGameObject;
 
 			private boolean painting = false;
+			private boolean spraying = false;
 			private boolean erasing = false;
 
 			@Override
@@ -393,6 +405,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						//Place a tile and return
 						paintTileAt(x, y);
 						painting = true;
+						return true;
+					} else if (mapEditorState.isSpraying()) {
+						// Spray tiles and return
+						sprayTilesAt();
+						spraying = true;
 						return true;
 					} else if (mapEditorState.isErasing()) {
 						TalosLayer layerSelected = mapEditorState.getLayerSelected();
@@ -502,6 +519,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (painting) {
 					painting = false;
+					return;
+				}
+				if (spraying) {
+					spraying = false;
 					return;
 				}
 				if (erasing) {
@@ -714,6 +735,61 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
+	private void sprayTilesAt () {
+
+		if (mapEditorState.isSpraying()) {
+			TalosLayer layerSelected = mapEditorState.getLayerSelected();
+			if (layerSelected != null) {
+				Vector2 origin = getMouseCordsOnScene();
+				LayerType type = layerSelected.getType();
+
+				GameObject gameObjectWeArePainting = mapEditorState.getGameObjectWeArePainting();
+				if (gameObjectWeArePainting != null) {
+					if (type == LayerType.DYNAMIC_ENTITY) {
+						double innerRadius = sprayInnerRadius;
+						double outerRadius = sprayOuterRadius;
+						double twopi = 2 * Math.PI;
+						// draw inner circle
+						for (int i = 1; i <= innerSprayCount; i++) {
+							double theta = twopi * rand.nextDouble();
+							double r = innerRadius * Math.sqrt(rand.nextDouble());
+							double x = r * Math.cos(theta);
+							double y = r * Math.sin(theta);
+
+							TransformComponent transformComponent = gameObjectWeArePainting.getComponent(TransformComponent.class);
+							transformComponent.position.set((float) x + origin.x, (float) y + origin.y);
+
+							GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
+							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+							TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+							tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
+							layerSelected.getRootEntities().add(gameObject);
+						}
+						// draw outer circle
+						for (int i = 1; i <= outerSprayCount; i++) {
+							double theta = twopi * rand.nextDouble();
+							double r = (outerRadius - innerRadius) * Math.sqrt(Math.abs(rand.nextGaussian())) + innerRadius;
+							double x = r * Math.cos(theta);
+							double y = r * Math.sin(theta);
+
+							TransformComponent transformComponent = gameObjectWeArePainting.getComponent(TransformComponent.class);
+							transformComponent.position.set((float) x + origin.x, (float) y + origin.y);
+
+							GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
+							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+							TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
+							tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
+							layerSelected.getRootEntities().add(gameObject);
+						}
+					} else {
+						System.out.println("Can't paint entity into static layer");
+					}
+				}
+			}
+		}
+	}
+
+
 	public static boolean isRenamePressed (int keycode) {
 		if (TalosMain.Instance().isOsX()) {
 			return isEnterPressed(keycode);
@@ -911,6 +987,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (mapEditorState.isEditing()) {
 			boolean painting = mapEditorState.isPainting();
+			boolean spraying = mapEditorState.isSpraying();
 			if (painting) {
 				if (mapEditorState.getLayerSelected() != null) {
 
@@ -953,6 +1030,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					}
 				}
 
+			} else if (spraying) {
+//				do nothing yet
 			}
 		}
 
@@ -980,6 +1059,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			rulerRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(true);
+
+			if (mapEditorState.isSpraying()) {
+				// show the spray radius
+				GL20.glLineWidth(5.0f);
+				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+				Vector2 vec = getMouseCordsOnScene();
+				shapeRenderer.circle(vec.x, vec.y, sprayInnerRadius, 20);
+				shapeRenderer.circle(vec.x, vec.y, sprayOuterRadius, 20);
+				shapeRenderer.end();
+				GL20.glLineWidth(1.0f);
+			}
 		} else {
 			gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
 			gridPropertyProvider.update(camera, parentAlpha);
