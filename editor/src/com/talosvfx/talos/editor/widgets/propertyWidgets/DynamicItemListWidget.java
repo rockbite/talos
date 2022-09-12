@@ -69,7 +69,6 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
                 super.selected(node);
                 list.getSelection().clear();
                 list.getSelection().add(node);
-                SceneEditorWorkspace.getInstance().requestSelectionClear();
             }
 
             @Override

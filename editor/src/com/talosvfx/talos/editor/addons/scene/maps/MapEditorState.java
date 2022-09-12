@@ -27,6 +27,7 @@ public class MapEditorState implements Notifications.Observer {
 
 	private boolean painting = false;
 	private boolean erasing = false;
+	private boolean spraying = false;
 
 	public MapEditorState () {
 		Notifications.registerObserver(this);
@@ -34,6 +35,10 @@ public class MapEditorState implements Notifications.Observer {
 
 	public boolean isPainting () {
 		return painting;
+	}
+
+	public boolean isSpraying () {
+		return spraying;
 	}
 
 	public boolean isErasing () {
@@ -46,6 +51,15 @@ public class MapEditorState implements Notifications.Observer {
 			showDrawingObject();
 		} else {
 			hideDrawingObject();
+		}
+	}
+
+	public void setSpraying (boolean spraying) {
+		this.spraying = spraying;
+		if (spraying) {
+			showSprayArea();
+		} else {
+			hideSprayArea();
 		}
 	}
 
@@ -109,6 +123,22 @@ public class MapEditorState implements Notifications.Observer {
 	}
 
 	private void hideDrawingObject () {
+		if (layerSelected != null) {
+			if (painting) {
+				layerSelected.entityPlacing = null;
+			}
+		}
+	}
+
+	private void showSprayArea () {
+		if (layerSelected != null) {
+			if (spraying) {
+				layerSelected.entityPlacing = gameObjectWeArePainting;
+			}
+		}
+	}
+
+	private void hideSprayArea () {
 		if (layerSelected != null) {
 			if (painting) {
 				layerSelected.entityPlacing = null;
