@@ -65,18 +65,18 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
             paletteWidget.updateValue(); //kind of a hack to do this /shrug face
             widgets.add(paletteWidget);
 
+            PropertyWidget mapWidthX = WidgetFactory.generate(layer, "mapWidth", "MapWidth");
+            mapWidthX.updateValue(); //kind of a hack to do this /shrug face
+            widgets.add(mapWidthX);
+
+            PropertyWidget mapWidthY = WidgetFactory.generate(layer, "mapHeight", "MapHeight");
+            mapWidthY.updateValue(); //kind of a hack to do this /shrug face
+            widgets.add(mapWidthY);
+
 
             //Static properties only
 
             if (layer.getType() == LayerType.STATIC) {
-
-                PropertyWidget mapWidthX = WidgetFactory.generate(layer, "mapWidth", "MapWidth");
-                mapWidthX.updateValue(); //kind of a hack to do this /shrug face
-                widgets.add(mapWidthX);
-
-                PropertyWidget mapWidthY = WidgetFactory.generate(layer, "mapHeight", "MapHeight");
-                mapWidthY.updateValue(); //kind of a hack to do this /shrug face
-                widgets.add(mapWidthY);
 
                 PropertyWidget tileSizeX = WidgetFactory.generate(layer, "tileSizeX", "TileSize X");
                 tileSizeX.updateValue(); //kind of a hack to do this /shrug face

@@ -86,7 +86,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public Array<String> layers = new Array<>();
 	public MapEditorState mapEditorState;
-	private MapEditorToolbar mapEditorToolbar;
+	public MapEditorToolbar mapEditorToolbar;
 
 	public boolean exporting = false;
 
@@ -575,11 +575,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					convertSelectedIntoGroup();
 				}
 
+				if (keycode == Input.Keys.ESCAPE) {
+					escapePressed();
+				}
+
 				return super.keyDown(event, keycode);
 			}
 		};
 
 		addListener(inputListener);
+	}
+
+	private void escapePressed() {
+		performSelectionClear();
+		mapEditorState.escapePressed();
 	}
 
 	private void convertSelectedIntoGroup () {
@@ -690,6 +699,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 						tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
 						layerSelected.getRootEntities().add(gameObject);
+						gameObject.isPlacing = false;
 					} else {
 						System.out.println("Can't paint entity into static layer");
 					}
@@ -1058,7 +1068,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			gridRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			gridRenderer.drawGrid(batch, shapeRenderer);
-			renderer.setRenderParentTiles(true);
+			renderer.setRenderParentTiles(false);
 
 			if (mapEditorState.isSpraying()) {
 				// show the spray radius
@@ -1206,7 +1216,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
-		if (mapEditorState.isEditing()) return;
+		//if (mapEditorState.isEditing()) return;
 		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
 		if (propertyHolder == null || currentHolder == propertyHolder)
 			return;
@@ -1296,34 +1306,36 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
-		mapEditorState.update(event);
+		//If this didn't come from scene editor ignore it
+		if (event.getContext() == this) {
 
-		if (event.getContext() != this) return; //If this didn't come from scene editor ignore it
+			ObjectSet<GameObject> gameObjects = event.get();
 
-		ObjectSet<GameObject> gameObjects = event.get();
-
-		if (event.get().size == 1) { //Only select gizmos if one is selected
-			selectGizmos(gameObjects);
-		} else {
-			unselectGizmos();
-			groupSelectionGizmo.setSelected(true);
-		}
-
-		// now for properties
-
-		if (gameObjects.size == 0) {
-			// we select the main container then
-			if (currentContainer instanceof Scene) {
-				Scene scene = (Scene)currentContainer;
-				selectPropertyHolder(scene);
-			}
-		} else {
-			if (gameObjects.size == 1) {
-				selectPropertyHolder(gameObjects.first());
+			if (event.get().size == 1) { //Only select gizmos if one is selected
+				selectGizmos(gameObjects);
 			} else {
-				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
+				unselectGizmos();
+				groupSelectionGizmo.setSelected(true);
+			}
+
+			// now for properties
+
+			if (gameObjects.size == 0) {
+				// we select the main container then
+				if (currentContainer instanceof Scene) {
+					Scene scene = (Scene) currentContainer;
+					selectPropertyHolder(scene);
+				}
+			} else {
+				if (gameObjects.size == 1) {
+					selectPropertyHolder(gameObjects.first());
+				} else {
+					selectPropertyHolder(new MultiPropertyHolder(gameObjects));
+				}
 			}
 		}
+
+		mapEditorState.update(event);
 	}
 
 	public void changeGOName (GameObject gameObject, String suggestedName) {
@@ -1666,7 +1678,27 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
 
 		staticGridPropertyProvider = new StaticBoundedGridPropertyProvider();
+		staticGridPropertyProvider.hideZero();
 		staticGridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
 	}
 
+	@Override
+	public void requestSelectionClear() {
+		if(mapEditorState.isEditing()) return;
+
+		performSelectionClear();
+	}
+
+	public void performSelectionClear() {
+		for (GameObject gameObject : selection) {
+			if (gizmos.gizmoMap.containsKey(gameObject)) {
+				Array<Gizmo> gizmo = gizmos.gizmoMap.get(gameObject);
+				for (int j = 0; j < gizmo.size; j++) {
+					gizmo.get(j).setSelected(false);
+				}
+			}
+		}
+		clearSelection();
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+	}
 }

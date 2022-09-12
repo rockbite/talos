@@ -143,33 +143,15 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
     }
 
     @Override
-    public float getWorldHeight () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapHeight();
-            }
-        }
-
+    public float getWorldWidth() {
         return -1;
     }
 
     @Override
-    public float getWorldWidth () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapWidth();
-            }
-        }
-
+    public float getWorldHeight() {
         return -1;
     }
+
 
     @Override
     public float getGridStartX () {

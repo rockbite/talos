@@ -2,7 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.TileGameObjectProxy;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -152,6 +155,7 @@ public class MapEditorState implements Notifications.Observer {
 	}
 
 	private void selectLayer (TalosLayer layer) {
+
 		boolean shouldShow = false;
 		if (this.layerSelected == null) {
 			shouldShow = true;
@@ -160,7 +164,6 @@ public class MapEditorState implements Notifications.Observer {
 		if (shouldShow) {
 			SceneEditorWorkspace.getInstance().showMapEditToolbar();
 		}
-
 
 		for (TalosLayer tLayer : mapComponent.getLayers()) {
 			tLayer.entityPlacing = null;
@@ -174,7 +177,18 @@ public class MapEditorState implements Notifications.Observer {
 		focusedMapObject = mapObject;
 		mapComponent = mapObject.getComponent(MapComponent.class);
 		mapFocused = true;
-		//selectLayer(mapComponent.getLayers().first());
+
+		mapComponent.setLayerSelectedByEmulating(mapComponent.getLayers().first());
+
+		// rty to show palette
+		if(mapComponent.selectedLayer.getGameResource() != null) {
+			// we have an asset let's show it's palette
+			SceneEditorAddon.get().openApp(new PaletteEditor(mapComponent.selectedLayer.getGameResource()), AEditorApp.AppOpenStrategy.RIGHT_TAB);
+		}
+
+		// select the brush tool
+		SceneEditorWorkspace.getInstance().mapEditorToolbar.enablePaintMode();
+
 		showDrawingObject();
 	}
 
@@ -203,5 +217,11 @@ public class MapEditorState implements Notifications.Observer {
 
 	public TalosLayer getLayerSelected () {
 		return layerSelected;
+	}
+
+	public void escapePressed() {
+		if(isEditing()) {
+			// todo: do something?
+		}
 	}
 }

@@ -48,7 +48,7 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 	public TalosLayer (String name) {
 		this.name = name;
-		this.type = LayerType.STATIC;
+		this.type = LayerType.DYNAMIC_ENTITY; // lets have dynamic the default
 	}
 	public String getName () {
 		return name;

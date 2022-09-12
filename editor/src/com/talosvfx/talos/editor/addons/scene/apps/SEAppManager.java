@@ -27,7 +27,9 @@ public class SEAppManager {
             return;
         }
 
-        if (strategy == AEditorApp.AppOpenStrategy.BOTTOM_TAB || strategy == AEditorApp.AppOpenStrategy.RIGHT_TAB) {
+        // todo: change this when tom adds layouts stuff
+
+        if (strategy == AEditorApp.AppOpenStrategy.BOTTOM_TAB) {
             AppTab newTab = new AppTab(editorApp) {
                 @Override
                 public String getTabTitle() {
@@ -47,6 +49,24 @@ public class SEAppManager {
             });
 
             SceneEditorAddon.get().bottomTabbedPane.add(newTab);
+        } if(strategy == AEditorApp.AppOpenStrategy.RIGHT_TAB) {
+            AppWindow window = new AppWindow(editorApp) {
+                @Override
+                protected void close () {
+                    super.close();
+                    editorApp.onHide();
+                }
+            };
+
+            editorApp.addAppListener(new AEditorApp.AppListener() {
+                @Override
+                public void closeRequested() {
+                    window.hide();
+                    editorApp.onHide();
+                }
+            });
+            window.setMovable(false);
+            SceneEditorAddon.get().rightMidContainer.add(window).grow();
         } else if(strategy == AEditorApp.AppOpenStrategy.WINDOW) {
             AppWindow window = new AppWindow(editorApp) {
                 @Override
@@ -97,7 +117,6 @@ public class SEAppManager {
 
             add(app.getContent()).grow();
 
-            pack();
             invalidate();
 
             centerWindow();

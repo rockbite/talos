@@ -27,6 +27,8 @@ public class MapComponent extends RendererComponent {
     private MapType mapType = MapType.ORTHOGRAPHIC_TOPDOWN;
     public transient TalosLayer selectedLayer;
     public transient MainRenderer mainRenderer = new MainRenderer();
+    private TalosLayerPropertiesWidget talosLayerPropertiesWidget;
+    private DynamicItemListWidget<TalosLayer> itemListWidget;
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -39,7 +41,7 @@ public class MapComponent extends RendererComponent {
                 return new TalosLayer("NewLayer");
             }
         };
-        DynamicItemListWidget<TalosLayer> itemListWidget = new DynamicItemListWidget<>("Layers", new Supplier<Array<TalosLayer>>() {
+        itemListWidget = new DynamicItemListWidget<>("Layers", new Supplier<Array<TalosLayer>>() {
             @Override
             public Array<TalosLayer> get () {
                 return layers;
@@ -73,7 +75,7 @@ public class MapComponent extends RendererComponent {
             }
         });
 
-        TalosLayerPropertiesWidget talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
+        talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
             @Override
             public TalosLayer get () {
                 return selectedLayer;
@@ -87,12 +89,7 @@ public class MapComponent extends RendererComponent {
             @Override
             public void selected (FilteredTree.Node<TalosLayer> node) {
                 super.selected(node);
-                selectedLayer = node.getObject();
-                TalosLayerSelectEvent talosLayerSelectEvent = Notifications.obtainEvent(TalosLayerSelectEvent.class);
-                talosLayerSelectEvent.layer = selectedLayer;
-                Notifications.fireEvent(talosLayerSelectEvent);
-                talosLayerPropertiesWidget.updateWidget(node.getObject());
-                talosLayerPropertiesWidget.toggleHide(false);
+                setLayerSelected(node.getObject());
             }
         });
 
@@ -152,5 +149,26 @@ public class MapComponent extends RendererComponent {
         super.reset();
         mapType = MapType.ORTHOGRAPHIC_TOPDOWN;
         layers.clear();
+    }
+
+    public void setLayerSelectedByEmulating(TalosLayer layer) {
+        Array<FilteredTree.Node<TalosLayer>> rootNodes = itemListWidget.list.getRootNodes();
+        for(FilteredTree.Node<TalosLayer> node: rootNodes) {
+            if(node.getObject() == layer) {
+                itemListWidget.list.getSelection().set(node);
+                break;
+            }
+        }
+
+        setLayerSelected(layer);
+    }
+
+    public void setLayerSelected(TalosLayer layer) {
+        selectedLayer = layer;
+        TalosLayerSelectEvent talosLayerSelectEvent = Notifications.obtainEvent(TalosLayerSelectEvent.class);
+        talosLayerSelectEvent.layer = selectedLayer;
+        Notifications.fireEvent(talosLayerSelectEvent);
+        talosLayerPropertiesWidget.updateWidget(layer);
+        talosLayerPropertiesWidget.toggleHide(false);
     }
 }

@@ -51,6 +51,7 @@ public class SceneEditorAddon implements IAddon {
 
     //Split pane responsible for directory view and (viewportwidget + hierarchy view)
     public VisSplitPane verticalSplitPane;
+    public Table rightMidContainer;
 
     @Override
     public void init () {
@@ -153,10 +154,16 @@ public class SceneEditorAddon implements IAddon {
         Table midPart = new Table();
         bottomTable = new Table();
 
+        Table superMidTable = new Table();
+
         workspaceContainer = new Table();
         VisSplitPane horizontalPane = new VisSplitPane(leftPart, propertyPanel, false);
         this.verticalSplitPane = new VisSplitPane(midPart, bottomTable, true);
-        VisSplitPane midPane = new VisSplitPane(hierarchy, workspaceContainer, false);
+        VisSplitPane midPane = new VisSplitPane(hierarchy, superMidTable, false);
+
+        superMidTable.add(workspaceContainer).grow();
+        rightMidContainer = new Table();
+        superMidTable.add(rightMidContainer).growY();
 
         createBottomTabs();
 

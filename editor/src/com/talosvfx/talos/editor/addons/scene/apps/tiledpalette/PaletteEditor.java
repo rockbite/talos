@@ -69,7 +69,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		paletteEditorWorkspace = new PaletteEditorWorkspace(this);
 		modeToggle = new ModeToggle();
 
-		this.content.add(paletteEditorWorkspace).minSize(336, 696).grow().row();
+		this.content.add(paletteEditorWorkspace).minSize(336, 400).grow().row();
 		this.content.add(modeToggle).growX().height(32);
 
 		Table toolbarContainer = new Table();

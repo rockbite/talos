@@ -247,7 +247,7 @@ public class AssetImporter {
         } else if(fileHandle.extension().equals("ttp")) {
             GameAsset<TilePaletteData> paletteData = (GameAsset<TilePaletteData>) AssetRepository.getInstance().getAssetForPath(fileHandle, true);
             if (paletteData != null) {
-                SceneEditorAddon.get().openApp(new PaletteEditor(paletteData), AEditorApp.AppOpenStrategy.WINDOW);
+                SceneEditorAddon.get().openApp(new PaletteEditor(paletteData), AEditorApp.AppOpenStrategy.RIGHT_TAB);
             } else {
                 System.out.println("Palette Asset not located");
             }

@@ -11,6 +11,10 @@ import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class MapEditorToolbar extends Table {
 
+	public SquareButton paint;
+	public SquareButton spray;
+	public SquareButton erase;
+
 	public MapEditorToolbar (Skin skin) {
 		super(skin);
 
@@ -40,9 +44,9 @@ public class MapEditorToolbar extends Table {
 
 		toolbar.setBackground(getSkin().newDrawable("button-main-menu"));
 
-		SquareButton paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"), true, "Paintbrush");
-		SquareButton spray = new SquareButton(getSkin(), getSkin().getDrawable("spray_icon"), true, "Spray");
-		SquareButton erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
+		paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"), true, "Paintbrush");
+		spray = new SquareButton(getSkin(), getSkin().getDrawable("spray_icon"), true, "Spray");
+		erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
 
 		ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
 		buttonButtonGroup.setMaxCheckCount(1);
@@ -63,18 +67,7 @@ public class MapEditorToolbar extends Table {
 
 				super.clicked(event, x, y);
 
-				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
-
-				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
-
-				//Lock gizmos and also lock seleection
-				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
-					SceneEditorWorkspace.getInstance().lockGizmos();
-				} else {
-					SceneEditorWorkspace.getInstance().unlockGizmos();
-				}
+				enablePaintMode();
 			}
 		});
 
@@ -139,5 +132,21 @@ public class MapEditorToolbar extends Table {
 
 		//Add the buttons
 
+	}
+
+	public void enablePaintMode() {
+		paint.setChecked(true);
+		SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+		SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
+
+		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
+
+		//Lock gizmos and also lock seleection
+		if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
+			SceneEditorWorkspace.getInstance().lockGizmos();
+		} else {
+			SceneEditorWorkspace.getInstance().unlockGizmos();
+		}
 	}
 }
