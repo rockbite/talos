@@ -32,6 +32,8 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
+		if(!gameObject.isEditorVisible()) return;
+
 		rectPatch.scale(1f / prevScale, 1f / prevScale);
 		rectPatch.scale(worldPerPixel, worldPerPixel);
 		prevScale = worldPerPixel;
