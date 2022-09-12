@@ -128,8 +128,10 @@ public class TileDataComponent extends AComponent implements Json.Serializable {
     public void translateToWorldPosition (Vector2 worldFromLocal) {
         GridPosition bottomLeftParentTile = getBottomLeftParentTile();
 
-        int newX = MathUtils.floor(worldFromLocal.x/1) * 1;
-        int newY = MathUtils.floor(worldFromLocal.y/1) * 1; //todo implement tile size
+        int newX = MathUtils.floor((worldFromLocal.x + 0.5f)/1) * 1;
+        int newY = MathUtils.floor((worldFromLocal.y + 0.5f)/1) * 1; //todo implement tile size
+
+        System.out.println(worldFromLocal.x);
 
         if (bottomLeftParentTile.x != newX || bottomLeftParentTile.y != newY) {
             int deltaX = newX - bottomLeftParentTile.getIntX();

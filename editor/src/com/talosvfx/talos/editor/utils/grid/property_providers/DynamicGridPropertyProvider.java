@@ -21,8 +21,7 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
     Color backgroundColor = Color.BROWN;
 
     private Array<GridLine> gridLines = new Array<>();
-
-    public boolean highlightZero = true;
+    private boolean highlightZero = true;
 
     @Override
     public Array<GridLine> getGridLines () {
@@ -100,6 +99,11 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
     }
 
     @Override
+    public boolean shouldHighlightZero() {
+        return highlightZero;
+    }
+
+    @Override
     public void update (OrthographicCamera camera, float parentAlpha) {
         gridLines.clear();
 
@@ -144,8 +148,8 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         zeroColor.set(Color.CYAN);
         zeroColor.a = zeroAlpha;
 
-        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), highlightZero ? zeroColor : gridMainLineColor, thickness));
-        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), highlightZero ? zeroColor : gridMainLineColor, thickness));
+        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
+        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
 
         gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
 
@@ -216,5 +220,9 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         }
 
         return unit;
+    }
+
+    public void hideZero() {
+        highlightZero = false;
     }
 }

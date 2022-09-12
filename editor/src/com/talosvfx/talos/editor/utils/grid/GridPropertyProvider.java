@@ -43,6 +43,8 @@ public interface GridPropertyProvider {
     void setHighlightCursorHover (boolean shouldHighlight);
     void setHighlightCursorSelect (boolean shouldHighlight);
 
+    boolean shouldHighlightZero();
+
 }
 
 

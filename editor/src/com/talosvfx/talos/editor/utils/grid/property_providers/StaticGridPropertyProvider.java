@@ -31,6 +31,7 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
     protected float endY;
 
     protected OrthographicCamera camera;
+    private boolean highlightZero = true;
 
     @Override
     public void update (OrthographicCamera camera, float alpha) {
@@ -73,12 +74,12 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
 
 
         for (float x = startX; x < startX + totalWidth; x += gridSizeX) {
-            gridLines.add(new GridLine(new Vector2(x, bottomSide), new Vector2(x, bottomSide + totalHeight), x == 0 ? zeroColor : color, thickness));
+            gridLines.add(new GridLine(new Vector2(x, bottomSide), new Vector2(x, bottomSide + totalHeight), (x == 0 && shouldHighlightZero()) ? zeroColor : color, thickness));
             endX = x;
         }
 
         for (float y = startY; y < startY + totalHeight; y += gridSizeY) {
-            gridLines.add(new GridLine(new Vector2(leftSide, y), new Vector2(leftSide + totalWidth, y), y == 0 ? zeroColor : color, thickness));
+            gridLines.add(new GridLine(new Vector2(leftSide, y), new Vector2(leftSide + totalWidth, y), (y == 0 && shouldHighlightZero()) ? zeroColor : color, thickness));
             endY = y;
         }
 
@@ -215,4 +216,16 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
         this.shouldHighlightCursorSelect = shouldHighlight;
     }
 
+    @Override
+    public boolean shouldHighlightZero() {
+        return highlightZero;
+    }
+
+    public void hideZero() {
+        highlightZero = false;
+    }
+
+    public void showZero() {
+        highlightZero = true;
+    }
 }

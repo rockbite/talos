@@ -225,10 +225,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                if (canMoveAround()) {
-                    return;
-                }
-
                 if (paletteEditor.isParentTileEditMode() || paletteEditor.isFakeHeightEditMode()) {
                     return;
                 }
@@ -977,6 +973,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
     }
 
+    @Override
+    protected boolean canMoveAround () {
+        if(entityUnderMouse != null) return false;
+        return isInViewPort || isDragging;
+    }
+
     private boolean isPointOverGameObject (Vector2 worldPos, GameObject gameObject) {
         if (gameObject instanceof TileGameObjectProxy) {
             return ((TileGameObjectProxy)gameObject).containsPoint(worldPos);
@@ -1123,6 +1125,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     @Override
     public void initializeGridPropertyProvider () {
         gridPropertyProvider = new StaticGridPropertyProvider();
+        ((StaticGridPropertyProvider)gridPropertyProvider).hideZero();
         gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
     }
 

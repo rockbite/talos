@@ -31,7 +31,7 @@ public class GridRendererWrapper extends Actor {
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.distanceThatLinesShouldBe = pixelToWorld(150f);
         gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
-        gridPropertyProvider.highlightZero = false;
+        gridPropertyProvider.hideZero();
         gridRenderer = new GridRenderer(gridPropertyProvider, null);
     }
 
