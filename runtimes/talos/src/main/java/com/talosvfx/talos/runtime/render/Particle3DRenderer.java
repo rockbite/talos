@@ -26,9 +26,9 @@ public class Particle3DRenderer implements ParticleRenderer {
 	@Getter
 	private Simple3DBatch batch;
 
-	private PerspectiveCamera worldCamera;
+	private Camera worldCamera;
 
-	public Particle3DRenderer (PerspectiveCamera worldCamera) {
+	public Particle3DRenderer (Camera worldCamera) {
 		this.worldCamera = worldCamera;
 		batch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
 
