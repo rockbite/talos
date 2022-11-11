@@ -7,6 +7,10 @@ plugins {
 dependencies {
     api project(":runtimes:talos")
     implementation libs.slf4j.api
+
+    testImplementation libs.bongo.desktop
+    testImplementation  libs.visui
+
 }
 
 task packageSources(type: Jar, dependsOn: [classes, jar]) {

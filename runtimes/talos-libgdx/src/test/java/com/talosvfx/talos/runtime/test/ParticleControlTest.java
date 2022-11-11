@@ -35,10 +35,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
 import com.talosvfx.talos.runtime.test.utils.CameraController;
-import com.talosvfx.talos.runtime.test.utils.TestAssetProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
@@ -61,9 +62,11 @@ public class ParticleControlTest extends ApplicationAdapter {
 	public void create () {
 
 		orthographicCamera = new OrthographicCamera();
-		float width = 2000f;
+		float width = 20;
 		float aspect = (float)Gdx.graphics.getWidth()/(float)Gdx.graphics.getHeight();
 		orthographicCamera.setToOrtho(false, width, width / aspect);
+		orthographicCamera.position.set(0, 0, 0);
+		orthographicCamera.update();
 		shapeRenderer = new ShapeRenderer();
 
 		batch = new PolygonSpriteBatch();
@@ -72,12 +75,15 @@ public class ParticleControlTest extends ApplicationAdapter {
 
 		cameraController = new CameraController(orthographicCamera);
 
-		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
 
 		TextureAtlas atlas = new TextureAtlas();
 		atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
-		descriptor.setAssetProvider(new TestAssetProvider(atlas));
-		descriptor.load(Gdx.files.internal("test.p"));
+		atlas.addRegion("spot", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("spot.png")))));
+
+
+		AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(atlas);
+		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), atlasAssetProvider);
+
 
 		particleEffectInstance = descriptor.createEffectInstance();
 
@@ -171,6 +177,11 @@ public class ParticleControlTest extends ApplicationAdapter {
 		stage.draw();
 	}
 
+	@Override
+	public void resize (int width, int height) {
+		super.resize(width, height);
+		stage.getViewport().update(width, height);
+	}
 
 	public static void main (String[] args) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();

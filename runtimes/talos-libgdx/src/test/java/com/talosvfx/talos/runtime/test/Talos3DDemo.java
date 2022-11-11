@@ -19,6 +19,7 @@ import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
 import com.talosvfx.talos.runtime.render.Particle3DRenderer;
 import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 
@@ -56,10 +57,12 @@ public class Talos3DDemo extends ApplicationAdapter {
 		textureAtlas.addRegion("fire", fireRegion);
 		textureAtlas.addRegion("spot", spotRegion);
 
+		AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(textureAtlas);
+
 		/**
 		 * Creating particle effect instance from particle effect descriptor
 		 */
-		ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), textureAtlas);
+		ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), atlasAssetProvider);
 		effect = effectDescriptor.createEffectInstance();
 
 		defaultRenderer = new Particle3DRenderer(camera);

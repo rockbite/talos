@@ -35,7 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.talosvfx.talos.runtime.test.utils.TestAssetProvider;
+import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ScopePayload;
@@ -121,7 +121,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
 		public TalosActor (FileHandle effect, TextureAtlas atlas, ParticleRenderer renderer) {
 			this.renderer = renderer;
-			particleEffectDescriptor.setAssetProvider(new TestAssetProvider(atlas));
+			particleEffectDescriptor.setAssetProvider(new AtlasAssetProvider(atlas));
 			particleEffectDescriptor.load(effect);
 			particleEffect = particleEffectDescriptor.createEffectInstance();
 			particleEffect.setScope(scope);
