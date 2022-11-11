@@ -16,11 +16,14 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.rockbite.bongo.engine.systems.CameraControllerSystem;
 import com.rockbite.bongo.engine.systems.render.EngineDebugSystem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareLabelButton;
@@ -30,6 +33,7 @@ public class PreviewImageControllerWidget extends Table {
 	CheckBox gridCheckBox;
 	CheckBox backgroundCheckBox;
 	CheckBox axisCheckbox;
+	CheckBox yUpCheckbox;
 	TextField imageSizeField;
 	TextField backgroundSizeField;
 	ImageButton removeBackgroundButton;
@@ -90,7 +94,7 @@ public class PreviewImageControllerWidget extends Table {
 		row();
 		axisCheckbox = new CheckBox("axis", skin);
 		axisCheckbox.setChecked(false);
-		add(axisCheckbox).colspan(3).left();
+		add(axisCheckbox).left();
 
 		axisCheckbox.addListener(new ChangeListener() {
 			@Override
@@ -101,6 +105,47 @@ public class PreviewImageControllerWidget extends Table {
 					system.setDrawAxis(true);
 				} else {
 					system.setDrawAxis(false);
+				}
+			}
+		});
+
+
+		yUpCheckbox = new CheckBox("+Z Up", skin);
+		yUpCheckbox.setChecked(false);
+		add(yUpCheckbox).colspan(2).left();
+
+		yUpCheckbox.addListener(new ChangeListener() {
+			boolean state = false;
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				final BongoPreview bongoPreview = TalosMain.Instance().UIStage().getInnerTertiumActor().getBongoPreview();
+				Camera worldCamera = bongoPreview.getWorldCamera();
+
+				state = !state;
+				if (state) {
+					worldCamera.up.set(0, 0, 1);
+
+					worldCamera.position.set(8, -5, 8);
+					worldCamera.lookAt(0, 2, 0);
+					worldCamera.near = 0.1f;
+					worldCamera.far = 100f;
+
+					worldCamera.update();
+
+					bongoPreview.getWorld().getSystem(CameraControllerSystem.class).setYUp(false);
+
+				} else {
+					worldCamera.up.set(0, 1, 0);
+
+					worldCamera.position.set(8, 5, 8);
+					worldCamera.lookAt(0, 2, 0);
+					worldCamera.near = 0.1f;
+					worldCamera.far = 100f;
+
+					worldCamera.update();
+
+					bongoPreview.getWorld().getSystem(CameraControllerSystem.class).setYUp(true);
+
 				}
 			}
 		});

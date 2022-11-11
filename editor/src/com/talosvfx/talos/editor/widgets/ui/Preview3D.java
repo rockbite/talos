@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
@@ -85,9 +86,9 @@ public class Preview3D extends PreviewWidget {
         worldCamera.far = 100f;
         worldCamera.update();
 
-        cameraInputController = new CameraInputController(worldCamera);
-        if (cameraInputController instanceof CameraInputController) {
-            ((CameraInputController)cameraInputController).translateTarget = false;
+        cameraInputController = new BongoCameraController(worldCamera);
+        if (cameraInputController instanceof BongoCameraController) {
+            ((BongoCameraController)cameraInputController).translateTarget = false;
         }
 
         bongoPreview.setCameraController(cameraInputController);
@@ -208,7 +209,7 @@ public class Preview3D extends PreviewWidget {
 
 
         if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
-            ((CameraInputController)cameraInputController).update();
+            ((BongoCameraController)cameraInputController).update();
         }
     }
 

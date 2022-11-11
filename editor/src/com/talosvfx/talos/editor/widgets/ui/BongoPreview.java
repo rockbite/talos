@@ -26,7 +26,7 @@ import com.rockbite.bongo.engine.systems.assets.AssetSystem;
 import com.rockbite.bongo.engine.systems.render.DepthPassSystem;
 import com.rockbite.bongo.engine.systems.render.EngineDebugSystem;
 import com.rockbite.bongo.engine.systems.render.EnvironmentConfigSystem;
-import com.rockbite.bongo.engine.systems.render.ShadedPassSystem;
+import com.rockbite.bongo.engine.systems.render.PBRShadedPassSystem;
 import com.rockbite.bongo.engine.systems.render.ShadowPassSystem;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -53,7 +53,7 @@ public class BongoPreview {
 			//RENDER
 			new DepthPassSystem().setContextStartEnd(true, false),
 			new ShadowPassSystem(),
-			new ShadedPassSystem().setContextStartEnd(false, true),
+			new PBRShadedPassSystem().setContextStartEnd(false, true),
 
 			new ParticleRenderPassSystem(),
 

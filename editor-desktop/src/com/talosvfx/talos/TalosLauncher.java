@@ -37,7 +37,7 @@ public class TalosLauncher {
 		config.setTitle("Talos");
 		config.useVsync(true);
 		config.setHdpiMode(HdpiMode.Pixels);
-		config.setBackBufferConfig(1,1,1,1,8,8, 16);
+		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
 		TalosMain talos = new TalosMain() {
