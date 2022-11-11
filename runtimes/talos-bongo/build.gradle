@@ -30,6 +30,13 @@ configurations {
 
 
 publishing {
+    repositories {
+        maven {
+            name = "snapshot"
+            url = getSnapshotRepositoryUrl()
+            credentials(org.gradle.api.credentials.PasswordCredentials)
+        }
+    }
     publications {
         mavenJava(MavenPublication) {
             from components.java
