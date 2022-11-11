@@ -4,7 +4,7 @@ on:
     branches:
       - talos-3d
 jobs:
-  Build-Web:
+  Build-Desktop-And-Snapshot:
     runs-on: ubuntu-latest
     env:
       ORG_GRADLE_PROJECT_GITHUB_USERNAME: ${{ github.actor }}

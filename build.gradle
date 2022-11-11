@@ -16,19 +16,12 @@ allprojects {
 
         getReleaseRepositoryUrl = {
             return project.hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-                    : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    : "https://oss.sonatype.org/content/repositories/releases"
         }
 
         getSnapshotRepositoryUrl = {
             return project.hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-                    : "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-        }
-        getRepositoryUsername = {
-            return project.hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
-        }
-
-        getRepositoryPassword = {
-            return project.hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+                    : "https://oss.sonatype.org/content/repositories/snapshots"
         }
     }
 
