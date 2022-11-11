@@ -126,8 +126,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
 			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
 
-			final Texture texture = textureRegion.getTexture();
-			texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
 		}
 	}
@@ -139,7 +137,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
 
 			final Texture texture = textureRegion.getTexture();
-			texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
 			batch.draw(texture, verts, 0, vertCount, tris, 0, triCount);
 		}

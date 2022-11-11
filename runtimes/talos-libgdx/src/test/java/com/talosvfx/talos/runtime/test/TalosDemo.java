@@ -50,16 +50,17 @@ public class TalosDemo extends ApplicationAdapter {
          * Prepare the texture atlas.
          * Normally just load Texture Atlas,  but for the sake of demo this will be creating fake atlas from just one texture.
          */
-        TextureRegion textureRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
-        TextureAtlas textureAtlas = new TextureAtlas();
-        textureAtlas.addRegion("fire", textureRegion);
+        TextureAtlas atlas = new TextureAtlas();
+        atlas.addRegion("fire", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("fire.png")))));
+        atlas.addRegion("spot", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("spot.png")))));
 
-        AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(textureAtlas);
+
+        AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(atlas);
 
         /**
          * Creating particle effect instance from particle effect descriptor
          */
-        ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("fire.p"), atlasAssetProvider);
+        ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), atlasAssetProvider);
         effect = effectDescriptor.createEffectInstance();
 
         defaultRenderer = new SpriteBatchParticleRenderer(viewport.getCamera());

@@ -28,10 +28,13 @@ public class Particle3DRenderer implements ParticleRenderer {
 
 	private Camera worldCamera;
 
-	public Particle3DRenderer (Camera worldCamera) {
+	public Particle3DRenderer (Camera worldCamera, Simple3DBatch simple3DBatch) {
 		this.worldCamera = worldCamera;
-		batch = new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0)));
+		this.batch = simple3DBatch;
+	}
 
+	public Particle3DRenderer (Camera worldCamera) {
+		this(worldCamera, new Simple3DBatch(4000, new VertexAttributes(VertexAttribute.Position(), VertexAttribute.ColorPacked(), VertexAttribute.TexCoords(0))));
 	}
 
 	@Override
