@@ -7,7 +7,7 @@ plugins {
 dependencies {
 
     api libs.bongo.engine
-    api libs.bongo.talos
+    api project(":runtimes:talos-bongo")
 
     api libs.visui
 

@@ -1,57 +1,42 @@
 plugins {
-    id "maven-publish"
+    id 'java-library'
+    id 'maven-publish'
+    alias(libs.plugins.lombok)
 }
 
 dependencies {
-    api libs.bongo.talos
-
-    testImplementation libs.bongo.desktop
-    testImplementation libs.visui
+    api project(":runtimes:talos")
+    implementation libs.slf4j.api
 }
 
-sourceSets.main.java.srcDirs = ["src/"]
-sourceSets.test.java.srcDirs = ["test/"]
+task packageSources(type: Jar, dependsOn: [classes, jar]) {
+    from delombok
+    from sourceSets.main.resources.srcDirs
+    archiveClassifier = 'web'
+}
+
+artifacts {
+    api(jar, packageSources)
+}
+
+configurations {
+    web {
+        canBeConsumed true
+        canBeResolved false
+        extendsFrom implementation, runtimeOnly
+    }
+}
+
 
 
 publishing {
-    repositories {
-        maven {
-            def repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-            url = isReleaseBuild ? repositoryUrl : snapshotRepositoryUrl
-        }
-    }
     publications {
-        maven(MavenPublication) {
-            artifactId = 'talos-libgdx'
+        mavenJava(MavenPublication) {
             from components.java
-            pom {
-                name = "Talos Libgdx Runtime"
-                description = "Talos runtime for use in LibGDX projects"
-                url = "https://github.com/rockbite/talos"
-                licenses {
-                    license {
-                        name = "The Apache Software License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "Tom-Ski"
-                        name = "Tom Wojciechowski"
-                        email = "tom@asidik.com"
-                    }
-                    developer {
-                        id = "azakhary"
-                        name = "Avetis Zakharyan"
-                    }
-                    scm {
-                        url = "https://github.com/rockbite/talos"
-                        connection = "scm:https://rockbite@github.com/rockbite/talos.git"
-                        developerConnection = "scm:git://github.com/rockbite/talos.git"
-                    }
-                }
-            }
+            artifact packageSources
+            groupId project.group
+            artifactId project.name
+            version project.version
         }
     }
 }

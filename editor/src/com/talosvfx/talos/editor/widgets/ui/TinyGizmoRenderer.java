@@ -15,13 +15,17 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.IntIntMap;
+import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.render.Render;
 
 import java.nio.FloatBuffer;
@@ -160,8 +164,16 @@ public class TinyGizmoRenderer {
 		float h = vec2.y - vec.y;
 
 		temp.set(Gdx.input.getX(), Gdx.input.getY());
+//		preview3D.screenToLocalCoordinates(temp);
 
-		final Ray pickRay = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
+		final Ray pickRay = camera.getPickRay(temp.x, temp.y,
+			RenderPassSystem.glViewport.x,
+			RenderPassSystem.glViewport.y,
+			RenderPassSystem.glViewport.width,
+			RenderPassSystem.glViewport.height
+		);
+
+
 
 		tinyGizmo.updateWindow(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		tinyGizmo.updateRay(pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
@@ -276,14 +288,15 @@ public class TinyGizmoRenderer {
 		shaderProgram.setUniformMatrix("u_projTrans", camera.combined);
 		mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
-//		Plane plane = new Plane(Vector3.Y, new Vector3(0, 0, 0));
+//		Plane plane = new Plane(new Vector3(0, 1, 0), 0f);
 //		Vector3 out = new Vector3();
 //		Intersector.intersectRayPlane(pickRay, plane, out);
 //
 //		shapeRenderer.setProjectionMatrix(camera.combined);
 //		shapeRenderer.setColor(Color.PINK);
 //		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-////		shapeRenderer.line(0, 0, 0, pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
+//		shapeRenderer.line(0, 3, 0, pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
+//		shapeRenderer.setColor(Color.YELLOW);
 //		shapeRenderer.line(0, 0, 0, out.x, out.y, out.z);
 //
 //		shapeRenderer.end();

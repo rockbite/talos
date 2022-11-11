@@ -82,6 +82,8 @@ Thumbs.db
 build/
 editor/build
 runtimes/build/
+/runtimes/talos/out/
+/runtimes/talos-bongo/out/
 /runtimes/talos-libgdx/out/
 editor/deploy/out-win/
 editor/deploy/*.zip

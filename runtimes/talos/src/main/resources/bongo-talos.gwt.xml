@@ -1,0 +1,19 @@
+
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
+<module>
+    <source path='com/talosvfx/'>
+
+    </source>
+
+    <extend-configuration-property name="artemis.reflect.include" value="com.talosvfx.talos.runtime.systems.render" />
+    <extend-configuration-property name="artemis.reflect.include" value="com.talosvfx.talos.runtime.components" />
+
+
+    <extend-configuration-property name="gdx.files.classpath" value="shaders/gl2/core/particle.frag.glsl" />
+    <extend-configuration-property name="gdx.files.classpath" value="shaders/gl2/core/particle.vert.glsl" />
+
+    <extend-configuration-property name="gdx.files.classpath" value="shaders/gl3/core/particle.frag.glsl" />
+    <extend-configuration-property name="gdx.files.classpath" value="shaders/gl3/core/particle.vert.glsl" />
+
+
+</module>

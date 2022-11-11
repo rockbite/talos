@@ -1,0 +1,42 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    alias(libs.plugins.lombok)
+}
+
+dependencies {
+    api libs.bongo.engine
+    api project(":runtimes:talos")
+}
+
+task packageSources(type: Jar, dependsOn: [classes, jar]) {
+    from delombok
+    from sourceSets.main.resources.srcDirs
+    archiveClassifier = 'web'
+}
+
+artifacts {
+    api(jar, packageSources)
+}
+
+configurations {
+    web {
+        canBeConsumed true
+        canBeResolved false
+        extendsFrom implementation, runtimeOnly
+    }
+}
+
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact packageSources
+            groupId project.group
+            artifactId project.name
+            version project.version
+        }
+    }
+}

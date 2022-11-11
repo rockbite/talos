@@ -6,6 +6,9 @@ dependencies {
 
     implementation libs.logback.core
     implementation libs.logback.classic
+
+    implementation variantOf(libs.tiny.gizmo) { classifier("natives-desktop") }
+
 }
 
 sourceSets.main.java.srcDirs = [ "src/" ]

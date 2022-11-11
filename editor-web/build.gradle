@@ -3,6 +3,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
     }
@@ -22,16 +23,20 @@ dependencies {
     implementation project(path: ":editor")
     implementation project(path: ":editor", configuration: "web")
 
-    api variantOf(libs.bongo.engine) { classifier("web") }
-    api variantOf(libs.bongo.talos) { classifier("web") }
+    api project(path: ":runtimes:talos-libgdx")
+    api project(path: ":runtimes:talos-libgdx", configuration: "web")
+    api project(path: ":runtimes:talos")
+    api project(path: ":runtimes:talos", configuration: "web")
+
     api libs.bongo.web
     api variantOf(libs.bongo.web) { classifier("web") }
+    api variantOf(libs.bongo.engine) { classifier("web") }
 
     implementation variantOf(libs.spine.libgdx) { classifier("sources") }
     implementation variantOf(libs.snakeyaml) { classifier("sources") }
     implementation variantOf(libs.visui) { classifier("sources") }
     implementation variantOf(libs.string.similarity) { classifier("sources") }
-//    implementation variantOf(libs.tiny.gizmo) { classifier("sources") }
+    implementation variantOf(libs.tiny.gizmo) { classifier("sources") }
 }
 
 gwt {
