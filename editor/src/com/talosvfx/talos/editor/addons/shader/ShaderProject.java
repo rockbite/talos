@@ -88,6 +88,9 @@ public class ShaderProject implements IProject {
 
         @Override
         public void write (Json json) {
+            if (projectMetadata == null) {
+                projectMetadata = new ProjectMetadata();
+            }
             projectMetadata.version = TalosVersion.getVersion();
             json.writeValue("metadata", projectMetadata);
             json.writeValue("nodes", nodeStage);
