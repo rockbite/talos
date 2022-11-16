@@ -79,7 +79,7 @@ public class Talos3DDemo extends ApplicationAdapter {
 	@Override
 	public void render () {
 		//update
-		float delta = Gdx.graphics.getDeltaTime();
+		float delta = Math.min(Gdx.graphics.getDeltaTime(), 1/30f);
 		effect.update(delta);
 
 		firstPersonCameraController.update(Gdx.graphics.getDeltaTime());

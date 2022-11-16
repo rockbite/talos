@@ -28,7 +28,6 @@ public abstract class ParticlePointDataGeneratorModule extends AbstractModule {
 		for (ParticlePointGroup group : pointData) {
 			particlePointDataPool.freeAll(group.pointDataArray);
 			group.pointDataArray.clear();
-			particlePointDataPool.clear();
 
 			groupPool.free(group);
 		}
