@@ -94,7 +94,6 @@ public class ParticleEffectDescriptor {
 					emitterDescriptor.drawableModule = (DrawableModule)module;
 				}
 				idMap.put(module.getIndex(), module);
-				System.out.println(module.getIndex() + " " + module);
 				emitterDescriptor.modules.add(module); // I cannot understand how this was working before. This is needed so that it can later reset requesters.
 
 			}
