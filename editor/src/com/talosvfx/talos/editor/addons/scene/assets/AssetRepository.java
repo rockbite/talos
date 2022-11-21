@@ -213,7 +213,7 @@ public class AssetRepository implements Notifications.Observer {
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
 		checkGameAssetCreation(GameAssetType.SCRIPT);
-		checkGameAssetCreation(GameAssetType.TWEEN);
+		checkGameAssetCreation(GameAssetType.ROUTINE);
 		checkGameAssetCreation(GameAssetType.ATLAS);
 		checkGameAssetCreation(GameAssetType.SOUND);
 
@@ -705,10 +705,10 @@ public class AssetRepository implements Notifications.Observer {
 				}
 
 				break;
-			case TWEEN:
+			case ROUTINE:
 				GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 				gameAssetOut = tweenGameAsset;
-				tweenGameAsset.setResourcePayload("Dummy");
+				tweenGameAsset.setResourcePayload(value.handle.readString());
 
 				if (createLinks) {
 					value.gameAssetReferences.add(tweenGameAsset);

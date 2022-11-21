@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -202,15 +203,26 @@ public class SEPropertyPanel extends PropertyPanel{
             scripts.setSelectable(false);
             tree.add(scripts);
 
+            // don't hardcode this
+            FilteredTree.Node<Object> customRenderers = new FilteredTree.Node<>("routinerenderers", new Label("Routine Renderers", getSkin()));
+            customRenderers.setSelectable(false);
+            tree.add(customRenderers);
+
             Label createScriptLabel = new Label("Create Script > ", getSkin());
             createScriptLabel.setColor(0.6f, 0.9f, 0.9f, 1f);
             FilteredTree.Node<Object> newScript = new FilteredTree.Node<>("createscript", createScriptLabel);
             scripts.add(newScript);
 
 
+            Label createRRLabel = new Label("New Renderer > ", getSkin());
+            createRRLabel.setColor(0.6f, 0.9f, 0.9f, 1f);
+            FilteredTree.Node<Object> newRR = new FilteredTree.Node<>("createRR", createRRLabel);
+            customRenderers.add(newRR);
+
             String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
             FileHandle rootHandle = Gdx.files.absolute(rootPath);
             collectAssets(GameAssetType.SCRIPT, rootHandle, scripts);
+            collectAssets(GameAssetType.ROUTINE, rootHandle, customRenderers);
 
             setToTree();
 
@@ -311,6 +323,20 @@ public class SEPropertyPanel extends PropertyPanel{
                             remove();
                             return;
                         }
+                        if (gameAsset.type == GameAssetType.ROUTINE) {
+                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                            routineRendererComponent.setGameAsset((GameAsset<String>)gameAsset);
+                            gameObject.addComponent(routineRendererComponent);
+
+                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+                            projectExplorer.reload();
+
+                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+
+                            remove();
+                            return;
+                        }
 
                     } else {
 
@@ -355,6 +381,39 @@ public class SEPropertyPanel extends PropertyPanel{
                             return;
                         }
                         //Check all the cases we might otherwise have
+
+                        if(name.equals("createRR")) {
+
+                            setToNameAndCreate("RR Name", "Use characters [a-Z] only", "[a-zA-Z]*", new Consumer<String>() {
+                                @Override
+                                public void accept(String newFileName) {
+                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
+
+                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "rw");
+                                    newDestination.writeString("", false);
+
+                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
+
+                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
+
+                                    if (assetForPath != null) {
+                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
+                                        gameObject.addComponent(routineRendererComponent);
+
+                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+                                        projectExplorer.reload();
+
+                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+                                    }
+
+                                    remove();
+                                }
+                            });
+
+                            return;
+                        }
                     }
                     remove();
                 }

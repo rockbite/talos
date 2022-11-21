@@ -10,7 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineEditor;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -251,10 +251,10 @@ public class AssetImporter {
             } else {
                 System.out.println("Palette Asset not located");
             }
-        } else if(fileHandle.extension().equals("tw")) {
-            TweenEditor editorApp = new TweenEditor(fileHandle);
+        } else if(fileHandle.extension().equals("rw")) {
+            RoutineEditor editorApp = new RoutineEditor(fileHandle);
             SceneEditorAddon.get().openApp(editorApp, AEditorApp.AppOpenStrategy.BOTTOM_TAB);
-            SceneEditorAddon.get().tweenEditor = editorApp;
+            SceneEditorAddon.get().routineEditor = editorApp;
             return;
         } else {
             FileOpener.open(fileHandle.file());

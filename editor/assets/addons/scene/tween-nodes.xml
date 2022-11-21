@@ -1,13 +1,22 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
     <category name="main" title="Main">
-        <module name = "TweenNode" title = "Tween" keywords = "tween, system">
-            <value port="input" name="startSignal" type="signal">play</value>
+        <module name = "RoutineNode" title = "Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
             <value port="output" name="startSignal" type="signal">start</value>
         </module>
-        <module name = "MoveByNode" title = "Move By" keywords = "movement">
+        <module name = "RenderRoutineNode" title = "Render Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
+            <inputText name="id" default="main">ID</inputText>
+            <group>
+                <value port="output" name="renderSignal" type="signal">next</value>
+                <value port="output" name="viewportPos" type="vec2">viewport pos</value>
+                <value port="output" name="viewportSize" type="vec2">viewport size</value>
+            </group>
+        </module>
+        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
@@ -18,13 +27,13 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name = "DelayNode" title = "Delay" keywords = "tween">
+        <module name = "DelayNode" title = "Delay" keywords = "tween" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name = "StaggerNode" title = "Stagger" keywords = "tween">
+        <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
                 <option value = "YPOS">Y Position</option>
@@ -40,10 +49,33 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
-        <module name = "NumberNode" title = "Number" keywords = "">
+        <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
             <dynamicValue port="output" name="value" type="float" min="-1000" max="1000">Value: </dynamicValue>
         </module>
-        <module name = "OneMinusNode" title = "One Minus" keywords = "">
+        <module name = "NumberNode" title = "Loop" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="from" type="int" default="1">from</dynamicValue>
+                <dynamicValue port="input" name="to" type="int" default="10">to</dynamicValue>
+                <dynamicValue port="input" name="step" type="int" default="1">step</dynamicValue>
+            </group>
+            <group>
+                <value port="output" name="index" type="int">index</value>
+                <value port="output" name="body" type="signal">body</value>
+                <value port="output" name="onComplete" type="signal">onComplete</value>
+            </group>
+        </module>
+        <module name = "RenderQuadNode" title = "Render Quad" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+                <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
+            </group>
+        </module>
+        <module name = "OneMinusNode" title = "One Minus" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="input" type="float">input</value>
             <value port="output" name="output" type="float">output</value>
         </module>

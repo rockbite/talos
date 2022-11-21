@@ -7,18 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonWriter;
-import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.TalosMain;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractTweenNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericRoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
-import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
@@ -27,27 +22,33 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 
-public class TweenStage extends DynamicNodeStage {
+public class RoutineStage extends DynamicNodeStage {
 
-    public final TweenEditor tweenEditor;
+    public final RoutineEditor routineEditor;
+
+    public RoutineConfigMap routineConfigMap;
 
     private Vector2 tmp = new Vector2();
 
     private float timeScale = 1f;
 
-    public TweenStage(TweenEditor tweenEditor, Skin skin) {
+    private RoutineInstance routineInstance; // runtime
+
+    public RoutineStage(RoutineEditor routineEditor, Skin skin) {
         super(skin);
-        this.tweenEditor = tweenEditor;
+        this.routineEditor = routineEditor;
 
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.S && TalosInputProcessor.ctrlPressed()) {
-                    writeData(tweenEditor.targetFileHandle);
+                    writeData(routineEditor.targetFileHandle);
                 }
                 return super.keyDown(event, keycode);
             }
         });
+
+        routineInstance = new RoutineInstance();
     }
 
     public void writeData(FileHandle target) {
@@ -55,6 +56,18 @@ public class TweenStage extends DynamicNodeStage {
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(this);
         target.writeString(data, false);
+    }
+
+    public void loadFrom(FileHandle targetFileHandle) {
+        Json json = new Json();
+        JsonReader jsonReader = new JsonReader();
+        read(json, jsonReader.parse(targetFileHandle));
+        routineInstance.loadFrom(targetFileHandle.readString(), routineConfigMap);
+    }
+
+    @Override
+    public void read(Json json, JsonValue root) {
+        super.read(json, root);
     }
 
     @Override
@@ -110,8 +123,8 @@ public class TweenStage extends DynamicNodeStage {
     public void playInitiated() {
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for(NodeWidget node : nodes) {
-            if (node instanceof AbstractTweenNode) {
-                AbstractTweenNode tweenNode = (AbstractTweenNode) node;
+            if (node instanceof AbstractRoutineNode) {
+                AbstractRoutineNode tweenNode = (AbstractRoutineNode) node;
 
                 tweenNode.reset();
             }
@@ -136,8 +149,8 @@ public class TweenStage extends DynamicNodeStage {
         boolean isRunning = false;
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for(NodeWidget node : nodes) {
-            if (node instanceof AbstractGenericTweenNode) {
-                AbstractGenericTweenNode tweenNode = (AbstractGenericTweenNode) node;
+            if (node instanceof AbstractGenericRoutineNode) {
+                AbstractGenericRoutineNode tweenNode = (AbstractGenericRoutineNode) node;
 
                 if(tweenNode.isRunning()) {
                     isRunning = true;

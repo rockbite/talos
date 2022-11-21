@@ -2,18 +2,18 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.TweenNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineNode;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
 
-class TrackRow implements TimelineItemDataProvider<TweenNode> {
+class TrackRow implements TimelineItemDataProvider<RoutineNode> {
 
     private float duration = 10;
     private int index;
 
-    private TweenNode tweenNode;
+    private RoutineNode routineNode;
 
-    public TrackRow(TweenNode tweenNode, int index) {
-        this.tweenNode = tweenNode;
+    public TrackRow(RoutineNode routineNode, int index) {
+        this.routineNode = routineNode;
         this.index = index;
     }
 
@@ -29,12 +29,12 @@ class TrackRow implements TimelineItemDataProvider<TweenNode> {
 
     @Override
     public String getItemName() {
-        return tweenNode.getTweenTitle() + " track " + getIndex();
+        return routineNode.getTweenTitle() + " track " + getIndex();
     }
 
     @Override
-    public TweenNode getIdentifier() {
-        return tweenNode;
+    public RoutineNode getIdentifier() {
+        return routineNode;
     }
 
     @Override

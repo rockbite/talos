@@ -310,6 +310,8 @@ public class MainRenderer implements Notifications.Observer {
                 renderSpine(batch, gameObject);
             } else if(gameObject.hasComponent(MapComponent.class)) {
                 renderMap(batch, gameObject);
+            } else if(gameObject.hasComponent(RoutineRendererComponent.class)) {
+                renderWithRoutine(batch, gameObject);
             }
         }
     }
@@ -533,6 +535,12 @@ public class MainRenderer implements Notifications.Observer {
 
     }
 
+    private void renderWithRoutine (Batch batch, GameObject gameObject) {
+        //We render the map with its own main renderer, its own sorter
+        RoutineRendererComponent routineRendererComponent = gameObject.getComponent(RoutineRendererComponent.class);
+        routineRendererComponent.render(this, batch, gameObject);
+    }
+
     private void renderMap (Batch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         MapComponent map = gameObject.getComponent(MapComponent.class);
@@ -639,5 +647,9 @@ public class MainRenderer implements Notifications.Observer {
 
     public void setRenderingEntitySelectionBuffer (boolean renderingToBuffer) {
         this.renderingToEntitySelectionBuffer = renderingToBuffer;
+    }
+
+    public Texture getWhiteTexture() {
+        return white;
     }
 }

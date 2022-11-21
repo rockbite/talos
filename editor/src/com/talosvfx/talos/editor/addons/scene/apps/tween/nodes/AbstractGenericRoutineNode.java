@@ -1,7 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.nodes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -19,18 +18,15 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineEditor;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.lang.reflect.Field;
 
 
-public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
+public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
 
     boolean running = false;
 
@@ -185,9 +181,9 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
     private void fetchGameObjects(Array<GameObject> list, String targetString) {
         SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-        TweenEditor tweenEditor = sceneEditorAddon.tweenEditor;
+        RoutineEditor routineEditor = sceneEditorAddon.routineEditor;
 
-        GameObject root = tweenEditor.scenePreviewStage.currentScene.root;
+        GameObject root = routineEditor.scenePreviewStage.currentScene.root;
 
         findGameObjects(list, root, targetString);
     }
@@ -307,7 +303,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                nodeBoard.selectNode(AbstractGenericTweenNode.this);
+                nodeBoard.selectNode(AbstractGenericRoutineNode.this);
                 event.cancel();
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -583,7 +579,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
                 }
 
                 if(!running) {
-                    ((TweenStage) nodeBoard.getNodeStage()).nodeReportedComplete();
+                    ((RoutineStage) nodeBoard.getNodeStage()).nodeReportedComplete();
 
                     if(isMicroView) {
                         microNodeView.hideProgressDisc();

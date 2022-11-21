@@ -1,34 +1,38 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 
-public class TweenEditor extends AEditorApp<FileHandle> {
+public class RoutineEditor extends AEditorApp<FileHandle> {
 
+    private final RoutineConfigMap routineConfigMap;
     private String title;
-    public TweenStage tweenStage;
+    public RoutineStage routineStage;
     public AnimationTimeline animationTimeline;
 
     public FileHandle targetFileHandle;
 
     public ScenePreviewStage scenePreviewStage;
 
-    public TweenEditor(FileHandle twFileHandle) {
+    public RoutineEditor(FileHandle twFileHandle) {
         super(twFileHandle);
         identifier = twFileHandle.path();
         title = twFileHandle.name();
         targetFileHandle = twFileHandle;
+
+        routineConfigMap = new RoutineConfigMap();
+        FileHandle handle = Gdx.files.internal("addons/scene/tween-nodes.xml");
+        routineConfigMap.loadFrom(handle);
+
         initContent();
     }
 
@@ -42,24 +46,23 @@ public class TweenEditor extends AEditorApp<FileHandle> {
         animationTimeline = new AnimationTimeline(skin);
         SplitPane splitPane = new SplitPane(animationTimeline, , false, skin);
         */
-        tweenStage = new TweenStage(this, skin);
-        tweenStage.init();
+        routineStage = new RoutineStage(this, skin);
+        routineStage.init();
+        routineStage.routineConfigMap = routineConfigMap;
 
         try {
-            Json json = new Json();
-            JsonReader jsonReader = new JsonReader();
-            tweenStage.read(json, jsonReader.parse(targetFileHandle));
+            routineStage.loadFrom(targetFileHandle);
         } catch (Exception e) {
             System.out.println(e);
         }
 
         scenePreviewStage = new ScenePreviewStage();
-        SplitPane splitPane = new SplitPane(scenePreviewStage, tweenStage.getContainer(),  false, TalosMain.Instance().getSkin());
+        SplitPane splitPane = new SplitPane(scenePreviewStage, routineStage.getContainer(),  false, TalosMain.Instance().getSkin());
         splitPane.setSplitAmount(0.2f);
 
         content.add(splitPane).grow();
 
-        TalosMain.Instance().getInputMultiplexer().addProcessor(tweenStage.getStage());
+        TalosMain.Instance().getInputMultiplexer().addProcessor(routineStage.getStage());
 
     }
 
@@ -71,7 +74,7 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     @Override
     public void onHide () {
         super.onHide();
-        SceneEditorAddon.get().tweenEditor = null;
+        SceneEditorAddon.get().routineEditor = null;
     }
 
 }

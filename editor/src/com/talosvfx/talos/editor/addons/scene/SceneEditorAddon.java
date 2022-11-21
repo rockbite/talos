@@ -17,7 +17,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.SEAppManager;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineEditor;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
@@ -32,7 +32,7 @@ public class SceneEditorAddon implements IAddon {
 
     public static SceneEditorProject SE;
     public SceneEditorWorkspace workspace;
-    public TweenEditor tweenEditor;
+    public RoutineEditor routineEditor;
     public HierarchyWidget hierarchy;
     public ProjectExplorerWidget projectExplorer;
     public SEPropertyPanel propertyPanel;

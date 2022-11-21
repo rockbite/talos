@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
-public class MoveByNode extends AbstractGenericTweenNode {
+public class MoveByNode extends AbstractGenericRoutineNode {
 
     @Override
     protected void startTween(GameObject target, GenericTweenData data) {
