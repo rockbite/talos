@@ -745,8 +745,8 @@ public class LayoutGrid extends WidgetGroup {
 	public void readFromJson (FileHandle handle) {
 		Json json = new Json();
 		LayoutJsonStructure layoutJsonStructure = json.fromJson(LayoutJsonStructure.class, handle);
-
-		LayoutItem parent = null;
+//
+//		LayoutItem parent = null;
 //
 //		if (layoutJsonStructure.type == LayoutType.COLUMN) {
 //			LayoutColumn layoutColumn = new LayoutColumn(skin, parent);
@@ -757,6 +757,8 @@ public class LayoutGrid extends WidgetGroup {
 //		} else if (layoutJsonStructure.type == LayoutType.APP) {
 //			//Register the app uuid for injection
 //		}
+
+		System.out.println("");
 
 
 	}

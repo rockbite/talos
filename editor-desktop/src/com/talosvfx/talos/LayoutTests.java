@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
@@ -82,38 +83,8 @@ public class LayoutTests extends ApplicationAdapter {
 	private LayoutApp createTestLayoutApp () {
 
 		String uuid = UUID.randomUUID().toString();
-		Table tab = createTab(uuid);
 
-		return new LayoutApp() {
-			@Override
-			public String getUniqueIdentifier () {
-				return uuid;
-			}
-
-			@Override
-			public Actor getTabWidget () {
-				return tab;
-			}
-
-			@Override
-			public Actor copyTabWidget () {
-				return createTab(uuid);
-			}
-
-			@Override
-			public Actor getMainContent () {
-				Table table = new Table();
-				table.setBackground(skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1f));
-				return table;
-			}
-
-			@Override
-			public Actor getCopyMainContent () {
-				Table table = new Table();
-				table.setBackground(skin.newDrawable("white", 0.5f, 0.5f, 0.5f, 1f));
-				return table;
-			}
-		};
+		return new DummyLayoutApp(skin, uuid);
 	}
 
 	private void newItem () {
