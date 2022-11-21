@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import java.util.Objects;
 
 public class LayoutGrid extends WidgetGroup {
-	private final DragAndDrop dragAndDrop;
+	private DragAndDrop dragAndDrop;
 
 	LayoutItem root;
 
@@ -69,7 +69,17 @@ public class LayoutGrid extends WidgetGroup {
 
 	}
 
-
+	public void reset () {
+		if (this.root != null) {
+			this.root.remove();
+			this.root = null;
+		}
+		overItem = null;
+		startItem = null;
+		sources.clear();
+		targets.clear();
+		dragAndDrop = new DragAndDrop();
+	}
 
 	public enum LayoutDirection {
 		UP,
@@ -547,8 +557,6 @@ public class LayoutGrid extends WidgetGroup {
 			Vector2 copyOfLocalCoords = new Vector2(universalCoords.x, universalCoords.y);
 			universalCoords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
 
-
-
 			//Prioritize tab
 			Actor hit = null;
 			if ((hit = overItem.hitTabTable(copyOfLocalCoords)) != null) {
@@ -606,7 +614,6 @@ public class LayoutGrid extends WidgetGroup {
 		if (overItem == null) {
 			return;
 		}
-
 
 		//UNiversal coordinates
 
@@ -760,7 +767,6 @@ public class LayoutGrid extends WidgetGroup {
 
 		System.out.println("");
 
-
 	}
 
 	private LayoutJsonStructure buildJsonFromObject (LayoutItem root) {
@@ -800,7 +806,5 @@ public class LayoutGrid extends WidgetGroup {
 
 		return jsonStructure;
 	}
-
-
 
 }

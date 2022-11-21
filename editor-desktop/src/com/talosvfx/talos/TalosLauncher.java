@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos;
 
+import com.badlogic.gdx.AbstractGraphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -34,17 +35,17 @@ public class TalosLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
-		config.setTitle("Talos");
 		config.useVsync(true);
-		config.setHdpiMode(HdpiMode.Pixels);
+		config.setHdpiMode(HdpiMode.Logical);
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
-		TalosMain talos = new TalosMain() {
+		TalosMain2 talos = new TalosMain2() {
 			@Override
 			public void create () {
 				super.create();
 				afterCreated();
+				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TalosVersion.getVersion());
 			}
 		};
 
