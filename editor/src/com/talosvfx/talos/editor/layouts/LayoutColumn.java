@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Null;
 
-public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
+public class LayoutColumn extends LayoutItem {
 
-	Array<com.talosvfx.talos.editor.layouts.LayoutItem> rows = new Array<>();
+	Array<LayoutItem> rows = new Array<>();
 	Array<LayoutResizeWidget> resizeWidgets = new Array<>();
 
 	public LayoutColumn (Skin skin, LayoutGrid grid) {
@@ -22,11 +22,11 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 		UP,RIGHT,DOWN,LEFT
 	}
 
-	public void addRowContainer (com.talosvfx.talos.editor.layouts.LayoutItem newLayoutContent, boolean up) {
+	public void addRowContainer (LayoutItem newLayoutContent, boolean up) {
 		addRowContainer(newLayoutContent, up, null);
 	}
 
-	public void addRowContainer (com.talosvfx.talos.editor.layouts.LayoutItem newLayoutContent, boolean up, @Null com.talosvfx.talos.editor.layouts.LayoutItem relative) {
+	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative) {
 
 		if (relative != null) {
 			//We are relative to some other actor
@@ -96,8 +96,8 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 
 		//idx of 0 is between the 0th-1st element
 
-		com.talosvfx.talos.editor.layouts.LayoutItem bottom = rows.get(idx);
-		com.talosvfx.talos.editor.layouts.LayoutItem top = rows.get(idx + 1);
+		LayoutItem bottom = rows.get(idx);
+		LayoutItem top = rows.get(idx + 1);
 
 		startRelativeHeightBottom = bottom.getRelativeHeight();
 		startRelativeHeightTop = top.getRelativeHeight();
@@ -123,8 +123,8 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 
 		float heightChangeRelative = -deltaY/totalPixelHeightToDistribute;
 
-		com.talosvfx.talos.editor.layouts.LayoutItem bottom = rows.get(idx);
-		com.talosvfx.talos.editor.layouts.LayoutItem top = rows.get(idx + 1);
+		LayoutItem bottom = rows.get(idx);
+		LayoutItem top = rows.get(idx + 1);
 
 		top.setRelativeHeight(startRelativeHeightTop - heightChangeRelative);
 		bottom.setRelativeHeight(startRelativeHeightBottom + heightChangeRelative);
@@ -135,12 +135,12 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 		super.draggedResizeWidget(layoutResizeWidget, event, x, y, pointer);
 	}
 
-	private void takeThirtyPercent (com.talosvfx.talos.editor.layouts.LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
+	private void takeThirtyPercent (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
 		if (otherItemIdx < 0 || otherItemIdx >= rows.size) {
 			//Just give it full width
 			rows.get(thisItemIdx).setRelativeHeight(1f);
 		} else {
-			com.talosvfx.talos.editor.layouts.LayoutItem layoutItem = rows.get(otherItemIdx);
+			LayoutItem layoutItem = rows.get(otherItemIdx);
 			float totalRelativeHeight = layoutItem.getRelativeHeight();
 			float totalRelativeSub = totalRelativeHeight * 0.3f;
 
@@ -163,7 +163,7 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 		float counterY = 0;
 
 		for (int i = 0; i < rows.size; i++) {
-			com.talosvfx.talos.editor.layouts.LayoutItem row = rows.get(i);
+			LayoutItem row = rows.get(i);
 			float heightForItem = row.getRelativeHeight() * getHeight();
 			row.setBounds(0, counterY, getWidth(), heightForItem);
 			counterY += heightForItem;
@@ -174,7 +174,7 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 
 			//Draw them at the end of each one
 
-			com.talosvfx.talos.editor.layouts.LayoutItem row = rows.get(i);
+			LayoutItem row = rows.get(i);
 			float heightForItem = row.getRelativeHeight() * getHeight();
 			counterY+= heightForItem;
 
@@ -188,7 +188,7 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 	}
 
 	@Override
-	public void removeItem (com.talosvfx.talos.editor.layouts.LayoutItem content) {
+	public void removeItem (LayoutItem content) {
 		if (rows.size > 1) {
 			removeActor(resizeWidgets.pop());
 		}
@@ -196,10 +196,10 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 
 		//Lets see if there is item below, or above to give back some width
 		if (idxOfItem >= 1) {
-			com.talosvfx.talos.editor.layouts.LayoutItem itemToGiveWidthTo = rows.get(idxOfItem - 1);
+			LayoutItem itemToGiveWidthTo = rows.get(idxOfItem - 1);
 			itemToGiveWidthTo.setRelativeHeight(itemToGiveWidthTo.getRelativeHeight() + content.getRelativeHeight());
 		} else if (idxOfItem == 0 && rows.size >= 2) {
-			com.talosvfx.talos.editor.layouts.LayoutItem itemToGiveWidthTo = rows.get(1);
+			LayoutItem itemToGiveWidthTo = rows.get(1);
 			itemToGiveWidthTo.setRelativeHeight(itemToGiveWidthTo.getRelativeHeight() + content.getRelativeHeight());
 		} else {
 			if (rows.size != 1) {
@@ -214,7 +214,7 @@ public class LayoutColumn extends com.talosvfx.talos.editor.layouts.LayoutItem {
 	}
 
 	@Override
-	public void exchangeItem (com.talosvfx.talos.editor.layouts.LayoutItem target, com.talosvfx.talos.editor.layouts.LayoutItem newColumn) {
+	public void exchangeItem (LayoutItem target, LayoutItem newColumn) {
 		removeActor(target);
 
 		int idx = rows.indexOf(target, true);

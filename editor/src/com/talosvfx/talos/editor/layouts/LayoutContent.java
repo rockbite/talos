@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ObjectMap;
 
-public class LayoutContent extends com.talosvfx.talos.editor.layouts.LayoutItem {
+public class LayoutContent extends LayoutItem {
 
 	private final Table innerContents;
 	private final Table tabBar;
@@ -109,12 +109,12 @@ public class LayoutContent extends com.talosvfx.talos.editor.layouts.LayoutItem 
 	}
 
 	@Override
-	public void removeItem (com.talosvfx.talos.editor.layouts.LayoutItem item) {
+	public void removeItem (LayoutItem item) {
 
 	}
 
 	@Override
-	public void exchangeItem (com.talosvfx.talos.editor.layouts.LayoutItem target, LayoutItem newItem) {
+	public void exchangeItem (LayoutItem target, LayoutItem newItem) {
 		throw new UnsupportedOperationException("Not supported operation");
 
 	}

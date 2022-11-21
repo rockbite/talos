@@ -84,14 +84,14 @@ public class LayoutGrid extends WidgetGroup {
 			root = content;
 			addActor(root);
 		} else {
-			if (root instanceof com.talosvfx.talos.editor.layouts.LayoutRow) {
-				((com.talosvfx.talos.editor.layouts.LayoutRow)root).addColumnContainer(content, false);
+			if (root instanceof LayoutRow) {
+				((LayoutRow)root).addColumnContainer(content, false);
 			} else {
 				//Exchange root
 				LayoutItem oldRoot = root;
 				removeActor(oldRoot);
 
-				com.talosvfx.talos.editor.layouts.LayoutRow newRow = new com.talosvfx.talos.editor.layouts.LayoutRow(skin, this);
+				LayoutRow newRow = new LayoutRow(skin, this);
 				newRow.addColumnContainer(oldRoot, false);
 				newRow.addColumnContainer(content, false);
 
@@ -214,19 +214,19 @@ public class LayoutGrid extends WidgetGroup {
 			case LEFT: {
 
 				//Check if root is row, if its not wrap
-				if (root instanceof com.talosvfx.talos.editor.layouts.LayoutRow) {
+				if (root instanceof LayoutRow) {
 					//Just add it to the column
 
 					LayoutContent newLayoutContent = new LayoutContent(skin, this);
 					newLayoutContent.addContent(app);
 
-					((com.talosvfx.talos.editor.layouts.LayoutRow)root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
+					((LayoutRow)root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
 
 				} else {
 					LayoutItem oldRoot = root;
 					removeActor(oldRoot);
 
-					com.talosvfx.talos.editor.layouts.LayoutRow newLayoutRow = new com.talosvfx.talos.editor.layouts.LayoutRow(skin, this);
+					LayoutRow newLayoutRow = new LayoutRow(skin, this);
 
 					newLayoutRow.setRelativeWidth(1f);
 					newLayoutRow.setRelativeHeight(1f);
@@ -303,16 +303,16 @@ public class LayoutGrid extends WidgetGroup {
 
 			//Check the parent item for the target. If its already a layout row, we can just add at top or bottom
 
-			com.talosvfx.talos.editor.layouts.LayoutRow rowTarget;
+			LayoutRow rowTarget;
 
 			boolean isExistingRow = false;
-			if (parentItem instanceof com.talosvfx.talos.editor.layouts.LayoutRow) {
-				rowTarget = (com.talosvfx.talos.editor.layouts.LayoutRow)parentItem;
+			if (parentItem instanceof LayoutRow) {
+				rowTarget = (LayoutRow)parentItem;
 				isExistingRow = true;
 			} else {
 				//Its TIME TO WRAP
 
-				com.talosvfx.talos.editor.layouts.LayoutRow newRow = new com.talosvfx.talos.editor.layouts.LayoutRow(skin, this);
+				LayoutRow newRow = new LayoutRow(skin, this);
 
 				//Remove the target
 				exchangeAndWrapToRow(newRow, target);
@@ -355,7 +355,7 @@ public class LayoutGrid extends WidgetGroup {
 		newColumn.addRowContainer(target, false);
 	}
 
-	private void exchangeAndWrapToRow (com.talosvfx.talos.editor.layouts.LayoutRow newRow, LayoutContent target) {
+	private void exchangeAndWrapToRow (LayoutRow newRow, LayoutContent target) {
 
 		//We need to swap this column with the parent
 		LayoutItem parent = (LayoutItem)target.getParent();
@@ -747,16 +747,16 @@ public class LayoutGrid extends WidgetGroup {
 		LayoutJsonStructure layoutJsonStructure = json.fromJson(LayoutJsonStructure.class, handle);
 
 		LayoutItem parent = null;
-
-		if (layoutJsonStructure.type == LayoutType.COLUMN) {
-			LayoutColumn layoutColumn = new LayoutColumn();
-		} else if (layoutJsonStructure.type == LayoutType.ROW) {
-			com.talosvfx.talos.editor.layouts.LayoutRow layoutRow = new com.talosvfx.talos.editor.layouts.LayoutRow();
-		} else if (layoutJsonStructure.type == LayoutType.CONTENT) {
-			LayoutContent layoutContent =  new LayoutContent();
-		} else if (layoutJsonStructure.type == LayoutType.APP) {
-			//Register the app uuid for injection 
-		}
+//
+//		if (layoutJsonStructure.type == LayoutType.COLUMN) {
+//			LayoutColumn layoutColumn = new LayoutColumn(skin, parent);
+//		} else if (layoutJsonStructure.type == LayoutType.ROW) {
+//			LayoutRow layoutRow = new LayoutRow();
+//		} else if (layoutJsonStructure.type == LayoutType.CONTENT) {
+//			LayoutContent layoutContent =  new LayoutContent();
+//		} else if (layoutJsonStructure.type == LayoutType.APP) {
+//			//Register the app uuid for injection
+//		}
 
 
 	}
@@ -773,7 +773,7 @@ public class LayoutGrid extends WidgetGroup {
 				LayoutJsonStructure child = buildJsonFromObject(row);
 				jsonStructure.children.add(child);
 			}
-		} else if (root instanceof com.talosvfx.talos.editor.layouts.LayoutRow) {
+		} else if (root instanceof LayoutRow) {
 			jsonStructure.type = LayoutType.ROW;
 			jsonStructure.relativeWidth = root.getRelativeWidth();
 			jsonStructure.relativeHeight = root.getRelativeHeight();

@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class LayoutResizeWidget extends Table {
 
 	private final Skin skin;
-	private final com.talosvfx.talos.editor.layouts.LayoutGrid layoutGrid;
+	private final LayoutGrid layoutGrid;
 
 	public LayoutResizeWidget (Skin skin, LayoutGrid layoutGrid, LayoutItem responder) {
 		this.skin = skin;
