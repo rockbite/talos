@@ -4,17 +4,23 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.layouts.LayoutColumn;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
-import com.talosvfx.talos.editor.layouts.LayoutRow;
+
+import java.util.UUID;
 
 public class LayoutTests extends ApplicationAdapter {
 
@@ -34,7 +40,7 @@ public class LayoutTests extends ApplicationAdapter {
 
 		stage = new Stage();
 
-		Gdx.input.setInputProcessor(new InputAdapter() {
+		InputAdapter debugProcessor = new InputAdapter() {
 			@Override
 			public boolean keyDown (int keycode) {
 				if (Input.Keys.SPACE == keycode) {
@@ -43,26 +49,102 @@ public class LayoutTests extends ApplicationAdapter {
 				if (Input.Keys.N == keycode) {
 					newItem();
 				}
+				if (Input.Keys.W == keycode) {
+					layoutGrid.writeToJson(Gdx.files.local("bananas.json"));
+				}
+				if (Input.Keys.R == keycode) {
+
+					stage.clear();
+					layoutGrid = new LayoutGrid(skin);
+
+					layoutGrid.readFromJson(Gdx.files.local("bananas.json"));
+				}
+
 				return super.keyDown(keycode);
 			}
-		});
+		};
+		Gdx.input.setInputProcessor(new InputMultiplexer(debugProcessor, stage));
 
 		refresh();
 	}
 
+	private Table createTab (String uuid) {
+		Table tab = new Table();
+		tab.setBackground(skin.getDrawable("tab-bg"));
+
+		tab.padLeft(10);
+		tab.padRight(10);
+		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
+		tab.add(visLabel);
+
+		return tab;
+	}
+	private LayoutApp createTestLayoutApp () {
+
+		String uuid = UUID.randomUUID().toString();
+		Table tab = createTab(uuid);
+
+		return new LayoutApp() {
+			@Override
+			public String getUniqueIdentifier () {
+				return uuid;
+			}
+
+			@Override
+			public Actor getTabWidget () {
+				return tab;
+			}
+
+			@Override
+			public Actor copyTabWidget () {
+				return createTab(uuid);
+			}
+
+			@Override
+			public Actor getMainContent () {
+				Table table = new Table();
+				table.setBackground(skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1f));
+				return table;
+			}
+
+			@Override
+			public Actor getCopyMainContent () {
+				Table table = new Table();
+				table.setBackground(skin.newDrawable("white", 0.5f, 0.5f, 0.5f, 1f));
+				return table;
+			}
+		};
+	}
+
 	private void newItem () {
-		layoutGrid.addContent(new LayoutContent(skin, layoutGrid));
+		LayoutContent content = new LayoutContent(skin, layoutGrid);
+
+		int random = MathUtils.random(1,3);
+		for (int i = 0; i < random; i++) {
+			content.addContent(createTestLayoutApp());
+		}
+
+		layoutGrid.addContent(content);
 	}
 	private void refresh () {
 		stage.clear();
 
 
 		layoutGrid = new LayoutGrid(skin);
-		layoutGrid.addContent(new LayoutContent(skin, layoutGrid));
+		LayoutContent content = new LayoutContent(skin, layoutGrid);
+		content.addContent(createTestLayoutApp());
+		layoutGrid.addContent(content);
 
 		layoutGrid.setFillParent(true);
 
 		stage.addActor(layoutGrid);
+
+
+	}
+
+	@Override
+	public void resize (int width, int height) {
+		stage.getViewport().update(width, height);
 	}
 
 	@Override
