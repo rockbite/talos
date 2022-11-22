@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.GameObjectListPopup;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
@@ -58,7 +59,7 @@ public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
     @Override
     public Actor getSubWidget () {
         Table table = new Table();
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select game object");
 
         nameLabel = new Label("", skin);

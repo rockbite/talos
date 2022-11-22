@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
@@ -14,11 +15,14 @@ import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
+import java.awt.*;
 
-public class ScenePreviewStage extends ViewportWidget implements Notifications.Observer {
+public class ScenePreviewStage extends ViewportWidget implements Observer {
 
     public Scene currentScene;
 
@@ -27,7 +31,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
     private boolean isPlaying = false;
 
     public ScenePreviewStage () {
-        setSkin(TalosMain.Instance().getSkin());
+        setSkin(SharedResources.skin);
         setWorldSize(10);
         renderer = new MainRenderer();
         addActor(rulerRenderer);
@@ -36,9 +40,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
     }
 
     @Override
-    public void drawContent (Batch batch, float parentAlpha) {
-        if (!(TalosMain.Instance().Project() instanceof SceneEditorProject))
-            return;
+    public void drawContent (PolygonBatch batch, float parentAlpha) {
         batch.end();
 
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
@@ -60,7 +62,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
         return isInViewPort || isDragging;
     }
 
-    private void drawMainRenderer (Batch batch, float parentAlpha) {
+    private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
         if (currentScene == null)
             return;
 

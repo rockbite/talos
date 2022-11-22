@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class TransformGizmo extends Gizmo {
@@ -33,7 +34,7 @@ public class TransformGizmo extends Gizmo {
 
             // drawing position point
             if(selected) {
-                drawPoint(batch, TalosMain.Instance().getSkin().getRegion("ic-target"), tmp, Color.ORANGE, 30);
+                drawPoint(batch, SharedResources.skin.getRegion("ic-target"), tmp, Color.ORANGE, 30);
                 drawBoundedBoxIfNeed(batch);
             }
         }

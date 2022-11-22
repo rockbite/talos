@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
@@ -56,8 +57,6 @@ public class ModuleListPopup extends VisWindow {
 
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
-
-        TalosMain.Instance().moduleNames.clear();
 
         parseCategory(tree, null, root);
 
@@ -140,9 +139,9 @@ public class ModuleListPopup extends VisWindow {
     private void registerModule(XmlReader.Element module) {
         try {
             Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + module.getText());
-            Class wrapperClazz =ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
+            Class wrapperClazz = ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
-            TalosMain.Instance().moduleNames.put(wrapperClazz, module.getAttribute("name"));
+            TalosVFXUtils.moduleNames.put(wrapperClazz, module.getAttribute("name"));
         } catch (ReflectionException e) {
             e.printStackTrace();
         }

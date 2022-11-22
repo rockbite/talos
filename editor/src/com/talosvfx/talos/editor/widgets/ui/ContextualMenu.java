@@ -20,9 +20,9 @@ public class ContextualMenu {
         popupMenu = new PopupMenu();
     }
 
-    public void show(Stage stage) {
+    public void show (Stage stage) {
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+        stage.screenToStageCoordinates(vec);
         show(stage, vec.x, vec.y);
     }
 

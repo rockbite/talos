@@ -17,6 +17,8 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
@@ -24,13 +26,17 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
-public class HierarchyWidget extends Table implements Notifications.Observer {
+public class HierarchyWidget extends Table implements Observer {
 
     private final ScrollPane scrollPane;
     private FilteredTree<GameObject> tree;
@@ -43,7 +49,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
 
     public HierarchyWidget() {
-        tree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
+        tree = new FilteredTree<>(SharedResources.skin, "modern");
         tree.draggable = true;
         //tree.getSelection().setMultiple(true);
 
@@ -144,13 +150,13 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         ImageButton eyeButton;
         ImageButton handButton;
 
-        Drawable openEyeDrawable = TalosMain.Instance().getSkin().getDrawable("timeline-icon-eye");
-        Drawable closedEyeDrawable = TalosMain.Instance().getSkin().getDrawable("timeline-icon-eye-closed");
+        Drawable openEyeDrawable = SharedResources.skin.getDrawable("timeline-icon-eye");
+        Drawable closedEyeDrawable = SharedResources.skin.getDrawable("timeline-icon-eye-closed");
 
         eyeButton = new ImageButton(openEyeDrawable);
         eyeButton.setColor(new Color(Color.WHITE));
 
-        handButton = new ImageButton(TalosMain.Instance().getSkin().getDrawable("hand-cursor"));
+        handButton = new ImageButton(SharedResources.skin.getDrawable("hand-cursor"));
         handButton.setColor(new Color(Color.WHITE));
 
         toolsWidget = new Table() {
@@ -476,7 +482,7 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
         objectMap.clear();
         nodeMap.clear();
 
-        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(entityContainer.getName(), TalosMain.Instance().getSkin()), entityContainer.getSelfObject()));
+        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(entityContainer.getName(), SharedResources.skin), entityContainer.getSelfObject()));
         parent.setObject(new GameObject());
         parent.setCompanionActor(createToolsForNode(parent));
         parent.setSelectable(false);
@@ -491,10 +497,15 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
     }
 
     private FilteredTree.Node<GameObject> createNodeForGameObject (GameObject gameObject) {
-        EditableLabel editableLabel = new EditableLabel(gameObject.getName(), TalosMain.Instance().getSkin());
+        EditableLabel editableLabel = new EditableLabel(gameObject.getName(), SharedResources.skin);
         editableLabel.setStage(getStage());
 
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+            @Override
+            public void editModeStarted () {
+
+            }
+
             @Override
             public void changed (String newText) {
                 SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
@@ -587,5 +598,14 @@ public class HierarchyWidget extends Table implements Notifications.Observer {
 
         objectTable.add(editableLabel);
         return objectTable;
+    }
+
+    @EventHandler
+    public void onGameAssetOpen (GameAssetOpenEvent gameAssetOpenEvent) {
+        GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
+        if (gameAsset.type == GameAssetType.SCENE) {
+            Scene resource = (Scene)gameAsset.getResource();
+            loadEntityContainer(resource);
+        }
     }
 }

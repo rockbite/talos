@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class Toast extends Table {
     public static float LENGTH_LONG = 3f;
@@ -26,7 +27,7 @@ public class Toast extends Table {
     }
 
     private Toast(){
-        messageLabel = new Label("", TalosMain.Instance().getSkin());
+        messageLabel = new Label("", SharedResources.skin);
         labelStyle = new Label.LabelStyle();
         labelStyle.font = messageLabel.getStyle().font;
         labelStyle.fontColor = Color.WHITE;

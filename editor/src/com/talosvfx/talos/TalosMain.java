@@ -17,6 +17,7 @@
 package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -42,6 +43,11 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+
 public class TalosMain extends ApplicationAdapter {
 
 	private static boolean focused = true;
@@ -60,7 +66,7 @@ public class TalosMain extends ApplicationAdapter {
 
 	private AddonController addonController;
 
-	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
+//	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
 	public static TalosMain Instance () {
 		return instance;

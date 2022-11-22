@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -32,6 +33,8 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -39,7 +42,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import java.util.Comparator;
 
 
-public class PaletteEditorWorkspace extends ViewportWidget implements Notifications.Observer {
+public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
     private PaletteEditor paletteEditor;
     GameAsset<TilePaletteData> paletteData;
     private Image selectionRect;
@@ -138,7 +141,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             }
         };
 
-        selectionRect = new Image(TalosMain.Instance().getSkin().getDrawable("orange_row"));
+        selectionRect = new Image(SharedResources.skin.getDrawable("orange_row"));
         selectionRect.setSize(0, 0);
         selectionRect.setVisible(false);
         addActor(selectionRect);
@@ -573,7 +576,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
     }
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
         batch.end();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.update(camera, parentAlpha);
@@ -659,7 +662,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
             shapeRenderer.end();
 
             batch.begin();
-            Skin skin = TalosMain.Instance().getSkin();
+            Skin skin = SharedResources.skin;
             Drawable appendIcon = skin.getDrawable("tile-plus-icon");
             Drawable removeIcon = skin.getDrawable("tile-minus-icon");
             float totalScreenSpaceParentSize = getWidth();
@@ -755,7 +758,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
                 shapeRenderer.end();
                 batch.begin();
-                Skin skin = TalosMain.Instance().getSkin();
+                Skin skin = SharedResources.skin;
                 Drawable lineAdjustIcon = skin.getDrawable("adjust-line-icon");
                 float totalScreenSpaceParentSize = getWidth();
                 float totalWorldWidth = getWorldWidth() * camera.zoom;
@@ -1129,7 +1132,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
     }
 
-    private void drawAllGameObjects (Batch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {
+    private void drawAllGameObjects (PolygonBatch batch, OrderedMap<GameAsset<?>, GameObject> gameObjects) {
         Array<GameAsset<?>> gameAssets = gameObjects.orderedKeys();
         for (GameAsset<?> gameAsset : gameAssets) {
             GameObject gameObject = gameObjects.get(gameAsset);

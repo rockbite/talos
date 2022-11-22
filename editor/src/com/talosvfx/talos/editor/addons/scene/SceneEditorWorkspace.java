@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -24,6 +25,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
@@ -37,6 +39,9 @@ import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -44,11 +49,9 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
-import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import org.lwjgl.opengl.GL20;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +65,7 @@ import static com.talosvfx.talos.editor.TalosInputProcessor.ctrlPressed;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
-public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Notifications.Observer {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
 
 	private static SceneEditorWorkspace instance;
 	public final TemplateListPopup templateListPopup;
@@ -154,9 +157,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		layers.add("UI");
 		layers.add("Misc");
 
-		setSkin(TalosMain.Instance().getSkin());
+		setSkin(SharedResources.skin);
 		setWorldSize(10);
-		mapEditorToolbar = new MapEditorToolbar(TalosMain.Instance().getSkin());
+		mapEditorToolbar = new MapEditorToolbar(SharedResources.skin);
 
 		snapshotService = new SnapshotService();
 		mapEditorState = new MapEditorState();
@@ -186,7 +189,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer = new MainRenderer();
 		uiSceneRenderer = new MainRenderer();
 
-		Skin skin = TalosMain.Instance().getSkin();
+		Skin skin = SharedResources.skin;
 		selectionRect = new Image(skin.getDrawable("orange_row"));
 		selectionRect.setSize(0, 0);
 		selectionRect.setVisible(false);
@@ -992,8 +995,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	public void act (float delta) {
-		if (!(TalosMain.Instance().Project() instanceof SceneEditorProject))
-			return;
 		super.act(delta);
 
 		if (mapEditorState.isEditing()) {
@@ -1056,9 +1057,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	@Override
-	public void drawContent (Batch batch, float parentAlpha) {
-		if (!(TalosMain.Instance().Project() instanceof SceneEditorProject))
-			return;
+	public void drawContent (PolygonBatch batch, float parentAlpha) {
 		batch.end();
 
 		((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
@@ -1073,13 +1072,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			if (mapEditorState.isSpraying()) {
 				// show the spray radius
-				GL20.glLineWidth(5.0f);
+				Gdx.gl.glLineWidth(5.0f);
 				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 				Vector2 vec = getMouseCordsOnScene();
 				shapeRenderer.circle(vec.x, vec.y, sprayInnerRadius, 20);
 				shapeRenderer.circle(vec.x, vec.y, sprayOuterRadius, 20);
 				shapeRenderer.end();
-				GL20.glLineWidth(1.0f);
+				Gdx.gl.glLineWidth(1.0f);
 			}
 		} else {
 			gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
@@ -1105,10 +1104,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	}
 
-	private void drawMainRenderer (Batch batch, float parentAlpha) {
+	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
 		if (currentContainer == null)
 			return;
 
+		renderer.setLayers(getLayerList());
 		renderer.update(currentContainer.getSelfObject());
 		renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
 	}
@@ -1195,7 +1195,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void openSavableContainer (SavableContainer mainScene) {
 		if (mainScene == null)
 			return;
-		sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
+//		sceneEditorAddon.hierarchy.loadEntityContainer(mainScene);
 		currentContainer = mainScene;
 
 		// process all game objects
@@ -1210,7 +1210,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (mainScene instanceof Scene) {
 			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
-			updateSettingsFromSceneSettings();
+			//todo redo
+//			updateSettingsFromSceneSettings();
 		} else {
 			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#241a00"));
 		}
@@ -1218,9 +1219,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public void selectPropertyHolder (IPropertyHolder propertyHolder) {
 		//if (mapEditorState.isEditing()) return;
-		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
-		if (propertyHolder == null || currentHolder == propertyHolder)
-			return;
+//		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
+//		if (propertyHolder == null || currentHolder == propertyHolder)
+//			return;
 
 		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
 	}
@@ -1409,6 +1410,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return data;
+	}
+
+	public void loadFromScene (Scene scene) {
+		openSavableContainer(scene);
+
 	}
 
 	public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
@@ -1689,6 +1695,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		staticGridPropertyProvider = new StaticBoundedGridPropertyProvider();
 		staticGridPropertyProvider.hideZero();
 		staticGridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+
 	}
 
 	@Override
@@ -1709,5 +1716,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 		clearSelection();
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+	}
+
+	@EventHandler
+	public void onGameAssetOpened (GameAssetOpenEvent gameAssetOpenEvent) {
+		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
+		if (gameAsset.type == GameAssetType.SCENE) {
+
+			loadFromScene(((Scene)gameAsset.getResource()));
+		}
 	}
 }

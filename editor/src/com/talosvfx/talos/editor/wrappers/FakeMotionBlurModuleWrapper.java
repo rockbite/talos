@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
 import com.talosvfx.talos.runtime.modules.FakeMotionBlurModule;
 
@@ -49,7 +50,7 @@ public class FakeMotionBlurModuleWrapper extends ModuleWrapper<FakeMotionBlurMod
 
     @Override
     protected String getOverrideTitle() {
-        return TalosMain.Instance().moduleNames.get(this.getClass());
+        return TalosVFXUtils.moduleNames.get(this.getClass());
     }
 
     @Override

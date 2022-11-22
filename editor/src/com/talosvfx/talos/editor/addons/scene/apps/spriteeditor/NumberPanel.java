@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class NumberPanel extends Table {
@@ -46,7 +47,7 @@ public class NumberPanel extends Table {
     }
 
     public void init() {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         setSkin(skin);
 
         isSelected = false;

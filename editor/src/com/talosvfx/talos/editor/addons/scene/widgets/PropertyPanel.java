@@ -12,11 +12,13 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 import java.util.Comparator;
 
-public class PropertyPanel extends Table implements Notifications.Observer {
+public class PropertyPanel extends Table implements Observer {
 
     Table container;
     Table fakeContainer;
@@ -28,7 +30,7 @@ public class PropertyPanel extends Table implements Notifications.Observer {
     private IPropertyHolder currentPropertyHolder;
 
     public PropertyPanel() {
-        setSkin(TalosMain.Instance().getSkin());
+        setSkin(SharedResources.skin);
 
         container = new Table();
         fakeContainer = new Table();

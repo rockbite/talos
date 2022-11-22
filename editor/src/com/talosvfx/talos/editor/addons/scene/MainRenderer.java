@@ -7,8 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -19,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
@@ -30,6 +33,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -37,7 +41,7 @@ import org.w3c.dom.Text;
 
 import java.util.Comparator;
 
-public class MainRenderer implements Notifications.Observer {
+public class MainRenderer implements Observer {
 
     public final Comparator<GameObject> layerAndDrawOrderComparator;
 
@@ -74,6 +78,11 @@ public class MainRenderer implements Notifications.Observer {
     public boolean skipUpdates = false;
 
     private Texture white;
+    private Array<String> layerList;
+
+    public void setLayers (Array<String> layerList) {
+        this.layerList = layerList;
+    }
 
     public static class RenderState {
         private Array<GameObject> list = new Array<>();
@@ -86,7 +95,7 @@ public class MainRenderer implements Notifications.Observer {
 
         Notifications.registerObserver(this);
 
-        talosRenderer = new SpriteBatchParticleRenderer();
+        talosRenderer = new SpriteBatchParticleRenderer(null);
         spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
@@ -174,12 +183,12 @@ public class MainRenderer implements Notifications.Observer {
 
 
     Array<GameObject> temp = new Array<>();
-    public void render (Batch batch, RenderState state, GameObject root) {
+    public void render (PolygonBatch batch, RenderState state, GameObject root) {
         temp.clear();
         temp.add(root);
         render(batch, state, temp);
     }
-    public void render (Batch batch, RenderState state, Array<GameObject> rootObjects) {
+    public void render (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
         mapRenderer.setCamera(this.camera);
 
         updateLayerOrderLookup();
@@ -352,12 +361,12 @@ public class MainRenderer implements Notifications.Observer {
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    private void renderParticle (Batch batch, GameObject gameObject) {
+    private void renderParticle (PolygonBatch batch, GameObject gameObject) {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
 
         ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.gameAsset.getResource());
-        instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
+        instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 
         if (!skipUpdates) {
             instance.update(Gdx.graphics.getDeltaTime());
@@ -533,7 +542,7 @@ public class MainRenderer implements Notifications.Observer {
 
     }
 
-    private void renderMap (Batch batch, GameObject gameObject) {
+    private void renderMap (PolygonBatch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         MapComponent map = gameObject.getComponent(MapComponent.class);
 
@@ -575,7 +584,6 @@ public class MainRenderer implements Notifications.Observer {
     }
 
     private void updateLayerOrderLookup () {
-        Array<String> layerList = SceneEditorAddon.get().workspace.getLayerList();
         layerOrderLookup.clear();
         int i = 0;
         for(String layer: layerList) {

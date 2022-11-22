@@ -15,6 +15,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 
 import java.util.function.Supplier;
@@ -82,7 +83,7 @@ public abstract class PropertyWidget<T> extends Table {
 	protected void build(String name) {
 		if(name != null) {
 			hasName = true;
-			propertyName = new Label(name + ":", TalosMain.Instance().getSkin());
+			propertyName = new Label(name + ":", SharedResources.skin);
 			propertyName.setAlignment(Align.left);
 			valueContainer = new Table();
 

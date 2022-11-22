@@ -2,10 +2,13 @@ package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 
 public class LayoutContent extends LayoutItem {
 
@@ -13,6 +16,7 @@ public class LayoutContent extends LayoutItem {
 	private final Table tabBar;
 	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
+	private ObjectMap<Actor, LayoutApp> tabToApps = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
@@ -40,8 +44,31 @@ public class LayoutContent extends LayoutItem {
 		innerContents.row();
 		innerContents.add(contentTable).grow();
 
+		Vector2 temp = new Vector2();
+		tabBar.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+
+				temp.set(x, y);
+				tabBar.localToActorCoordinates(LayoutContent.this, temp);
+
+				LayoutApp result = getAppForHit(temp);
+				if (result != null) {
+					swapToApp(result);
+				}
+
+			}
+		});
+
+		contentTable.debugAll();
+
 	}
 
+	private void swapToApp (LayoutApp result) {
+		contentTable.clearChildren();
+		contentTable.add(result.getMainContent()).grow();
+	}
 
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
@@ -61,10 +88,8 @@ public class LayoutContent extends LayoutItem {
 			grid.registerDragSource(this, layoutApp, layoutApp.getTabWidget());
 
 			//The state of content depends on the tabs
-			if (apps.size == 1) {
-				//It was the first one
-				contentTable.add(layoutApp.getMainContent()).grow();
-			}
+
+			swapToApp(layoutApp);
 		}
 	}
 
@@ -81,18 +106,47 @@ public class LayoutContent extends LayoutItem {
 
 		invalidate();
 
+		if (!apps.isEmpty()) {
+			for (ObjectMap.Entry<String, LayoutApp> first : apps) {
+				swapToApp(first.value);
+				break;
+			}
+		}
+
+	}
+
+	public LayoutApp getAppForHit (Vector2 localCoords) {
+		Actor hit = hit(localCoords.x, localCoords.y, true);
+		if (hit == null) return null;
+
+		if (hit == tabBar) {
+			return null;
+		}
+
+
+		for (LayoutApp value : apps.values()) {
+			Actor tabWidget = value.getTabWidget();
+			if (tabWidget == hit || hit.isDescendantOf(tabWidget)) {
+				return value;
+			}
+		}
+
+		return null;
 	}
 
 	public Actor hitTabTable (Vector2 localCoords) {
 		Actor hit = hit(localCoords.x, localCoords.y, true);
+		if (hit == null) return null;
 
 		if (hit == tabBar) {
 			return tabBar;
 		}
 
+
 		for (LayoutApp value : apps.values()) {
-			if (value.getTabWidget() == hit) {
-				return tabBar;
+			Actor tabWidget = value.getTabWidget();
+			if (tabWidget == hit || hit.isDescendantOf(tabWidget)) {
+				return tabWidget;
 			}
 		}
 

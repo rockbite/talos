@@ -1,37 +1,39 @@
 package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.widget.VisLabel;
 
 public class DummyLayoutApp implements LayoutApp {
 
-	private String uuid;
+	private String tabName;
 
 	private transient Actor tabWidget;
 	private transient Actor mainContent;
 	private transient Skin skin;
 
-	public DummyLayoutApp (Skin skin, String uuid) {
-		this.uuid = uuid;
+	public DummyLayoutApp (Skin skin, String tabName) {
+		this.tabName = tabName;
 		build(skin);
 	}
 
 	public void build (Skin skin) {
 		this.skin = skin;
 
-		tabWidget = createTab(uuid);
+		tabWidget = createTab(tabName);
 		mainContent = createMainContent();
 	}
 
-	private Table createTab (String uuid) {
+	private Table createTab (String tabName) {
 		Table tab = new Table();
+		tab.setTouchable(Touchable.enabled);
 		tab.setBackground(skin.getDrawable("tab-bg"));
 
 		tab.padLeft(10);
 		tab.padRight(10);
-		VisLabel visLabel = new VisLabel(uuid.substring(0, 10));
+		VisLabel visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
 		tab.add(visLabel);
 
 		return tab;
@@ -45,7 +47,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	@Override
 	public String getUniqueIdentifier () {
-		return uuid;
+		return tabName;
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	@Override
 	public Actor copyTabWidget () {
-		return createTab(uuid);
+		return createTab(tabName);
 	}
 
 	@Override

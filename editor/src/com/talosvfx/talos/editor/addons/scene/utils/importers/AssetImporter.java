@@ -17,6 +17,9 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
+import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.FileOpener;
@@ -123,7 +126,7 @@ public class AssetImporter {
     }
 
     public static FileHandle getMetadataHandleFor (FileHandle handle) {
-        handle = get(handle.path());
+//        handle = get(handle.path());
 
         FileHandle metadataHandle = Gdx.files.absolute(handle.parent().path() + File.separator + handle.name() + ".meta");
         return metadataHandle;
@@ -219,10 +222,25 @@ public class AssetImporter {
 
     public static void fileOpen (FileHandle fileHandle) {
         if(fileHandle.isDirectory()) {
-            SceneEditorAddon.get().projectExplorer.select(fileHandle.path());
+            AssetChangeDirectoryEvent assetChangeDirectoryEvent = Notifications.obtainEvent(AssetChangeDirectoryEvent.class);
+            assetChangeDirectoryEvent.setPath(fileHandle);
+            Notifications.fireEvent(assetChangeDirectoryEvent);
+            return;
+
+        }
+
+        //Game resource event
+        GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
+        if (assetForPath != null) {
+            GameAssetOpenEvent resourceOpenEvent = Notifications.obtainEvent(GameAssetOpenEvent.class);
+            resourceOpenEvent.setGameAsset(assetForPath);
+            Notifications.fireEvent(resourceOpenEvent);
             return;
         }
+
         if(fileHandle.extension().equals("scn")) {
+
+
             SceneEditorAddon.get().workspace.openScene(fileHandle);
             return;
         } else if(fileHandle.extension().equals("prefab")) {

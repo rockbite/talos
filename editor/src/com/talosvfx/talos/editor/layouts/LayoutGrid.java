@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -80,6 +81,12 @@ public class LayoutGrid extends WidgetGroup {
 		targets.clear();
 		dragAndDrop = new DragAndDrop();
 	}
+
+	@Override
+	public void draw (Batch batch, float parentAlpha) {
+		super.draw(batch, parentAlpha);
+	}
+
 
 	public enum LayoutDirection {
 		UP,

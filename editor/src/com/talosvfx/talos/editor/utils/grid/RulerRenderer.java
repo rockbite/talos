@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 import static com.kotcrab.vis.ui.VisUI.getSkin;
@@ -33,7 +34,7 @@ public class RulerRenderer extends Group {
     }
 
     protected void addRulers () {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         xRulerTable = new Table(skin);
         xRulerTable.background("panel_input_bg");
         addActor(xRulerTable);

@@ -77,6 +77,8 @@ public class MetaData implements Json.Serializable {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
+        if (true) return; //no meta
+
         JsonValue arr = jsonData.get("scopeDefaults");
         int iter = 0;
         for(JsonValue item: arr) {

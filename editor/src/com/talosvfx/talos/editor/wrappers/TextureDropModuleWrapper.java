@@ -30,6 +30,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
@@ -45,7 +46,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
 
     @Override
     protected void configureSlots() {
-        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+        final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
         defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
@@ -64,7 +65,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             if (extension.endsWith("png") || extension.endsWith("jpg")) {
                 final Texture texture = new Texture(fileHandle);
                 final Sprite region = new Sprite(texture);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addToAtlas(fileHandle.nameWithoutExtension(), region);
+                final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+                assetProvider.addToAtlas(fileHandle.nameWithoutExtension(), region);
                 setModuleRegion(fileHandle.nameWithoutExtension(), region);
                 dropWidget.setDrawable(new TextureRegionDrawable(region));
 
@@ -77,8 +79,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                     @Override
                     public void updated(FileHandle handle) {
 
-                        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-                        Sprite region = projectAssetProvider.replaceRegion(handle);
+                        final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+                        Sprite region = assetProvider.replaceRegion(handle);
 
                         setModuleRegion(handle.nameWithoutExtension(), region);
                         dropWidget.setDrawable(new TextureRegionDrawable(region));
@@ -106,7 +108,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             }
         }
     
-        final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+        final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
         final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
         if (textureRegion != null) {

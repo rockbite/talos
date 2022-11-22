@@ -527,14 +527,14 @@ public abstract class ViewportWidget extends Table {
 				isInViewPort = true;
 
 				super.enter(event, x, y, pointer, fromActor);
-				TalosMain.Instance().UIStage().getStage().setScrollFocus(ViewportWidget.this);
+//				TalosMain.Instance().UIStage().getStage().setScrollFocus(ViewportWidget.this);
 			}
 
 			@Override
 			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
 				if (pointer != -1)
 					return; //Only care about exit/enter from mouse move
-				TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
+//				TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
 
 				isInViewPort = false;
 				super.exit(event, x, y, pointer, toActor);
@@ -566,6 +566,7 @@ public abstract class ViewportWidget extends Table {
 	public void draw (Batch batch, float parentAlpha) {
 		batch.end();
 
+
 		localToScreenCoordinates(temp.set(0, 0));
 		int x = (int)temp.x;
 		int y = (int)temp.y;
@@ -580,7 +581,6 @@ public abstract class ViewportWidget extends Table {
 
 		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float aspect = getWidth() / getHeight();
 
@@ -602,7 +602,7 @@ public abstract class ViewportWidget extends Table {
         HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
         if (!locked) {
-            drawGizmos(batch, parentAlpha);
+//            drawGizmos(batch, parentAlpha);
         }
 
 		batch.end();
@@ -613,7 +613,7 @@ public abstract class ViewportWidget extends Table {
 		batch.setTransformMatrix(prevTransform);
 		batch.begin();
 
-		getEntityUnderMouse();
+//		getEntityUnderMouse();
 
 //		Debug entity secltion
 //		if (entityUnderMouse != null) {
@@ -749,8 +749,6 @@ public abstract class ViewportWidget extends Table {
 	protected boolean canMoveAround() {
 		return Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
 	}
-
-	public abstract void drawContent (Batch batch, float parentAlpha);
 
 	public OrthographicCamera getCamera () {
 		return camera;
@@ -1010,4 +1008,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public abstract void initializeGridPropertyProvider ();
+
+	public void resetToDefaults () {
+
+
+	}
 }

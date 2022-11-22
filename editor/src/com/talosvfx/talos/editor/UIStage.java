@@ -60,6 +60,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.*;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -330,7 +331,7 @@ public class UIStage {
 	}
 
 	private void buildPreviewController () {
-		previewController = new PreviewImageControllerWidget(TalosMain.Instance().getSkin()) {
+		previewController = new PreviewImageControllerWidget(SharedResources.skin) {
 			@Override
 			public void removeImage () {
 				super.removeImage();
@@ -401,7 +402,7 @@ public class UIStage {
 		horizontalPane.setSplitAmount(0.3f);
 
 		fullScreenTable.row();
-		fullScreenTable.add(layoutContainer).grow();
+//		fullScreenTable.add(layoutContainer).grow();
 
 		mainLayout.add(verticalPane).grow();
 	}

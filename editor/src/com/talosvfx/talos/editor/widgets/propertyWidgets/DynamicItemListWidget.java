@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -50,7 +51,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
     public Actor getSubWidget () {
         Table table = new Table();
 
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
 
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.DARK_GRAY));
@@ -164,9 +165,14 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
     }
 
     private FilteredTree.Node<T> createNode(T t) {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         EditableLabel editableLabel = new EditableLabel(t.toString(), skin);
         editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+            @Override
+            public void editModeStarted () {
+
+            }
+
             @Override
             public void changed (String newText) {
                 String checkedName = interaction.updateName(t, newText);

@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class CameraPreview extends Actor {
 
@@ -42,7 +43,7 @@ public class CameraPreview extends Actor {
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 200, 200, false);
         polygonSpriteBatch = new PolygonSpriteBatch();
         viewport = new FitViewport(10, 10);
-        white = TalosMain.Instance().getSkin().getRegion("white");
+        white = SharedResources.skin.getRegion("white");
     }
 
     @Override

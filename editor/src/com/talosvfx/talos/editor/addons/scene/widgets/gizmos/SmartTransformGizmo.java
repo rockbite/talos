@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.util.Comparator;
@@ -54,11 +55,11 @@ public class SmartTransformGizmo extends Gizmo {
     private float nextRotation;
 
     public SmartTransformGizmo() {
-        NinePatchDrawable rectDrawable = (NinePatchDrawable) TalosMain.Instance().getSkin().getDrawable("border-dark-orange");
+        NinePatchDrawable rectDrawable = (NinePatchDrawable) SharedResources.skin.getDrawable("border-dark-orange");
         rect = new Image(rectDrawable);
         rectPatch = rectDrawable.getPatch();
 
-        circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
+        circle = new Image(SharedResources.skin.getDrawable("vfx-green"));
 
         for (int i = 0; i < 4; i++) {
             points[i] = new Vector2();

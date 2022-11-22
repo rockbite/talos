@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -21,7 +22,7 @@ public class IntPropertyWidget extends PropertyWidget<Integer> {
 
     @Override
     public Actor getSubWidget() {
-        textField = new TextField("", TalosMain.Instance().getSkin(), "panel");
+        textField = new TextField("", SharedResources.skin, "panel");
         textField.setTextFieldFilter(new IntFieldFilter());
 
         listener = new ChangeListener() {

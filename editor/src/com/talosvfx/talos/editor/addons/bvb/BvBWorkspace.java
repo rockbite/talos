@@ -24,7 +24,10 @@ import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.TalosVersion;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -89,7 +92,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     private BvBWorkspace() {
-        setSkin(TalosMain.Instance().getSkin());
+        setSkin(SharedResources.skin);
         setModeUI();
 
         topUI.setTransform(false);
@@ -104,7 +107,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         setCameraPos(0, 0);
 
-        hintLabel = new Label("", TalosMain.Instance().getSkin());
+        hintLabel = new Label("", SharedResources.skin);
         add(hintLabel).left().expandX().pad(5f);
         row();
         add().expand();
@@ -503,7 +506,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         String name = handle.nameWithoutExtension();
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-        descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
+        TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+
+        descriptor.setAssetProvider(assetProvider);
         descriptor.load(handle);
         vfxLibrary.put(name, descriptor);
 
@@ -545,7 +550,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         String name = handle.nameWithoutExtension();
         if (vfxLibrary.containsKey(name)) {
             ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-            descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
+            TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+
+            descriptor.setAssetProvider(assetProvider);
             descriptor.load(handle);
             vfxLibrary.put(name, descriptor);
 
@@ -674,30 +681,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         PropertyWidget preMultipliedAlphaWidget = WidgetFactory.generate(this, "preMultipliedAlpha", "premultiplied alpha");
         PropertyWidget speed = WidgetFactory.generate(BvBWorkspace.this, "speedMultiplier", "speed multiplier");
 
-        CheckboxWidget showGridWidget = new CheckboxWidget("show/hide grid") {
-            @Override
-            public Boolean getValue() {
-                return showGrid;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                showGrid = value;
-            }
-        };
-
-        FloatPropertyWidget speed = new FloatPropertyWidget("speed multiplier") {
-            @Override
-            public Float getValue() {
-                return speedMultiplier;
-            }
-
-            @Override
-            public void valueChanged(Float value) {
-                speedMultiplier = value;
-            }
-        };
-
 
         FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width", new Supplier<Float>() {
             @Override
@@ -723,7 +706,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
         });
 
-        properties.add(showGridWidget);
+//        properties.add(showGridWidget);
         properties.add(preMultipliedAlphaWidget);
         properties.add(speed);
         properties.add(worldWidthWidget);
@@ -762,7 +745,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     public void flyLabel(String text) {
-        Label label = new Label(text, TalosMain.Instance().getSkin());
+        Label label = new Label(text, SharedResources.skin);
         label.setPosition(getWidth() / 2f - label.getPrefWidth() / 2f, 0);
         addActor(label);
 

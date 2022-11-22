@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.util.function.Supplier;
@@ -32,7 +33,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     @Override
     public Actor getSubWidget() {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         box = new Image(skin.newDrawable(ColorLibrary.SHAPE_SQUARE));
         box.setSize(20, 20);
         box.addListener(new ClickListener() {

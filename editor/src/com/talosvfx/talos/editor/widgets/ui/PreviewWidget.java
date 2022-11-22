@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -38,6 +39,7 @@ import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -46,6 +48,7 @@ import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public abstract class PreviewWidget extends ViewportWidget {
 
+    private final PreviewImageControllerWidget previewController;
     Vector2 mid = new Vector2();
 
     Vector2 temp = new Vector2();
@@ -63,6 +66,7 @@ public abstract class PreviewWidget extends ViewportWidget {
     private Label gpuTimeLbl;
     private Label cpuTimeLbl;
 
+    private Image previewImage = new Image();
 
     protected StringBuilder stringBuilder = new StringBuilder();
     protected int trisCount = 0;
@@ -70,14 +74,24 @@ public abstract class PreviewWidget extends ViewportWidget {
     protected FloatCounter cpuTime = new FloatCounter(100);
     protected float fps = 0;
 
+    private GLProfiler glProfiler = new GLProfiler(Gdx.graphics);
+    private FPSLogger fpsLogger = new FPSLogger();
+
+    private Array<DragPoint> dragPoints = new Array<>();
+    private IDragPointProvider dragPointProvider = null;
+
+    private String backgroundImagePath = "";
+    private float gridSize;
+
     public PreviewWidget(PreviewImageControllerWidget previewImageControllerWidget) {
         super();
+        this.previewController = previewImageControllerWidget;
 
-        countLbl = new Label(countStr, TalosMain.Instance().getSkin());
-        trisCountLbl = new Label(trisCountStr, TalosMain.Instance().getSkin());
-        nodeCallsLbl = new Label(nodeCallsStr, TalosMain.Instance().getSkin());
-        gpuTimeLbl = new Label(gpuTimeStr, TalosMain.Instance().getSkin());
-        cpuTimeLbl = new Label(cpuTimeStr, TalosMain.Instance().getSkin());
+        countLbl = new Label(countStr, SharedResources.skin);
+        trisCountLbl = new Label(trisCountStr, SharedResources.skin);
+        nodeCallsLbl = new Label(nodeCallsStr, SharedResources.skin);
+        gpuTimeLbl = new Label(gpuTimeStr, SharedResources.skin);
+        cpuTimeLbl = new Label(cpuTimeStr, SharedResources.skin);
 
         countLbl.setColor(Color.GRAY);
         trisCountLbl.setColor(Color.GRAY);
@@ -94,7 +108,7 @@ public abstract class PreviewWidget extends ViewportWidget {
         add(gpuTimeLbl).left().top().padLeft(22).row();
         add().expand();
         row();
-        add(previewController).bottom().left().growX();
+        add(previewImageControllerWidget).bottom().left().growX();
 
         cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 
@@ -121,13 +135,13 @@ public abstract class PreviewWidget extends ViewportWidget {
                 prevPos.set(x, y);
 
                 //detect drag points
-                for(DragPoint point: dragPoints) {
-                    if(pos.dst(point.position) < 0.2f * camera.zoom) {
-                        // dragging a point
-                        currentlyDragging = point;
-                        return true;
-                    }
-                }
+//                for(DragPoint point: dragPoints) {
+//                    if(pos.dst(point.position) < 0.2f * camera.zoom) {
+//                        // dragging a point
+//                        currentlyDragging = point;
+//                        return true;
+//                    }
+//                }
 
                 if(button == 1) {
                     moving = true;
@@ -142,24 +156,24 @@ public abstract class PreviewWidget extends ViewportWidget {
 
                 getWorldFromLocal(tmp.set(x, y, 0)); // I can't really explain
                 pos.set(tmp.x, tmp.y);
-
-                if(moving) {
-                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-                    particleEffect.setPosition(tmp.x, tmp.y);
-                } else {
-                    getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
-                    getWorldFromLocal(tmp2.set(x, y, 0));
-
-                    if(currentlyDragging == null) {
-                        // panning
-
-                        camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
-                    } else {
-                        // dragging a point
-                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
-                        dragPointProvider.dragPointChanged(currentlyDragging);
-                    }
-                }
+//
+//                if(moving) {
+//                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//                    particleEffect.setPosition(tmp.x, tmp.y);
+//                } else {
+//                    getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
+//                    getWorldFromLocal(tmp2.set(x, y, 0));
+//
+//                    if(currentlyDragging == null) {
+//                        // panning
+//
+//                        camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
+//                    } else {
+//                        // dragging a point
+//                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
+//                        dragPointProvider.dragPointChanged(currentlyDragging);
+//                    }
+//                }
 
                 prevPos.set(x, y);
             }
@@ -283,7 +297,7 @@ public abstract class PreviewWidget extends ViewportWidget {
             previewImage.draw(batch, parentAlpha);
         }
 
-        spriteBatchParticleRenderer.setBatch(batch);
+//        spriteBatchParticleRenderer.setBatch(batch);
 
         batch.flush();
         glProfiler.enable();
@@ -291,7 +305,7 @@ public abstract class PreviewWidget extends ViewportWidget {
         long timeBefore = TimeUtils.nanoTime();
 
         final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        particleEffect.render(particleRenderer);
+//        particleEffect.render(particleRenderer);
 
         batch.flush();
         renderTime.put(TimeUtils.timeSinceNanos(timeBefore));
@@ -306,14 +320,14 @@ public abstract class PreviewWidget extends ViewportWidget {
         // now for the drag points
         if(dragPoints.size > 0) {
             batch.end();
-            tmpColor.set(Color.ORANGE);
-            tmpColor.a = 0.8f;
+//            tmpColor.set(Color.ORANGE);
+//            tmpColor.a = 0.8f;
             Gdx.gl.glLineWidth(1f);
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(tmpColor);
+//            shapeRenderer.setColor(tmpColor);
 
             for (DragPoint point : dragPoints) {
                 shapeRenderer.circle(point.position.x, point.position.y, 0.1f * camera.zoom, 15);
@@ -376,23 +390,10 @@ public abstract class PreviewWidget extends ViewportWidget {
         previewController.setGridVisible(isVisible);
     }
 
-
-    }
-
-    public abstract void fileDrop(float x, float y, String[] paths);
-    public abstract void unregisterDragPoints();
-    public abstract void registerForDragPoints(IDragPointProvider dragPointProvider);
-    public abstract void unregisterDragPoints(IDragPointProvider dragPointProvider);
-
-    public abstract String getBackgroundImagePath();
-    public abstract boolean isGridVisible();
-    public abstract boolean isBackgroundImageInBack();
     public abstract float getBgImageSize();
     public abstract float getGridSize();
 
     public abstract void setBackgroundImage(String bgImagePath);
-    public abstract void setGridVisible(boolean isGridVisible);
-    public abstract void setImageIsBackground(boolean bgImageIsInBack);
     public abstract void setBgImageSize(float bgImageSize);
     public abstract void setGridSize(float gridSize);
 

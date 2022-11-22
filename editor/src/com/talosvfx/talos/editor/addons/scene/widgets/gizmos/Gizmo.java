@@ -16,6 +16,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
@@ -56,7 +57,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     private Image circle;
 
     public Gizmo() {
-        circle = new Image(TalosMain.Instance().getSkin().getDrawable("vfx-green"));
+        circle = new Image(SharedResources.skin.getDrawable("vfx-green"));
     }
 
     public void setGameObject(GameObject gameObject) {
@@ -83,7 +84,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     }
 
     protected void drawLine(Batch batch, float x1, float y1, float x2, float y2, Color color) {
-        TextureRegion white = TalosMain.Instance().getSkin().getRegion("white");
+        TextureRegion white = SharedResources.skin.getRegion("white");
         tmp.set(x2, y2).sub(x1, y1);
         float thickness = worldPerPixel * 3f;
         float length = tmp.len();

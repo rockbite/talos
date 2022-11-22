@@ -2,8 +2,9 @@ package com.talosvfx.talos.editor.addons.scene.events;
 
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class ProjectDirectoryContentsChanged implements Notifications.Event {
+public class ProjectDirectoryContentsChanged implements TalosEvent {
 
     private FileWatching.Changes changes;
 
@@ -12,7 +13,7 @@ public class ProjectDirectoryContentsChanged implements Notifications.Event {
 
     }
 
-    public Notifications.Event set(FileWatching.Changes changes) {
+    public ProjectDirectoryContentsChanged set(FileWatching.Changes changes) {
         this.changes = changes;
         return this;
     }

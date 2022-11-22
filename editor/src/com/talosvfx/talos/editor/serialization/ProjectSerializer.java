@@ -20,8 +20,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.modules.EmitterModule;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
 public class ProjectSerializer {
@@ -40,7 +43,7 @@ public class ProjectSerializer {
         if(metaData != null) {
             final JsonValue resourcePaths = metaData.get("resourcePaths");
             if (resourcePaths != null) {
-                final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+                final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
                 for (JsonValue resourcePath : resourcePaths) {
                     projectAssetProvider.addUnknownResource(resourcePath.asString());
                 }

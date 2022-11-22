@@ -18,8 +18,10 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class CameraPane extends Actor implements Notifications.Observer {
+public class CameraPane extends Actor implements Observer {
 
     private final Label title;
     private final Image bg;
@@ -29,8 +31,8 @@ public class CameraPane extends Actor implements Notifications.Observer {
     private GameObject cameraObject;
 
     public CameraPane () {
-        title = new Label("qaqov tolma", TalosMain.Instance().getSkin());
-        bg = new Image(TalosMain.Instance().getSkin().getDrawable("window"));
+        title = new Label("qaqov tolma", SharedResources.skin);
+        bg = new Image(SharedResources.skin.getDrawable("window"));
 
         cameraPreview = new CameraPreview();
 

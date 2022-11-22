@@ -13,6 +13,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class TweenEditor extends AEditorApp<FileHandle> {
 
@@ -54,12 +55,12 @@ public class TweenEditor extends AEditorApp<FileHandle> {
         }
 
         scenePreviewStage = new ScenePreviewStage();
-        SplitPane splitPane = new SplitPane(scenePreviewStage, tweenStage.getContainer(),  false, TalosMain.Instance().getSkin());
+        SplitPane splitPane = new SplitPane(scenePreviewStage, tweenStage.getContainer(),  false, SharedResources.skin);
         splitPane.setSplitAmount(0.2f);
 
         content.add(splitPane).grow();
 
-        TalosMain.Instance().getInputMultiplexer().addProcessor(tweenStage.getStage());
+//        TalosMain.Instance().getInputMultiplexer().addProcessor(tweenStage.getStage());
 
     }
 

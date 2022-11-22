@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -62,6 +63,9 @@ public class GameObjectActor extends Table {
 		}
 
 		uiRenderer.update(gameObject);
-		uiRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
+		if (batch instanceof PolygonBatch) {
+			uiRenderer.render((PolygonBatch)batch, new MainRenderer.RenderState(), gameObject);
+		}
+
 	}
 }

@@ -189,11 +189,6 @@ public class Preview2D extends PreviewWidget {
     @Override
     public void drawContent(PolygonBatch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
-        if (previewController.isGridVisible()) {
-            batch.end();
-            drawGrid(batch, parentAlpha * 0.5f);
-            batch.begin();
-        }
 
         mid.set(0, 0);
 

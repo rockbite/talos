@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -51,8 +52,8 @@ public class SEPropertyPanel extends PropertyPanel{
             container.row();
 
             Table table = new Table();
-            Label label = new Label("Add Component", TalosMain.Instance().getSkin());
-            SquareButton button = new SquareButton(TalosMain.Instance().getSkin(), label, "Add Component to entity");
+            Label label = new Label("Add Component", SharedResources.skin);
+            SquareButton button = new SquareButton(SharedResources.skin, label, "Add Component to entity");
 
             button.addListener(new ClickListener() {
                 @Override

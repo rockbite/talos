@@ -35,10 +35,10 @@ public class GridRenderer {
 
 	public void drawGrid (Batch batch, ShapeRenderer shapeRenderer) {
 		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
-		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
+//		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
 		Gdx.gl.glLineWidth(1f);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
+//		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
 
 		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);

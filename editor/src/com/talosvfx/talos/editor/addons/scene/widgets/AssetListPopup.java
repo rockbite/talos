@@ -16,6 +16,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -73,7 +74,7 @@ public class AssetListPopup<T> extends VisWindow {
         tree.clearChildren();
         FileHandle root = Gdx.files.absolute(rootPath);
 
-        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), TalosMain.Instance().getSkin()));
+        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), SharedResources.skin));
         rootNode.setObject(null);
         tree.add(rootNode);
 

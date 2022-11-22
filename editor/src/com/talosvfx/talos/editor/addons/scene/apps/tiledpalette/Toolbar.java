@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.OrderedSet;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
@@ -22,7 +23,7 @@ public class Toolbar extends Table {
     public Toolbar(PaletteEditor paletteEditor) {
         this.paletteEditor = paletteEditor;
 
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
 
         setBackground(skin.newDrawable("square-bordered"));
 

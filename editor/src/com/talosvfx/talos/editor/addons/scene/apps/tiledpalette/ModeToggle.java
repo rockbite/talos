@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ModeToggle extends Table {
@@ -21,7 +22,7 @@ public class ModeToggle extends Table {
     private TextButton entityBtn;
 
     public ModeToggle () {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
 
         defaults().padLeft(8).padRight(8);
         setBackground(skin.newDrawable("square-bordered"));

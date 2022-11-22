@@ -124,7 +124,7 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
+//		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
 
 		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
 	}

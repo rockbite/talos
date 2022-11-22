@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -68,7 +69,7 @@ public class GameObjectListPopup extends VisWindow {
 
     private void loadTree (GameObject root, Predicate<FilteredTree.Node<GameObject>> predicate) {
         tree.clearChildren();
-        rootNode = new FilteredTree.Node<>(root.getName(), new Label(root.getName(), TalosMain.Instance().getSkin()));
+        rootNode = new FilteredTree.Node<>(root.getName(), new Label(root.getName(), SharedResources.skin));
         rootNode.setObject(root);
         tree.add(rootNode);
 
@@ -155,7 +156,7 @@ public class GameObjectListPopup extends VisWindow {
         for (int i = 0; i < gameObjects.size; i++) {
             GameObject gameObject = gameObjects.get(i);
 
-            final FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), new Label(gameObject.getName(), TalosMain.Instance().getSkin()));
+            final FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), new Label(gameObject.getName(), SharedResources.skin));
             newNode.setObject(gameObject);
 
             if (predicate.evaluate(newNode)) {

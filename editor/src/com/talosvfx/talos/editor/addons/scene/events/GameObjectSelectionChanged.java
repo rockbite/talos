@@ -4,9 +4,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
-public class GameObjectSelectionChanged implements Notifications.Event {
+public class GameObjectSelectionChanged implements TalosEvent {
 
     private ObjectSet<GameObject> objectArray = new ObjectSet<>();
     private ViewportWidget context;

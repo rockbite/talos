@@ -21,6 +21,13 @@ import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
+import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
@@ -36,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public class ProjectExplorerWidget extends Table {
+public class ProjectExplorerWidget extends Table implements Observer {
 
     private final FilteredTree<String> directoryTree;
     public static FileFilter fileFilter;
@@ -52,7 +59,8 @@ public class ProjectExplorerWidget extends Table {
     public Array<FileHandle> filesToManipulate = new Array<>();
 
     public ProjectExplorerWidget() {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
+        Notifications.registerObserver(this);
 
         Table horizontalPanel = new Table();
         horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.LIGHT_GRAY));
@@ -101,7 +109,7 @@ public class ProjectExplorerWidget extends Table {
 
         Table container = new Table();
 
-        directoryTree = new FilteredTree<>(TalosMain.Instance().getSkin(), "modern");
+        directoryTree = new FilteredTree<>(SharedResources.skin, "modern");
 
         Table directoryTreeTable = new Table();
         directoryTreeTable.top().defaults().top();
@@ -115,8 +123,8 @@ public class ProjectExplorerWidget extends Table {
 
         scrollPaneTable.add(scrollPane).height(0).grow();
 
-        directoryViewWidget = new DirectoryViewWidget();
-        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, TalosMain.Instance().getSkin());
+        directoryViewWidget = new DirectoryViewWidget(this);
+        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, SharedResources.skin);
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
@@ -539,7 +547,7 @@ public class ProjectExplorerWidget extends Table {
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
 
-        rootNode = new FilteredTree.Node("project",  new Label("Project", TalosMain.Instance().getSkin()));
+        rootNode = new FilteredTree.Node("project",  new Label("Project", SharedResources.skin));
         rootNode.setObject(path); // project path
         traversePath(root, 0, 10, rootNode);
         directoryTree.add(rootNode);
@@ -581,6 +589,11 @@ public class ProjectExplorerWidget extends Table {
                 }
 
                 label.setListener(new EditableLabel.EditableLabelChangeListener() {
+                    @Override
+                    public void editModeStarted () {
+
+                    }
+
                     @Override
                     public void changed (String newText) {
                         String path = (String) newNode.getObject();
@@ -634,12 +647,12 @@ public class ProjectExplorerWidget extends Table {
             this.editable = editable;
             Image icon;
             if(fileHandle.isDirectory()) {
-                icon = new Image(TalosMain.Instance().getSkin().getDrawable("ic-folder"));
+                icon = new Image(SharedResources.skin.getDrawable("ic-folder"));
             } else {
-                icon = new Image(TalosMain.Instance().getSkin().getDrawable("ic-file-blank"));
+                icon = new Image(SharedResources.skin.getDrawable("ic-file-blank"));
             }
 
-            label = new EditableLabel(fileHandle.name(), TalosMain.Instance().getSkin());
+            label = new EditableLabel(fileHandle.name(), SharedResources.skin);
             label.setEditable(editable);
 
             add(icon);
@@ -701,4 +714,16 @@ public class ProjectExplorerWidget extends Table {
     public DirectoryViewWidget getDirectoryViewWidget() {
         return directoryViewWidget;
     }
+
+    @EventHandler
+    public void onProjectLoad (ProjectLoadedEvent event) {
+        TalosProjectData projectData = event.getProjectData();
+        loadDirectoryTree(projectData.rootProjectDir().path());
+    }
+
+    @EventHandler
+    public void onDirectoryChange (AssetChangeDirectoryEvent assetChangeDirectoryEvent) {
+        select(assetChangeDirectoryEvent.getPath().path());
+    }
+
 }

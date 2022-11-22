@@ -8,6 +8,10 @@ import com.talosvfx.talos.TalosMain;
 public class TalosInputProcessor implements InputProcessor {
 
     public static boolean ctrlPressed () {
+
+        //todo
+        if (true) return false;
+
         if (TalosMain.Instance().isOsX()) {
             return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
         } else {
@@ -17,6 +21,9 @@ public class TalosInputProcessor implements InputProcessor {
 
     @Override
     public boolean keyDown (int keycode) {
+        //todo
+        if (true) return false;
+
         if (keycode == Input.Keys.Z && ctrlPressed() && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             TalosMain.Instance().ProjectController().undo();
             return true;

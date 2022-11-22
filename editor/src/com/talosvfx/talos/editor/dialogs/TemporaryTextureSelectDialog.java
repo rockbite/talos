@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -69,11 +70,11 @@ public class TemporaryTextureSelectDialog extends VisWindow {
 
         public TextureSelection (String internalAssetPath) {
             this.internalAssetPath = internalAssetPath;
-            setBackground(TalosMain.Instance().getSkin().newDrawable("white", 0, 0, 0, 0.9f));
+            setBackground(SharedResources.skin.newDrawable("white", 0, 0, 0, 0.9f));
 
             texture = new Texture(Gdx.files.internal(internalAssetPath));
             final Image image = new Image(texture);
-            selected = new Image(TalosMain.Instance().getSkin().newDrawable("white", 1f, 1f, 1f, 1f));
+            selected = new Image(SharedResources.skin.newDrawable("white", 1f, 1f, 1f, 1f));
             this.selected.setColor(1f, 1f, 1f, 0);
 
             add(new Stack(image, selected)).grow();

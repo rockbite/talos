@@ -11,6 +11,8 @@ import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.EventData;
 import com.esotericsoftware.spine.Slot;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.talosvfx.talos.editor.assets.TalosAssetProvider;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.utils.NumberUtils;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
@@ -410,7 +412,9 @@ public class BoundEffect implements Json.Serializable, IPropertyProvider, Timeli
 
         //TODO: refactor this
         ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-        descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
+        TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+
+        descriptor.setAssetProvider(assetProvider);
         descriptor.load(effectHandle);
         parent.getWorkspace().getVfxLibrary().put(name, descriptor);
 

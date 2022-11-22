@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.GameObjectActor;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -48,9 +49,9 @@ class Item extends Widget implements ActorCloneable<Item> {
 	private float space = 5, spaceSmall = 2, spaceBig = 7;
 
 	public Item () {
-		Skin skin = TalosMain.Instance().getSkin();
+		Skin skin = SharedResources.skin;
 		icon = new Image(null, Scaling.fit, Align.center);
-		brokenStatus = new Image(TalosMain.Instance().getSkin().newDrawable("ic-fileset-file"));
+		brokenStatus = new Image(SharedResources.skin.newDrawable("ic-fileset-file"));
 		brokenStatus.setColor(Color.RED);
 		label = new EditableLabel("text", skin);
 		label.getLabel().setAlignment(Align.center);
@@ -68,12 +69,12 @@ class Item extends Widget implements ActorCloneable<Item> {
 		if (fileHandle.isDirectory()) {
 			FileHandle[] content = fileHandle.list();
 			if (content.length == 0) {
-				icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big-empty"));
+				icon.setDrawable(SharedResources.skin.getDrawable("ic-folder-big-empty"));
 			} else {
-				icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-folder-big"));
+				icon.setDrawable(SharedResources.skin.getDrawable("ic-folder-big"));
 			}
 		} else {
-			icon.setDrawable(TalosMain.Instance().getSkin().getDrawable("ic-file-big"));
+			icon.setDrawable(SharedResources.skin.getDrawable("ic-file-big"));
 			String extension = fileHandle.extension();
 			if (extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
 				Texture texture = new Texture(fileHandle);
@@ -123,10 +124,10 @@ class Item extends Widget implements ActorCloneable<Item> {
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		if (selected) {
-			Drawable bg = ColorLibrary.obtainBackground(TalosMain.Instance().getSkin(), "white", ColorLibrary.BackgroundColor.DARK_GRAY);
+			Drawable bg = ColorLibrary.obtainBackground(SharedResources.skin, "white", ColorLibrary.BackgroundColor.DARK_GRAY);
 			bg.draw(batch, getX(), getY(), getWidth(), getHeight());
 		} else if (mouseover) {
-			Drawable bg = ColorLibrary.obtainBackground(TalosMain.Instance().getSkin(), "white", ColorLibrary.BackgroundColor.LIGHT_GRAY);
+			Drawable bg = ColorLibrary.obtainBackground(SharedResources.skin, "white", ColorLibrary.BackgroundColor.LIGHT_GRAY);
 			bg.draw(batch, getX(), getY(), getWidth(), getHeight());
 		}
 

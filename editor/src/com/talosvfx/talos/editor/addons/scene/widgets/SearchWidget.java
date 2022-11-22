@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SearchWidget extends Table {
@@ -13,11 +14,11 @@ public class SearchWidget extends Table {
     private TextField textField;
 
     public SearchWidget () {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
         // add search icon
         Container<Image> searchIcon = new Container<>();
         searchIcon.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.BLACK));
-        Image icon = new Image(TalosMain.Instance().getSkin().newDrawable("search"), Scaling.fit);
+        Image icon = new Image(SharedResources.skin.newDrawable("search"), Scaling.fit);
         icon.setOrigin(icon.getWidth() / 2f, icon.getHeight() / 2f);
         icon.setScale(0.6f, 0.6f);
         searchIcon.setActor(icon);

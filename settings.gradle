@@ -23,6 +23,7 @@ dependencyResolutionManagement {
             version("tiny-gizmo", "0.0.1-SNAPSHOT")
             version("logback", "1.2.3")
             version("slf4j", "1.7.25")
+            version("spark", "2.9.4")
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
             library("bongo-engine", "com.rockbite.bongo", "engine").versionRef("bongo")
@@ -44,6 +45,8 @@ dependencyResolutionManagement {
             library("logback-core", "ch.qos.logback", "logback-core").versionRef("logback")
             library("logback-classic", "ch.qos.logback", "logback-classic").versionRef("logback")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
+
+            library("spark", "com.sparkjava", "spark-core").versionRef("spark")
 
             plugin("lombok", "io.freefair.lombok").version("6.4.1")
         }

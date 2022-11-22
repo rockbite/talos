@@ -39,6 +39,8 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
@@ -61,7 +63,7 @@ import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImport
 import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
 import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
-public class AssetRepository implements Notifications.Observer {
+public class AssetRepository implements Observer {
 
 	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
@@ -168,7 +170,8 @@ public class AssetRepository implements Notifications.Observer {
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
 			public void run () {
-				loadChangesFromScripts(AssetRepository.this::fileVisit);
+				//todo scripts
+//				loadChangesFromScripts(AssetRepository.this::fileVisit);
 			}
 		});
 	}
@@ -670,7 +673,10 @@ public class AssetRepository implements Notifications.Observer {
 
 				FileHandle pFile = value.handle.parent().child(value.handle.nameWithoutExtension() + ".p");
 				if (!pFile.exists()) {
-					throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
+					updateVFXTLS(value, true);
+					if (!pFile.exists()) {
+						throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
+					}
 				}
 
 				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(pFile);
@@ -736,7 +742,7 @@ public class AssetRepository implements Notifications.Observer {
 
 				Scene scene = new Scene();
 				scene.path = value.handle.path();
-				scene.loadFromPath();
+				scene.loadFromHandle(value.handle);
 
 				sceneGameAsset.setResourcePayload(scene);
 
@@ -826,13 +832,15 @@ public class AssetRepository implements Notifications.Observer {
 	}
 
 	public void updateVFXTLS (RawAsset tlsRawAsset, boolean checkGameResources) {
-		ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
-		String exportDataJson = writeTalosPExport(exportData);
+		if (checkGameResources) {
+			ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
+			String exportDataJson = writeTalosPExport(exportData);
 
-		FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
-		exportedPFile.writeString(exportDataJson, false);
+			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
+			exportedPFile.writeString(exportDataJson, false);
 
-		rawAssetCreated(exportedPFile, checkGameResources);
+			rawAssetCreated(exportedPFile, checkGameResources);
+		}
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
@@ -872,6 +880,11 @@ public class AssetRepository implements Notifications.Observer {
 		} catch (GameAssetType.NoAssetTypeException noAssetTypeException) {
 			//Its not an asset
 		}
+	}
+
+	@EventHandler
+	public void onProjectLoad (ProjectLoadedEvent projectLoadedEvent) {
+		loadAssetsForProject(projectLoadedEvent.getProjectData().rootProjectDir());
 	}
 
 	@EventHandler

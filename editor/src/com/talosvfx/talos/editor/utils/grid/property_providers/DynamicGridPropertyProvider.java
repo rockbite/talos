@@ -10,7 +10,7 @@ import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 
 public class DynamicGridPropertyProvider implements GridPropertyProvider {
 
-    public float gridUnit;
+    public float gridUnit = 1;
     public float gridXStart;
     public float gridYStart;
     public float gridXEnd;

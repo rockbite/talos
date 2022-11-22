@@ -1,36 +1,16 @@
 package com.talosvfx.talos.editor.utils;
 
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.macosx.ObjCRuntime;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
-import static org.lwjgl.system.JNI.*;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.macosx.CoreFoundation.*;
-import static org.lwjgl.system.macosx.ObjCRuntime.objc_getClass;
-import static org.lwjgl.system.macosx.ObjCRuntime.sel_getUid;
 
 public class FileOpener {
 
 	public static void open (File file) {
 		openSystem(file.getPath());
-	}
-	private static void openHackMac (File file) {
-		long objc_msgSend = ObjCRuntime.getLibrary().getFunctionAddress("objc_msgSend");
-
-		try (MemoryStack stack = stackPush()) {
-			long fullPath = CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, stack.UTF8(file.getAbsolutePath()), kCFStringEncodingUTF8, kCFAllocatorNull);
-
-			long sharedWorkspace = invokePPP(objc_getClass("NSWorkspace"), sel_getUid("sharedWorkspace"), objc_msgSend);
-			int result = invokePPPI(sharedWorkspace, sel_getUid("openFile:"), fullPath, objc_msgSend);
-			System.out.println("SUCCESS: " + (result != 0 ? "YES" : "NO"));
-
-			CFRelease(fullPath);
-		}
 	}
 
 	private static boolean openSystem (String what) {

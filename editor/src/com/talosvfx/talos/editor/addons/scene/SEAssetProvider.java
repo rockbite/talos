@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
 
 public class SEAssetProvider extends BaseAssetProvider {
@@ -16,7 +17,7 @@ public class SEAssetProvider extends BaseAssetProvider {
 
     public SEAssetProvider() {
         defaultSprite = new Sprite();
-        defaultSprite.setRegion(TalosMain.Instance().getSkin().getRegion("white"));
+        defaultSprite.setRegion(SharedResources.skin.getRegion("white"));
 
         setAssetHandler(Sprite.class, new AssetHandler<Sprite>() {
             @Override

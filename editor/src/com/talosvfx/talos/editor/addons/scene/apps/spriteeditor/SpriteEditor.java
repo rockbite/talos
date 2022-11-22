@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class SpriteEditor extends AEditorApp<SpriteMetadata> {
 
@@ -58,16 +59,16 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
         ninePatchPreview = new NinePatchPreview();
         Table numberControls = new Table();
 
-        Label leftLabel = new Label("Left: ", TalosMain.Instance().getSkin());
+        Label leftLabel = new Label("Left: ", SharedResources.skin);
         leftProperty = new NumberPanel();
-        Label rightLabel = new Label("Right: ", TalosMain.Instance().getSkin());
+        Label rightLabel = new Label("Right: ", SharedResources.skin);
         rightProperty = new NumberPanel();
-        Label topLabel = new Label("Top: ", TalosMain.Instance().getSkin());
+        Label topLabel = new Label("Top: ", SharedResources.skin);
         topProperty = new NumberPanel();
-        Label bottomLabel = new Label("Bottom: ", TalosMain.Instance().getSkin());
+        Label bottomLabel = new Label("Bottom: ", SharedResources.skin);
         bottomProperty = new NumberPanel();
 
-        TextButton saveSpriteMetaData = new TextButton("Save", TalosMain.Instance().getSkin());
+        TextButton saveSpriteMetaData = new TextButton("Save", SharedResources.skin);
         saveSpriteMetaData.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

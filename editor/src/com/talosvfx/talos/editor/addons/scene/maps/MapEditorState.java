@@ -17,8 +17,9 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 
-public class MapEditorState implements Notifications.Observer {
+public class MapEditorState implements Observer {
 
 	private GameObject focusedMapObject;
 	private MapComponent mapComponent;

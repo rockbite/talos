@@ -5,8 +5,9 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class ComponentUpdated implements Notifications.Event {
+public class ComponentUpdated implements TalosEvent {
 
     private AComponent component;
     private boolean rapid;
@@ -20,18 +21,18 @@ public class ComponentUpdated implements Notifications.Event {
         notifyUI = false;
     }
 
-    public Notifications.Event set (AComponent component, boolean rapid, boolean notifyUI) {
+    public ComponentUpdated set (AComponent component, boolean rapid, boolean notifyUI) {
         this.rapid = rapid;
         this.component = component;
         this.notifyUI = notifyUI;
         return this;
     }
 
-    public Notifications.Event set (AComponent component) {
+    public ComponentUpdated set (AComponent component) {
         return set(component, false, true);
     }
 
-    public Notifications.Event set (AComponent component, boolean rapid) {
+    public ComponentUpdated set (AComponent component, boolean rapid) {
         return set(component, rapid, true);
     }
 

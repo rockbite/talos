@@ -1,8 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class AssetPathChanged implements Notifications.Event{
+public class AssetPathChanged implements TalosEvent {
 
     public String oldRelativePath;
     public String newRelativePath;

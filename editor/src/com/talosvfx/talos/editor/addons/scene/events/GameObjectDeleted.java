@@ -2,8 +2,9 @@ package com.talosvfx.talos.editor.addons.scene.events;
 
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class GameObjectDeleted implements Notifications.Event {
+public class GameObjectDeleted implements TalosEvent {
 
     private GameObject target;
 

@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class SceneEditorAddon implements IAddon {
@@ -148,7 +149,7 @@ public class SceneEditorAddon implements IAddon {
     }
 
     private void makeLayout(Table container) {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = SharedResources.skin;
 
         Table leftPart = new Table();
         Table midPart = new Table();
@@ -287,7 +288,7 @@ public class SceneEditorAddon implements IAddon {
 
     public static SceneEditorAddon get() {
         // todo: add some null checks
-        return ((SceneEditorProject)TalosMain.Instance().Project()).sceneEditorAddon;
+        return null;
     }
 
     public void openApp(AEditorApp editorApp, AEditorApp.AppOpenStrategy strategy) {

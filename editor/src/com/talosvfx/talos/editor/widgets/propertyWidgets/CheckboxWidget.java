@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -27,7 +28,7 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	@Override
 	public Actor getSubWidget() {
-		checkBox = new CheckBox("", TalosMain.Instance().getSkin(), "panel-checkbox");
+		checkBox = new CheckBox("", SharedResources.skin, "panel-checkbox");
 
 		listener = new ChangeListener() {
 			@Override

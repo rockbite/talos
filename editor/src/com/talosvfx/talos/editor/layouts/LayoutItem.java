@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 
 public abstract class LayoutItem extends WidgetGroup {
 
@@ -36,7 +38,10 @@ public abstract class LayoutItem extends WidgetGroup {
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
-		super.draw(batch, parentAlpha);
+		if (clipBegin()) {
+			super.draw(batch, parentAlpha);
+			clipEnd();
+		}
 	}
 
 

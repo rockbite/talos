@@ -394,9 +394,7 @@ public class TalosProject implements IProject {
 		return currentEmitterWrapper.getGraph();
 	}
 
-	public TalosAssetProvider getProjectAssetProvider () {
-		return projectAssetProvider;
-	}
+
 
 	public void importFromLegacyFormat(FileHandle fileHandle) {
 		cleanData();

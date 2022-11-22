@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -60,7 +61,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         };
 
         xValue = new ValueWidget();
-        xValue.init(TalosMain.Instance().getSkin());
+        xValue.init(SharedResources.skin);
         xValue.setRange(-9999, 9999);
         xValue.setStep(0.1f);
         xValue.setValue(0);
@@ -69,7 +70,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         xValue.addListener(listener);
 
         yValue = new ValueWidget();
-        yValue.init(TalosMain.Instance().getSkin());
+        yValue.init(SharedResources.skin);
         yValue.setRange(-9999, 9999);
         yValue.setStep(0.1f);
         yValue.setValue(0);
@@ -80,7 +81,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         Table left = new Table();
         Table right = new Table();
 
-        title = new Label(name, TalosMain.Instance().getSkin());
+        title = new Label(name, SharedResources.skin);
         title.setAlignment(Align.left);
 
         left.add(title).left().expand().pad(2).top();

@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -34,7 +35,7 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
 
     @Override
     public Actor getSubWidget() {
-        listContainer = new GlobalValueListContainer(TalosMain.Instance().getSkin());
+        listContainer = new GlobalValueListContainer(SharedResources.skin);
         listContainer.setBoneList(boneListSuppler.get());
         return listContainer;
     }

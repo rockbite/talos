@@ -2,7 +2,9 @@ package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
@@ -26,7 +28,7 @@ public class TalosMapRenderer {
 	}
 
 	private interface RenderFunction {
-		void render (MainRenderer mainRenderer, Batch batch, GameObject entityThatHasTheMap, MapComponent map);
+		void render (MainRenderer mainRenderer, PolygonBatch batch, GameObject entityThatHasTheMap, MapComponent map);
 	}
 
 	private ObjectMap<MapType, RenderFunction> renderModes = new ObjectMap<>();
@@ -69,7 +71,7 @@ public class TalosMapRenderer {
 		state = new MainRenderer.RenderState();
 	}
 
-	private void orthoRenderMap (MainRenderer mainRenderer, Batch batch, GameObject gameObject, MapComponent map) {
+	private void orthoRenderMap (MainRenderer mainRenderer, PolygonBatch batch, GameObject gameObject, MapComponent map) {
 		Array<TalosLayer> layers = map.getLayers();
 
 		for (TalosLayer layer : layers) {
@@ -159,7 +161,7 @@ public class TalosMapRenderer {
 		mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
 	}
 
-	public void render (MainRenderer mainRenderer, Batch batch, GameObject entityThatHasTheMap, MapComponent map) {
+	public void render (MainRenderer mainRenderer, PolygonBatch batch, GameObject entityThatHasTheMap, MapComponent map) {
 		MapType mapType = map.getMapType();
 		renderModes.get(mapType).render(mainRenderer, batch, entityThatHasTheMap, map);
 	}

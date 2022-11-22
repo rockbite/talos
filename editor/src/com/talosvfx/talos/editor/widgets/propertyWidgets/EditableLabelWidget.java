@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 import java.util.function.Supplier;
@@ -23,7 +24,7 @@ public class EditableLabelWidget extends PropertyWidget<String> {
 
     @Override
     public Actor getSubWidget() {
-        propertyValue = new EditableLabel("", TalosMain.Instance().getSkin());
+        propertyValue = new EditableLabel("", SharedResources.skin);
         propertyValue.setAlignment(Align.right);
 
         propertyValue.addListener(new FocusListener() {
@@ -37,6 +38,11 @@ public class EditableLabelWidget extends PropertyWidget<String> {
         });
 
         propertyValue.setListener(new EditableLabel.EditableLabelChangeListener() {
+            @Override
+            public void editModeStarted () {
+
+            }
+
             @Override
             public void changed (String newText) {
                 callValueChanged(newText);

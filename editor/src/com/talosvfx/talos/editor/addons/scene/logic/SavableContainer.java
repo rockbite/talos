@@ -152,6 +152,10 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
         load(dataFile.readString());
     }
 
+    public void loadFromHandle (FileHandle handle) {
+        load(handle.readString());
+    }
+
     public void save() {
         FileHandle file = AssetImporter.get(path);
         String data = getAsString();

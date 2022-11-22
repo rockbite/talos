@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -616,7 +617,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         private ShaderProgram shaderProgram;
 
         public ProgressWidget() {
-            super(TalosMain.Instance().getSkin());
+            super(SharedResources.skin);
 
             region = getSkin().getAtlas().findRegion("mini-node-bg");
 
@@ -686,7 +687,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
         private ObjectFloatMap<String> progressMap = new ObjectFloatMap<>();
 
         public MicroNodeView() {
-            super(TalosMain.Instance().getSkin());
+            super(SharedResources.skin);
 
             shadow = new Image(ColorLibrary.obtainBackground(getSkin(), "mini-node-bg-shadow", ColorLibrary.BackgroundColor.DARK_GRAY));
             shadow.getColor().a = 0.4f;
@@ -705,7 +706,7 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
             shadow.setPosition(-shadow.getWidth()/2, -shadow.getHeight()/2);
             bg.setPosition(-bg.getWidth()/2, -bg.getHeight()/2);
 
-            label = new Label("1.0", TalosMain.Instance().getSkin());
+            label = new Label("1.0", SharedResources.skin);
             add(label).expand().center();
         }
 
