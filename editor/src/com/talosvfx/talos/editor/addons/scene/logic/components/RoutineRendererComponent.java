@@ -1,12 +1,17 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
@@ -20,18 +25,28 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
+import javax.swing.border.AbstractBorder;
 import java.util.function.Supplier;
 
 public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<String> {
 
     GameAsset<String> routineResource;
 
-    private transient RoutineInstance routineInstance;
+    @ValueProperty(prefix = {"W", "H"})
+    public Vector2 viewportSize = new Vector2(6, 4);
+
+
+    public transient RoutineInstance routineInstance;
+    private transient TextureRegion textureRegion = new TextureRegion();
+    private transient float renderCoolDown  = 0f;
 
     @Override
     public void write(Json json) {
         GameResourceOwner.writeGameAsset(json, this);
+        json.writeValue("size", viewportSize, Vector2.class);
     }
 
     @Override
@@ -40,6 +55,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
+
+        viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
+        if(viewportSize == null) viewportSize = new Vector2(6, 4);
     }
 
     @Override
@@ -65,6 +83,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         });
 
         properties.add(widget);
+
+        PropertyWidget sizeWidget = WidgetFactory.generate(this, "viewportSize", "Viewport");
+        properties.add(sizeWidget);
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
@@ -116,17 +137,53 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     }
 
     public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject) {
+
+        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+        renderCoolDown -= Gdx.graphics.getDeltaTime();
+
+        boolean reset = false;
+
+        if(renderCoolDown <= 0f) {
+            renderCoolDown = 1f;
+            reset = true;
+        }
+
         // todo this is not nice
-        routineInstance.clearMemory();
+        if(reset) {
+            routineInstance.clearMemory();
+        }
         RoutineNode main = routineInstance.getNodeById("main");
-        if(main != null && main instanceof RenderRoutineNode) {
+        if(main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) routineInstance.getNodeById("main");
-            renderRoutineNode.receiveSignal("startSignal");
+
+            Vector3 cameraPos = mainRenderer.getCamera().position;
+            renderRoutineNode.position.set(transform.position);
+            renderRoutineNode.viewportPosition.set(cameraPos.x, cameraPos.y);
+            renderRoutineNode.viewportSize.set(viewportSize.x, viewportSize.y);
+
+            if(reset) {
+                renderRoutineNode.receiveSignal("startSignal");
+            }
 
             for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
-                batch.draw(mainRenderer.getWhiteTexture(),
+                boolean aspect = drawableQuad.aspect;
+                float scl = (float)drawableQuad.texture.getWidth() / drawableQuad.texture.getHeight();
+                float width = drawableQuad.size.x;
+                float height = drawableQuad.size.y;
+                if(aspect) {
+                    height = width / scl;
+                }
+
+                textureRegion.setRegion(drawableQuad.texture);
+                batch.setColor(drawableQuad.color);
+                batch.draw(textureRegion,
                         drawableQuad.position.x, drawableQuad.position.y,
-                        drawableQuad.size.x, drawableQuad.size.y);
+                        0.5f, 0.5f,
+                        1f, 1f,
+                        width, height,
+                        drawableQuad.rotation);
+                batch.setColor(Color.WHITE);
             }
         }
     }

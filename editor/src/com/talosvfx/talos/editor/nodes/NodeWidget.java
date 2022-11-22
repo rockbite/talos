@@ -39,7 +39,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     protected Array<String> inputSlots = new Array();
     protected Array<String> outputSlots = new Array();
 
-    protected ObjectMap<String, AbstractWidget> widgetMap = new ObjectMap();
+    public ObjectMap<String, AbstractWidget> widgetMap = new ObjectMap();
 
     protected ObjectMap<String, String> typeMap = new ObjectMap();
     protected ObjectMap<String, String> defaultsMap = new ObjectMap();
@@ -112,6 +112,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         widgetClassMap.put("select", SelectWidget.class);
         widgetClassMap.put("checkbox", CheckBoxWidget.class);
         widgetClassMap.put("color", ColorWidget.class);
+        widgetClassMap.put("asset", GameAssetWidget.class);
         widgetClassMap.put("dynamicValue", ValueWidget.class);
         widgetClassMap.put("inputText", TextValueWidget.class);
         widgetClassMap.put("button", ButtonWidget.class);
@@ -511,7 +512,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                     widget.addListener(new ChangeListener() {
                         @Override
                         public void changed (ChangeEvent changeEvent, Actor actor) {
-                            Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
+                            reportNodeDataModified();
                         }
                     });
                 }
@@ -524,12 +525,16 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 XmlReader.Element group = row;
                 for (int i = 0; i < group.getChildCount(); i++) {
                     XmlReader.Element groupRow = group.getChild(i);
-                    if(groupRow.getName().equals("dynamicValue") || groupRow.getName().equals("value")) {
+                    if(groupRow.getName().equals("dynamicValue") || groupRow.getName().equals("value") || groupRow.getName().equals("color") || groupRow.getName().equals("checkbox")) {
                         addRow(groupRow, i, group.getChildCount(), true);
                     }
                 }
             }
         }
+    }
+
+    protected void reportNodeDataModified() {
+        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
     }
 
     public void constructNode(XmlReader.Element module) {

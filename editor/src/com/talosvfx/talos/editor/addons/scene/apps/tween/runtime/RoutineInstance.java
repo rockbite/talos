@@ -11,6 +11,8 @@ public class RoutineInstance {
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
+    private IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
+
     private RoutineConfigMap config;
 
     public Array<DrawableQuad> drawableQuads = new Array<>();
@@ -22,8 +24,12 @@ public class RoutineInstance {
     public void loadFrom(String fileContent, RoutineConfigMap config) {
         this.config = config;
 
+        if(fileContent == null || fileContent.isEmpty()) return;
+
         JsonReader jsonReader = new JsonReader();
         JsonValue root = jsonReader.parse(fileContent);
+
+        if(root == null) return;
 
         JsonValue list = root.get("list");
         JsonValue connections = root.get("connections");
@@ -40,6 +46,7 @@ public class RoutineInstance {
                 clazz = ClassReflection.forName(packageName);
                 RoutineNode routineNode = (RoutineNode) ClassReflection.newInstance(clazz);
                 routineNode.loadFrom(this, nodeData);
+                lowLevelLookup.put(routineNode.uniqueId, routineNode);
 
                 JsonValue properties = nodeData.get("properties");
                 if(properties != null) {
@@ -50,7 +57,7 @@ public class RoutineInstance {
 
                 idMap.put(id, routineNode);
             } catch (ReflectionException e) {
-                throw new RuntimeException(e);
+                //throw new RuntimeException(e);
             }
         }
 
@@ -73,6 +80,10 @@ public class RoutineInstance {
 
     public RoutineNode getNodeById(String id) {
         return lookup.get(id);
+    }
+
+    public RoutineNode getNodeById(Integer id) {
+        return lowLevelLookup.get(id);
     }
 
     public XmlReader.Element getConfig(String name) {

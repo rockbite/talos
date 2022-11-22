@@ -1,14 +1,18 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.*;
 import com.sun.org.apache.bcel.internal.generic.FLOAD;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 
 public abstract class RoutineNode {
 
     protected RoutineInstance routineInstanceRef;
+    public int uniqueId;
 
     enum DataType {
         NUMBER,
@@ -16,7 +20,8 @@ public abstract class RoutineNode {
         VECTOR3,
         COLOR,
         ASSET,
-        STRING
+        STRING,
+        FLUID
     }
 
     enum PortType {
@@ -45,11 +50,17 @@ public abstract class RoutineNode {
         public Object valueOverride;
 
         public void setValueFromString(String val) {
-            if(dataType == DataType.NUMBER) {
+            if(dataType == DataType.FLUID) {
+                valueOverride = Float.parseFloat(val);
+            } else if (dataType == DataType.NUMBER) {
                 valueOverride = Float.parseFloat(val);
             } else {
                 valueOverride = val;
             }
+        }
+
+        public void setValue(Object object) {
+            valueOverride = object;
         }
     }
 
@@ -70,6 +81,8 @@ public abstract class RoutineNode {
 
         JsonValue properties = nodeData.get("properties");
         configureNode(properties);
+
+        uniqueId = nodeData.getInt("id");
     }
 
     private void constructNode(XmlReader.Element config) {
@@ -113,6 +126,7 @@ public abstract class RoutineNode {
             if(type.equals("color")) port.dataType = DataType.COLOR;
             if(type.equals("asset")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
+            if(type.equals("fluid")) port.dataType = DataType.FLUID;
         }
 
         if(portType.equals("input")) {
@@ -131,7 +145,14 @@ public abstract class RoutineNode {
             String name = item.name;
 
             Port port = inputs.get(name);
-            port.setValueFromString(properties.getString(name));
+            JsonValue jsonValue = properties.get(name);
+            if(port.dataType == DataType.COLOR) {
+                Json json = new Json();
+                Color color = json.readValue(Color.class, jsonValue);
+                port.setValue(color);
+            } else {
+                port.setValueFromString(properties.getString(name));
+            }
         }
     }
 
@@ -161,7 +182,9 @@ public abstract class RoutineNode {
      * I just got signal to one of my ports
      * @param portName
      */
-    public abstract void receiveSignal(String portName);
+    public void receiveSignal(String portName) {
+
+    }
 
     /**
      * Send signal to all connections from particular output port
@@ -181,6 +204,63 @@ public abstract class RoutineNode {
         }
     }
 
+    protected GameAsset fetchAssetValue(String key) {
+        Port port = inputs.get(key);
+
+        if(port.valueOverride instanceof GameAsset) {
+            return (GameAsset)(port.valueOverride);
+        } else {
+            //todo: fix assumption that it is PNG
+            GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String)port.valueOverride, GameAssetType.SPRITE);
+
+            return asset;
+        }
+    }
+
+    protected String fetchStringValue(String key) {
+        Port port = inputs.get(key);
+
+
+
+        return (String) port.valueOverride;
+    }
+
+    protected float fetchFloatValue(String key) {
+        Object object = fetchValue(key);
+
+        if(object instanceof Integer) {
+            int result = (int) object;
+            return (float) result;
+        }
+
+        return (float)object;
+    }
+
+    protected Color fetchColorValue(String key) {
+        Object object = fetchValue(key);
+        return (Color)object;
+    }
+
+    protected boolean fetchBooleanValue(String key) {
+        Object object = fetchValue(key);
+        if(object instanceof String) {
+            boolean result = Boolean.parseBoolean((String) object);
+            return result;
+        }
+        return (boolean)object;
+    }
+
+    protected int fetchIntValue(String key) {
+        Object object = fetchValue(key);
+
+        if(object instanceof Float) {
+            float result = (float) object;
+            return (int) Math.floor(result);
+        }
+
+        return (int)object;
+    }
+
     /**
      * Ask my input port for it's value
      * @param key
@@ -198,8 +278,7 @@ public abstract class RoutineNode {
                 RoutineNode targetNode = connection.toPort.nodeRef;
                 String targetPortName = connection.toPort.name;
 
-                targetNode.queryValue(targetPortName);
-
+                return targetNode.queryValue(targetPortName);
             } else {
                 if(port.valueOverride == null && port.dataType == DataType.NUMBER) {
                     return 0f;
@@ -215,8 +294,13 @@ public abstract class RoutineNode {
      * I have been asked from my output port to provide its value
      * @param targetPortName
      */
-    public void queryValue(String targetPortName) {
+    public Object queryValue(String targetPortName) {
 
+        return 0;
+    }
+
+    public void setProperty(String key, Object value) {
+        inputs.get(key).valueOverride = value;
     }
 
 }

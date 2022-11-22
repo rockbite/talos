@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -8,21 +9,31 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.*;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 
-public class RoutineStage extends DynamicNodeStage {
+public class RoutineStage extends DynamicNodeStage implements Notifications.Observer {
 
     public final RoutineEditor routineEditor;
 
@@ -32,7 +43,7 @@ public class RoutineStage extends DynamicNodeStage {
 
     private float timeScale = 1f;
 
-    private RoutineInstance routineInstance; // runtime
+    public RoutineInstance routineInstance; // runtime
 
     public RoutineStage(RoutineEditor routineEditor, Skin skin) {
         super(skin);
@@ -49,6 +60,8 @@ public class RoutineStage extends DynamicNodeStage {
         });
 
         routineInstance = new RoutineInstance();
+
+        Notifications.registerObserver(this);
     }
 
     public void writeData(FileHandle target) {
@@ -62,6 +75,7 @@ public class RoutineStage extends DynamicNodeStage {
         Json json = new Json();
         JsonReader jsonReader = new JsonReader();
         read(json, jsonReader.parse(targetFileHandle));
+
         routineInstance.loadFrom(targetFileHandle.readString(), routineConfigMap);
     }
 
@@ -113,6 +127,89 @@ public class RoutineStage extends DynamicNodeStage {
 
             nodeBoard.makeConnection(connection.fromNode, delayNode, connection.fromId, "startSignal");
             nodeBoard.makeConnection(delayNode, connection.toNode, "onComplete", connection.toId);
+        }
+    }
+
+    private void reloadRoutineInstanceFromMemory(RoutineInstance instance) {
+        Json json = new Json();
+        json.setOutputType(JsonWriter.OutputType.json);
+        String data = json.prettyPrint(this);
+        instance.loadFrom(data, routineConfigMap);
+    }
+
+    private void reloadRoutineInstancesFromMemory() {
+        Array<RoutineInstance> routineInstances = collectRoutineInstances();
+        for (RoutineInstance instance : routineInstances) {
+            reloadRoutineInstanceFromMemory(instance);
+        }
+    }
+
+    @EventHandler
+    public void onNodeCreatedEvent(NodeCreatedEvent event) {
+        reloadRoutineInstancesFromMemory();
+    }
+
+    @EventHandler
+    public void onNodeRemovedEvent(NodeRemovedEvent event) {
+        reloadRoutineInstancesFromMemory();
+    }
+
+    @EventHandler
+    public void onNodeConnectionCreatedEvent(NodeConnectionCreatedEvent event) {
+        reloadRoutineInstancesFromMemory();
+    }
+
+    @EventHandler
+    public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
+        reloadRoutineInstancesFromMemory();
+    }
+
+    @EventHandler
+    public void onNodeDataModifiedEvent(NodeDataModifiedEvent event) {
+        NodeWidget node = event.getNode();
+
+        Array<RoutineInstance> routineInstances = collectRoutineInstances();
+
+        for (RoutineInstance instance : routineInstances) {
+            updateRoutineInstanceDataFromWidget(instance, node);
+        }
+    }
+
+    /**
+     * I need my psychiatrist to talk about this.
+     */
+    private Array<RoutineInstance> collectRoutineInstances() {
+        Array<RoutineInstance> result = new Array<>();
+        Array<GameObject> list = new Array<>();
+
+        if(routineEditor.scenePreviewStage != null) {
+            GameObject root = routineEditor.scenePreviewStage.currentScene.root;
+            root.findGOsWithComponents(list, RoutineRendererComponent.class);
+
+            for (GameObject gameObject : list) {
+                RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+                result.add(component.routineInstance);
+            }
+        }
+
+        result.add(routineInstance);
+
+        return result;
+    }
+
+    private void updateRoutineInstanceDataFromWidget(RoutineInstance routineInstance, NodeWidget nodeWidget) {
+        RoutineNode logicNode = routineInstance.getNodeById(nodeWidget.getUniqueId());
+
+        if(logicNode == null) return;
+
+        // update input properties
+        for (ObjectMap.Entry<String, AbstractWidget> stringAbstractWidgetEntry : nodeWidget.widgetMap) {
+            String key = stringAbstractWidgetEntry.key;
+            AbstractWidget value = stringAbstractWidgetEntry.value;
+
+            if(value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget) {
+                logicNode.setProperty(key, value.getValue());
+            }
         }
     }
 
