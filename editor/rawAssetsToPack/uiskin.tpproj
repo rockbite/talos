@@ -32,7 +32,7 @@ limitMemory=true
 useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:uiskin/images,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:uiskin/images/timeline,type:Input,dirFilePrefix:timeline-,recursive:false,flattenPaths:false},{path:uiskin/images/nodes,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:uiskin/images,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:uiskin/images/timeline,type:Input,dirFilePrefix:timeline-,recursive:false,flattenPaths:false},{path:uiskin/images/nodes,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:uiskin/images/se,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 
 
 -PROJ-

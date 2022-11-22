@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -23,7 +24,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
-    private Stage stageRef;
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -41,7 +41,6 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private boolean showProgress;
 
-    private EventListener stageListener;
     private Vector2 tmpVec = new Vector2();
 
     private boolean isDragging = false;
@@ -147,7 +146,10 @@ public class ValueWidget extends AbstractWidget<Float> {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                isDragging = false;
+                if (isDragging) {
+                    isDragging = false;
+                    setValue(value, true);
+                }
                 setBackgrounds();
             }
 
@@ -163,7 +165,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 
@@ -180,33 +182,6 @@ public class ValueWidget extends AbstractWidget<Float> {
                 }
             }
         });
-
-        stageListener = new InputListener() {
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tmpVec.set(x, y);
-                ValueWidget.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = ValueWidget.this.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null) {
-                        getStage().setKeyboardFocus(null);
-                }
-
-                return false;
-            }
-        };
-    }
-
-    @Override
-    protected void setStage(Stage stage) {
-        super.setStage(stage);
-        if (stage != null) {
-            getStage().getRoot().addCaptureListener(stageListener);
-            stageRef = getStage();
-        } else {
-            if(stageRef != null) {
-                stageRef.getRoot().removeCaptureListener(stageListener);
-                stageRef = null;
-            }
-        }
     }
 
     private void showEditMode() {
@@ -279,6 +254,10 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
+        setValue(value, isChanged(value));
+    }
+
+    public void setValue(float value, boolean notify) {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
@@ -296,7 +275,9 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         updateProgress();
 
-        fireChangedEvent();
+        if (notify) {
+            fireChangedEvent();
+        }
     }
 
     private void updateProgress() {
@@ -338,11 +319,14 @@ public class ValueWidget extends AbstractWidget<Float> {
         setLabel(text);
     }
 
+    public boolean isFastChange () {
+        return isDragging;
+    }
+
     @Override
     public Float getValue () {
         return value;
     }
-
 
     @Override
     public void read (Json json, JsonValue jsonValue) {
@@ -357,5 +341,9 @@ public class ValueWidget extends AbstractWidget<Float> {
     public void setType(Type type) {
         this.type = type;
         setBackgrounds();
+    }
+
+    public void setNone() {
+        valueLabel.setText("-");
     }
 }

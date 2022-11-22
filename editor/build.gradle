@@ -26,13 +26,30 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["assets"]
 
 
-task createProperties(dependsOn: processResources) {
-    doLast {
-        new File("$projectDir/assets/talos-version.properties").withWriter { w ->
-            Properties p = new Properties()
-            p['version'] = project.version.toString()
-            p.store w, null
+
+
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+task createProperties () {
+    doFirst {
+
+        def file = rootProject.file("editor/assets/talos-version.properties");
+        Properties properties = new Properties();
+        if (file.exists()) {
+            properties.load(file.newReader());
         }
+        properties.setProperty("version", project.version);
+        properties.setProperty("buildHash", getGitHash());
+        properties.setProperty("buildTime", System.currentTimeMillis() + "");
+
+        properties.store(file.newPrintWriter(), "");
     }
 }
 

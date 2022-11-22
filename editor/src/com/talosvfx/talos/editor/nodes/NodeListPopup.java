@@ -115,9 +115,9 @@ public class NodeListPopup extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void chosen(FilteredTree.Node node) {
+            public void selected (FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     String nodeName = titleToNodeName.get(node.name);
                     String className = getClassNameFromModuleName(nodeName);
@@ -134,10 +134,9 @@ public class NodeListPopup extends VisWindow {
                     remove();
                 }
             }
-
             @Override
-            public void selected(FilteredTree.Node node) {
-
+            public void addedIntoSelection (FilteredTree.Node node) {
+                super.addedIntoSelection(node);
             }
         });
     }

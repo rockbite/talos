@@ -5,25 +5,28 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.TalosVersion;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.CheckboxWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -31,6 +34,7 @@ import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.function.Supplier;
 
 public class BvBWorkspace extends ViewportWidget implements Json.Serializable, IPropertyProvider {
 
@@ -39,14 +43,16 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private SkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
     private BVBSkeletonRenderer renderer;
+    private BackgroundImageController backgroundImageController;
 
     private AttachmentPoint movingPoint;
+    private final Image backgroundImage = new Image();
 
     private boolean paused = false;
     private boolean showingTools = false;
 
-    private float speedMultiplier = 1f;
-    private boolean preMultipliedAlpha = false;
+    public float speedMultiplier = 1f;
+    public boolean preMultipliedAlpha = false;
     private boolean showGrid = true;
 
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
@@ -65,9 +71,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private int selectIndex = 0;
 
     private Group topUI = new Group();
+    private String backgroundImagePath = "";
 
     public static BvBWorkspace getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new BvBWorkspace();
         }
         return instance;
@@ -78,6 +85,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         bvb.properties.showPanel(this);
         bvb.properties.showPanel(skeletonContainer);
+        bvb.properties.showPanel(backgroundImageController);
     }
 
     private BvBWorkspace() {
@@ -87,6 +95,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         topUI.setTransform(false);
 
         skeletonContainer = new SkeletonContainer(this);
+        backgroundImageController = new BackgroundImageController();
 
         talosRenderer = new SpriteBatchParticleRenderer(camera);
 
@@ -94,7 +103,6 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         renderer.setPremultipliedAlpha(false); // PMA results in correct blending without outlines. (actually should be true, not sure why this ruins scene2d later, probably blend screwup, will check later)
 
         setCameraPos(0, 0);
-        bgColor.set(0.1f, 0.1f, 0.1f, 1f);
 
         hintLabel = new Label("", TalosMain.Instance().getSkin());
         add(hintLabel).left().expandX().pad(5f);
@@ -106,11 +114,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         addListeners();
         addPanListener();
 
+        addActor(rulerRenderer);
         instance = this;
     }
 
     private void addListeners() {
-        addListener(new ClickListener() {
+        inputListener = new ClickListener() {
 
             private Vector3 tmp3 = new Vector3();
             private Vector2 pos = new Vector2();
@@ -123,32 +132,32 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                 getStage().setKeyboardFocus(BvBWorkspace.this);
 
-                if(skeletonContainer.getSkeleton() == null) return false;
+                if (skeletonContainer.getSkeleton() == null) return false;
 
                 Array<AttachmentPoint> possiblePoints = new Array<>();
                 ObjectMap<AttachmentPoint, BoundEffect> pointEffectMap = new ObjectMap<>();
 
                 // check for all attachment points
-                for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+                for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
                     AttachmentPoint position = effect.getPositionAttachment();
                     Array<AttachmentPoint> attachments = effect.getAttachments();
 
                     tmp = getAttachmentPosition(position);
-                    if(tmp.dst(pos) < pixelToWorld(10f)) {
+                    if (tmp.dst(pos) < pixelToWorld(10f)) {
                         possiblePoints.add(position);
                         pointEffectMap.put(position, effect);
                     }
 
-                    for(AttachmentPoint point: attachments) {
+                    for (AttachmentPoint point : attachments) {
                         tmp = getAttachmentPosition(point);
-                        if(tmp.dst(pos) < pixelToWorld(10f)) {
+                        if (tmp.dst(pos) < pixelToWorld(10f)) {
                             possiblePoints.add(point);
                             pointEffectMap.put(point, effect);
                         }
                     }
                 }
 
-                if(possiblePoints.size > 0) {
+                if (possiblePoints.size > 0) {
                     AttachmentPoint point = possiblePoints.get(selectIndex % possiblePoints.size);
                     BoundEffect effect = pointEffectMap.get(point);
                     movingPoint = point;
@@ -158,7 +167,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                     return true;
                 }
 
-                if(selectedEffect != null) {
+                if (selectedEffect != null) {
                     effectUnselected(selectedEffect);
                 }
 
@@ -172,9 +181,9 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
 
-                if(movingPoint != null && !movingPoint.isStatic()) {
+                if (movingPoint != null && !movingPoint.isStatic()) {
 
-                    if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+                    if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
                         Bone boneByName = skeletonContainer.getBoneByName(movingPoint.getBoneName());
                         float boneWorldScale = boneByName.getWorldScaleX();
                         pos.sub(boneByName.getWorldX(), boneByName.getWorldY());
@@ -198,7 +207,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 getWorldFromLocal(tmp3.set(x, y, 0));
                 pos.set(tmp3.x, tmp3.y);
 
-                if(skeletonContainer.getSkeleton() != null) {
+                if (skeletonContainer.getSkeleton() != null) {
                     Bone closestBone = skeletonContainer.findClosestBone(pos);
                     float dist = skeletonContainer.getBoneDistance(closestBone, pos);
 
@@ -216,7 +225,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
-                if(movingPoint != null) {
+                if (movingPoint != null) {
                     TalosMain.Instance().ProjectController().setDirty();
                 }
 
@@ -226,40 +235,34 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
 
-                if(keycode == Input.Keys.F5) {
+                if (keycode == Input.Keys.F5) {
                     // find particle or emitter or then any other module and focus on it
                     camera.position.set(0, 0, 0);
                     setWorldSize(getWorldWidth());
                 }
-                if(keycode == Input.Keys.SPACE) {
+                if (keycode == Input.Keys.SPACE) {
                     paused = !paused;
                     bvb.getTimeline().setPaused(paused);
                 }
-                if(keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    if(selectedEffect != null) {
+                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
+                    if (selectedEffect != null) {
                         skeletonContainer.removeEffect(selectedEffect);
                         effectUnselected(selectedEffect);
                     }
                 }
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     camera.position.set(0, 0, 0);
                     setWorldSize(getWorldWidth());
                 }
-                if(keycode == Input.Keys.SHIFT_LEFT) {
+                if (keycode == Input.Keys.SHIFT_LEFT) {
                     showingTools = !showingTools;
-                }
-
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().undo();
-                }
-
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().redo();
                 }
 
                 return super.keyDown(event, keycode);
             }
-        });
+        };
+
+        addListener(inputListener);
     }
 
     public void effectSelected(BoundEffect effect) {
@@ -283,7 +286,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     @Override
     public void act(float delta) {
         super.act(delta);
-        if(skeletonContainer != null) {
+        if (skeletonContainer != null) {
             skeletonContainer.update(delta * speedMultiplier, paused);
         }
 
@@ -292,12 +295,17 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     @Override
     public void drawContent(PolygonBatch batch, float parentAlpha) {
-        if(showGrid) {
-            batch.end();
-            drawGrid(batch, parentAlpha);
-            batch.begin();
-        }
+        batch.end();
 
+        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+        ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+        gridPropertyProvider.update(camera, parentAlpha);
+        gridRenderer.drawGrid(batch, shapeRenderer);
+        batch.begin();
+
+        if (backgroundImage.getDrawable() != null) {
+            renderBackgroundImage(batch, parentAlpha);
+        }
         drawVFXBefore(batch, parentAlpha);
         drawSpine(batch, parentAlpha);
         drawVFX(batch, parentAlpha);
@@ -305,16 +313,35 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         drawTools(batch, parentAlpha);
 
-        if(showingTools) {
+        if (showingTools) {
             topUI.draw(batch, parentAlpha);
         }
     }
 
+    @Override
+    public void initializeGridPropertyProvider () {
+        gridPropertyProvider = new DynamicGridPropertyProvider();
+        gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+    }
+
+    private void renderBackgroundImage(Batch batch, float parentAlpha) {
+        float imagePrefWidth = backgroundImage.getPrefWidth();
+        float imagePrefHeight = backgroundImage.getPrefHeight();
+        float scale = imagePrefHeight / imagePrefWidth;
+
+        float imageWidth = backgroundImageController.imageWidth;
+        float imageHeight = imageWidth * scale;
+
+        backgroundImage.setPosition(backgroundImageController.xOffset - imageWidth / 2,  backgroundImageController.yOffset - imageHeight / 2);
+        backgroundImage.setSize(imageWidth, imageHeight);
+        backgroundImage.draw(batch, parentAlpha);
+    }
+
     private void drawTools(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
-        if(skeleton == null) return;
+        if (skeleton == null) return;
 
-        if(showingTools) {
+        if (showingTools) {
             batch.end();
             Gdx.gl.glLineWidth(1f);
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -326,7 +353,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             shapeRenderer.end();
             batch.begin();
 
-            if(showingTools) {
+            if (showingTools) {
                 drawSpriteTools(batch, parentAlpha);
             }
         }
@@ -353,26 +380,26 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         /**
          * Draw bound effects and their attachment points
          */
-        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+        for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
             // position attachment first
             AttachmentPoint positionAttachment = effect.getPositionAttachment();
-            if(positionAttachment != null && !positionAttachment.isStatic()) {
+            if (positionAttachment != null && !positionAttachment.isStatic()) {
                 Vector2 pos = getAttachmentPosition(positionAttachment);
 
                 batch.setColor(1f, 1f, 1f, 1f);
                 float size = pixelToWorld(12f);
-                batch.draw(getSkin().getRegion("vfx-red"), pos.x-size/2f, pos.y-size/2f, size, size);
+                batch.draw(getSkin().getRegion("vfx-red"), pos.x - size / 2f, pos.y - size / 2f, size, size);
             }
 
             // now iterate through other non static attachments
             shapeRenderer.setColor(Color.GREEN);
-            for(AttachmentPoint point: effect.getAttachments()) {
-                if(!point.isStatic()) {
+            for (AttachmentPoint point : effect.getAttachments()) {
+                if (!point.isStatic()) {
                     Vector2 pos = getAttachmentPosition(point);
 
                     batch.setColor(1f, 1f, 1f, 1f);
                     float size = pixelToWorld(12f);
-                    batch.draw(getSkin().getRegion("vfx-green"), pos.x-size/2f, pos.y-size/2f, size, size);
+                    batch.draw(getSkin().getRegion("vfx-green"), pos.x - size / 2f, pos.y - size / 2f, size, size);
                 }
             }
         }
@@ -383,10 +410,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         /**
          * If attachment point of an effect is currently being moved, then draw line to it's origin or nearest bone
          */
-        if(movingPoint != null && !movingPoint.isStatic()) {
+        if (movingPoint != null && !movingPoint.isStatic()) {
             tmp2.set(getAttachmentPosition(movingPoint));
 
-            if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
                 Bone bone = skeletonContainer.getBoneByName(movingPoint.getBoneName());
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
@@ -404,11 +431,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     private Vector2 getAttachmentPosition(AttachmentPoint point) {
-        if(!point.isStatic()) {
+        if (!point.isStatic()) {
             tmp.set(point.getWorldOffsetX(), point.getWorldOffsetY());
             tmp.rotate(skeletonContainer.getBoneRotation(point.getBoneName()));
             tmp.add(skeletonContainer.getBonePosX(point.getBoneName()), skeletonContainer.getBonePosY(point.getBoneName()));
-        } else{
+        } else {
             tmp.set(point.getStaticValue().get(0), point.getStaticValue().get(1));
         }
         return tmp;
@@ -417,7 +444,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private void drawSpine(Batch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
         AnimationState animationState = skeletonContainer.getAnimationState();
-        if(skeleton == null) return;
+        if (skeleton == null) return;
 
         skeleton.setPosition(0, 0);
         skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
@@ -436,7 +463,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private void drawVFXBefore(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
-        if(skeleton == null) return;
+        if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
@@ -449,7 +476,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private void drawVFX(PolygonBatch batch, float parentAlpha) {
         Skeleton skeleton = skeletonContainer.getSkeleton();
-        if(skeleton == null) return;
+        if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
         for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
@@ -469,7 +496,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     public BoundEffect addParticle(FileHandle handle) {
-        if(skeletonContainer.getSkeleton() == null) return null;
+        if (skeletonContainer.getSkeleton() == null) return null;
         pathMap.put(handle.name(), handle.path());
 
         registerTalosAssets(handle);
@@ -495,10 +522,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         final JsonValue parse = jsonReader.parse(handle);
         final JsonValue metaData = parse.get("metadata");
         final JsonValue resourcePaths = metaData.get("resources");
-        if(resourcePaths == null) {
+        if (resourcePaths == null) {
             return;
         }
-        for(JsonValue path: resourcePaths) {
+        for (JsonValue path : resourcePaths) {
             String name = path.asString();
             String possiblePath = handle.parent() + File.separator + name + ".png"; // this is handling only PNG's which is bad
             FileHandle fileHandle = TalosMain.Instance().ProjectController().findFile(possiblePath);
@@ -516,7 +543,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     public void updateParticle(FileHandle handle) {
         String name = handle.nameWithoutExtension();
-        if(vfxLibrary.containsKey(name)) {
+        if (vfxLibrary.containsKey(name)) {
             ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
             descriptor.setAssetProvider(TalosMain.Instance().TalosProject().getProjectAssetProvider());
             descriptor.load(handle);
@@ -559,7 +586,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeObjectStart("metadata");
         json.writeArrayStart("assets");
         Array<String> result = skeletonContainer.getUsedParticleEffectNames();
-        for(String name: result) {
+        for (String name : result) {
             json.writeObjectStart();
             json.writeValue("name", name);
             json.writeValue("type", "vfx");
@@ -574,7 +601,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     public void write(Json json) {
         json.writeValue("skeleton", skeletonContainer);
         json.writeObjectStart("paths");
-        for(String fileName: pathMap.keys()) {
+        for (String fileName : pathMap.keys()) {
             json.writeValue(fileName, pathMap.get(fileName));
         }
         json.writeObjectEnd();
@@ -586,7 +613,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeValue("zoom", camera.zoom);
         json.writeValue("cameraPosX", camera.position.x);
         json.writeValue("cameraPosY", camera.position.y);
-        if(selectedEffect != null) {
+        if (selectedEffect != null) {
             json.writeValue("selectedEffect", selectedEffect.name);
         }
         json.writeValue("version", TalosVersion.getVersion());
@@ -597,7 +624,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         cleanWorkspace();
         JsonValue paths = jsonData.get("paths");
         pathMap.clear();
-        for(JsonValue path: paths) {
+        for (JsonValue path : paths) {
             pathMap.put(path.name(), path.asString());
         }
 
@@ -610,7 +637,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         setWorldSize(jsonData.getFloat("worldSize", 1280));
         float scl = jsonData.getFloat("spineScale", 1);
         spineScaleWidget.setValue(scl);
-        skeletonContainer.setScale(1f/scl, 1f/scl);
+        skeletonContainer.setScale(1f / scl, 1f / scl);
         camera.zoom = jsonData.getFloat("zoom", camera.zoom);
         camera.position.x = jsonData.getFloat("cameraPosX", 0);
         camera.position.y = jsonData.getFloat("cameraPosY", 0);
@@ -618,10 +645,11 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.cleanPanels();
         bvb.properties.showPanel(this);
         bvb.properties.showPanel(skeletonContainer);
+        bvb.properties.showPanel(backgroundImageController);
 
         String selectedEffect = jsonData.getString("selectedEffect", null);
         BoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
-        if(effect != null) effectSelected(effect);
+        if (effect != null) effectSelected(effect);
     }
 
 
@@ -643,17 +671,8 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         Array<PropertyWidget> properties = new Array<>();
 
 
-        CheckboxWidget preMultipliedAlphaWidget = new CheckboxWidget("premultiplied alpha") {
-            @Override
-            public Boolean getValue() {
-                return preMultipliedAlpha;
-            }
-
-            @Override
-            public void valueChanged(Boolean value) {
-                preMultipliedAlpha = value;
-            }
-        };
+        PropertyWidget preMultipliedAlphaWidget = WidgetFactory.generate(this, "preMultipliedAlpha", "premultiplied alpha");
+        PropertyWidget speed = WidgetFactory.generate(BvBWorkspace.this, "speedMultiplier", "speed multiplier");
 
         CheckboxWidget showGridWidget = new CheckboxWidget("show/hide grid") {
             @Override
@@ -680,31 +699,29 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         };
 
 
-        FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width") {
-
+        FloatPropertyWidget worldWidthWidget = new FloatPropertyWidget("world width", new Supplier<Float>() {
             @Override
-            public Float getValue() {
+            public Float get() {
                 return getWorldWidth();
             }
-
+        }, new PropertyWidget.ValueChanged<Float>() {
             @Override
-            public void valueChanged(Float value) {
+            public void report(Float value) {
                 setWorldSize(value);
             }
-        };
+        });
 
-        spineScaleWidget = new FloatPropertyWidget("spine scale") {
+        spineScaleWidget = new FloatPropertyWidget("spine scale", new Supplier<Float>() {
             @Override
-            public Float getValue() {
+            public Float get() {
                 return getSpineScale();
             }
-
+        }, new PropertyWidget.ValueChanged<Float>() {
             @Override
-            public void valueChanged(Float value) {
+            public void report(Float value) {
                 setSpineScale(value);
             }
-        };
-
+        });
 
         properties.add(showGridWidget);
         properties.add(preMultipliedAlphaWidget);
@@ -716,13 +733,13 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     private void setSpineScale(Float scale) {
-        if(skeletonContainer == null || skeletonContainer.getSkeleton() == null) return;
-        skeletonContainer.getSkeleton().setScale(1f/scale, 1f/scale);
+        if (skeletonContainer == null || skeletonContainer.getSkeleton() == null) return;
+        skeletonContainer.getSkeleton().setScale(1f / scale, 1f / scale);
     }
 
     private Float getSpineScale() {
-        if(skeletonContainer == null || skeletonContainer.getSkeleton() == null) return 1f;
-        return 1f/skeletonContainer.getSkeleton().getScaleX();
+        if (skeletonContainer == null || skeletonContainer.getSkeleton() == null) return 1f;
+        return 1f / skeletonContainer.getSkeleton().getScaleX();
     }
 
     @Override
@@ -735,13 +752,18 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         return 0;
     }
 
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return getClass();
+    }
+
     public SkeletonContainer getSkeletonContainer() {
         return skeletonContainer;
     }
 
-    public void flyLabel (String text) {
+    public void flyLabel(String text) {
         Label label = new Label(text, TalosMain.Instance().getSkin());
-        label.setPosition(getWidth()/2f - label.getPrefWidth()/2f, 0);
+        label.setPosition(getWidth() / 2f - label.getPrefWidth() / 2f, 0);
         addActor(label);
 
         label.addAction(Actions.fadeOut(0.4f));
@@ -750,7 +772,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 Actions.moveBy(0, 100, 0.5f),
                 Actions.run(new Runnable() {
                     @Override
-                    public void run () {
+                    public void run() {
                         label.remove();
                     }
                 })
@@ -759,7 +781,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     }
 
-    public void effectScopeUpdated () {
+    public void effectScopeUpdated() {
         bvb.getTimeline().updateEffectList(skeletonContainer.getBoundEffects());
     }
 
@@ -769,5 +791,41 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     public boolean isPaused() {
         return paused;
+    }
+
+    public void removePreviewImage() {
+        backgroundImage.setDrawable(null);
+        backgroundImagePath = "";
+    }
+
+    public String getBackgroundImagePath() {
+        return backgroundImagePath;
+    }
+
+    public void setBackgroundImage(FileHandle handle) {
+        if (handle != null) {
+            addBackgroundImage(handle);
+        } else {
+            backgroundImage.setDrawable(null);
+            backgroundImagePath = "";
+        }
+    }
+
+    public void addBackgroundImage(FileHandle fileHandle) {
+        final String extension = fileHandle.extension();
+
+        if (extension.endsWith("png") || extension.endsWith("jpg")) {
+            fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
+            if (fileHandle != null && fileHandle.exists()) {
+                final TextureRegion textureRegion = new TextureRegion(new Texture(fileHandle));
+
+                if (textureRegion != null) {
+                    backgroundImage.setDrawable(new TextureRegionDrawable(textureRegion));
+                    backgroundImagePath = fileHandle.path();
+
+                    TalosMain.Instance().ProjectController().setDirty();
+                }
+            }
+        }
     }
 }

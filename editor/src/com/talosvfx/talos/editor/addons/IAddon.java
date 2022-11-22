@@ -17,4 +17,6 @@ public interface IAddon {
     void announceLocalSettings(SettingsDialog settingsDialog);
 
     void buildMenu(MenuBar menuBar);
+
+    void dispose();
 }

@@ -91,9 +91,9 @@ public class ModuleListPopup extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void chosen(FilteredTree.Node node) {
+            public void selected(FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     try {
                         Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
@@ -107,8 +107,8 @@ public class ModuleListPopup extends VisWindow {
             }
 
             @Override
-            public void selected(FilteredTree.Node node) {
-
+            public void addedIntoSelection (FilteredTree.Node node) {
+                super.addedIntoSelection(node);
             }
         });
     }

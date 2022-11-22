@@ -18,14 +18,17 @@ package com.talosvfx.talos.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -35,6 +38,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisSplitPane;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
@@ -44,8 +48,11 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
+import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
@@ -80,6 +87,7 @@ public class UIStage {
 	BatchConvertDialog batchConvertDialog;
 	public SettingsDialog settingsDialog;
 	public TemporaryTextureSelectDialog temporaryTextureDialog;
+	public NewProjectDialog newProjectDialog;
 
 	ColorPicker colorPicker;
 
@@ -98,6 +106,8 @@ public class UIStage {
 	private MainMenu mainMenu;
 	private VisSplitPane horizontalPane;
 	private VisSplitPane verticalPane;
+	private Table mainLayout;
+	private Table customLayout;
 
 	@Getter
 	private Preview3D innerTertiumActor;
@@ -120,10 +130,12 @@ public class UIStage {
 		defaults();
 		constructMenu();
 		constructTabPane();
+
 		constructSplitPanes();
 
 		batchConvertDialog = new BatchConvertDialog();
 		settingsDialog = new SettingsDialog();
+		newProjectDialog = new NewProjectDialog();
 		temporaryTextureDialog = new TemporaryTextureSelectDialog();
 
 		FileHandle list = Gdx.files.internal("modules.xml");
@@ -158,7 +170,7 @@ public class UIStage {
 			FileHandle handle = Gdx.files.absolute(path);
 			if(handle.exists()) {
 				String extension = handle.extension();
-				if(extension.equals("tls")) {
+				if(extension.equals("tls") && TalosMain.Instance().ProjectController().getProject() != SceneEditorAddon.SE) {
 					// load project file
 					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
 					TalosMain.Instance().ProjectController().loadProject(handle);
@@ -173,7 +185,7 @@ public class UIStage {
 					// ask addons if they are interested
 					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
 					if (addon != null) {
-						break;
+						continue;
 					}
 				}
 			}
@@ -290,6 +302,10 @@ public class UIStage {
 		FileSystemInteraction.instance().save();
 	}
 
+	public void openDialog(VisWindow dialog) {
+		stage.addActor(dialog.fadeIn());
+	}
+
 
 	public void legacyImportAction() {
 //		fileChooser.setMode(FileChooser.Mode.OPEN);
@@ -385,7 +401,22 @@ public class UIStage {
 		horizontalPane.setSplitAmount(0.3f);
 
 		fullScreenTable.row();
-		fullScreenTable.add(verticalPane).grow();
+		fullScreenTable.add(layoutContainer).grow();
+
+		mainLayout.add(verticalPane).grow();
+	}
+
+	public void showCustomLayout(Table table) {
+		mainLayout.setVisible(false);
+		customLayout.setVisible(true);
+
+		customLayout.clearChildren();
+		customLayout.add(table).grow();
+	}
+
+	public void hideCustomLayout() {
+		mainLayout.setVisible(true);
+		customLayout.setVisible(false);
 	}
 
 	public void swapToAddonContent(Table left, Table right, Table bottom) {
@@ -410,6 +441,7 @@ public class UIStage {
 	}
 
 	public void swapToTalosContent() {
+		hideCustomLayout();
 		verticalPane.setVisible(true);
 		horizontalPane.setVisible(true);
 
@@ -427,6 +459,9 @@ public class UIStage {
 		previewWidgetCell.setActor(previewWidget);
 		bottomTable.add(bottomPane).expand().grow();
 		TalosMain.Instance().enableNodeStage();
+
+		TalosMain.Instance().UIStage().getStage().setKeyboardFocus(rightTable);
+		hideCustomLayout();
 
 		mainMenu.restore();
 	}
@@ -488,6 +523,12 @@ public class UIStage {
 		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
 	}
 
+	public void showColorPicker(Color color, ColorPickerListener listener) {
+		colorPicker.setColor(color);
+		colorPicker.setListener(listener);
+		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
+	}
+
 	public PreviewWidget PreviewWidget() {
 		return previewWidget;
 	}
@@ -515,5 +556,10 @@ public class UIStage {
 		} else {
 			return Vector2Module.class;
 		}
+	}
+
+	public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
+		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
+		stage.addActor(yesNoDialog.fadeIn());
 	}
 }

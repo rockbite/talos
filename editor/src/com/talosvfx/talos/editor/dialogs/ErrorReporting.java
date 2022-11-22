@@ -9,9 +9,12 @@ public class ErrorReporting {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorReporting.class);
 
+    public boolean enabled = true;
 
     public void reportException(Throwable e) {
         logger.error("Error", e);
-        Dialogs.showErrorDialog(TalosMain.Instance().UIStage().getStage(), "Talos just encountered an error, click details, then copy and send error developers if you dare", e);
+        if (enabled) {
+            Dialogs.showErrorDialog(TalosMain.Instance().UIStage().getStage(), "Talos just encountered an error, click details, then copy and send error developers if you dare", e);
+        }
     }
 }

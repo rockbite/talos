@@ -39,9 +39,6 @@ import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
 
-import com.esotericsoftware.spine.BlendMode;
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -61,7 +58,7 @@ public class BVBSkeletonRenderer {
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
 	private @Null
-	com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect;
+	TalosSkeletonRenderer.VertexEffect vertexEffect;
 	private final Vector2 temp = new Vector2();
 	private final Vector2 temp2 = new Vector2();
 	private final Color temp3 = new Color();
@@ -88,7 +85,7 @@ public class BVBSkeletonRenderer {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeletonContainer == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -169,7 +166,7 @@ public class BVBSkeletonRenderer {
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -309,7 +306,7 @@ public class BVBSkeletonRenderer {
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
@@ -437,7 +434,7 @@ public class BVBSkeletonRenderer {
 		Vector2 tempPosition = this.temp, tempUV = this.temp2;
 		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
 		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
+		TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
 		tempLight1.set(NumberUtils.floatToIntColor(light));
 		tempDark1.set(NumberUtils.floatToIntColor(dark));
 		if (stride == 5) {
@@ -501,11 +498,11 @@ public class BVBSkeletonRenderer {
 	}
 
 	public @Null
-	com.esotericsoftware.spine.SkeletonRenderer.VertexEffect getVertexEffect () {
+	TalosSkeletonRenderer.VertexEffect getVertexEffect () {
 		return vertexEffect;
 	}
 
-	public void setVertexEffect (@Null com.esotericsoftware.spine.SkeletonRenderer.VertexEffect vertexEffect) {
+	public void setVertexEffect (@Null TalosSkeletonRenderer.VertexEffect vertexEffect) {
 		this.vertexEffect = vertexEffect;
 	}
 

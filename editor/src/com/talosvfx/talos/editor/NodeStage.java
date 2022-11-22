@@ -28,7 +28,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.utils.GridRenderer;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 
@@ -41,6 +40,8 @@ public class NodeStage extends WorkplaceStage {
     public ModuleBoardWidget moduleBoardWidget;
 
     private Image selectionRect;
+
+    private GridRendererWrapper gridRendererWrapper;
 
     public NodeStage (Skin skin) {
         super();
@@ -90,7 +91,7 @@ public class NodeStage extends WorkplaceStage {
                     startPos.set(x, y);
                 }
 
-                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
 
                 return true;
             }
@@ -123,7 +124,7 @@ public class NodeStage extends WorkplaceStage {
 
                 super.touchDragged(event, x, y, pointer);
 
-                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
+                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
             }
 
             @Override
@@ -145,7 +146,7 @@ public class NodeStage extends WorkplaceStage {
 
                 selectionRect.setVisible(false);
 
-                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
             }
 
             @Override
@@ -188,14 +189,6 @@ public class NodeStage extends WorkplaceStage {
                     moduleBoardWidget.selectAllModules();
                 }
 
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().undo();
-                }
-
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().redo();
-                }
-
                 return super.keyDown(event, keycode);
             }
         });
@@ -205,9 +198,8 @@ public class NodeStage extends WorkplaceStage {
 
 
     private void initActors() {
-        GridRenderer gridRenderer = new GridRenderer(stage);
-        stage.addActor(gridRenderer);
-
+        gridRendererWrapper = new GridRendererWrapper(stage);
+        stage.addActor(gridRendererWrapper);
         moduleBoardWidget = new ModuleBoardWidget(this);
 
         stage.addActor(moduleBoardWidget);

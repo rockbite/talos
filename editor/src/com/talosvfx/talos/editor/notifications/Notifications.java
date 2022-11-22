@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.notifications;
 
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -8,6 +9,9 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.notifications.events.*;
 
 
@@ -44,6 +48,13 @@ public class Notifications {
         addPool(NodeDataModifiedEvent.class);
         addPool(NodeRemovedEvent.class);
         addPool(AssetFileDroppedEvent.class);
+        addPool(TalosLayerSelectEvent.class);
+        addPool(TweenPlayedEvent.class);
+        addPool(TweenFinishedEvent.class);
+    }
+
+    public static void addEventToPool(Class<? extends Event> clazz) {
+        getInstance().addPool(clazz);
     }
 
     private void addPool(Class clazz) {
@@ -112,6 +123,10 @@ public class Notifications {
             for(EventRunner eventRunner: invocationMap.get(event.getClass())) {
                 eventRunner.runEvent(event);
             }
+        }
+
+        if (event.notifyThroughSocket()) {
+            NotificationMessageHandler.sendEventToSocket(event);
         }
 
         eventPoolMap.get(event.getClass()).free(event);

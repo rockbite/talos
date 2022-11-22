@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
+import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -39,7 +41,12 @@ public class NodeBoard extends WidgetGroup implements Observer {
     private Vector2[] curvePoints = new Vector2[4];
     Vector2 tmp = new Vector2();
     Vector2 tmp2 = new Vector2();
+    Vector2 tmp3 = new Vector2();
+    Vector3 vec3 = new Vector3();
     Vector2 prev = new Vector2();
+
+    public static Color curveColor = new Color(1, 1, 1, 0.4f);
+    public static Color curveColorSelected = new Color(1, 1, 1, 0.8f);
 
     public int globalNodeCounter = 0;
     private ObjectIntMap<Class<? extends NodeWidget>> nodeCounter = new ObjectIntMap<>();
@@ -61,6 +68,8 @@ public class NodeBoard extends WidgetGroup implements Observer {
     public Array<NodeGroup> groups = new Array<>();
     public Group groupContainer = new Group();
     public Group mainContainer = new Group();
+    private Color tmpColor = new Color();
+    private NodeConnection hoveredConnection = null;
 
     public void reset () {
         nodeCounter = new ObjectIntMap<>();
@@ -76,11 +85,43 @@ public class NodeBoard extends WidgetGroup implements Observer {
 
     }
 
+    public NodeConnection getHoveredConnection() {
+        return hoveredConnection;
+    }
+
     public static class NodeConnection {
         public NodeWidget fromNode;
         public NodeWidget toNode;
         public String fromId;
         public String toId;
+
+        private Actor dataActor = null;
+
+        public boolean basic = false;
+
+        public void setHighlightActor(Actor tmpActor) {
+            dataActor = tmpActor;
+            basic = false;
+        }
+
+        public void unsetHighlightActor() {
+            dataActor = null;
+        }
+
+        public float getHighlight() {
+            if(dataActor == null) return -1;
+            return dataActor.getX();
+        }
+
+        public Color getHighlightColor() {
+            if(dataActor == null) return NodeBoard.curveColor;
+            return dataActor.getColor();
+        }
+
+        public void setHighlightActorBasic(Actor tmpActor) {
+            dataActor = tmpActor;
+            basic = true;
+        }
     }
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
@@ -130,8 +171,11 @@ public class NodeBoard extends WidgetGroup implements Observer {
         // draw active curve
         if(activeCurve != null) {
             shapeRenderer.setColor(0, 203/255f, 124/255f, 1f);
-            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
+            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y, null, null);
         }
+
+        NodeConnection hoveredConnectionRef = hoveredConnection;
+        hoveredConnection = null;
 
         shapeRenderer.setColor(1, 1, 1, 0.4f);
         // draw nodes
@@ -142,11 +186,22 @@ public class NodeBoard extends WidgetGroup implements Observer {
             connection.toNode.getInputSlotPos(connection.toId, tmp);
             float toX = tmp.x;
             float toY = tmp.y;
-            drawCurve(x, y, toX, toY);
+
+            drawCurve(x, y, toX, toY, connection, hoveredConnectionRef);
         }
     }
 
-    private void drawCurve(float x, float y, float toX, float toY) {
+
+    private void drawCurve(float x, float y, float toX, float toY, NodeConnection nodeConnection, NodeConnection hoveredConnectionRef) {
+
+        float highlight = -1;
+        Color highlightColor = NodeBoard.curveColor;
+
+        if(nodeConnection != null) {
+            highlight = nodeConnection.getHighlight();
+            highlightColor = nodeConnection.getHighlightColor();
+        }
+
         float minOffset = 10f;
         float maxOffset = 150f;
 
@@ -166,12 +221,67 @@ public class NodeBoard extends WidgetGroup implements Observer {
         float resolution = 1f/20f;
 
         for(float i = 0; i < 1f; i+=resolution) {
+
+            float thickness = 2f;
+
+            Color mainColor = NodeBoard.curveColor;
+
+            if(hoveredConnectionRef == nodeConnection && nodeConnection != null) {
+                thickness = 2.5f;
+                mainColor = curveColorSelected;
+            }
+
+            if(highlight >= 0) {
+                float highlightDist = Math.abs(i - highlight);
+
+                if(nodeConnection.basic) {
+                    highlightDist = 0;
+                }
+
+                float clamp = 0.2f;
+                float interpolationAlpha = MathUtils.clamp(highlightDist, 0, clamp) * (1f/clamp); // 0->1 value, where 0 is max highlight, 1 is default
+                tmpColor.a = MathUtils.lerp(highlightColor.a, mainColor.a, interpolationAlpha);
+                tmpColor.r = MathUtils.lerp(highlightColor.r, mainColor.r, interpolationAlpha);
+                tmpColor.g = MathUtils.lerp(highlightColor.g, mainColor.g, interpolationAlpha);
+                tmpColor.b = MathUtils.lerp(highlightColor.b, mainColor.b, interpolationAlpha);
+                thickness = 2f + (1f - interpolationAlpha) * 6f;
+
+                if(nodeConnection.basic) {
+                    thickness = 2f;
+                }
+
+                shapeRenderer.setColor(tmpColor);
+            } else {
+                shapeRenderer.setColor(mainColor);
+            }
+
             bezier.valueAt(tmp, i);
             if(i > 0) {
-                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, 2f);
+                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, thickness);
             }
             prev.set(tmp);
+
+            boolean isSegmentHit = segmentHit(prev, tmp);
+
+            if(isSegmentHit) {
+                hoveredConnection = nodeConnection;
+            }
         }
+    }
+
+    private boolean segmentHit(Vector2 p1, Vector2 p2) {
+
+        vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        nodeStage.getCamera().unproject(vec3);
+        tmp3.set(vec3.x, vec3.y);
+
+        float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
+
+        if(dist < 30) {
+            return true; // it's a mario!
+        }
+
+        return false;
     }
 
     public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
@@ -226,6 +336,8 @@ public class NodeBoard extends WidgetGroup implements Observer {
         Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(node));
 
         mainContainer.removeActor(node);
+
+        node.notifyRemoved();
 
         TalosMain.Instance().ProjectController().setDirty();
     }
@@ -289,8 +401,8 @@ public class NodeBoard extends WidgetGroup implements Observer {
         //Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionPreRemovedEvent.class).set(connection));
         nodeConnections.removeValue(connection, true);
 
-        connection.fromNode.setSlotInactive(connection.fromId, false);
-        connection.toNode.setSlotInactive(connection.toId, true);
+        connection.fromNode.setSlotConnectionInactive(connection, false);
+        connection.toNode.setSlotConnectionInactive(connection, true);
 
         Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
 
@@ -305,6 +417,17 @@ public class NodeBoard extends WidgetGroup implements Observer {
         if(activeCurve != null) {
             activeCurve.setTo(toX, toY);
         }
+    }
+
+    public NodeConnection findConnection(NodeWidget from, NodeWidget to, String slotForm, String slotTo) {
+        // a bit slow but...
+        for(NodeConnection connection : nodeConnections) {
+            if(connection.fromNode == from && connection.toNode == to && slotForm.equals(connection.fromId) && slotTo.equals(connection.toId)) {
+                return connection;
+            }
+        }
+
+        return null;
     }
 
     public NodeConnection addConnectionCurve(NodeWidget from, NodeWidget to, String slotForm, String slotTo) {
@@ -733,8 +856,10 @@ public class NodeBoard extends WidgetGroup implements Observer {
     private void collectNodesNodeAffects(Array<NodeWidget> nodeList, NodeWidget node) {
         nodeList.add(node);
 
-        for(NodeWidget.Connection connection: node.outputs.values()) {
-            collectNodesNodeAffects(nodeList, connection.targetNode);
+        for(Array<NodeWidget.Connection> connections: node.outputs.values()) {
+            for(NodeWidget.Connection connection : connections) {
+                collectNodesNodeAffects(nodeList, connection.targetNode);
+            }
         }
     }
 
@@ -818,6 +943,10 @@ public class NodeBoard extends WidgetGroup implements Observer {
                 addNodeToSelection(node);
             }
         }
+    }
+
+    public DynamicNodeStage getNodeStage() {
+        return nodeStage;
     }
 
 }

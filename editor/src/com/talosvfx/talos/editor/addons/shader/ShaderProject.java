@@ -16,14 +16,14 @@ public class ShaderProject implements IProject {
     }
 
     @Override
-    public void loadProject (String data) {
+    public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
         Json json = new Json();
         ProjectData projectData = json.fromJson(ProjectData.class, data);
         projectData.loadStage(shaderAddon.nodeStage);
     }
 
     @Override
-    public String getProjectString () {
+    public String getProjectString (boolean toMemory) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
 
@@ -122,5 +122,20 @@ public class ShaderProject implements IProject {
         public void read (Json json, JsonValue jsonValue) {
             version = jsonValue.getString("version");
         }
+    }
+
+    @Override
+    public String getProjectTypeName () {
+        return "Shader Graph";
+    }
+
+    @Override
+    public boolean requiresWorkspaceLocation () {
+        return false;
+    }
+
+    @Override
+    public void createWorkspaceEnvironment (String path, String name) {
+
     }
 }

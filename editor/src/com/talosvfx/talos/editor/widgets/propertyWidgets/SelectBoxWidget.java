@@ -9,15 +9,32 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 
+import java.util.function.Supplier;
 
-public abstract class SelectBoxWidget extends PropertyWidget<String> {
+
+public class SelectBoxWidget extends PropertyWidget<String> {
 
     Stack stack;
     Label noValueLabel;
     SelectBox<String> selectBox;
 
-    public SelectBoxWidget(String name) {
-        super(name);
+    Supplier<Array<String>> optionListSupplier;
+
+    public SelectBoxWidget() {
+        super();
+    }
+
+    public SelectBoxWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Supplier<Array<String>> optionListSupplier) {
+        super(name, supplier, valueChanged);
+        setOptionListSupplier(optionListSupplier);
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        SelectBoxWidget clone = (SelectBoxWidget) super.clone();
+        clone.setOptionListSupplier(this.optionListSupplier);
+
+        return clone;
     }
 
     @Override
@@ -35,7 +52,7 @@ public abstract class SelectBoxWidget extends PropertyWidget<String> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 String newValue = selectBox.getSelected();
-                valueChanged(newValue);
+                callValueChanged(newValue);
             }
         };
         selectBox.addListener(listener);
@@ -45,7 +62,7 @@ public abstract class SelectBoxWidget extends PropertyWidget<String> {
 
     @Override
     public void updateWidget(String value) {
-        Array<String> list = getOptionsList();
+        Array<String> list = optionListSupplier.get();
         if(list != null) {
             selectBox.removeListener(listener);
             selectBox.setItems(list);
@@ -61,5 +78,7 @@ public abstract class SelectBoxWidget extends PropertyWidget<String> {
         }
     }
 
-    public abstract Array<String> getOptionsList();
+    public void setOptionListSupplier(Supplier<Array<String>> supplier) {
+        this.optionListSupplier = supplier;
+    }
 }

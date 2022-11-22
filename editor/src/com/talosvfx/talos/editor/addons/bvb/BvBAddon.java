@@ -21,6 +21,7 @@ public class BvBAddon implements IAddon {
     ParticleList particleList;
 
     public FileTracker.Tracker spineTracker;
+    public FileTracker.Tracker bvbBackgroundTracker;
     public FileTracker.Tracker particleTracker;
 
     @Override
@@ -32,6 +33,8 @@ public class BvBAddon implements IAddon {
         spineTracker = handle -> workspace.setSkeleton(handle);
 
         particleTracker = handle -> workspace.updateParticle(handle);
+
+        bvbBackgroundTracker = handle -> workspace.setBackgroundImage(handle);
 
     }
 
@@ -62,6 +65,11 @@ public class BvBAddon implements IAddon {
         });
 
         menuBar.addMenu(bvbMenu);
+    }
+
+    @Override
+    public void dispose () {
+
     }
 
     private void buildUI() {
@@ -109,6 +117,12 @@ public class BvBAddon implements IAddon {
                 TalosMain.Instance().FileTracker().trackFile(handle, particleTracker);
 
                 return true;
+            }
+
+            if (handle.extension().equals("png")) {
+                // let's load some background weeeee
+                workspace.addBackgroundImage(handle);
+                TalosMain.Instance().FileTracker().trackFile(handle, bvbBackgroundTracker);
             }
         }
 

@@ -203,8 +203,14 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
         super.read(json, jsonData);
 
         equalsButton.setChecked(jsonData.getBoolean("equals"));
+
         lowShape.setScaleVal(jsonData.getFloat("lowScale"));
         highShape.setScaleVal(jsonData.getFloat("highScale"));
+
+        lowShape.setShape(jsonData.getInt("lowShape", 0));
+        highShape.setShape(jsonData.getInt("highShape", 0));
+        lowShape.setSide(jsonData.getInt("lowSide", 0));
+        highShape.setSide(jsonData.getInt("highSide", 0));
 
         updateWidgetsFromModuleData();
         lockUpdate = false;
@@ -216,6 +222,12 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
 
         json.writeValue("lowScale", lowShape.getScale());
         json.writeValue("highScale", highShape.getScale());
+
+        json.writeValue("lowShape", lowShape.getShape());
+        json.writeValue("highShape", highShape.getShape());
+        json.writeValue("lowSide", lowShape.getSide());
+        json.writeValue("highSide", highShape.getSide());
+
         json.writeValue("equals", equalsButton.isChecked());
     }
 

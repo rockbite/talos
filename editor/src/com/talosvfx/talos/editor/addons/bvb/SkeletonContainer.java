@@ -14,6 +14,7 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 
 public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
@@ -517,19 +518,35 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
         Array<PropertyWidget> properties = new Array<>();
 
-        LabelWidget skeletonName = new LabelWidget("skeleton name") {
+        LabelWidget skeletonName = new LabelWidget("skeleton name", new Supplier<String>() {
             @Override
-            public String getValue() {
+            public String get() {
                 if(skeleton != null) {
                     return skeleton.getData().getName();
                 }
                 return "N/A";
             }
-        };
+        });
 
-        SelectBoxWidget currentSkinWidget = new SelectBoxWidget("skin") {
+        SelectBoxWidget currentSkinWidget = new SelectBoxWidget("skin", new Supplier<String>() {
             @Override
-            public Array<String> getOptionsList() {
+            public String get() {
+                if(currentSkin != null) {
+                    return currentSkin.getName();
+                }
+                return "N/A";
+            }
+        }, new PropertyWidget.ValueChanged<String>() {
+            @Override
+            public void report(String value) {
+                currentSkin = skeleton.getData().findSkin(value);
+                skeleton.setSkin(currentSkin);
+                skeleton.setSlotsToSetupPose();
+                effectScopeUpdated();
+            }
+        }, new Supplier<Array<String>>() {
+            @Override
+            public Array<String> get() {
                 if(skeleton != null) {
                     Array<String> result = new Array<>();
                     for(Skin skin : skeleton.getData().getSkins()) {
@@ -542,27 +559,29 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 }
                 return null;
             }
+        });
 
+        SelectBoxWidget currentAnimationWidget = new SelectBoxWidget("animation", new Supplier<String>() {
             @Override
-            public String getValue() {
-                if(currentSkin != null) {
-                    return currentSkin.getName();
+            public String get() {
+                if(currentAnimation != null) {
+                    return currentAnimation.getName();
                 }
                 return "N/A";
             }
-
+        }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void valueChanged(String value) {
-                currentSkin = skeleton.getData().findSkin(value);
-                skeleton.setSkin(currentSkin);
-                skeleton.setSlotsToSetupPose();
+            public void report(String value) {
+                currentAnimation = skeleton.getData().findAnimation(value);
+                animationState.setAnimation(0, currentAnimation, true);
+
+                workspace.effectUnselected(workspace.selectedEffect);
+
                 effectScopeUpdated();
             }
-        };
-
-        SelectBoxWidget currentAnimationWidget = new SelectBoxWidget("animation") {
+        }, new Supplier<Array<String>>() {
             @Override
-            public Array<String> getOptionsList() {
+            public Array<String> get() {
                 if(skeleton != null) {
                     Array<String> result = new Array<>();
                     for(Animation animation : skeleton.getData().getAnimations()) {
@@ -575,25 +594,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 }
                 return null;
             }
-
-            @Override
-            public String getValue() {
-                if(currentAnimation != null) {
-                    return currentAnimation.getName();
-                }
-                return "N/A";
-            }
-
-            @Override
-            public void valueChanged(String value) {
-                currentAnimation = skeleton.getData().findAnimation(value);
-                animationState.setAnimation(0, currentAnimation, true);
-
-                workspace.effectUnselected(workspace.selectedEffect);
-
-                effectScopeUpdated();
-            }
-        };
+        });
 
         properties.add(skeletonName);
         properties.add(currentSkinWidget);
@@ -610,6 +611,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     @Override
     public int getPriority() {
         return 1;
+    }
+
+    @Override
+    public Class<? extends IPropertyProvider> getType() {
+        return this.getClass();
     }
 
     public BoundEffect getEffectByName(String selectedEffect) {

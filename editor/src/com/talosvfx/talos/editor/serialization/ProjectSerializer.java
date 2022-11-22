@@ -48,12 +48,12 @@ public class ProjectSerializer {
         }
     }
 
-    public ProjectData read (FileHandle fileHandle) {
+    public ProjectData readTalosTLSProject (FileHandle fileHandle) {
         if(!fileHandle.exists()) return null;
-        return read(fileHandle.readString());
+        return readTalosTLSProject(fileHandle.readString());
     }
 
-    public ProjectData read (String data) {
+    public static ProjectData readTalosTLSProject (String data) {
         Json json = new Json();
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: WrapperRegistry.map.values()) {
@@ -84,7 +84,7 @@ public class ProjectSerializer {
         return data;
     }
 
-    public String writeExport(ExportData exportData) {
+    public static String writeTalosPExport (ExportData exportData) {
         Json json = new Json();
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: ParticleEmitterDescriptor.registeredModules) {

@@ -1,0 +1,51 @@
+<modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
+    <category name="main" title="Main">
+        <module name = "TweenNode" title = "Tween" keywords = "tween, system">
+            <value port="input" name="startSignal" type="signal">play</value>
+            <inputText name="title" default="Tween">Title</inputText>
+            <inputText name="target" default="">Target</inputText>
+            <button name="playButton">Play</button>
+            <value port="output" name="startSignal" type="signal">start</value>
+        </module>
+        <module name = "MoveByNode" title = "Move By" keywords = "movement">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "DelayNode" title = "Delay" keywords = "tween">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "StaggerNode" title = "Stagger" keywords = "tween">
+            <select name="strategy">
+                <option value = "INDEX">By Index</option>
+                <option value = "YPOS">Y Position</option>
+                <option value = "XPOS">X Position</option>
+            </select>
+            <select name="sorting">
+                <option value = "ASC">Ascending</option>
+                <option value = "DESC">Descending</option>
+            </select>
+            <group>
+                <dynamicValue name="min" type="float" default="1">Min</dynamicValue>
+                <dynamicValue name="max" type="float" default="1">Max</dynamicValue>
+            </group>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "NumberNode" title = "Number" keywords = "">
+            <dynamicValue port="output" name="value" type="float" min="-1000" max="1000">Value: </dynamicValue>
+        </module>
+        <module name = "OneMinusNode" title = "One Minus" keywords = "">
+            <value port="input" name="input" type="float">input</value>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+    </category>
+</modules>

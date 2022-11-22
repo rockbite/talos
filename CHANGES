@@ -1,5 +1,19 @@
+[1.5.0]
+- Scene Editor addon with a whole sweet of features bellow
+- Scenes and Prefabs
+- Importer for 9patch files
+- ECS like GameObject/Component system
+- File explorer
+- Property system to edit individual components and other property holders
+- Game Object templates
+- Transform system, and useful gizmos
+- Support for nested objects
+- Support for particle effects, and linking to TLS
+- Metadata system for each asset
+- Multiple camera system, and camera previews
+
 [1.4.2]
-- Material Modile for 2D/3D preview of shader code output
+- Material Module for 2D/3D preview of shader code output
 - External shader module with annotation support
 - Pixel Shader module now allows pass through output of it's code
 

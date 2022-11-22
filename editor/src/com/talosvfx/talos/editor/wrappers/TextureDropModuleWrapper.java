@@ -113,7 +113,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             setModuleRegion(regionName, textureRegion);
             dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
         } else {
-            TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
+            //TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
         }
     }
 

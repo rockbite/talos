@@ -15,13 +15,14 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
-import com.talosvfx.talos.editor.utils.GridRenderer;
 
 public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
 
+    private final NodeStageActor container;
     protected XmlReader.Element nodeData;
     public Skin skin;
     protected NodeBoard nodeBoard;
@@ -33,6 +34,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         super();
         this.skin = skin;
         nodeData = loadData();
+
+        container = new NodeStageActor(this);
     }
 
     protected abstract XmlReader.Element loadData();
@@ -84,7 +87,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     }
 
     protected void initActors() {
-        GridRenderer gridRenderer = new GridRenderer(stage);
+        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
         stage.addActor(gridRenderer);
 
         nodeBoard = new NodeBoard(skin, this);
@@ -110,7 +113,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                TalosMain.Instance().getCameraController().scrolled(amountX, amountY);
+                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
@@ -122,6 +125,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
+                }
+
+                NodeBoard.NodeConnection hoveredConnection = nodeBoard.getHoveredConnection();
+
+                if(hoveredConnection != null && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && button == 0) {
+                    onConnectionClicked(hoveredConnection);
                 }
 
                 return true;
@@ -157,7 +166,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-                if(button == 0 && (!event.isCancelled() && !event.isHandled())) {
+                if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
                     FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
                 }
@@ -201,17 +210,13 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                     nodeBoard.selectAllNodes();
                 }
 
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().undo();
-                }
-
-                if(keycode == Input.Keys.Z && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    TalosMain.Instance().ProjectController().redo();
-                }
-
                 return super.keyDown(event, keycode);
             }
         });
+    }
+
+    protected void onConnectionClicked(NodeBoard.NodeConnection hoveredConnection) {
+
     }
 
     public void write (Json json) {
@@ -317,6 +322,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     public NodeBoard getNodeBoard () {
         return nodeBoard;
+    }
+
+    public NodeStageActor getContainer() {
+        return container;
     }
 
     @Override

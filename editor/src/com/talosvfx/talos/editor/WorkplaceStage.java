@@ -47,14 +47,19 @@ public abstract class WorkplaceStage {
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                TalosMain.Instance().getCameraController().scrolled(amountX, amountY);
+                cameraController.scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 TalosMain.Instance().UIStage().getStage().unfocusAll();
-                TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+
+                if(TalosMain.Instance().getCameraController() != null) {
+                    TalosMain.Instance().getCameraController().touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
+                } else {
+                    cameraController.touchDown(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
+                }
 
                 return true;
             }
@@ -65,14 +70,22 @@ public abstract class WorkplaceStage {
 
                 super.touchDragged(event, x, y, pointer);
 
-                TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.input.getY(), pointer);
+                if(TalosMain.Instance().getCameraController() != null) {
+                    TalosMain.Instance().getCameraController().touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
+                } else {
+                    cameraController.touchDragged(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer);
+                }
             }
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
-                TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.input.getY(), pointer, button);
+                if(TalosMain.Instance().getCameraController() != null) {
+                    TalosMain.Instance().getCameraController().touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
+                } else {
+                    cameraController.touchUp(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), pointer, button);
+                }
             }
 
             @Override

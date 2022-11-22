@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.AddonController;
@@ -35,7 +36,9 @@ import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.render.Render;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
 
@@ -103,14 +106,19 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
-	public Cursor pickerCursor;
-	private Cursor currentCursor;
+	private TalosInputProcessor talosInputProcessor;
 
 	private Array<InputProcessor> inputProcessors = new Array<>();
 	private Array<InputProcessor> customInputProcessors = new Array<>();
 
 	public TalosMain () {
 
+	}
+
+	public boolean isOsX() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		boolean isMacOs = osName.startsWith("mac os x");
+		return isMacOs;
 	}
 
 	@Override
@@ -129,8 +137,6 @@ public class TalosMain extends ApplicationAdapter {
 		skin.addRegions(atlas);
 
 		VisUI.load(skin);
-
-		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
 
 		uiStage = new UIStage(skin);
 
@@ -173,15 +179,42 @@ public class TalosMain extends ApplicationAdapter {
 		setInputProcessors();
 	}
 
-	public void setCursor(Cursor cursor) {
-		if(currentCursor != cursor) {
-			if(cursor != null) {
-				Gdx.graphics.setCursor(cursor);
-			} else {
-				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+	private void loadFromProperties () {
+		FileHandle properties = Gdx.files.internal("talos-version.properties");
+		if (properties.exists()) {
+			Properties props = new Properties();
+			try {
+				props.load(properties.read());
+
+				String title = "Talos";
+				//buildHash=cac0e98
+				//buildTime=1660634881583
+				//version=1.4.2-SNAPSHOT
+
+				if (props.containsKey("version")) {
+					title = props.getProperty("version");
+				}
+				if (props.containsKey("buildTime")) {
+					String buildTime = props.getProperty("buildTime");
+					Date date = new Date(Long.parseLong(buildTime));
+
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
+					title += " " + sdf.format(date);
+				}
+				if (props.containsKey("buildHash")) {
+					title += " " + props.getProperty("buildHash");
+				}
+				Gdx.graphics.setTitle(title);
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			currentCursor = cursor;
 		}
+	}
+
+	public void setPerFrameCursorTypeEnabled () {
+
 	}
 
 	public void disableNodeStage() {
@@ -207,12 +240,13 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		if (!focused) {
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		CursorUtil.checkAndReset();
+
+
+		try {
+			Thread.sleep(16);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		if (currentWorkplaceStage != null) {
@@ -249,12 +283,13 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
+		addonController.dispose();
 		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
 			currentWorkplaceStage.getStage().dispose();
 		}
-		pickerCursor.dispose();
 		uiStage.getStage().dispose();
 		Render.instance().dispose();
+		SocketServer.dispose();
 	}
 
 	public Skin getSkin() {
@@ -262,6 +297,8 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public CameraController getCameraController() {
+		if(currentWorkplaceStage == null) return null;
+
 		return currentWorkplaceStage.getCameraController();
 	}
 
