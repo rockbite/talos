@@ -54,6 +54,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
 
                         nodeBoard.tryAndConnectLasCC(node);
+
+                        node.finishedCreatingFresh();
                     }
                 }
             }

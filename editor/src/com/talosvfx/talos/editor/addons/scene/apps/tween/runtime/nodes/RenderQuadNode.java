@@ -9,8 +9,6 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import org.w3c.dom.Text;
 
 public class RenderQuadNode extends RoutineNode {
 

@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.ProbabilityChoiceWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
@@ -207,7 +208,7 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
             String key = stringAbstractWidgetEntry.key;
             AbstractWidget value = stringAbstractWidgetEntry.value;
 
-            if(value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget) {
+            if(value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
                 logicNode.setProperty(key, value.getValue());
             }
         }

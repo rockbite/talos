@@ -14,7 +14,7 @@ public abstract class RoutineNode {
     protected RoutineInstance routineInstanceRef;
     public int uniqueId;
 
-    enum DataType {
+    public enum DataType {
         NUMBER,
         VECTOR2,
         VECTOR3,
@@ -24,20 +24,20 @@ public abstract class RoutineNode {
         FLUID
     }
 
-    enum PortType {
+    public enum PortType {
         INPUT,
         OUTPUT,
         NONE
     }
 
-    enum ConnectionType {
+    public enum ConnectionType {
         SIGNAL,
         DATA
     }
 
     public class Connection {
-        Port fromPort;
-        Port toPort;
+        public Port fromPort;
+        public Port toPort;
     }
 
     public class Port {
@@ -64,8 +64,8 @@ public abstract class RoutineNode {
         }
     }
 
-    private ObjectMap<String, Port> inputs = new ObjectMap<>();
-    private ObjectMap<String, Port> outputs = new ObjectMap<>();
+    protected ObjectMap<String, Port> inputs = new ObjectMap<>();
+    protected ObjectMap<String, Port> outputs = new ObjectMap<>();
 
     public RoutineNode() {
 
@@ -207,13 +207,21 @@ public abstract class RoutineNode {
     protected GameAsset fetchAssetValue(String key) {
         Port port = inputs.get(key);
 
-        if(port.valueOverride instanceof GameAsset) {
-            return (GameAsset)(port.valueOverride);
-        } else {
-            //todo: fix assumption that it is PNG
-            GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String)port.valueOverride, GameAssetType.SPRITE);
+        if(port.connections.isEmpty()) {
+            if (port.valueOverride instanceof GameAsset) {
+                return (GameAsset) (port.valueOverride);
+            } else {
+                //todo: fix assumption that it is PNG
+                GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String) port.valueOverride, GameAssetType.SPRITE);
 
-            return asset;
+                return asset;
+            }
+        } else {
+            Connection connection = port.connections.first();
+            RoutineNode targetNode = connection.toPort.nodeRef;
+            String targetPortName = connection.toPort.name;
+
+            return (GameAsset) targetNode.queryValue(targetPortName);
         }
     }
 
@@ -302,7 +310,9 @@ public abstract class RoutineNode {
     }
 
     public void setProperty(String key, Object value) {
-        inputs.get(key).valueOverride = value;
+        if(inputs.containsKey(key)) {
+            inputs.get(key).valueOverride = value;
+        }
     }
 
 }

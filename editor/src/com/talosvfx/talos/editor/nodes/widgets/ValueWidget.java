@@ -45,6 +45,8 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private boolean isDragging = false;
 
+    private boolean isDisabled;
+
     public ValueWidget() {
         editing = new Table();
         main = new Table();
@@ -117,6 +119,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(isDisabled) return false;
                 dragged = false;
                 lastPos = x;
                 return super.touchDown(event, x, y, pointer, button);
@@ -185,6 +188,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     private void showEditMode() {
+        if(isDisabled) return;
         if(editing.isVisible()) return;
 
         getStage().setKeyboardFocus(textField);
@@ -345,5 +349,13 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     public void setNone() {
         valueLabel.setText("-");
+    }
+
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
     }
 }

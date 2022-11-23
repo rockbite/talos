@@ -21,14 +21,13 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
 
     private ObjectMap<String, ProbabilityWidget> map = new ObjectMap<>();
     private ObjectMap<ProbabilityWidget, Cell<ProbabilityWidget>> cellMap = new ObjectMap<>();
+    private boolean reading = false;
 
     @Override
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
 
         container = getCustomContainer("container");
-
-        addProbabilityRow();
     }
 
     private String getFeeName(String prefix) {
@@ -44,16 +43,76 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
         // try to find holes
         for(int i = 0; i <= max; i++) {
             if(!map.containsKey(prefix+i)) {
-                return prefix+"i";
+                return prefix + i;
             }
         }
 
         return prefix+(max+1);
     }
 
-    private void addProbabilityRow() {
-        String name = getFeeName("input");
+    @Override
+    protected void readProperties(JsonValue properties) {
+        reading = true;
+        for(int i = 0; i < properties.size; i++) {
+            String name = properties.get(i).name;
+            float value = properties.get(i).asFloat();
+            if(!widgetMap.containsKey(name)) {
+                addProbabilityRow(name);
+                ProbabilityWidget widget = (ProbabilityWidget) widgetMap.get(name);
+                widget.setValue(value);
+            }
+        }
 
+        ProbabilityWidget widget = addProbabilityRow(getFeeName("input"));
+        widget.setDisabled(true);
+
+        if(properties.size == 0) {
+            widget.setValue(100);
+        }
+
+        reading = false;
+    }
+
+    private void adjustOthersExcept(ProbabilityWidget widget) {
+        if(reading) return;
+
+        float sum = 0;
+        Array<ProbabilityWidget> list = new Array<>();
+        for(String name: map.keys()) {
+            ProbabilityWidget item = map.get(name);
+            if(!item.isDisabled()) {
+                list.add(item);
+                sum += item.getValue();
+            }
+        }
+
+        float target = 100;
+        float magnitude = target/sum; // this is how much everything in list has to grow
+        if(widget != null) {
+            if(list.size > 1) {
+                list.removeValue(widget, true);
+                target = target - widget.getValue();
+                sum = sum - widget.getValue();
+                if(sum > 0) {
+                    magnitude = target / sum;
+                } else {
+                    magnitude = 0;
+                }
+            }
+        }
+
+        reading = true; // lock this event
+        for (ProbabilityWidget probabilityWidget : list) {
+            float newVal = target/list.size;
+            if(sum != 0) {
+                newVal = probabilityWidget.getValue() * magnitude;
+            }
+            probabilityWidget.setValue(newVal);
+        }
+        reading = false;
+    }
+
+    private ProbabilityWidget addProbabilityRow(String name) {
         ProbabilityWidget widget = new ProbabilityWidget();
         widget.init(getSkin());
 
@@ -67,6 +126,7 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
         widget.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent changeEvent, Actor actor) {
+                adjustOthersExcept(widget);
                 reportNodeDataModified();
             }
         });
@@ -76,16 +136,26 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
 
         map.put(name, widget);
         cellMap.put(widget, probabilityWidgetCell);
+
+        return widget;
     }
 
     @Override
     public void attachNodeToMyInput(NodeWidget node, String mySlot, String targetSlot) {
         super.attachNodeToMyInput(node, mySlot, targetSlot);
 
-        addProbabilityRow();
-        // lower position
-        setY(getY() - 42);
-        layout();
+        ProbabilityWidget curr = (ProbabilityWidget) widgetMap.get(mySlot);
+        curr.setDisabled(false);
+
+        // adding latest one
+        if(widgetMap.size - 1 == inputs.size) {
+            ProbabilityWidget widget = addProbabilityRow(getFeeName("input"));
+            // lower position
+            setY(getY() - 42);
+            layout();
+
+            widget.setDisabled(true);
+        }
     }
 
     @Override
@@ -99,11 +169,22 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
         Cell<ProbabilityWidget> probabilityWidgetCell = cellMap.get(probabilityChoiceWidget);
         probabilityWidgetCell.height(0).pad(0);
         probabilityWidgetCell.getTable().invalidateHierarchy();
-        container.getCells().removeValue(probabilityWidgetCell, true);
+        //container.getCells().removeValue(probabilityWidgetCell, true);
         setY(getY() + 42);
+
+        widgetMap.remove(toId);
+        typeMap.remove(toId);
+        defaultsMap.remove(toId);
+        map.remove(toId);
+        cellMap.remove(probabilityChoiceWidget);
+        inputs.remove(toId);
+
+        adjustOthersExcept(null);
     }
 
     public static class ProbabilityWidget extends AbstractWidget<Float>  {
+
+        private ValueWidget widget;
 
         public ProbabilityWidget() {
 
@@ -114,7 +195,7 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
             super.init(skin);
 
             Label label = new Label("weight", getSkin());
-            ValueWidget widget = new ValueWidget();
+            widget = new ValueWidget();
             widget.init(getSkin());
             widget.setRange(0, 100);
             widget.setStep(1f);
@@ -124,6 +205,10 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
             add(widget).right();
         }
 
+        public void setValue(float val) {
+            widget.setValue(val);
+        }
+
         @Override
         public void loadFromXML(XmlReader.Element element) {
 
@@ -131,18 +216,63 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
 
         @Override
         public Float getValue() {
-            return null;
+            return widget.getValue();
         }
 
         @Override
         public void read(Json json, JsonValue jsonValue) {
-
+           widget.read(json, jsonValue);
         }
 
         @Override
         public void write(Json json, String name) {
+            widget.write(json, name);
+        }
 
+        public void setDisabled(boolean isDisabled) {
+            widget.setDisabled(isDisabled);
+        }
+
+        public boolean isDisabled() {
+            return widget.isDisabled();
         }
     }
 
+    @Override
+    public void read(Json json, JsonValue jsonValue) {
+        super.read(json, jsonValue);
+    }
+
+    @Override
+    public void write (Json json) {
+        json.writeValue("name", getNodeName());
+        json.writeValue("id", getUniqueId());
+        json.writeValue("title", title.getText());
+        json.writeObjectStart("position");
+        json.writeValue("x", getX() + "");
+        json.writeValue("y", getY() + "");
+        json.writeObjectEnd();
+
+        json.writeObjectStart("properties");
+
+        for(String name: widgetMap.keys()) {
+            if(inputs.get(name) != null) {
+                AbstractWidget widget = widgetMap.get(name);
+                widget.write(json, name);
+            }
+        }
+
+        writeProperties(json);
+
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void finishedCreatingFresh() {
+        if(inputs.size == 0) {
+            ProbabilityWidget widget = addProbabilityRow(getFeeName("input"));
+            widget.setDisabled(true);
+            widget.setValue(100);
+        }
+    }
 }

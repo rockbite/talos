@@ -23,7 +23,7 @@ import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
-    EditableLabel title;
+    protected EditableLabel title;
 
     protected ObjectMap<String, Table> inputSlotMap = new ObjectMap<>();
     protected ObjectMap<String, Table> outputSlotMap = new ObjectMap<>();
@@ -86,6 +86,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     public void notifyRemoved() {
 
+    }
+
+    public void finishedCreatingFresh() {
+        // for overriding
     }
 
     public class Connection {
@@ -573,7 +577,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         json.writeObjectEnd();
     }
 
-    private String getNodeName () {
+    protected String getNodeName () {
         return nodeName;
     }
 
