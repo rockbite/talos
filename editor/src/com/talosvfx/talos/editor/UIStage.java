@@ -132,12 +132,12 @@ public class UIStage {
 		WrapperRegistry.map.clear();
 		moduleListPopup = new ModuleListPopup(root);
 
-//		colorPicker = new ColorPicker();
-//		colorPicker.padTop(32);
-//		colorPicker.padLeft(16);
-//		colorPicker.setHeight(330);
-//		colorPicker.setWidth(430);
-//		colorPicker.padRight(26);
+		colorPicker = new ColorPicker();
+		colorPicker.padTop(32);
+		colorPicker.padLeft(16);
+		colorPicker.setHeight(330);
+		colorPicker.setWidth(430);
+		colorPicker.padRight(26);
 	}
 
 	public boolean isIn3DMode () {
