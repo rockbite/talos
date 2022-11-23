@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 import java.util.Objects;
 
@@ -426,6 +427,7 @@ public class LayoutGrid extends WidgetGroup {
 
 					getDragHit(dragHitResult);
 
+
 					Vector2 vector2 = new Vector2();
 					float hitInStageX = vector2.x;
 					float hitInStageY = vector2.y;
@@ -692,6 +694,12 @@ public class LayoutGrid extends WidgetGroup {
 			root = false;
 			direction = null;
 		}
+
+		@Override
+		public String toString () {
+			String hitName = hit != null ? hit.getClass().getSimpleName() : "null";
+			return "DragHitResult{" + "hit=" + hitName + ", root=" + root + ", direction=" + direction + '}';
+		}
 	}
 
 	@Override
@@ -716,6 +724,10 @@ public class LayoutGrid extends WidgetGroup {
 		screenToLocalCoordinates(screenCoords);
 
 		Actor hit = hit(x, y, true);
+
+		hit = getLayoutFromHit(hit);
+
+
 		if (hit instanceof LayoutContent) {
 			overItem = (LayoutContent)hit;
 		} else if (hit != null) {
@@ -729,6 +741,21 @@ public class LayoutGrid extends WidgetGroup {
 		} else {
 			overItem = null;
 		}
+	}
+
+	private Actor getLayoutFromHit (Actor hit) {
+		if (hit == null) return null;
+
+		if (hit instanceof LayoutContent) return hit;
+
+
+		LayoutItem layoutItem = hit.firstAscendant(LayoutContent.class);
+
+		if (layoutItem != null) {
+			return layoutItem;
+		}
+
+		return hit;
 	}
 
 	enum LayoutType {
@@ -772,7 +799,6 @@ public class LayoutGrid extends WidgetGroup {
 //			//Register the app uuid for injection
 //		}
 
-		System.out.println("");
 
 	}
 

@@ -22,6 +22,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
@@ -30,6 +31,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
@@ -129,5 +131,6 @@ public class TalosMain2 extends ApplicationAdapter {
 		skin.dispose();
 		stage.dispose();
 		VisUI.dispose();
+		SocketServer.dispose();
 	}
 }

@@ -1,4 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.utils;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -51,6 +53,23 @@ public class FileWatching {
     public FileWatching () {
         workingThread = new Thread(this::run, "Watcher thread");
         workingThread.start();
+
+        Gdx.app.addLifecycleListener(new LifecycleListener() {
+            @Override
+            public void pause () {
+
+            }
+
+            @Override
+            public void resume () {
+
+            }
+
+            @Override
+            public void dispose () {
+                workingThread.stop();
+            }
+        });
     }
 
     public void startWatchingCurrentProject () throws IOException {
