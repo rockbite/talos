@@ -184,5 +184,13 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
+        <module name = "AssetSelectNode" title = "Asset Select" keywords = "" class = "RoutineNodeWidget">
+            <asset name="asset" type="SPRITE">asset</asset>
+            <value port="output" name="output" type="asset">asset</value>
+        </module>
+        <module name = "ProbabilityChoiceNode" title = "Probability Choice" keywords = "" class = "ProbabilityChoiceWidget">
+            <container name="container"></container>
+            <value port="output" name="output" type="fluid">output</value>
+        </module>
     </category>
 </modules>

@@ -228,7 +228,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         Table portTable = widget.addPort(isInput);
 
         if (isInput) {
-             configureNodeActions(portTable, variableName, true);
+            configureNodeActions(portTable, variableName, true);
             inputSlots.add(variableName);
         } else {
             configureNodeActions(portTable, variableName, false);
