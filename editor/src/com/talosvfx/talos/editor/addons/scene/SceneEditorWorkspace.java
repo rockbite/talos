@@ -71,7 +71,6 @@ import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransfo
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
-	private static SceneEditorWorkspace instance;
 	public final TemplateListPopup templateListPopup;
 
 	private String projectPath;
@@ -1105,12 +1104,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
 	}
 
-	public static SceneEditorWorkspace getInstance () {
-		if (instance == null) {
-			instance = new SceneEditorWorkspace();
-		}
-		return instance;
-	}
 
 	public void cleanWorkspace () {
 

@@ -353,56 +353,58 @@ public class AssetRepository implements Observer {
 	public void exportToFile () { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
-		FileHandle scenes = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("scenes");
-		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
-		if (scenes.exists()) {
-			for (FileHandle handle : scenes.list()) {
-				JsonValue scene = new JsonReader().parse(handle);
+		logger.info("redo exporting");
 
-				JsonValue gameObjects = scene.get("gameObjects");
-				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
-			}
-		}
-
-		//Find all prefabs
-		FileHandle assets = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assets");
-		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
-		findAllPrefabs(assets, identifiersBeingUsedByComponents);
-
-
-		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
-		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
-
-			//we need to get the identifier and type pairs
-
-			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
-			if (gameAsset == null) {
-				System.out.println("Game asset is null, not exporting");
-				continue;
-			}
-			if (gameAsset.isBroken()) {
-				System.out.println("Game asset is broken, not exporting");
-				continue;
-			}
-
-			gameAssetsToExport.add(gameAsset);
-			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
-		}
-
-		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
-
-		for (GameAsset<?> gameAsset : gameAssetsToExport) {
-			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
-			assetExportStructure.identifier = gameAsset.nameIdentifier;
-			assetExportStructure.type = gameAsset.type;
-			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
-			}
-			gameAssetExportStructure.gameAssets.add(assetExportStructure);
-		}
-
-		FileHandle assetRepoExportFile = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assetExport.json");
-		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+//		FileHandle scenes = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("scenes");
+//		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
+//		if (scenes.exists()) {
+//			for (FileHandle handle : scenes.list()) {
+//				JsonValue scene = new JsonReader().parse(handle);
+//
+//				JsonValue gameObjects = scene.get("gameObjects");
+//				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
+//			}
+//		}
+//
+//		//Find all prefabs
+//		FileHandle assets = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assets");
+//		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
+//		findAllPrefabs(assets, identifiersBeingUsedByComponents);
+//
+//
+//		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
+//		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
+//
+//			//we need to get the identifier and type pairs
+//
+//			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
+//			if (gameAsset == null) {
+//				System.out.println("Game asset is null, not exporting");
+//				continue;
+//			}
+//			if (gameAsset.isBroken()) {
+//				System.out.println("Game asset is broken, not exporting");
+//				continue;
+//			}
+//
+//			gameAssetsToExport.add(gameAsset);
+//			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
+//		}
+//
+//		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+//
+//		for (GameAsset<?> gameAsset : gameAssetsToExport) {
+//			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
+//			assetExportStructure.identifier = gameAsset.nameIdentifier;
+//			assetExportStructure.type = gameAsset.type;
+//			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+//				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
+//			}
+//			gameAssetExportStructure.gameAssets.add(assetExportStructure);
+//		}
+//
+//		FileHandle assetRepoExportFile = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assetExport.json");
+//		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
 
 
 	}
@@ -493,26 +495,30 @@ public class AssetRepository implements Observer {
 
 			//Find all components in the current scene that was using this and reset their game asset to the new one
 			Array<GameObject> list = new Array<>();
-			SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
-			if (sceneEditorWorkspace != null && sceneEditorWorkspace.getRootGO() != null) {
-				sceneEditorWorkspace.getRootGO().getChildrenByComponent(GameResourceOwner.class, list);
-				for (GameObject gameObject : list) {
-					for (AComponent component : gameObject.getComponents()) {
-						if (component instanceof GameResourceOwner) {
-							GameResourceOwner<?> gameResourceOwner = (GameResourceOwner<?>)component;
 
-							GameAsset<?> gameResource = gameResourceOwner.getGameResource();
-							if (gameResource.type == GameAssetType.SKELETON) {
-								System.out.println();
-							}
 
-							if (gameResourceOwner.getGameResource().equals(oldGameAsset)) {
-								gameResourceOwner.setGameAsset(gameAsset);
-							}
-						}
-					}
-				}
-			}
+			logger.info("Redo searching game objects for updating");
+//
+//			SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
+//			if (sceneEditorWorkspace != null && sceneEditorWorkspace.getRootGO() != null) {
+//				sceneEditorWorkspace.getRootGO().getChildrenByComponent(GameResourceOwner.class, list);
+//				for (GameObject gameObject : list) {
+//					for (AComponent component : gameObject.getComponents()) {
+//						if (component instanceof GameResourceOwner) {
+//							GameResourceOwner<?> gameResourceOwner = (GameResourceOwner<?>)component;
+//
+//							GameAsset<?> gameResource = gameResourceOwner.getGameResource();
+//							if (gameResource.type == GameAssetType.SKELETON) {
+//								System.out.println();
+//							}
+//
+//							if (gameResourceOwner.getGameResource().equals(oldGameAsset)) {
+//								gameResourceOwner.setGameAsset(gameAsset);
+//							}
+//						}
+//					}
+//				}
+//			}
 		}
 
 		if (shouldUpdate) {
@@ -919,18 +925,20 @@ public class AssetRepository implements Observer {
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(proxyScriptHandle);
 			metadataHandleFor.writeString(json.prettyPrint(metaData), false);
 
-			GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
-			Array<ScriptComponent> updatedComponents = new Array<>();
-			updateScriptComponentsForNewMeta(rootGO, (ScriptMetadata) metaData, updatedComponents);
+			logger.info("redo script meta changing");
 
-			Gdx.app.postRunnable(new Runnable() {
-				@Override
-				public void run () {
-					for (ScriptComponent updatedComponent : updatedComponents) {
-						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
-					}
-				}
-			});
+//			GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+//			Array<ScriptComponent> updatedComponents = new Array<>();
+//			updateScriptComponentsForNewMeta(rootGO, (ScriptMetadata) metaData, updatedComponents);
+
+//			Gdx.app.postRunnable(new Runnable() {
+//				@Override
+//				public void run () {
+//					for (ScriptComponent updatedComponent : updatedComponents) {
+//						Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+//					}
+//				}
+//			});
 		}
 	}
 
@@ -984,8 +992,10 @@ public class AssetRepository implements Observer {
 	}
 
 	public static FileHandle getExportedScriptsFolderHandle () {
-		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
-		return Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
+		logger.info("Redo scripts folder to not be unique");
+//		String projectPath = SceneEditorWorkspace.getInstance().getProjectPath();
+//		return Gdx.files.absolute(projectPath).parent().child("src").child("scene").child("scripts");
+		return Gdx.files.local(".");
 	}
 
 	public GameAsset<?> getAssetForPath (FileHandle file, boolean ignoreBroken) {

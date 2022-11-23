@@ -202,9 +202,9 @@ public class FileWatching {
 
         if (handle.path().contains(scriptFolderPath)) {
             // a script file is changed
-            if (!SceneEditorWorkspace.getInstance().exporting) {
-                Notifications.fireEvent(Notifications.obtainEvent(ScriptFileChangedEvent.class).set(event.kind(), handle));
-            }
+//            if (!SceneEditorWorkspace.getInstance().exporting) {
+//                Notifications.fireEvent(Notifications.obtainEvent(ScriptFileChangedEvent.class).set(event.kind(), handle));
+//            }
         }
 
         if (changes != null) {

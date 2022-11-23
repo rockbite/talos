@@ -15,8 +15,12 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpriteTransformGizmo extends SmartTransformGizmo {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpriteTransformGizmo.class);
 
     private Vector2 tempVec2 = new Vector2();
 
@@ -31,14 +35,16 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         if (isSelected()) {
             Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
-            SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
-            vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
+            logger.info("Redo smart transform cursor update");
 
-            if (isOnTouchedPoint(vec.x, vec.y)) {
-                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-            } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
-                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
-            }
+//            SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
+//            vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
+//
+//            if (isOnTouchedPoint(vec.x, vec.y)) {
+//                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+//            } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
+//                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
+//            }
         }
 
     }

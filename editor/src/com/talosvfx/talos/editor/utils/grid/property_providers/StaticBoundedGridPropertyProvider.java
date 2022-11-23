@@ -9,8 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticBoundedGridPropertyProvider extends StaticGridPropertyProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(StaticBoundedGridPropertyProvider.class);
 
     @Override
     public void update (OrthographicCamera camera, float alpha) {
@@ -48,29 +52,32 @@ public class StaticBoundedGridPropertyProvider extends StaticGridPropertyProvide
 
     @Override
     public float getWorldHeight () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapHeight();
-            }
-        }
+
+        logger.info("redo world height");
+//        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
+//            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//            if (selectedLayer == null) {
+//                return -1;
+//            } else {
+//                return selectedLayer.getMapHeight();
+//            }
+//        }
 
         return -1;
     }
 
     @Override
     public float getWorldWidth () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapWidth();
-            }
-        }
+        logger.info("redo world width");
+//        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
+//            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//
+//            if (selectedLayer == null) {
+//                return -1;
+//            } else {
+//                return selectedLayer.getMapWidth();
+//            }
+//        }
 
         return -1;
     }

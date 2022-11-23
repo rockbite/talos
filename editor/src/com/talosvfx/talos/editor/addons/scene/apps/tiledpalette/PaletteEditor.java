@@ -22,10 +22,14 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
+
+	private static final Logger logger = LoggerFactory.getLogger(PaletteEditor.class);
 	private String title;
 	private DragAndDrop.Target target;
 	private ModeToggle modeToggle;
@@ -57,7 +61,8 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 		initContent();
 
 		for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : paletteData.getResource().gameObjects) {
-			SceneEditorWorkspace.getInstance().initGizmos(entry.value, paletteEditorWorkspace);
+			logger.info("gizmos redo");
+//			SceneEditorWorkspace.getInstance().initGizmos(entry.value, paletteEditorWorkspace);
 		}
 	}
 
@@ -141,7 +146,9 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 			GameObject gameObject = addEntity(gameAsset);
 			if (gameObject != null) {
 				TransformComponent component = gameObject.getComponent(TransformComponent.class);
-				SceneEditorWorkspace.getInstance().initGizmos(gameObject, paletteEditorWorkspace);
+
+				logger.info("init gizmos redo");
+//				SceneEditorWorkspace.getInstance().initGizmos(gameObject, paletteEditorWorkspace);
 
 				TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 

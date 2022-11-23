@@ -106,8 +106,8 @@ public class GameObjectListPopup extends VisWindow {
     }
 
     public void showPopup (Stage stage, Vector2 location, Predicate<FilteredTree.Node<GameObject>> filter, FilteredTree.ItemListener<GameObject> listener) {
-        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
-        loadTree(rootGO, filter);
+//        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+//        loadTree(rootGO, filter);
 
         setPosition(location.x, location.y - getHeight());
         if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());

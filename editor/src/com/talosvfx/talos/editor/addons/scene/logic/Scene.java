@@ -11,10 +11,14 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
 public class Scene extends SavableContainer implements IPropertyProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(Scene.class);
 
     public Scene() {
         super();
@@ -137,12 +141,14 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
     @Override
     protected void writeData (Json json) {
-        SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
-        String relativePath = sceneEditorWorkspace.getRelativePath(path);
-        SceneProjectSettings sceneProjectSettings = sceneEditorWorkspace.projectSettingsObjectMap.get(relativePath);
-        if (sceneProjectSettings != null) {
-            sceneProjectSettings.updateValues();
-        }
+//        SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
+//        String relativePath = sceneEditorWorkspace.getRelativePath(path);
+//        SceneProjectSettings sceneProjectSettings = sceneEditorWorkspace.projectSettingsObjectMap.get(relativePath);
+//        if (sceneProjectSettings != null) {
+//            sceneProjectSettings.updateValues();
+//        }
+
+        logger.info("redo scene saving, should be just a game asset");
 
         json.writeValue("name", getName());
         super.writeData(json);

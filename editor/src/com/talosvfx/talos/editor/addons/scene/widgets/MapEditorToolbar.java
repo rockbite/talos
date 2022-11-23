@@ -83,18 +83,19 @@ public class MapEditorToolbar extends Table {
 
 				super.clicked(event, x, y);
 
-				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
 
-				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(spray.isChecked());
+//				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+//				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+//				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
+//
+//				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(spray.isChecked());
 
-				//Lock gizmos and also lock seleection
-				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
-					SceneEditorWorkspace.getInstance().lockGizmos();
-				} else {
-					SceneEditorWorkspace.getInstance().unlockGizmos();
-				}
+//				Lock gizmos and also lock seleection
+//				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
+//					SceneEditorWorkspace.getInstance().lockGizmos();
+//				} else {
+//					SceneEditorWorkspace.getInstance().unlockGizmos();
+//				}
 			}
 		});
 
@@ -110,19 +111,19 @@ public class MapEditorToolbar extends Table {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-
-				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
-				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
-
-				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(erase.isChecked());
-
-				//Lock gizmos and also lock seleection
-				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
-					SceneEditorWorkspace.getInstance().lockGizmos();
-				} else {
-					SceneEditorWorkspace.getInstance().unlockGizmos();
-				}
+//
+//				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+//				SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+//				SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
+//
+//				SceneEditorWorkspace.getInstance().mapEditorState.setErasing(erase.isChecked());
+//
+//				Lock gizmos and also lock seleection
+//				if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
+//					SceneEditorWorkspace.getInstance().lockGizmos();
+//				} else {
+//					SceneEditorWorkspace.getInstance().unlockGizmos();
+//				}
 			}
 		});
 
@@ -136,17 +137,17 @@ public class MapEditorToolbar extends Table {
 
 	public void enablePaintMode() {
 		paint.setChecked(true);
-		SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
-		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
-		SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
-
-		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
-
-		//Lock gizmos and also lock seleection
-		if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
-			SceneEditorWorkspace.getInstance().lockGizmos();
-		} else {
-			SceneEditorWorkspace.getInstance().unlockGizmos();
-		}
+//		SceneEditorWorkspace.getInstance().mapEditorState.setErasing(false);
+//		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(false);
+//		SceneEditorWorkspace.getInstance().mapEditorState.setSpraying(false);
+//
+//		SceneEditorWorkspace.getInstance().mapEditorState.setPainting(paint.isChecked());
+//
+//		Lock gizmos and also lock seleection
+//		if (paint.isChecked() || erase.isChecked() || spray.isChecked()) {
+//			SceneEditorWorkspace.getInstance().lockGizmos();
+//		} else {
+//			SceneEditorWorkspace.getInstance().unlockGizmos();
+//		}
 	}
 }

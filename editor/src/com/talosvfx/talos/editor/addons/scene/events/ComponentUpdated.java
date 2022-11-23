@@ -60,7 +60,7 @@ public class ComponentUpdated implements TalosEvent {
 
     @Override
     public Json getAdditionalData (Json json) {
-        GameObject parentGameObject = SceneEditorWorkspace.getInstance().getGOWith(component);
+        GameObject parentGameObject = component.getGameObject();
         if (parentGameObject == null || component == null) {
             return json;
         }

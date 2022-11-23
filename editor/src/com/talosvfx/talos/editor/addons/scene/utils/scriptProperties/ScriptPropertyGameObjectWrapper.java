@@ -6,8 +6,13 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptPropertyGameObjectWrapper extends ScriptPropertyWrapper<GameObject> {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ScriptPropertyGameObjectWrapper.class);
 
     private String objectGOUUID;
     private String defaultGOUuid;
@@ -15,17 +20,20 @@ public class ScriptPropertyGameObjectWrapper extends ScriptPropertyWrapper<GameO
 
     @Override
     public GameObject parseValueFromString (String value) {
-        SceneEditorWorkspace instance = SceneEditorWorkspace.getInstance();
-        if (instance == null) {
-            // not initialized yet, gotta go
-            return null;
-        }
+        logger.info("Redo parse value from string");
+        return null;
 
-        if (value.isEmpty()) {
-            return null;
-        }
-
-        return instance.getGameObjectForUUID(value);
+//        SceneEditorWorkspace instance = SceneEditorWorkspace.getInstance();
+//        if (instance == null) {
+//             not initialized yet, gotta go
+//            return null;
+//        }
+//
+//        if (value.isEmpty()) {
+//            return null;
+//        }
+//
+//        return instance.getGameObjectForUUID(value);
     }
 
     @Override
@@ -47,15 +55,17 @@ public class ScriptPropertyGameObjectWrapper extends ScriptPropertyWrapper<GameO
 
     @Override
     public GameObject getValue () {
-        if (objectGOUUID == null) {
-            return null;
-        }
-
-        if (value == null) {
-            value = SceneEditorWorkspace.getInstance().getGameObjectForUUID(objectGOUUID);
-        }
-
-        return super.getValue();
+        logger.info("redo getVAlue");
+        return null;
+//        if (objectGOUUID == null) {
+//            return null;
+//        }
+//
+//        if (value == null) {
+//            value = SceneEditorWorkspace.getInstance().getGameObjectForUUID(objectGOUUID);
+//        }
+//
+//        return super.getValue();
     }
 
     @Override

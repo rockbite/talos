@@ -16,8 +16,12 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MapEditorState implements Observer {
+
+	private static final Logger logger = LoggerFactory.getLogger(MapEditorState.class);
 
 	private GameObject focusedMapObject;
 	private MapComponent mapComponent;
@@ -161,7 +165,9 @@ public class MapEditorState implements Observer {
 		}
 		this.layerSelected = layer;
 		if (shouldShow) {
-			SceneEditorWorkspace.getInstance().showMapEditToolbar();
+			logger.info("redo show map edit toolbar");
+
+//			SceneEditorWorkspace.getInstance().showMapEditToolbar();
 		}
 
 		for (TalosLayer tLayer : mapComponent.getLayers()) {
@@ -189,7 +195,9 @@ public class MapEditorState implements Observer {
 		}
 
 		// select the brush tool
-		SceneEditorWorkspace.getInstance().mapEditorToolbar.enablePaintMode();
+
+		logger.info("redo paint mode");
+//		SceneEditorWorkspace.getInstance().mapEditorToolbar.enablePaintMode();
 
 		showDrawingObject();
 	}
@@ -199,7 +207,9 @@ public class MapEditorState implements Observer {
 
 		if (layerSelected != null) {
 			//Hide the edit window tab
-			SceneEditorWorkspace.getInstance().hideMapEditToolbar();
+
+			logger.info("redo hide edit toolbar");
+//			SceneEditorWorkspace.getInstance().hideMapEditToolbar();
 		}
 		if (mapFocused) {
 			mapFocused = false;

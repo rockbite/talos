@@ -13,10 +13,14 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.UUID;
 
-public class TilePaletteData implements Json.Serializable{
+public class TilePaletteData implements Json.Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(TilePaletteData.class);
     public ObjectMap<UUID, GameAsset<?>> references;
 
 
@@ -66,7 +70,9 @@ public class TilePaletteData implements Json.Serializable{
     public void removeEntity (GameAsset<?> gameAsset) {
         GameObject gameObject = gameObjects.remove(gameAsset);
         rootDummy.removeObject(gameObject);
-        SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
+
+        logger.info("redo remove gizmos");
+//        SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
     }
 
     public enum TileOrEntity {

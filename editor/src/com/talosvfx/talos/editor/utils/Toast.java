@@ -8,8 +8,13 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Toast extends Table {
+
+    private static final Logger logger = LoggerFactory.getLogger(Toast.class);
+
     public static float LENGTH_LONG = 3f;
     public static float LENGTH_SHORT = 1f;
 
@@ -35,8 +40,9 @@ public class Toast extends Table {
         messageLabel.setAlignment(Align.right);
         add(messageLabel);
         messageLabel.getColor().a = 0f;
-        SceneEditorWorkspace.getInstance().add(this).grow()
-                .pad(30);
+
+        logger.info("Toast");
+//        SceneEditorWorkspace.getInstance().add(this).grow().pad(30);
     }
 
     private void setProperties(String message, float duration, int align){

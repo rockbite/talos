@@ -11,8 +11,12 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticGridPropertyProvider implements GridPropertyProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(StaticGridPropertyProvider.class);
 
     protected Array<GridLine> gridLines = new Array<>();
 
@@ -114,30 +118,32 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
 
     @Override
     public float getUnitX () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return 1;
-            } else {
-                return selectedLayer.getTileSizeX();
-            }
-        }
+        logger.info("unit x redo static grid");
+//        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
+//            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//
+//            if (selectedLayer == null) {
+//                return 1;
+//            } else {
+//                return selectedLayer.getTileSizeX();
+//            }
+//        }
 
         return 1;
     }
 
     @Override
     public float getUnitY () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return 1;
-            } else {
-                return selectedLayer.getTileSizeY();
-            }
-        }
+        logger.info("unity y redo static grid");
+//        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
+//            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//
+//            if (selectedLayer == null) {
+//                return 1;
+//            } else {
+//                return selectedLayer.getTileSizeY();
+//            }
+//        }
 
         return 1;
     }

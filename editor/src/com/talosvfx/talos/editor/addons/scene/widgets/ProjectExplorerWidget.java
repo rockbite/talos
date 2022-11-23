@@ -81,7 +81,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
                     directoryViewWidget.openDirectory(getCurrentFolder().path());
                     return;
                 }
-                FileHandle root = SceneEditorWorkspace.getInstance().getProjectFolder();
+                FileHandle root = SharedResources.currentProject.rootProjectDir();
                 Array<FileHandle> stack = new Array<>();
                 Array<FileHandle> similarFiles = new Array<>();
                 StringSimilarity similar = new JaroWinkler();

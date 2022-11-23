@@ -38,11 +38,15 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.Comparator;
 
 
 public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaletteEditorWorkspace.class);
     private PaletteEditor paletteEditor;
     GameAsset<TilePaletteData> paletteData;
     private Image selectionRect;
@@ -687,23 +691,24 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
 
         batch.begin();
 
-        TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-        float tileSizeX = 1;
-        float tileSizeY = 1;
-        if (layerSelected != null) {
-            tileSizeX = layerSelected.getTileSizeX();
-            tileSizeY = layerSelected.getTileSizeY();
-        }
+        logger.info("redo map editor workspace stuff");
+//        TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//        float tileSizeX = 1;
+//        float tileSizeY = 1;
+//        if (layerSelected != null) {
+//            tileSizeX = layerSelected.getTileSizeX();
+//            tileSizeY = layerSelected.getTileSizeY();
+//        }
 
-        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
-            if (entry.value instanceof TileGameObjectProxy) {
-
-                TileGameObjectProxy value = (TileGameObjectProxy)entry.value;
-                StaticTile staticTile = value.staticTile;
-
-                mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
-            }
-        }
+//        for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
+//            if (entry.value instanceof TileGameObjectProxy) {
+//
+//                TileGameObjectProxy value = (TileGameObjectProxy)entry.value;
+//                StaticTile staticTile = value.staticTile;
+//
+//                mainRenderer.renderStaticTileDynamic(staticTile, batch, tileSizeX, tileSizeY);
+//            }
+//        }
 
 
         drawAllGameObjects(batch, gameObjects);
@@ -789,11 +794,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
         // get grid size
         float gridSizeX = 1;
         float gridSizeY = 1;
-        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-        if (layerSelected != null) {
-            gridSizeX = layerSelected.getTileSizeX();
-            gridSizeY = layerSelected.getTileSizeY();
-        }
+
+        logger.info("redo map editor stufff");
+//        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//        if (layerSelected != null) {
+//            gridSizeX = layerSelected.getTileSizeX();
+//            gridSizeY = layerSelected.getTileSizeY();
+//        }
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Color renderColor =  parentTileColorGray;
@@ -851,11 +858,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
         // get grid size
         float gridSizeX = 1;
         float gridSizeY = 1;
-        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-        if (layerSelected != null) {
-            gridSizeX = layerSelected.getTileSizeX();
-            gridSizeY = layerSelected.getTileSizeY();
-        }
+        logger.info("Redo map editor stuff");
+//        final TalosLayer layerSelected = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
+//        if (layerSelected != null) {
+//            gridSizeX = layerSelected.getTileSizeX();
+//            gridSizeY = layerSelected.getTileSizeY();
+//        }
 
         // render highlight
         Gdx.gl.glLineWidth(4f);

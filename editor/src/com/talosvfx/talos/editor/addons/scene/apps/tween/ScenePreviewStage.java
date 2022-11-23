@@ -3,11 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -16,10 +14,12 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
-
-import java.awt.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScenePreviewStage extends ViewportWidget implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
     public Scene currentScene;
 
@@ -85,14 +85,15 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
     }
 
     public void updateWorkspaceState (boolean copy) {
-        SavableContainer currentContainer = SceneEditorWorkspace.getInstance().getCurrentContainer();
-
-        if (copy) {
-            Scene scene = new Scene();
-            scene.load(currentContainer.getAsString());
-            currentScene = scene;
-        } else {
-            currentScene = ((Scene) currentContainer);
-        }
+        logger.info("Scene preview stage update redo");
+//        SavableContainer currentContainer = SceneEditorWorkspace.getInstance().getCurrentContainer();
+//
+//        if (copy) {
+//            Scene scene = new Scene();
+//            scene.load(currentContainer.getAsString());
+//            currentScene = scene;
+//        } else {
+//            currentScene = ((Scene) currentContainer);
+//        }
     }
 }

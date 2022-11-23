@@ -61,12 +61,17 @@ import com.talosvfx.talos.editor.utils.grid.GridRenderer;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 
 public abstract class ViewportWidget extends Table {
+
+
+	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
 	protected OrthographicCamera camera;
 
@@ -660,12 +665,13 @@ public abstract class ViewportWidget extends Table {
 		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
 
 
-		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
-		if (root != null) {
-			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
-		} else {
-			entityUnderMouse = null;
-		}
+		logger.info("get entity under mouse reimplement");
+//		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
+//		if (root != null) {
+//			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
+//		} else {
+//			entityUnderMouse = null;
+//		}
 
 	}
 	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {

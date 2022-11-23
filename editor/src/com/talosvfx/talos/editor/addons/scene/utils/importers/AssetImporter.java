@@ -295,17 +295,19 @@ public class AssetImporter {
 
         //Are we moving the actual scene editting?
 
-        String path = SceneEditorWorkspace.getInstance().getCurrentContainer().path;
-        if (file.path().equals(path)) {
-            //moving the scene that we are editing
-            if (directory.isDirectory()) {
-                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.child(file.name()).path();
-            } else {
-                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.path();
-            }
 
-            SceneEditorWorkspace.getInstance().getCurrentContainer().setName(file.name());
-        }
+        logger.info("Rdo scene editing move");
+//        String path = SceneEditorWorkspace.getInstance().getCurrentContainer().path;
+//        if (file.path().equals(path)) {
+//            //moving the scene that we are editing
+//            if (directory.isDirectory()) {
+//                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.child(file.name()).path();
+//            } else {
+//                SceneEditorWorkspace.getInstance().getCurrentContainer().path = directory.path();
+//            }
+//
+//            SceneEditorWorkspace.getInstance().getCurrentContainer().setName(file.name());
+//        }
 
         AssetRepository.getInstance().moveFile(file, directory, checkGameAssets, rename);
 
