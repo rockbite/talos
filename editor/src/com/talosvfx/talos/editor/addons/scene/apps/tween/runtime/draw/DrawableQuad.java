@@ -13,6 +13,7 @@ public class DrawableQuad implements Pool.Poolable {
     public float rotation;
     public Color color;
     public boolean aspect;
+    public float z;
 
     @Override
     public void reset() {

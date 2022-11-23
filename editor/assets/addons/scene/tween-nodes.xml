@@ -66,6 +66,7 @@
             <group>
                 <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
                 <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+                <dynamicValue port="input" name="z" type="float" min="-1000" max="1000">Z: </dynamicValue>
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
                 <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
                 <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step="1">Rotation: </dynamicValue>

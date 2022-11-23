@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import javax.swing.border.AbstractBorder;
+import java.util.Comparator;
 import java.util.function.Supplier;
 
 public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<String> {
@@ -42,15 +43,34 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public transient RoutineInstance routineInstance;
     private transient TextureRegion textureRegion = new TextureRegion();
     private transient float renderCoolDown  = 0f;
+    private Comparator<? super DrawableQuad> zComparator;
+
+    public RoutineRendererComponent() {
+        zComparator = new Comparator<DrawableQuad>() {
+            @Override
+            public int compare(DrawableQuad o2, DrawableQuad o1) {
+                int result = (int) (o1.z*10000 - o2.z*10000);
+                if(result == 0) {
+                    result = (int) (o1.position.x*10000 - o2.position.x*10000);
+                }
+                if(result == 0) {
+                    result = (int) (o1.position.y*10000 - o2.position.y*10000);
+                }
+                return result;
+            }
+        };
+    }
 
     @Override
     public void write(Json json) {
+        super.write(json);
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("size", viewportSize, Vector2.class);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        super.read(json, jsonData);
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
@@ -165,6 +185,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             if(reset) {
                 renderRoutineNode.receiveSignal("startSignal");
             }
+
+            routineInstance.drawableQuads.sort(zComparator);
 
             for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
                 boolean aspect = drawableQuad.aspect;

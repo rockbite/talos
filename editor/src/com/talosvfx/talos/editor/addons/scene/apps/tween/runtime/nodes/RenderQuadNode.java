@@ -21,9 +21,11 @@ public class RenderQuadNode extends RoutineNode {
         DrawableQuad drawableQuad = Pools.obtain(DrawableQuad.class);
         float x = fetchFloatValue("x");
         float y = fetchFloatValue("y");
+        float z = fetchFloatValue("z");
         float width = fetchFloatValue("width");
         float height = fetchFloatValue("height");
         drawableQuad.position.set(x, y);
+        drawableQuad.z = z;
         drawableQuad.size.set(width, height);
 
         GameAsset<Texture> asset = fetchAssetValue("sprite");
