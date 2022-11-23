@@ -42,6 +42,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toast;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -52,6 +53,8 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGrid
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,10 +70,10 @@ import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransfo
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
 
+	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	private static SceneEditorWorkspace instance;
 	public final TemplateListPopup templateListPopup;
 
-	private SceneEditorAddon sceneEditorAddon;
 	private String projectPath;
 
 	private SavableContainer currentContainer;
@@ -88,7 +91,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private FileWatching fileWatching = new FileWatching();
 	private float reloadScheduled = -1;
 
-	public Array<String> layers = new Array<>();
 	public MapEditorState mapEditorState;
 	public MapEditorToolbar mapEditorToolbar;
 
@@ -152,10 +154,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private Image selectionRect;
 
 	public SceneEditorWorkspace () {
-		layers.clear();
-		layers.add("Default");
-		layers.add("UI");
-		layers.add("Misc");
 
 		setSkin(SharedResources.skin);
 		setWorldSize(10);
@@ -613,13 +611,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
 			public void run () {
-				for (GameObject gameObject : selectedObjects) {
-					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
-				}
 
-				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
-
-				selectGameObjectExternally(dummyParent);
+				logger.info("Redo reposition game object and restructure on group");
+//				for (GameObject gameObject : selectedObjects) {
+//					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
+//				}
+//
+//				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
+//
+//				selectGameObjectExternally(dummyParent);
 			}
 		});
 	}
@@ -840,9 +840,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		String name = gameObject.getName();
 
 		String path = getProjectPath() + File.separator + "assets";
-		if (SceneEditorAddon.get().projectExplorer.getCurrentFolder() != null) {
-			path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
-		}
+
+		logger.info("Redo convert to prefab");
+//		if (SceneEditorAddon.get().projectExplorer.getCurrentFolder() != null) {
+//			path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
+//		}
 
 		FileHandle handle = AssetImporter.suggestNewNameForFileHandle(path, name, "prefab");
 		if (handle != null) {
@@ -856,7 +858,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			prefab.root = gamePrefab;
 			prefab.save();
 			AssetRepository.getInstance().rawAssetCreated(handle, true);
-			SceneEditorAddon.get().projectExplorer.reload();
+//			SceneEditorAddon.get().projectExplorer.reload();
 		}
 	}
 
@@ -930,13 +932,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		changeVersion = UUID.randomUUID().toString();
 
 		if (projectPath != null) {
-			json.writeArrayStart("layers");
-			for (String layer : layers) {
-				json.writeValue(layer);
-			}
-			json.writeArrayEnd();
 
-			json.writeValue("currentScene", AssetImporter.relative(currentContainer.path));
+			logger.info("Redo write");
+//			json.writeValue("currentScene", AssetImporter.relative(currentContainer.path));
 
 			json.writeValue("changeVersion", changeVersion);
 
@@ -952,17 +950,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void read (Json json, JsonValue jsonData) {
 		changeVersion = jsonData.getString("changeVersion", "");
 
-		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
-
-		projectExplorer.loadDirectoryTree(projectPath);
-
-		JsonValue layersJson = jsonData.get("layers");
-		if (layersJson != null) {
-			layers.clear();
-			for (JsonValue layerJson : layersJson) {
-				layers.add(layerJson.asString());
-			}
-		}
+		logger.info("redo read");
+//		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
+//
+//		projectExplorer.loadDirectoryTree(projectPath);
 
 		projectSettingsObjectMap.clear();
 		JsonValue projectSettings = jsonData.get("projectSettings");
@@ -974,19 +965,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 
-		String path = jsonData.getString("currentScene", "");
-		FileHandle sceneFileHandle = AssetImporter.get(path);
-		if (sceneFileHandle.exists()) {
-			SavableContainer container;
-			if (sceneFileHandle.extension().equals("prefab")) {
-				container = new Prefab();
-			} else {
-				container = new Scene();
-			}
-			container.path = sceneFileHandle.path();
-			container.loadFromPath();
-			openSavableContainer(container);
-		}
+
+		logger.info("redo get scene");
+//		String path = jsonData.getString("currentScene", "");
+//		FileHandle sceneFileHandle = AssetImporter.get(path);
+//		if (sceneFileHandle.exists()) {
+//			SavableContainer container;
+//			if (sceneFileHandle.extension().equals("prefab")) {
+//				container = new Prefab();
+//			} else {
+//				container = new Scene();
+//			}
+//			container.path = sceneFileHandle.path();
+//			container.loadFromPath();
+//			openSavableContainer(container);
+//		}
 
 
 
@@ -1051,7 +1044,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			reloadScheduled -= delta;
 			if (reloadScheduled <= 0) {
 				reloadScheduled = -1;
-				reloadProjectExplorer();
 			}
 		}
 	}
@@ -1111,10 +1103,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.setLayers(getLayerList());
 		renderer.update(currentContainer.getSelfObject());
 		renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
-	}
-
-	public void setAddon (SceneEditorAddon sceneEditorAddon) {
-		this.sceneEditorAddon = sceneEditorAddon;
 	}
 
 	public static SceneEditorWorkspace getInstance () {
@@ -1187,10 +1175,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	}
 
-	public void reloadProjectExplorer () {
-		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
-		projectExplorer.loadDirectoryTree(projectPath);
-	}
 
 	public void openSavableContainer (SavableContainer mainScene) {
 		if (mainScene == null)
@@ -1282,7 +1266,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onComponentUpdated (ComponentUpdated event) {
 		AComponent component = event.getComponent();
 		if (event.isNotifyUI()) {
-			sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
+
+
+			logger.info("Redo property provider reload from component update");
+//			sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
 
 			if (!event.wasRapid()) {
 				TalosMain.Instance().ProjectController().setDirty();
@@ -1293,7 +1280,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectDeleted (GameObjectDeleted event) {
 		GameObject target = event.getTarget();
-		sceneEditorAddon.propertyPanel.notifyPropertyHolderRemoved(target);
+
+		logger.info("redo holder removed");
+//		sceneEditorAddon.propertyPanel.notifyPropertyHolderRemoved(target);
 
 		// remove gizmos
 		removeGizmos(target);
@@ -1396,20 +1385,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public String saveData (boolean toMemory) {
-		Json json = new Json();
-		json.setOutputType(JsonWriter.OutputType.json);
-		String data = json.prettyPrint(sceneEditorAddon.workspace);
+		logger.info("Save redo");
+//		Json json = new Json();
+//		json.setOutputType(JsonWriter.OutputType.json);
+//		String data = json.prettyPrint(sceneEditorAddon.workspace);
+//
+//		SavableContainer savableContainer = currentContainer;
+//		if (savableContainer != null) {
+//			if (toMemory) {
+//				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(savableContainer.path), savableContainer.getAsString());
+//			} else {
+//				savableContainer.save();
+//			}
+//		}
 
-		SavableContainer savableContainer = currentContainer;
-		if (savableContainer != null) {
-			if (toMemory) {
-				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(savableContainer.path), savableContainer.getAsString());
-			} else {
-				savableContainer.save();
-			}
-		}
+//		return data;
 
-		return data;
+		return "";
 	}
 
 	public void loadFromScene (Scene scene) {
@@ -1417,6 +1409,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	}
 
+	@Deprecated
 	public void loadFromData (Json json, JsonValue jsonData, boolean fromMemory) {
 		String path = jsonData.getString("currentScene", "");
 
@@ -1424,42 +1417,42 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		AssetRepository.getInstance().loadAssetsForProject(Gdx.files.absolute(projectPath));
 
 		String currentFolderPath = null;
-		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
-		if (projectExplorer.getCurrentFolder() != null) {
-			currentFolderPath = projectExplorer.getCurrentFolder().path();
-		}
+//		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
+//		if (projectExplorer.getCurrentFolder() != null) {
+//			currentFolderPath = projectExplorer.getCurrentFolder().path();
+//		}
 
 		read(json, jsonData);
 
 		if (fromMemory && currentFolderPath != null) {
-			projectExplorer.select(currentFolderPath);
+//			projectExplorer.select(currentFolderPath);
 		}
-
-		FileHandle sceneFileHandle = AssetImporter.get(path);
-		if (sceneFileHandle.exists()) {
-			SavableContainer container;
-			if (sceneFileHandle.extension().equals("prefab")) {
-				container = new Prefab();
-			} else {
-				container = new Scene();
-			}
-			container.path = sceneFileHandle.path();
-			if (fromMemory) {
-				container.load(snapshotService.getSnapshot(changeVersion, AssetImporter.relative(container.path)));
-			} else {
-				container.loadFromPath();
-				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
-			}
-
-			openSavableContainer(container);
-		}
-
-		if (!fromMemory) {
-			Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
-		}else{
-			Toast toast = Toast.makeToast("last action reversed", Toast.LENGTH_SHORT, Align.bottomRight);
-			toast.show();
-		}
+//
+//		FileHandle sceneFileHandle = AssetImporter.get(path);
+//		if (sceneFileHandle.exists()) {
+//			SavableContainer container;
+//			if (sceneFileHandle.extension().equals("prefab")) {
+//				container = new Prefab();
+//			} else {
+//				container = new Scene();
+//			}
+//			container.path = sceneFileHandle.path();
+//			if (fromMemory) {
+//				container.load(snapshotService.getSnapshot(changeVersion, AssetImporter.relative(container.path)));
+//			} else {
+//				container.loadFromPath();
+//				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(container.path), container.getAsString());
+//			}
+//
+//			openSavableContainer(container);
+//		}
+//
+//		if (!fromMemory) {
+//			Notifications.fireEvent(Notifications.obtainEvent(ProjectOpened.class));
+//		}else{
+//			Toast toast = Toast.makeToast("last action reversed", Toast.LENGTH_SHORT, Align.bottomRight);
+//			toast.show();
+//		}
 	}
 
 	private void updateSettingsFromSceneSettings () {
@@ -1474,8 +1467,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		camera.zoom = sceneProjectSettings.cameraZoom;
 		camera.position.set(sceneProjectSettings.cameraX, sceneProjectSettings.cameraY, camera.position.z);
-		sceneEditorAddon.projectExplorer.select(sceneProjectSettings.directoryPath);
-		sceneEditorAddon.verticalSplitPane.setSplitAmount(sceneProjectSettings.directorySize);
+//		sceneEditorAddon.projectExplorer.select(sceneProjectSettings.directoryPath);
+//		sceneEditorAddon.verticalSplitPane.setSplitAmount(sceneProjectSettings.directorySize);
 	}
 
 	public String getRelativePath (String fullPath) {
@@ -1495,16 +1488,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		parentToMoveTo.addGameObject(childThatHasMoved);
 		GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
 		//for updating left panel values
-		SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-		sceneEditorAddon.workspace.selectGameObjectExternally(childThatHasMoved);
 
-		TalosMain.Instance().ProjectController().setDirty();
+		logger.info("redo reposition game object");
+
+
+//		SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//		sceneEditorAddon.workspace.selectGameObjectExternally(childThatHasMoved);
+//
+//		TalosMain.Instance().ProjectController().setDirty();
 	}
 
 
 
 	public Array<String> getLayerList () {
-		return layers;
+		SceneData sceneData = SharedResources.currentProject.getSceneData();
+
+		return sceneData.getRenderLayers();
 	}
 
 	public GameObject getRootGO () {
@@ -1587,31 +1586,33 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			Notifications.fireEvent(componentUpdatedEvent);
 		}
 
-		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
-		if (currentHolder != null) {
-			if (currentHolder instanceof MultiPropertyHolder) {
-				ObjectSet<IPropertyHolder> holders = ((MultiPropertyHolder)currentHolder).getHolders();
-				boolean setDirty = false;
-				for (IPropertyHolder holder : holders) {
-					if (holder instanceof AMetadata) {
-						AssetImporter.saveMetadata((AMetadata)holder);
-					} else {
-						setDirty = true;
-					}
-				}
-				if (setDirty && !event.fastChange) {
-					TalosMain.Instance().ProjectController().setDirty();
-				}
-			} else {
-				if (currentHolder instanceof AMetadata) {
-					AssetImporter.saveMetadata((AMetadata)currentHolder);
-				} else {
-					if (!event.fastChange) {
-						TalosMain.Instance().ProjectController().setDirty();
-					}
-				}
-			}
-		}
+
+		logger.info("redo on property holder edited");
+//		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
+//		if (currentHolder != null) {
+//			if (currentHolder instanceof MultiPropertyHolder) {
+//				ObjectSet<IPropertyHolder> holders = ((MultiPropertyHolder)currentHolder).getHolders();
+//				boolean setDirty = false;
+//				for (IPropertyHolder holder : holders) {
+//					if (holder instanceof AMetadata) {
+//						AssetImporter.saveMetadata((AMetadata)holder);
+//					} else {
+//						setDirty = true;
+//					}
+//				}
+//				if (setDirty && !event.fastChange) {
+//					TalosMain.Instance().ProjectController().setDirty();
+//				}
+//			} else {
+//				if (currentHolder instanceof AMetadata) {
+//					AssetImporter.saveMetadata((AMetadata)currentHolder);
+//				} else {
+//					if (!event.fastChange) {
+//						TalosMain.Instance().ProjectController().setDirty();
+//					}
+//				}
+//			}
+//		}
 	}
 
 	@EventHandler

@@ -85,6 +85,8 @@ public class TalosMain2 extends ApplicationAdapter {
 	}
 
 	private void projectLoader (TalosProjectData projectData) {
+		SharedResources.currentProject = projectData;
+
 		TalosLocalPrefs.Instance().updateProject(projectData);
 
 		layoutGridContainer.clearChildren();

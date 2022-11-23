@@ -14,7 +14,6 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
@@ -36,6 +35,8 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.interfaces.StringSimilarity;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -44,6 +45,8 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 public class ProjectExplorerWidget extends Table implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectExplorerWidget.class);
 
     private final FilteredTree<String> directoryTree;
     public static FileFilter fileFilter;
@@ -218,20 +221,22 @@ public class ProjectExplorerWidget extends Table implements Observer {
         Runnable runnable = new Runnable() {
             @Override
             public void run () {
-                FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
-                for(String path: paths) {
-                    FileHandle handle = Gdx.files.absolute(path);
-                    AssetImporter.deleteFile(handle);
 
-                    parent = handle.parent();
-                }
-
-                loadDirectoryTree((String) rootNode.getObject());
-
-                if(!parent.path().equals(parent)) {
-                    expand(parent.path());
-                    select(parent.path());
-                }
+                logger.info("todo - Reimplement delete paths");
+//                FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
+//                for(String path: paths) {
+//                    FileHandle handle = Gdx.files.absolute(path);
+//                    AssetImporter.deleteFile(handle);
+//
+//                    parent = handle.parent();
+//                }
+//
+//                loadDirectoryTree((String) rootNode.getObject());
+//
+//                if(!parent.path().equals(parent)) {
+//                    expand(parent.path());
+//                    select(parent.path());
+//                }
             }
         };
 

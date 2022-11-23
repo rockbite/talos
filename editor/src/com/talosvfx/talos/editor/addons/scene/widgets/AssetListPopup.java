@@ -12,18 +12,20 @@ import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class AssetListPopup<T> extends VisWindow {
+
+    private static final Logger logger = LoggerFactory.getLogger(AssetListPopup.class);
 
     private InputListener stageListener;
     FilteredTree<GameAsset<T>> tree;
@@ -69,18 +71,20 @@ public class AssetListPopup<T> extends VisWindow {
     }
 
     private void loadTree(Predicate<FilteredTree.Node<GameAsset<T>>> predicate) {
-        String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
-        FileHandle rootHandle = Gdx.files.absolute(rootPath);
-        tree.clearChildren();
-        FileHandle root = Gdx.files.absolute(rootPath);
 
-        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), SharedResources.skin));
-        rootNode.setObject(null);
-        tree.add(rootNode);
-
-        traversePath(root, 0, 10, rootNode, predicate);
-
-        rootNode.setExpanded(true);
+        logger.info("Load the asset list tree needs redoing");
+//        String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
+//        FileHandle rootHandle = Gdx.files.absolute(rootPath);
+//        tree.clearChildren();
+//        FileHandle root = Gdx.files.absolute(rootPath);
+//
+//        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), SharedResources.skin));
+//        rootNode.setObject(null);
+//        tree.add(rootNode);
+//
+//        traversePath(root, 0, 10, rootNode, predicate);
+//
+//        rootNode.setExpanded(true);
     }
 
     public boolean contains (float x, float y) {

@@ -3,17 +3,13 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.SceneProjectSettings;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
@@ -56,7 +52,9 @@ public class Scene extends SavableContainer implements IPropertyProvider {
     private String getNextAvailableLayerName (String base) {
         String newLayer = base;
         int count = 1;
-        while (SceneEditorAddon.get().workspace.layers.contains(newLayer, false)) {
+        SceneData sceneData = SharedResources.currentProject.getSceneData();
+        Array<String> renderLayers = sceneData.getRenderLayers();
+        while (renderLayers.contains(newLayer, false)) {
             newLayer = base + count++;
         }
 
@@ -76,8 +74,6 @@ public class Scene extends SavableContainer implements IPropertyProvider {
             }
         });
 
-        final SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-
         Supplier<ItemData> newItemDataSupplier = new Supplier<ItemData>() {
             @Override
             public ItemData get () {
@@ -91,7 +87,9 @@ public class Scene extends SavableContainer implements IPropertyProvider {
             @Override
             public Array<ItemData> get () {
                 Array<ItemData> list = new Array<>();
-                for (String layerName : workspace.layers) {
+                TalosProjectData currentProject = SharedResources.currentProject;
+                Array<String> renderLayers = currentProject.getSceneData().getRenderLayers();
+                for (String layerName : renderLayers) {
                     ItemData itemData = new ItemData(layerName);
                     if (layerName.equals("Default")) {
                         itemData.canDelete = false;
@@ -103,9 +101,11 @@ public class Scene extends SavableContainer implements IPropertyProvider {
         }, new PropertyWidget.ValueChanged<Array<ItemData>>() {
             @Override
             public void report (Array<ItemData> value) {
-                workspace.layers.clear();
+                TalosProjectData currentProject = SharedResources.currentProject;
+                Array<String> renderLayers = currentProject.getSceneData().getRenderLayers();
+                renderLayers.clear();
                 for (ItemData item : value) {
-                    workspace.layers.add(item.text);
+                    renderLayers.add(item.text);
                 }
 
                 Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));

@@ -45,7 +45,7 @@ public class MainMenu extends Table {
         modulesMenu = new Menu("Modules");
         menuBar.addMenu(modulesMenu);
 
-        TalosMain.Instance().Addons().buildMenu(menuBar);
+//        TalosMain.Instance().Addons().buildMenu(menuBar);
 
         Menu helpMenu = new Menu("Help");
         MenuItem about = new MenuItem("About");
@@ -288,7 +288,7 @@ public class MainMenu extends Table {
                         TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
                         TalosMain.Instance().ProjectController().loadProject(handle);
                     } else {
-                        TalosMain.Instance().Addons().projectFileDrop(handle);
+//                        TalosMain.Instance().Addons().projectFileDrop(handle);
                     }
                 }
             });

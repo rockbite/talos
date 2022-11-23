@@ -5,10 +5,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.StringWriter;
 
 public abstract class SavableContainer implements GameObjectContainer, Json.Serializable, IPropertyHolder {
+
+    private static final Logger logger = LoggerFactory.getLogger(SavableContainer.class);
 
     public String path;
     public GameObject root;
@@ -148,8 +152,9 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     public void loadFromPath() {
-        FileHandle dataFile = AssetImporter.get(path);
-        load(dataFile.readString());
+        logger.info("Redo load from path");
+        //        FileHandle dataFile = AssetImporter.get(path);
+//        load(dataFile.readString());
     }
 
     public void loadFromHandle (FileHandle handle) {
@@ -157,8 +162,9 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     }
 
     public void save() {
-        FileHandle file = AssetImporter.get(path);
-        String data = getAsString();
-        file.writeString(data, false);
+        logger.info("redo save to path");
+//        FileHandle file = AssetImporter.get(path);
+//        String data = getAsString();
+//        file.writeString(data, false);
     }
 }

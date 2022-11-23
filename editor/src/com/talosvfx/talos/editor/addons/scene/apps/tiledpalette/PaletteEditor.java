@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -84,7 +83,7 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 		// register the drag and drop target
 		target = new PaletteDragAndDropTarget(paletteEditorWorkspace);
-		SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().registerTarget(target);
+//		SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().registerTarget(target);
 
 		// lock gizmo by default
 		paletteEditorWorkspace.lockGizmos();
@@ -101,11 +100,11 @@ public class PaletteEditor extends AEditorApp<GameAsset<TilePaletteData>> {
 
 		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(object);
 
-		SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().unregisterTarget(target);
-		for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : object.getResource().gameObjects) {
-			SceneEditorWorkspace.getInstance().removeGizmos(entry.value);
-		}
-		Notifications.registerObserver(paletteEditorWorkspace);
+//		SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().unregisterTarget(target);
+//		for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : object.getResource().gameObjects) {
+//			SceneEditorWorkspace.getInstance().removeGizmos(entry.value);
+//		}
+//		Notifications.registerObserver(paletteEditorWorkspace);
 
 	}
 

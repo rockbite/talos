@@ -1,18 +1,13 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class TweenEditor extends AEditorApp<FileHandle> {
@@ -72,7 +67,6 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     @Override
     public void onHide () {
         super.onHide();
-        SceneEditorAddon.get().tweenEditor = null;
     }
 
 }

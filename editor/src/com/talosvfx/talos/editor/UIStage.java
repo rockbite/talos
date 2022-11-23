@@ -47,8 +47,6 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.IAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
@@ -171,24 +169,24 @@ public class UIStage {
 			FileHandle handle = Gdx.files.absolute(path);
 			if(handle.exists()) {
 				String extension = handle.extension();
-				if(extension.equals("tls") && TalosMain.Instance().ProjectController().getProject() != SceneEditorAddon.SE) {
-					// load project file
-					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-					TalosMain.Instance().ProjectController().loadProject(handle);
-				} else {
-					// notify talos first
-					if(TalosMain.Instance().ProjectController().getProject() == ProjectController.TLS) {
-						AssetFileDroppedEvent event = Notifications.obtainEvent(AssetFileDroppedEvent.class);
-						event.setFileHandle(handle);
-						event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
-						Notifications.fireEvent(event);
-					}
-					// ask addons if they are interested
-					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
-					if (addon != null) {
-						continue;
-					}
-				}
+//				if(extension.equals("tls") && TalosMain.Instance().ProjectController().getProject() != SceneEditorAddon.SE) {
+//					// load project file
+//					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+//					TalosMain.Instance().ProjectController().loadProject(handle);
+//				} else {
+//					// notify talos first
+//					if(TalosMain.Instance().ProjectController().getProject() == ProjectController.TLS) {
+//						AssetFileDroppedEvent event = Notifications.obtainEvent(AssetFileDroppedEvent.class);
+//						event.setFileHandle(handle);
+//						event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
+//						Notifications.fireEvent(event);
+//					}
+//					// ask addons if they are interested
+////					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);
+////					if (addon != null) {
+////						continue;
+////					}
+//				}
 			}
 		}
 

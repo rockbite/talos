@@ -1,11 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.utils;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class FileWatching {
 
             watchService = FileSystems.getDefault().newWatchService();
 
-            Path project = Paths.get(SceneEditorAddon.get().workspace.getProjectPath());
+            Path project = Paths.get(SharedResources.currentProject.rootProjectDir().path());
             directoryModification(project, this::registerDirectory);
             FileHandle exportedScriptsFolderHandle = AssetRepository.getExportedScriptsFolderHandle();
             if (exportedScriptsFolderHandle.exists()) {

@@ -84,7 +84,6 @@ public class SettingsDialog extends VisWindow {
 
     private void initContent() {
         addPathSetting("Particle Assets Default Path", ASSET_PATH);
-        TalosMain.Instance().Addons().announceLocalSettings(this);
 
         TextButton saveButton = new TextButton("Save", getSkin());
         add(saveButton).right().padRight(5);

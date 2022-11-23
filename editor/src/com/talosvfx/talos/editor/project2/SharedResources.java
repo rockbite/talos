@@ -9,4 +9,6 @@ public class SharedResources {
 	public static Stage stage;
 
 	public static ProjectLoader projectLoader;
+
+	public static TalosProjectData currentProject;
 }

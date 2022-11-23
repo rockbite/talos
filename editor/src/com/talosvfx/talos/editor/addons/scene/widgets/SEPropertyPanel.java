@@ -18,7 +18,6 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -31,12 +30,16 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SEPropertyPanel extends PropertyPanel{
+public class SEPropertyPanel extends PropertyPanel {
+
+    private static final Logger logger = LoggerFactory.getLogger(SEPropertyPanel.class);
 
     public SEPropertyPanel() {
         super();
@@ -209,9 +212,10 @@ public class SEPropertyPanel extends PropertyPanel{
             scripts.add(newScript);
 
 
-            String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
-            FileHandle rootHandle = Gdx.files.absolute(rootPath);
-            collectAssets(GameAssetType.SCRIPT, rootHandle, scripts);
+            logger.info("Reimplement collecting of scripts");
+//            String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
+//            FileHandle rootHandle = Gdx.files.absolute(rootPath);
+//            collectAssets(GameAssetType.SCRIPT, rootHandle, scripts);
 
             setToTree();
 
@@ -303,11 +307,12 @@ public class SEPropertyPanel extends PropertyPanel{
                             scriptComponent.setGameAsset((GameAsset<String>)gameAsset);
                             gameObject.addComponent(scriptComponent);
 
-                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                            projectExplorer.reload();
-
-                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+                            logger.info("reimplement prperty panel select game object");
+//                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+//                            projectExplorer.reload();
+//
+//                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+//                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
 
                             remove();
                             return;
@@ -321,33 +326,34 @@ public class SEPropertyPanel extends PropertyPanel{
                                 public void accept (String newFileName) {
                                     //Create the script, and then add it to the game component after registering etc etc
 
-                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
-
-                                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "ts");
-                                    FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
-
-                                    String templateString = templateScript.readString();
-                                    templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
-                                    newScriptDestination.writeString(templateString, false);
-
-                                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
-
-                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScriptDestination, false);
-
-                                    if (assetForPath != null) {
-
-                                        ScriptComponent scriptComponent = new ScriptComponent();
-                                        scriptComponent.setGameAsset((GameAsset<String>)assetForPath);
-                                        gameObject.addComponent(scriptComponent);
-
-
-                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                                        projectExplorer.reload();
-
-                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-
-                                    }
+                                    logger.info("Reimplement create script and register");
+//                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
+//
+//                                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "ts");
+//                                    FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
+//
+//                                    String templateString = templateScript.readString();
+//                                    templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
+//                                    newScriptDestination.writeString(templateString, false);
+//
+//                                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
+//
+//                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScriptDestination, false);
+//
+//                                    if (assetForPath != null) {
+//
+//                                        ScriptComponent scriptComponent = new ScriptComponent();
+//                                        scriptComponent.setGameAsset((GameAsset<String>)assetForPath);
+//                                        gameObject.addComponent(scriptComponent);
+//
+//
+//                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+//                                        projectExplorer.reload();
+//
+//                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+//                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+//
+//                                    }
 
                                     remove();
                                     return;

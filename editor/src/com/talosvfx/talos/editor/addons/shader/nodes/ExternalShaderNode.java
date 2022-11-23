@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;

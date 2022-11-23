@@ -1,7 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.property;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,8 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Predicate;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
@@ -20,10 +16,14 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AssetSelectWidget.class);
 
     private Label nameLabel;
     private GameAsset<T> gameAsset;
@@ -77,23 +77,24 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
                 Vector2 pos = new Vector2(button.getWidth()/2f, button.getHeight()/2f);
                 button.localToStageCoordinates(pos);
 
-                AssetListPopup assetListPopup = SceneEditorAddon.get().workspace.getAssetListPopup();
-                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
-
-                    @Override
-                    public void selected (FilteredTree.Node<GameAsset<T>> node) {
-                        GameAsset<T> gameAsset = node.getObject();
-                        if (gameAsset == null || gameAsset.isBroken()) {
-                            // facing a directory or bad asset
-                            assetListPopup.resetSelection();
-                            return;
-                        }
-
-                        updateWidget(gameAsset);
-                        callValueChanged(gameAsset);
-                        assetListPopup.remove();
-                    }
-                });
+                logger.info("Redo asset selection widget");
+//                AssetListPopup assetListPopup = SceneEditorAddon.get().workspace.getAssetListPopup();
+//                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
+//
+//                    @Override
+//                    public void selected (FilteredTree.Node<GameAsset<T>> node) {
+//                        GameAsset<T> gameAsset = node.getObject();
+//                        if (gameAsset == null || gameAsset.isBroken()) {
+//                            // facing a directory or bad asset
+//                            assetListPopup.resetSelection();
+//                            return;
+//                        }
+//
+//                        updateWidget(gameAsset);
+//                        callValueChanged(gameAsset);
+//                        assetListPopup.remove();
+//                    }
+//                });
             }
         });
         return table;

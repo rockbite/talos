@@ -9,21 +9,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Predicate;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.addons.scene.widgets.GameObjectListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 
 public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
+
+    private static final Logger logger = LoggerFactory.getLogger(GameObjectSelectWidget.class);
 
     private Label nameLabel;
     private GameObject gameObject;
@@ -76,18 +76,20 @@ public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
                 Vector2 pos = new Vector2(button.getWidth()/2f, button.getHeight()/2f);
                 button.localToStageCoordinates(pos);
 
-                GameObjectListPopup gameObjectListPopup = SceneEditorAddon.get().workspace.getGameObjectListPopup();
-                gameObjectListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameObject>() {
+                logger.info("GAme object list popup needs redoing");
 
-                    @Override
-                    public void selected (FilteredTree.Node<GameObject> node) {
-                        GameObject gameObject = node.getObject();
-
-                        updateWidget(gameObject);
-                        callValueChanged(gameObject);
-                        gameObjectListPopup.remove();
-                    }
-                });
+//                GameObjectListPopup gameObjectListPopup = SceneEditorAddon.get().workspace.getGameObjectListPopup();
+//                gameObjectListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameObject>() {
+//
+//                    @Override
+//                    public void selected (FilteredTree.Node<GameObject> node) {
+//                        GameObject gameObject = node.getObject();
+//
+//                        updateWidget(gameObject);
+//                        callValueChanged(gameObject);
+//                        gameObjectListPopup.remove();
+//                    }
+//                });
             }
         });
 

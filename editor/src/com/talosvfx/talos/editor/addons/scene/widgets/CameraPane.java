@@ -3,26 +3,22 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
-import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
-import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CameraPane extends Actor implements Observer {
 
+    private static final Logger logger = LoggerFactory.getLogger(CameraPane.class);
     private final Label title;
     private final Image bg;
     private CameraPreview cameraPreview;
@@ -56,12 +52,12 @@ public class CameraPane extends Actor implements Observer {
 
     @Override
     public void act (float delta) {
-        if(TalosMain.Instance().Project() instanceof SceneEditorProject) {
-            setVisible(true);
-        } else {
-            setVisible(false);
-            return;
-        }
+//        if(TalosMain.Instance().Project() instanceof SceneEditorProject) {
+//            setVisible(true);
+//        } else {
+//            setVisible(false);
+//            return;
+//        }
         super.act(delta);
 
         if(cameraObject!= null) {
@@ -74,10 +70,12 @@ public class CameraPane extends Actor implements Observer {
         title.setEllipsis(true);
 
         Vector2 vec = Pools.get(Vector2.class).obtain();
-        // position specifically
-        Table workspace = SceneEditorAddon.get().workspaceContainer;
 
-        workspace.localToStageCoordinates(vec.set(workspace.getWidth(), 0));
+        logger.info("Redo camera pane");
+        // position specifically
+//        Table workspace = SceneEditorAddon.get().workspaceContainer;
+//
+//        workspace.localToStageCoordinates(vec.set(workspace.getWidth(), 0));
 
         setPosition(vec.x - getWidth() + 5, vec.y - 8);
 

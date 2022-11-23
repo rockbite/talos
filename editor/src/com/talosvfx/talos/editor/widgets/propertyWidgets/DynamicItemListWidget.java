@@ -52,6 +52,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         Table table = new Table();
 
         Skin skin = SharedResources.skin;
+        setSkin(skin);
 
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.BackgroundColor.DARK_GRAY));

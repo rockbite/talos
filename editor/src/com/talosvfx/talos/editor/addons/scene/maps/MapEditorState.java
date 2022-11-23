@@ -1,8 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
@@ -184,7 +182,10 @@ public class MapEditorState implements Observer {
 		// rty to show palette
 		if(mapComponent.selectedLayer.getGameResource() != null) {
 			// we have an asset let's show it's palette
-			SceneEditorAddon.get().openApp(new PaletteEditor(mapComponent.selectedLayer.getGameResource()), AEditorApp.AppOpenStrategy.RIGHT_TAB);
+
+			//todo
+			System.out.println("Show the palette editor");
+//			SceneEditorAddon.get().openApp(new PaletteEditor(mapComponent.selectedLayer.getGameResource()), AEditorApp.AppOpenStrategy.RIGHT_TAB);
 		}
 
 		// select the brush tool

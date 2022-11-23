@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
@@ -109,17 +108,17 @@ public class CameraPreview extends Actor {
     private void drawPreview () {
 
 
-        SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-        GameObject rootGO = workspace.getRootGO();
-        MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
-
-        renderer.skipUpdates = true;
-
-        renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
-        renderer.update(rootGO);
-        renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
-
-        renderer.skipUpdates = false;
+//        SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
+//        GameObject rootGO = workspace.getRootGO();
+//        MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
+//
+//        renderer.skipUpdates = true;
+//
+//        renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
+//        renderer.update(rootGO);
+//        renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
+//
+//        renderer.skipUpdates = false;
     }
 
     public void setViewport (float worldWidth, float worldHeight, float width, float height) {

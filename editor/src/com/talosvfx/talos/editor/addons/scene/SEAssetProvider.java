@@ -1,15 +1,19 @@
 package com.talosvfx.talos.editor.addons.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SEAssetProvider extends BaseAssetProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(SEAssetProvider.class);
 
     Sprite defaultSprite;
 
@@ -43,8 +47,11 @@ public class SEAssetProvider extends BaseAssetProvider {
     }
 
     private FileHandle searchForFile(String name) {
-        FileHandle projectFolder = SceneEditorAddon.get().workspace.getProjectFolder();
-        return recursiveSearch(projectFolder, name);
+
+        logger.info("Redo search for file");
+//        FileHandle projectFolder = SceneEditorAddon.get().workspace.getProjectFolder();
+//        return recursiveSearch(projectFolder, name);
+        return Gdx.files.local(".");
     }
 
     private FileHandle recursiveSearch(FileHandle dir, String name) {

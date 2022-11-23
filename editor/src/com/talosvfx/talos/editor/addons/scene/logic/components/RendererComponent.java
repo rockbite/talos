@@ -1,12 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -50,7 +50,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         }, new Supplier<Array<String>>() {
             @Override
             public Array<String> get() {
-                return SceneEditorAddon.get().workspace.getLayerList();
+                SceneData sceneData = SharedResources.currentProject.getSceneData();
+                return sceneData.getRenderLayers();
             }
         });
 

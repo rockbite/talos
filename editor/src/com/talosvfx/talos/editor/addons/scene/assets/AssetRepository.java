@@ -41,10 +41,13 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,12 +62,13 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.relative;
 import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
 import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
 
 public class AssetRepository implements Observer {
 
+
+	private static final Logger logger = LoggerFactory.getLogger(AssetRepository.class);
 	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
@@ -1294,6 +1298,21 @@ public class AssetRepository implements Observer {
 		}
 	}
 
+	public static String relative(String fullPath) {
+		return relative(Gdx.files.absolute(fullPath));
+	}
+
+	public static String relative(FileHandle fileHandle) {
+		logger.info("should be removed, not sure why we need this");
+		String projectPath = SharedResources.currentProject.rootProjectDir().path();
+
+		String path = fileHandle.path();
+		if(path.startsWith(projectPath)) {
+			path = path.substring(projectPath.length());
+		}
+
+		return path;
+	}
 
 	private boolean isRootGameResource (RawAsset rawAsset) {
 		GameAssetType assetTypeFromExtension = null;

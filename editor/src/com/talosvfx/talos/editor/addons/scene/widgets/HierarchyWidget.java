@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -35,8 +33,12 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HierarchyWidget extends Table implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
 
     private final ScrollPane scrollPane;
     private FilteredTree<GameObject> tree;
@@ -67,32 +69,40 @@ public class HierarchyWidget extends Table implements Observer {
             public void selected (FilteredTree.Node<GameObject> node) {
                 super.selected(node);
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                focusKeyboard(gameObject);
-                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+
+                logger.info("Redo select and focus");
+//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//                focusKeyboard(gameObject);
+//                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
             }
 
             @Override
             public void addedIntoSelection (FilteredTree.Node<GameObject> node) {
                 super.addedIntoSelection(node);
-                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                sceneEditorAddon.workspace.addToSelection(gameObject);
+
+                logger.info("Redo add to selection");
+//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
+//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//                sceneEditorAddon.workspace.addToSelection(gameObject);
             }
 
             @Override
             public void removedFromSelection (FilteredTree.Node<GameObject> node) {
                 super.removedFromSelection(node);
-                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                sceneEditorAddon.workspace.removeFromSelection(gameObject);
+
+                logger.info("redo remove from selection");
+//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
+//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//                sceneEditorAddon.workspace.removeFromSelection(gameObject);
             }
 
             @Override
             public void clearSelection () {
                 super.clearSelection();
-                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-                sceneEditorAddon.workspace.requestSelectionClear();
+
+                logger.info("redo request selection clear");
+//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//                sceneEditorAddon.workspace.requestSelectionClear();
             }
 
             @Override
@@ -100,15 +110,17 @@ public class HierarchyWidget extends Table implements Observer {
                 if (node == null) {
                     return;
                 }
-                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
 
-                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-
-                if(!tree.getSelection().contains(node)) {
-                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
-                }
-
-                showContextMenu(gameObject);
+                logger.info("redo selection|context menu");
+//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
+//
+//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
+//
+//                if(!tree.getSelection().contains(node)) {
+//                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+//                }
+//
+//                showContextMenu(gameObject);
             }
 
             @Override
@@ -121,7 +133,8 @@ public class HierarchyWidget extends Table implements Observer {
                     }
 
                 }
-                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
+                logger.info("Redo delete game object");
+//                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
             }
 
             @Override
@@ -129,7 +142,8 @@ public class HierarchyWidget extends Table implements Observer {
                 if(parentToMoveTo != null) {
                     GameObject parent = objectMap.get(parentToMoveTo.getObject().uuid.toString());
                     GameObject child = objectMap.get(childThatHasMoved.getObject().uuid.toString());
-                    SceneEditorAddon.get().workspace.repositionGameObject(parent, child);
+                    logger.info("redo reposition game object");
+//                    SceneEditorAddon.get().workspace.repositionGameObject(parent, child);
                 }
             }
 
@@ -244,7 +258,8 @@ public class HierarchyWidget extends Table implements Observer {
             public void clicked (InputEvent event, float x, float y) {
                 FilteredTree.Node<GameObject> item = tree.getSelection().first();
                 GameObject gameObject = objectMap.get(item.getObject().uuid.toString());
-                SceneEditorAddon.get().workspace.convertToPrefab(gameObject);
+                logger.info("redo convert to prefab");
+//                SceneEditorAddon.get().workspace.convertToPrefab(gameObject);
             }
         });
         contextualMenu.addSeparator();
@@ -300,26 +315,29 @@ public class HierarchyWidget extends Table implements Observer {
                     }
 
                 }
-                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
+                logger.info("redo delete game objects");
+//                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
             }
         });
         contextualMenu.addSeparator();
 
         PopupMenu popupMenu = new PopupMenu();
-        ObjectMap<String, XmlReader.Element> confMap = SceneEditorAddon.get().workspace.templateListPopup.getConfMap();
-        for(String key: confMap.keys()) {
-            XmlReader.Element element = confMap.get(key);
 
-            MenuItem item = new MenuItem(element.getAttribute("title"));
-            final String name = element.getAttribute("name");
-            item.addListener(new ClickListener() {
-                @Override
-                public void clicked (InputEvent event, float x, float y) {
-                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject, name);
-                }
-            });
-            popupMenu.addItem(item);
-        }
+        logger.info("Redo popup menu");
+//        ObjectMap<String, XmlReader.Element> confMap = SceneEditorAddon.get().workspace.templateListPopup.getConfMap();
+//        for(String key: confMap.keys()) {
+//            XmlReader.Element element = confMap.get(key);
+//
+//            MenuItem item = new MenuItem(element.getAttribute("title"));
+//            final String name = element.getAttribute("name");
+//            item.addListener(new ClickListener() {
+//                @Override
+//                public void clicked (InputEvent event, float x, float y) {
+//                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject, name);
+//                }
+//            });
+//            popupMenu.addItem(item);
+//        }
 
         MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
             @Override
@@ -508,7 +526,8 @@ public class HierarchyWidget extends Table implements Observer {
 
             @Override
             public void changed (String newText) {
-                SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
+                logger.info("Redo change game object name");
+//                SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
             }
         });
 

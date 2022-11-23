@@ -33,7 +33,7 @@ public class SceneProjectSettings implements Json.Serializable {
         cameraX = sceneEditorWorkspace.getCameraPosX();
         cameraY = sceneEditorWorkspace.getCameraPosY();
         cameraZoom = sceneEditorWorkspace.getCameraZoom();
-        directoryPath = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
-        directorySize = SceneEditorAddon.get().verticalSplitPane.getSplit();
+//        directoryPath = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
+//        directorySize = SceneEditorAddon.get().verticalSplitPane.getSplit();
     }
 }

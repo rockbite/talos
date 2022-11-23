@@ -4,9 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditor;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
@@ -15,8 +12,12 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpriteMetadata extends AMetadata {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpriteMetadata.class);
 
     public int[] borderData = {0, 0, 0, 0};
 
@@ -50,7 +51,11 @@ public class SpriteMetadata extends AMetadata {
                         Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderEdited.class));
                     }
                 });
-                SceneEditorAddon.get().openApp(spriteEditor, AEditorApp.AppOpenStrategy.WINDOW);
+
+                //Send request to open sprite editor
+                //todo
+                logger.info("todo open sprite editor request");
+//                SceneEditorAddon.get().openApp(spriteEditor, AEditorApp.AppOpenStrategy.WINDOW);
             }
         });
         propertyWidgets.add(spriteEditor);

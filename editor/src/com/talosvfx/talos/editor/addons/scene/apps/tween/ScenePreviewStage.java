@@ -1,11 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;

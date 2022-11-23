@@ -16,16 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenEditor;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.lang.reflect.Field;
@@ -185,12 +178,12 @@ public abstract class AbstractGenericTweenNode extends AbstractTweenNode {
     }
 
     private void fetchGameObjects(Array<GameObject> list, String targetString) {
-        SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
-        TweenEditor tweenEditor = sceneEditorAddon.tweenEditor;
-
-        GameObject root = tweenEditor.scenePreviewStage.currentScene.root;
-
-        findGameObjects(list, root, targetString);
+//        SceneEditorAddon sceneEditorAddon = ((SceneEditorProject) TalosMain.Instance().ProjectController().getProject()).sceneEditorAddon;
+//        TweenEditor tweenEditor = sceneEditorAddon.tweenEditor;
+//
+//        GameObject root = tweenEditor.scenePreviewStage.currentScene.root;
+//
+//        findGameObjects(list, root, targetString);
     }
 
     private void findGameObjects(Array<GameObject> list, GameObject parent, String targetString) {

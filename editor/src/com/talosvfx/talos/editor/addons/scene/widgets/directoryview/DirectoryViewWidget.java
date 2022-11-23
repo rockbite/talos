@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -23,6 +22,8 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -30,6 +31,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class DirectoryViewWidget extends Table {
+
+    private static final Logger logger = LoggerFactory.getLogger(DirectoryViewWidget.class);
     private static final DirectoryViewFileComparator DIRECTORY_VIEW_FILE_COMPARATOR = new DirectoryViewFileComparator();
     private static final FileFilter DIRECTORY_VIEW_FILE_FILTER = new DirectoryViewFileFilter();
     private final ScrollPane scrollPane;
@@ -370,160 +373,160 @@ public class DirectoryViewWidget extends Table {
     }
 
     private void dragAndDrop () {
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                Actor actor = getActor();
-
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Object object = payload.getObject();
-                if(object instanceof Array) {
-
-                    Array<Item> array = (Array<Item>) object;
-
-                    for (int i = 0; i < selected.size; i++) {
-                        Item item = selected.get(i);
-                        if (item.gameAsset != null) {
-                            AssetImporter.createAssetInstance(item.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
-                        }
-                    }
-                } else {
-                    if (object instanceof GameAsset) {
-                        AssetImporter.createAssetInstance((GameAsset) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
-                    }
-                    if (object instanceof FileHandle) {
-                        //Do nothing here anymore
-                    }
-                }
-
-                for (Item item : selected) {
-                    item.deselect();
-                }
-                selected.clear();
-                reportSelectionChanged();
-            }
-        });
-
-        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-            }
-        });
-
-        for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
-            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
-                @Override
-                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                    return true;
-                }
-
-                @Override
-                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                    // Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
-
-                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-
-                    Object object = payload.getObject();
-                    if (object instanceof Array) {
-                        Array<Item> array = (Array<Item>) object;
-                        for (Item sourceItem : array) {
-                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
-                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
-                            }
-                        }
-                    } else if (object instanceof GameAsset) {
-                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
-                        FileHandle handle = sourceItem.getRootRawAsset().handle;
-                        if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle, false);
-                        }
-                    } else if (object instanceof FileHandle) {
-                        FileHandle handle = (FileHandle) payload.getObject();
-                        if (!handle.path().equals(fileHandle.path())) {
-                            AssetImporter.moveFile(handle, fileHandle, false);
-                        }
-                    }
-                }
-            });
-        }
-
-        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
-        @Override
-        public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-            Actor hit = DirectoryViewWidget.this.hit(x, y, true);
-
-            for (Actor child : items.getChildren()) {
-                ((Item)child).setMouseover(false);
-            }
-
-            if (hit instanceof Item) {
-                ((Item)hit).setMouseover(true);
-                return true;
-            }
-
-            return false;
-        }
-
-        @Override
-        public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-            for (Actor child : items.getChildren()) {
-                ((Item)child).setMouseover(false);
-            }
-
-            Actor hit = DirectoryViewWidget.this.hit(x, y, true);
-
-            if (!(hit instanceof Item)) {
-                return;
-            }
-
-
-            Item targetItem = (Item)hit; //todo
-
-            if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
-
-                Object object = payload.getObject();
-                if (object instanceof Array) {
-                    Array<Item> array = (Array<Item>) object;
-                    Array<Item> copy = new Array<>();
-                    copy.addAll(array);
-                    for (Item sourceItem : copy) {
-                        if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
-                            AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
-                        }
-                    }
-                } else if (object instanceof GameAsset) {
-                    GameAsset sourceItem = (GameAsset) payload.getObject();
-                    FileHandle handle = sourceItem.getRootRawAsset().handle;
-                    if (!handle.path().equals(targetItem.fileHandle.path())) {
-                        AssetImporter.moveFile(handle, targetItem.fileHandle, false);
-                    }
-                } else if (object instanceof FileHandle) {
-                    FileHandle handle = (FileHandle) payload.getObject();
-                    if (!handle.path().equals(targetItem.fileHandle.path())) {
-                        AssetImporter.moveFile(handle, targetItem.fileHandle, false);
-                    }
-                }
-
-                for (Item item : selected) {
-                    item.deselect();
-                }
-                selected.clear();
-                reportSelectionChanged();
-            }
-        }
-    });
+//        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().workspace) {
+//            @Override
+//            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//
+//                Actor actor = getActor();
+//
+//                return true;
+//            }
+//
+//            @Override
+//            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                Object object = payload.getObject();
+//                if(object instanceof Array) {
+//
+//                    Array<Item> array = (Array<Item>) object;
+//
+//                    for (int i = 0; i < selected.size; i++) {
+//                        Item item = selected.get(i);
+//                        if (item.gameAsset != null) {
+//                            AssetImporter.createAssetInstance(item.gameAsset, SceneEditorAddon.get().workspace.getRootGO());
+//                        }
+//                    }
+//                } else {
+//                    if (object instanceof GameAsset) {
+//                        AssetImporter.createAssetInstance((GameAsset) payload.getObject(), SceneEditorAddon.get().workspace.getRootGO());
+//                    }
+//                    if (object instanceof FileHandle) {
+//                        //Do nothing here anymore
+//                    }
+//                }
+//
+//                for (Item item : selected) {
+//                    item.deselect();
+//                }
+//                selected.clear();
+//                reportSelectionChanged();
+//            }
+//        });
+//
+//        dragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorAddon.get().hierarchy) {
+//            @Override
+//            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                return true;
+//            }
+//
+//            @Override
+//            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                Actor targetActor = getActor();
+//            }
+//        });
+//
+//        for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : SceneEditorAddon.get().projectExplorer.getNodes()) {
+//            dragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
+//                @Override
+//                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                    return true;
+//                }
+//
+//                @Override
+//                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//
+//                    // Payload is either an Array<ItemView>, Or its a FileHandle, Or its a GameAsset
+//
+//                    fileHandle = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+//
+//                    Object object = payload.getObject();
+//                    if (object instanceof Array) {
+//                        Array<Item> array = (Array<Item>) object;
+//                        for (Item sourceItem : array) {
+//                            if (!sourceItem.fileHandle.path().equals(fileHandle.path())) {
+//                                AssetImporter.moveFile(sourceItem.fileHandle, fileHandle, false);
+//                            }
+//                        }
+//                    } else if (object instanceof GameAsset) {
+//                        GameAsset<?> sourceItem = (GameAsset) payload.getObject();
+//                        FileHandle handle = sourceItem.getRootRawAsset().handle;
+//                        if (!handle.path().equals(fileHandle.path())) {
+//                            AssetImporter.moveFile(handle, fileHandle, false);
+//                        }
+//                    } else if (object instanceof FileHandle) {
+//                        FileHandle handle = (FileHandle) payload.getObject();
+//                        if (!handle.path().equals(fileHandle.path())) {
+//                            AssetImporter.moveFile(handle, fileHandle, false);
+//                        }
+//                    }
+//                }
+//            });
+//        }
+//
+//        dragAndDrop.addTarget(new DragAndDrop.Target(this) {
+//        @Override
+//        public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//            Actor hit = DirectoryViewWidget.this.hit(x, y, true);
+//
+//            for (Actor child : items.getChildren()) {
+//                ((Item)child).setMouseover(false);
+//            }
+//
+//            if (hit instanceof Item) {
+//                ((Item)hit).setMouseover(true);
+//                return true;
+//            }
+//
+//            return false;
+//        }
+//
+//        @Override
+//        public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//            for (Actor child : items.getChildren()) {
+//                ((Item)child).setMouseover(false);
+//            }
+//
+//            Actor hit = DirectoryViewWidget.this.hit(x, y, true);
+//
+//            if (!(hit instanceof Item)) {
+//                return;
+//            }
+//
+//
+//            Item targetItem = (Item)hit; //todo
+//
+//            if(targetItem.fileHandle.isDirectory() && !targetItem.fileHandle.path().equals(fileHandle.path())) {
+//
+//                Object object = payload.getObject();
+//                if (object instanceof Array) {
+//                    Array<Item> array = (Array<Item>) object;
+//                    Array<Item> copy = new Array<>();
+//                    copy.addAll(array);
+//                    for (Item sourceItem : copy) {
+//                        if (!sourceItem.fileHandle.path().equals(targetItem.fileHandle.path())) {
+//                            AssetImporter.moveFile(sourceItem.fileHandle, targetItem.fileHandle, false);
+//                        }
+//                    }
+//                } else if (object instanceof GameAsset) {
+//                    GameAsset sourceItem = (GameAsset) payload.getObject();
+//                    FileHandle handle = sourceItem.getRootRawAsset().handle;
+//                    if (!handle.path().equals(targetItem.fileHandle.path())) {
+//                        AssetImporter.moveFile(handle, targetItem.fileHandle, false);
+//                    }
+//                } else if (object instanceof FileHandle) {
+//                    FileHandle handle = (FileHandle) payload.getObject();
+//                    if (!handle.path().equals(targetItem.fileHandle.path())) {
+//                        AssetImporter.moveFile(handle, targetItem.fileHandle, false);
+//                    }
+//                }
+//
+//                for (Item item : selected) {
+//                    item.deselect();
+//                }
+//                selected.clear();
+//                reportSelectionChanged();
+//            }
+//        }
+//    });
     }
 
     private void itemClicked (Item item, boolean rightClick) {

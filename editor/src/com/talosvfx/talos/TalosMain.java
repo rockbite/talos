@@ -18,19 +18,15 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.addons.AddonController;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
@@ -64,7 +60,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private static TalosMain instance;
 
-	private AddonController addonController;
 
 //	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
@@ -134,7 +129,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		screenshotService = new ScreenshotService();
 
-		addonController = new AddonController();
 
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
@@ -162,7 +156,6 @@ public class TalosMain extends ApplicationAdapter {
 		uiStage.init();
 		nodeStage.init();
 
-		addonController.initAll();
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -289,7 +282,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
-		addonController.dispose();
 		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
 			currentWorkplaceStage.getStage().dispose();
 		}
@@ -306,10 +298,6 @@ public class TalosMain extends ApplicationAdapter {
 		if(currentWorkplaceStage == null) return null;
 
 		return currentWorkplaceStage.getCameraController();
-	}
-
-	public AddonController Addons() {
-		return addonController;
 	}
 
 	public FileTracker FileTracker() {

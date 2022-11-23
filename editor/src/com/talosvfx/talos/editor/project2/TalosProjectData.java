@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryVie
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ public class TalosProjectData implements Json.Serializable {
 	private transient FileHandle projectFile;
 
 
+	@Getter
+	private SceneData sceneData = new SceneData();
 
 	public TalosProjectData () {
 		layoutGrid = new LayoutGrid(SharedResources.skin);

@@ -12,12 +12,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CurveComponent;
 import com.talosvfx.talos.editor.project.IProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CurveGizmo extends Gizmo {
 
+    private static final Logger logger = LoggerFactory.getLogger(CurveGizmo.class);
     private Bezier<Vector2> bezier = new Bezier<>();
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
@@ -117,10 +119,12 @@ public class CurveGizmo extends Gizmo {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             IProject project = TalosMain.Instance().ProjectController().getProject();
-            if(project instanceof SceneEditorProject) {
-                SceneEditorProject sceneEditorProject = (SceneEditorProject) project;
-                sceneEditorProject.sceneEditorAddon.workspace.requestSelectionClear();
-            }
+
+            logger.info("redo request slection clear from curve gizmo");
+//            if(project instanceof SceneEditorProject) {
+//                SceneEditorProject sceneEditorProject = (SceneEditorProject) project;
+//                sceneEditorProject.sceneEditorAddon.workspace.requestSelectionClear();
+//            }
         }
     }
 
