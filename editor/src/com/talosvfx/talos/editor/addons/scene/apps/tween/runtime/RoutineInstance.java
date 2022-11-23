@@ -17,6 +17,9 @@ public class RoutineInstance {
 
     public Array<DrawableQuad> drawableQuads = new Array<>();
 
+    public Array<Integer> scopeNumbers = new Array<>();
+    private float requesterId;
+
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
     }
@@ -90,11 +93,36 @@ public class RoutineInstance {
         return config.getConfig(name);
     }
 
+    public void setRequester(float id) {
+        requesterId = id;
+    }
+
+    public void beingDepth() {
+        scopeNumbers.add(0);
+    }
+
+    public void incrementDepth() {
+        scopeNumbers.set(scopeNumbers.size - 1, scopeNumbers.get(scopeNumbers.size - 1) + 1);
+    }
+
+    public void endDepth() {
+        scopeNumbers.removeIndex(scopeNumbers.size - 1);
+    }
+
     public void clearMemory() {
         for(DrawableQuad quad: drawableQuads) {
             Pools.free(quad);
         }
 
         drawableQuads.clear();
+    }
+
+    public float getRequesterId() {
+        return requesterId;
+    }
+
+    public float getDepthHash() {
+        int hash = scopeNumbers.hashCode();
+        return hash;
     }
 }

@@ -82,6 +82,13 @@
                 <value port="output" name="y" type="float">Y: </value>
             </group>
         </module>
+        <module name = "Vector2Node" title = "Vector2" keywords = "" class = "RoutineNodeWidget">
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+            <value port="output" name="output" type="vec2">vector2: </value>
+        </module>
         <module name = "MathModule" title = "Math Module" keywords = "" class = "RoutineNodeWidget">
             <value port="output" name="outputValue" type="fluid">Output Value</value>
             <select name="operation">
@@ -167,6 +174,14 @@
             <value port="input" name="color" type="color">color</value>
             <dynamicValue port="input" name="brightness" type="float" default="1" min = "0" max = "1" step="0.01">brightness: </dynamicValue>
             <value port="output" name="output" type="color">output</value>
+        </module>
+        <module name = "RandomNode" title = "Random Number" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="seed" type="float">seed</value>
+            <group>
+                <dynamicValue port="input" name="min" type="float" default="0" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
+                <dynamicValue port="input" name="max" type="float" default="1" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
+            </group>
+            <value port="output" name="output" type="float">output</value>
         </module>
     </category>
 </modules>

@@ -268,6 +268,8 @@ public abstract class RoutineNode {
      */
     protected Object fetchValue(String key) {
 
+        routineInstanceRef.setRequester(uniqueId);
+
         Port port = inputs.get(key);
 
         if(port == null) return null;
