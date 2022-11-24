@@ -7,8 +7,6 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 
 public class PixelPickerNode extends RoutineNode {
-
-
     private Pixmap pixmap;
     private String assetName;
 
@@ -23,10 +21,11 @@ public class PixelPickerNode extends RoutineNode {
         GameAsset<Texture> asset = fetchAssetValue("texture");
         Texture texture = asset.getResource();
 
-        if(assetName == null || (assetName != null && !assetName.equals(asset.nameIdentifier))) {
+        if(assetName == null || (assetName != null && !assetName.equals(asset.nameIdentifier)) || nodeDirty) {
             texture.getTextureData().prepare();
             pixmap = texture.getTextureData().consumePixmap();
             assetName = asset.nameIdentifier;
+            nodeDirty = false;
         }
 
         if(pixmap != null) {

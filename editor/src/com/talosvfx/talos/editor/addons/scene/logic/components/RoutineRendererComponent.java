@@ -41,24 +41,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
 
     public transient RoutineInstance routineInstance;
-    private transient TextureRegion textureRegion = new TextureRegion();
-    private transient float renderCoolDown  = 0f;
-    private Comparator<? super DrawableQuad> zComparator;
 
     public RoutineRendererComponent() {
-        zComparator = new Comparator<DrawableQuad>() {
-            @Override
-            public int compare(DrawableQuad o2, DrawableQuad o1) {
-                int result = (int) (o1.z*10000 - o2.z*10000);
-                if(result == 0) {
-                    result = (int) (o1.position.x*10000 - o2.position.x*10000);
-                }
-                if(result == 0) {
-                    result = (int) (o1.position.y*10000 - o2.position.y*10000);
-                }
-                return result;
-            }
-        };
+
     }
 
     @Override
@@ -148,65 +133,11 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         // this needs changing
         RoutineConfigMap routineConfigMap = new RoutineConfigMap();
         routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
-        routineInstance.loadFrom(gameAsset.getResource(), routineConfigMap);
+        routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource(), routineConfigMap);
     }
 
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {
         return false;
-    }
-
-    public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject) {
-
-        TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-
-        renderCoolDown -= Gdx.graphics.getDeltaTime();
-
-        boolean reset = false;
-
-        if(renderCoolDown <= 0f) {
-            renderCoolDown = 0.1f;
-            reset = true;
-        }
-
-        // todo this is not nice
-        if(reset) {
-            routineInstance.clearMemory();
-        }
-        RoutineNode main = routineInstance.getNodeById("main");
-        if(main instanceof RenderRoutineNode) {
-            RenderRoutineNode renderRoutineNode = (RenderRoutineNode) routineInstance.getNodeById("main");
-
-            Vector3 cameraPos = mainRenderer.getCamera().position;
-            renderRoutineNode.position.set(transform.position);
-            renderRoutineNode.viewportPosition.set(cameraPos.x, cameraPos.y);
-            renderRoutineNode.viewportSize.set(viewportSize.x, viewportSize.y);
-
-            if(reset) {
-                renderRoutineNode.receiveSignal("startSignal");
-            }
-
-            routineInstance.drawableQuads.sort(zComparator);
-
-            for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
-                boolean aspect = drawableQuad.aspect;
-                float scl = (float)drawableQuad.texture.getWidth() / drawableQuad.texture.getHeight();
-                float width = drawableQuad.size.x;
-                float height = drawableQuad.size.y;
-                if(aspect) {
-                    height = width / scl;
-                }
-
-                textureRegion.setRegion(drawableQuad.texture);
-                batch.setColor(drawableQuad.color);
-                batch.draw(textureRegion,
-                        drawableQuad.position.x, drawableQuad.position.y,
-                        0.5f, 0.5f,
-                        1f, 1f,
-                        width, height,
-                        drawableQuad.rotation);
-                batch.setColor(Color.WHITE);
-            }
-        }
     }
 }

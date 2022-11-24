@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -65,6 +66,8 @@ public class MainRenderer implements Notifications.Observer {
     private TalosMapRenderer mapRenderer;
     private ShapeRenderer shapeRenderer;
 
+    private RoutineRenderer routineRenderer;
+
     private TextureRegion textureRegion = new TextureRegion();
     private OrthographicCamera camera;
 
@@ -90,6 +93,7 @@ public class MainRenderer implements Notifications.Observer {
         spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
+        routineRenderer = new RoutineRenderer();
 
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
@@ -538,7 +542,7 @@ public class MainRenderer implements Notifications.Observer {
     private void renderWithRoutine (Batch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         RoutineRendererComponent routineRendererComponent = gameObject.getComponent(RoutineRendererComponent.class);
-        routineRendererComponent.render(this, batch, gameObject);
+        routineRenderer.render(this, batch, gameObject, routineRendererComponent);
     }
 
     private void renderMap (Batch batch, GameObject gameObject) {

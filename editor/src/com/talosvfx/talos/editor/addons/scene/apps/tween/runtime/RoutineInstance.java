@@ -5,9 +5,13 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.draw.DrawableQuad;
 
+import java.util.UUID;
+
 public class RoutineInstance {
 
     private Array<RoutineNode> nodes = new Array<>();
+
+    public transient UUID uuid;
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
@@ -20,12 +24,15 @@ public class RoutineInstance {
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
+    public transient boolean isDirty = true;
+
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
     }
 
-    public void loadFrom(String fileContent, RoutineConfigMap config) {
+    public void loadFrom(UUID uuid, String fileContent, RoutineConfigMap config) {
         this.config = config;
+        this.uuid = new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
 
         if(fileContent == null || fileContent.isEmpty()) return;
 
