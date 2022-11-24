@@ -131,13 +131,30 @@ public class LayoutGrid extends WidgetGroup {
 			}
 		}
 
-		if (content instanceof LayoutContent) {
-			registerDragTarget((LayoutContent)content);
-		}
+		registerDragTargetRecursive(content);
 
+
+	}
+	private void registerDragTargetRecursive (LayoutItem item) {
+		if (item instanceof LayoutContent) {
+			registerDragTarget((LayoutContent)item);
+		} else if (item instanceof LayoutRow) {
+			Array<LayoutItem> columns = ((LayoutRow)item).getColumns();
+			for (int i = 0; i < columns.size; i++) {
+				LayoutItem layoutItem = columns.get(i);
+				registerDragTargetRecursive(layoutItem);
+			}
+		} else if (item instanceof LayoutColumn) {
+			Array<LayoutItem> rows = ((LayoutColumn)item).getRows();
+			for (int i = 0; i < rows.size; i++) {
+				LayoutItem layoutItem = rows.get(i);
+				registerDragTargetRecursive(layoutItem);
+			}
+		}
 	}
 
 	void registerDragTarget (LayoutContent layoutContent) {
+		if (targets.containsKey(layoutContent)) return; //Don't register twice
 		DragAndDrop.Target target = new DragAndDrop.Target(layoutContent) {
 			@Override
 			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
