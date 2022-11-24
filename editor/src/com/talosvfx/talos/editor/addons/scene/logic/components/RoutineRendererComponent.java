@@ -165,7 +165,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         boolean reset = false;
 
         if(renderCoolDown <= 0f) {
-            renderCoolDown = 1f;
+            renderCoolDown = 0.1f;
             reset = true;
         }
 
