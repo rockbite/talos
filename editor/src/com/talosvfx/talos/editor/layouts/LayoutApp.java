@@ -6,6 +6,7 @@ public interface LayoutApp {
 
 //	change tis to focus
 
+	void setTabActive (boolean active);
 
 	String getUniqueIdentifier ();
 	Actor getTabWidget ();

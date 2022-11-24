@@ -16,7 +16,6 @@ public class LayoutContent extends LayoutItem {
 	private final Table tabBar;
 	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
-	private ObjectMap<Actor, LayoutApp> tabToApps = new ObjectMap<>();
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
@@ -66,8 +65,12 @@ public class LayoutContent extends LayoutItem {
 	}
 
 	private void swapToApp (LayoutApp result) {
+		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+			app.value.setTabActive(false);
+		}
 		contentTable.clearChildren();
 		contentTable.add(result.getMainContent()).grow();
+		result.setTabActive(true);
 	}
 
 	public void addContent (LayoutApp layoutApp) {

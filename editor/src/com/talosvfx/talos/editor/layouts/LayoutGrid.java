@@ -19,6 +19,10 @@ import com.badlogic.gdx.utils.SnapshotArray;
 import java.util.Objects;
 
 public class LayoutGrid extends WidgetGroup {
+
+//	active tabs in layout grid. check unity
+
+//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 	private DragAndDrop dragAndDrop;
 
 	LayoutItem root;

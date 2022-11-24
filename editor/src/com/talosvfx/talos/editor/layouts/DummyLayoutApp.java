@@ -10,7 +10,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	private String tabName;
 
-	private transient Actor tabWidget;
+	private transient Table tabWidget;
 	private transient Actor mainContent;
 	private transient Skin skin;
 
@@ -37,6 +37,15 @@ public class DummyLayoutApp implements LayoutApp {
 		tab.add(visLabel);
 
 		return tab;
+	}
+
+	@Override
+	public void setTabActive (boolean active) {
+		if (active) {
+			tabWidget.setBackground(skin.getDrawable("tab-bg"));
+		} else {
+			tabWidget.setBackground(skin.newDrawable("tab-bg", 0.5f, 0.5f, 0.5f, 1f));
+		}
 	}
 
 	private Actor createMainContent () {
