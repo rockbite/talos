@@ -29,7 +29,7 @@ public class LayoutGrid extends WidgetGroup {
 
 	private DragHitResult dragHitResult = new DragHitResult();
 
-	private ObjectMap<LayoutContentApp, DragAndDrop.Source> sources = new ObjectMap<>();
+	private ObjectMap<LayoutContentAppPair, DragAndDrop.Source> sources = new ObjectMap<>();
 	private ObjectMap<LayoutContent, DragAndDrop.Target> targets = new ObjectMap<>();
 
 	float horizontalPercent = 0.3f;
@@ -156,9 +156,9 @@ public class LayoutGrid extends WidgetGroup {
 					return;
 
 				if (hitResult.root) {
-					dropContainer((LayoutContentApp)payload.getObject(), null, dragHitResult.direction);
+					dropContainer((LayoutContentAppPair)payload.getObject(), null, dragHitResult.direction);
 				} else {
-					dropContainer((LayoutContentApp)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
+					dropContainer((LayoutContentAppPair)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
 				}
 
 			}
@@ -175,7 +175,7 @@ public class LayoutGrid extends WidgetGroup {
 	/*
 	target is null when root should be used
 	 */
-	private void dropContainer (LayoutContentApp source, @Null LayoutContent target, LayoutDirection direction) {
+	private void dropContainer (LayoutContentAppPair source, @Null LayoutContent target, LayoutDirection direction) {
 		//Here comes the logic
 
 		LayoutContent parent = source.layoutContent;
@@ -405,7 +405,7 @@ public class LayoutGrid extends WidgetGroup {
 	//Add each LayoutContent for drag and drop as a target
 	void registerDragSource (LayoutContent parent, LayoutApp layoutApp, Actor actorToDrag) {
 
-		LayoutContentApp layoutContentAppObject = new LayoutContentApp(parent, layoutApp);
+		LayoutContentAppPair layoutContentAppObject = new LayoutContentAppPair(parent, layoutApp);
 
 		DragAndDrop.Source source = new DragAndDrop.Source(actorToDrag) {
 			@Override
@@ -672,11 +672,11 @@ public class LayoutGrid extends WidgetGroup {
 
 	}
 
-	static class LayoutContentApp {
+	static class LayoutContentAppPair {
 		public LayoutContent layoutContent;
 		public LayoutApp app;
 
-		public LayoutContentApp (LayoutContent parent, LayoutApp app) {
+		public LayoutContentAppPair (LayoutContent parent, LayoutApp app) {
 			this.layoutContent = parent;
 			this.app = app;
 		}
@@ -687,7 +687,7 @@ public class LayoutGrid extends WidgetGroup {
 				return true;
 			if (o == null || getClass() != o.getClass())
 				return false;
-			LayoutContentApp that = (LayoutContentApp)o;
+			LayoutContentAppPair that = (LayoutContentAppPair)o;
 			return Objects.equals(layoutContent, that.layoutContent) && Objects.equals(app, that.app);
 		}
 
