@@ -33,6 +33,7 @@ public class RoutineInstance {
     public void loadFrom(UUID uuid, String fileContent, RoutineConfigMap config) {
         this.config = config;
         this.uuid = new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
+        this.isDirty = true;
 
         if(fileContent == null || fileContent.isEmpty()) return;
 

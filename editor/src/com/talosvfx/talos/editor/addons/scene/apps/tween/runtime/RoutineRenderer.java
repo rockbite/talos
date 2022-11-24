@@ -2,8 +2,11 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
@@ -40,6 +43,12 @@ public class RoutineRenderer {
     }
 
 
+    Rectangle mainCameraRect = new Rectangle();
+    Rectangle viewportRect = new Rectangle();
+    Rectangle intersectionRect = new Rectangle();
+    Vector2 positionTempVector = new Vector2();
+    Vector2 sizeTempVector = new Vector2();
+
     public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject, RoutineRendererComponent routineRendererComponent) {
         RoutineInstance routineInstance = routineRendererComponent.routineInstance;
         Vector2 viewportSize = routineRendererComponent.viewportSize;
@@ -55,21 +64,33 @@ public class RoutineRenderer {
             reset = true;
         }
 
-        // todo this is not nice
-        if(reset) {
-            routineInstance.clearMemory();
-        }
+        float offset = 5;
 
         RoutineNode main = routineInstance.getNodeById("main");
         if (main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
-            Vector3 cameraPos = mainRenderer.getCamera().position;
-            renderRoutineNode.position.set(transform.position);
-            renderRoutineNode.viewportPosition.set(cameraPos.x, cameraPos.y);
-            renderRoutineNode.viewportSize.set(viewportSize.x, viewportSize.y);
+            OrthographicCamera camera = mainRenderer.getCamera();
+            Vector3 cameraPos = camera.position;
+            mainCameraRect.setSize(camera.viewportWidth * camera.zoom + offset, camera.viewportHeight * camera.zoom + offset).setCenter(cameraPos.x, cameraPos.y);
 
-            if(reset) {
+            Vector2 position = transform.position;
+            viewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(position.x, position.y);
+
+            boolean intersects = Intersector.intersectRectangles(mainCameraRect, viewportRect, intersectionRect);
+
+            intersectionRect.getCenter(positionTempVector);
+            intersectionRect.getSize(sizeTempVector);
+
+
+            if (!(positionTempVector.equals(renderRoutineNode.position) && sizeTempVector.equals(renderRoutineNode.viewportSize))) {
+                reset = true;
+            }
+
+            if (reset) {
+                routineInstance.clearMemory();
+                renderRoutineNode.position.set(positionTempVector);
+                renderRoutineNode.viewportSize.set(sizeTempVector);
                 renderRoutineNode.receiveSignal("startSignal");
                 routineInstance.drawableQuads.sort(zComparator);
                 routineInstance.isDirty = false;
