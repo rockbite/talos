@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.ProjectSplash;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosLocalPrefs;
@@ -53,6 +54,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		AssetRepository.init();
 		SharedResources.projectLoader = this::projectLoader;
+		SharedResources.appManager = new AppManager();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));

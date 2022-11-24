@@ -135,7 +135,7 @@ public class LayoutGrid extends WidgetGroup {
 
 
 	}
-	private void registerDragTargetRecursive (LayoutItem item) {
+	public void registerDragTargetRecursive (LayoutItem item) {
 		if (item instanceof LayoutContent) {
 			registerDragTarget((LayoutContent)item);
 		} else if (item instanceof LayoutRow) {

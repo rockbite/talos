@@ -24,6 +24,8 @@ import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirector
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.FileOpener;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import org.slf4j.Logger;
@@ -233,9 +235,16 @@ public class AssetImporter {
 
         }
 
+
         //Game resource event
         GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
         if (assetForPath != null) {
+            if (SharedResources.appManager.canOpenInTalos(assetForPath)) {
+                SharedResources.appManager.openNewAsset(assetForPath);
+                return;
+            }
+
+
             GameAssetOpenEvent resourceOpenEvent = Notifications.obtainEvent(GameAssetOpenEvent.class);
             resourceOpenEvent.setGameAsset(assetForPath);
             Notifications.fireEvent(resourceOpenEvent);

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -12,24 +11,17 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
-import com.talosvfx.talos.runtime.IEmitter;
-import com.talosvfx.talos.runtime.Particle;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.Particle3DRenderer;
-import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 import lombok.Getter;
 
 import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
@@ -52,7 +44,6 @@ public class Preview3D extends PreviewWidget {
 
     private IDragPointProvider dragPointProvider;
     private Array<DragPoint> dragPoints = new Array<>();
-
 
     public Preview3D(PreviewImageControllerWidget previewImageControllerWidget) {
         super(previewImageControllerWidget);
@@ -148,16 +139,16 @@ public class Preview3D extends PreviewWidget {
             @Override
             public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(Preview3D.this);
-                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(Preview3D.this);
+//                TalosMain.Instance().UIStage().getStage().setScrollFocus(Preview3D.this);
+//                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(Preview3D.this);
             }
 
             @Override
             public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
                 if (pointer != -1) return; //Only care about exit/enter from mouse move
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
-                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(null);
+//                TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
+//                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(null);
             }
         });
     }
@@ -221,14 +212,13 @@ public class Preview3D extends PreviewWidget {
             switchCamera();
         }
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        if (particleEffect != null) {
-            bongoPreview.updateParticleInstance(particleEffect);
+        if (effectInstance != null) {
+            bongoPreview.updateParticleInstance(effectInstance);
         }
 
         batch.end();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+//        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 
 //        modelBatch.begin(worldCamera);
 //        //if(isDrawXYZ) modelBatch.render(xyzInstance);

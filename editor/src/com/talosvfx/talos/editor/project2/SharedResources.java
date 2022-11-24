@@ -11,4 +11,6 @@ public class SharedResources {
 	public static ProjectLoader projectLoader;
 
 	public static TalosProjectData currentProject;
+
+	public static AppManager appManager;
 }

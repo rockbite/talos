@@ -42,6 +42,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -82,6 +83,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 
     private String backgroundImagePath = "";
     private float gridSize;
+    protected ParticleEffectInstance effectInstance;
 
     public PreviewWidget(PreviewImageControllerWidget previewImageControllerWidget) {
         super();
@@ -235,14 +237,13 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 
         long timeBefore = TimeUtils.nanoTime();
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
         if (this instanceof Preview2D) {
-            particleEffect.update(Gdx.graphics.getDeltaTime());
+            effectInstance.update(Gdx.graphics.getDeltaTime());
         }
-        cpuTime.put( TimeUtils.timeSinceNanos(timeBefore));
+        cpuTime.put(TimeUtils.timeSinceNanos(timeBefore));
 
         stringBuilder.clear();
-        stringBuilder.append(countStr).append(particleEffect.getParticleCount());
+        stringBuilder.append(countStr).append(effectInstance.getParticleCount());
         countLbl.setText(stringBuilder.toString());
 
         stringBuilder.clear();
@@ -250,7 +251,7 @@ public abstract class PreviewWidget extends ViewportWidget {
         trisCountLbl.setText(stringBuilder.toString());
 
         stringBuilder.clear();
-        stringBuilder.append(nodeCallsStr).append(particleEffect.getNodeCalls());
+        stringBuilder.append(nodeCallsStr).append(effectInstance.getNodeCalls());
         nodeCallsLbl.setText(stringBuilder.toString());
 
         float rt = renderTime.value/1000000f;
@@ -304,7 +305,6 @@ public abstract class PreviewWidget extends ViewportWidget {
 
         long timeBefore = TimeUtils.nanoTime();
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
 //        particleEffect.render(particleRenderer);
 
         batch.flush();
@@ -399,4 +399,9 @@ public abstract class PreviewWidget extends ViewportWidget {
 
     public abstract void removePreviewImage();
     public abstract void gridSizeChanged(float size);
+
+
+    public void setParticleEffect (ParticleEffectDescriptor resource) {
+        effectInstance = resource.createEffectInstance();
+    }
 }
