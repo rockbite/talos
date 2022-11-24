@@ -15,4 +15,6 @@ public interface LayoutApp {
 	Actor getMainContent ();
 	Actor getCopyMainContent ();
 
+	void setDestroyCallback (DestroyCallback destroyCallback);
+
 }

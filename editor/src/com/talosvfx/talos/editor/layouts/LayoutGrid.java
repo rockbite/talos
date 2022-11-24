@@ -20,7 +20,6 @@ import java.util.Objects;
 
 public class LayoutGrid extends WidgetGroup {
 
-//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 	private DragAndDrop dragAndDrop;
 
 	LayoutItem root;
@@ -63,6 +62,11 @@ public class LayoutGrid extends WidgetGroup {
 	}
 
 	private void removeRecursive (LayoutItem content, boolean removeEmpty) {
+		if (content.getParent() instanceof LayoutGrid) {
+			reset();
+			return;
+		}
+
 		LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
 
 		parent.removeItem(content);

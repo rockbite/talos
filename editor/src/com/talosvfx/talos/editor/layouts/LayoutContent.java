@@ -75,6 +75,12 @@ public class LayoutContent extends LayoutItem {
 
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
+		layoutApp.setDestroyCallback(new DestroyCallback() {
+			@Override
+			public void onDestroyRequest () {
+				removeContent(layoutApp);
+			}
+		});
 	}
 
 	public void addContent (LayoutApp layoutApp, boolean copy) {
@@ -114,6 +120,9 @@ public class LayoutContent extends LayoutItem {
 				swapToApp(first.value);
 				break;
 			}
+		} else {
+			contentTable.clearChildren();
+			grid.removeContent(this);
 		}
 
 	}
