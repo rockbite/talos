@@ -78,7 +78,7 @@ public class LayoutContent extends LayoutItem {
 		layoutApp.setDestroyCallback(new DestroyCallback() {
 			@Override
 			public void onDestroyRequest () {
-				removeContent(layoutApp);
+				grid.removeApp(LayoutContent.this, layoutApp);
 			}
 		});
 	}
@@ -102,9 +102,6 @@ public class LayoutContent extends LayoutItem {
 		}
 	}
 
-	public void removeContent (String uniqueID) {
-		removeContent(apps.get(uniqueID));
-	}
 	public void removeContent (LayoutApp app) {
 		apps.remove(app.getUniqueIdentifier());
 
@@ -122,7 +119,6 @@ public class LayoutContent extends LayoutItem {
 			}
 		} else {
 			contentTable.clearChildren();
-			grid.removeContent(this);
 		}
 
 	}

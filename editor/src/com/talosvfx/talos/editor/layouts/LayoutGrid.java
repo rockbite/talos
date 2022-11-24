@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.SnapshotArray;
 
 import java.util.Objects;
 
@@ -48,6 +47,13 @@ public class LayoutGrid extends WidgetGroup {
 
 	public void removeContent (LayoutContent content) {
 		removeContent(content, true);
+	}
+
+
+	public void removeApp (LayoutContent layoutContent, LayoutApp layoutApp) {
+		//Find the content that has it and remove it
+		removeContent(layoutContent);
+
 	}
 
 	public void removeContent (LayoutContent content, boolean removeEmptyParent) {
@@ -93,6 +99,7 @@ public class LayoutGrid extends WidgetGroup {
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 	}
+
 
 
 	public enum LayoutDirection {
