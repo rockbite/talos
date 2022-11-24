@@ -1559,6 +1559,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onProjectDirectoryContentsChanged (ProjectDirectoryContentsChanged event) {
+		// TODO: 11/24/2022 THIS IS A TEMPORARY CHANGES BEFORE TOM's REFACTOR FOR THE WHOLE THING 
+		for (FileHandle fileHandle : event.getChanges().changed) {
+			GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
+			if (assetForPath != null) {
+				for (GameAsset.GameAssetUpdateListener listener : assetForPath.listeners) {
+					listener.onUpdate();
+				}
+			}
+		}
+
 		if (event.getChanges().directoryStructureChange()) {
 			boolean nonMeta = false;
 			for (FileHandle added : event.getChanges().added) {

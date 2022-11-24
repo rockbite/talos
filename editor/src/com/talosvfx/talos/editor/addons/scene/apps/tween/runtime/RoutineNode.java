@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.*;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -11,8 +10,12 @@ import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 
 public abstract class RoutineNode {
 
+    private GameAsset.GameAssetUpdateListener updateListener;
+
     protected RoutineInstance routineInstanceRef;
     public int uniqueId;
+
+    protected boolean nodeDirty = false;
 
     public enum DataType {
         NUMBER,
@@ -68,7 +71,13 @@ public abstract class RoutineNode {
     protected ObjectMap<String, Port> outputs = new ObjectMap<>();
 
     public RoutineNode() {
-
+        updateListener = new GameAsset.GameAssetUpdateListener() {
+            @Override
+            public void onUpdate () {
+                RoutineNode.this.routineInstanceRef.isDirty = true;
+                RoutineNode.this.nodeDirty = true;
+            }
+        };
     }
 
     public void loadFrom(RoutineInstance routineInstance, JsonValue nodeData) {
@@ -213,7 +222,9 @@ public abstract class RoutineNode {
             } else {
                 //todo: fix assumption that it is PNG
                 GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String) port.valueOverride, GameAssetType.SPRITE);
-
+                if (!asset.listeners.contains(updateListener, true)) {
+                    asset.listeners.add(updateListener);
+                }
                 return asset;
             }
         } else {
@@ -221,7 +232,12 @@ public abstract class RoutineNode {
             RoutineNode targetNode = connection.toPort.nodeRef;
             String targetPortName = connection.toPort.name;
 
-            return (GameAsset) targetNode.queryValue(targetPortName);
+            GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
+            if (!gameAsset.listeners.contains(updateListener, true)) {
+                gameAsset.listeners.add(updateListener);
+            }
+
+            return gameAsset;
         }
     }
 

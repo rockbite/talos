@@ -21,10 +21,14 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.ProbabilityChoice
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -75,9 +79,12 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     public void loadFrom(FileHandle targetFileHandle) {
         Json json = new Json();
         JsonReader jsonReader = new JsonReader();
-        read(json, jsonReader.parse(targetFileHandle));
 
-        routineInstance.loadFrom(targetFileHandle.readString(), routineConfigMap);
+        GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(targetFileHandle, true);
+        AMetadata metaData = assetForPath.getRootRawAsset().metaData;
+        routineInstance.loadFrom(metaData.uuid, targetFileHandle.readString(), routineConfigMap);
+
+        read(json, jsonReader.parse(targetFileHandle));
     }
 
     @Override
@@ -135,7 +142,7 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(this);
-        instance.loadFrom(data, routineConfigMap);
+        instance.loadFrom(instance.uuid, data, routineConfigMap);
     }
 
     private void reloadRoutineInstancesFromMemory() {
@@ -189,7 +196,9 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
 
             for (GameObject gameObject : list) {
                 RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-                result.add(component.routineInstance);
+                if (component.routineInstance.uuid.equals(routineInstance.uuid)) {
+                    result.add(component.routineInstance);
+                }
             }
         }
 
@@ -203,6 +212,8 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
 
         if(logicNode == null) return;
 
+        boolean setRoutineDirty = false;
+
         // update input properties
         for (ObjectMap.Entry<String, AbstractWidget> stringAbstractWidgetEntry : nodeWidget.widgetMap) {
             String key = stringAbstractWidgetEntry.key;
@@ -210,7 +221,12 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
 
             if(value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
                 logicNode.setProperty(key, value.getValue());
+                setRoutineDirty = true;
             }
+        }
+
+        if (setRoutineDirty) {
+            routineInstance.isDirty = true;
         }
     }
 
