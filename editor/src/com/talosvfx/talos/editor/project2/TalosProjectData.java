@@ -10,8 +10,10 @@ import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.layouts.LayoutColumn;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.layouts.LayoutRow;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -29,10 +31,8 @@ public class TalosProjectData implements Json.Serializable {
 	@Getter
 	private transient LayoutGrid layoutGrid;
 
-
 	//Always non null, points to a project file that represents the root of the project
 	private transient FileHandle projectFile;
-
 
 	@Getter
 	private SceneData sceneData = new SceneData();
@@ -78,6 +78,7 @@ public class TalosProjectData implements Json.Serializable {
 	public FileHandle rootProjectDir () {
 		return projectFile.parent();
 	}
+
 	private void createDefaultDirs () {
 		rootProjectDir().child("scenes").mkdirs();
 		rootProjectDir().child("textures").mkdirs();
@@ -88,65 +89,58 @@ public class TalosProjectData implements Json.Serializable {
 	public void test () {
 		layoutGrid.reset();
 
+		SceneEditorWorkspace workspaceWidget = new SceneEditorWorkspace();
+		//Find a scene and open it
 
-		{
-			LayoutContent sceneEditorWorkspace = new LayoutContent(SharedResources.skin, layoutGrid);
+		DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, "Scene") {
+			@Override
+			public Actor getMainContent () {
+				return workspaceWidget;
+			}
+		};
 
-			SceneEditorWorkspace workspaceWidget = new SceneEditorWorkspace();
-			//Find a scene and open it
+		ProjectExplorerWidget projectExplorerWidget = new ProjectExplorerWidget();
+		DummyLayoutApp assetDirectoryApp = new DummyLayoutApp(SharedResources.skin, "Assets") {
+			@Override
+			public Actor getMainContent () {
+				return projectExplorerWidget;
+			}
+		};
 
-			sceneEditorWorkspace.addContent(new DummyLayoutApp(SharedResources.skin, "Scene") {
-				@Override
-				public Actor getMainContent () {
-					return workspaceWidget;
-				}
-			});
 
-			layoutGrid.addContent(sceneEditorWorkspace);
-		}
-		{
-			LayoutContent directoryViewContent = new LayoutContent(SharedResources.skin, layoutGrid);
-			ProjectExplorerWidget projectExplorerWidget = new ProjectExplorerWidget();
-			directoryViewContent.addContent(new DummyLayoutApp(SharedResources.skin, "Assets") {
-				@Override
-				public Actor getMainContent () {
-					return projectExplorerWidget;
-				}
-			});
+		PropertyPanel propertyPanel = new PropertyPanel();
+		DummyLayoutApp propertyPanelApp = new DummyLayoutApp(SharedResources.skin, "Properties") {
+			@Override
+			public Actor getMainContent () {
+				return propertyPanel;
+			}
+		};
 
-			layoutGrid.addContent(directoryViewContent);
+		HierarchyWidget hierarchyWidget = new HierarchyWidget();
+		DummyLayoutApp hierarchyApp = new DummyLayoutApp(SharedResources.skin, "Hierarchy") {
+			@Override
+			public Actor getMainContent () {
+				return hierarchyWidget;
+			}
+		};
 
-		}
-		{
-			LayoutContent propertiesWidget = new LayoutContent(SharedResources.skin, layoutGrid);
+		LayoutRow layoutRow = new LayoutRow(SharedResources.skin, layoutGrid);
+		LayoutColumn layoutColumn = new LayoutColumn(SharedResources.skin, layoutGrid);
 
-			PropertyPanel propertyPanel = new PropertyPanel();
-			propertiesWidget.addContent(new DummyLayoutApp(SharedResources.skin, "Properties") {
-				@Override
-				public Actor getMainContent () {
-					return propertyPanel;
-				}
-			});
 
-			layoutGrid.addContent(propertiesWidget);
+		///row 1  -> column -> [hierarchy - scene - properties]
+		//row 2 -> assets
 
-		}
-		{
-			LayoutContent hierarchyView = new LayoutContent(SharedResources.skin, layoutGrid);
+		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, hierarchyApp), true);
+		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, sceneEditorWorkspaceApp), false);
+		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, propertyPanelApp), false);
 
-			HierarchyWidget hierarchyWidget = new HierarchyWidget();
-			hierarchyView.addContent(new DummyLayoutApp(SharedResources.skin, "Hierarchy") {
-				@Override
-				public Actor getMainContent () {
-					return hierarchyWidget;
-				}
-			});
+		layoutColumn.addRowContainer(layoutRow, true);
+		layoutColumn.addRowContainer(new LayoutContent(SharedResources.skin, layoutGrid, assetDirectoryApp), false);
 
-			layoutGrid.addContent(hierarchyView);
+		layoutGrid.addContent(layoutColumn);
 
-		}
 	}
-
 
 	public String getAbsolutePathToProjectFile () {
 		return projectFile.path();

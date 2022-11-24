@@ -16,8 +16,6 @@ public abstract class LayoutItem extends WidgetGroup {
 	protected final LayoutGrid grid;
 	protected final Skin skin;
 
-	private Drawable background;
-	private final Color randomColour;
 
 	private float relativeWidth;
 	private float relativeHeight;
@@ -25,16 +23,6 @@ public abstract class LayoutItem extends WidgetGroup {
 	public LayoutItem (Skin skin, LayoutGrid grid) {
 		this.skin = skin;
 		this.grid = grid;
-
-		randomColour = new Color(MathUtils.random(0.5f, 1f), MathUtils.random(0.5f, 1f), MathUtils.random(0.5f, 1f), 1f);
-	}
-
-	public Color getRandomColour () {
-		return randomColour;
-	}
-
-	public void setRandomColour (Color color) {
-		this.randomColour.set(color);
 	}
 
 	@Override

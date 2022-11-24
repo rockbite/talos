@@ -194,103 +194,14 @@ public class LayoutGrid extends WidgetGroup {
 		}
 
 		if (dragHitResult.root) {
-			//Target
-			switch (direction) {
-
-			case UP:
-			case DOWN: {
-
-				//Check if root is row, if its not wrap
-				if (root instanceof LayoutColumn) {
-					//Just add it to the column
-
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-					newLayoutContent.addContent(app);
-
-					((LayoutColumn)root).addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
-
-				} else {
-					LayoutItem oldRoot = root;
-					removeActor(oldRoot);
-
-					LayoutColumn newColumn = new LayoutColumn(skin, this);
-
-					newColumn.setRelativeWidth(1f);
-					newColumn.setRelativeHeight(1f);
-
-					oldRoot.setRelativeWidth(1f);
-					oldRoot.setRelativeHeight(1f);
-
-					newColumn.addRowContainer(oldRoot, true);
-
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-
-					registerDragTarget(newLayoutContent);
-
-					newLayoutContent.setRandomColour(parent.getRandomColour());
-					newLayoutContent.addContent(app);
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
-
-					newColumn.addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
-					addActor(newColumn);
-
-					root = newColumn;
-				}
-
-			}
-			break;
-
-			case RIGHT:
-			case LEFT: {
-
-				//Check if root is row, if its not wrap
-				if (root instanceof LayoutRow) {
-					//Just add it to the column
-
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-					newLayoutContent.addContent(app);
-
-					((LayoutRow)root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
-
-				} else {
-					LayoutItem oldRoot = root;
-					removeActor(oldRoot);
-
-					LayoutRow newLayoutRow = new LayoutRow(skin, this);
-
-					newLayoutRow.setRelativeWidth(1f);
-					newLayoutRow.setRelativeHeight(1f);
-
-					oldRoot.setRelativeWidth(1f);
-					oldRoot.setRelativeHeight(1f);
-
-					newLayoutRow.addColumnContainer(oldRoot, true);
-
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-
-					registerDragTarget(newLayoutContent);
-
-					newLayoutContent.setRandomColour(parent.getRandomColour());
-					newLayoutContent.addContent(app);
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
-
-					newLayoutRow.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
-					addActor(newLayoutRow);
-
-					root = newLayoutRow;
-				}
-			}
-
-			break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + direction);
-			}
-
-			return;
+			placeContentInRoot(direction, app);
+		} else {
+			placeContentRelative(target, direction, app);
 		}
 
+	}
+
+	public void placeContentRelative (LayoutContent target, LayoutDirection direction, LayoutApp app) {
 		//Target
 		switch (direction) {
 
@@ -320,7 +231,6 @@ public class LayoutGrid extends WidgetGroup {
 			}
 
 			LayoutContent newLayoutContent = new LayoutContent(skin, this);
-			newLayoutContent.setRandomColour(parent.getRandomColour());
 			registerDragTarget(newLayoutContent);
 			newLayoutContent.addContent(app);
 			colTarget.addRowContainer(newLayoutContent, direction == LayoutDirection.UP, isExistingColumn ? target : null);
@@ -353,7 +263,6 @@ public class LayoutGrid extends WidgetGroup {
 			}
 
 			LayoutContent newLayoutContent = new LayoutContent(skin, this);
-			newLayoutContent.setRandomColour(parent.getRandomColour());
 			registerDragTarget(newLayoutContent);
 			newLayoutContent.addContent(app);
 			rowTarget.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT, isExistingRow ? target : null);
@@ -369,7 +278,100 @@ public class LayoutGrid extends WidgetGroup {
 		default:
 			throw new IllegalStateException("Unexpected value: " + direction);
 		}
+	}
 
+	public void placeContentInRoot (LayoutDirection direction, LayoutApp app) {
+		//Target
+		switch (direction) {
+
+		case UP:
+		case DOWN: {
+
+			//Check if root is row, if its not wrap
+			if (root instanceof LayoutColumn) {
+				//Just add it to the column
+
+				LayoutContent newLayoutContent = new LayoutContent(skin, this);
+				newLayoutContent.addContent(app);
+
+				((LayoutColumn)root).addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
+
+			} else {
+				LayoutItem oldRoot = root;
+				removeActor(oldRoot);
+
+				LayoutColumn newColumn = new LayoutColumn(skin, this);
+
+				newColumn.setRelativeWidth(1f);
+				newColumn.setRelativeHeight(1f);
+
+				oldRoot.setRelativeWidth(1f);
+				oldRoot.setRelativeHeight(1f);
+
+				newColumn.addRowContainer(oldRoot, true);
+
+				LayoutContent newLayoutContent = new LayoutContent(skin, this);
+
+				registerDragTarget(newLayoutContent);
+
+				newLayoutContent.addContent(app);
+				newLayoutContent.setRelativeWidth(1f);
+				newLayoutContent.setRelativeHeight(1f);
+
+				newColumn.addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
+				addActor(newColumn);
+
+				root = newColumn;
+			}
+
+		}
+		break;
+
+		case RIGHT:
+		case LEFT: {
+
+			//Check if root is row, if its not wrap
+			if (root instanceof LayoutRow) {
+				//Just add it to the column
+
+				LayoutContent newLayoutContent = new LayoutContent(skin, this);
+				newLayoutContent.addContent(app);
+
+				((LayoutRow)root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
+
+			} else {
+				LayoutItem oldRoot = root;
+				removeActor(oldRoot);
+
+				LayoutRow newLayoutRow = new LayoutRow(skin, this);
+
+				newLayoutRow.setRelativeWidth(1f);
+				newLayoutRow.setRelativeHeight(1f);
+
+				oldRoot.setRelativeWidth(1f);
+				oldRoot.setRelativeHeight(1f);
+
+				newLayoutRow.addColumnContainer(oldRoot, true);
+
+				LayoutContent newLayoutContent = new LayoutContent(skin, this);
+
+				registerDragTarget(newLayoutContent);
+
+				newLayoutContent.addContent(app);
+				newLayoutContent.setRelativeWidth(1f);
+				newLayoutContent.setRelativeHeight(1f);
+
+				newLayoutRow.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
+				addActor(newLayoutRow);
+
+				root = newLayoutRow;
+			}
+		}
+
+		break;
+		default:
+			throw new IllegalStateException("Unexpected value: " + direction);
+		}
 	}
 
 	private void exchangeAndWrapToColumn (LayoutColumn newColumn, LayoutContent target) {
@@ -413,7 +415,6 @@ public class LayoutGrid extends WidgetGroup {
 				DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
 				LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
-				dummy.setRandomColour(parent.getRandomColour());
 				dummy.setSize(200, 200);
 
 				dummy.addContent(layoutApp, true);

@@ -17,6 +17,11 @@ public class LayoutContent extends LayoutItem {
 	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
 
+	public LayoutContent (Skin skin, LayoutGrid layoutGrid, LayoutApp app) {
+		this(skin, layoutGrid);
+		addContent(app);
+	}
+
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
 
