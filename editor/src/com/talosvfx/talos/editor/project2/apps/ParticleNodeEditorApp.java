@@ -177,16 +177,9 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
-
 		loadProject(gameAsset.getResource());
 
-		GridRendererWrapper gridRendererWrapper = new GridRendererWrapper(SharedResources.stage);
-
-//		Table table = new Table();
-
-//		table.addActor(gridRendererWrapper);
 		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
-//		table.addActor(moduleGraphUIWrapper);
 
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
 			@Override
