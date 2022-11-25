@@ -26,11 +26,9 @@ public class ProjectController {
 
     private SnapshotTracker snapshotTracker;
 
-    public static TalosProject TLS = new TalosProject();
     private boolean lastDirTracking = true;
 
     public ProjectController() {
-        currentProject = TLS;
 
         snapshotTracker = new SnapshotTracker();
     }
@@ -248,11 +246,6 @@ public class ProjectController {
         projectFileName = fileName;
         currentTab = tab;
         currentProject = currentTab.getProjectType();
-        if (tab.getProjectType() == TLS) {
-            TalosMain.Instance().UIStage().swapToTalosContent();
-        } else {
-            currentProject.initUIContent();
-        }
     }
 
     public void removeTab(FileTab tab) {
@@ -270,9 +263,6 @@ public class ProjectController {
 
     public void setProject(IProject project) {
         currentProject = project;
-        if(project.equals(TLS)) {
-            TalosMain.Instance().UIStage().swapToTalosContent();
-        }
     }
 
     public IProject getProject() {

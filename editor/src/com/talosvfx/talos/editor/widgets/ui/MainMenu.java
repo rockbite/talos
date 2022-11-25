@@ -116,7 +116,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.deleteSelectedWrappers();
+//                TalosMain.Instance().NodeStage().moduleBoardWidget.deleteSelectedWrappers();
             }
         });
 
@@ -124,7 +124,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupFromSelectedWrappers();
+//                TalosMain.Instance().NodeStage().moduleBoardWidget.createGroupFromSelectedWrappers();
             }
         });
 
@@ -132,7 +132,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.ungroupSelectedWrappers();
+//                TalosMain.Instance().NodeStage().moduleBoardWidget.ungroupSelectedWrappers();
             }
         });
 
@@ -224,7 +224,7 @@ public class MainMenu extends Table {
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.N && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     if(!newProject.isDisabled()) {
-                        TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+//                        TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
                     }
                 }
                 if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
@@ -285,7 +285,7 @@ public class MainMenu extends Table {
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
                     if(handle.extension().equals("tls")) {
-                        TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+//                        TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
                         TalosMain.Instance().ProjectController().loadProject(handle);
                     } else {
 //                        TalosMain.Instance().Addons().projectFileDrop(handle);

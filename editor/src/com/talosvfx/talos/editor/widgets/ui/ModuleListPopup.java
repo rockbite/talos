@@ -31,9 +31,13 @@ import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModuleListPopup extends VisWindow {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ModuleListPopup.class);
 
     private InputListener stageListener;
     FilteredTree<String> tree;
@@ -97,7 +101,11 @@ public class ModuleListPopup extends VisWindow {
                     try {
                         Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
-                            TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
+
+
+
+                            logger.info("Creat emodule impl redo");
+//                            TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
@@ -165,7 +173,6 @@ public class ModuleListPopup extends VisWindow {
 
     @Override
     public boolean remove () {
-        TalosMain.Instance().NodeStage().moduleBoardWidget.clearCC();
         if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
     }

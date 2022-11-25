@@ -50,8 +50,6 @@ public class ParticleComponent extends RendererComponent implements GameResource
             public void clicked(ButtonPropertyWidget<String> widget) {
                 //Edit this tls
                 RawAsset rootRawAsset = getGameResource().getRootRawAsset();
-                TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-                TalosMain.Instance().ProjectController().loadProject(rootRawAsset.handle);
             }
         }, new Supplier<String>() {
             @Override

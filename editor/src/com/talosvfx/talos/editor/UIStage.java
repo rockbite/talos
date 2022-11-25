@@ -217,7 +217,7 @@ public class UIStage {
 			public void removedTab(Tab tab) {
 				TalosMain.Instance().ProjectController().removeTab((FileTab) tab);
 				if(tabbedPane.getTabs().size == 0) {
-					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+//					TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 				}
 			}
 
@@ -229,8 +229,10 @@ public class UIStage {
 	}
 
 	public PopupMenu createModuleListPopup() {
-		OrthographicCamera cam = (OrthographicCamera) TalosMain.Instance().NodeStage().getStage().getCamera();
-		Vector2 location = new Vector2(cam.position.x, cam.position.y);
+//		OrthographicCamera cam = (OrthographicCamera) TalosMain.Instance().NodeStage().getStage().getCamera();
+//		Vector2 location = new Vector2(cam.position.x, cam.position.y);
+
+		Vector2 location = new Vector2();
 
 		PopupMenu menu = new PopupMenu();
 		Array<Class> temp = new Array<>();
@@ -252,7 +254,7 @@ public class UIStage {
 			menuItem.addListener(new ClickListener() {
 				@Override
 				public void clicked (InputEvent event, float x, float y) {
-					TalosMain.Instance().NodeStage().moduleBoardWidget.createModule( clazz, finalLocation.x, finalLocation.y);
+//					TalosMain.Instance().NodeStage().moduleBoardWidget.createModule( clazz, finalLocation.x, finalLocation.y);
 				}
 			});
 		}
@@ -266,7 +268,7 @@ public class UIStage {
 
 
 	public void newProjectAction() {
-		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
+//		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 	public void openProjectAction(final IProject projectType) {
@@ -274,7 +276,7 @@ public class UIStage {
 	}
 
 	public void openProjectAction() {
-		openProjectAction(ProjectController.TLS);
+//		openProjectAction(ProjectController.TLS);
 	}
 
 	public void saveProjectAction() {
@@ -496,7 +498,7 @@ public class UIStage {
 					super.clicked(event, x, y);
 					//openProject(fileName);
 					TalosMain.Instance().ProjectController().lastDirTrackingDisable();
-					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
+//					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
 					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
 					TalosMain.Instance().ProjectController().lastDirTrackingEnable();
 					TalosMain.Instance().ProjectController().unbindFromFile();

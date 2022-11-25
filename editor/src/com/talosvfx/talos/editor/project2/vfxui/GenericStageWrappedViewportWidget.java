@@ -1,0 +1,83 @@
+package com.talosvfx.talos.editor.project2.vfxui;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
+import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+
+public class GenericStageWrappedViewportWidget extends ViewportWidget {
+
+	private final Stage stage;
+
+	public GenericStageWrappedViewportWidget (Actor actor) {
+		super();
+
+
+		stage = new Stage(new ScreenViewport(camera));
+
+		stage.addActor(actor);
+
+		setWorldSize(1000);
+
+	}
+
+	@Override
+	public void act (float delta) {
+		super.act(delta);
+
+		Vector2 temp = new Vector2();
+		temp.set(getX(), getY());
+		localToScreenCoordinates(temp);
+		float x1 = temp.x;
+		float y1 = Gdx.graphics.getHeight() - temp.y;
+
+		temp.set(getX() + getWidth(), getY() + getHeight());
+		localToScreenCoordinates(temp);
+		float x2 = temp.x;
+		float y2 = Gdx.graphics.getHeight() - temp.y;
+
+		int screenWidth = (int)(x2 - x1);
+		int screenHeight = (int)(y2 - y1);
+		stage.getViewport().setScreenBounds((int)x1, (int)y1, screenWidth, screenHeight);
+ 		stage.act();
+
+	}
+
+	@Override
+	public void drawContent (PolygonBatch batch, float parentAlpha) {
+
+		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+		((DynamicGridPropertyProvider)gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+		gridPropertyProvider.update(camera, parentAlpha);
+		gridRenderer.drawGrid(batch, shapeRenderer);
+
+		Array<Rectangle> stack = new Array<>();
+		while (ScissorStack.peekScissors() != null) {
+			stack.add(ScissorStack.popScissors());
+		}
+
+		batch.end();
+		stage.draw();
+ 		batch.begin();
+
+		int idx = stack.size - 1;
+		while (idx >= 0) {
+			ScissorStack.pushScissors(stack.get(idx));
+			idx--;
+		}
+	}
+
+	@Override
+	public void initializeGridPropertyProvider () {
+		gridPropertyProvider = new DynamicGridPropertyProvider();
+		gridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
+	}
+}

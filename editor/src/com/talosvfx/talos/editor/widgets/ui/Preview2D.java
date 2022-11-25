@@ -104,8 +104,8 @@ public class Preview2D extends PreviewWidget {
                 pos.set(tmp.x, tmp.y, 0);
 
                 if(moving) {
-                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-                    particleEffect.setPosition(tmp.x, tmp.y, particleEffect.getPosition().z);
+//                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//                    particleEffect.setPosition(tmp.x, tmp.y, particleEffect.getPosition().z);
                 } else {
                     getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
                     getWorldFromLocal(tmp2.set(x, y, 0));
@@ -214,8 +214,8 @@ public class Preview2D extends PreviewWidget {
 
         long timeBefore = TimeUtils.nanoTime();
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        particleEffect.render(particleRenderer);
+//        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//        particleEffect.render(particleRenderer);
 
         batch.flush();
         renderTime.put(TimeUtils.timeSinceNanos(timeBefore));

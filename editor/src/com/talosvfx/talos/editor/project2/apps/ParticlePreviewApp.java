@@ -5,12 +5,13 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.widgets.ui.Preview3D;
 import com.talosvfx.talos.editor.widgets.ui.PreviewImageControllerWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
-public class ParticlePreviewApp extends AppManager.BaseApp<ParticleEffectDescriptor> {
+public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 
 
 	private Preview3D preview3D;
@@ -22,7 +23,7 @@ public class ParticlePreviewApp extends AppManager.BaseApp<ParticleEffectDescrip
 	}
 
 	@Override
-	public void updateForGameAsset (GameAsset<ParticleEffectDescriptor> gameAsset) {
+	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
 		preview3D.setParticleEffect(gameAsset.getResource());

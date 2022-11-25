@@ -58,11 +58,11 @@ public class MetaData implements Json.Serializable {
         json.writeValue("gridSize", TalosMain.Instance().UIStage().PreviewWidget().getGridSize());
 
         // particle position
-        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        if(particleEffect != null) {
-            json.writeValue("particlePositionX", particleEffect.getPosition().x);
-            json.writeValue("particlePositionY", particleEffect.getPosition().y);
-        }
+//        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//        if(particleEffect != null) {
+//            json.writeValue("particlePositionX", particleEffect.getPosition().x);
+//            json.writeValue("particlePositionY", particleEffect.getPosition().y);
+//        }
 
         final ObjectMap<FileHandle, FileTracker.FileEntry> currentTabFiles = TalosMain.Instance().FileTracker().getCurrentTabFiles();
 
@@ -107,13 +107,13 @@ public class MetaData implements Json.Serializable {
         TalosMain.Instance().UIStage().PreviewWidget().setCameraZoom(jsonData.getFloat("previewCamZoom", 1.4285715f));
 
         // particle position
-        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        if(particleEffect != null) {
-            float pPosX = jsonData.getFloat("particlePositionX", 0);
-            float pPosY = jsonData.getFloat("particlePositionY", 0);
-            float pPosZ = jsonData.getFloat("particlePositionZ", 0);
-            particleEffect.setPosition(pPosX, pPosY, pPosZ);
-        }
+//        ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//        if(particleEffect != null) {
+//            float pPosX = jsonData.getFloat("particlePositionX", 0);
+//            float pPosY = jsonData.getFloat("particlePositionY", 0);
+//            float pPosZ = jsonData.getFloat("particlePositionZ", 0);
+//            particleEffect.setPosition(pPosX, pPosY, pPosZ);
+//        }
 
         JsonValue resourcePaths = jsonData.get("resourcePaths");
         if (resourcePaths != null) {

@@ -22,15 +22,34 @@ import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ProjectData {
+import java.util.function.Supplier;
+
+public class VFXProjectData {
 
 	public MetaData metaData = new MetaData();
 
 	private Array<EmitterData> emitters = new Array<>();
 
-	public ProjectData () {
+	@Getter
+	private transient VFXEditorState editorState = new VFXEditorState();
+
+	@Getter
+	private transient Supplier<ParticleEffectDescriptor> descriptorSupplier = new Supplier<ParticleEffectDescriptor>() {
+		@Override
+		public ParticleEffectDescriptor get () {
+			return descriptor;
+		}
+	};
+
+	@Setter
+	private transient ParticleEffectDescriptor descriptor;
+
+	public VFXProjectData () {
 
 	}
 

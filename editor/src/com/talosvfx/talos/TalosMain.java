@@ -23,14 +23,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
-import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.socket.SocketServer;
@@ -50,7 +48,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private UIStage uiStage;
 
-	private NodeStage nodeStage;
 
 	private WorkplaceStage currentWorkplaceStage;
 
@@ -75,19 +72,11 @@ public class TalosMain extends ApplicationAdapter {
 
 	public ErrorReporting errorReporting;
 
-	public NodeStage NodeStage () {
-		return nodeStage;
-	}
-
 	private Preferences preferences;
 
 	private FileTracker fileTracker = new FileTracker();
 
 	private InputMultiplexer inputMultiplexer;
-
-	public TalosProject TalosProject() {
-		return ProjectController.TLS;
-	}
 
 	public IProject Project() {
 		return projectController.getProject();
@@ -142,8 +131,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		errorReporting = new ErrorReporting();
 
-		nodeStage = new NodeStage(skin);
-		currentWorkplaceStage = nodeStage;
 
 		projectController = new ProjectController();
 
@@ -154,13 +141,11 @@ public class TalosMain extends ApplicationAdapter {
 		setInputProcessors();
 
 		uiStage.init();
-		nodeStage.init();
 
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
 		// final init after all is done
-		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 	private void setInputProcessors() {
@@ -218,7 +203,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	public void disableNodeStage() {
 		currentWorkplaceStage = null;
-		inputProcessors.removeValue(nodeStage.getStage(), true);
 	}
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
@@ -230,7 +214,6 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public void enableNodeStage() {
-		currentWorkplaceStage = nodeStage;
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
 		inputProcessors.add(currentWorkplaceStage.getStage());

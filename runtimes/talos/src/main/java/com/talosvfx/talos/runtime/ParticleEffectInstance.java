@@ -60,7 +60,7 @@ public class ParticleEffectInstance {
 		return paused;
 	}
 
-	public class EmitterComparator implements Comparator<IEmitter> {
+	public static class EmitterComparator implements Comparator<IEmitter> {
 
 		@Override
 		public int compare(IEmitter o1, IEmitter o2) {

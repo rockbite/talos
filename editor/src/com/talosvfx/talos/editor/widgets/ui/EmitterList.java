@@ -39,7 +39,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onToggleLoop (boolean loopEnabled) {
-                TalosMain.Instance().TalosProject().getParticleEffect().loopable = loopEnabled;
+//                TalosMain.Instance().TalosProject().getParticleEffect().loopable = loopEnabled;
             }
 
             @Override
@@ -56,15 +56,15 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             protected void onItemVisibilityChange (Object identifier, boolean isVisible) {
                 ParticleEmitterWrapper wrapper = (ParticleEmitterWrapper) identifier;
                 wrapper.isMuted = !isVisible;
-                TalosMain.Instance().TalosProject().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(isVisible);
+//                TalosMain.Instance().TalosProject().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(isVisible);
             }
 
             @Override
             protected void onItemSelect(Object identifier) {
                 ParticleEmitterWrapper selected = (ParticleEmitterWrapper) identifier;
 
-                TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(selected);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(selected);
+//                TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(selected);
+//                TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(selected);
             }
 
             @Override
@@ -76,7 +76,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onSkipToStartClicked () {
-                TalosMain.Instance().TalosProject().getParticleEffect().restart();
+//                TalosMain.Instance().TalosProject().getParticleEffect().restart();
                 getActionWidget().getPlayButton().setChecked(true);
             }
 
@@ -85,9 +85,9 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 boolean play = getActionWidget().getPlayButton().isChecked();
 
                 if(play) {
-                    TalosMain.Instance().TalosProject().getParticleEffect().resume();
+//                    TalosMain.Instance().TalosProject().getParticleEffect().resume();
                 } else {
-                    TalosMain.Instance().TalosProject().getParticleEffect().pause();
+//                    TalosMain.Instance().TalosProject().getParticleEffect().pause();
                 }
 
             }
@@ -103,16 +103,16 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 }
 
                 for(ParticleEmitterWrapper wrapper: selector) {
-                    TalosMain.Instance().TalosProject().removeEmitter(wrapper);
+//                    TalosMain.Instance().TalosProject().removeEmitter(wrapper);
                 }
                 
                 removeItems(selector);
 
-                Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-                if(activeWrappers.size == 0) {
-                    // we need to create default one
-                    TalosMain.Instance().TalosProject().resetToNew();
-                }
+//                Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+//                if(activeWrappers.size == 0) {
+//                     we need to create default one
+//                    TalosMain.Instance().TalosProject().resetToNew();
+//                }
             }
         });
     }
@@ -123,11 +123,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         if(selectedItem != null) {
             float sortPosition = selectedItem.getEmitter().getSortPosition() + moveBy;
             selectedItem.setPosition(sortPosition);
-            TalosMain.Instance().TalosProject().sortEmitters();
+//            TalosMain.Instance().TalosProject().sortEmitters();
 
-            Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-            //activeWrappers.reverse();
-            setData(activeWrappers);
+//            Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+//            activeWrappers.reverse();
+//            setData(activeWrappers);
             setSelected(selectedItem);
         }
     }
@@ -140,14 +140,14 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             sortPosition = selectedItem.getEmitter().getSortPosition() + 0.5f;
         }
 
-        final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", sortPosition);
-        Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-
-        // update all items
-        //activeWrappers.reverse();
-        setData(activeWrappers);
-
-        setSelected(emitter);
+//        final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", sortPosition);
+//        Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+//
+//         update all items
+//        activeWrappers.reverse();
+//        setData(activeWrappers);
+//
+//        setSelected(emitter);
     }
 
     @Override
@@ -160,8 +160,8 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             setData(emitterWrappers);
             setSelected(emitterWrappers.first());
 
-            TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(emitterWrappers.first());
-            TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrappers.first());
+//            TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(emitterWrappers.first());
+//            TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrappers.first());
         }
     }
 
@@ -169,12 +169,12 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public void act (float delta) {
         super.act(delta);
 
-        float totalTime = TalosMain.Instance().TalosProject().getParticleEffect().getTotalTime();
-        float duration = TalosMain.Instance().TalosProject().estimateTotalEffectDuration();
-
-        float time = totalTime % duration;
-
-        setTimeCursor(time);
+//        float totalTime = TalosMain.Instance().TalosProject().getParticleEffect().getTotalTime();
+//        float duration = TalosMain.Instance().TalosProject().estimateTotalEffectDuration();
+//
+//        float time = totalTime % duration;
+//
+//        setTimeCursor(time);
     }
 
     public void setPaused (boolean paused) {

@@ -19,9 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import lombok.Getter;
 
 import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;

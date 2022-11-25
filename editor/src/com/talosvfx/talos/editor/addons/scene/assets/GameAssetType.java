@@ -15,7 +15,7 @@ public enum GameAssetType {
 	SKELETON(new String[]{"skeleton", "skel", "skele"}, true),
 	SOUND(new String[]{"mp3", "ogg", "m4a", "wav"}, true),
 	VFX(new String[]{"tls"}, true),
-	VFX_OUTPUT(new String[]{"p"}, false),
+	VFX_OUTPUT(new String[]{"p"}, true),
 	SCRIPT(new String[]{"ts", "js"}, true),
 	TWEEN(new String[]{"tw"}, true),
 	PREFAB(new String[]{"prefab"}, true),

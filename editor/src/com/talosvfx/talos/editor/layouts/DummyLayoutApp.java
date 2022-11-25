@@ -10,9 +10,13 @@ import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 
+import java.util.UUID;
+
 public class DummyLayoutApp implements LayoutApp {
 
 	private String tabName;
+
+	private String uuid;
 
 	private transient Table tabWidget;
 	private transient Actor mainContent;
@@ -22,6 +26,7 @@ public class DummyLayoutApp implements LayoutApp {
 	public DummyLayoutApp (Skin skin, String tabName) {
 		this.tabName = tabName;
 		build(skin);
+		uuid = UUID.randomUUID().toString();
 	}
 
 	public void build (Skin skin) {
@@ -75,7 +80,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	@Override
 	public String getUniqueIdentifier () {
-		return tabName;
+		return uuid;
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
@@ -32,21 +33,26 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
-import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
 import com.talosvfx.talos.runtime.*;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ModuleBoardWidget extends WidgetGroup {
+
+    private static Logger logger = LoggerFactory.getLogger(ModuleBoardWidget.class);
     ShapeRenderer shapeRenderer;
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
     public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
     private ParticleEmitterWrapper currentEmitterWrapper;
+    private ParticleEmitterDescriptor currentEmitterGraph;
     private ObjectSet<ModuleWrapper> selectedWrappers = new ObjectSet<>();
 
     private ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapperGroup>> groups = new ObjectMap<>();
@@ -68,16 +74,15 @@ public class ModuleBoardWidget extends WidgetGroup {
     private ModuleWrapper wasWrapperSelectedOnDown = null;
     private ModuleWrapper wasWrapperDragged = null;
 
-
-    private NodeStage mainStage;
     private ModuleWrapper ccFromWrapper = null;
     private int ccFromSlot = 0;
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
 
-    public ModuleBoardWidget(NodeStage mainStage) {
+    public ModuleBoardWidget() {
         super();
-        this.mainStage = mainStage;
+
+        setTouchable(Touchable.enabled);
 
         curvePoints[0] = new Vector2();
         curvePoints[1] = new Vector2();
@@ -141,14 +146,15 @@ public class ModuleBoardWidget extends WidgetGroup {
         connection.fromModule.setSlotInactive(connection.fromSlot, false);
         connection.toModule.setSlotInactive(connection.toSlot, true);
 
-        mainStage.getCurrentModuleGraph().removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
-        mainStage.getCurrentModuleGraph().removeNode(connection.toModule.getModule(), connection.toSlot, true);
+        currentEmitterGraph.removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
+        currentEmitterGraph.removeNode(connection.toModule.getModule(), connection.toSlot, true);
 
-        TalosMain.Instance().ProjectController().setDirty();
+//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void setCurrentEmitter(ParticleEmitterWrapper currentEmitterWrapper) {
         this.currentEmitterWrapper = currentEmitterWrapper;
+        this.currentEmitterGraph = currentEmitterWrapper.getGraph();
 
         groupContainer.clearChildren();
         moduleContainer.clearChildren();
@@ -287,8 +293,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         Array<ModuleWrapperGroup> groups = getSelectedGroups();
 
         ClipboardPayload payload = new ClipboardPayload(wrappers, connections, groups);
-        Vector3 camPos = TalosMain.Instance().NodeStage().getStage().getCamera().position;
-        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+
+        logger.info("copy select todo");
+//        Vector3 camPos = TalosMain.Instance().NodeStage().getStage().getCamera().position;
+//        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
 
         Json json = new Json();
         String clipboard = json.toJson(payload);
@@ -311,8 +319,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         try {
             ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
 
-            Vector3 camPosAtPaste = TalosMain.Instance().NodeStage().getStage().getCamera().position;
-            Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+            logger.info("Copy paste todo");
+//            Vector3 camPosAtPaste = TalosMain.Instance().NodeStage().getStage().getCamera().position;
+//            Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+            Vector2 offset = new Vector2(0, 0);
             offset.sub(payload.cameraPositionAtCopy);
 
             ObjectSet<ModuleWrapper> wrappers = payload.wrappers;
@@ -410,7 +420,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void showPopup() {
-        ParticleEmitterDescriptor moduleGraph = getModuleGraph();
+        ParticleEmitterDescriptor moduleGraph = getCurrentEmitterGraph();
 
         if(moduleGraph == null) return;
 
@@ -442,7 +452,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 removeConnection(getCurrentConnections().get(i));
             }
         }
-        mainStage.getCurrentModuleGraph().removeModule(wrapper.getModule());
+        currentEmitterGraph.removeModule(wrapper.getModule());
         moduleContainer.removeActor(wrapper);
         for(ModuleWrapperGroup group: getGroups()) {
             group.removeWrapper(wrapper);
@@ -457,12 +467,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         try {
             module = ClassReflection.newInstance(clazz);
 
-            if (TalosMain.Instance().TalosProject().getCurrentModuleGraph().addModule(module)) {
+            if (currentEmitterGraph.addModule(module)) {
                 final U moduleWrapper = createModuleWrapper(module, x, y);
                 moduleWrapper.setModuleToDefaults();
-                module.setModuleGraph(TalosMain.Instance().TalosProject().getCurrentModuleGraph());
+                module.setModuleGraph(currentEmitterGraph);
 
-                TalosMain.Instance().ProjectController().setDirty();
+//                TalosMain.Instance().ProjectController().setDirty();
 
                 return (U)moduleWrapper;
             } else {
@@ -626,14 +636,14 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void act(float delta) {
 
         //center pos
-        tmp.x = gridPos.x+getStage().getWidth()/2f;
-        tmp.y = gridPos.y+getStage().getHeight()/2f;
+//        tmp.x = gridPos.x+getStage().getWidth()/2f;
+//        tmp.y = gridPos.y+getStage().getHeight()/2f;
 
         // now we need to figure out how to project that pos from stage to this widget
-        this.stageToLocalCoordinates(tmp);
+//        this.stageToLocalCoordinates(tmp);
 
-        groupContainer.setPosition(tmp.x, tmp.y);
-        moduleContainer.setPosition(tmp.x, tmp.y);
+//        groupContainer.setPosition(tmp.x, tmp.y);
+//        moduleContainer.setPosition(tmp.x, tmp.y);
 
         super.act(delta);
     }
@@ -643,8 +653,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         super.layout();
     }
 
-    public ParticleEmitterDescriptor getModuleGraph() {
-        return mainStage.getCurrentModuleGraph();
+
+    @Deprecated
+    public ParticleEmitterDescriptor getCurrentEmitterGraph () {
+        return currentEmitterGraph;
     }
 
     public void setActiveCurve(float x, float y, float toX, float toY, boolean isInput) {
@@ -671,13 +683,12 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public void makeConnection(ModuleWrapper from, ModuleWrapper to, int slotFrom, int slotTo) {
-        mainStage.getCurrentModuleGraph().connectNode(from.getModule(), to.getModule(), slotFrom, slotTo);
+        currentEmitterGraph.connectNode(from.getModule(), to.getModule(), slotFrom, slotTo);
         addConnectionCurve(from, to, slotFrom, slotTo);
 
         from.attachModuleToMyOutput(to, slotFrom, slotTo);
         to.attachModuleToMyInput(from, slotTo, slotFrom);
 
-        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void connectNodeIfCan(ModuleWrapper currentWrapper, int currentSlot, boolean currentIsInput) {
@@ -828,7 +839,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void wrapperClickedUp(ModuleWrapper wrapper) {
 
         if(wasWrapperDragged != null) {
-            TalosMain.Instance().ProjectController().setDirty();
+//            TalosMain.Instance().ProjectController().setDirty();
         } else {
             // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
             if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -850,13 +861,13 @@ public class ModuleBoardWidget extends WidgetGroup {
             other.removeWrappers(wrappers);
         }
 
-        ModuleWrapperGroup group = new ModuleWrapperGroup(mainStage.getSkin());
+        ModuleWrapperGroup group = new ModuleWrapperGroup(SharedResources.skin);
+        group.setModuleBoardReference(this);
         group.setWrappers(wrappers);
         getGroups().add(group);
 
         groupContainer.addActor(group);
 
-        TalosMain.Instance().ProjectController().setDirty();
 
         clearSelection();
 
@@ -909,7 +920,8 @@ public class ModuleBoardWidget extends WidgetGroup {
             tmp.add(moduleContainer.getX(), moduleContainer.getY());
             localToStageCoordinates(tmp);
 
-            TalosMain.Instance().NodeStage().getCamera().position.set(tmp.x, tmp.y, 0);
+            logger.info("Set position in reset");
+//            TalosMain.Instance().NodeStage().getCamera().position.set(tmp.x, tmp.y, 0);
         }
     }
 

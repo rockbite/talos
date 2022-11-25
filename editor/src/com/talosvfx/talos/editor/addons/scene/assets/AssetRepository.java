@@ -20,15 +20,12 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
@@ -42,6 +39,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
+import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
@@ -62,8 +61,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.talosvfx.talos.editor.project.TalosProject.exportTLSDataToP;
-import static com.talosvfx.talos.editor.serialization.ProjectSerializer.writeTalosPExport;
+import static com.talosvfx.talos.editor.serialization.VFXProjectSerializer.readTalosTLSProject;
+import static com.talosvfx.talos.editor.serialization.VFXProjectSerializer.writeTalosPExport;
 
 public class AssetRepository implements Observer {
 
@@ -227,6 +226,7 @@ public class AssetRepository implements Observer {
 		checkGameAssetCreation(GameAssetType.SKELETON);
 
 		checkGameAssetCreation(GameAssetType.VFX);
+		checkGameAssetCreation(GameAssetType.VFX_OUTPUT);
 		checkGameAssetCreation(GameAssetType.PREFAB);
 		checkGameAssetCreation(GameAssetType.SCENE);
 
@@ -644,7 +644,7 @@ public class AssetRepository implements Observer {
 				break;
 			case SOUND:
 				break;
-			case VFX:
+			case VFX_OUTPUT:
 
 				GameAsset<ParticleEffectDescriptor> particleEffectDescriptorGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 
@@ -678,18 +678,7 @@ public class AssetRepository implements Observer {
 					}
 				});
 
-				//We need to find the asset that is linked to
-				//P should be same directory, lets find it
-
-				FileHandle pFile = value.handle.parent().child(value.handle.nameWithoutExtension() + ".p");
-				if (!pFile.exists()) {
-					updateVFXTLS(value, true);
-					if (!pFile.exists()) {
-						throw new GdxRuntimeException("No p file for tls " + value.handle.path() + " " + pFile.path());
-					}
-				}
-
-				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(pFile);
+				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
 
 				try {
 					particleEffectDescriptor.load(rawAssetPFile.handle);
@@ -706,7 +695,27 @@ public class AssetRepository implements Observer {
 				}
 
 				break;
-			case VFX_OUTPUT:
+			case VFX:
+
+				GameAsset<VFXProjectData> vfxProjectDataGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+
+				gameAssetOut = vfxProjectDataGameAsset;
+
+				if (createLinks) {
+					vfxProjectDataGameAsset.dependentRawAssets.add(value);
+				}
+
+				VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
+
+				RawAsset rawAssetTLSFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
+
+				vfxProjectDataGameAsset.setResourcePayload(projectData);
+
+				if (createLinks) {
+					value.gameAssetReferences.add(vfxProjectDataGameAsset);
+					vfxProjectDataGameAsset.dependentRawAssets.add(rawAssetTLSFile);
+				}
+
 				break;
 			case SCRIPT:
 
@@ -842,15 +851,15 @@ public class AssetRepository implements Observer {
 	}
 
 	public void updateVFXTLS (RawAsset tlsRawAsset, boolean checkGameResources) {
-		if (checkGameResources) {
-			ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
-			String exportDataJson = writeTalosPExport(exportData);
-
-			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
-			exportedPFile.writeString(exportDataJson, false);
-
-			rawAssetCreated(exportedPFile, checkGameResources);
-		}
+//		if (checkGameResources) {
+//			ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
+//			String exportDataJson = writeTalosPExport(exportData);
+//
+//			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
+//			exportedPFile.writeString(exportDataJson, false);
+//
+//			rawAssetCreated(exportedPFile, checkGameResources);
+//		}
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
@@ -859,9 +868,9 @@ public class AssetRepository implements Observer {
 
 			RawAsset rawAsset = new RawAsset(fileHandle);
 
-			if (assetTypeFromExtension == GameAssetType.VFX) {
-				updateVFXTLS(rawAsset, checkGameResources);
-			}
+//			if (assetTypeFromExtension == GameAssetType.VFX) {
+////				updateVFXTLS(rawAsset, checkGameResources);
+//			}
 
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
 			if (metadataHandleFor.exists()) {

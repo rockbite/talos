@@ -490,12 +490,12 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
-				float currWidth = camera.viewportWidth * camera.zoom;
-				float nextWidth = currWidth * (1f + amountY * 0.1f);
-				float nextZoom = nextWidth / camera.viewportWidth;
-				camera.zoom = nextZoom;
-
+//				float currWidth = camera.viewportWidth * camera.zoom;
+//				float nextWidth = currWidth * (1f + amountY * 0.1f);
+//				float nextZoom = nextWidth / camera.viewportWidth;
+				camera.zoom += amountY;
 				camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
+
 				camera.update();
 
 				return true;
@@ -503,6 +503,7 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				getStage().setScrollFocus(ViewportWidget.this);
 				canPan = canMoveAround();
 				cameraController.touchDown((int)x, (int)y, pointer, button);
 				return !event.isHandled();
