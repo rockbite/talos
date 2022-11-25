@@ -192,5 +192,33 @@
             <container name="container"></container>
             <value port="output" name="output" type="fluid">output</value>
         </module>
+        <module name = "StoreMemoryNode" title = "Store Memory" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="start" type="signal">start</value>
+            <inputText name="name" default="varname">name</inputText>
+            <value port="input" name="input" type="float">input</value>
+            <value port="output" name="next" type="signal">next</value>
+        </module>
+        <module name = "GetMemoryNode" title = "Get Memory" keywords = "" class = "RoutineNodeWidget">
+            <inputText name="name" default="varname">name</inputText>
+            <value port="output" name="value" type="fluid">value</value>
+        </module>
+        <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
+            <dynamicValue name="value" type="float" default="0">value: </dynamicValue>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "RectangleNode" title = "Rectangle" keywords = "" class = "RoutineNodeWidget">
+            <group>
+                <value port="input" name="center" type="vec2">center</value>
+                <value port="input" name="size" type="vec2">size</value>
+            </group>
+            <group>
+                <value port="output" name="left" type="float">left</value>
+                <value port="output" name="right" type="float">right</value>
+            </group>
+            <group>
+                <value port="output" name="bottom" type="float">bottom</value>
+                <value port="output" name="top" type="float">top</value>
+            </group>
+        </module>
     </category>
 </modules>
