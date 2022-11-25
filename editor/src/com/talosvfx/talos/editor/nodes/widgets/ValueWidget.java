@@ -9,16 +9,17 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
-    private final Table editing;
-    private final Table main;
-    private final Table progressContainer;
-    private final Table progress;
+    private Table editing;
+    private Table main;
+    private Table progressContainer;
+    private Table progress;
 
     private Label label;
     private Label valueLabel;
@@ -52,7 +53,11 @@ public class ValueWidget extends AbstractWidget<Float> {
         main = new Table();
         progressContainer = new Table();
         progress = new Table();
+    }
 
+    public ValueWidget(Skin skin) {
+        this();
+        init(skin);
     }
 
     @Override

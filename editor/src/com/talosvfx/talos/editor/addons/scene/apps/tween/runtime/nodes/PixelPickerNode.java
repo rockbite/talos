@@ -22,7 +22,9 @@ public class PixelPickerNode extends RoutineNode {
         Texture texture = asset.getResource();
 
         if(assetName == null || (assetName != null && !assetName.equals(asset.nameIdentifier)) || nodeDirty) {
-            texture.getTextureData().prepare();
+            if(!texture.getTextureData().isPrepared()) {
+                texture.getTextureData().prepare();
+            }
             pixmap = texture.getTextureData().consumePixmap();
             assetName = asset.nameIdentifier;
             nodeDirty = false;

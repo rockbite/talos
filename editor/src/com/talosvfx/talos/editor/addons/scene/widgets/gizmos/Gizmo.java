@@ -20,7 +20,6 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
 
-
     public static class TransformSettings  {
         public float gridSizeX = 1;
         public float gridSizeY = 1;
@@ -155,6 +154,10 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     }
 
     public void keyDown (InputEvent event, int keycode) {
+
+    }
+
+    public void keyUp(InputEvent event, int keycode) {
 
     }
 

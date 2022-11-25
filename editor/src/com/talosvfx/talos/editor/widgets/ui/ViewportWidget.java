@@ -105,6 +105,7 @@ public abstract class ViewportWidget extends Table {
 
 
 	protected GroupSelectionGizmo groupSelectionGizmo;
+	private boolean panRequiresSpace = false;
 
 	public ViewportWidget () {
 		shapeRenderer = new ShapeRenderer();
@@ -336,6 +337,20 @@ public abstract class ViewportWidget extends Table {
 				}
 				return super.keyDown(event, keycode);
 			}
+
+			@Override
+			public boolean keyUp (InputEvent event, int keycode) {
+				if (locked) {
+					return true;
+				}
+
+				for (Gizmo gizmo : ViewportWidget.this.gizmos.gizmoList) {
+					if (gizmo.isSelected()) {
+						gizmo.keyUp(event, keycode);
+					}
+				}
+				return super.keyUp(event, keycode);
+			}
 		};
 
 		addListener(gizmoListener);
@@ -496,6 +511,9 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
+				if(panRequiresSpace && !Gdx.input.isKeyPressed(Input.Keys.SPACE)) return false;
+
 				canPan = canMoveAround();
 				cameraController.touchDown((int)x, (int)y, pointer, button);
 				return !event.isHandled();
@@ -514,7 +532,6 @@ public abstract class ViewportWidget extends Table {
 				// can't move around disable dragging
 				if (!canPan)
 					return;
-
 				isDragging = true;
 
 				cameraController.touchDragged((int)x, (int)y, pointer);
@@ -1005,4 +1022,8 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public abstract void initializeGridPropertyProvider ();
+
+	public void panRequiresSpace(boolean panRequiresSpace) {
+		this.panRequiresSpace = panRequiresSpace;
+	}
 }

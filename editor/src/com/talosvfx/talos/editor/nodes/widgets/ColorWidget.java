@@ -19,16 +19,21 @@ public class ColorWidget extends AbstractWidget<Color> {
     private Color color = new Color();
     private Table colorButton;
 
-    @Override
-    public void init(Skin skin) {
+    public void init(Skin skin, String text) {
         super.init(skin);
 
-        Label label = new Label("Color", skin);
+        Label label = null;
+        if(text != null) {
+            label = new Label(text, skin);
+        }
+
 
         colorButton = new Table();
         colorButton.setBackground(skin.newDrawable(ColorLibrary.SHAPE_SQUIRCLE));
 
-        content.add(label).left().expandX().height(32);
+        if(label != null) {
+            content.add(label).left().expandX().height(32);
+        }
         content.add(colorButton).right().expandX().height(32).width(96);
         color.set(Color.CORAL);
         colorButton.setColor(color);
@@ -49,6 +54,17 @@ public class ColorWidget extends AbstractWidget<Color> {
                 });
             }
         });
+    }
+
+    @Override
+    public void init(Skin skin) {
+        init(skin, "Color");
+    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color.set(color);
+        colorButton.setColor(color);
     }
 
     @Override
