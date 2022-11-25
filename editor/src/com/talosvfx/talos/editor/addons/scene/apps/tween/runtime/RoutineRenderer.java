@@ -2,8 +2,12 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
@@ -40,6 +44,12 @@ public class RoutineRenderer {
     }
 
 
+    private final Rectangle cameraViewportRect = new Rectangle();
+    private final Rectangle objectViewportRect = new Rectangle();
+    private final Rectangle intersectionRect = new Rectangle();
+    private final Vector2 positionTemp = new Vector2();
+
+
     public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject, RoutineRendererComponent routineRendererComponent) {
         RoutineInstance routineInstance = routineRendererComponent.routineInstance;
         Vector2 viewportSize = routineRendererComponent.viewportSize;
@@ -59,10 +69,18 @@ public class RoutineRenderer {
         if (main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
-            Vector3 cameraPos = mainRenderer.getCamera().position;
+
+            OrthographicCamera camera = mainRenderer.getCamera();
+            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom).setCenter(camera.position.x, camera.position.y);
+            objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);
+            Intersector.intersectRectangles(cameraViewportRect, objectViewportRect, intersectionRect);
+
+
+            intersectionRect.getCenter(positionTemp);
             renderRoutineNode.position.set(transform.position);
-            renderRoutineNode.viewportPosition.set(cameraPos.x, cameraPos.y);
-            renderRoutineNode.viewportSize.set(viewportSize.x, viewportSize.y);
+            renderRoutineNode.viewportPosition.set(positionTemp.x, positionTemp.y);
+            renderRoutineNode.viewportSize.set(intersectionRect.width, intersectionRect.height);
+
 
             if(reset) {
                 routineInstance.clearMemory();
@@ -85,8 +103,8 @@ public class RoutineRenderer {
                 batch.draw(textureRegion,
                         drawableQuad.position.x, drawableQuad.position.y,
                         0.5f, 0.5f,
-                        1f, 1f,
                         width, height,
+                        1, 1,
                         drawableQuad.rotation);
                 batch.setColor(Color.WHITE);
             }

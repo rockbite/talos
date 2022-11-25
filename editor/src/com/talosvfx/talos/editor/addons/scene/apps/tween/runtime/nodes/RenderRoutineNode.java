@@ -24,7 +24,7 @@ public class RenderRoutineNode extends RoutineNode {
         if(targetPortName.equals("viewportSize")) {
             return viewportSize;
         }
-        if(targetPortName.equals("viewportPosition")) {
+        if(targetPortName.equals("viewportPos")) {
             return viewportPosition;
         }
 
