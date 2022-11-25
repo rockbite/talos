@@ -34,6 +34,14 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         routineConfigMap.loadFrom(handle);
 
         initContent();
+
+        addAppListener(new AppListener() {
+            @Override
+            public void closeRequested () {
+                SceneEditorAddon.get().routineEditor = null;
+                TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
+            }
+        });
     }
 
     @Override
@@ -70,11 +78,4 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
     public String getTitle() {
         return title;
     }
-
-    @Override
-    public void onHide () {
-        super.onHide();
-        SceneEditorAddon.get().routineEditor = null;
-    }
-
 }
