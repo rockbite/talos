@@ -635,6 +635,17 @@ public class MainRenderer implements Notifications.Observer {
         if(event.getComponent() instanceof ParticleComponent) {
             particleCache.remove((ParticleComponent)event.getComponent());
         }
+
+        if (event.getComponent() instanceof RoutineRendererComponent) {
+            RoutineRendererComponent routineRendererComponent = (RoutineRendererComponent) event.getComponent();
+            routineRendererComponent.routineInstance.isDirty = true;
+        }
+
+        GameObject gameObject = event.getComponent().getGameObject();
+        if (event.getComponent() instanceof TransformComponent && gameObject.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+            component.routineInstance.isDirty = true;
+        }
     }
 
     public void setCamera (OrthographicCamera camera) {
