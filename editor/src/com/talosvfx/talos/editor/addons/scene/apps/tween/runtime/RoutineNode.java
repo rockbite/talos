@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -283,6 +284,12 @@ public abstract class RoutineNode {
         }
 
         return (int)object;
+    }
+
+    protected Vector2 fetchVector2Value(String key) {
+        Object object = fetchValue(key);
+
+        return (Vector2)object;
     }
 
     /**

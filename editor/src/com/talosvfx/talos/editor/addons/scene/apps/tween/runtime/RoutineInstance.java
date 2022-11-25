@@ -21,6 +21,8 @@ public class RoutineInstance {
 
     public Array<DrawableQuad> drawableQuads = new Array<>();
 
+    public ObjectMap<String, Object> memory = new ObjectMap<>();
+
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
@@ -132,5 +134,13 @@ public class RoutineInstance {
     public float getDepthHash() {
         int hash = scopeNumbers.hashCode();
         return hash;
+    }
+
+    public void storeMemory(String name, Object value) {
+        memory.put(name, value);
+    }
+
+    public Object fetchMemory(String name) {
+        return memory.get(name);
     }
 }
