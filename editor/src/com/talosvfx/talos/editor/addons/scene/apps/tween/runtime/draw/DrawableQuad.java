@@ -11,12 +11,12 @@ public class DrawableQuad implements Pool.Poolable {
     public Vector2 size = new Vector2();
     public Texture texture;
     public float rotation;
-    public Color color;
+    public Color color = new Color();
     public boolean aspect;
     public float z;
 
     @Override
     public void reset() {
-
+        color.set(Color.WHITE);
     }
 }

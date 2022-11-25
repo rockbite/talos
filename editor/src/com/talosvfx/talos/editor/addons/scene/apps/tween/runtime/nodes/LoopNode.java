@@ -18,7 +18,7 @@ public class LoopNode extends RoutineNode {
         for(int i = from; from < to ? i < to : i > to; i += step) {
             index = i;
             sendSignal("body");
-            routineInstanceRef.incrementDepth();
+            routineInstanceRef.setDepthValue(i);
         }
         routineInstanceRef.endDepth();
 

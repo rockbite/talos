@@ -111,8 +111,8 @@ public class RoutineInstance {
         scopeNumbers.add(0);
     }
 
-    public void incrementDepth() {
-        scopeNumbers.set(scopeNumbers.size - 1, scopeNumbers.get(scopeNumbers.size - 1) + 1);
+    public void setDepthValue(int val) {
+        scopeNumbers.set(scopeNumbers.size - 1, val);
     }
 
     public void endDepth() {

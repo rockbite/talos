@@ -31,7 +31,7 @@ public class RenderQuadNode extends RoutineNode {
         drawableQuad.texture = resource;
 
         drawableQuad.rotation = fetchFloatValue("rotation");
-        drawableQuad.color = fetchColorValue("color");
+        drawableQuad.color.set(fetchColorValue("color"));
         if(drawableQuad.color == null) {
             drawableQuad.color = Color.WHITE;
         }
