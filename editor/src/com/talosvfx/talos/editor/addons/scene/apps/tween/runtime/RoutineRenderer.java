@@ -48,6 +48,7 @@ public class RoutineRenderer {
     private final Rectangle objectViewportRect = new Rectangle();
     private final Rectangle intersectionRect = new Rectangle();
     private final Vector2 positionTemp = new Vector2();
+    private final Vector2 sizeTemp = new Vector2();
 
 
     public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject, RoutineRendererComponent routineRendererComponent) {
@@ -65,22 +66,27 @@ public class RoutineRenderer {
             reset = true;
         }
 
+        float cameraCull = 4;
+
         RoutineNode main = routineInstance.getNodeById("main");
         if (main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
 
             OrthographicCamera camera = mainRenderer.getCamera();
-            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom).setCenter(camera.position.x, camera.position.y);
+            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom + cameraCull, camera.viewportHeight * camera.zoom + cameraCull).setCenter(camera.position.x, camera.position.y);
             objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);
             Intersector.intersectRectangles(cameraViewportRect, objectViewportRect, intersectionRect);
 
-
             intersectionRect.getCenter(positionTemp);
-            renderRoutineNode.position.set(transform.position);
-            renderRoutineNode.viewportPosition.set(positionTemp.x, positionTemp.y);
-            renderRoutineNode.viewportSize.set(intersectionRect.width, intersectionRect.height);
+            intersectionRect.getSize(sizeTemp);
+            if (!renderRoutineNode.viewportPosition.equals(positionTemp) || !renderRoutineNode.viewportSize.equals(sizeTemp)) {
+                renderRoutineNode.viewportPosition.set(positionTemp);
+                renderRoutineNode.viewportSize.set(sizeTemp);
+                reset = true;
+            }
 
+            renderRoutineNode.position.set(transform.position);
 
             if(reset) {
                 routineInstance.clearMemory();
