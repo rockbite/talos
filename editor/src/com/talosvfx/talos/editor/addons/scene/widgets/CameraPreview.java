@@ -36,6 +36,8 @@ public class CameraPreview extends Actor {
     private CameraComponent component;
     private GameObject cameraObject;
 
+    private OrthographicCamera camera;
+
     private float presumedRotation = 0;
 
     public CameraPreview () {
@@ -43,6 +45,7 @@ public class CameraPreview extends Actor {
         polygonSpriteBatch = new PolygonSpriteBatch();
         viewport = new FitViewport(10, 10);
         white = TalosMain.Instance().getSkin().getRegion("white");
+        camera = new OrthographicCamera();
     }
 
     @Override
@@ -114,7 +117,16 @@ public class CameraPreview extends Actor {
 
         renderer.skipUpdates = true;
 
-        renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
+        CameraComponent cameraObjectComponent = cameraObject.getComponent(CameraComponent.class);
+        TransformComponent transformComponent = cameraObject.getComponent(TransformComponent.class);
+
+        camera.zoom = cameraObjectComponent.zoom;
+        camera.viewportWidth = cameraObjectComponent.size.x;
+        camera.viewportHeight = cameraObjectComponent.size.y;
+        Vector2 position = transformComponent.position;
+        camera.position.set(position.x, position.y, 0);
+
+        renderer.setCamera(camera);
         renderer.update(rootGO);
         renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
 
