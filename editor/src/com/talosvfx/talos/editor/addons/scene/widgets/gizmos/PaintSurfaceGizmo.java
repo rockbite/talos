@@ -106,6 +106,12 @@ public class PaintSurfaceGizmo extends Gizmo {
         frameBuffer.begin();
         innerBatch.begin();
 
+        if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+            innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        } else {
+            innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        }
+
         innerBatch.draw(brushTexture,
                 tmp.x - brushTexture.getWidth()/2f, 400 - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
 
@@ -171,20 +177,27 @@ public class PaintSurfaceGizmo extends Gizmo {
         viewport.setWorldSize(resource.getWidth(), resource.getHeight());
         viewport.apply(true);
 
+
         frameBuffer.begin();
-        Gdx.gl.glClearColor(0, 0, 0, 0f);
+        innerBatch.disableBlending();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        Gdx.gl.glClearColor(1, 1, 1, 0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         innerBatch.setProjectionMatrix(viewport.getCamera().combined);
         innerBatch.begin();
-        innerBatch.draw(resource, 0, 0, resource.getWidth(), resource.getHeight(),
+        innerBatch.draw(resource, 0, 0f, resource.getWidth(), resource.getHeight(),
                 0, 0, resource.getWidth(), resource.getHeight(),
                 false, true);
         innerBatch.end();
         frameBuffer.end();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        innerBatch.enableBlending();
     }
 
     private void createBrushTexture() {
         int size = paintToolsPane.getSize();
+        float opacity = paintToolsPane.getOpacity();
         float hardness = paintToolsPane.getHardness();
         float maxShift = 0.25f;
         float shift = (1f - hardness) * maxShift;
@@ -205,7 +218,12 @@ public class PaintSurfaceGizmo extends Gizmo {
                     fadeOff = 1f - (MathUtils.clamp(dstFromCenter, point, 1f) - point) * 2f;
                 }
 
-                color.a = fadeOff;
+                color.a = fadeOff * opacity;
+
+                if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+                    color.set(Color.GRAY);
+                    color.a = fadeOff * opacity;
+                }
 
                 pixmap.setColor(color);
                 pixmap.drawPixel(x, y);

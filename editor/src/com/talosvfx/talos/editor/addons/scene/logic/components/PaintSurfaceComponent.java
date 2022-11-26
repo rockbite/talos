@@ -25,6 +25,18 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
     @ValueProperty(min = 0, max = 1, step=0.01f, progress = true)
     public float overlay = 0.5f;
 
+    @ValueProperty
+    public boolean redChannel = true;
+
+    @ValueProperty
+    public boolean greenChannel = true;
+
+    @ValueProperty
+    public boolean blueChannel = true;
+
+    @ValueProperty
+    public boolean alphaChannel = true;
+
     transient GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
         @Override
         public void onUpdate () {
@@ -55,9 +67,19 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
         PropertyWidget overlayWidget = WidgetFactory.generate(this, "overlay", "Overlay");
 
+        PropertyWidget redChannelWidget = WidgetFactory.generate(this, "redChannel", "Red Channel");
+        PropertyWidget greenChannelWidget = WidgetFactory.generate(this, "greenChannel", "Green Channel");
+        PropertyWidget blueChannelWidget = WidgetFactory.generate(this, "blueChannel", "Blue Channel");
+        PropertyWidget alphaChannelWidget = WidgetFactory.generate(this, "alphaChannel", "Alpha Channel");
+
         properties.add(textureWidget);
         properties.add(sizeWidget);
         properties.add(overlayWidget);
+
+        properties.add(redChannelWidget);
+        properties.add(greenChannelWidget);
+        properties.add(blueChannelWidget);
+        properties.add(alphaChannelWidget);
 
         return properties;
     }

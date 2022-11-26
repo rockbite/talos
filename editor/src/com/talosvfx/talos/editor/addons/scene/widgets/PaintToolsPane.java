@@ -5,9 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
@@ -32,6 +34,13 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
     private float bracketCoolDown = 0f;
     private int bracketDown = 0;
 
+    private Tool currentTool = Tool.BRUSH;
+
+    public enum Tool {
+        BRUSH,
+        ERASER
+    }
+
     public PaintToolsPane(PaintSurfaceGizmo paintSurfaceGizmo) {
         this.paintSurfaceGizmo = paintSurfaceGizmo;
         Notifications.registerObserver(this);
@@ -54,7 +63,7 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
         colorWidget.setColor(Color.WHITE);
         add(colorWidget).padRight(10);
 
-        sizeWidget = createFloatWidget("size", 1, 100, 1f);
+        sizeWidget = createFloatWidget("size", 1, 100, 5);
         sizeWidget.setStep(1);
         add(sizeWidget).padRight(10);
         hardnessWidget = createFloatWidget("hardness", 0, 100, 100f);
@@ -74,6 +83,34 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 paintSurfaceGizmo.brushTexture = null;
+            }
+        });
+        colorWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                paintSurfaceGizmo.brushTexture = null;
+            }
+        });
+        opacityWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                paintSurfaceGizmo.brushTexture = null;
+            }
+        });
+
+        paint.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                paintSurfaceGizmo.brushTexture = null;
+                currentTool = Tool.BRUSH;
+            }
+        });
+
+        erase.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                paintSurfaceGizmo.brushTexture = null;
+                currentTool = Tool.ERASER;
             }
         });
 
@@ -178,5 +215,13 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
         bracketDown = 0;
         bracketStartCoolDown = 0;
         bracketCoolDown = 0f;
+    }
+
+    public float getOpacity() {
+        return opacityWidget.getValue()/100;
+    }
+
+    public Tool getCurrentTool() {
+        return currentTool;
     }
 }
