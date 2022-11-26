@@ -123,7 +123,6 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         frameBuffer.end();
         String path = surface.gameAsset.dependentRawAssets.first().handle.path();
-        //String path = "/Users/azakhary/work/test.png";
         FileHandle handle = Gdx.files.absolute(path);
 
         PixmapIO.writePNG(handle, pixmap);
