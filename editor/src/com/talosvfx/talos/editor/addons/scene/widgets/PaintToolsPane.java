@@ -13,10 +13,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.PaintSurfaceComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.PaintSurfaceGizmo;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
@@ -35,6 +39,8 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
     private int bracketDown = 0;
 
     private Tool currentTool = Tool.BRUSH;
+
+    private Color fullColor = new Color(Color.WHITE);
 
     public enum Tool {
         BRUSH,
@@ -89,6 +95,8 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 paintSurfaceGizmo.brushTexture = null;
+                fullColor.set(colorWidget.getValue());
+                applyChannelFilterToColor();
             }
         });
         opacityWidget.addListener(new ChangeListener() {
@@ -115,6 +123,36 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
         });
 
     }
+
+    private void applyChannelFilterToColor() {
+        PaintSurfaceComponent surface = paintSurfaceGizmo.getGameObject().getComponent(PaintSurfaceComponent.class);
+        if(!surface.redChannel) {
+            colorWidget.getValue().r = 0;
+        } else {
+            colorWidget.getValue().r = fullColor.r;
+        }
+        if(!surface.greenChannel) {
+            colorWidget.getValue().g = 0;
+        } else {
+            colorWidget.getValue().g = fullColor.g;
+        }
+        if(!surface.blueChannel) {
+            colorWidget.getValue().b = 0;
+        } else {
+            colorWidget.getValue().b = fullColor.b;
+        }
+        colorWidget.setColor(colorWidget.getValue()); // to update the view
+    }
+
+    @EventHandler
+    public void onComponentUpdated(ComponentUpdated event) {
+        AComponent component = event.getComponent();
+        PaintSurfaceComponent surface = paintSurfaceGizmo.getGameObject().getComponent(PaintSurfaceComponent.class);
+        if (component == surface && !event.wasRapid()) {
+            applyChannelFilterToColor();
+        }
+    }
+
 
     private ValueWidget createFloatWidget(String name, float min, float max, float value) {
         ValueWidget hardnessWidget = new ValueWidget(TalosMain.Instance().getSkin());
