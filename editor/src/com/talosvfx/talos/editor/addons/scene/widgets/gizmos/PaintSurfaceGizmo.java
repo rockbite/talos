@@ -107,8 +107,10 @@ public class PaintSurfaceGizmo extends Gizmo {
         innerBatch.begin();
 
         if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_REVERSE_SUBTRACT);
             innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
+            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
             innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         }
 
@@ -120,8 +122,8 @@ public class PaintSurfaceGizmo extends Gizmo {
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
 
         frameBuffer.end();
-        //String path = surface.gameAsset.dependentRawAssets.first().handle.parent().path();
-        String path = "/Users/azakhary/work/test.png";
+        String path = surface.gameAsset.dependentRawAssets.first().handle.path();
+        //String path = "/Users/azakhary/work/test.png";
         FileHandle handle = Gdx.files.absolute(path);
 
         PixmapIO.writePNG(handle, pixmap);
@@ -221,7 +223,6 @@ public class PaintSurfaceGizmo extends Gizmo {
                 color.a = fadeOff * opacity;
 
                 if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
-                    color.set(Color.GRAY);
                     color.a = fadeOff * opacity;
                 }
 
