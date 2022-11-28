@@ -56,6 +56,8 @@ public class ProbabilityChoiceNode extends ARndNode {
 
         float result = random.nextFloat();
 
+        clearCache();
+
         result *= sum;
 
         if(inputs.size == 0) {

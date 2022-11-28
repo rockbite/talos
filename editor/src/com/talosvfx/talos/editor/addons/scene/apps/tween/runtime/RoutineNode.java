@@ -16,6 +16,8 @@ public abstract class RoutineNode {
 
     protected boolean nodeDirty = false;
 
+    private boolean resetWasCalled = false;
+
     protected ObjectMap<String, Object> cachedValues = new ObjectMap<>();
 
     public enum DataType {
@@ -234,13 +236,17 @@ public abstract class RoutineNode {
             String targetPortName = connection.toPort.name;
 
             if (targetNode.cachedValues.containsKey(targetPortName)) {
-                return ((GameAsset) targetNode.cachedValues.get(targetPortName));
+                return (GameAsset) (targetNode.cachedValues.get(targetPortName));
             } else {
                 GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
                 if (!gameAsset.listeners.contains(updateListener, true)) {
                     gameAsset.listeners.add(updateListener);
                 }
-                targetNode.cachedValues.put(targetPortName, cachedValues);
+                if (!targetNode.resetWasCalled) {
+                    targetNode.cachedValues.put(targetPortName, gameAsset);
+                } else {
+                    targetNode.resetWasCalled = false;
+                }
                 return gameAsset;
             }
         }
@@ -319,7 +325,11 @@ public abstract class RoutineNode {
                     return targetNode.cachedValues.get(targetPortName);
                 } else {
                     Object queryValue = targetNode.queryValue(targetPortName);
-                    targetNode.cachedValues.put(targetPortName, queryValue);
+                    if (!targetNode.resetWasCalled) {
+                        targetNode.cachedValues.put(targetPortName, queryValue);
+                    } else {
+                        targetNode.resetWasCalled = false;
+                    }
                     return queryValue;
                 }
             } else {
@@ -334,6 +344,7 @@ public abstract class RoutineNode {
     }
 
     protected void clearCache () {
+        resetWasCalled = true;
         cachedValues.clear();
         clearAllCachesForRight(this);
     }

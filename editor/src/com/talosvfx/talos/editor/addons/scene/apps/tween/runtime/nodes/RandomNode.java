@@ -17,6 +17,8 @@ public class RandomNode extends ARndNode {
 
         float rand = min + random.nextFloat() * (max - min);
 
+        clearCache();
+
         return rand;
     }
 }

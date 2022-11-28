@@ -61,7 +61,7 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         try {
             routineStage.loadFrom(targetFileHandle);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         scenePreviewStage = new ScenePreviewStage();
