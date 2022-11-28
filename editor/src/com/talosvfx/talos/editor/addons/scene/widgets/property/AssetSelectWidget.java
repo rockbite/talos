@@ -30,12 +30,11 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
 
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
-    public AssetSelectWidget() {
-        super();
-    }
+    private AssetListPopup<T> assetListPopup;
 
     public AssetSelectWidget (String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
         super(name, supplier, valueChanged);
+        assetListPopup = new AssetListPopup<>();
         this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {
             @Override
             public boolean evaluate (FilteredTree.Node<GameAsset<T>> node) {
@@ -77,24 +76,22 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
                 Vector2 pos = new Vector2(button.getWidth()/2f, button.getHeight()/2f);
                 button.localToStageCoordinates(pos);
 
-                logger.info("Redo asset selection widget");
-//                AssetListPopup assetListPopup = SceneEditorAddon.get().workspace.getAssetListPopup();
-//                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
-//
-//                    @Override
-//                    public void selected (FilteredTree.Node<GameAsset<T>> node) {
-//                        GameAsset<T> gameAsset = node.getObject();
-//                        if (gameAsset == null || gameAsset.isBroken()) {
-//                            // facing a directory or bad asset
-//                            assetListPopup.resetSelection();
-//                            return;
-//                        }
-//
-//                        updateWidget(gameAsset);
-//                        callValueChanged(gameAsset);
-//                        assetListPopup.remove();
-//                    }
-//                });
+                assetListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameAsset<T>>() {
+                    @Override
+                    public void selected(FilteredTree.Node<GameAsset<T>> node) {
+                        super.selected(node);
+                        GameAsset<T> gameAsset = node.getObject();
+                        if (gameAsset == null || gameAsset.isBroken()) {
+                            // facing a directory or bad asset
+                            assetListPopup.resetSelection();
+                            return;
+                        }
+
+                        updateWidget(gameAsset);
+                        callValueChanged(gameAsset);
+                        assetListPopup.remove();
+                    }
+                });
             }
         });
         return table;
