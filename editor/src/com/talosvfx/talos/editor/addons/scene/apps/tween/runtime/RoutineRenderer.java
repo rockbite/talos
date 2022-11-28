@@ -59,7 +59,7 @@ public class RoutineRenderer {
 
         renderCoolDown -= Gdx.graphics.getDeltaTime();
 
-        boolean reset = false;
+        boolean reset = true;
 
         if(renderCoolDown <= 0f && routineInstance.isDirty) {
             renderCoolDown = 0.1f;
