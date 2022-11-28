@@ -56,8 +56,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
     private ContextualMenu contextualMenu;
     private FilteredTree.Node<String> rootNode;
 
-    private DragAndDrop dragAndDrop;
-
     public boolean isCutting = false;
     public Array<FileHandle> filesToManipulate = new Array<>();
 
@@ -203,8 +201,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
         });
 
         directoryTree.expandAll();
-
-        dragAndDrop = new DragAndDrop();
     }
 
     private String getCurrSelectedPath() {
@@ -546,8 +542,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
     }
 
     public void loadDirectoryTree (String path) {
-        dragAndDrop.clear();
-
         nodes.clear();
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
