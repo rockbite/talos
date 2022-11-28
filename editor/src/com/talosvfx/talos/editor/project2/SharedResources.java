@@ -16,4 +16,6 @@ public class SharedResources {
 	public static AppManager appManager;
 
 	public static InputHandling inputHandling;
+
+	public static GlobalDragAndDrop globalDragAndDrop;
 }

@@ -618,10 +618,10 @@ public abstract class ViewportWidget extends Table {
 		getEntityUnderMouse();
 
 //		Debug entity secltion
-		if (entityUnderMouse != null) {
-			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
-			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
-		}
+//		if (entityUnderMouse != null) {
+//			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
+//			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
+//		}
 
 		boolean debugEntityIDS = false;
 

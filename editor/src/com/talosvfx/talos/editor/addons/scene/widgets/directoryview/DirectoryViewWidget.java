@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
@@ -336,7 +337,7 @@ public class DirectoryViewWidget extends Table {
 
             items.addActor(item);
 
-            dragAndDrop.addSource(new DragAndDrop.Source(item) {
+            SharedResources.globalDragAndDrop.addSource(new DragAndDrop.Source(item) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
@@ -352,21 +353,36 @@ public class DirectoryViewWidget extends Table {
                         Actor dragging = ((ActorCloneable) newView).copyActor(item);
                         dragging.setSize(item.getWidth(), item.getHeight());
                         payload.setDragActor(dragging);
-                        if (newView.gameAsset != null) {
-                            payload.setObject(newView.gameAsset);
-                        } else {
-                            payload.setObject(fileHandle);
-                        }
+                        payload.setObject(getPayloadforItem(item));
                     } else {
                         Label dragging = new Label("Multiple selection", SharedResources.skin);
                         payload.setDragActor(dragging);
-                        payload.setObject(selected);
+                        payload.setObject(convertArrayIntoArrayDragDropPayload(selected));
                     }
 
                     return payload;
                 }
             });
         }
+    }
+
+    private GlobalDragAndDrop.BaseDragAndDropPayload getPayloadforItem (Item item) {
+        if (item.gameAsset != null) {
+            return new GlobalDragAndDrop.GameAssetDragAndDropPayload(item.gameAsset);
+        } else {
+            return new GlobalDragAndDrop.FileHandleDragAndDropPayload(item.fileHandle);
+        }
+    }
+
+    private GlobalDragAndDrop.ArrayDragAndDropPayload convertArrayIntoArrayDragDropPayload (Array<Item> selected) {
+        GlobalDragAndDrop.ArrayDragAndDropPayload arrayDragAndDropPayload = new GlobalDragAndDrop.ArrayDragAndDropPayload();
+
+        for (Item item : selected) {
+            GlobalDragAndDrop.BaseDragAndDropPayload payloadforItem = getPayloadforItem(item);
+            arrayDragAndDropPayload.getItems().add(payloadforItem);
+        }
+
+        return arrayDragAndDropPayload;
     }
 
     private void dragAndDrop () {

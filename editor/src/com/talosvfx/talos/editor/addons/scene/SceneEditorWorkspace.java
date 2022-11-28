@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
@@ -45,6 +46,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
+import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
@@ -69,6 +71,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.TalosInputProcessor.ctrlPressed;
+import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.attemptToImport;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
@@ -199,6 +202,45 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		addActor(rulerRenderer);
 
 		rand = new Random();
+
+		SharedResources.globalDragAndDrop.addTarget(new DragAndDrop.Target(SceneEditorWorkspace.this) {
+			@Override
+			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+				if (currentContainer == null) return false;
+
+				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+
+				if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+					//We support single game asset drops
+
+					return true;
+				}
+
+				return false;
+			}
+
+			@Override
+			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+
+				if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+					//We support single game asset drops
+					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
+					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
+						GameAsset<Texture> gameAsset = (GameAsset<Texture>)gameAssetPayload.getGameAsset();
+
+						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
+						vec.set(touchToWorld.x, touchToWorld.y);
+						createSpriteObject(gameAsset, vec, currentContainer.getSelfObject());
+
+					}
+					return;
+				}
+				logger.info("TODO other implementations of drag drop payloads");
+
+			}
+		});
 	}
 
 	public GameObject createEmpty (Vector2 position, GameObject parent) {
@@ -1269,7 +1311,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
 			public void run () {
-				TalosMain.Instance().ProjectController().setDirty();
 			}
 		});
 	}
