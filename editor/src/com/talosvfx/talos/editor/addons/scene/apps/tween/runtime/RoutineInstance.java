@@ -107,7 +107,7 @@ public class RoutineInstance {
         requesterId = id;
     }
 
-    public void beingDepth() {
+    public void beginDepth () {
         scopeNumbers.add(0);
     }
 
@@ -124,6 +124,9 @@ public class RoutineInstance {
             Pools.free(quad);
         }
 
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            routineNodeEntry.value.cachedValues.clear();
+        }
         drawableQuads.clear();
     }
 

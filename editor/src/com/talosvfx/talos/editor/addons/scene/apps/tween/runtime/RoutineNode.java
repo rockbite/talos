@@ -1,13 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween.runtime;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 
 public abstract class RoutineNode {
 
@@ -17,6 +15,8 @@ public abstract class RoutineNode {
     public int uniqueId;
 
     protected boolean nodeDirty = false;
+
+    protected ObjectMap<String, Object> cachedValues = new ObjectMap<>();
 
     public enum DataType {
         NUMBER,
@@ -233,12 +233,16 @@ public abstract class RoutineNode {
             RoutineNode targetNode = connection.toPort.nodeRef;
             String targetPortName = connection.toPort.name;
 
-            GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
-            if (!gameAsset.listeners.contains(updateListener, true)) {
-                gameAsset.listeners.add(updateListener);
+            if (targetNode.cachedValues.containsKey(targetPortName)) {
+                return ((GameAsset) targetNode.cachedValues.get(targetPortName));
+            } else {
+                GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
+                if (!gameAsset.listeners.contains(updateListener, true)) {
+                    gameAsset.listeners.add(updateListener);
+                }
+                targetNode.cachedValues.put(targetPortName, cachedValues);
+                return gameAsset;
             }
-
-            return gameAsset;
         }
     }
 
@@ -311,7 +315,13 @@ public abstract class RoutineNode {
                 RoutineNode targetNode = connection.toPort.nodeRef;
                 String targetPortName = connection.toPort.name;
 
-                return targetNode.queryValue(targetPortName);
+                if (targetNode.cachedValues.containsKey(targetPortName)) {
+                    return targetNode.cachedValues.get(targetPortName);
+                } else {
+                    Object queryValue = targetNode.queryValue(targetPortName);
+                    targetNode.cachedValues.put(targetPortName, queryValue);
+                    return queryValue;
+                }
             } else {
                 if(port.valueOverride == null && port.dataType == DataType.NUMBER) {
                     return 0f;
@@ -321,6 +331,23 @@ public abstract class RoutineNode {
         }
 
         return null;
+    }
+
+    protected void clearCache () {
+        cachedValues.clear();
+        clearAllCachesForRight(this);
+    }
+
+    private static void clearAllCachesForRight(RoutineNode routineNode) {
+        Array<Port> ports = routineNode.outputs.values().toArray();
+        for (int i = 0; i < ports.size; i++) {
+            Port port = ports.get(i);
+            for (Connection connection : port.connections) {
+                RoutineNode nodeRef = connection.toPort.nodeRef;
+                nodeRef.cachedValues.clear();
+                clearAllCachesForRight(nodeRef);
+            }
+        }
     }
 
     /**

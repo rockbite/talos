@@ -28,13 +28,13 @@ public class PixelPickerNode extends RoutineNode {
             pixmap = texture.getTextureData().consumePixmap();
             assetName = asset.nameIdentifier;
             nodeDirty = false;
+            clearCache();
         }
 
         if(pixmap != null) {
             if(x >= 0 && y >= 0 && x <= pixmap.getWidth() && y <= pixmap.getHeight()) {
                 int bits =  pixmap.getPixel(x, y);
                 color.set(bits);
-
                 return color;
             }
         }
