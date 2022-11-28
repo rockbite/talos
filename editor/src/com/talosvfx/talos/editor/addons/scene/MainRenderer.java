@@ -315,7 +315,9 @@ public class MainRenderer implements Notifications.Observer {
             } else if(gameObject.hasComponent(MapComponent.class)) {
                 renderMap(batch, gameObject);
             } else if(gameObject.hasComponent(RoutineRendererComponent.class)) {
-                renderWithRoutine(batch, gameObject);
+                if (!renderingToEntitySelectionBuffer) {
+                    renderWithRoutine(batch, gameObject);
+                }
             }
         }
     }
