@@ -47,6 +47,10 @@ public class RoutineInstance {
         JsonValue list = root.get("list");
         JsonValue connections = root.get("connections");
 
+        if (list == null || connections == null) {
+            return;
+        }
+
         IntMap<RoutineNode> idMap = new IntMap<>();
 
         for(JsonValue nodeData: list) {
@@ -107,7 +111,7 @@ public class RoutineInstance {
         requesterId = id;
     }
 
-    public void beingDepth() {
+    public void beginDepth () {
         scopeNumbers.add(0);
     }
 
