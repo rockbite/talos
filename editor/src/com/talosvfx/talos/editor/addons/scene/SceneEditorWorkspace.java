@@ -70,10 +70,9 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.talosvfx.talos.editor.TalosInputProcessor.ctrlPressed;
-import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.attemptToImport;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
 
@@ -494,6 +493,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (button == 2 || ctrlPressed()) {
 					selectionRect.setVisible(true);
 					selectionRect.setSize(0, 0);
+					selectionRect.setPosition(x, y);
 					startPos.set(x, y);
 
 					return true;
@@ -1405,6 +1405,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 			return true;
+		}
+
+		if(ctrlPressed()) {
+			return false;
 		}
 
 		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());

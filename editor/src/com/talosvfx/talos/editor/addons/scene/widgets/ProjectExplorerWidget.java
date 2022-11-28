@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
 public class ProjectExplorerWidget extends Table implements Observer {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectExplorerWidget.class);
@@ -502,7 +504,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
     }
 
     public void select (FilteredTree.Node node) {
-        if (TalosInputProcessor.ctrlPressed()){
+        if (ctrlPressed()){
             directoryTree.getSelection().add(node);
         }else {
             directoryTree.getSelection().clear();

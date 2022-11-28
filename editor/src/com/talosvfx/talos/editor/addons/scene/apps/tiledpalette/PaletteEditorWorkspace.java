@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 
 import java.util.Comparator;
 
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
 
 public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
 
@@ -216,7 +218,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
 
                 upWillClear = true;
 
-                if (button == 2 || TalosInputProcessor.ctrlPressed()) {
+                if (button == 2 || ctrlPressed()) {
 
                     isSelectingWithDrag = true;
                     selectionRect.setVisible(true);

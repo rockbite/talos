@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -29,6 +28,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class DirectoryViewWidget extends Table {
 
@@ -64,15 +65,15 @@ public class DirectoryViewWidget extends Table {
 			@Override
 			public boolean keyDown (InputEvent event, int keycode) {
 
-				if (keycode == Input.Keys.X && TalosInputProcessor.ctrlPressed()) {
+				if (keycode == Input.Keys.X && ctrlPressed()) {
 					projectExplorerWidget.invokeCut(convertToFileArray(selected));
 				}
 
-				if (keycode == Input.Keys.C && TalosInputProcessor.ctrlPressed()) {
+				if (keycode == Input.Keys.C && ctrlPressed()) {
 					projectExplorerWidget.invokeCopy(convertToFileArray(selected));
 				}
 
-				if (keycode == Input.Keys.V && TalosInputProcessor.ctrlPressed()) {
+				if (keycode == Input.Keys.V && ctrlPressed()) {
 					projectExplorerWidget.invokePaste(fileHandle);
 				}
 
@@ -85,7 +86,7 @@ public class DirectoryViewWidget extends Table {
 					projectExplorerWidget.deletePath(paths);
 				}
 
-				if (keycode == Input.Keys.A && TalosInputProcessor.ctrlPressed()) {
+				if (keycode == Input.Keys.A && ctrlPressed()) {
 					for (Actor child : items.getChildren()) {
 						Item item = (Item)child;
 						if (!selected.contains(item, true)) {
@@ -451,7 +452,7 @@ public class DirectoryViewWidget extends Table {
 	}
 
 	private void itemClicked (Item item, boolean rightClick) {
-		boolean addToSelection = TalosInputProcessor.ctrlPressed();
+		boolean addToSelection = ctrlPressed();
 		boolean shiftSelectRange = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
 
 		if (rightClick) {

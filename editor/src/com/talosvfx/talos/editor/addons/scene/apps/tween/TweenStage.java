@@ -23,6 +23,8 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
 public class TweenStage extends DynamicNodeStage {
 
     public final TweenEditor tweenEditor;
@@ -38,7 +40,7 @@ public class TweenStage extends DynamicNodeStage {
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.S && TalosInputProcessor.ctrlPressed()) {
+                if(keycode == Input.Keys.S && ctrlPressed()) {
                     writeData(tweenEditor.targetFileHandle);
                 }
                 return super.keyDown(event, keycode);
