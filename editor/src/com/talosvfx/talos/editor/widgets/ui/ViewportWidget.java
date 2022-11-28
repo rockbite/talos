@@ -65,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Comparator;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public abstract class ViewportWidget extends Table {
 
@@ -271,7 +272,7 @@ public abstract class ViewportWidget extends Table {
 					return;
 				}
 
-				if (TalosInputProcessor.ctrlPressed()) {
+				if (ctrlPressed()) {
 					return;
 				}
 

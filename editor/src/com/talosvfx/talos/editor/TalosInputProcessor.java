@@ -5,19 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.talosvfx.talos.TalosMain;
 
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
 public class TalosInputProcessor implements InputProcessor {
-
-    public static boolean ctrlPressed () {
-
-        //todo
-        if (true) return false;
-
-        if (TalosMain.Instance().isOsX()) {
-            return Gdx.input.isKeyPressed(Input.Keys.SYM) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-        } else {
-            return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-        }
-    }
 
     @Override
     public boolean keyDown (int keycode) {

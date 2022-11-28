@@ -38,10 +38,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
-import com.talosvfx.talos.editor.TalosInputProcessor;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
+
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 /**
  * A tree widget where each node has an icon, actor, and child nodes.
@@ -273,13 +274,13 @@ public class FilteredTree<T> extends WidgetGroup {
                     return;
 
                 // Add node to the already selected ones
-                if (!selection.contains(node) && TalosInputProcessor.ctrlPressed()) {
+                if (!selection.contains(node) && ctrlPressed()) {
                     addNodeToSelection(node);
                     return;
                 }
 
                 // Deselect node from already selected ones but keep others
-                if (selection.contains(node) && TalosInputProcessor.ctrlPressed()){
+                if (selection.contains(node) && ctrlPressed()){
                     removeNodeFromSelection(node);
                     return;
                 }
@@ -373,7 +374,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
 
                     if (!selection.contains(node)) {
-                        if (!TalosInputProcessor.ctrlPressed()) {
+                        if (!ctrlPressed()) {
                             clearSelection(true);
                         }
                         addNodeToSelection(node);
