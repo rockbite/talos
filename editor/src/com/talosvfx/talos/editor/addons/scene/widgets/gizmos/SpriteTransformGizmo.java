@@ -35,6 +35,9 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         if (isSelected()) {
             Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
+            viewport.screenToLocalCoordinates(vec);
+            viewport.getWorldFromLocal(vec.x, vec.y);
+
             logger.info("Redo smart transform cursor update");
 
 //            SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);

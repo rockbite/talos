@@ -12,17 +12,21 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
+    protected ViewportWidget viewport;
 
+    public void setViewport (ViewportWidget viewport) {
+        this.viewport = viewport;
+    }
 
-    public static class TransformSettings  {
+	public static class TransformSettings  {
         public float gridSizeX = 1;
         public float gridSizeY = 1;
 
