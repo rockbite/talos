@@ -71,20 +71,14 @@ public class AssetListPopup<T> extends VisWindow {
     }
 
     private void loadTree(Predicate<FilteredTree.Node<GameAsset<T>>> predicate) {
+        FileHandle rootHandle = SharedResources.currentProject.rootProjectDir();
+        rootNode = new FilteredTree.Node<>(rootHandle.path(), new Label(rootHandle.name(), SharedResources.skin));
 
-        logger.info("Load the asset list tree needs redoing");
-//        String rootPath = SceneEditorAddon.get().workspace.getProjectPath();
-//        FileHandle rootHandle = Gdx.files.absolute(rootPath);
-//        tree.clearChildren();
-//        FileHandle root = Gdx.files.absolute(rootPath);
-//
-//        rootNode = new FilteredTree.Node<>(rootPath, new Label(rootHandle.name(), SharedResources.skin));
-//        rootNode.setObject(null);
-//        tree.add(rootNode);
-//
-//        traversePath(root, 0, 10, rootNode, predicate);
-//
-//        rootNode.setExpanded(true);
+        tree.clearChildren();
+        tree.add(rootNode);
+
+        traversePath(rootHandle, 0, 10, rootNode, predicate);
+        rootNode.setExpanded(true);
     }
 
     public boolean contains (float x, float y) {
