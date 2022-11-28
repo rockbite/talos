@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.socket.SocketServer;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
@@ -115,6 +116,8 @@ public class TalosMain2 extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		CursorUtil.checkAndReset();
+
 		super.render();
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);

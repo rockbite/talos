@@ -36,18 +36,13 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
             viewport.screenToLocalCoordinates(vec);
-            viewport.getWorldFromLocal(vec.x, vec.y);
+            vec = viewport.getWorldFromLocal(vec.x, vec.y);
 
-            logger.info("Redo smart transform cursor update");
-
-//            SceneEditorWorkspace.getInstance().screenToLocalCoordinates(vec);
-//            vec = SceneEditorWorkspace.getInstance().getWorldFromLocal(vec.x, vec.y);
-//
-//            if (isOnTouchedPoint(vec.x, vec.y)) {
-//                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-//            } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
-//                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
-//            }
+            if (isOnTouchedPoint(vec.x, vec.y)) {
+                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+            } else if (isOnTouchedRotationArea(vec.x, vec.y)) {
+                CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
+            }
         }
 
     }

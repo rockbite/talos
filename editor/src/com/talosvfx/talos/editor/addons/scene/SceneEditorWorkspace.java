@@ -1336,7 +1336,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		// remove gizmos
 		removeGizmos(target);
 
-		TalosMain.Instance().ProjectController().setDirty();
 	}
 
 	@EventHandler
