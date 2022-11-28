@@ -1676,7 +1676,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onAssetPathChanged (AssetPathChanged event) {
 		Array<AComponent> list = new Array<>();
-		notifyAssetPathChanged(list, currentContainer.getSelfObject(), event);
 
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
@@ -1688,23 +1687,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		});
 	}
 
-	private void notifyAssetPathChanged (Array<AComponent> list, GameObject gameObject, AssetPathChanged event) {
-//        Iterable<AComponent> components = gameObject.getComponents();
-//        for(AComponent component: components) {
-//            boolean affected = component.notifyAssetPathChanged(event.oldRelativePath, event.newRelativePath);
-//            if(affected) {
-//                list.add(component);
-//            }
-//        }
-//
-//        Array<GameObject> gameObjects = gameObject.getGameObjects();
-//        if(gameObjects != null) {
-//            for(GameObject child: gameObjects) {
-//                notifyAssetPathChanged(list, child, event);
-//            }
-//        }
-		System.out.println("Does nothing anymore");
-	}
+
 
 	public void dispose () {
 		fileWatching.shutdown();
