@@ -56,7 +56,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
     @Override
     protected boolean canMoveAround () {
-        return isInViewPort || isDragging;
+        return isDragging;
     }
 
     private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {

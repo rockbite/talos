@@ -32,6 +32,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
@@ -55,6 +56,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		AssetRepository.init();
 		SharedResources.projectLoader = this::projectLoader;
 		SharedResources.appManager = new AppManager();
+		SharedResources.inputHandling = new InputHandling();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
@@ -83,7 +85,8 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
-		Gdx.input.setInputProcessor(stage);
+		SharedResources.inputHandling.addPermanentInputProcessor(stage);
+		SharedResources.inputHandling.setGDXMultiPlexer();
 
 		openProjectExplorer();
 	}

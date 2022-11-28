@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -39,8 +40,8 @@ public class SelectBoxWidget extends PropertyWidget<String> {
 
     @Override
     public Actor getSubWidget() {
-        selectBox = new SelectBox<>(TalosMain.Instance().UIStage().getSkin(), "propertyValue");
-        noValueLabel = new Label("", TalosMain.Instance().UIStage().getSkin());
+        selectBox = new SelectBox<>(SharedResources.skin, "propertyValue");
+        noValueLabel = new Label("", SharedResources.skin);
         noValueLabel.setAlignment(Align.right);
         stack = new Stack();
         stack.add(noValueLabel);

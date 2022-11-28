@@ -27,6 +27,10 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.*;
+import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
@@ -435,7 +439,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				if (button == 1 && !event.isCancelled()) {
 					final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-					(TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+					screenToLocalCoordinates(vec);
+					localToStageCoordinates(vec);
 
 					Vector2 location = new Vector2(vec);
 					Vector2 createLocation = new Vector2(hitCords);
@@ -545,7 +550,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					}
 				}
 
-				getStage().setKeyboardFocus(SceneEditorWorkspace.this);
 
 				selectionRect.setVisible(false);
 			}
@@ -585,6 +589,21 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		};
 
 		addListener(inputListener);
+	}
+
+	@EventHandler
+	public void selectExternal (SelectGameObjectExternallyEvent event) {
+		selectGameObjectExternally(event.getGameObject());
+	}
+
+	@EventHandler
+	public void addToSelectionEvent (AddToSelectionEvent addToSelectionEvent) {
+		addToSelection(addToSelectionEvent.getGameObject());
+	}
+
+	@EventHandler
+	public void removeFromSelectionEvent (RemoveFromSelectionEvent removeFromSelectionEvent) {
+		removeFromSelection(removeFromSelectionEvent.getGameObject());
 	}
 
 	private void escapePressed() {
@@ -1260,12 +1279,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		AComponent component = event.getComponent();
 		if (event.isNotifyUI()) {
 
-
-			logger.info("Redo property provider reload from component update");
-//			sceneEditorAddon.propertyPanel.propertyProviderUpdated(component);
-
 			if (!event.wasRapid()) {
-				TalosMain.Instance().ProjectController().setDirty();
+//				TalosMain.Instance().ProjectController().setDirty();
 			}
 		}
 	}
@@ -1343,7 +1358,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	protected boolean canMoveAround () {
-		boolean initialMusts = isInViewPort || isDragging;
+		boolean initialMusts = true;
 		if (!initialMusts) {
 			return false;
 		}
@@ -1368,6 +1383,15 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return false;
+	}
+
+	@Override
+	protected GameObject getRootSceneObject () {
+		if (this.currentContainer != null) {
+			return currentContainer.root;
+		} else {
+			return super.getRootSceneObject();
+		}
 	}
 
 	public Vector2 getMouseCordsOnScene () {
@@ -1690,6 +1714,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		staticGridPropertyProvider.hideZero();
 		staticGridPropertyProvider.getBackgroundColor().set(0.1f, 0.1f, 0.1f, 1f);
 
+	}
+
+	@EventHandler
+	public void onRequestSelectionClear (RequestSelectionClearEvent clearEvent) {
+		requestSelectionClear();
 	}
 
 	@Override

@@ -22,6 +22,7 @@ public class DummyLayoutApp implements LayoutApp {
 	private transient Actor mainContent;
 	private transient Skin skin;
 	private DestroyCallback destroyCallback;
+	private boolean active;
 
 	public DummyLayoutApp (Skin skin, String tabName) {
 		this.tabName = tabName;
@@ -65,11 +66,18 @@ public class DummyLayoutApp implements LayoutApp {
 
 	@Override
 	public void setTabActive (boolean active) {
+		this.active = active;
+
 		if (active) {
 			tabWidget.setBackground(skin.getDrawable("tab-bg"));
 		} else {
 			tabWidget.setBackground(skin.newDrawable("tab-bg", 0.5f, 0.5f, 0.5f, 1f));
 		}
+	}
+
+	@Override
+	public boolean isTabActive () {
+		return active;
 	}
 
 	private Actor createMainContent () {
@@ -81,6 +89,11 @@ public class DummyLayoutApp implements LayoutApp {
 	@Override
 	public String getUniqueIdentifier () {
 		return uuid;
+	}
+
+	@Override
+	public String getFriendlyName () {
+		return tabName;
 	}
 
 	@Override
@@ -108,5 +121,20 @@ public class DummyLayoutApp implements LayoutApp {
 	@Override
 	public void setDestroyCallback (DestroyCallback destroyCallback) {
 		this.destroyCallback = destroyCallback;
+	}
+
+	@Override
+	public void setScrollFocus () {
+
+	}
+
+	@Override
+	public void onInputProcessorAdded () {
+
+	}
+
+	@Override
+	public void onInputProcessorRemoved () {
+
 	}
 }

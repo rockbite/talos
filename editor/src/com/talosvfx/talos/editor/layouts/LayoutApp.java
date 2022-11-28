@@ -7,8 +7,10 @@ public interface LayoutApp {
 //	change tis to focus
 
 	void setTabActive (boolean active);
+	boolean isTabActive ();
 
 	String getUniqueIdentifier ();
+	String getFriendlyName ();
 	Actor getTabWidget ();
 	Actor copyTabWidget ();
 
@@ -16,5 +18,10 @@ public interface LayoutApp {
 	Actor getCopyMainContent ();
 
 	void setDestroyCallback (DestroyCallback destroyCallback);
+
+	void setScrollFocus ();
+
+	void onInputProcessorAdded ();
+	void onInputProcessorRemoved ();
 
 }

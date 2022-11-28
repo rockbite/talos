@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.util.function.Supplier;
 
@@ -33,7 +34,7 @@ public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
 
     @Override
     public Actor getSubWidget() {
-        attachmentPointBox = new AttachmentPointBox(TalosMain.Instance().UIStage().getSkin(), "position");
+        attachmentPointBox = new AttachmentPointBox(SharedResources.skin, "position");
 
         Array<String> boneNameList = new Array<>();
         boneNameList.clear();

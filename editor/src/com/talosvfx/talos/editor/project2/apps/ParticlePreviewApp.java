@@ -33,6 +33,17 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 			public Actor getMainContent () {
 				return preview3D;
 			}
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				SharedResources.stage.setScrollFocus(preview3D);
+			}
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+			}
+
+
 		};
 
 	}

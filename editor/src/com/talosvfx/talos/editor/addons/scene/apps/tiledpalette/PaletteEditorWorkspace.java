@@ -987,7 +987,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
     @Override
     protected boolean canMoveAround () {
         if(entityUnderMouse != null) return false;
-        return isInViewPort || isDragging;
+        return isDragging;
     }
 
     private boolean isPointOverGameObject (Vector2 worldPos, GameObject gameObject) {

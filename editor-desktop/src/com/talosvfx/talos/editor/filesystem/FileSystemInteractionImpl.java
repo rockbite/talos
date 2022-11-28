@@ -8,6 +8,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -17,7 +18,7 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 	private final FileChooser fileChooser;
 
 	public FileSystemInteractionImpl () {
-		Skin skin = TalosMain.Instance().UIStage().getSkin();
+		Skin skin = SharedResources.skin;
 		fileChooser = new FileChooser(FileChooser.Mode.SAVE);
 		fileChooser.setBackground(skin.getDrawable("window-noborder"));
 

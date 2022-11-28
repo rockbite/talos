@@ -65,9 +65,6 @@ public class DirectoryViewWidget extends Table {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (getStage() != null) {
-                    getStage().setKeyboardFocus(DirectoryViewWidget.this);
-                }
                 return super.touchDown(event, x, y, pointer, button);
             }
 
@@ -107,8 +104,8 @@ public class DirectoryViewWidget extends Table {
                     reportSelectionChanged();
                 }
 
-                boolean renamePressed = TalosMain.Instance().isOsX() && keycode == Input.Keys.ENTER ||
-                                        !TalosMain.Instance().isOsX() && keycode == Input.Keys.F2;
+                boolean renamePressed = TalosMain.isOsX() && keycode == Input.Keys.ENTER ||
+                                        !TalosMain.isOsX() && keycode == Input.Keys.F2;
                 if (renamePressed) {
                     rename();
                 }

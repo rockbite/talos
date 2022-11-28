@@ -105,7 +105,7 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
-	public boolean isOsX() {
+	public static boolean isOsX() {
 		String osName = System.getProperty("os.name").toLowerCase();
 		boolean isMacOs = osName.startsWith("mac os x");
 		return isMacOs;

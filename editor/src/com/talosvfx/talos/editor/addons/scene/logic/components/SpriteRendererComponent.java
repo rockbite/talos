@@ -120,8 +120,10 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
                 final Texture texture = getGameResource().getResource();
 
-                final float aspect = texture.getHeight() * 1f / texture.getWidth();
-                size.y = size.x * aspect;
+                if (texture != null) {
+                    final float aspect = texture.getHeight() * 1f / texture.getWidth();
+                    size.y = size.x * aspect;
+                }
 
                 final ValueWidget yValue = ((Vector2PropertyWidget) sizeWidget).yValue;
                 yValue.setValue(size.y, false);
@@ -141,14 +143,16 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
                     final ValueWidget yValue = vector2PropertyWidget.yValue;
                     final Texture texture = getGameResource().getResource();
 
-                    final float aspect = texture.getHeight() * 1f / texture.getWidth();
+                    if (texture != null) {
+                        final float aspect = texture.getHeight() * 1f / texture.getWidth();
 
-                    if (event.getTarget() == xValue) {
-                        size.y = size.x * aspect;
-                    }
+                        if (event.getTarget() == xValue) {
+                            size.y = size.x * aspect;
+                        }
 
-                    if (event.getTarget() == yValue) {
-                        size.x = size.y / aspect;
+                        if (event.getTarget() == yValue) {
+                            size.x = size.y / aspect;
+                        }
                     }
 
                     xValue.setValue(size.x, false);

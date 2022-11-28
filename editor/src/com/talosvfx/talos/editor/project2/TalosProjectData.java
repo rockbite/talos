@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -90,12 +91,26 @@ public class TalosProjectData implements Json.Serializable {
 		layoutGrid.reset();
 
 		SceneEditorWorkspace workspaceWidget = new SceneEditorWorkspace();
+		workspaceWidget.disableListeners();
 		//Find a scene and open it
 
 		DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, "Scene") {
 			@Override
 			public Actor getMainContent () {
 				return workspaceWidget;
+			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				workspaceWidget.restoreListeners();
+				SharedResources.stage.setScrollFocus(workspaceWidget);
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+				workspaceWidget.disableListeners();
 			}
 		};
 
@@ -121,6 +136,17 @@ public class TalosProjectData implements Json.Serializable {
 			@Override
 			public Actor getMainContent () {
 				return hierarchyWidget;
+			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				SharedResources.stage.setScrollFocus(hierarchyWidget.getScrollPane());
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
 			}
 		};
 

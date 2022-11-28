@@ -4,9 +4,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.kotcrab.vis.ui.VisUI;
 import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -180,11 +182,31 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 		loadProject(gameAsset.getResource());
 
 		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
+		moduleGraphUIWrapper.disableListeners();
 
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return moduleGraphUIWrapper;
+			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				moduleGraphUIWrapper.restoreListeners();
+				SharedResources.stage.setScrollFocus(moduleGraphUIWrapper);
+				SharedResources.inputHandling.addPriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.setGDXMultiPlexer();
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+				moduleGraphUIWrapper.disableListeners();
+				SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.setGDXMultiPlexer();
+
+				Stage stage = moduleGraphUIWrapper.getStage();
 			}
 		};
 

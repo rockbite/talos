@@ -32,7 +32,7 @@ public class TweenEditor extends AEditorApp<FileHandle> {
     public void initContent() {
         content = new Table();
 
-        Skin skin = TalosMain.Instance().UIStage().getSkin();
+        Skin skin = SharedResources.skin;
 
         /*
         animationTimeline = new AnimationTimeline(skin);

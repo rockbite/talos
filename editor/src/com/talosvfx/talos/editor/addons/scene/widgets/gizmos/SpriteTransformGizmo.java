@@ -106,8 +106,10 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         if (spriteRendererComponent.fixAspectRatio) {
             Texture texture = spriteRendererComponent.getGameResource().getResource();
 
-            final float aspect = texture.getHeight() * 1f / texture.getWidth();
-            spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
+            if (texture != null) {
+                final float aspect = texture.getHeight() * 1f / texture.getWidth();
+                spriteRendererComponent.size.y = spriteRendererComponent.size.x * aspect;
+            }
         }
 
         if (spriteRendererComponent.fixAspectRatio) {

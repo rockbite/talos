@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Select;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
@@ -22,6 +23,10 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
+import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
@@ -58,7 +63,7 @@ public class HierarchyWidget extends Table implements Observer {
         top();
         defaults().top();
 
-        scrollPane= new ScrollPane(tree);
+        scrollPane = new ScrollPane(tree);
 
         add(scrollPane).height(0).grow().pad(5).padRight(0);
 
@@ -70,39 +75,40 @@ public class HierarchyWidget extends Table implements Observer {
                 super.selected(node);
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
-                logger.info("Redo select and focus");
-//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//                focusKeyboard(gameObject);
-//                sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
+                SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
+                selectGameObjectExternallyEvent.setGameObject(gameObject);
+                Notifications.fireEvent(selectGameObjectExternallyEvent);
             }
 
             @Override
             public void addedIntoSelection (FilteredTree.Node<GameObject> node) {
                 super.addedIntoSelection(node);
 
-                logger.info("Redo add to selection");
-//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//                sceneEditorAddon.workspace.addToSelection(gameObject);
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
+
+                AddToSelectionEvent addToSelectionEvent = Notifications.obtainEvent(AddToSelectionEvent.class);
+                addToSelectionEvent.setGameObject(gameObject);
+                Notifications.fireEvent(addToSelectionEvent);
+
             }
 
             @Override
             public void removedFromSelection (FilteredTree.Node<GameObject> node) {
                 super.removedFromSelection(node);
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
-                logger.info("redo remove from selection");
-//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//                sceneEditorAddon.workspace.removeFromSelection(gameObject);
+                RemoveFromSelectionEvent removeFromSelectionEvent = Notifications.obtainEvent(RemoveFromSelectionEvent.class);
+                removeFromSelectionEvent.setGameObject(gameObject);
+                Notifications.fireEvent(removeFromSelectionEvent);
+
             }
 
             @Override
             public void clearSelection () {
                 super.clearSelection();
 
-                logger.info("redo request selection clear");
-//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//                sceneEditorAddon.workspace.requestSelectionClear();
+                RequestSelectionClearEvent requestSelectionClearEvent = Notifications.obtainEvent(RequestSelectionClearEvent.class);
+                Notifications.fireEvent(requestSelectionClearEvent);
             }
 
             @Override
@@ -114,11 +120,13 @@ public class HierarchyWidget extends Table implements Observer {
                 logger.info("redo selection|context menu");
 //                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
 //
-//                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
+                GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 //
-//                if(!tree.getSelection().contains(node)) {
-//                    sceneEditorAddon.workspace.selectGameObjectExternally(gameObject);
-//                }
+                if(!tree.getSelection().contains(node)) {
+                    SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
+                    selectGameObjectExternallyEvent.setGameObject(gameObject);
+                    Notifications.fireEvent(selectGameObjectExternallyEvent);
+                }
 //
 //                showContextMenu(gameObject);
             }
@@ -589,6 +597,10 @@ public class HierarchyWidget extends Table implements Observer {
             }
 
         }
+    }
+
+    public ScrollPane getScrollPane () {
+        return scrollPane;
     }
 
     private static class HierarchyWrapper extends Table {

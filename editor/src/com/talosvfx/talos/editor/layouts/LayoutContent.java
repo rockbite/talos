@@ -3,23 +3,52 @@ package com.talosvfx.talos.editor.layouts;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LayoutContent extends LayoutItem {
+
+	private static final Logger logger = LoggerFactory.getLogger(LayoutContent.class);
 
 	private final Table innerContents;
 	private final Table tabBar;
 	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
+	private LayoutApp activeApp;
 
 	public LayoutContent (Skin skin, LayoutGrid layoutGrid, LayoutApp app) {
 		this(skin, layoutGrid);
 		addContent(app);
+
+		addListener(new InputListener() {
+			@Override
+			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				super.enter(event, x, y, pointer, fromActor);
+				if (pointer != -1) return;
+				if (fromActor == null || !fromActor.isDescendantOf(LayoutContent.this)) {
+					logger.info("Enter {}", activeApp.getFriendlyName());
+					activeApp.onInputProcessorAdded();
+				}
+			}
+
+			@Override
+			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				super.exit(event, x, y, pointer, toActor);
+				if (pointer != -1) return;
+				if (toActor == null || !toActor.isDescendantOf(LayoutContent.this)) {
+					logger.info("Exit {}", activeApp.getFriendlyName());
+					activeApp.onInputProcessorRemoved();
+				}
+			}
+		});
 	}
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
@@ -71,11 +100,16 @@ public class LayoutContent extends LayoutItem {
 
 	private void swapToApp (LayoutApp result) {
 		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+			if (app.value.isTabActive()) {
+				app.value.onInputProcessorRemoved();
+			}
 			app.value.setTabActive(false);
 		}
 		contentTable.clearChildren();
 		contentTable.add(result.getMainContent()).grow();
 		result.setTabActive(true);
+		activeApp = result;
+		activeApp.onInputProcessorAdded();
 	}
 
 	public void addContent (LayoutApp layoutApp) {

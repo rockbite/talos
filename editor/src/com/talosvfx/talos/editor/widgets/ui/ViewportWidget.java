@@ -28,11 +28,13 @@ import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
@@ -94,7 +96,6 @@ public abstract class ViewportWidget extends Table {
 	private Vector2 vec2 = new Vector2();
 
 	protected InputListener inputListener;
-	protected boolean isInViewPort;
 	protected boolean isDragging;
 	private boolean inputListenersEnabled = true;
 
@@ -484,6 +485,20 @@ public abstract class ViewportWidget extends Table {
 		return null;
 	}
 
+
+	private Array<EventListener> storedListeners = new Array<>();
+	public void disableListeners () {
+		DelayedRemovalArray<EventListener> listeners = getListeners();
+		storedListeners.addAll(listeners);
+		clearListeners();
+	}
+
+	public void restoreListeners () {
+		for (EventListener storedListener : storedListeners) {
+			addListener(storedListener);
+		}
+	}
+
 	protected void addPanListener () {
 		addListener(new InputListener() {
 			boolean canPan = false;
@@ -503,7 +518,6 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				getStage().setScrollFocus(ViewportWidget.this);
 				canPan = canMoveAround();
 				cameraController.touchDown((int)x, (int)y, pointer, button);
 				return !event.isHandled();
@@ -526,24 +540,6 @@ public abstract class ViewportWidget extends Table {
 				isDragging = true;
 
 				cameraController.touchDragged((int)x, (int)y, pointer);
-			}
-
-			@Override
-			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				isInViewPort = true;
-
-				super.enter(event, x, y, pointer, fromActor);
-//				TalosMain.Instance().UIStage().getStage().setScrollFocus(ViewportWidget.this);
-			}
-
-			@Override
-			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-				if (pointer != -1)
-					return; //Only care about exit/enter from mouse move
-//				TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
-
-				isInViewPort = false;
-				super.exit(event, x, y, pointer, toActor);
 			}
 		});
 	}
@@ -608,7 +604,7 @@ public abstract class ViewportWidget extends Table {
         HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
         if (!locked) {
-//            drawGizmos(batch, parentAlpha);
+            drawGizmos(batch, parentAlpha);
         }
 
 		batch.end();
@@ -619,13 +615,13 @@ public abstract class ViewportWidget extends Table {
 		batch.setTransformMatrix(prevTransform);
 		batch.begin();
 
-//		getEntityUnderMouse();
+		getEntityUnderMouse();
 
 //		Debug entity secltion
-//		if (entityUnderMouse != null) {
-//			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
-//			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
-//		}
+		if (entityUnderMouse != null) {
+			batch.draw(entitySelectionBuffer.getFrameBuffer().getColorBufferTexture(), getX(), getY(), getWidth(), getHeight(), 0, 0, 1, 1);
+			System.out.println(entityUnderMouse.uuid.toString() + " " + this.getClass());
+		}
 
 		boolean debugEntityIDS = false;
 
@@ -665,16 +661,19 @@ public abstract class ViewportWidget extends Table {
 
 		Color color = entitySelectionBuffer.getPixelAtNDC(uiSpace);
 
-
-		logger.info("get entity under mouse reimplement");
-//		GameObject root = SceneEditorWorkspace.getInstance().getRootGO();
-//		if (root != null) {
-//			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
-//		} else {
-//			entityUnderMouse = null;
-//		}
+		GameObject root = getRootSceneObject();
+		if (root != null) {
+			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
+		} else {
+			entityUnderMouse = null;
+		}
 
 	}
+
+	protected GameObject getRootSceneObject () {
+		return null;
+	}
+
 	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
@@ -754,7 +753,7 @@ public abstract class ViewportWidget extends Table {
 
 	// allow moving around if space bar is pressed and is in viewport or has dragged from viewport
 	protected boolean canMoveAround() {
-		return Gdx.input.isKeyPressed(Input.Keys.SPACE) && (isInViewPort || isDragging);
+		return Gdx.input.isKeyPressed(Input.Keys.SPACE) || (isDragging);
 	}
 
 	public OrthographicCamera getCamera () {

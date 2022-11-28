@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
@@ -12,9 +13,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import lombok.Getter;
 
 public class GenericStageWrappedViewportWidget extends ViewportWidget {
 
+
+	@Getter
 	private final Stage stage;
 
 	public GenericStageWrappedViewportWidget (Actor actor) {
@@ -26,7 +30,6 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		stage.addActor(actor);
 
 		setWorldSize(1000);
-
 	}
 
 	@Override
