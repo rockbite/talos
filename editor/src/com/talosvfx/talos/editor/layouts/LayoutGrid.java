@@ -63,7 +63,11 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
 	public void removeApp (LayoutContent layoutContent, LayoutApp layoutApp) {
 		//Find the content that has it and remove it
-		removeContent(layoutContent);
+		layoutContent.removeContent(layoutApp);
+
+		if (layoutContent.isEmpty()) {
+			removeContent(layoutContent);
+		}
 
 	}
 

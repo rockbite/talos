@@ -77,6 +77,8 @@ public class LayoutContent extends LayoutItem {
 		addListener(new InputListener() {
 			@Override
 			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				if (activeApp == null) return;
+
 				super.enter(event, x, y, pointer, fromActor);
 				if (pointer != -1) return;
 				if (fromActor == null || !fromActor.isDescendantOf(LayoutContent.this)) {
@@ -87,6 +89,8 @@ public class LayoutContent extends LayoutItem {
 
 			@Override
 			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				if (activeApp == null) return;
+
 				super.exit(event, x, y, pointer, toActor);
 				if (pointer != -1) return;
 				if (toActor == null || !toActor.isDescendantOf(LayoutContent.this)) {
@@ -113,18 +117,20 @@ public class LayoutContent extends LayoutItem {
 
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
-		layoutApp.setDestroyCallback(new DestroyCallback() {
-			@Override
-			public void onDestroyRequest () {
-				grid.removeApp(LayoutContent.this, layoutApp);
-			}
-		});
+
 	}
 
 	public void addContent (LayoutApp layoutApp, boolean copy) {
 		addContent(layoutApp, copy, true);
 	}
 	public void addContent (LayoutApp layoutApp, boolean copy, boolean swapToActive) {
+		layoutApp.setDestroyCallback(new DestroyCallback() {
+			@Override
+			public void onDestroyRequest () {
+				grid.removeApp(LayoutContent.this, layoutApp);
+			}
+		});
+
 		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
 
 		if (copy) {
