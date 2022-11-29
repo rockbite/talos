@@ -6,8 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -16,13 +16,40 @@ import java.util.function.Supplier;
 public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     private Image box;
-
-    public ColorPropertyWidget() {
-        super();
-    }
+    private ColorPicker colorPicker;
 
     public ColorPropertyWidget(String name, Supplier<Color> supplier, ValueChanged<Color> valueChanged) {
         super(name, supplier, valueChanged);
+
+        colorPicker = new ColorPicker("Color Picker", new ColorPickerAdapter() {
+            @Override
+            public void reset(Color previousColor, Color newColor) {
+                super.reset(previousColor, newColor);
+                box.setColor(newColor);
+                callValueChanged(newColor);
+
+            }
+
+            @Override
+            public void canceled(Color oldColor) {
+                super.canceled(oldColor);
+                box.setColor(oldColor);
+                callValueChanged(oldColor);
+
+            }
+
+            @Override
+            public void changed(Color newColor) {
+                super.changed(newColor);
+                box.setColor(newColor);
+                callValueChanged(box.getColor());
+            }
+        });
+        colorPicker.padTop(32);
+        colorPicker.padLeft(16);
+        colorPicker.setHeight(330);
+        colorPicker.setWidth(430);
+        colorPicker.padRight(26);
     }
 
     @Override
@@ -36,33 +63,13 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
         Skin skin = SharedResources.skin;
         box = new Image(skin.newDrawable(ColorLibrary.SHAPE_SQUARE));
         box.setSize(20, 20);
+
         box.addListener(new ClickListener() {
             @Override
-            public void clicked (InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(box.getColor(), new ColorPickerAdapter() {
-                    @Override
-                    public void reset (Color previousColor, Color newColor) {
-                        super.reset(previousColor, newColor);
-                        box.setColor(newColor);
-                        callValueChanged(newColor);
-
-                    }
-
-                    @Override
-                    public void canceled (Color oldColor) {
-                        super.canceled(oldColor);
-                        box.setColor(oldColor);
-                        callValueChanged(oldColor);
-
-                    }
-
-                    @Override
-                    public void changed(Color newColor) {
-                        super.changed(newColor);
-                        box.setColor(newColor);
-                        callValueChanged(box.getColor());
-                    }
-                });
+            public void clicked(InputEvent event, float x, float y) {
+                colorPicker.setColor(box.getColor());
+                SharedResources.stage.addActor(colorPicker.fadeIn()
+                );
             }
         });
 
@@ -71,7 +78,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     @Override
     public void updateWidget(Color value) {
-        if(value != null) {
+        if (value != null) {
             box.setColor(value);
         }
     }
