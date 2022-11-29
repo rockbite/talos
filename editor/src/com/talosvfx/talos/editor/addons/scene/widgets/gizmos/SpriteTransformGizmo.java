@@ -48,10 +48,14 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 
+        // patch for negative width and height cases
+        float signWidth = Math.signum(spriteRendererComponent.size.x);
+        float signHeight = Math.signum(spriteRendererComponent.size.y);
+
         rectangle.set(
-            -spriteRendererComponent.size.x/2f, -spriteRendererComponent.size.y/2f,
-            spriteRendererComponent.size.x, spriteRendererComponent.size.y
-            );
+                signWidth * -spriteRendererComponent.size.x / 2f, signHeight * -spriteRendererComponent.size.y / 2f,
+                signWidth * spriteRendererComponent.size.x, signHeight * spriteRendererComponent.size.y
+        );
 
         rectangle.x += transformComponent.worldPosition.x;
         rectangle.y += transformComponent.worldPosition.y;
