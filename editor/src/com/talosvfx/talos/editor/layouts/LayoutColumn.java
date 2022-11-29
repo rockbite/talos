@@ -26,7 +26,14 @@ public class LayoutColumn extends LayoutItem {
 		addRowContainer(newLayoutContent, up, null);
 	}
 
+	public void addRowContainer (LayoutItem newLayoutContent, boolean up, boolean resize) {
+		addRowContainer(newLayoutContent, up, null, resize);
+	}
+
 	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative) {
+		addRowContainer(newLayoutContent, up, relative, false);
+	}
+	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative, boolean resize) {
 
 		if (relative != null) {
 			//We are relative to some other actor
@@ -38,25 +45,35 @@ public class LayoutColumn extends LayoutItem {
 			}
 
 			rows.insert(idxRelative, newLayoutContent);
-			takeThirtyPercent(newLayoutContent, idxRelative, !up ? idxRelative + 1 : idxRelative - 1);
+			if (resize) {
+				takeThirtyPercent(newLayoutContent, idxRelative, !up ? idxRelative + 1 : idxRelative - 1);
+			}
 
 		} else {
 			if (!up) {
 				rows.insert(0, newLayoutContent);
 				if (rows.size == 1) {
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+					if (resize) {
+						newLayoutContent.setRelativeWidth(1f);
+						newLayoutContent.setRelativeHeight(1f);
+					}
 				} else {
-					takeThirtyPercent(newLayoutContent, 0, 1);
+					if (resize) {
+						takeThirtyPercent(newLayoutContent, 0, 1);
+					}
 				}
 
 			} else {
 				rows.add(newLayoutContent);
 				if (rows.size == 1) {
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+					if (resize) {
+						newLayoutContent.setRelativeWidth(1f);
+						newLayoutContent.setRelativeHeight(1f);
+					}
 				} else {
-					takeThirtyPercent(newLayoutContent, 1, 0);
+					if (resize) {
+						takeThirtyPercent(newLayoutContent, 1, 0);
+					}
 				}
 			}
 		}

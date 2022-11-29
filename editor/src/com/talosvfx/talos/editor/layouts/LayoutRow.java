@@ -18,10 +18,17 @@ public class LayoutRow extends LayoutItem {
 	}
 
 	public void addColumnContainer (LayoutItem newLayoutContent, boolean left) {
-		addColumnContainer(newLayoutContent, left, null);
+		addColumnContainer(newLayoutContent, left, null, true);
+	}
+	public void addColumnContainer (LayoutItem newLayoutContent, boolean left, boolean resize) {
+		addColumnContainer(newLayoutContent, left, null, resize);
 	}
 
 	public void addColumnContainer (LayoutItem newLayoutContent, boolean left, @Null LayoutItem relative) {
+		addColumnContainer(newLayoutContent, left, relative, true);
+	}
+
+	public void addColumnContainer (LayoutItem newLayoutContent, boolean left, @Null LayoutItem relative, boolean resize) {
 
 		if (relative != null) {
 			//We are relative to some other actor
@@ -33,8 +40,9 @@ public class LayoutRow extends LayoutItem {
 			}
 
 			columns.insert(idxRelative, newLayoutContent);
-			takeThirtyPercent(newLayoutContent, idxRelative, left ? idxRelative + 1 : idxRelative - 1);
-
+			if (resize) {
+				takeThirtyPercent(newLayoutContent, idxRelative, left ? idxRelative + 1 : idxRelative - 1);
+			}
 
 		} else {
 			if (left) {
@@ -42,19 +50,27 @@ public class LayoutRow extends LayoutItem {
 
 				//Take 30% from index 1 width
 				if (columns.size == 1) {
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+					if (resize) {
+						newLayoutContent.setRelativeWidth(1f);
+						newLayoutContent.setRelativeHeight(1f);
+					}
 				} else {
-					takeThirtyPercent(newLayoutContent, 0, 1);
+					if (resize) {
+						takeThirtyPercent(newLayoutContent, 0, 1);
+					}
 				}
 
 			} else {
 				columns.add(newLayoutContent);
 				if (columns.size == 1) {
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+					if (resize) {
+						newLayoutContent.setRelativeWidth(1f);
+						newLayoutContent.setRelativeHeight(1f);
+					}
 				} else {
-					takeThirtyPercent(newLayoutContent, 1, 0);
+					if (resize) {
+						takeThirtyPercent(newLayoutContent, 1, 0);
+					}
 				}
 			}
 		}

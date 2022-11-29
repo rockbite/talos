@@ -525,9 +525,7 @@ public class UIStage {
 	}
 
 	public void showColorPicker(Color color, ColorPickerListener listener) {
-		colorPicker.setColor(color);
-		colorPicker.setListener(listener);
-		TalosMain.Instance().UIStage().getStage().addActor(colorPicker.fadeIn());
+
 	}
 
 	public PreviewWidget PreviewWidget() {

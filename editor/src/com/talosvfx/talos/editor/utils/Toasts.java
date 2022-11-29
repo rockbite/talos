@@ -50,8 +50,20 @@ public class Toasts {
 	private Toasts () {
 	}
 
+	private void showToast () {
+
+	}
+
+	public void showErrorToast (String message) {
+		showToast(message, ColorLibrary.ORANGE);
+	}
+
 	public void showInfoToast (String message) {
-		Toast toast = new Toast(message, ColorLibrary.BLUE);
+		showToast(message, ColorLibrary.BLUE);
+	}
+
+	private void showToast (String message, Color color) {
+		Toast toast = new Toast(message, color);
 		toastTarget.addActor(toast);
 		toastTarget.setFillParent(true);
 		toastTarget.setPosition(0, 0);

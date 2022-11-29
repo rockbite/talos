@@ -92,6 +92,11 @@ public class DummyLayoutApp implements LayoutApp {
 	}
 
 	@Override
+	public void setUniqueIdentifier (String uuid) {
+		this.uuid = uuid;
+	}
+
+	@Override
 	public String getFriendlyName () {
 		return tabName;
 	}

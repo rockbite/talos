@@ -1,0 +1,49 @@
+package com.talosvfx.talos.editor.project2.apps;
+
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
+import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
+
+@SingletonApp
+public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
+
+	private final ProjectExplorerWidget projectExplorerWidget;
+
+	public ProjectExplorerApp () {
+		this.singleton = true;
+
+		super.updateForGameAsset(gameAsset);
+
+		projectExplorerWidget = new ProjectExplorerWidget();
+		DummyLayoutApp assetDirectoryApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+			@Override
+			public Actor getMainContent () {
+				return projectExplorerWidget;
+			}
+		};
+
+		this.gridAppReference = assetDirectoryApp;
+	}
+
+	@Override
+	public void updateForGameAsset (GameAsset<Object> gameAsset) {
+		super.updateForGameAsset(gameAsset);
+		projectExplorerWidget.loadDirectoryTree(SharedResources.currentProject.rootProjectDir().path());
+
+	}
+
+	@Override
+	public String getAppName () {
+		if (gameAsset != null) {
+			return "Explorer - ";
+		} else {
+			return "Explorer - ";
+		}
+	}
+}
+

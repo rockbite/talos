@@ -57,8 +57,6 @@ public class LayoutTests extends ApplicationAdapter {
 
 					stage.clear();
 					layoutGrid = new LayoutGrid(skin);
-
-					layoutGrid.readFromJson(Gdx.files.local("bananas.json"));
 				}
 
 				return super.keyDown(keycode);

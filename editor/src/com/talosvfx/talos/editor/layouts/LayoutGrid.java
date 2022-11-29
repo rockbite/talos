@@ -11,13 +11,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class LayoutGrid extends WidgetGroup {
+public class LayoutGrid extends WidgetGroup implements Json.Serializable {
+
+	private static final Logger logger = LoggerFactory.getLogger(LayoutGrid.class);
 
 	private DragAndDrop dragAndDrop;
 
@@ -100,6 +110,17 @@ public class LayoutGrid extends WidgetGroup {
 		super.draw(batch, parentAlpha);
 	}
 
+	@Override
+	public void write (Json json) {
+		LayoutJsonStructure layoutJsonStructure = buildJsonFromObject(root);
+		json.writeValue("structure", layoutJsonStructure);
+	}
+
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonData.get("structure"));
+		System.out.println("got structure");
+	}
 
 
 	public enum LayoutDirection {
@@ -799,10 +820,24 @@ public class LayoutGrid extends WidgetGroup {
 	static class LayoutJsonStructure {
 		LayoutType type;
 		String appID;
+
+		boolean tabActive;
+
+		String baseAppClazz;
+		String gameAssetIdentifier;
+		GameAssetType gameAssetType;
+
 		float relativeWidth;
 		float relativeHeight;
 		Array<LayoutJsonStructure> children = new Array<>();
 	}
+
+	public String writeToJsonString () {
+		Json json = new Json();
+		LayoutJsonStructure layoutJsonStructure = buildJsonFromObject(root);
+		return json.prettyPrint(layoutJsonStructure);
+	}
+
 
 	public void writeToJson (FileHandle handle) {
 		Json json = new Json();
@@ -814,24 +849,114 @@ public class LayoutGrid extends WidgetGroup {
 
 	}
 
-	public void readFromJson (FileHandle handle) {
+	public void readFromJson (JsonValue jsonLayoutRepresentation) {
 		Json json = new Json();
-		LayoutJsonStructure layoutJsonStructure = json.fromJson(LayoutJsonStructure.class, handle);
-//
-//		LayoutItem parent = null;
-//
-//		if (layoutJsonStructure.type == LayoutType.COLUMN) {
-//			LayoutColumn layoutColumn = new LayoutColumn(skin, parent);
-//		} else if (layoutJsonStructure.type == LayoutType.ROW) {
-//			LayoutRow layoutRow = new LayoutRow();
-//		} else if (layoutJsonStructure.type == LayoutType.CONTENT) {
-//			LayoutContent layoutContent =  new LayoutContent();
-//		} else if (layoutJsonStructure.type == LayoutType.APP) {
-//			//Register the app uuid for injection
-//		}
+		LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonLayoutRepresentation);
+
+		LayoutItem parent = null;
+
+		if (layoutJsonStructure.type == LayoutType.COLUMN) {
+			LayoutColumn layoutColumn = new LayoutColumn(skin, this);
+			parent = layoutColumn;
+		} else if (layoutJsonStructure.type == LayoutType.ROW) {
+			LayoutRow layoutRow = new LayoutRow(skin, this);
+			parent = layoutRow;
+		} else if (layoutJsonStructure.type == LayoutType.CONTENT) {
+			LayoutContent layoutContent =  new LayoutContent(skin, this);
+			parent = layoutContent;
+		} else if (layoutJsonStructure.type == LayoutType.APP) {
+			throw new GdxRuntimeException("Root can't be an APP");
+		}
+
+		//Load the children and this is recursive
+		loadChildren(parent, layoutJsonStructure);
 
 
+		addContent(parent);
 	}
+
+	private void loadChildren (LayoutItem parent, LayoutJsonStructure layoutJsonStructure) {
+		Array<LayoutJsonStructure> children = layoutJsonStructure.children;
+
+		if (children != null && !children.isEmpty()) {
+			for (int i = 0; i < children.size; i++) {
+				LayoutJsonStructure child = children.get(i);
+
+				LayoutItem layoutItem = null;
+
+				if (child.type == LayoutType.COLUMN) {
+					LayoutColumn layoutColumn = new LayoutColumn(skin, this);
+					layoutColumn.setRelativeWidth(child.relativeWidth);
+					layoutColumn.setRelativeHeight(child.relativeHeight);
+
+					layoutItem = layoutColumn;
+
+				} else if (child.type == LayoutType.ROW) {
+					LayoutRow layoutRow = new LayoutRow(skin, this);
+					layoutRow.setRelativeWidth(child.relativeWidth);
+					layoutRow.setRelativeHeight(child.relativeHeight);
+
+					layoutItem = layoutRow;
+				} else if (child.type == LayoutType.CONTENT) {
+					LayoutContent layoutContent =  new LayoutContent(skin, this);
+					layoutContent.setRelativeWidth(child.relativeWidth);
+					layoutContent.setRelativeHeight(child.relativeHeight);
+
+					layoutItem = layoutContent;
+
+				} else if (child.type == LayoutType.APP) {
+
+					String appID = child.appID;
+					boolean tabActive = child.tabActive;
+					String baseAppClazz = child.baseAppClazz;
+					String gameAssetIdentifier = child.gameAssetIdentifier;
+					GameAssetType gameAssetType = child.gameAssetType;
+
+					//We need to make the app
+
+					try {
+						AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier);
+
+						//We skip and just add it to the parent
+						if (!(parent instanceof LayoutContent)) {
+							logger.error("Parent is not layout content, invalid layout, ignoring");
+						}
+
+						LayoutApp gridAppReference = baseApp.getGridAppReference();
+
+						gridAppReference.setTabActive(tabActive);
+
+						LayoutContent parent1 = (LayoutContent)parent;
+						parent1.addContent(gridAppReference, false, false);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("Error creating app from layout", e);
+						Toasts.getInstance().showErrorToast("Error creating app from layout " + e.getMessage());
+					}
+				}
+
+				if (layoutItem != null) {
+
+					//Add this item to the parent if parent is rows or layout
+					if (parent instanceof LayoutRow) {
+						((LayoutRow)parent).addColumnContainer(layoutItem, false, false);
+					} else if (parent instanceof LayoutColumn) {
+						((LayoutColumn)parent).addRowContainer(layoutItem, true, false);
+					}
+
+					//Load the children
+
+					loadChildren(layoutItem, child);
+
+				}
+			}
+		}
+
+		if (parent instanceof LayoutContent)
+			((LayoutContent)parent).sortToActiveTab();
+	}
+
 
 	private LayoutJsonStructure buildJsonFromObject (LayoutItem root) {
 		LayoutJsonStructure jsonStructure = new LayoutJsonStructure();
@@ -864,6 +989,13 @@ public class LayoutGrid extends WidgetGroup {
 				LayoutJsonStructure child = new LayoutJsonStructure();
 				child.type = LayoutType.APP;
 				child.appID = app.key;
+				child.tabActive = app.value.isTabActive();
+				AppManager.BaseApp appy = SharedResources.appManager.getAppForLayoutApp(app);
+				if (appy != null) {
+					child.baseAppClazz = appy.getClass().getSimpleName();
+					child.gameAssetIdentifier = appy.getAssetIdentifier();
+					child.gameAssetType = appy.getGameAssetType();
+				}
 				jsonStructure.children.add(child);
 			}
 		}

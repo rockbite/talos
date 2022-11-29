@@ -3,7 +3,9 @@ package com.talosvfx.talos.editor.project2;
 import com.artemis.utils.reflect.ClassReflection;
 import com.artemis.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
@@ -11,8 +13,65 @@ import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.apps.ParticlePreviewApp;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
+import com.talosvfx.talos.editor.project2.apps.PropertiesPanelApp;
+import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
+import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
+import com.talosvfx.talos.editor.project2.apps.SingletonApp;
+import lombok.Getter;
 
 public class AppManager {
+
+	private static final Object dummyObject = new Object();
+	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
+
+	static {
+		singletonAsset.setResourcePayload(dummyObject);
+	}
+
+	public BaseApp getAppForLayoutApp (ObjectMap.Entry<String, LayoutApp> app) {
+		LayoutApp value = app.value;
+
+		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
+			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
+			for (int i = 0; i < apps.size; i++) {
+				BaseApp<?> baseApp = apps.get(i);
+				if (baseApp.gridAppReference == value) {
+					//Its this app, lets return it
+					return baseApp;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier) {
+
+		Class<U> appForSimpleName = (Class<U>)appRegistry.getAppForSimpleName(baseAppClazz);
+
+		if (appForSimpleName == null) {
+			throw new GdxRuntimeException("No app found for clazz " + baseAppClazz + " register it in AppManager");
+		}
+
+		GameAsset<T> gameAsset;
+		if (gameAssetIdentifier.equals("singleton") && gameAssetType == GameAssetType.DIRECTORY) {
+			gameAsset = (GameAsset<T>)singletonAsset;
+		} else {
+			gameAsset = AssetRepository.getInstance().getAssetForIdentifier(gameAssetIdentifier, gameAssetType);
+		}
+
+		U baseAppForGameAsset = createBaseAppForGameAsset(gameAsset, appForSimpleName);
+		baseAppForGameAsset.setAppID(appID);
+
+		if (!baseAppsOpenForGameAsset.containsKey(gameAsset)) {
+			baseAppsOpenForGameAsset.put(gameAsset, new Array<>());
+		}
+		Array<BaseApp<T>> baseApps = (Array<BaseApp<T>>)baseAppsOpenForGameAsset.get(gameAsset);
+		baseApps.add(baseAppForGameAsset);
+
+		return baseAppForGameAsset;
+	}
 
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 
@@ -20,33 +79,67 @@ public class AppManager {
 
 	public abstract static class BaseApp<T> {
 		protected boolean singleton;
+
+		@Getter
 		protected LayoutApp gridAppReference;
 
 		protected GameAsset<T> gameAsset;
+
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
 		}
 
 		public abstract String getAppName ();
 
+		public GameAssetType getGameAssetType () {
+			return gameAsset.type;
+		}
+
+		public String getAssetIdentifier () {
+			return gameAsset.nameIdentifier;
+		}
+
+		public void setAppID (String appID) {
+			getGridAppReference().setUniqueIdentifier(appID);
+		}
 	}
 
 	private static class AppRegistry {
 
-		private ObjectMap<GameAssetType, Array<Class<? extends BaseApp>>> gameAssetTypeToAppsMap = new ObjectMap<>();
+		private ObjectMap<String, Class<? extends BaseApp<?>>> simpleNameMap = new ObjectMap<>();
+		private ObjectMap<GameAssetType, Array<Class<? extends BaseApp<?>>>> gameAssetTypeToAppsMap = new ObjectMap<>();
 
-		private void registerAppsForAssetType (GameAssetType gameAssetType, Class<? extends BaseApp>... classes) {
-			for (Class<? extends BaseApp> aClass : classes) {
+		private <T, U extends BaseApp<T>> void registerAppsForAssetType (GameAssetType gameAssetType, Class<? extends U>... classes) {
+			for (Class<? extends U> aClass : classes) {
 				if (!gameAssetTypeToAppsMap.containsKey(gameAssetType)) {
 					gameAssetTypeToAppsMap.put(gameAssetType, new Array<>());
 				}
-				gameAssetTypeToAppsMap.get(gameAssetType).add(aClass);
+
+				//Type unsafe part, resitrcted
+				Array classesArray = gameAssetTypeToAppsMap.get(gameAssetType);
+				classesArray.add(aClass);
+				simpleNameMap.put(aClass.getSimpleName(), aClass);
 			}
 		}
 
-		public Array<Class<? extends BaseApp>> getAppsForGameAssetType (GameAssetType gameAssetType) {
+		public void addExternalClass (Class<? extends BaseApp<?>> clazz) {
+			simpleNameMap.put(clazz.getSimpleName(), clazz);
+		}
+
+		public Class<? extends BaseApp<?>> getAppForSimpleName (String baseAppClazz) {
+			if (baseAppClazz == null) {
+				System.out.println();
+			}
+			return simpleNameMap.get(baseAppClazz);
+		}
+
+		public <T, U extends BaseApp<T>> Array<Class<U>> getAppsForGameAssetType (GameAsset<T> gameAsset) {
+			GameAssetType gameAssetType = gameAsset.type;
 			if (gameAssetTypeToAppsMap.containsKey(gameAssetType)) {
-				return gameAssetTypeToAppsMap.get(gameAssetType);
+
+				//Type unsafe part
+				Array classes = gameAssetTypeToAppsMap.get(gameAssetType);
+				return classes;
 			} else {
 				return new Array<>();
 			}
@@ -55,13 +148,17 @@ public class AppManager {
 		public boolean hasAssetType (GameAssetType type) {
 			return gameAssetTypeToAppsMap.containsKey(type);
 		}
+
 	}
 
-	private ObjectMap<GameAsset<?>, Array<? extends BaseApp>> baseAppsOpenForGameAsset = new ObjectMap<>();
+	private ObjectMap<GameAsset<?>, Array<? extends BaseApp<?>>> baseAppsOpenForGameAsset = new ObjectMap<>();
 
 	private AppRegistry appRegistry = new AppRegistry();
 
 	public AppManager () {
+		appRegistry.addExternalClass(ProjectExplorerApp.class);
+
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, PropertiesPanelApp.class, SceneHierarchyApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
 	}
 
@@ -69,13 +166,17 @@ public class AppManager {
 		return appRegistry.hasAssetType(gameAsset.type);
 	}
 
+	public <T, U extends BaseApp<T>> void openApp (GameAsset<T> asset, Class<U> app) {
+		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
+		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
+	}
+
 	private static class LayoutGridTargetConfig {
 		LayoutContent target; //null for root
 		LayoutGrid.LayoutDirection direction;
 	}
 
-
-	public <T> void openNewAsset (GameAsset<T> gameAsset) {
+	public <T, U extends BaseApp<T>> void openNewAsset (GameAsset<T> gameAsset) {
 
 		//open vfx.
 		//Open preview, timeline, node editor
@@ -86,7 +187,6 @@ public class AppManager {
 
 		//For each window to open, lets
 
-
 		//find apps that need creating
 		//find apps that need exchanging (singletons that need to be injected)
 
@@ -95,30 +195,39 @@ public class AppManager {
 
 		LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
 
-		Array<? extends BaseApp> appsToUpdate = getAppsToUpdate(gameAsset);
-		Array<? extends BaseApp> appsToCreate = getAppsToCreateAndOpen(gameAsset, appsToUpdate);
+		Array<U> appsToUpdate = getAppsToUpdate(gameAsset);
+		Array<U> appsToCreate = getAppsToCreateAndOpen(gameAsset, appsToUpdate);
 
-		for (BaseApp baseApp : appsToCreate) {
-			LayoutGridTargetConfig placementConfig = getBestPlacementForApp(baseApp, layoutGrid);
-
-			if (placementConfig.target == null) {
-				layoutGrid.addContent(new LayoutContent(SharedResources.skin, layoutGrid, baseApp.gridAppReference));
-				//Its root, so we should add it to root via addContent
-			} else {
-				//Add it externally
-				if (placementConfig.direction == LayoutGrid.LayoutDirection.TAB) {
-					placementConfig.target.addContent(baseApp.gridAppReference);
-				} else {
-					layoutGrid.placeContentRelative(placementConfig.target, placementConfig.direction, baseApp.gridAppReference);
-
-				}
-			}
+		for (U baseApp : appsToCreate) {
+			createAppAndPlaceInGrid(gameAsset, layoutGrid, baseApp);
 		}
 
-		for (BaseApp baseApp : appsToUpdate) {
+		for (BaseApp<T> baseApp : appsToUpdate) {
 			baseApp.updateForGameAsset(gameAsset);
 		}
 
+	}
+
+	private <T, U extends BaseApp<T>> void createAppAndPlaceInGrid (GameAsset<T> gameAsset, LayoutGrid layoutGrid, U baseApp) {
+		LayoutGridTargetConfig placementConfig = getBestPlacementForApp(baseApp, layoutGrid);
+
+		if (placementConfig.target == null) {
+			layoutGrid.addContent(new LayoutContent(SharedResources.skin, layoutGrid, baseApp.gridAppReference));
+			//Its root, so we should add it to root via addContent
+		} else {
+			//Add it externally
+			if (placementConfig.direction == LayoutGrid.LayoutDirection.TAB) {
+				placementConfig.target.addContent(baseApp.gridAppReference);
+			} else {
+				layoutGrid.placeContentRelative(placementConfig.target, placementConfig.direction, baseApp.gridAppReference);
+
+			}
+		}
+		if (!baseAppsOpenForGameAsset.containsKey(gameAsset)) {
+			baseAppsOpenForGameAsset.put(gameAsset, new Array<>());
+		}
+		Array<BaseApp<T>> baseApps = (Array<BaseApp<T>>)baseAppsOpenForGameAsset.get(gameAsset);
+		baseApps.add(baseApp);
 	}
 
 	private LayoutGridTargetConfig getBestPlacementForApp (BaseApp app, LayoutGrid layoutGrid) {
@@ -131,16 +240,17 @@ public class AppManager {
 		return layoutGridTargetConfig;
 	}
 
-	private Array<? extends BaseApp> getAppsToUpdate (GameAsset<?> gameAsset) {
+	private <T, U extends BaseApp<T>> Array<U> getAppsToUpdate (GameAsset<T> gameAsset) {
 		if (baseAppsOpenForGameAsset.containsKey(gameAsset)) {
-			Array<? extends BaseApp> baseApps = baseAppsOpenForGameAsset.get(gameAsset);
+			//Unsafe type
+			Array<U> baseApps = (Array<U>)baseAppsOpenForGameAsset.get(gameAsset);
 			return baseApps;
 		}
 		return new Array<>();
 	}
 
-	private <T> BaseApp createBaseAppForGameAsset (GameAsset<T> gameAsset, Class<? extends BaseApp> aClass) {
-		BaseApp baseApp = null;
+	private <T, U extends BaseApp<T>> U createBaseAppForGameAsset (GameAsset<T> gameAsset, Class<U> aClass) {
+		U baseApp = null;
 		try {
 			baseApp = ClassReflection.newInstance(aClass);
 		} catch (ReflectionException e) {
@@ -149,18 +259,26 @@ public class AppManager {
 		baseApp.updateForGameAsset(gameAsset);
 		return baseApp;
 	}
-	private <T> Array<BaseApp> getAppsToCreateAndOpen (GameAsset<T> gameAsset, Array<? extends BaseApp> openApps) {
 
-		Array<Class<? extends BaseApp>> appsForGameAssetType = appRegistry.getAppsForGameAssetType(gameAsset.type);
+	private <T, U extends BaseApp<T>> Array<U> getAppsToCreateAndOpen (GameAsset<T> gameAsset, Array<U> openApps) {
 
-		Array<BaseApp> baseAppsToCreate = new Array<>();
+		Array<Class<U>> appsForGameAssetType = appRegistry.getAppsForGameAssetType(gameAsset);
 
-		for (Class<? extends BaseApp> aClass : appsForGameAssetType) {
+		Array<U> baseAppsToCreate = new Array<>();
+
+		for (Class<U> aClass : appsForGameAssetType) {
 			//Check if we have one open in openApps
+			boolean singleton = false;
+
+			if (aClass.isAnnotationPresent(SingletonApp.class)) {
+				singleton = true;
+			}
+
+			//todo do something with singleton
 
 			boolean shouldSkip = false;
 			for (int i = 0; i < openApps.size; i++) {
-				BaseApp baseApp = openApps.get(i);
+				U baseApp = openApps.get(i);
 				if (baseApp.getClass() == aClass) {
 					shouldSkip = true;//Its already open, so we should ignore it as its in the update list
 					break;
@@ -169,14 +287,13 @@ public class AppManager {
 
 			if (!shouldSkip) {
 				//We should create the base app
-				baseAppsToCreate.add(createBaseAppForGameAsset(gameAsset, aClass));
+				U baseAppForGameAsset = createBaseAppForGameAsset(gameAsset, aClass);
+				baseAppsToCreate.add(baseAppForGameAsset);
 			}
 
 		}
 
 		return baseAppsToCreate;
 	}
-
-
 
 }

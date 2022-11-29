@@ -11,6 +11,8 @@ public interface LayoutApp {
 	boolean isTabActive ();
 
 	String getUniqueIdentifier ();
+
+	void setUniqueIdentifier (String uuid);
 	String getFriendlyName ();
 	Actor getTabWidget ();
 	Actor copyTabWidget ();

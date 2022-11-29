@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.input.Shortcuts;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
@@ -89,9 +90,12 @@ public class TalosMain2 extends ApplicationAdapter {
 		layoutGridContainer.clearChildren();
 		layoutGridContainer.add(projectData.getLayoutGrid()).grow();
 
+
 		ProjectLoadedEvent projectLoadedEvent = Notifications.obtainEvent(ProjectLoadedEvent.class);
 		projectLoadedEvent.setProjectData(projectData);
 		Notifications.fireEvent(projectLoadedEvent);
+
+		projectData.loadLayout();
 
 	}
 

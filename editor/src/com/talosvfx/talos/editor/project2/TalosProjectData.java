@@ -1,26 +1,16 @@
 package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
-import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
-import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
-import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
-import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
-import com.talosvfx.talos.editor.layouts.LayoutColumn;
-import com.talosvfx.talos.editor.layouts.LayoutContent;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
-import com.talosvfx.talos.editor.layouts.LayoutRow;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.editor.utils.Toasts;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.UUID;
 
 public class TalosProjectData implements Json.Serializable {
 	public static final String TALOS_PROJECT_EXTENSION = "tlsprj";
@@ -40,8 +30,6 @@ public class TalosProjectData implements Json.Serializable {
 
 	public TalosProjectData () {
 		layoutGrid = new LayoutGrid(SharedResources.skin);
-
-		test();
 	}
 
 	public static TalosProjectData loadFromFile (FileHandle projectToTryToLoad) {
@@ -68,8 +56,9 @@ public class TalosProjectData implements Json.Serializable {
 		return talosProjectData;
 	}
 
-	private void save () {
+	public void save () {
 		Json json = new Json();
+		json.setOutputType(JsonWriter.OutputType.json);
 		String jsonString = json.prettyPrint(this);
 		projectFile.writeString(jsonString, false);
 
@@ -87,87 +76,6 @@ public class TalosProjectData implements Json.Serializable {
 		rootProjectDir().child("vfx").mkdirs();
 	}
 
-	public void test () {
-		layoutGrid.reset();
-
-		SceneEditorWorkspace workspaceWidget = new SceneEditorWorkspace();
-		workspaceWidget.disableListeners();
-		//Find a scene and open it
-
-		DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, "Scene") {
-			@Override
-			public Actor getMainContent () {
-				return workspaceWidget;
-			}
-
-			@Override
-			public void onInputProcessorAdded () {
-				super.onInputProcessorAdded();
-				workspaceWidget.restoreListeners();
-				SharedResources.stage.setScrollFocus(workspaceWidget);
-			}
-
-			@Override
-			public void onInputProcessorRemoved () {
-				super.onInputProcessorRemoved();
-				workspaceWidget.disableListeners();
-			}
-		};
-
-		ProjectExplorerWidget projectExplorerWidget = new ProjectExplorerWidget();
-		DummyLayoutApp assetDirectoryApp = new DummyLayoutApp(SharedResources.skin, "Assets") {
-			@Override
-			public Actor getMainContent () {
-				return projectExplorerWidget;
-			}
-		};
-
-
-		PropertyPanel propertyPanel = new PropertyPanel();
-		DummyLayoutApp propertyPanelApp = new DummyLayoutApp(SharedResources.skin, "Properties") {
-			@Override
-			public Actor getMainContent () {
-				return propertyPanel;
-			}
-		};
-
-		HierarchyWidget hierarchyWidget = new HierarchyWidget();
-		DummyLayoutApp hierarchyApp = new DummyLayoutApp(SharedResources.skin, "Hierarchy") {
-			@Override
-			public Actor getMainContent () {
-				return hierarchyWidget;
-			}
-
-			@Override
-			public void onInputProcessorAdded () {
-				super.onInputProcessorAdded();
-				SharedResources.stage.setScrollFocus(hierarchyWidget.getScrollPane());
-			}
-
-			@Override
-			public void onInputProcessorRemoved () {
-				super.onInputProcessorRemoved();
-			}
-		};
-
-		LayoutRow layoutRow = new LayoutRow(SharedResources.skin, layoutGrid);
-		LayoutColumn layoutColumn = new LayoutColumn(SharedResources.skin, layoutGrid);
-
-
-		///row 1  -> column -> [hierarchy - scene - properties]
-		//row 2 -> assets
-
-		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, hierarchyApp), true);
-		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, sceneEditorWorkspaceApp), false);
-		layoutRow.addColumnContainer(new LayoutContent(SharedResources.skin, layoutGrid, propertyPanelApp), false);
-
-		layoutColumn.addRowContainer(layoutRow, true);
-		layoutColumn.addRowContainer(new LayoutContent(SharedResources.skin, layoutGrid, assetDirectoryApp), false);
-
-		layoutGrid.addContent(layoutColumn);
-
-	}
-
 	public String getAbsolutePathToProjectFile () {
 		return projectFile.path();
 	}
@@ -175,11 +83,32 @@ public class TalosProjectData implements Json.Serializable {
 	@Override
 	public void write (Json json) {
 		json.writeValue("projectName", projectFile.nameWithoutExtension());
+		json.writeValue("currentLayout", layoutGrid);
 	}
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		String projectName = jsonData.getString("projectName", "NoName");
+		if (jsonData.has("currentLayout")) {
+			jsonLayoutRepresentation = jsonData.getChild("currentLayout");
+		}
+	}
+	private JsonValue jsonLayoutRepresentation = null;
 
+	public void loadLayout () {
+		if (jsonLayoutRepresentation != null) {
+//			layoutGrid.load
+			logger.info("todo load");
+
+			try {
+				layoutGrid.readFromJson(jsonLayoutRepresentation);
+			} catch (Exception e) {
+				logger.error("error loading json layout", e);
+				Toasts.getInstance().showErrorToast("Error loading layout " + e.getMessage());
+				SharedResources.appManager.openApp(AppManager.singletonAsset, ProjectExplorerApp.class);
+			}
+		} else {
+			SharedResources.appManager.openApp(AppManager.singletonAsset, ProjectExplorerApp.class);
+		}
 	}
 }

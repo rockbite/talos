@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -123,6 +124,9 @@ public class LayoutContent extends LayoutItem {
 	}
 
 	public void addContent (LayoutApp layoutApp, boolean copy) {
+		addContent(layoutApp, copy, true);
+	}
+	public void addContent (LayoutApp layoutApp, boolean copy, boolean swapToActive) {
 		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
 
 		if (copy) {
@@ -137,7 +141,9 @@ public class LayoutContent extends LayoutItem {
 
 			//The state of content depends on the tabs
 
-			swapToApp(layoutApp);
+			if (swapToActive) {
+				swapToApp(layoutApp);
+			}
 		}
 	}
 
@@ -222,5 +228,22 @@ public class LayoutContent extends LayoutItem {
 
 	public ObjectMap<String, LayoutApp> getApps () {
 		return apps;
+	}
+
+	public void sortToActiveTab () {
+		LayoutApp firstActive = null;
+		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+			if (app.value.isTabActive()) {
+				firstActive = app.value;
+				break;
+			}
+		}
+
+		if (firstActive == null) {
+			throw new GdxRuntimeException("Active tab not found");
+		}
+
+		swapToApp(firstActive);
+
 	}
 }
