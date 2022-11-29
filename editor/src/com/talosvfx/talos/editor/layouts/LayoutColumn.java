@@ -31,7 +31,7 @@ public class LayoutColumn extends LayoutItem {
 	}
 
 	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative) {
-		addRowContainer(newLayoutContent, up, relative, false);
+		addRowContainer(newLayoutContent, up, relative, true);
 	}
 	public void addRowContainer (LayoutItem newLayoutContent, boolean up, @Null LayoutItem relative, boolean resize) {
 
