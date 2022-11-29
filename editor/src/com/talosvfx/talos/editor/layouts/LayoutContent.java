@@ -28,28 +28,6 @@ public class LayoutContent extends LayoutItem {
 	public LayoutContent (Skin skin, LayoutGrid layoutGrid, LayoutApp app) {
 		this(skin, layoutGrid);
 		addContent(app);
-
-		addListener(new InputListener() {
-			@Override
-			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				super.enter(event, x, y, pointer, fromActor);
-				if (pointer != -1) return;
-				if (fromActor == null || !fromActor.isDescendantOf(LayoutContent.this)) {
-					logger.info("Enter {}", activeApp.getFriendlyName());
-					activeApp.onInputProcessorAdded();
-				}
-			}
-
-			@Override
-			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-				super.exit(event, x, y, pointer, toActor);
-				if (pointer != -1) return;
-				if (toActor == null || !toActor.isDescendantOf(LayoutContent.this)) {
-					logger.info("Exit {}", activeApp.getFriendlyName());
-					activeApp.onInputProcessorRemoved();
-				}
-			}
-		});
 	}
 
 	public LayoutContent (Skin skin, LayoutGrid grid) {
@@ -95,8 +73,28 @@ public class LayoutContent extends LayoutItem {
 			}
 		});
 
-		contentTable.debugAll();
 
+		addListener(new InputListener() {
+			@Override
+			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				super.enter(event, x, y, pointer, fromActor);
+				if (pointer != -1) return;
+				if (fromActor == null || !fromActor.isDescendantOf(LayoutContent.this)) {
+					logger.info("Enter {}", activeApp.getFriendlyName());
+					activeApp.onInputProcessorAdded();
+				}
+			}
+
+			@Override
+			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				super.exit(event, x, y, pointer, toActor);
+				if (pointer != -1) return;
+				if (toActor == null || !toActor.isDescendantOf(LayoutContent.this)) {
+					logger.info("Exit {}", activeApp.getFriendlyName());
+					activeApp.onInputProcessorRemoved();
+				}
+			}
+		});
 	}
 
 	private void swapToApp (LayoutApp result) {

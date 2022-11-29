@@ -16,15 +16,26 @@
 
 package com.talosvfx.talos;
 
-import com.badlogic.gdx.AbstractGraphics;
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.layouts.LayoutContent;
+import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
 
@@ -73,6 +84,60 @@ public class TalosLauncher {
 //			}
 //		});
 //		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
+
+		SharedResources.windowUtils = new WindowUtils() {
+			@Override
+			public void openWindow (LayoutApp layoutApp) {
+				Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+				Lwjgl3Application lwjgl3App = (Lwjgl3Application)Gdx.app;
+
+				config.setWindowedMode(500, 500);
+
+				Lwjgl3Window window = lwjgl3App.newWindow(new ApplicationAdapter() {
+
+					private Stage stage;
+
+					@Override
+					public void create () {
+						super.create();
+
+						stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+						SharedResources.inputHandling.addPermanentInputProcessor(stage);
+						SharedResources.inputHandling.setGDXMultiPlexer();
+
+
+						Table layoutGridContainer = new Table();
+						layoutGridContainer.setFillParent(true);
+
+						LayoutGrid layoutGrid = new LayoutGrid(SharedResources.skin);
+
+						layoutGridContainer.clearChildren();
+						layoutGridContainer.add(layoutGrid).grow();
+
+						stage.addActor(layoutGridContainer);
+
+						layoutGrid.addContent(new LayoutContent(SharedResources.skin, layoutGrid, layoutApp));
+					}
+
+					@Override
+					public void render () {
+						super.render();
+						ScreenUtils.clear(0, 0, 0, 1f, true);
+
+						stage.act();
+						stage.draw();
+
+					}
+
+					@Override
+					public void resize (int width, int height) {
+						super.resize(width, height);
+						stage.getViewport().update(width, height, true);
+					}
+				}, config);
+			}
+
+		};
 
 		new Lwjgl3Application(talos, config);
 	}

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -128,7 +129,8 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 		RIGHT,
 		DOWN,
 		LEFT,
-		TAB
+		TAB,
+		POP
 	}
 
 	public void addContent (LayoutItem content) {
@@ -188,15 +190,31 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 			@Override
 			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 				DragHitResult hitResult = dragHitResult;
+
+				Object payloadObject = payload.getObject();
+				LayoutContentAppPair layoutContentAppPair = (LayoutContentAppPair)payloadObject;
+
+				if (dragHitResult.direction == LayoutDirection.POP) {
+
+					if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+						removeApp(layoutContentAppPair.layoutContent, layoutContentAppPair.app);
+						SharedResources.windowUtils.openWindow(layoutContentAppPair.app);
+					}
+
+					return;
+				}
+
 				if (hitResult.hit == null)
 					return;
 				if (hitResult.hit == startItem)
 					return;
 
+
+
 				if (hitResult.root) {
-					dropContainer((LayoutContentAppPair)payload.getObject(), null, dragHitResult.direction);
+					dropContainer(layoutContentAppPair, null, dragHitResult.direction);
 				} else {
-					dropContainer((LayoutContentAppPair)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
+					dropContainer(layoutContentAppPair, dragHitResult.hit, dragHitResult.direction);
 				}
 
 			}
@@ -707,6 +725,11 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 				dragHitResult.hit = overItem;
 				dragHitResult.direction = LayoutDirection.UP;
 			}
+		}
+
+
+		if (dragHitResult.direction == null) { //Disable pop, not ready
+//			dragHitResult.direction = LayoutDirection.POP;
 		}
 
 	}

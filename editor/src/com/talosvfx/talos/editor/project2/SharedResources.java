@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.project2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
+import com.talosvfx.talos.editor.utils.WindowUtils;
 
 public class SharedResources {
 	public static Skin skin;
@@ -18,4 +19,6 @@ public class SharedResources {
 	public static InputHandling inputHandling;
 
 	public static GlobalDragAndDrop globalDragAndDrop;
+
+	public static WindowUtils windowUtils;
 }
