@@ -18,4 +18,8 @@ public class InputUtils {
             return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
         }
     }
+
+    public static boolean macCmdPressed () {
+        return isOsX() && Gdx.input.isKeyPressed(Input.Keys.SYM);
+    }
 }

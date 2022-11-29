@@ -2,27 +2,16 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.XmlReader;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.widget.VisDialog;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
@@ -34,16 +23,11 @@ import com.talosvfx.talos.editor.project2.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
+import com.talosvfx.talos.editor.project2.input.Shortcuts;
+import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
-import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
-import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
-import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
-import com.talosvfx.talos.runtime.modules.EmitterModule;
 import lombok.Getter;
-
-import java.util.UUID;
 
 public class TalosMain2 extends ApplicationAdapter {
 	@Getter
@@ -61,6 +45,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling = new InputHandling();
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
+		SaveSystem saveSystem = new SaveSystem();
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
 		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
@@ -88,10 +73,12 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
+		SharedResources.inputHandling.addPermanentInputProcessor(new Shortcuts());
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
 		openProjectExplorer();
+
 	}
 
 	private void projectLoader (TalosProjectData projectData) {
