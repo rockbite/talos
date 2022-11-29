@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -1367,6 +1369,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 			return true;
+		}
+
+		if (TalosInputProcessor.ctrlPressed()) {
+			return false;
 		}
 
 		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
