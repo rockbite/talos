@@ -267,4 +267,15 @@ public class RoutineInstance {
 
         return null;
     }
+
+    public void updateNodesFromProperties () {
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            RoutineNode value = routineNodeEntry.value;
+            if (value instanceof ExposedVariableNode) {
+                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
+                int index = exposedVariableNode.index;
+                exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
+            }
+        }
+    }
 }

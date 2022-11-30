@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -52,6 +54,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         super.write(json);
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("size", viewportSize, Vector2.class);
+        if (routineInstance != null) {
+            json.writeValue("properties", routineInstance.getPropertyWrappers());
+        }
     }
 
     @Override
@@ -61,6 +66,20 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
+
+
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+        propertyWrappers.clear();
+
+        if (routineInstance != null) {
+            JsonValue propertiesJson = jsonData.get("properties");
+            if (propertiesJson != null) {
+                for (JsonValue propertyJson : propertiesJson) {
+                    propertyWrappers.add(json.readValue(PropertyWrapper.class, propertyJson));
+                }
+            }
+            routineInstance.updateNodesFromProperties();
+        }
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
         if(viewportSize == null) viewportSize = new Vector2(6, 4);

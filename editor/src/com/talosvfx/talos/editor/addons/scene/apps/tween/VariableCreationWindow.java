@@ -2,8 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -16,13 +14,8 @@ import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.ExposedVariableNode;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
-import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
@@ -91,7 +84,7 @@ public class VariableCreationWindow extends Table {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                    payload.setObject(variableTemplateRow.propertyWrapper);
+                    payload.setObject(routineStage.routineInstance.getPropertyWrapperWithIndex(variableTemplateRow.propertyWrapper.index));
                     Table payloadTable = new Table();
                     float width = variableTemplateRow.getWidth();
                     float height = variableTemplateRow.getHeight();
