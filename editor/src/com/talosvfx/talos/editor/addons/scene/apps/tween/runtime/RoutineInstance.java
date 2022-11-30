@@ -194,4 +194,14 @@ public class RoutineInstance {
         exposedPropertyIndex++;
         propertyWrappers.add(propertyFloatWrapper);
     }
+
+    public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            if (propertyWrapper.index == index) {
+                return propertyWrapper;
+            }
+        }
+
+        return null;
+    }
 }

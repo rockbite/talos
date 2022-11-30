@@ -15,11 +15,6 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
 
     public int index;
 
-    public PropertyWrapper () {
-
-    }
-
-
     public void collectAttributes (Array<String> attributes) {
         for (int i = 0; i < attributes.size; i+=2) {
             String type = attributes.get(i);

@@ -11,6 +11,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 
 public class RoutineEditor extends AEditorApp<FileHandle> {
 
@@ -46,8 +48,8 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
                 TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
             }
         });
-        variableCreationWindow.reloadWidgets(routineStage);
 
+        variableCreationWindow.reloadWidgets(routineStage);
     }
 
     @Override
@@ -90,5 +92,15 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
 
     public void deleteParamTemplateWithIndex (int index) {
         // TODO: 11/29/2022  implement please
+    }
+
+    public void changeKeyFor (int index, String value) {
+        RoutineInstance routineInstance = routineStage.routineInstance;
+        PropertyWrapper<?> propertyWrapper = routineInstance.getPropertyWrapperWithIndex(index);
+        propertyWrapper.propertyName = value;
+    }
+
+    public void changeTypeFor (int index, String newType) {
+
     }
 }

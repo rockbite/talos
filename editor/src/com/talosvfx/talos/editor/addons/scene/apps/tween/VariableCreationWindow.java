@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -12,10 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.ExposedVariableNode;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
+import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
@@ -84,7 +90,7 @@ public class VariableCreationWindow extends Table {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                    payload.setObject(variableTemplateRow);
+                    payload.setObject(variableTemplateRow.propertyWrapper);
                     Table payloadTable = new Table();
                     float width = variableTemplateRow.getWidth();
                     float height = variableTemplateRow.getHeight();
@@ -117,9 +123,13 @@ public class VariableCreationWindow extends Table {
                 if (exposedVariable != null) {
                     NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
                     exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
+                    RoutineInstance routineInstance = routineStage.routineInstance;
                     Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
-                }
+                    (exposedVariable.widgetMap.get("key")).setTouchable(Touchable.disabled);
 
+                    ExposedVariableNode exposedVariableNode = ((ExposedVariableNode) routineInstance.getNodeById(exposedVariable.getUniqueId()));
+                    exposedVariableNode.updateForPropertyWrapper(((PropertyWrapper<?>) payload.getObject()));
+                }
             }
         });
     }
@@ -143,13 +153,12 @@ public class VariableCreationWindow extends Table {
     }
 
     @Override
-    public float getPrefWidth () {
-        return 100;
-    }
-
-    @Override
     public void act (float delta) {
         super.act(delta);
+        if (!(TalosMain.Instance().Project() instanceof SceneEditorProject)) {
+            return;
+        }
+
         RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
         if (routineEditor == null) {
             return;
