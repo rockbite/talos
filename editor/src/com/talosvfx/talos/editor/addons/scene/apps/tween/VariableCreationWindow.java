@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.ExposedVariableNode;
@@ -119,16 +120,17 @@ public class VariableCreationWindow extends Table {
                 temp.set(x, y);
                 routineStage.getContainer().localToScreenCoordinates(temp);
                 routineStage.getStage().screenToStageCoordinates(temp);
-                NodeWidget exposedVariable = routineStage.createNode("ExposedVariableNode", temp.x, temp.y);
+                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
+                PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
                 if (exposedVariable != null) {
                     NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
                     exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
                     RoutineInstance routineInstance = routineStage.routineInstance;
                     Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
-                    (exposedVariable.widgetMap.get("key")).setTouchable(Touchable.disabled);
+                    exposedVariable.update(propertyWrapper);
 
                     ExposedVariableNode exposedVariableNode = ((ExposedVariableNode) routineInstance.getNodeById(exposedVariable.getUniqueId()));
-                    exposedVariableNode.updateForPropertyWrapper(((PropertyWrapper<?>) payload.getObject()));
+                    exposedVariableNode.updateForPropertyWrapper(propertyWrapper);
                 }
             }
         });

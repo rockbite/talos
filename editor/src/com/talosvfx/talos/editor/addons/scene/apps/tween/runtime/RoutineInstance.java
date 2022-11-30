@@ -89,7 +89,7 @@ public class RoutineInstance {
             }
         }
 
-        exposedPropertyIndex = root.getInt("exposedPropertyIndex", 0);
+        exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
 
         IntMap<RoutineNode> idMap = new IntMap<>();
 

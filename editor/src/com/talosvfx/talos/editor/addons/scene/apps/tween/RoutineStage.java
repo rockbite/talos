@@ -14,10 +14,7 @@ import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.ProbabilityChoiceWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
@@ -91,7 +88,11 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     @Override
     public void read(Json json, JsonValue root) {
         super.read(json, root);
-
+        for (NodeWidget node : nodeBoard.nodes) {
+            if (node instanceof RoutineExposedVariableNodeWidget) {
+                ((RoutineExposedVariableNodeWidget) node).update(routineInstance.getPropertyWrapperWithIndex(((RoutineExposedVariableNodeWidget) node).index));
+            }
+        }
     }
 
     @Override

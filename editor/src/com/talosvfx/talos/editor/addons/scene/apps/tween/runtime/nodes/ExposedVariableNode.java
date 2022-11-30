@@ -29,4 +29,9 @@ public class ExposedVariableNode extends RoutineNode {
         super.loadFrom(routineInstance, nodeData);
         index = nodeData.getInt("index", 0);
     }
+
+    @Override
+    protected void configureNode (JsonValue properties) {
+
+    }
 }
