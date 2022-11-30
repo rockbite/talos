@@ -1,9 +1,11 @@
-package com.talosvfx.talos.editor.project2;
+package com.talosvfx.talos.editor.project2.localprefs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.talosvfx.talos.editor.project2.RecentProject;
+import com.talosvfx.talos.editor.project2.TalosProjectData;
 import lombok.Data;
 
 public class TalosLocalPrefs {

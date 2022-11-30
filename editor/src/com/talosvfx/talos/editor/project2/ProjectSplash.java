@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 
 import java.io.File;
 
