@@ -80,6 +80,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private String projectPath;
 
 	private SavableContainer currentContainer;
+	private GameAsset<Scene> gameAsset;
 
 	private MainRenderer renderer;
 	private final MainRenderer uiSceneRenderer;
@@ -986,6 +987,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
 				addToSelection(gameObject);
 			}
+
+			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1485,9 +1489,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return "";
 	}
 
-	public void loadFromScene (Scene scene) {
-		openSavableContainer(scene);
-
+	public void loadFromScene (GameAsset<Scene> scene) {
+		gameAsset = scene;
+		openSavableContainer(scene.getResource());
 	}
 
 	@Deprecated
@@ -1781,7 +1785,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
 		if (gameAsset.type == GameAssetType.SCENE) {
 
-			loadFromScene(((Scene)gameAsset.getResource()));
 		}
 	}
 }

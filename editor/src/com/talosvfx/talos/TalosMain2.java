@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.input.Shortcuts;
+import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
@@ -44,6 +45,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.appManager = new AppManager();
 		SharedResources.inputHandling = new InputHandling();
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
+		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 		SaveSystem saveSystem = new SaveSystem();
 

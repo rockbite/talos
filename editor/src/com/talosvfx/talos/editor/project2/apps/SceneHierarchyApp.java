@@ -54,5 +54,10 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> {
 			return "Hierarchy - ";
 		}
 	}
+
+	@Override
+	public void onRemove () {
+			
+	}
 }
 

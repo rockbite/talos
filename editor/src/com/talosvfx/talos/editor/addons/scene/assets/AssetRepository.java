@@ -39,9 +39,11 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ExportData;
@@ -266,7 +268,8 @@ public class AssetRepository implements Observer {
 		}
 	}
 
-	private void reloadGameAsset (GameAsset gameAssetReference) {
+
+	public void reloadGameAsset (GameAsset gameAssetReference) {
 		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
 
@@ -804,11 +807,49 @@ public class AssetRepository implements Observer {
 		return gameAssetOut;
 	}
 
-	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset) {
-		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {
+		if (useGlobalState) {
+			GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
+			SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
+		}
 
-		String jsonString = json.toJson(gameAsset.getResource());
-		rootRawAsset.handle.writeString(jsonString, false);
+		saveGameAssetResourceJsonToFile(gameAsset);
+	}
+
+	private interface GameResourceSaveStrategy<T> {
+		String serializeToJson (GameAsset<T> gameAsset, Json json);
+	}
+	private ObjectMap<GameAssetType, GameResourceSaveStrategy> saveStrategyObjectMap = new ObjectMap<>();
+
+	{
+		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
+	}
+
+	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {
+
+		Scene resource = gameAsset.getResource();
+		String asString = resource.getAsString();
+
+		return asString;
+	}
+
+	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+		GameResourceSaveStrategy<T> gameResourceSaveStrategy = saveStrategyObjectMap.get(gameAsset.type);
+		if (gameResourceSaveStrategy != null) {
+			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+
+			String jsonString = gameResourceSaveStrategy.serializeToJson(gameAsset, json);
+			if (jsonString == null) {
+				Toasts.getInstance().showErrorToast("Error saving asset " + gameAsset);
+				logger.error("Error saving asset");
+				return;
+			}
+			rootRawAsset.handle.writeString(jsonString, false);
+
+		} else {
+			logger.error("Trying to save an asset that doesn't have a save strategy");
+		}
+
 	}
 
 	public GameObject copyGameObject (GameObject gameObject) {

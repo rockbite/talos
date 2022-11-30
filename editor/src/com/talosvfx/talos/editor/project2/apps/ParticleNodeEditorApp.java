@@ -221,5 +221,10 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 			return "VFX - ";
 		}
 	}
+
+	@Override
+	public void onRemove () {
+
+	}
 }
 

@@ -40,5 +40,10 @@ public class PropertiesPanelApp extends AppManager.BaseApp<Scene> {
 			return "Properties - ";
 		}
 	}
+
+	@Override
+	public void onRemove () {
+
+	}
 }
 

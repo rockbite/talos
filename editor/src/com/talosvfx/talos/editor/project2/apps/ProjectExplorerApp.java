@@ -45,5 +45,10 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 			return "Explorer - ";
 		}
 	}
+
+	@Override
+	public void onRemove () {
+
+	}
 }
 

@@ -53,5 +53,10 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 			return "VFX - ";
 		}
 	}
+
+	@Override
+	public void onRemove () {
+
+	}
 }
 

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.InputUtils;
 
 public class Shortcuts extends InputAdapter {
@@ -19,6 +20,9 @@ public class Shortcuts extends InputAdapter {
 			return true;
 		}
 
+		if (keycode == Input.Keys.Z && (InputUtils.ctrlPressed() || InputUtils.macCmdPressed())) {
+			SharedResources.globalSaveStateSystem.onUndoRequest();
+		}
 
 		return false;
 

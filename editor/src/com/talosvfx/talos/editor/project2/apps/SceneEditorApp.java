@@ -10,9 +10,10 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 
 
 @SingletonApp
-public class SceneEditorApp extends AppManager.BaseApp<Scene> {
+public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener {
 
 	private final SceneEditorWorkspace workspaceWidget;
+
 
 	public SceneEditorApp () {
 		this.singleton = true;
@@ -47,7 +48,12 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> {
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
-		workspaceWidget.loadFromScene(gameAsset.getResource());
+		if (!gameAsset.listeners.contains(this, true)) {
+			gameAsset.listeners.add(this);
+		}
+
+
+		workspaceWidget.loadFromScene(gameAsset);
 
 	}
 
@@ -58,6 +64,16 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> {
 		} else {
 			return "Scene - ";
 		}
+	}
+
+	@Override
+	public void onRemove () {
+		gameAsset.listeners.removeValue(this, true);
+	}
+
+	@Override
+	public void onUpdate () {
+		workspaceWidget.loadFromScene(gameAsset);
 	}
 }
 

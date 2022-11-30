@@ -98,9 +98,6 @@ public class TalosProjectData implements Json.Serializable {
 
 	public void loadLayout () {
 		if (jsonLayoutRepresentation != null) {
-//			layoutGrid.load
-			logger.info("todo load");
-
 			try {
 				layoutGrid.readFromJson(jsonLayoutRepresentation);
 			} catch (Exception e) {

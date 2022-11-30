@@ -78,7 +78,8 @@ public class AppManager {
 			for (int i = apps.size - 1; i >= 0; i--) {
 				BaseApp<?> baseApp = apps.get(i);
 				if (baseApp.getGridAppReference() == layoutApp) {
-					apps.removeIndex(i);
+					BaseApp<?> appToRemove = apps.removeIndex(i);
+					appToRemove.onRemove();
 				}
 			}
 		}
@@ -113,6 +114,8 @@ public class AppManager {
 		public void setAppID (String appID) {
 			getGridAppReference().setUniqueIdentifier(appID);
 		}
+
+		public abstract void onRemove ();
 	}
 
 	private static class AppRegistry {

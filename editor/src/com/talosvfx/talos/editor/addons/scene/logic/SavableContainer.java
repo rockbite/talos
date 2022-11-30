@@ -119,7 +119,6 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 
     public String getAsString () {
         try {
-            FileHandle file = Gdx.files.absolute(path);
 
             StringWriter stringWriter = new StringWriter();
             Json json = new Json();
@@ -134,10 +133,9 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
             return finalString;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+            logger.error("Error saving scene", e);
+            return null;
         }
-
-        return "";
     }
 
     public void load(String data) {
