@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 
 public class VFXProjectData {
 
-	public MetaData metaData = new MetaData();
 
 	private Array<EmitterData> emitters = new Array<>();
 

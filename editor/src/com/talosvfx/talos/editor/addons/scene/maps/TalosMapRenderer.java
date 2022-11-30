@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
@@ -21,9 +22,9 @@ import java.util.Comparator;
 
 public class TalosMapRenderer {
 
-	private OrthographicCamera camera;
+	private Camera camera;
 
-	public void setCamera (OrthographicCamera camera) {
+	public void setCamera (Camera camera) {
 		this.camera = camera;
 	}
 
@@ -86,7 +87,13 @@ public class TalosMapRenderer {
 				int mapHeight = layer.getMapHeight();
 
 				Vector3 position = camera.position;
-				float zoom = camera.zoom;
+
+				float zoom = 1f;
+				if (camera instanceof OrthographicCamera) {
+					zoom = ((OrthographicCamera)camera).zoom;
+				}
+
+
 				float viewportWidth = camera.viewportWidth * zoom;
 				float viewportHeight = camera.viewportHeight * zoom;
 

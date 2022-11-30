@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
-
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
@@ -17,75 +18,86 @@ import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Supplier;
+
 public class ScenePreviewStage extends ViewportWidget implements Observer {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
-    public Scene currentScene;
+	public Scene currentScene;
 
-    private MainRenderer renderer;
+	private MainRenderer renderer;
 
-    private boolean isPlaying = false;
+	private boolean isPlaying = false;
 
-    public ScenePreviewStage () {
-        setSkin(SharedResources.skin);
-        setWorldSize(10);
-        renderer = new MainRenderer();
-        addActor(rulerRenderer);
-        Notifications.registerObserver(this);
-        updateWorkspaceState(false);
-    }
+	public ScenePreviewStage () {
+		setSkin(SharedResources.skin);
+		setWorldSize(10);
+		renderer = new MainRenderer();
+		addActor(rulerRenderer);
+		Notifications.registerObserver(this);
+		updateWorkspaceState(false);
+	}
 
-    @Override
-    public void drawContent (PolygonBatch batch, float parentAlpha) {
-        batch.end();
+	@Override
+	public void drawContent (PolygonBatch batch, float parentAlpha) {
+		batch.end();
 
-        gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-        ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
 
-        gridPropertyProvider.update(camera, parentAlpha);
-        gridRenderer.drawGrid(batch, shapeRenderer);
-        renderer.setRenderParentTiles(false);
-        batch.begin();
+		gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
+		((DynamicGridPropertyProvider)gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 
-        renderer.skipUpdates = !isPlaying;
-        renderer.setCamera(camera);
-        drawMainRenderer(batch, parentAlpha);
-        renderer.skipUpdates = !isPlaying;
-    }
+		if (camera instanceof OrthographicCamera) {
+			gridPropertyProvider.update((OrthographicCamera)camera, parentAlpha);
+		}
 
-    @Override
-    protected boolean canMoveAround () {
-        return isDragging;
-    }
+		gridRenderer.drawGrid(batch, shapeRenderer);
+		renderer.setRenderParentTiles(false);
+		batch.begin();
 
-    private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
-        if (currentScene == null)
-            return;
+		renderer.skipUpdates = !isPlaying;
+		if (camera instanceof OrthographicCamera) {
+			renderer.setCamera((OrthographicCamera)camera);
+		}
 
-        renderer.update(currentScene.getSelfObject());
-        renderer.render(batch, new MainRenderer.RenderState(), currentScene.getSelfObject());
-    }
+		drawMainRenderer(batch, parentAlpha);
+		renderer.skipUpdates = !isPlaying;
+	}
 
-    @Override
-    public void initializeGridPropertyProvider () {
-        gridPropertyProvider = new DynamicGridPropertyProvider();
-    }
+	@Override
+	protected boolean canMoveAround () {
+		return isDragging;
+	}
 
-    @EventHandler
-    public void onTweenPlay (TweenPlayedEvent event) {
-        updateWorkspaceState(true);
-        isPlaying = true;
-    }
+	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
+		if (currentScene == null)
+			return;
 
-    @EventHandler
-    public void onTweenFinish (TweenFinishedEvent event) {
-        updateWorkspaceState(false);
-        isPlaying = false;
-    }
+		renderer.update(currentScene.getSelfObject());
+		renderer.render(batch, new MainRenderer.RenderState(), currentScene.getSelfObject());
+	}
 
-    public void updateWorkspaceState (boolean copy) {
-        logger.info("Scene preview stage update redo");
+	@Override
+	public void initializeGridPropertyProvider () {
+		gridPropertyProvider = new DynamicGridPropertyProvider();
+	}
+
+	@EventHandler
+	public void onTweenPlay (TweenPlayedEvent event) {
+		updateWorkspaceState(true);
+		isPlaying = true;
+	}
+
+	@EventHandler
+	public void onTweenFinish (TweenFinishedEvent event) {
+		updateWorkspaceState(false);
+		isPlaying = false;
+	}
+
+	public void updateWorkspaceState (boolean copy) {
+		logger.info("Scene preview stage update redo");
 //        SavableContainer currentContainer = SceneEditorWorkspace.getInstance().getCurrentContainer();
 //
 //        if (copy) {
@@ -95,5 +107,5 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 //        } else {
 //            currentScene = ((Scene) currentContainer);
 //        }
-    }
+	}
 }

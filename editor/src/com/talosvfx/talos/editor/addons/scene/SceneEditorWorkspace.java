@@ -3,7 +3,9 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -925,6 +927,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void copySelected () {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		ClipboardPayload payload = new ClipboardPayload();
 		Array<GameObject> gameObjects = selection.orderedItems();
 		for (int i = 0; i < selection.size; i++) {
@@ -945,6 +950,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void pasteFromClipboard () {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		String clipboard = Gdx.app.getClipboard().getContents();
 
 		Json json = new Json();
@@ -1106,16 +1114,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	public void drawContent (PolygonBatch batch, float parentAlpha) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		batch.end();
 
 		((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 		if (mapEditorState.isEditing()) {
 			staticGridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
 			staticGridPropertyProvider.setHighlightCursorHover(true);
-			staticGridPropertyProvider.update(camera, parentAlpha);
+			if (camera instanceof OrthographicCamera) {
+				staticGridPropertyProvider.update((OrthographicCamera)camera, parentAlpha);
+			}
 			gridRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(staticGridPropertyProvider);
-			gridRenderer.drawGrid(batch, shapeRenderer);
+			if (viewportViewSettings.isShowGrid()) {
+				gridRenderer.drawGrid(batch, shapeRenderer);
+			}
 			renderer.setRenderParentTiles(false);
 
 			if (mapEditorState.isSpraying()) {
@@ -1130,11 +1145,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		} else {
 			gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-			gridPropertyProvider.update(camera, parentAlpha);
+			if (camera instanceof OrthographicCamera) {
+				gridPropertyProvider.update((OrthographicCamera)camera, parentAlpha);
+			}
 			gridRenderer.setGridPropertyProvider(gridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(gridPropertyProvider);
-			gridRenderer.drawGrid(batch, shapeRenderer);
+			if (viewportViewSettings.isShowGrid() && !viewportViewSettings.is3D()) {
+				gridRenderer.drawGrid(batch, shapeRenderer);
+			}
 			renderer.setRenderParentTiles(false);
+		}
+
+
+		if (viewportViewSettings.isShowAxis()) {
+			drawAxis();
 		}
 
 		batch.begin();
@@ -1512,21 +1536,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 //		}
 	}
 
-	private void updateSettingsFromSceneSettings () {
-		Scene scene = (Scene) currentContainer;
-		String scenePath = scene.path;
-		String relativePath = getRelativePath(scenePath);
-		SceneProjectSettings sceneProjectSettings = projectSettingsObjectMap.get(relativePath);
-		if (sceneProjectSettings == null) {
-			sceneProjectSettings = new SceneProjectSettings();
-			projectSettingsObjectMap.put(relativePath, sceneProjectSettings);
-		}
-
-		camera.zoom = sceneProjectSettings.cameraZoom;
-		camera.position.set(sceneProjectSettings.cameraX, sceneProjectSettings.cameraY, camera.position.z);
-//		sceneEditorAddon.projectExplorer.select(sceneProjectSettings.directoryPath);
-//		sceneEditorAddon.verticalSplitPane.setSplitAmount(sceneProjectSettings.directorySize);
-	}
 
 	public String getRelativePath (String fullPath) {
 		String projectFullPath = getProjectPath();
@@ -1710,6 +1719,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	protected void drawEntitiesForSelection () {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		super.drawEntitiesForSelection();
 		renderer.skipUpdates = true;
 

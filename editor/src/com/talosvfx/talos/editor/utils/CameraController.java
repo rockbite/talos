@@ -18,6 +18,7 @@ package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -27,7 +28,7 @@ public class CameraController extends InputAdapter {
 
 	private Actor boundsProvider;
 
-	private final OrthographicCamera camera;
+	private Camera camera;
 
 	private Vector3 delta = new Vector3();
 
@@ -55,17 +56,22 @@ public class CameraController extends InputAdapter {
 
 	@Override
 	public boolean scrolled (float amountX, float amountY) {
-		float currWidth = camera.viewportWidth * camera.zoom;
-		float nextWidth = currWidth * (1f + amountY * 0.1f);
-		float nextZoom = nextWidth/camera.viewportWidth;
 
-		// snapping to one
-		if(camera.zoom < 1 && nextZoom >= 1) nextZoom = 1f;
-		if(camera.zoom > 1 && nextZoom <= 1) nextZoom = 1f;
 
-		camera.zoom = nextZoom;
+		//todo
+		//Potentially redo zoom
 
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.01f, 30f);
+//		float currWidth = camera.viewportWidth * camera.zoom;
+//		float nextWidth = currWidth * (1f + amountY * 0.1f);
+//		float nextZoom = nextWidth/camera.viewportWidth;
+//
+//		// snapping to one
+//		if(camera.zoom < 1 && nextZoom >= 1) nextZoom = 1f;
+//		if(camera.zoom > 1 && nextZoom <= 1) nextZoom = 1f;
+//
+//		camera.zoom = nextZoom;
+//
+//		camera.zoom = MathUtils.clamp(camera.zoom, 0.01f, 30f);
 
 		return true;
 	}
@@ -124,5 +130,9 @@ public class CameraController extends InputAdapter {
 
 
 		return super.touchDragged(screenX, screenY, pointer);
+	}
+
+	public void setCamera (Camera currentCamera) {
+		this.camera = currentCamera;
 	}
 }

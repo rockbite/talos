@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -70,7 +71,7 @@ public class MainRenderer implements Observer {
     private ShapeRenderer shapeRenderer;
 
     private TextureRegion textureRegion = new TextureRegion();
-    private OrthographicCamera camera;
+    private Camera camera;
 
     private boolean renderParentTiles = false;
     private boolean renderingToEntitySelectionBuffer = false;
@@ -633,13 +634,11 @@ public class MainRenderer implements Observer {
         }
     }
 
-    public void setCamera (OrthographicCamera camera) {
+    public void setCamera (Camera camera) {
+
         this.camera = camera;
     }
 
-    public OrthographicCamera getCamera () {
-        return camera;
-    }
 
     public void setRenderParentTiles (boolean renderParentTiles) {
         this.renderParentTiles = renderParentTiles;

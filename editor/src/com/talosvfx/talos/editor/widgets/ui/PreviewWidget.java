@@ -42,9 +42,10 @@ import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 
+import java.util.function.Supplier;
+
 public abstract class PreviewWidget extends ViewportWidget {
 
-	private final PreviewImageControllerWidget previewController;
 	Vector2 mid = new Vector2();
 
 	Vector2 temp = new Vector2();
@@ -82,9 +83,8 @@ public abstract class PreviewWidget extends ViewportWidget {
 	private ParticleEffectDescriptor descriptor;
 	protected ParticleEffectInstance effectInstance;
 
-	public PreviewWidget (PreviewImageControllerWidget previewImageControllerWidget) {
+	public PreviewWidget () {
 		super();
-		this.previewController = previewImageControllerWidget;
 
 		countLbl = new Label(countStr, SharedResources.skin);
 		trisCountLbl = new Label(trisCountStr, SharedResources.skin);
@@ -107,9 +107,8 @@ public abstract class PreviewWidget extends ViewportWidget {
 		add(gpuTimeLbl).left().top().padLeft(22).row();
 		add().expand();
 		row();
-		add(previewImageControllerWidget).bottom().left().growX();
 
-		cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
+//		cameraController.scrollOnly = true; // camera controller can't operate in this shitty custom conditions
 
 		initListeners();
 
@@ -216,7 +215,6 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 					if (textureRegion != null) {
 						previewImage.setDrawable(new TextureRegionDrawable(textureRegion));
-						previewController.setImageWidth(10);
 
 						backgroundImagePath = fileHandle.path();
 
@@ -237,11 +235,6 @@ public abstract class PreviewWidget extends ViewportWidget {
 		}
 
 		long timeBefore = TimeUtils.nanoTime();
-		if (this instanceof Preview2D) {
-			if (this.effectInstance != null) {
-				effectInstance.update(Gdx.graphics.getDeltaTime());
-			}
-		}
 		cpuTime.put(TimeUtils.timeSinceNanos(timeBefore));
 
 		if (effectInstance != null) {
@@ -278,12 +271,16 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 	@Override
 	public void drawContent (PolygonBatch batch, float parentAlpha) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
 
-		if (previewController.isGridVisible()) {
+		if (viewportViewSettings.isShowGrid()) {
 			batch.end();
 			gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
 			((DynamicGridPropertyProvider)gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
-			gridPropertyProvider.update(camera, parentAlpha);
+			if (camera instanceof OrthographicCamera) {
+				gridPropertyProvider.update((OrthographicCamera)camera, parentAlpha);
+			} //todo make it compatible with perspective camera if needs
 			gridRenderer.drawGrid(batch, shapeRenderer);
 			batch.begin();
 		}
@@ -294,15 +291,16 @@ public abstract class PreviewWidget extends ViewportWidget {
 		float imagePrefHeight = previewImage.getPrefHeight();
 		float scale = imagePrefHeight / imagePrefWidth;
 
-		float imageWidth = previewController.getImageWidth();
-		float imageHeight = imageWidth * scale;
-		previewController.getPreviewBoxWidth();
-
-		previewImage.setPosition(mid.x - imageWidth / 2, mid.y - imageHeight / 2);
-		previewImage.setSize(imageWidth, imageHeight);
-		if (previewController.isBackground()) {
-			previewImage.draw(batch, parentAlpha);
-		}
+		//todo preview image
+//		float imageWidth = previewController.getImageWidth();
+//		float imageHeight = imageWidth * scale;
+//		previewController.getPreviewBoxWidth();
+//
+//		previewImage.setPosition(mid.x - imageWidth / 2, mid.y - imageHeight / 2);
+//		previewImage.setSize(imageWidth, imageHeight);
+//		if (previewController.isBackground()) {
+//			previewImage.draw(batch, parentAlpha);
+//		}
 
 //        spriteBatchParticleRenderer.setBatch(batch);
 
@@ -317,10 +315,10 @@ public abstract class PreviewWidget extends ViewportWidget {
 		renderTime.put(TimeUtils.timeSinceNanos(timeBefore));
 		trisCount = (int)(glProfiler.getVertexCount().value / 3f);
 		glProfiler.disable();
-
-		if (!previewController.isBackground()) {
-			previewImage.draw(batch, parentAlpha);
-		}
+//
+//		if (!previewController.isBackground()) {
+//			previewImage.draw(batch, parentAlpha);
+//		}
 
 		// now for the drag points
 		if (dragPoints.size > 0) {
@@ -335,7 +333,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 //            shapeRenderer.setColor(tmpColor);
 
 			for (DragPoint point : dragPoints) {
-				shapeRenderer.circle(point.position.x, point.position.y, 0.1f * camera.zoom, 15);
+				shapeRenderer.circle(point.position.x, point.position.y, 0.1f * viewportViewSettings.getZoom(), 15);
 			}
 
 			shapeRenderer.end();
@@ -373,36 +371,6 @@ public abstract class PreviewWidget extends ViewportWidget {
 			dragPoints.clear();
 		}
 	}
-
-	public String getBackgroundImagePath () {
-		return backgroundImagePath;
-	}
-
-	public boolean isBackgroundImageInBack () {
-		return previewController.isBackground();
-	}
-
-	public void setImageIsBackground (boolean isBackground) {
-		previewController.setIsBackground(isBackground);
-	}
-
-	public boolean isGridVisible () {
-		return previewController.isGridVisible();
-	}
-
-	public void setGridVisible (boolean isVisible) {
-		previewController.setGridVisible(isVisible);
-	}
-
-	public abstract float getBgImageSize ();
-
-	public abstract float getGridSize ();
-
-	public abstract void setBackgroundImage (String bgImagePath);
-
-	public abstract void setBgImageSize (float bgImageSize);
-
-	public abstract void setGridSize (float gridSize);
 
 	public abstract void removePreviewImage ();
 

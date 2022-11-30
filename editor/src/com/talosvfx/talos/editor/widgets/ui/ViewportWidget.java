@@ -18,6 +18,8 @@ package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -26,18 +28,29 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
+import com.badlogic.gdx.utils.Scaling;
+import com.kotcrab.vis.ui.widget.VisCheckBox;
+import com.kotcrab.vis.ui.widget.VisImage;
+import com.kotcrab.vis.ui.widget.VisImageButton;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisSelectBox;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextField;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
-import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -52,7 +65,6 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.GridRenderer;
@@ -63,6 +75,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
@@ -72,13 +85,10 @@ public abstract class ViewportWidget extends Table {
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
-	protected OrthographicCamera camera;
-
 	protected Matrix4 emptyTransform = new Matrix4();
 	private Matrix4 prevTransform = new Matrix4();
 	private Matrix4 prevProjection = new Matrix4();
 
-	public CameraController cameraController;
 
 	protected float maxZoom = 0.01f;
 	protected float minZoom = 200f;
@@ -111,26 +121,249 @@ public abstract class ViewportWidget extends Table {
 
 	protected GroupSelectionGizmo groupSelectionGizmo;
 
+	protected ViewportViewSettings viewportViewSettings;
+
     public ViewportWidget() {
+		 viewportViewSettings = new ViewportViewSettings(this);
+
         shapeRenderer = Render.instance().shapeRenderer();
 		entitySelectionBuffer = new EntitySelectionBuffer();
-		camera = new OrthographicCamera();
-		camera.viewportWidth = 10;
 		initializeGridPropertyProvider();
 		gridRenderer = new GridRenderer(gridPropertyProvider, this);
 		rulerRenderer = new RulerRenderer(gridPropertyProvider, this);
 
 		setTouchable(Touchable.enabled);
 
-		cameraController = new CameraController(camera);
-		cameraController.setInvert(true);
-		cameraController.setBoundsProvider(this);
 
 		addPanListener();
 		addGizmoListener();
 
 		groupSelectionGizmo = new GroupSelectionGizmo(this);
 		gizmos.gizmoList.add(groupSelectionGizmo);
+
+		Table fullscreenUITable = new Table();
+		fullscreenUITable.top().defaults().top();
+		fullscreenUITable.setFillParent(true);
+
+		Table topToolbar = new Table();
+
+		int rulerPadding = 20;
+		rulerPadding += 5; //additional padding
+
+		fullscreenUITable.add(topToolbar).growX().height(20).padTop(rulerPadding).padLeft(rulerPadding).padRight(4);
+
+		topToolbar.right();
+
+		float iconSize = 15;
+
+
+		VisImageButton dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
+		dropdownForWorld.getImage().setScaling(Scaling.fill);
+
+		VisTable viewTable = createViewSettingsDialog();
+
+		dropdownForWorld.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+
+				if (dropdownForWorld.isChecked()) {
+					addActor(viewTable);
+
+					Vector2 vector2 = new Vector2();
+					vector2.set(dropdownForWorld.getWidth(), 0);
+					dropdownForWorld.localToActorCoordinates(ViewportWidget.this, vector2);
+					viewTable.pack();
+					viewTable.setPosition(vector2.x - viewTable.getWidth(), vector2.y - viewTable.getHeight());
+
+				} else {
+					viewTable.remove();
+				}
+			}
+		});
+		topToolbar.add(dropdownForWorld).size(iconSize);
+
+		addActor(fullscreenUITable);
+	}
+
+	private VisTable createViewSettingsDialog () {
+		VisTable visTable = new VisTable();
+		visTable.pad(10);
+
+		visTable.defaults();
+
+		visTable.setBackground(SharedResources.skin.getDrawable("background-fill"));
+		visTable.setTouchable(Touchable.enabled);
+		visTable.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+			}
+		});
+
+
+		VisTable cameraTable = new VisTable();
+		cameraTable.defaults().pad(5);
+		cameraTable.left().defaults().left();
+
+		VisLabel cameraLabel = new VisLabel("Camera");
+
+		VisLabel cameraTypeLabel = new VisLabel("Type");
+		VisSelectBox<String> cameraTypeBox = new VisSelectBox<>();
+		cameraTypeBox.setItems("Orthographic", "Perspective");
+		cameraTypeBox.setSelected(viewportViewSettings.getCurrentCamera() instanceof OrthographicCamera ? "Orthographic" : "Perspective");
+		cameraTypeBox.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				if (cameraTypeBox.getSelected().equals("Orthographic")) {
+					viewportViewSettings.setOrthographic();
+				} else if (cameraTypeBox.getSelected().equals("Perspective")) {
+					viewportViewSettings.setPerspective();
+				}
+			}
+		});
+
+		VisLabel fovLabel = new VisLabel("Fov");
+		VisTextField fovField = new VisTextField(viewportViewSettings.getFov()+"");
+		fovField.setTextFieldFilter(new FloatRangeDigitFilter());
+		fovField.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				String text = fovField.getText();
+				if (text != null && !text.isEmpty()) {
+					viewportViewSettings.setFov(Float.parseFloat(text));
+				}
+			}
+		});
+
+		VisLabel nearLabel = new VisLabel("Near");
+		VisTextField nearField  = new VisTextField(viewportViewSettings.getNear()+"");
+		nearField.setTextFieldFilter(new FloatRangeDigitFilter());
+		nearField.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				String text = nearField.getText();
+				if (text != null && !text.isEmpty()) {
+					viewportViewSettings.setNear(Float.parseFloat(text));
+				}
+			}
+		});
+
+		VisLabel farLabel = new VisLabel("Far");
+		VisTextField farField  = new VisTextField(viewportViewSettings.getFar()+"");
+		farField.setTextFieldFilter(new FloatRangeDigitFilter());
+		farField.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				String text = farField.getText();
+				if (text != null && !text.isEmpty()) {
+					viewportViewSettings.setFar(Float.parseFloat(text));
+				}
+			}
+		});
+
+		VisCheckBox checkbox3D = new VisCheckBox("3D");
+		VisCheckBox zUpCheckbox = new VisCheckBox("+Z up");
+
+		checkbox3D.setChecked(viewportViewSettings.is3D());
+		zUpCheckbox.setChecked(viewportViewSettings.isPositiveZUp());
+
+		checkbox3D.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				viewportViewSettings.set3D(checkbox3D.isChecked());
+			}
+		});
+		zUpCheckbox.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				viewportViewSettings.setPositiveZUp(zUpCheckbox.isChecked());
+			}
+		});
+
+		cameraTable.add(cameraLabel).colspan(2);
+		cameraTable.row();
+
+		cameraTable.add(cameraTypeLabel);
+		cameraTable.add(cameraTypeBox);
+
+
+		cameraTable.row();
+		cameraTable.add(fovLabel);
+		cameraTable.add(fovField);
+
+		cameraTable.row();
+		cameraTable.add(nearLabel);
+		cameraTable.add(nearField);
+
+		cameraTable.row();
+		cameraTable.add(farLabel);
+		cameraTable.add(farField);
+
+		cameraTable.row();
+		cameraTable.add(checkbox3D);
+		cameraTable.add(zUpCheckbox);
+
+		VisTable axisTable = new VisTable();
+		axisTable.defaults().pad(5);
+		axisTable.left().defaults().left();
+
+		VisLabel axisLabel = new VisLabel("Axis");
+
+		axisTable.add(axisLabel).colspan(2);
+		axisTable.row();
+
+		VisCheckBox axisCheckbox = new VisCheckBox("Axis");
+		VisCheckBox gridCheckbox = new VisCheckBox("Grid");
+
+		axisCheckbox.setChecked(viewportViewSettings.isShowAxis());
+		gridCheckbox.setChecked(viewportViewSettings.isShowGrid());
+
+		axisCheckbox.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				viewportViewSettings.setShowAxis(axisCheckbox.isChecked());
+			}
+		});
+		gridCheckbox.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				viewportViewSettings.setShowGrid(gridCheckbox.isChecked());
+			}
+		});
+
+		VisLabel gridSizeLabel = new VisLabel("Grid Size");
+		VisTextField gridSizeField = new VisTextField(viewportViewSettings.getGridSize() + "");
+		gridSizeField.setTextFieldFilter(new FloatRangeDigitFilter());
+
+		gridSizeField.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				String text = gridSizeField.getText();
+				if (text != null && !text.isEmpty()) {
+					viewportViewSettings.setGridSize(Float.parseFloat(text));
+				}
+			}
+		});
+
+		axisTable.add(axisCheckbox).colspan(2);
+		axisTable.row();
+		axisTable.add(gridCheckbox).colspan(2);
+		axisTable.row();
+
+		axisTable.add(gridSizeLabel);
+		axisTable.add(gridSizeField);
+
+
+		visTable.add(cameraTable).growX();
+		visTable.row();
+		visTable.add(new VisImage("white")).growX().height(1);
+		visTable.row();
+		visTable.add(axisTable).growX();
+
+		visTable.pack();
+
+		return visTable;
 	}
 
 	public void unselectGizmos () {
@@ -506,10 +739,13 @@ public abstract class ViewportWidget extends Table {
 //				float currWidth = camera.viewportWidth * camera.zoom;
 //				float nextWidth = currWidth * (1f + amountY * 0.1f);
 //				float nextZoom = nextWidth / camera.viewportWidth;
-				camera.zoom += amountY;
-				camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
 
-				camera.update();
+				float currentZoom = viewportViewSettings.getZoom();
+				currentZoom += amountY;
+				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
+
+				viewportViewSettings.setZoom(currentZoom);
+
 
 				return true;
 			}
@@ -517,14 +753,17 @@ public abstract class ViewportWidget extends Table {
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				canPan = canMoveAround();
-				cameraController.touchDown((int)x, (int)y, pointer, button);
+				InputAdapter inputAdapter = viewportViewSettings.getCurrentCameraControllerSupplier().get();
+				inputAdapter.touchDown((int)x, (int)y, pointer, button);
 				return !event.isHandled();
 			}
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				isDragging = false;
-				cameraController.touchUp((int)x, (int)y, pointer, button);
+				InputAdapter inputAdapter = viewportViewSettings.getCurrentCameraControllerSupplier().get();
+
+				inputAdapter.touchUp((int)x, (int)y, pointer, button);
 				canPan = false;
 			}
 
@@ -536,8 +775,9 @@ public abstract class ViewportWidget extends Table {
 					return;
 
 				isDragging = true;
+				InputAdapter inputAdapter = viewportViewSettings.getCurrentCameraControllerSupplier().get();
 
-				cameraController.touchDragged((int)x, (int)y, pointer);
+				inputAdapter.touchDragged((int)x, (int)y, pointer);
 			}
 		});
 	}
@@ -583,13 +823,12 @@ public abstract class ViewportWidget extends Table {
 
 
 		float aspect = getWidth() / getHeight();
-
-		camera.viewportHeight = camera.viewportWidth / aspect;
-
-		camera.update();
+		viewportViewSettings.update(aspect);
 
 		prevTransform.set(batch.getTransformMatrix());
 		prevProjection.set(batch.getProjectionMatrix());
+
+		Camera camera = viewportViewSettings.getCurrentCameraSupplier().get();
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.setTransformMatrix(emptyTransform);
@@ -645,7 +884,9 @@ public abstract class ViewportWidget extends Table {
 			bitmapFont.dispose();
 		}
 
-		rulerRenderer.configureRulers();
+		if (!viewportViewSettings.is3D()) {
+			rulerRenderer.configureRulers();
+		}
 
 		super.draw(batch, parentAlpha);
 	}
@@ -749,47 +990,39 @@ public abstract class ViewportWidget extends Table {
 		}
 	}
 
+	protected void drawAxis () {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.setProjectionMatrix(camera.combined);
+
+		shapeRenderer.setColor(Color.valueOf("E33750")); //x
+		shapeRenderer.line(-100, 0, 0, 100, 0, 0);
+		shapeRenderer.setColor(Color.valueOf("88D407")); //Y
+		shapeRenderer.line(0, -100, 0, 0, 100, 0);
+		shapeRenderer.setColor(Color.valueOf("2F82DF")); //z
+		shapeRenderer.line(0, 0, -100, 0, 0, 100);
+
+		shapeRenderer.end();
+	}
+
 	// allow moving around if space bar is pressed and is in viewport or has dragged from viewport
 	protected boolean canMoveAround() {
 		return Gdx.input.isKeyPressed(Input.Keys.SPACE) || (isDragging);
 	}
 
-	public OrthographicCamera getCamera () {
-		return camera;
-	}
-
-	public float getCameraPosX () {
-		return camera.position.x;
-	}
-
-	public float getCameraPosY () {
-		return camera.position.y;
-	}
-
-	public float getCameraZoom () {
-		return camera.zoom;
-	}
-
-	public void setCameraPos (float x, float y) {
-		camera.position.set(x, y, 0);
-	}
-
-	public void setCameraZoom (float zoom) {
-		camera.zoom = zoom;
-	}
-
-	public void setViewportWidth (float width) {
-		camera.viewportWidth = width;
-		camera.update();
-	}
 
 	protected void setWorldSize (float worldWidth) {
+		this.viewportViewSettings.setWorldWidth(worldWidth);
 		this.worldWidth = worldWidth;
 		updateNumbers();
 	}
 
 	private void updateNumbers () {
-		camera.zoom = worldWidth / camera.viewportWidth;
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
+		viewportViewSettings.setZoom(worldWidth / camera.viewportWidth);
 		gridSize = worldWidth / 40f;
 		float minWidth = gridSize * 4f;
 		float maxWidth = worldWidth * 10f;
@@ -798,10 +1031,6 @@ public abstract class ViewportWidget extends Table {
 		camera.update();
 	}
 
-	protected void resetCamera () {
-		camera.position.set(0, 0, 0);
-		camera.zoom = worldWidth / camera.viewportWidth;
-	}
 
 	private void getViewportBounds (Rectangle out) {
 		localToScreenCoordinates(temp.set(0, 0));
@@ -822,6 +1051,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public Vector2 getLocalFromWorld (float x, float y) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		getViewportBounds(Rectangle.tmp);
 		camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
 		tmp.y = Gdx.graphics.getHeight() - tmp.y;
@@ -832,6 +1064,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public Vector2 getWorldFromLocal (float x, float y) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		Vector2 vector2 = localToScreenCoordinates(new Vector2(x, y));
 
 		getViewportBounds(Rectangle.tmp);
@@ -844,6 +1079,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	protected Vector3 getWorldFromLocal (Vector3 vec) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		Vector2 vector2 = localToScreenCoordinates(new Vector2(vec.x, vec.y));
 
 		getViewportBounds(Rectangle.tmp);
@@ -853,6 +1091,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public Vector3 getTouchToWorld (float x, float y) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		Vector3 vec = new Vector3(x, y, 0);
 
 		getViewportBounds(Rectangle.tmp);
@@ -862,6 +1103,9 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	protected float pixelToWorld (float pixelSize) {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
+
 		tmp.set(0, 0, 0);
 		camera.unproject(tmp);
 		float baseline = tmp.x;
@@ -983,9 +1227,10 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	private void drawGizmos (Batch batch, float parentAlpha) {
+		float zoom = viewportViewSettings.getZoom();
 		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
-			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * camera.zoom);
+			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * zoom);
 
 			gizmo.draw(batch, parentAlpha);
 		}
@@ -1001,6 +1246,8 @@ public abstract class ViewportWidget extends Table {
 
 
 	protected void beginEntitySelectionBuffer () {
+		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+		Camera camera = currentCameraSupplier.get();
 		entitySelectionBuffer.begin(camera);
 	}
 	protected void endEntitySelectionBuffer() {

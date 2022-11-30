@@ -55,6 +55,7 @@ public class VFXProjectSerializer {
 
     public static VFXProjectData readTalosTLSProject (String data) {
         Json json = new Json();
+        json.setIgnoreUnknownFields(true);
         ParticleEmitterDescriptor.registerModules();
         for (Class clazz: WrapperRegistry.map.values()) {
             json.addClassTag(clazz.getSimpleName(), clazz);

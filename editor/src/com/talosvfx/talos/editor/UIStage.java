@@ -81,8 +81,6 @@ public class UIStage {
 
 	private EmitterList emitterList;
 	public PreviewWidget previewWidget;
-	public PreviewImageControllerWidget previewController;
-
 	BatchConvertDialog batchConvertDialog;
 	public SettingsDialog settingsDialog;
 	public TemporaryTextureSelectDialog temporaryTextureDialog;
@@ -110,7 +108,6 @@ public class UIStage {
 
 	@Getter
 	private Preview3D innerTertiumActor;
-	private Preview2D innerSecundumActor;
 
 	private boolean isIn3DMode;
 
@@ -331,26 +328,24 @@ public class UIStage {
 	}
 
 	private void buildPreviewController () {
-		previewController = new PreviewImageControllerWidget(SharedResources.skin) {
-			@Override
-			public void removeImage () {
-				super.removeImage();
-				previewWidget.removePreviewImage();
-			}
-
-			@Override
-			public void gridSizeChanged(float size) {
-				super.gridSizeChanged(size);
-				previewWidget.gridSizeChanged(size);
-			}
-		};
+//		previewController = new PreviewImageControllerWidget(SharedResources.skin) {
+//			@Override
+//			public void removeImage () {
+//				super.removeImage();
+//				previewWidget.removePreviewImage();
+//			}
+//
+//			@Override
+//			public void gridSizeChanged(float size) {
+//				super.gridSizeChanged(size);
+//				previewWidget.gridSizeChanged(size);
+//			}
+//		};
 	}
 
 	private void constructSplitPanes () {
 		buildPreviewController();
-		innerSecundumActor = new Preview2D(previewController);
-		innerTertiumActor = new Preview3D(previewController);
-		previewWidget = innerSecundumActor;
+//		innerTertiumActor = new Preview3D(previewController);
 
 		emitterList = new EmitterList(skin);
 
@@ -391,8 +386,8 @@ public class UIStage {
 		leftTable.setSkin(skin);
 		leftTable.add(previewWidgetContainer).grow();
 		leftTable.row();
-		leftTable.add(previewController).growX();
-
+//		leftTable.add(previewController).growX();
+//
 		rightTable = new Table(); rightTable.setSkin(skin);
 		rightTable.add().grow();
 		horizontalPane = new VisSplitPane(leftTable, rightTable, false);
@@ -455,7 +450,7 @@ public class UIStage {
 
 		leftTable.add(previewWidgetContainer).grow();
 		leftTable.row();
-		leftTable.add(previewController).growX();
+//		leftTable.add(previewController).growX();
 
 		previewWidgetCell.setActor(previewWidget);
 		bottomTable.add(bottomPane).expand().grow();
@@ -469,12 +464,11 @@ public class UIStage {
 
 	public void swapDimensions() {
 		if (previewWidget == innerTertiumActor) {
-			previewWidget = innerSecundumActor;
-			previewController.dimensionChanged(false);
+//			previewController.dimensionChanged(false);
 			isIn3DMode = false;
 		} else {
 			previewWidget = innerTertiumActor;
-			previewController.dimensionChanged(true);
+//			previewController.dimensionChanged(true);
 			isIn3DMode = true;
 		}
 

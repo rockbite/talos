@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -42,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
@@ -132,7 +135,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
         this.paletteEditor = paletteEditor;
         this.paletteData = paletteEditor.getObject();
         setWorldSize(10f);
-        setCameraPos(0, 0);
+//        setCameraPos(0, 0);
 
         Notifications.registerObserver(this);
 
@@ -584,8 +587,13 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
     @Override
     public void drawContent(PolygonBatch batch, float parentAlpha) {
         batch.end();
+        Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+        Camera camera = currentCameraSupplier.get();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
-        gridPropertyProvider.update(camera, parentAlpha);
+
+        if (camera instanceof OrthographicCamera) {
+            gridPropertyProvider.update((OrthographicCamera)camera, parentAlpha);
+        }
         gridRenderer.drawGrid(batch, shapeRenderer);
 
         OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
@@ -672,7 +680,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
             Drawable appendIcon = skin.getDrawable("tile-plus-icon");
             Drawable removeIcon = skin.getDrawable("tile-minus-icon");
             float totalScreenSpaceParentSize = getWidth();
-            float totalWorldWidth = getWorldWidth() * camera.zoom;
+            float totalWorldWidth = getWorldWidth() * viewportViewSettings.getZoom();
             float worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
             float icWidth = worldPerPixel * 12f;
             float icHeight = worldPerPixel * 12f;
@@ -768,7 +776,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
                 Skin skin = SharedResources.skin;
                 Drawable lineAdjustIcon = skin.getDrawable("adjust-line-icon");
                 float totalScreenSpaceParentSize = getWidth();
-                float totalWorldWidth = getWorldWidth() * camera.zoom;
+                float totalWorldWidth = getWorldWidth() * viewportViewSettings.getZoom();
                 float worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
                 float icWidth = worldPerPixel * 8f;
                 float icHeight = worldPerPixel * 16f;
@@ -1089,7 +1097,6 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
     @Override
     public void act(float delta) {
         super.act(delta);
-        camera.update();
     }
 
     public void startFakeHeightEditMode () {
@@ -1109,6 +1116,9 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
 
     @Override
     protected void drawEntitiesForSelection () {
+        Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+        Camera camera = currentCameraSupplier.get();
+
         super.drawEntitiesForSelection();
 
         mainRenderer.setRenderingEntitySelectionBuffer(true);
