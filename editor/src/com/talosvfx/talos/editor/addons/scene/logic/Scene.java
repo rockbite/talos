@@ -85,7 +85,7 @@ public class Scene extends SavableContainer implements IPropertyProvider {
                 return new ItemData(newLayer, newLayer);
             }
         };
-        DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers", new Supplier<Array<ItemData>>() {
+        DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers" , new Supplier<Array<ItemData>>() {
             @Override
             public Array<ItemData> get () {
                 Array<ItemData> list = new Array<>();
@@ -130,6 +130,8 @@ public class Scene extends SavableContainer implements IPropertyProvider {
                 return newText;
             }
         });
+
+        itemListWidget.setDraggableInLayerOnly(true);
 
         properties.add(labelWidget);
         properties.add(itemListWidget);

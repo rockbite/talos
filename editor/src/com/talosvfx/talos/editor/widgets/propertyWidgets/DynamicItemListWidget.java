@@ -22,7 +22,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
     private DynamicItemListInteraction<T> interaction;
     public FilteredTree<T> list;
-
+    private boolean draggableInLayerOnly;
 
     public interface DynamicItemListInteraction<T> {
         Supplier<T> newInstanceCreator ();
@@ -35,6 +35,10 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
     public DynamicItemListWidget(String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, DynamicItemListInteraction<T> interaction) {
         super(name, supplier, valueChanged);
         this.interaction = interaction;
+    }
+
+    public void setDraggableInLayerOnly (boolean draggableInLayerOnly) {
+        this.draggableInLayerOnly = draggableInLayerOnly;
     }
 
 
@@ -183,6 +187,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         });
         FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
+        node.draggableInLayerOnly = draggableInLayerOnly;
         node.setObject(t);
 
         return node;
