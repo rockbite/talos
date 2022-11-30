@@ -1580,14 +1580,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onPropertyHolderEdited (PropertyHolderEdited event) {
 		Object parentOfPropertyHolder = event.parentOfPropertyHolder;
-		if (parentOfPropertyHolder instanceof AComponent) {
-			ComponentUpdated componentUpdatedEvent = Notifications.obtainEvent(ComponentUpdated.class);
-			componentUpdatedEvent.set(((AComponent) parentOfPropertyHolder), event.fastChange, false);
-			Notifications.fireEvent(componentUpdatedEvent);
-		}
 
 
-		logger.info("redo on property holder edited");
 //		IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
 //		if (currentHolder != null) {
 //			if (currentHolder instanceof MultiPropertyHolder) {

@@ -74,9 +74,11 @@ public abstract class AbstractWidget<T> extends Table {
     protected boolean fireChangedEvent() {
         ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
 
-        boolean var2;
+        boolean var2 = false;
         try {
             var2 = fire(changeEvent);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             Pools.free(changeEvent);
         }

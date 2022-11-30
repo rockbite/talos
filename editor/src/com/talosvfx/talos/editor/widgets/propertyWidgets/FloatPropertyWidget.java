@@ -36,6 +36,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
                         callValueChanged(valueWidget.getValue());
                     }
                 } catch (NumberFormatException e){
+                    e.printStackTrace();
                     callValueChanged(0f);
                 }
             }

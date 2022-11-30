@@ -21,7 +21,8 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
     public ColorPropertyWidget(String name, Supplier<Color> supplier, ValueChanged<Color> valueChanged) {
         super(name, supplier, valueChanged);
 
-        colorPicker = new ColorPicker("Color Picker", new ColorPickerAdapter() {
+        colorPicker = new ColorPicker("Color Picker");
+        colorPicker.setListener(new ColorPickerAdapter() {
             @Override
             public void reset(Color previousColor, Color newColor) {
                 super.reset(previousColor, newColor);
@@ -42,9 +43,11 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
             public void changed(Color newColor) {
                 super.changed(newColor);
                 box.setColor(newColor);
-                callValueChanged(box.getColor());
+                callValueChanged(newColor);
+
             }
         });
+
         colorPicker.padTop(32);
         colorPicker.padLeft(16);
         colorPicker.setHeight(330);
@@ -67,9 +70,8 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
         box.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                colorPicker.setColor(box.getColor());
-                SharedResources.stage.addActor(colorPicker.fadeIn()
-                );
+                colorPicker.setColor(getValue());
+                SharedResources.stage.addActor(colorPicker.fadeIn());
             }
         });
 

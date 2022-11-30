@@ -141,6 +141,7 @@ public class ValueWidget extends AbstractWidget<Float> {
                 setValue(value + change);
 
                 lastPos = x;
+
             }
 
             @Override

@@ -100,6 +100,7 @@ public class WidgetFactory {
                     Vector2 val = (Vector2) field.get(parent);
                     return val;
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return new Vector2(0, 0);
                 }
             }
@@ -117,7 +118,7 @@ public class WidgetFactory {
                     }
 
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
@@ -135,6 +136,7 @@ public class WidgetFactory {
                     Color val = (Color) field.get(parent);
                     return val;
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return Color.WHITE;
                 }
             }
@@ -144,7 +146,7 @@ public class WidgetFactory {
                 try {
                     field.set(parent, value);
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
@@ -160,6 +162,7 @@ public class WidgetFactory {
                 try {
                     return primitive ? field.getBoolean(parent) : (Boolean) field.get(parent);
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return false;
                 }
             }
@@ -169,7 +172,7 @@ public class WidgetFactory {
                 try {
                     field.set(parent, value);
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
@@ -185,6 +188,7 @@ public class WidgetFactory {
                     String val = field.get(parent).toString();
                     return val;
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return "";
                 }
             }
@@ -201,6 +205,7 @@ public class WidgetFactory {
                     String val = field.get(parent).toString();
                     return val;
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return "";
                 }
             }
@@ -210,7 +215,7 @@ public class WidgetFactory {
                 try {
                     field.set(parent, value);
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
@@ -225,6 +230,7 @@ public class WidgetFactory {
                 try {
                     return primitive ? field.getInt(parent) : (Integer) field.get(parent);
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return 0;
                 }
             }
@@ -234,7 +240,7 @@ public class WidgetFactory {
                 try {
                     field.set(parent, value);
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
@@ -266,6 +272,7 @@ public class WidgetFactory {
                 try {
                     return primitive ? field.getFloat(parent) : (Float) field.get(parent);
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                     return 0f;
                 }
             }
@@ -275,7 +282,7 @@ public class WidgetFactory {
                 try {
                     field.set(parent, value);
                 } catch (IllegalAccessException e) {
-
+                    e.printStackTrace();
                 }
             }
         });
