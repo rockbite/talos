@@ -27,7 +27,7 @@ public class ViewportViewSettings {
 
 
 	private float fov = 69;
-	private float near = 0;
+	private float near = 0f;
 	private float far = 100;
 
 	private float zoom = 1;
@@ -54,9 +54,9 @@ public class ViewportViewSettings {
 		orthographicCamera = new OrthographicCamera(10, 10);
 		perspectiveCamera = new PerspectiveCamera(fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		orthographicCamera.position.set(0, 0, 10);
+		orthographicCamera.position.set(0, 0, 1);
 
-		perspectiveCamera.position.set(0, 0, 10);
+		perspectiveCamera.position.set(0, 0, 5);
 		perspectiveCamera.lookAt(new Vector3(0, 0, 0));
 
 		orthographicCamera.update();
@@ -129,6 +129,8 @@ public class ViewportViewSettings {
 		perspectiveCamera.fieldOfView = fov;
 		perspectiveCamera.near = near;
 		perspectiveCamera.far = far;
+		perspectiveCamera.viewportWidth = worldWidth;
+		perspectiveCamera.viewportHeight = orthographicCamera.viewportWidth / aspect;
 		perspectiveCamera.update();
 
 		orthographicCamera.viewportWidth = worldWidth;

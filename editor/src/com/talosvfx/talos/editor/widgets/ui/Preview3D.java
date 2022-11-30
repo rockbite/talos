@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -44,6 +45,9 @@ public class Preview3D extends PreviewWidget {
 
     public Preview3D() {
         super();
+        if (MathUtils.isEqual(viewportViewSettings.getNear(), 0.0f)) {
+            viewportViewSettings.setNear(0.01f);
+        }
 //        cameraController.scrollOnly = true;
         setWorldSize(10);
 
