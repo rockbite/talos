@@ -100,7 +100,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	public boolean exporting = false;
 
-	public ObjectMap<String, SceneProjectSettings> projectSettingsObjectMap = new ObjectMap<>();
 
 	private float sprayInnerRadius = 10;
 	private float sprayOuterRadius = 15;
@@ -997,61 +996,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@Override
 	public void write (Json json) {
-		changeVersion = UUID.randomUUID().toString();
 
-		if (projectPath != null) {
-
-			logger.info("Redo write");
-//			json.writeValue("currentScene", AssetImporter.relative(currentContainer.path));
-
-			json.writeValue("changeVersion", changeVersion);
-
-			SceneProjectSettings currentSceneSetting = projectSettingsObjectMap.get(getRelativePath(currentContainer.path));
-			if (currentSceneSetting != null) {
-				currentSceneSetting.updateValues();
-			}
-			json.writeValue("projectSettings", projectSettingsObjectMap);
-		}
 	}
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
-		changeVersion = jsonData.getString("changeVersion", "");
 
-		logger.info("redo read");
-//		ProjectExplorerWidget projectExplorer = sceneEditorAddon.projectExplorer;
-//
-//		projectExplorer.loadDirectoryTree(projectPath);
-
-		projectSettingsObjectMap.clear();
-		JsonValue projectSettings = jsonData.get("projectSettings");
-		if (projectSettings != null) {
-			for (JsonValue projectSetting : projectSettings) {
-				SceneProjectSettings value = new SceneProjectSettings();
-				value.read(json, projectSetting);
-				projectSettingsObjectMap.put(projectSetting.name, value);
-			}
-		}
-
-
-		logger.info("redo get scene");
-//		String path = jsonData.getString("currentScene", "");
-//		FileHandle sceneFileHandle = AssetImporter.get(path);
-//		if (sceneFileHandle.exists()) {
-//			SavableContainer container;
-//			if (sceneFileHandle.extension().equals("prefab")) {
-//				container = new Prefab();
-//			} else {
-//				container = new Scene();
-//			}
-//			container.path = sceneFileHandle.path();
-//			container.loadFromPath();
-//			openSavableContainer(container);
-//		}
-
-
-
-//        SceneEditorAddon.get().assetImporter.housekeep(projectPath);
 	}
 
 	@Override
@@ -1467,26 +1417,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		this.screenToLocalCoordinates(vec);
 		Vector2 local = getWorldFromLocal(vec.x, vec.y);
 		return local;
-	}
-
-	public String saveData (boolean toMemory) {
-		logger.info("Save redo");
-//		Json json = new Json();
-//		json.setOutputType(JsonWriter.OutputType.json);
-//		String data = json.prettyPrint(sceneEditorAddon.workspace);
-//
-//		SavableContainer savableContainer = currentContainer;
-//		if (savableContainer != null) {
-//			if (toMemory) {
-//				snapshotService.saveSnapshot(changeVersion, AssetImporter.relative(savableContainer.path), savableContainer.getAsString());
-//			} else {
-//				savableContainer.save();
-//			}
-//		}
-
-//		return data;
-
-		return "";
 	}
 
 	public void loadFromScene (GameAsset<Scene> scene) {

@@ -82,7 +82,6 @@ public class LayoutContent extends LayoutItem {
 				super.enter(event, x, y, pointer, fromActor);
 				if (pointer != -1) return;
 				if (fromActor == null || !fromActor.isDescendantOf(LayoutContent.this)) {
-					logger.info("Enter {}", activeApp.getFriendlyName());
 					activeApp.onInputProcessorAdded();
 				}
 			}
@@ -94,7 +93,6 @@ public class LayoutContent extends LayoutItem {
 				super.exit(event, x, y, pointer, toActor);
 				if (pointer != -1) return;
 				if (toActor == null || !toActor.isDescendantOf(LayoutContent.this)) {
-					logger.info("Exit {}", activeApp.getFriendlyName());
 					activeApp.onInputProcessorRemoved();
 				}
 			}
