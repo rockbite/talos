@@ -106,6 +106,10 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         return properties;
     }
 
+    public void updateProperties() {
+
+    }
+
     @Override
     public String getPropertyBoxTitle() {
         return "Routine Renderer";
@@ -143,6 +147,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
         routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource(), routineConfigMap);
     }
+
+
 
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {

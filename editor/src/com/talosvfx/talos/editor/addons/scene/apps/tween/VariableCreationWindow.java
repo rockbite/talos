@@ -125,12 +125,8 @@ public class VariableCreationWindow extends Table {
                 if (exposedVariable != null) {
                     NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
                     exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
-                    RoutineInstance routineInstance = routineStage.routineInstance;
                     Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
                     exposedVariable.update(propertyWrapper);
-
-                    ExposedVariableNode exposedVariableNode = ((ExposedVariableNode) routineInstance.getNodeById(exposedVariable.getUniqueId()));
-                    exposedVariableNode.updateForPropertyWrapper(propertyWrapper);
                 }
             }
         });
@@ -138,17 +134,15 @@ public class VariableCreationWindow extends Table {
 
     private void addButton() {
         Skin skin = TalosMain.Instance().getSkin();
-        SquareButton squareButton = new SquareButton(skin, new Label("New template", skin), "Add a new variable template");
+        SquareButton squareButton = new SquareButton(skin, new Label("New Variable", skin), "Add a new Variable");
         squareButton.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 squareButton.setChecked(false);
+
                 RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
-                RoutineStage routineStage = routineEditor.routineStage;
-                RoutineInstance routineInstance = routineStage.routineInstance;
-                routineInstance.createNewPropertyWrapper();
-                reloadWidgets(routineStage);
+                routineEditor.createNewVariable();
             }
         });
         add(squareButton).growX();

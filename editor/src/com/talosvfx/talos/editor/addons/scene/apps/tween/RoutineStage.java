@@ -20,9 +20,12 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -34,6 +37,7 @@ import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 
 public class RoutineStage extends DynamicNodeStage implements Notifications.Observer {
@@ -65,6 +69,21 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         routineInstance = new RoutineInstance();
 
         Notifications.registerObserver(this);
+    }
+
+    public void routineUpdated() {
+        reloadRoutineInstancesFromMemory();
+
+        IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
+        Iterable<IPropertyProvider> propertyProviders = currentHolder.getPropertyProviders();
+        for (IPropertyProvider propertyProvider : propertyProviders) {
+            if (propertyProvider instanceof RoutineRendererComponent) {
+                RoutineRendererComponent routineRendererComponent = (RoutineRendererComponent) propertyProvider;
+                if (routineRendererComponent.routineInstance.uuid.equals(routineInstance.uuid)) {
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(routineRendererComponent));
+                }
+            }
+        }
     }
 
     public void writeData(FileHandle target) {

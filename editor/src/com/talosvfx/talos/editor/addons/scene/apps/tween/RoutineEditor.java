@@ -111,6 +111,8 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
                 }
             }
         }
+
+        routineStage.routineUpdated();
     }
 
     public void changeKeyFor (int index, String value) {
@@ -126,8 +128,7 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
                 }
             }
         }
-
-        // TODO: 11/30/2022 iterate through all GO Routines and update there
+        routineStage.routineUpdated();
     }
 
     public void changeTypeFor (int index, String newType) {
@@ -135,6 +136,13 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         routineInstance.changeExposedVariableType(index, newType);
 
         variableCreationWindow.reloadWidgets(routineStage);
-        // TODO: 11/30/2022 iterate through all GO Routines and update there
+        routineStage.routineUpdated();
+    }
+
+    public void createNewVariable () {
+        RoutineInstance routineInstance = routineStage.routineInstance;
+        routineInstance.createNewPropertyWrapper();
+        variableCreationWindow.reloadWidgets(routineStage);
+        routineStage.routineUpdated();
     }
 }
