@@ -5,9 +5,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 
-public class ScriptPropertyGameObjectWrapper extends ScriptPropertyWrapper<GameObject> {
+public class PropertyGameObjectWrapper extends PropertyWrapper<GameObject> {
 
     private String objectGOUUID;
     private String defaultGOUuid;

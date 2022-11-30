@@ -5,13 +5,19 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public abstract class ScriptPropertyWrapper<T> implements Cloneable, Json.Serializable {
+public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable {
 
     public String propertyName;
 
     public T value;
 
     public T defaultValue;
+
+    public int index;
+
+    public PropertyWrapper () {
+
+    }
 
 
     public void collectAttributes (Array<String> attributes) {
@@ -32,12 +38,13 @@ public abstract class ScriptPropertyWrapper<T> implements Cloneable, Json.Serial
     }
 
     @Override
-    public ScriptPropertyWrapper<T> clone () {
+    public PropertyWrapper<T> clone () {
         try {
-            ScriptPropertyWrapper<T> clone = (ScriptPropertyWrapper<T>) super.clone();
+            PropertyWrapper<T> clone = (PropertyWrapper<T>) super.clone();
             clone.value = value;
             clone.defaultValue = defaultValue;
             clone.propertyName = propertyName;
+            clone.index = index;
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -48,11 +55,13 @@ public abstract class ScriptPropertyWrapper<T> implements Cloneable, Json.Serial
     @Override
     public void read (Json json, JsonValue jsonData) {
        propertyName = jsonData.getString("propertyName");
+       index = jsonData.getInt("index");
     }
 
     @Override
     public void write (Json json) {
         json.writeValue("propertyName", propertyName);
+        json.writeValue("index", index);
     }
 
     public abstract T parseValueFromString (String value);

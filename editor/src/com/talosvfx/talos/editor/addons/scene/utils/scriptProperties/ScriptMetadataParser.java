@@ -18,7 +18,7 @@ public class ScriptMetadataParser {
 
 
     private static class ScriptPropertyWrappers {
-        private final ObjectMap<Class, Class<? extends ScriptPropertyWrapper<?>>> registeredTypes = new ObjectMap<>();
+        private final ObjectMap<Class, Class<? extends PropertyWrapper<?>>> registeredTypes = new ObjectMap<>();
 
         private ObjectMap<String, String> primitiveReplacementMap = new ObjectMap<>();
 
@@ -30,7 +30,7 @@ public class ScriptMetadataParser {
             primitiveReplacementMap.put("String", String.class.getName());
         }
 
-        <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends ScriptPropertyWrapper<T>> wrapperClazz) {
+        <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends PropertyWrapper<T>> wrapperClazz) {
             this.registeredTypes.put(clazz, wrapperClazz);
         }
 
@@ -54,8 +54,8 @@ public class ScriptMetadataParser {
         }
 
         @SuppressWarnings("unchecked")
-        <T> ScriptPropertyWrapper<T> createPropertyWrapperForClazz (Class<T> clazz) {
-            Class<ScriptPropertyWrapper<T>> aClass = (Class<ScriptPropertyWrapper<T>>)registeredTypes.get(clazz);
+        <T> PropertyWrapper<T> createPropertyWrapperForClazz (Class<T> clazz) {
+            Class<PropertyWrapper<T>> aClass = (Class<PropertyWrapper<T>>)registeredTypes.get(clazz);
             try {
                 return ClassReflection.newInstance(aClass);
             } catch (ReflectionException e) {
@@ -63,7 +63,7 @@ public class ScriptMetadataParser {
             }
         }
 
-        public <T> ScriptPropertyWrapper<T> createPropertyWrapperForClazzName (String parameterClassName) {
+        public <T> PropertyWrapper<T> createPropertyWrapperForClazzName (String parameterClassName) {
             String clazzName = parseName(parameterClassName);
             Class aClass = null;
             try {
@@ -85,11 +85,11 @@ public class ScriptMetadataParser {
     }
 
     private void registerSupportedClasses () {
-        scriptPropertyWrappers.registerPropertyWrapper(Float.class, ScriptPropertyFloatWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(Boolean.class, ScriptPropertyBooleanWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(Integer.class, ScriptPropertyIntegerWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(String.class, ScriptPropertyStringWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(GameObject.class, ScriptPropertyGameObjectWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(Float.class, PropertyFloatWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(Boolean.class, PropertyBooleanWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(Integer.class, PropertyIntegerWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(String.class, PropertyStringWrapper.class);
+        scriptPropertyWrappers.registerPropertyWrapper(GameObject.class, PropertyGameObjectWrapper.class);
     }
 
     public void processHandle(FileHandle handle, ScriptMetadata metadata) {
@@ -149,10 +149,10 @@ public class ScriptMetadataParser {
             //remove type and leave only arguments
             attributes.removeRange(0, 1);
 
-            ScriptPropertyWrapper<?> scriptPropertyWrapper = scriptPropertyWrappers.createPropertyWrapperForClazzName(parameterClassName);
-            scriptPropertyWrapper.collectAttributes(attributes);
-            scriptPropertyWrapper.propertyName = parameterName;
-            metadata.scriptPropertyWrappers.add(scriptPropertyWrapper);
+            PropertyWrapper<?> propertyWrapper = scriptPropertyWrappers.createPropertyWrapperForClazzName(parameterClassName);
+            propertyWrapper.collectAttributes(attributes);
+            propertyWrapper.propertyName = parameterName;
+            metadata.scriptPropertyWrappers.add(propertyWrapper);
         }
     }
 

@@ -18,10 +18,13 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
     private String title;
     public RoutineStage routineStage;
     public AnimationTimeline animationTimeline;
+    public VariableCreationWindow variableCreationWindow;
 
     public FileHandle targetFileHandle;
 
     public ScenePreviewStage scenePreviewStage;
+
+    public SplitPane splitPane;
 
     public RoutineEditor(FileHandle twFileHandle) {
         super(twFileHandle);
@@ -32,6 +35,7 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         routineConfigMap = new RoutineConfigMap();
         FileHandle handle = Gdx.files.internal("addons/scene/tween-nodes.xml");
         routineConfigMap.loadFrom(handle);
+        variableCreationWindow = new VariableCreationWindow();
 
         initContent();
 
@@ -42,6 +46,8 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
                 TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
             }
         });
+        variableCreationWindow.reloadWidgets(routineStage);
+
     }
 
     @Override
@@ -65,7 +71,10 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         }
 
         scenePreviewStage = new ScenePreviewStage();
-        SplitPane splitPane = new SplitPane(scenePreviewStage, routineStage.getContainer(),  false, TalosMain.Instance().getSkin());
+        Table table = new Table();
+        table.add(routineStage.getContainer()).grow();
+        table.addActor(variableCreationWindow);
+        splitPane = new SplitPane(scenePreviewStage, table,  false, TalosMain.Instance().getSkin());
         splitPane.setSplitAmount(0.2f);
 
         content.add(splitPane).grow();
@@ -77,5 +86,9 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
     @Override
     public String getTitle() {
         return title;
+    }
+
+    public void deleteParamTemplateWithIndex (int index) {
+        // TODO: 11/29/2022  implement please
     }
 }

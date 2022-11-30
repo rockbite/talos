@@ -55,6 +55,15 @@ public class SelectWidget extends AbstractWidget<String> {
         selectBox.setItems(items);
     }
 
+    public void setOptions(String[] options) {
+        for (String option : options) {
+            titleMap.put(option, option);
+            keyMap.put(option, option);
+        }
+
+        selectBox.setItems(options);
+    }
+
     @Override
     public String getValue () {
         String title = selectBox.getSelected();

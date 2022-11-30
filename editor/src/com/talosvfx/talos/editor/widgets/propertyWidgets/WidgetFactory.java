@@ -2,17 +2,11 @@ package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
-import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,19 +15,19 @@ import java.util.function.Supplier;
 
 public class WidgetFactory {
 
-    public static PropertyWidget generateForScriptProperty(ScriptPropertyWrapper wrapper) {
+    public static PropertyWidget generateForScriptProperty(PropertyWrapper wrapper) {
         try {
             Field value = wrapper.getClass().getField("value");
-            if (wrapper instanceof ScriptPropertyBooleanWrapper) {
+            if (wrapper instanceof PropertyBooleanWrapper) {
                 return generateForBoolean(wrapper, value, null, wrapper.propertyName, false);
-            } else if (wrapper instanceof ScriptPropertyIntegerWrapper) {
+            } else if (wrapper instanceof PropertyIntegerWrapper) {
                 return generateForInt(wrapper, value, null, wrapper.propertyName, false);
-            } else if(wrapper instanceof ScriptPropertyFloatWrapper) {
+            } else if(wrapper instanceof PropertyFloatWrapper) {
                 return generateForFloat(wrapper, value, null, wrapper.propertyName, false);
-            }  else if(wrapper instanceof ScriptPropertyStringWrapper) {
+            }  else if(wrapper instanceof PropertyStringWrapper) {
                 return generateForString(wrapper, value, null, wrapper.propertyName);
-            } else if (wrapper instanceof ScriptPropertyGameObjectWrapper) {
-                return generateForGameObject((ScriptPropertyGameObjectWrapper) wrapper);
+            } else if (wrapper instanceof PropertyGameObjectWrapper) {
+                return generateForGameObject((PropertyGameObjectWrapper) wrapper);
             }
 
         } catch (NoSuchFieldException e) {
@@ -242,7 +236,7 @@ public class WidgetFactory {
         return widget;
     }
 
-    private static GameObjectSelectWidget generateForGameObject (ScriptPropertyGameObjectWrapper wrapper) {
+    private static GameObjectSelectWidget generateForGameObject (PropertyGameObjectWrapper wrapper) {
         GameObjectSelectWidget widget = new GameObjectSelectWidget(wrapper.propertyName, new Supplier<GameObject>() {
             @Override
             public GameObject get() {
@@ -280,8 +274,8 @@ public class WidgetFactory {
             }
         });
 
-        if (parent instanceof ScriptPropertyFloatWrapper) {
-            ScriptPropertyFloatWrapper numberWrapper = (ScriptPropertyFloatWrapper) parent;
+        if (parent instanceof PropertyFloatWrapper) {
+            PropertyFloatWrapper numberWrapper = (PropertyFloatWrapper) parent;
             widget.configureFromValues(numberWrapper.minValue, numberWrapper.maxValue, numberWrapper.step);
         } else {
             widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));

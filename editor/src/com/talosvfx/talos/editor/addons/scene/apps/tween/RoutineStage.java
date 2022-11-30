@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -90,6 +91,24 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     @Override
     public void read(Json json, JsonValue root) {
         super.read(json, root);
+
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("propertyWrapperIndex", routineInstance.getExposedPropertyIndex());
+
+        json.writeObjectStart("propertyWrappers");
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            json.writeObjectStart("property");
+            json.writeValue("className", propertyWrapper.getClass().getName());
+            json.writeValue("property", propertyWrapper);
+            json.writeObjectEnd();
+        }
+        json.writeObjectEnd();
+
     }
 
     @Override

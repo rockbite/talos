@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -8,14 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 
 import java.util.function.Supplier;
 
