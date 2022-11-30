@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractTweenNode;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;

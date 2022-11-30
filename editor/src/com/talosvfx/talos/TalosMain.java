@@ -23,7 +23,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.TalosInputProcessor;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
@@ -95,8 +94,6 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	private ScreenshotService screenshotService;
-
-	private TalosInputProcessor talosInputProcessor;
 
 	private Array<InputProcessor> inputProcessors = new Array<>();
 	private Array<InputProcessor> customInputProcessors = new Array<>();
