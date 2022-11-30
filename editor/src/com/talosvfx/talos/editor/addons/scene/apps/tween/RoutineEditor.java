@@ -5,14 +5,20 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
+import com.talosvfx.talos.editor.nodes.NodeBoard;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 
 public class RoutineEditor extends AEditorApp<FileHandle> {
 
@@ -91,16 +97,44 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
     }
 
     public void deleteParamTemplateWithIndex (int index) {
-        // TODO: 11/29/2022  implement please
+        RoutineInstance routineInstance = routineStage.routineInstance;
+        routineInstance.removeExposedVariablesWithIndex(index);
+        variableCreationWindow.reloadWidgets(routineStage);
+
+        NodeBoard nodeBoard = routineStage.getNodeBoard();
+
+        for (NodeWidget node : nodeBoard.nodes) {
+            if (node instanceof RoutineExposedVariableNodeWidget) {
+                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
+                if (widget.index == index) {
+                    widget.update(null);
+                }
+            }
+        }
     }
 
     public void changeKeyFor (int index, String value) {
         RoutineInstance routineInstance = routineStage.routineInstance;
-        PropertyWrapper<?> propertyWrapper = routineInstance.getPropertyWrapperWithIndex(index);
-        propertyWrapper.propertyName = value;
+        routineInstance.changeExposedVariableKey(index, value);
+        NodeBoard nodeBoard = routineStage.getNodeBoard();
+
+        for (NodeWidget node : nodeBoard.nodes) {
+            if (node instanceof RoutineExposedVariableNodeWidget) {
+                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
+                if (widget.index == index) {
+                    widget.update(routineInstance.getPropertyWrapperWithIndex(index));
+                }
+            }
+        }
+
+        // TODO: 11/30/2022 iterate through all GO Routines and update there
     }
 
     public void changeTypeFor (int index, String newType) {
+        RoutineInstance routineInstance = routineStage.routineInstance;
+        routineInstance.changeExposedVariableType(index, newType);
 
+        variableCreationWindow.reloadWidgets(routineStage);
+        // TODO: 11/30/2022 iterate through all GO Routines and update there
     }
 }

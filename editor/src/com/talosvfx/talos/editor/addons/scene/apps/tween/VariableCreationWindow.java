@@ -38,7 +38,7 @@ public class VariableCreationWindow extends Table {
 
     public void reloadWidgets(RoutineStage routineStage) {
         clear();
-        setSize(400, 300);
+        setSize(420, 300);
         defaults().pad(5);
         bottom().left();
 

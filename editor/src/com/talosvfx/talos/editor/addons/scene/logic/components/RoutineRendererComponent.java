@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -94,6 +95,13 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
+
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            PropertyWidget generate = WidgetFactory.generateForScriptProperty(propertyWrapper);
+            generate.setParent(this);
+            properties.add(generate);
+        }
 
         return properties;
     }

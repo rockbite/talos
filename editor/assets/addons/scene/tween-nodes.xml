@@ -220,7 +220,7 @@
                 <value port="output" name="top" type="float">top</value>
             </group>
         </module>
-        <module name = "ExposedVariableNode" title = "Exposed Variable" keywords = "" class = "RoutineNodeWidget">
+        <module name = "ExposedVariableNode" title = "Exposed Variable" keywords = "" class = "RoutineExposedVariableNodeWidget">
             <inputText name="key" default="">Key</inputText>
             <group>
                 <value port="output" name="output" type="fluid">output</value>

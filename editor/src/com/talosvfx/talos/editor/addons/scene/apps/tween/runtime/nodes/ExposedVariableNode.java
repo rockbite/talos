@@ -9,7 +9,7 @@ public class ExposedVariableNode extends RoutineNode {
 
     public int index;
 
-    private transient PropertyWrapper<?> propertyWrapper;
+    public transient PropertyWrapper<?> propertyWrapper;
 
     public void updateForPropertyWrapper (PropertyWrapper<?> propertyWrapper) {
         index = propertyWrapper.index;

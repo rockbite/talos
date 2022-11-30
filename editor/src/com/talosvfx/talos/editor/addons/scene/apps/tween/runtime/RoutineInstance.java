@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.draw.DrawableQuad;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyFloatWrapper;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.ExposedVariableNode;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
 
 import java.util.UUID;
 
@@ -200,6 +200,69 @@ public class RoutineInstance {
             if (propertyWrapper.index == index) {
                 return propertyWrapper;
             }
+        }
+
+        return null;
+    }
+
+    public void removeExposedVariablesWithIndex (int index) {
+        PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
+        propertyWrappers.removeValue(propertyWrapperWithIndex, true);
+
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            RoutineNode value = routineNodeEntry.value;
+            if (value instanceof ExposedVariableNode) {
+                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
+                if (exposedVariableNode.index == index) {
+                    exposedVariableNode.propertyWrapper = null;
+                }
+            }
+        }
+    }
+
+    public void changeExposedVariableKey (int index, String newKey) {
+        PropertyWrapper<?> propertyWrapper = getPropertyWrapperWithIndex(index);
+        propertyWrapper.propertyName = newKey;
+    }
+
+    public void changeExposedVariableType (int index, String newType) {
+        PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
+        PropertyWrapper<?> newInstance = getPropertyForType(newType);
+        if (newInstance == null) {
+            System.out.println("CHECK TYPE, THERE IS NO TYPE MATCHING FOR - " + newType);
+            return;
+        }
+
+        newInstance.index = index;
+        newInstance.propertyName = propertyWrapperWithIndex.propertyName;
+        int i = propertyWrappers.indexOf(propertyWrapperWithIndex, true);
+        propertyWrappers.removeValue(propertyWrapperWithIndex, true);
+        propertyWrappers.insert(i, newInstance);
+
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            RoutineNode value = routineNodeEntry.value;
+            if (value instanceof ExposedVariableNode) {
+                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
+                if (exposedVariableNode.index == index) {
+                    exposedVariableNode.updateForPropertyWrapper(newInstance);
+                }
+            }
+        }
+    }
+
+    private PropertyWrapper<?> getPropertyForType (String type) {
+        type = type.toLowerCase();
+        switch (type) {
+            case "boolean":
+                return new PropertyBooleanWrapper();
+            case "integer":
+                return new PropertyIntegerWrapper();
+            case "float":
+                return new PropertyFloatWrapper();
+            case "game object":
+                return new PropertyGameObjectWrapper();
+            case "string":
+                return new PropertyStringWrapper();
         }
 
         return null;
