@@ -128,6 +128,7 @@ public class LayoutContent extends LayoutItem {
 			@Override
 			public void onDestroyRequest () {
 				grid.removeApp(LayoutContent.this, layoutApp);
+				layoutApp.setDestroyCallback(null);
 			}
 		});
 

@@ -29,14 +29,13 @@ public class AppManager {
 		singletonAsset.setResourcePayload(dummyObject);
 	}
 
-	public BaseApp getAppForLayoutApp (ObjectMap.Entry<String, LayoutApp> app) {
-		LayoutApp value = app.value;
+	public BaseApp getAppForLayoutApp (LayoutApp app) {
 
 		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
 			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
 			for (int i = 0; i < apps.size; i++) {
 				BaseApp<?> baseApp = apps.get(i);
-				if (baseApp.gridAppReference == value) {
+				if (baseApp.gridAppReference == app) {
 					//Its this app, lets return it
 					return baseApp;
 				}
@@ -71,6 +70,18 @@ public class AppManager {
 		baseApps.add(baseAppForGameAsset);
 
 		return baseAppForGameAsset;
+	}
+
+	public void onAppRemoved (LayoutApp layoutApp) {
+		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
+			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
+			for (int i = apps.size - 1; i >= 0; i--) {
+				BaseApp<?> baseApp = apps.get(i);
+				if (baseApp.getGridAppReference() == layoutApp) {
+					apps.removeIndex(i);
+				}
+			}
+		}
 	}
 
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object

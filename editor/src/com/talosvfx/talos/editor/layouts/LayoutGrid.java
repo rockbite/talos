@@ -64,6 +64,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 	public void removeApp (LayoutContent layoutContent, LayoutApp layoutApp) {
 		//Find the content that has it and remove it
 		layoutContent.removeContent(layoutApp);
+		SharedResources.appManager.onAppRemoved(layoutApp);
 
 		if (layoutContent.isEmpty()) {
 			removeContent(layoutContent);
@@ -1017,7 +1018,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 				child.type = LayoutType.APP;
 				child.appID = app.key;
 				child.tabActive = app.value.isTabActive();
-				AppManager.BaseApp appy = SharedResources.appManager.getAppForLayoutApp(app);
+				AppManager.BaseApp appy = SharedResources.appManager.getAppForLayoutApp(app.value);
 				if (appy != null) {
 					child.baseAppClazz = appy.getClass().getSimpleName();
 					child.gameAssetIdentifier = appy.getAssetIdentifier();

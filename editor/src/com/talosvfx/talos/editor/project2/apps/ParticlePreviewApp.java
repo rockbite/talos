@@ -17,13 +17,6 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 		this.singleton = false;
 
 		preview3D = new Preview3D();
-	}
-
-	@Override
-	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
-		super.updateForGameAsset(gameAsset);
-
-		preview3D.setParticleEffect(gameAsset.getResource());
 
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
 			@Override
@@ -42,6 +35,13 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 
 
 		};
+	}
+
+	@Override
+	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
+		super.updateForGameAsset(gameAsset);
+
+		preview3D.setParticleEffect(gameAsset.getResource());
 
 	}
 

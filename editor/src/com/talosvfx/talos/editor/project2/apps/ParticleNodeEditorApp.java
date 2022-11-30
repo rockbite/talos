@@ -51,6 +51,35 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 		this.singleton = false;
 
 		moduleBoardWidget = new ModuleBoardWidget();
+
+		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
+		moduleGraphUIWrapper.disableListeners();
+
+		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+			@Override
+			public Actor getMainContent () {
+				return moduleGraphUIWrapper;
+			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				moduleGraphUIWrapper.restoreListeners();
+				SharedResources.stage.setScrollFocus(moduleGraphUIWrapper);
+				SharedResources.inputHandling.addPriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.setGDXMultiPlexer();
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+				moduleGraphUIWrapper.disableListeners();
+				SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.setGDXMultiPlexer();
+
+				Stage stage = moduleGraphUIWrapper.getStage();
+			}
+		};
 	}
 
 	private void loadProject (VFXProjectData projectData) {
@@ -181,34 +210,6 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 		loadProject(gameAsset.getResource());
 
-		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
-		moduleGraphUIWrapper.disableListeners();
-
-		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
-			@Override
-			public Actor getMainContent () {
-				return moduleGraphUIWrapper;
-			}
-
-			@Override
-			public void onInputProcessorAdded () {
-				super.onInputProcessorAdded();
-				moduleGraphUIWrapper.restoreListeners();
-				SharedResources.stage.setScrollFocus(moduleGraphUIWrapper);
-				SharedResources.inputHandling.addPriorityInputProcessor(moduleGraphUIWrapper.getStage());
-				SharedResources.inputHandling.setGDXMultiPlexer();
-			}
-
-			@Override
-			public void onInputProcessorRemoved () {
-				super.onInputProcessorRemoved();
-				moduleGraphUIWrapper.disableListeners();
-				SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphUIWrapper.getStage());
-				SharedResources.inputHandling.setGDXMultiPlexer();
-
-				Stage stage = moduleGraphUIWrapper.getStage();
-			}
-		};
 
 	}
 
