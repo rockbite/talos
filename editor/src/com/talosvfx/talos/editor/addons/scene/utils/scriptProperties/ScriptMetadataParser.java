@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -28,6 +29,7 @@ public class ScriptMetadataParser {
             primitiveReplacementMap.put("boolean", Boolean.class.getName());
             primitiveReplacementMap.put("GameObject", GameObject.class.getName());
             primitiveReplacementMap.put("String", String.class.getName());
+            primitiveReplacementMap.put("vec2", Vector2.class.getName());
         }
 
         <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends PropertyWrapper<T>> wrapperClazz) {

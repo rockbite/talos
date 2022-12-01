@@ -16,7 +16,7 @@ public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
             maxValue = Float.MAX_VALUE;
         }
         if (step == null) {
-            step = 1f;
+            step = 0.1f;
         }
         if (defaultValue == null) {
             defaultValue = 0f;
@@ -41,7 +41,7 @@ public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
 
         minValue = jsonData.getFloat("minValue", -Float.MAX_VALUE);
         maxValue = jsonData.getFloat("maxValue", Float.MAX_VALUE);
-        step = jsonData.getFloat("step", 1f);
+        step = jsonData.getFloat("step", 0.1f);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class VariableTemplateRow<T> extends Table {
         typeLabel.set("Type", Align.center);
         add(typeLabel);
 
-        String[] options = new String[]{"Integer", "Float", "Boolean", "String", "Game Object"};
+        String[] options = new String[]{"Integer", "Float", "Boolean", "String", "Game Object", "Vector2"};
         typeSelectWidget = new SelectWidget();
         typeSelectWidget.init(skin);
         typeSelectWidget.setOptions(options);
@@ -108,6 +108,8 @@ public class VariableTemplateRow<T> extends Table {
             return "Integer";
         } else if (propertyWrapper instanceof PropertyFloatWrapper) {
             return "Float";
+        } else if (propertyWrapper instanceof PropertyVec2Wrapper) {
+            return "Vector2";
         }
 
         return null;

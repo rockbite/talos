@@ -112,7 +112,7 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
             }
         }
 
-        routineStage.routineUpdated();
+        routineStage.reloadRoutineInstancesFromMemory();
     }
 
     public void changeKeyFor (int index, String value) {
@@ -128,7 +128,7 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
                 }
             }
         }
-        routineStage.routineUpdated();
+        routineStage.reloadRoutineInstancesFromMemory();
     }
 
     public void changeTypeFor (int index, String newType) {
@@ -136,13 +136,13 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         routineInstance.changeExposedVariableType(index, newType);
 
         variableCreationWindow.reloadWidgets(routineStage);
-        routineStage.routineUpdated();
+        routineStage.reloadRoutineInstancesFromMemory();
     }
 
     public void createNewVariable () {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.createNewPropertyWrapper();
         variableCreationWindow.reloadWidgets(routineStage);
-        routineStage.routineUpdated();
+        routineStage.reloadRoutineInstancesFromMemory();
     }
 }

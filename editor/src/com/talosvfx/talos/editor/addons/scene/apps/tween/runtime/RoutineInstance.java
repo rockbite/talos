@@ -133,6 +133,8 @@ public class RoutineInstance {
                 fromNode.addConnection(toNode, fromSlot, toSlot);
             }
         }
+
+        updateNodesFromProperties();
     }
 
     public RoutineNode getNodeById(String id) {
@@ -263,6 +265,8 @@ public class RoutineInstance {
                 return new PropertyGameObjectWrapper();
             case "string":
                 return new PropertyStringWrapper();
+            case "vector2":
+                return new PropertyVec2Wrapper();
         }
 
         return null;

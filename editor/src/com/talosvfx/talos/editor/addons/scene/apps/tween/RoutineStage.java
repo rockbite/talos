@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -9,10 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
@@ -24,11 +20,10 @@ import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -37,8 +32,6 @@ import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.*;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 
 public class RoutineStage extends DynamicNodeStage implements Notifications.Observer {
 
@@ -72,16 +65,36 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     }
 
     public void routineUpdated() {
-        reloadRoutineInstancesFromMemory();
+        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+        updatePropertiesForGOs(rootGO, updatedComponents);
 
-        IPropertyHolder currentHolder = SceneEditorAddon.get().propertyPanel.getCurrentHolder();
-        Iterable<IPropertyProvider> propertyProviders = currentHolder.getPropertyProviders();
-        for (IPropertyProvider propertyProvider : propertyProviders) {
-            if (propertyProvider instanceof RoutineRendererComponent) {
-                RoutineRendererComponent routineRendererComponent = (RoutineRendererComponent) propertyProvider;
-                if (routineRendererComponent.routineInstance.uuid.equals(routineInstance.uuid)) {
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(routineRendererComponent));
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run () {
+                for (RoutineRendererComponent updatedComponent : updatedComponents) {
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
                 }
+            }
+        });
+    }
+
+    private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {
+        if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+            if (component.routineInstance != null) {
+                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
+                    component.updatePropertyWrappers(true);
+                    updatedComponents.add(component);
+                }
+            }
+        }
+
+        Array<GameObject> children = gameObject.getGameObjects();
+        if (children != null) {
+            for (int i = 0; i < children.size; i++) {
+                GameObject child = children.get(i);
+                updatePropertiesForGOs(child, updatedComponents);
             }
         }
     }
@@ -182,9 +195,10 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(this);
         instance.loadFrom(instance.uuid, data, routineConfigMap);
+        routineUpdated();
     }
 
-    private void reloadRoutineInstancesFromMemory() {
+    public void reloadRoutineInstancesFromMemory() {
         Array<RoutineInstance> routineInstances = collectRoutineInstances();
         for (RoutineInstance instance : routineInstances) {
             reloadRoutineInstanceFromMemory(instance);

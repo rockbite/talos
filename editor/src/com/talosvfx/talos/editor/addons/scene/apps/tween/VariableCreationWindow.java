@@ -38,7 +38,7 @@ public class VariableCreationWindow extends Table {
 
         Table mainContent = new Table();
         mainContent.setSkin(TalosMain.Instance().getSkin());
-        mainContent.setBackground("timelinebg");
+        mainContent.setBackground("background-fill");
 
         Table contentTable = new Table();
         contentTable.top().left();

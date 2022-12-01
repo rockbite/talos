@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public class WidgetFactory {
 
-    public static PropertyWidget generateForScriptProperty(PropertyWrapper wrapper) {
+    public static PropertyWidget generateForPropertyWrapper (PropertyWrapper wrapper) {
         try {
             Field value = wrapper.getClass().getField("value");
             if (wrapper instanceof PropertyBooleanWrapper) {
@@ -28,6 +28,8 @@ public class WidgetFactory {
                 return generateForString(wrapper, value, null, wrapper.propertyName);
             } else if (wrapper instanceof PropertyGameObjectWrapper) {
                 return generateForGameObject((PropertyGameObjectWrapper) wrapper);
+            } else if (wrapper instanceof PropertyVec2Wrapper) {
+                return generateForVector2(wrapper, value, null, wrapper.propertyName);
             }
 
         } catch (NoSuchFieldException e) {
