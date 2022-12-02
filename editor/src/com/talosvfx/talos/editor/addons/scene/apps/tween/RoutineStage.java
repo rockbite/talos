@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -9,26 +8,23 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractGenericRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.AbstractRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.DelayNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.ProbabilityChoiceWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -36,7 +32,6 @@ import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.*;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 
 public class RoutineStage extends DynamicNodeStage implements Notifications.Observer {
 
@@ -69,6 +64,41 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         Notifications.registerObserver(this);
     }
 
+    public void routineUpdated() {
+        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+        updatePropertiesForGOs(rootGO, updatedComponents);
+
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run () {
+                for (RoutineRendererComponent updatedComponent : updatedComponents) {
+                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+                }
+            }
+        });
+    }
+
+    private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {
+        if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+            if (component.routineInstance != null) {
+                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
+                    component.updatePropertyWrappers(true);
+                    updatedComponents.add(component);
+                }
+            }
+        }
+
+        Array<GameObject> children = gameObject.getGameObjects();
+        if (children != null) {
+            for (int i = 0; i < children.size; i++) {
+                GameObject child = children.get(i);
+                updatePropertiesForGOs(child, updatedComponents);
+            }
+        }
+    }
+
     public void writeData(FileHandle target) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
@@ -90,6 +120,28 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     @Override
     public void read(Json json, JsonValue root) {
         super.read(json, root);
+        for (NodeWidget node : nodeBoard.nodes) {
+            if (node instanceof RoutineExposedVariableNodeWidget) {
+                ((RoutineExposedVariableNodeWidget) node).update(routineInstance.getPropertyWrapperWithIndex(((RoutineExposedVariableNodeWidget) node).index));
+            }
+        }
+    }
+
+    @Override
+    public void write (Json json) {
+        super.write(json);
+        json.writeValue("propertyWrapperIndex", routineInstance.getExposedPropertyIndex());
+
+        json.writeObjectStart("propertyWrappers");
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            json.writeObjectStart("property");
+            json.writeValue("className", propertyWrapper.getClass().getName());
+            json.writeValue("property", propertyWrapper);
+            json.writeObjectEnd();
+        }
+        json.writeObjectEnd();
+
     }
 
     @Override
@@ -143,9 +195,10 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(this);
         instance.loadFrom(instance.uuid, data, routineConfigMap);
+        routineUpdated();
     }
 
-    private void reloadRoutineInstancesFromMemory() {
+    public void reloadRoutineInstancesFromMemory() {
         Array<RoutineInstance> routineInstances = collectRoutineInstances();
         for (RoutineInstance instance : routineInstances) {
             reloadRoutineInstanceFromMemory(instance);

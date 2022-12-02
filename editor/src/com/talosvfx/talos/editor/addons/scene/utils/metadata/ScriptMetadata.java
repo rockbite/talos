@@ -4,15 +4,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptMetadataParser;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 
 public class ScriptMetadata extends AMetadata {
 
-    public Array<ScriptPropertyWrapper<?>> scriptPropertyWrappers;
+    public Array<PropertyWrapper<?>> scriptPropertyWrappers;
 
     public ScriptMetadata () {
         super();
@@ -26,7 +24,7 @@ public class ScriptMetadata extends AMetadata {
         JsonValue propertiesJson = jsonData.get("scriptProperties");
         if (propertiesJson != null) {
             for (JsonValue propertyJson : propertiesJson) {
-                scriptPropertyWrappers.add(json.readValue(ScriptPropertyWrapper.class, propertyJson));
+                scriptPropertyWrappers.add(json.readValue(PropertyWrapper.class, propertyJson));
             }
         }
     }

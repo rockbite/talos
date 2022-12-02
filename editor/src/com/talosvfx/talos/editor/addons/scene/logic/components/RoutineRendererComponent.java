@@ -1,35 +1,23 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.draw.DrawableQuad;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.RenderRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
-import javax.swing.border.AbstractBorder;
-import java.util.Comparator;
 import java.util.function.Supplier;
 
 public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<String> {
@@ -42,6 +30,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     public transient RoutineInstance routineInstance;
 
+    public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
+
     public RoutineRendererComponent() {
 
     }
@@ -51,6 +41,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         super.write(json);
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("size", viewportSize, Vector2.class);
+        json.writeValue("properties", propertyWrappers);
     }
 
     @Override
@@ -58,11 +49,53 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         super.read(json, jsonData);
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
+        propertyWrappers.clear();
+        JsonValue propertiesJson = jsonData.get("properties");
+        if (propertiesJson != null) {
+            for (JsonValue propertyJson : propertiesJson) {
+                propertyWrappers.add(json.readValue(PropertyWrapper.class, propertyJson));
+            }
+        }
+
         GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
-        if(viewportSize == null) viewportSize = new Vector2(6, 4);
+        if (viewportSize == null) viewportSize = new Vector2(6, 4);
+    }
+
+    public void updatePropertyWrappers (boolean tryToMerge) {
+        Array<PropertyWrapper<?>> copyWrappers = new Array<>();
+        copyWrappers.addAll(propertyWrappers);
+
+        propertyWrappers.clear();
+        if (routineInstance != null) {
+            for (PropertyWrapper<?> propertyWrapper : routineInstance.getPropertyWrappers()) {
+                propertyWrappers.add(propertyWrapper);
+            }
+        }
+
+        if (tryToMerge) {
+            for (PropertyWrapper copyWrapper : copyWrappers) {
+                for (PropertyWrapper propertyWrapper : propertyWrappers) {
+                    if (copyWrapper.index == propertyWrapper.index && copyWrapper.getClass().equals(propertyWrapper.getClass())) {
+                        propertyWrapper.setValue(copyWrapper.getValue());
+                        break;
+                    }
+                }
+            }
+
+            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+                if (propertyWrapper.getValue() == null) {
+                    propertyWrapper.setDefault();
+                }
+            }
+
+        } else {
+            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+                propertyWrapper.setDefault();
+            }
+        }
     }
 
     @Override
@@ -94,6 +127,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
+
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
+            generate.setParent(this);
+            properties.add(generate);
+        }
 
         return properties;
     }
@@ -134,7 +173,10 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         RoutineConfigMap routineConfigMap = new RoutineConfigMap();
         routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
         routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource(), routineConfigMap);
+        updatePropertyWrappers(true);
     }
+
+
 
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {

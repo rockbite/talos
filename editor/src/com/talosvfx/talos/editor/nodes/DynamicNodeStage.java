@@ -268,6 +268,12 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
         IntMap<NodeWidget> nodeMap = new IntMap<>();
 
+        stage.setKeyboardFocus(stage.getRoot());
+
+        if (nodes == null) {
+            return;
+        }
+
         for (JsonValue nodeData: nodes) {
             String nodeName = nodeData.getString("name");
 
@@ -283,6 +289,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         }
 
         nodeBoard.globalNodeCounter = idCounter + 1;
+
+        if (connections == null);
 
         for (JsonValue connectionData: connections) {
             int fromNode = connectionData.getInt("fromNode");
@@ -312,9 +320,6 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 nodeGroup.setColor(color);
             }
         }
-
-        stage.setKeyboardFocus(stage.getRoot());
-
     }
 
     public void reset () {

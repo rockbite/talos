@@ -55,6 +55,15 @@ public class SelectWidget extends AbstractWidget<String> {
         selectBox.setItems(items);
     }
 
+    public void setOptions(String[] options) {
+        for (String option : options) {
+            titleMap.put(option, option);
+            keyMap.put(option, option);
+        }
+
+        selectBox.setItems(options);
+    }
+
     @Override
     public String getValue () {
         String title = selectBox.getSelected();
@@ -63,10 +72,14 @@ public class SelectWidget extends AbstractWidget<String> {
         return name;
     }
 
+    public void setValue(String value) {
+        selectBox.setSelected(keyMap.get(value));
+    }
+
     @Override
     public void read (Json json, JsonValue jsonValue) {
         String val = jsonValue.asString();
-        selectBox.setSelected(keyMap.get(val));
+        setValue(val);
     }
 
     @Override

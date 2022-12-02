@@ -3,10 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 
-public class ScriptPropertyFloatWrapper extends ScriptPropertyNumberWrapper<Float> {
+public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
 
     @Override
     public void collectAttributes (Array<String> attributes) {
@@ -18,7 +16,7 @@ public class ScriptPropertyFloatWrapper extends ScriptPropertyNumberWrapper<Floa
             maxValue = Float.MAX_VALUE;
         }
         if (step == null) {
-            step = 1f;
+            step = 0.1f;
         }
         if (defaultValue == null) {
             defaultValue = 0f;
@@ -38,12 +36,12 @@ public class ScriptPropertyFloatWrapper extends ScriptPropertyNumberWrapper<Floa
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        defaultValue= jsonData.getFloat("defaultValue", 0);
+        defaultValue = jsonData.getFloat("defaultValue", 0);
         value = jsonData.getFloat("value", defaultValue);
 
-        minValue = jsonData.getFloat("minValue");
-        maxValue = jsonData.getFloat("maxValue");
-        step = jsonData.getFloat("step");
+        minValue = jsonData.getFloat("minValue", -Float.MAX_VALUE);
+        maxValue = jsonData.getFloat("maxValue", Float.MAX_VALUE);
+        step = jsonData.getFloat("step", 0.1f);
     }
 
     @Override
