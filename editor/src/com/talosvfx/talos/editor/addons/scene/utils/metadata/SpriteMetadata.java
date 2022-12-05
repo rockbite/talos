@@ -4,11 +4,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditor;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -39,23 +39,9 @@ public class SpriteMetadata extends AMetadata {
         ButtonPropertyWidget<String> spriteEditor = new ButtonPropertyWidget<String>("Sprite Editor", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
             public void clicked (ButtonPropertyWidget<String> widget) {
-                SpriteEditor spriteEditor = new SpriteEditor(SpriteMetadata.this);
-                spriteEditor.setListener(new SpriteEditor.SpriteMetadataListener() {
-                    @Override
-                    public void changed(int left, int right, int top, int bottom) {
-                        borderData[0] = left;
-                        borderData[1] = right;
-                        borderData[2] = top;
-                        borderData[3] = bottom;
-
-                        Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderEdited.class));
-                    }
-                });
-
-                //Send request to open sprite editor
-                //todo
                 logger.info("todo open sprite editor request");
-//                SceneEditorAddon.get().openApp(spriteEditor, AEditorApp.AppOpenStrategy.WINDOW);
+                GameAsset<Texture> assetForPath = (GameAsset<Texture>) AssetRepository.getInstance().getAssetForPath(link.handle, false);
+                SharedResources.appManager.openApp(assetForPath, SpriteEditorApp.class);
             }
         });
         propertyWidgets.add(spriteEditor);
