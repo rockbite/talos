@@ -25,6 +25,8 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
                 metaData.borderData[1] = right;
                 metaData.borderData[2] = top;
                 metaData.borderData[3] = bottom;
+
+                // TODO: 05.12.22 Save to medatada file 
             }
         });
         DummyLayoutApp spriteEditorApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
