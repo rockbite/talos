@@ -14,15 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.CursorUtil;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class EditPanel extends Table {
-    public static final float WIDTH = 370.0f;
-    public static final float HEIGHT = 370.0f;
+    public static final float WIDTH = 300f;
+    public static final float HEIGHT = 300f;
 
     public static final int LEFT = 0b1;
     public static final int RIGHT = 0b10;
@@ -167,7 +165,6 @@ public class EditPanel extends Table {
                 bounds.width /= zoom;
                 bounds.height /= zoom;
 
-
                 return super.mouseMoved(event, x, y);
             }
 
@@ -237,19 +234,6 @@ public class EditPanel extends Table {
                     editPanelListener.dragStop(getLeft(), getTop(), getTop(), getBottom());
                 }
                 isDragging = false;
-            }
-
-            @Override
-            public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(EditPanel.this);
-            }
-
-            @Override
-            public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                if (pointer != -1) return; // Only care about exit/enter from mouse move
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
             }
         });
     }
@@ -464,9 +448,21 @@ public class EditPanel extends Table {
         }
     }
 
+    void resetOffsets() {
+        topOffset = 0;
+        leftOffset = 0;
+        bottomOffset = 0;
+        rightOffset = 0;
+    }
+
 
     public static abstract class EditPanelListener {
         public abstract void changed(float left, float right, float top, float bottom);
         public abstract void dragStop(float left, float right, float top, float bottom);
+    }
+
+    @Override
+    public float getPrefWidth () {
+        return EditPanel.WIDTH;
     }
 }

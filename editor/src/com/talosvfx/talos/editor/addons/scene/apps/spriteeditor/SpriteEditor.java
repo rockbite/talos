@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 
@@ -9,15 +8,17 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class SpriteEditor extends AEditorApp<SpriteMetadata> {
+public class SpriteEditor extends WidgetGroup {
 
     private SpriteMetadataListener listener;
 
-    private EditPanel editPanel;
+    public EditPanel editPanel;
+    private Table rightSide;
+
     private NinePatchPreview ninePatchPreview;
     private NumberPanel leftProperty;
     private NumberPanel rightProperty;
@@ -27,16 +28,18 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
     private Texture texture;
     private NinePatchDrawable patchDrawable;
 
-    public SpriteEditor(SpriteMetadata metadata) {
-        super(metadata);
-        identifier = object.uuid  + "";
-        initContent();
-        show(metadata);
+    private final float pad = 40.0f;
+    private final float space = 20.0f;
+
+    private float width = 0;
+    private float height = 0;
+
+    public SpriteEditor() {
+        super();
+        init();
     }
 
-    @Override
-    public void initContent() {
-        content = new Table();
+    public void init() {
         editPanel = new EditPanel(new EditPanel.EditPanelListener() {
             @Override
             public void changed(float left, float right, float top, float bottom) {
@@ -51,7 +54,7 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 updatePreview();
             }
         });
-        Table rightSide = new Table();
+        rightSide = new Table();
         ninePatchPreview = new NinePatchPreview();
         Table numberControls = new Table();
 
@@ -95,9 +98,8 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
         rightSide.row();
         rightSide.add(saveSpriteMetaData).size(60, 40).bottom().right().padTop(10);
 
-        content.pad(15);
-        content.add(editPanel).width(EditPanel.WIDTH).height(EditPanel.HEIGHT).space(40);
-        content.add(rightSide).size(300, 370);
+        addActor(editPanel);
+        addActor(rightSide);
 
         leftProperty.setListener(new NumberPanel.NumberPanelListener() {
             @Override
@@ -225,27 +227,23 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 (int) editPanel.getTop(),
                 (int) editPanel.getBottom()
             );
+            editPanel.resetOffsets();
         }
-    }
-
-    @Override
-    public String getTitle() {
-        return "Sprite Editor";
     }
 
     public void setListener(SpriteMetadataListener spriteMetadataListener) {
         listener = spriteMetadataListener;
     }
 
-    public static interface SpriteMetadataListener {
+    public interface SpriteMetadataListener {
         void changed(int left, int right, int top, int bottom);
     }
 
-    public AEditorApp show(SpriteMetadata metadata) {
-
+    public void show(GameAsset<Texture> gameAsset) {
         // get ninepatch
-        FileHandle file = metadata.link.handle;
-        texture = new Texture(file);
+        texture = gameAsset.getResource();
+        SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
+
         // clamp metadata values in case they are invalid
         metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
         metadata.borderData[1] = MathUtils.clamp(metadata.borderData[1], 0, texture.getWidth());
@@ -277,8 +275,6 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
         rightProperty.setValue(editPanel.getRight());
         topProperty.setValue(editPanel.getTop());
         bottomProperty.setValue(editPanel.getBottom());
-
-        return this;
     }
 
     private void updatePreview() {
@@ -306,13 +302,18 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 {
                     float w = NinePatchPreview.WIDTH / 4f - 5;
                     float h = 3 * NinePatchPreview.HEIGHT / 4f;
-                    float ratio = h / w;
-                    setSize(getWidth(), getHeight() * ratio);
-
-                    float scaleX = w / getWidth();
-                    float scaleY = h / getHeight();
-                    float scale = Math.min(scaleX, scaleY);
-                    setScale(scale, scale);
+                    float width = patchDrawable.getMinWidth();
+                    float height =  patchDrawable.getMinHeight();
+                    float upscaled_width, upscaled_height;
+                    if (width < height) {
+                        upscaled_width = width;
+                        upscaled_height = height * ( h / w);
+                    } else {
+                        upscaled_width = width;
+                        upscaled_height = height * ((width * h) / (height * w));
+                    }
+                    setSize(upscaled_width, upscaled_height);
+                    setScale(w / getWidth(), h / getHeight());
                     setPosition(0, NinePatchPreview.WIDTH - getHeight() * getScaleY());
                 }
             };
@@ -320,12 +321,10 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 {
                     float w = 3 * NinePatchPreview.WIDTH / 4f;
                     float h = 3 * NinePatchPreview.HEIGHT / 4f;
-                    float ratio = w / h;
-                    setSize(getWidth() * ratio, getHeight());
+                    float longestSide = Math.max(patchDrawable.getMinWidth(), patchDrawable.getMinHeight());
+                    setSize(longestSide, longestSide);
 
-                    float scaleX = w / getWidth();
-                    float scaleY = h / getHeight();
-                    float scale = Math.min(scaleX, scaleY);
+                    float scale = Math.min(w / longestSide, h / longestSide);
                     setScale(scale, scale);
                     setPosition(NinePatchPreview.WIDTH - getWidth() * getScaleX(), NinePatchPreview.HEIGHT - getHeight() * getScaleY());
                 }
@@ -334,13 +333,18 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
                 {
                     float w = NinePatchPreview.WIDTH;
                     float h = NinePatchPreview.HEIGHT / 4f - 5;
-                    float ratio = w / h;
-                    setSize(getWidth() * ratio, getHeight());
-
-                    float scaleX = w / getWidth();
-                    float scaleY = h / getHeight();
-                    float scale = Math.min(scaleX, scaleY);
-                    setScale(scale, scale);
+                    float width = patchDrawable.getMinWidth();
+                    float height =  patchDrawable.getMinHeight();
+                    float upscaled_width, upscaled_height;
+                    if (width > height) {
+                        upscaled_width = width * ((w/height) / (h/width));
+                        upscaled_height = height;
+                    } else {
+                        upscaled_width = width * (w / h);
+                        upscaled_height = height;
+                    }
+                    setSize(upscaled_width, upscaled_height);
+                    setScale(w / getWidth(), h / getHeight());
                 }
             };
 
@@ -348,5 +352,37 @@ public class SpriteEditor extends AEditorApp<SpriteMetadata> {
             addActor(square);
             addActor(horizontal);
         }
+    }
+    public static int gcd(int a, int b) { return b==0 ? a : gcd(b, a%b); }
+    @Override
+    public void layout() {
+        super.layout();
+        float remainingWidth = getWidth() - 2 * pad - editPanel.getPrefWidth() - rightSide.getPrefWidth();
+        if (remainingWidth < 0) {
+            layoutWrapped();
+            return;
+        }
+
+        // position the right side
+        rightSide.setPosition(getWidth() - rightSide.getPrefWidth() / 2f - pad, rightSide.getPrefHeight() / 2f + pad);
+        editPanel.setPosition(pad, pad);
+        editPanel.setSize(getWidth() - 2.0f * pad - rightSide.getPrefWidth() - space, getHeight() - 2.0f * pad);
+    }
+
+    private void layoutWrapped () {
+        rightSide.setPosition(pad + rightSide.getPrefWidth() / 2f, pad + rightSide.getPrefHeight() / 2f);
+        float remainingHeight = getHeight() - 2.0f * pad - space - rightSide.getPrefHeight();
+        remainingHeight = Math.max(remainingHeight, editPanel.getPrefHeight());
+        editPanel.setSize(getWidth() - 2.0f * pad, remainingHeight);
+        editPanel.setPosition(pad, getHeight() - pad - remainingHeight);
+    }
+
+    @Override
+    public float getPrefWidth() {
+        return width;
+    }
+
+    public float getPrefHeight() {
+        return height;
     }
 }

@@ -5,6 +5,7 @@ import com.artemis.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -174,6 +175,7 @@ public class AppManager {
 
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, PropertiesPanelApp.class, SceneHierarchyApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
 	}
 
 	public <T> boolean canOpenInTalos (GameAsset<T> gameAsset) {
