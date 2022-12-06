@@ -551,8 +551,5 @@ public class UIStage {
 		}
 	}
 
-	public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
-		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
-		stage.addActor(yesNoDialog.fadeIn());
-	}
+
 }

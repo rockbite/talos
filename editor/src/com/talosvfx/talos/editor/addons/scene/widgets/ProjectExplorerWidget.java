@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
+import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -218,20 +219,21 @@ public class ProjectExplorerWidget extends Table implements Observer {
             public void run () {
 
                 logger.info("todo - Reimplement delete paths");
-//                FileHandle parent = SceneEditorAddon.get().workspace.getProjectFolder();
-//                for(String path: paths) {
-//                    FileHandle handle = Gdx.files.absolute(path);
-//                    AssetImporter.deleteFile(handle);
-//
-//                    parent = handle.parent();
-//                }
-//
-//                loadDirectoryTree((String) rootNode.getObject());
-//
-//                if(!parent.path().equals(parent)) {
-//                    expand(parent.path());
-//                    select(parent.path());
-//                }
+                FileHandle parent = SharedResources.currentProject.rootProjectDir();
+
+                for (String path : paths) {
+                    FileHandle handle = Gdx.files.absolute(path);
+                    AssetImporter.deleteFile(handle);
+
+                    parent = handle.parent();
+                }
+
+                loadDirectoryTree(rootNode.getObject());
+
+                if(!parent.path().equals(parent)) {
+                    expand(parent.path());
+                    select(parent.path());
+                }
             }
         };
 
@@ -240,15 +242,12 @@ public class ProjectExplorerWidget extends Table implements Observer {
 			pathString += path + "\n";
 		}
 
-        TalosMain.Instance().UIStage().showYesNoDialog("Delete files?", "Are you sure you want to delete the paths: \n" + pathString, runnable, new Runnable() {
+        showYesNoDialog("Delete files?", "Are you sure you want to delete the paths: \n" + pathString, runnable, new Runnable() {
             @Override
             public void run () {
 
             }
         });
-
-
-
     }
 
     public  ObjectMap<String, FilteredTree.Node<String>> getNodes(){
@@ -723,4 +722,8 @@ public class ProjectExplorerWidget extends Table implements Observer {
         select(assetChangeDirectoryEvent.getPath().path());
     }
 
+    public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
+		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
+		getStage().addActor(yesNoDialog.fadeIn());
+	}
 }
