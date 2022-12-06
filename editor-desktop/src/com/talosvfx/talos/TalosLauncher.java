@@ -161,14 +161,7 @@ public class TalosLauncher {
 						final int x = Gdx.input.getX();
 						final int y = Gdx.input.getY();
 
-						try {
-							final UIStage uiStage = TalosMain.Instance().UIStage();
-							final WorkplaceStage nodeStage = TalosMain.Instance().getNodeStage();
-							nodeStage.fileDrop(filesPaths, x, y);
-							uiStage.fileDrop(filesPaths, x, y);
-						}  catch (Exception e) {
-							TalosMain.Instance().reportException(e);
-						}
+						SharedResources.globalDragAndDrop.fakeDragDrop(x, y, filesPaths);
 					}
 				});
 			}

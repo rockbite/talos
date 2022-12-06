@@ -389,7 +389,7 @@ public class DirectoryViewWidget extends Table {
 					return true;
 				}
 
-				return false;
+				return true;
 			}
 
 			@Override
@@ -400,30 +400,31 @@ public class DirectoryViewWidget extends Table {
 
 				Actor hit = DirectoryViewWidget.this.hit(x, y, true);
 
-				if (!(hit instanceof Item)) {
-					return;
-				}
 
 				//We should check what kind of payload we got
 
 				GlobalDragAndDrop.BaseDragAndDropPayload payloadObject = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
 
-				Item targetItem = (Item)hit; //todo
 
-				if (!targetItem.fileHandle.isDirectory() || targetItem.fileHandle.path().equals(fileHandle.path())) {
-					return;
+				if (hit instanceof Item) {
+					Item targetItem = (Item)hit; //todo
+
+					if (!targetItem.fileHandle.isDirectory() || targetItem.fileHandle.path().equals(fileHandle.path())) {
+						return;
+					}
+
+					handlePayloadMove(payloadObject, targetItem);
+
+					for (Item item : selected) {
+						item.deselect();
+					}
+					selected.clear();
+					reportSelectionChanged();
+
+					openDirectory(targetItem.fileHandle.path());
+				} else {
+					logger.info("TODO COPY INTO DIRECTORY and do asset stuff");
 				}
-
-				handlePayloadMove(payloadObject, targetItem);
-
-				for (Item item : selected) {
-					item.deselect();
-				}
-				selected.clear();
-				reportSelectionChanged();
-
-				openDirectory(targetItem.fileHandle.path());
-
 			}
 		});
 	}
