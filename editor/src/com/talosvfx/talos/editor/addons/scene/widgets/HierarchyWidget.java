@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectRepositionHierarchyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
@@ -249,11 +250,15 @@ public class HierarchyWidget extends Table implements Observer {
                 event.stop();
                 gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
 
-                logger.info("redo remove from selection on hand");
-//                if (SceneEditorWorkspace.getInstance().selection.contains(gameObject)) {
-//                    SceneEditorWorkspace.getInstance().removeFromSelection(gameObject);
-//                }
-
+                Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
+                for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
+                    if (gameObjectNode.getObject() == gameObject) {
+                        DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
+                        deSelectGameObjectExternallyEvent.setGameObject(gameObject);
+                        Notifications.fireEvent(deSelectGameObjectExternallyEvent);
+                        tree.removeNodeFromSelection(gameObjectNode);
+                    }
+                }
                 return true;
             }
         });
@@ -296,7 +301,7 @@ public class HierarchyWidget extends Table implements Observer {
         contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                logger.info("Paste probably shouldn't happen here, but if we want it, we should decide on the logic");
+                SceneUtils.paste(currentContainer);
             }
         });
         contextualMenu.addSeparator();

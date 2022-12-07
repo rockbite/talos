@@ -29,7 +29,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -37,6 +38,8 @@ import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImport
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 
 public class SceneUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(SceneUtils.class);
 
 	public static GameObject createEmpty (GameObjectContainer gameObjectContainer, Vector2 position, GameObject parent) {
 		return createObjectByTypeName(gameObjectContainer, "empty", position, parent, "empty");
@@ -220,5 +223,15 @@ public class SceneUtils {
 
 	public static void copy (GameObjectContainer currentContainer, Array<GameObject> arraySelection) {
 		copyPasteBuffer.put(currentContainer, arraySelection);
+	}
+
+	public static void paste (GameObjectContainer currentContainer) {
+		logger.info("Needs a rethink");
+		if (copyPasteBuffer.containsKey(currentContainer)) {
+			if (copyPasteBuffer.get(currentContainer).isEmpty()) {
+
+
+			}
+		}
 	}
 }

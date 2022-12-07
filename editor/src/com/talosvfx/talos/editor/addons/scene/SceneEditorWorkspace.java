@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
+import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
@@ -451,6 +452,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void selectExternal (SelectGameObjectExternallyEvent event) {
 		selectGameObjectExternally(event.getGameObject());
+	}
+	@EventHandler
+	public void deSelectEternal (DeSelectGameObjectExternallyEvent event) {
+		removeFromSelection(event.getGameObject());
 	}
 
 	@EventHandler
