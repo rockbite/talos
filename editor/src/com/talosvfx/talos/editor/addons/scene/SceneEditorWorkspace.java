@@ -1121,9 +1121,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameObjectDeleted (GameObjectDeleted event) {
 		GameObject target = event.getTarget();
 
-		logger.info("redo holder removed");
-//		sceneEditorAddon.propertyPanel.notifyPropertyHolderRemoved(target);
-
 		// remove gizmos
 		removeGizmos(target);
 

@@ -74,6 +74,9 @@ public class HierarchyWidget extends Table implements Observer {
             @Override
             public void selected (FilteredTree.Node<GameObject> node) {
                 super.selected(node);
+
+                SharedResources.stage.setKeyboardFocus(tree);
+
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
                 SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
@@ -134,11 +137,12 @@ public class HierarchyWidget extends Table implements Observer {
                     if(objectMap.containsKey(node.getObject().uuid.toString())) {
                         GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                         gameObjects.add(gameObject);
-                    }
 
+                        GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
+                        gameObjectDeleted.setTarget(gameObject);
+                        Notifications.fireEvent(gameObjectDeleted);
+                    }
                 }
-                logger.info("Redo delete game object");
-//                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
             }
 
             @Override

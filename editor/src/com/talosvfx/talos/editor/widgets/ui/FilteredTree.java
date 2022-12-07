@@ -327,6 +327,7 @@ public class FilteredTree<T> extends WidgetGroup {
                         for (ItemListener<T> itemListener : itemListeners) {
                             itemListener.delete(nodes);
                         }
+                        selection.removeAll(nodes);
                     }
                 }
                 return super.keyDown(event, keycode);
