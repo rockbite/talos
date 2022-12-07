@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -366,7 +367,12 @@ public class MainRenderer implements Observer {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
 
-        ParticleEffectInstance instance = obtainParticle(gameObject, particleComponent.gameAsset.getResource());
+        VFXProjectData resource = particleComponent.gameAsset.getResource();
+        ParticleEffectDescriptor descriptor = resource.getDescriptorSupplier().get();
+
+        if (descriptor == null) return;
+
+        ParticleEffectInstance instance = obtainParticle(gameObject, descriptor);
         instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 
         if (!skipUpdates) {

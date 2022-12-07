@@ -18,6 +18,8 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -193,6 +195,31 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public void setParent (GameObject gameObject) {
         parent = gameObject;
+    }
+
+    private ArrayList<String> goNames = new ArrayList<>();
+    @Override
+    public Supplier<Collection<String>> getAllGONames () {
+        goNames.clear();
+        addNamesToList(goNames, this);
+        return new Supplier<Collection<String>>() {
+            @Override
+            public Collection<String> get () {
+                return goNames;
+            }
+        };
+    }
+
+    private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
+        goNames.add(gameObject.getName());
+        if (gameObject.getGameObjects() != null) {
+            Array<GameObject> gameObjects = gameObject.getGameObjects();
+            for (int i = 0; i < gameObjects.size; i++) {
+                GameObject child = gameObjects.get(i);
+                addNamesToList(goNames, child);
+
+            }
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -20,10 +21,10 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 
 import java.util.function.Supplier;
 
-public class ParticleComponent extends RendererComponent implements GameResourceOwner<ParticleEffectDescriptor> {
-    private transient GameAsset<ParticleEffectDescriptor> defaultGameAsset;
+public class ParticleComponent extends RendererComponent implements GameResourceOwner<VFXProjectData> {
+    private transient GameAsset<VFXProjectData> defaultGameAsset;
 
-    public GameAsset<ParticleEffectDescriptor> gameAsset;
+    public GameAsset<VFXProjectData> gameAsset;
     @Override
     public Class<? extends IPropertyProvider> getType() {
         return getClass();
@@ -33,14 +34,19 @@ public class ParticleComponent extends RendererComponent implements GameResource
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget<ParticleEffectDescriptor> descriptorWidget = new AssetSelectWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<ParticleEffectDescriptor>>() {
+        //		if (this.descriptor != vfxProjectData.getDescriptorSupplier().get()) {
+        //			this.descriptor = vfxProjectData.getDescriptorSupplier().get();
+        //			this.effectInstance = this.descriptor.createEffectInstance();
+        //		}
+
+        AssetSelectWidget<VFXProjectData> descriptorWidget = new AssetSelectWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<VFXProjectData>>() {
             @Override
-            public GameAsset<ParticleEffectDescriptor> get() {
+            public GameAsset<VFXProjectData> get() {
                 return gameAsset;
             }
-        }, new PropertyWidget.ValueChanged<GameAsset<ParticleEffectDescriptor>>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<VFXProjectData>>() {
             @Override
-            public void report(GameAsset<ParticleEffectDescriptor> value) {
+            public void report(GameAsset<VFXProjectData> value) {
                 setGameAsset(value);
             }
         });
@@ -109,7 +115,7 @@ public class ParticleComponent extends RendererComponent implements GameResource
     };
 
     private void loadDescriptorFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<ParticleEffectDescriptor> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
+        GameAsset<VFXProjectData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
         setGameAsset(assetForIdentifier);
     }
 
@@ -119,12 +125,12 @@ public class ParticleComponent extends RendererComponent implements GameResource
     }
 
     @Override
-    public GameAsset<ParticleEffectDescriptor> getGameResource () {
+    public GameAsset<VFXProjectData> getGameResource () {
         return this.gameAsset;
     }
 
     @Override
-    public void setGameAsset (GameAsset<ParticleEffectDescriptor> newGameAsset) {
+    public void setGameAsset (GameAsset<VFXProjectData> newGameAsset) {
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);

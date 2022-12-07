@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
@@ -117,18 +118,13 @@ public class HierarchyWidget extends Table implements Observer {
                     return;
                 }
 
-                logger.info("redo selection|context menu");
-//                SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
-//
                 if(!tree.getSelection().contains(node)) {
                     SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
                     selectGameObjectExternallyEvent.setGameObject(gameObject);
                     Notifications.fireEvent(selectGameObjectExternallyEvent);
                 }
-//
-//                showContextMenu(gameObject);
+                showContextMenu(gameObject);
             }
 
             @Override
@@ -325,31 +321,35 @@ public class HierarchyWidget extends Table implements Observer {
                         GameObject gameObject = objectMap.get(nodeObject.getObject().uuid.toString());
                         gameObjects.add(gameObject);
                     }
-
                 }
-                logger.info("redo delete game objects");
-//                SceneEditorAddon.get().workspace.deleteGameObjects(gameObjects);
+
+                for (GameObject object : gameObjects) {
+                    GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
+                    gameObjectDeleted.setTarget(object);
+                    Notifications.fireEvent(gameObjectDeleted);
+                }
+
             }
         });
         contextualMenu.addSeparator();
 
         PopupMenu popupMenu = new PopupMenu();
 
-        logger.info("Redo popup menu");
-//        ObjectMap<String, XmlReader.Element> confMap = SceneEditorAddon.get().workspace.templateListPopup.getConfMap();
-//        for(String key: confMap.keys()) {
-//            XmlReader.Element element = confMap.get(key);
-//
-//            MenuItem item = new MenuItem(element.getAttribute("title"));
-//            final String name = element.getAttribute("name");
-//            item.addListener(new ClickListener() {
-//                @Override
-//                public void clicked (InputEvent event, float x, float y) {
-//                    SceneEditorAddon.get().workspace.createObjectByTypeName(name, new Vector2(), gameObject, name);
-//                }
-//            });
-//            popupMenu.addItem(item);
-//        }
+        ObjectMap<String, XmlReader.Element> confMap = SharedResources.configData.getGameObjectConfigurationMap();
+        for(String key: confMap.keys()) {
+            XmlReader.Element element = confMap.get(key);
+
+            MenuItem item = new MenuItem(element.getAttribute("title"));
+            final String name = element.getAttribute("name");
+            item.addListener(new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                    SceneUtils.createObjectByTypeName(currentContainer, name, new Vector2(), gameObject, name);
+
+                }
+            });
+            popupMenu.addItem(item);
+        }
 
         MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
             @Override
@@ -507,7 +507,7 @@ public class HierarchyWidget extends Table implements Observer {
         }
     }
 
-    public void loadEntityContainer(GameObjectContainer entityContainer) {
+    public void loadEntityContainer (GameObjectContainer entityContainer) {
         tree.clearChildren();
         objectMap.clear();
         nodeMap.clear();

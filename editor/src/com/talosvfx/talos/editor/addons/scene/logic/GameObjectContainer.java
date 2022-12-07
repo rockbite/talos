@@ -3,6 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 
+import java.util.Collection;
+import java.util.function.Supplier;
+
 public interface GameObjectContainer {
 
     String getName();
@@ -23,4 +26,6 @@ public interface GameObjectContainer {
     GameObject getParent();
     GameObject getSelfObject();
     void setParent(GameObject gameObject);
+
+    Supplier<Collection<String>> getAllGONames ();
 }

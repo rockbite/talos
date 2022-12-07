@@ -167,21 +167,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		Notifications.registerObserver(this);
 
-		FileHandle list = Gdx.files.internal("addons/scene/go-templates.xml");
-		XmlReader xmlReader = new XmlReader();
-		XmlReader.Element root = xmlReader.parse(list);
 
-		GizmoRegister.init(root);
+		GizmoRegister.init(SharedResources.configData.getGameObjectConfigurationXMLRoot());
 
 		assetListPopup = new AssetListPopup<>();
 		gameObjectListPopup = new GameObjectListPopup();
-		templateListPopup = new TemplateListPopup(root);
+		templateListPopup = new TemplateListPopup(SharedResources.configData.getGameObjectConfigurationXMLRoot());
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
 			public void chosen (XmlReader.Element template, float x, float y) {
 				Vector2 pos = new Vector2(x, y);
 				String templateName = template.getAttribute("name");
-				createObjectByTypeName(templateName, pos, null, templateName);
+				SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
 			}
 		});
 
@@ -229,7 +226,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
 						vec.set(touchToWorld.x, touchToWorld.y);
-						createSpriteObject(gameAsset, vec, currentContainer.getSelfObject());
+
+						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 					}
 					return;
@@ -240,189 +238,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		});
 	}
 
-	public GameObject createEmpty (Vector2 position, GameObject parent) {
-		return createObjectByTypeName("empty", position, parent, "empty");
-	}
 
-	public GameObject createSpriteObject (GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
-		GameObject spriteObject = createObjectByTypeName("sprite", sceneCords, parent, spriteAsset.nameIdentifier);
-		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
-		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
-		}
-		component.setGameAsset(spriteAsset);
-
-		return spriteObject;
-	}
-
-	public GameObject createSpineObject (GameAsset<SkeletonData> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject spineObject = createObjectByTypeName("spine", sceneCords, parent, asset.nameIdentifier);
-		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
-
-		if (!fromDirectoryView) {
-			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
-		}
-		rendererComponent.setGameAsset(asset);
-
-		return spineObject;
-	}
-
-	public GameObject createParticle (GameAsset<ParticleEffectDescriptor> asset, Vector2 sceneCords, GameObject parent) {
-		GameObject particleObject = createObjectByTypeName("particle", sceneCords, parent, asset.nameIdentifier);
-		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
-
-		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
-		}
-		component.setGameAsset(asset);
-
-		return particleObject;
-	}
-
-	private ArrayList<String> goNames = new ArrayList<>();
-	private Supplier<Collection<String>> getAllGONames () {
-		goNames.clear();
-		addNamesToList(goNames, getRootGO());
-		return new Supplier<Collection<String>>() {
-			@Override
-			public Collection<String> get () {
-				return goNames;
-			}
-		};
-	}
-
-	private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
-		goNames.add(gameObject.getName());
-		if (gameObject.getGameObjects() != null) {
-			Array<GameObject> gameObjects = gameObject.getGameObjects();
-			for (int i = 0; i < gameObjects.size; i++) {
-				GameObject child = gameObjects.get(i);
-				addNamesToList(goNames, child);
-
-			}
-		}
-	}
-
-	public GameObject createObjectByTypeName (String idName, Vector2 position, GameObject parent, String nameHint) {
-		GameObject gameObject = new GameObject();
-		XmlReader.Element template = templateListPopup.getTemplate(idName);
-
-		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
-
-		String name = NamingUtils.getNewName(nameHint, getAllGONames());
-
-		gameObject.setName(name);
-		initComponentsFromTemplate(gameObject, templateListPopup.getTemplate(idName));
-		initializeDefaultValues(gameObject, position);
-
-		if (parent == null) {
-			currentContainer.addGameObject(gameObject);
-		} else {
-			parent.addGameObject(gameObject);
-		}
-
-		if (!fromDirectoryView) {
-			initGizmos(gameObject, this);
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
-			Gdx.app.postRunnable(new Runnable() {
-				@Override
-				public void run () {
-					selectGameObjectExternally(gameObject);
-				}
-			});
-		}
-
-		return gameObject;
-	}
-
-	private void initializeDefaultValues (GameObject gameObject, Vector2 position) {
-		if (position != null && gameObject.hasComponent(TransformComponent.class)) {
-			// oh boi always special case with this fuckers
-			TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-			transformComponent.position.set(position.x, position.y);
-		}
-
-		if (gameObject.hasComponent(ParticleComponent.class)) {
-			GameAsset<ParticleEffectDescriptor> sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
-			if (sample.isBroken()) {
-				// first time for sample
-				AssetRepository.getInstance().copySampleParticleToProject(getAssetsFolder());
-				sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
-			}
-			ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
-			particleComponent.setGameAsset(sample);
-		}
-	}
-
-	public GameObject createFromPrefab (GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
-
-		Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
-
-		GameObject gameObject = prefab.root.getGameObjects().first();
-		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-		transformComponent.position.set(position);
-
-		String name = NamingUtils.getNewName(prefab.name, getAllGONames());
-
-		gameObject.setName(name);
-
-		randomizeChildrenUUID(gameObject);
-		if (parent == null) {
-			currentContainer.addGameObject(gameObject);
-		} else {
-			parent.addGameObject(gameObject);
-		}
-
-		if (!fromDirectoryView) {
-			initGizmos(gameObject, this);
-
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
-
-			selectGameObjectExternally(gameObject);
-		}
-
-		return gameObject;
-	}
-
-	private static void randomizeChildrenUUID(GameObject parent) {
-		parent.uuid = UUID.randomUUID();
-		Array<GameObject> gameObjects = parent.getGameObjects();
-		if (gameObjects != null) {
-			for (GameObject gameObject : gameObjects) {
-				randomizeChildrenUUID(gameObject);
-			}
-		}
-	}
-
-	private void initComponentsFromTemplate (GameObject gameObject, XmlReader.Element template) {
-		XmlReader.Element container = template.getChildByName("components");
-		Array<XmlReader.Element> componentsXMLArray = container.getChildrenByName("component");
-		for (XmlReader.Element componentXML : componentsXMLArray) {
-			String className = componentXML.getAttribute("className");
-			String classPath = templateListPopup.componentClassPath;
-
-			try {
-				Class clazz = ClassReflection.forName(classPath + "." + className);
-				Object instance = ClassReflection.newInstance(clazz);
-				AComponent component = (AComponent)instance;
-				// TOM SAYS TO DO THIS IT"S NOT ME I SWEAR
-				Json json = new Json();
-				String s = json.toJson(component);
-				component = json.fromJson(component.getClass(), s);
-				gameObject.addComponent(component);
-
-				if (component instanceof MapComponent) {
-					//Add a layer also
-					TalosLayer layer = new TalosLayer("NewLayer");
-					((MapComponent)component).getLayers().add(layer);
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	protected void initListeners () {
 		inputListener = new InputListener() {
@@ -663,7 +480,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
 
 
-		GameObject dummyParent = createEmpty(new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
+		GameObject dummyParent = SceneUtils.createEmpty(currentContainer, new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
 		Gdx.app.postRunnable(new Runnable() {
@@ -971,10 +788,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
 
-				String name = NamingUtils.getNewName(gameObject.getName(), getAllGONames());
+				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
 
 				gameObject.setName(name);
-				randomizeChildrenUUID(gameObject);
+				SceneUtils.randomizeChildrenUUID(gameObject);
 				parent.addGameObject(gameObject);
 				if (gameObject.hasComponentType(TransformComponent.class)) {
 					TransformComponent component = gameObject.getComponent(TransformComponent.class);
@@ -1355,7 +1172,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (suggestedName.equals(gameObject.getName()))
 			return;
 
-		String finalName = NamingUtils.getNewName(suggestedName, getAllGONames());
+		String finalName = NamingUtils.getNewName(suggestedName, currentContainer.getAllGONames());
 
 
 		String oldName = gameObject.getName();

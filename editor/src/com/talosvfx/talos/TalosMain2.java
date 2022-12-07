@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.ConfigData;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.ProjectSplash;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -46,6 +47,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling = new InputHandling();
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
+		SharedResources.configData = new ConfigData();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 		SaveSystem saveSystem = new SaveSystem();
 

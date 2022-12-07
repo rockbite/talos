@@ -5,10 +5,14 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 public abstract class SavableContainer implements GameObjectContainer, Json.Serializable, IPropertyHolder {
 
@@ -104,6 +108,31 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
     @Override
     public void setParent (GameObject gameObject) {
         // do nothing
+    }
+
+    private ArrayList<String> goNames = new ArrayList<>();
+    @Override
+    public Supplier<Collection<String>> getAllGONames () {
+        goNames.clear();
+        addNamesToList(goNames, root);
+        return new Supplier<Collection<String>>() {
+            @Override
+            public Collection<String> get () {
+                return goNames;
+            }
+        };
+    }
+
+    private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
+        goNames.add(gameObject.getName());
+        if (gameObject.getGameObjects() != null) {
+            Array<GameObject> gameObjects = gameObject.getGameObjects();
+            for (int i = 0; i < gameObjects.size; i++) {
+                GameObject child = gameObjects.get(i);
+                addNamesToList(goNames, child);
+
+            }
+        }
     }
 
     protected void writeData (Json json) {

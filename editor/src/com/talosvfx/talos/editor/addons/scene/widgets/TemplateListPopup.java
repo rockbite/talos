@@ -143,11 +143,4 @@ public class TemplateListPopup extends VisWindow {
         return super.remove();
     }
 
-    public XmlReader.Element getTemplate(String name) {
-        return configurationMap.get(name);
-    }
-
-    public ObjectMap<String, XmlReader.Element> getConfMap() {
-        return configurationMap;
-    }
 }
