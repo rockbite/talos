@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
@@ -196,4 +197,28 @@ public class SceneUtils {
 		}
 	}
 
+	public static  void repositionGameObject (GameObjectContainer currentContainer, GameObject parentToMoveTo, GameObject childThatHasMoved) {
+		if (parentToMoveTo == null) {
+			parentToMoveTo = currentContainer.getSelfObject();
+		}
+
+		if (childThatHasMoved.parent != null) {
+			childThatHasMoved.parent.removeObject(childThatHasMoved);
+		}
+
+		parentToMoveTo.addGameObject(childThatHasMoved);
+		GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
+		//for updating left panel values
+
+
+		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
+		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
+		Notifications.fireEvent(selectGameObjectExternallyEvent);
+	}
+
+	private static ObjectMap<GameObjectContainer, Array<GameObject>> copyPasteBuffer = new ObjectMap<>();
+
+	public static void copy (GameObjectContainer currentContainer, Array<GameObject> arraySelection) {
+		copyPasteBuffer.put(currentContainer, arraySelection);
+	}
 }

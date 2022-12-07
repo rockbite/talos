@@ -1121,6 +1121,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameObjectDeleted (GameObjectDeleted event) {
 		GameObject target = event.getTarget();
 
+		GameObject parent = target.getParent();
+		parent.removeObject(target);
+
 		// remove gizmos
 		removeGizmos(target);
 
@@ -1289,27 +1292,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return fullPath.replace(projectFullPath, "").substring(1);
 	}
 
-	public void repositionGameObject (GameObject parentToMoveTo, GameObject childThatHasMoved) {
-		if (parentToMoveTo == null) {
-			parentToMoveTo = currentContainer.getSelfObject();
-		}
 
-		if (childThatHasMoved.parent != null) {
-			childThatHasMoved.parent.removeObject(childThatHasMoved);
-		}
-
-		parentToMoveTo.addGameObject(childThatHasMoved);
-		GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
-		//for updating left panel values
-
-		logger.info("redo reposition game object");
-
-
-//		SceneEditorAddon sceneEditorAddon = SceneEditorAddon.get();
-//		sceneEditorAddon.workspace.selectGameObjectExternally(childThatHasMoved);
-//
-//		TalosMain.Instance().ProjectController().setDirty();
-	}
 
 
 

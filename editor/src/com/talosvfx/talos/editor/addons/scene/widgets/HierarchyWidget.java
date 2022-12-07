@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -23,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectRepositionHierarchyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
@@ -147,11 +149,11 @@ public class HierarchyWidget extends Table implements Observer {
 
             @Override
             public void onNodeMove (FilteredTree.Node<GameObject> parentToMoveTo, FilteredTree.Node<GameObject> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
-                if(parentToMoveTo != null) {
+                if (parentToMoveTo != null) {
                     GameObject parent = objectMap.get(parentToMoveTo.getObject().uuid.toString());
                     GameObject child = objectMap.get(childThatHasMoved.getObject().uuid.toString());
-                    logger.info("redo reposition game object");
-//                    SceneEditorAddon.get().workspace.repositionGameObject(parent, child);
+
+                    SceneUtils.repositionGameObject(currentContainer, parent, child);
                 }
             }
 
@@ -282,15 +284,19 @@ public class HierarchyWidget extends Table implements Observer {
         contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                logger.info("Redo copy");
-//                SceneEditorWorkspace.getInstance().copySelected();
+                Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
+                Array<GameObject> arraySelection = new Array<>();
+                for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
+                    arraySelection.add(gameObjectNode.getObject());
+                }
+
+                SceneUtils.copy(currentContainer, arraySelection);
             }
         });
         contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                logger.info("redo paste");
-//                SceneEditorWorkspace.getInstance().pasteFromClipboard();
+                logger.info("Paste probably shouldn't happen here, but if we want it, we should decide on the logic");
             }
         });
         contextualMenu.addSeparator();
