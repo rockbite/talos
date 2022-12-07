@@ -538,8 +538,15 @@ public class HierarchyWidget extends Table implements Observer {
 
             @Override
             public void changed (String newText) {
-                logger.info("Redo change game object name");
-//                SceneEditorAddon.get().workspace.changeGOName(gameObject, newText);
+                String oldName = gameObject.getName();
+
+                gameObject.setName(newText);
+
+                GameObjectNameChanged gameObjectNameChanged = Notifications.obtainEvent(GameObjectNameChanged.class);
+                gameObjectNameChanged.target = gameObject;
+                gameObjectNameChanged.newName = newText;
+                gameObjectNameChanged.oldName = oldName;
+                Notifications.fireEvent(gameObjectNameChanged);
             }
         });
 

@@ -1131,7 +1131,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectNameChanged (GameObjectNameChanged event) {
-		TalosMain.Instance().ProjectController().setDirty();
 	}
 
 	@EventHandler
