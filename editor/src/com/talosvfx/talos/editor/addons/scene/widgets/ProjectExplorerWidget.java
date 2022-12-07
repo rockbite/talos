@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.KeepStopReplaceDialog;
 import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -218,7 +219,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
             @Override
             public void run () {
 
-                logger.info("todo - Reimplement delete paths");
                 FileHandle parent = SharedResources.currentProject.rootProjectDir();
 
                 for (String path : paths) {
@@ -726,4 +726,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
 		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
 		getStage().addActor(yesNoDialog.fadeIn());
 	}
+
+    public void showKeepStopReplaceDialog (String title, String message, Runnable keep, Runnable stop, Runnable replace) {
+        KeepStopReplaceDialog keepStopReplaceDialog = new KeepStopReplaceDialog(title, message, keep, stop, replace);
+        getStage().addActor(keepStopReplaceDialog.fadeIn());
+    }
 }

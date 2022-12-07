@@ -1188,8 +1188,12 @@ public class AssetRepository implements Observer {
 	}
 
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory) {
+		return copyRawAsset(file, directory, false);
+	}
+
+	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
 		String fileName = file.name();
-		if (directory.child(fileName).exists()) {
+		if (directory.child(fileName).exists() && !replace) {
 			String baseName = file.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {

@@ -73,10 +73,25 @@ public class GlobalDragAndDrop {
 	}
 
 	public void fakeDragDrop (int screenX, int screenY, String[] absoluteFiles) {
+		if (absoluteFiles.length == 1) {
+			FileHandle handle = Gdx.files.absolute(absoluteFiles[0]);
+			if (handle.extension().equals(TalosProjectData.TALOS_PROJECT_EXTENSION)) {
+				// load the project
+				TalosProjectData data = TalosProjectData.loadFromFile(handle);
+				SharedResources.projectLoader.loadProject(data);
+				return;
+			}
+		}
+
 		ArrayDragAndDropPayload arrayDragAndDropPayload = new ArrayDragAndDropPayload();
 		Array<BaseDragAndDropPayload> items = arrayDragAndDropPayload.getItems();
 		for (String absoluteFileHandle : absoluteFiles) {
-			items.add(new FileHandleDragAndDropPayload(Gdx.files.absolute(absoluteFileHandle)));
+			FileHandle absolute = Gdx.files.absolute(absoluteFileHandle);
+			AssetFileDroppedEvent fileDropEvent = Notifications.obtainEvent(AssetFileDroppedEvent.class);
+			fileDropEvent.setFileHandle(absolute);
+			fileDropEvent.setScreenPos(screenX, screenY);
+			Notifications.fireEvent(fileDropEvent);
+			items.add(new FileHandleDragAndDropPayload(absolute));
 		}
 
 		Table dummyActor = new Table();
@@ -133,27 +148,6 @@ public class GlobalDragAndDrop {
 
 		dummyActor.remove();
 	}
-
-//	public void fileDrop (float x, float y, String[] filePaths) {
-//		for (String path : filePaths) {
-//			FileHandle handle = Gdx.files.absolute(path);
-//			String ext = handle.extension();
-//
-//			if (handle.exists()) {
-//				if (ext.equals(TalosProjectData.TALOS_PROJECT_EXTENSION)) {
-//					TalosProjectData data = TalosProjectData.loadFromFile(handle);
-//					SharedResources.projectLoader.loadProject(data);
-//				} else {
-//					AssetFileDroppedEvent fileDropEvent = Notifications.obtainEvent(AssetFileDroppedEvent.class);
-//					fileDropEvent.setFileHandle(handle);
-//					fileDropEvent.setScreenPos(x, y);
-//					Notifications.fireEvent(fileDropEvent);
-//					fakeSource.setPayload(new FileHandleDragAndDropPayload(handle));
-//					fakeSource.drag(new InputEvent(), x, y, 0);
-//				}
-//			}
-//		}
-//	}
 
 	public static class BaseDragAndDropPayload {
 

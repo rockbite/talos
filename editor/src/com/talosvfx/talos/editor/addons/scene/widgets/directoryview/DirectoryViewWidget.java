@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -425,7 +426,57 @@ public class DirectoryViewWidget extends Table {
 
 					openDirectory(targetItem.fileHandle.path());
 				} else {
-					logger.info("TODO COPY INTO DIRECTORY and do asset stuff");
+					if (payloadObject instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
+						Array<GlobalDragAndDrop.BaseDragAndDropPayload> items = ((GlobalDragAndDrop.ArrayDragAndDropPayload) payloadObject).getItems();
+						FileHandle lastCopiedFile = null;
+						for (GlobalDragAndDrop.BaseDragAndDropPayload item : items) {
+							if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+								AssetRepository assetRepository = AssetRepository.getInstance();
+								FileHandle handle = ((GlobalDragAndDrop.FileHandleDragAndDropPayload) item).getHandle();
+								if (fileHandle.child(handle.name()).exists()) {
+									// file is already present, see if it should be replaced
+									String title = "Oh no!";
+									String message = "An older item named \"" + handle.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
+									Runnable keep = new Runnable() {
+										@Override
+										public void run() {
+											FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle);
+											String projectPath = SharedResources.currentProject.rootProjectDir().path();
+											projectExplorerWidget.loadDirectoryTree(projectPath);
+											projectExplorerWidget.expand(newHandle.parent().path());
+											projectExplorerWidget.select(newHandle.parent().path());
+										}
+									};
+									Runnable stop = new Runnable() {
+										@Override
+										public void run() {
+											// do nothing
+										}
+									};
+									Runnable replace = new Runnable() {
+										@Override
+										public void run() {
+											FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle, true);
+											String projectPath = SharedResources.currentProject.rootProjectDir().path();
+											projectExplorerWidget.loadDirectoryTree(projectPath);
+											projectExplorerWidget.expand(newHandle.parent().path());
+											projectExplorerWidget.select(newHandle.parent().path());
+										}
+									};
+
+									projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
+								} else {
+									lastCopiedFile = assetRepository.copyRawAsset(handle, fileHandle);
+								}
+							}
+						}
+						if (lastCopiedFile != null) {
+							String projectPath = SharedResources.currentProject.rootProjectDir().path();
+							projectExplorerWidget.loadDirectoryTree(projectPath);
+							projectExplorerWidget.expand(lastCopiedFile.parent().path());
+							projectExplorerWidget.select(lastCopiedFile.parent().path());
+						}
+					}
 				}
 			}
 		});
