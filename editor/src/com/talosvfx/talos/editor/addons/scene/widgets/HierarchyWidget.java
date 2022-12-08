@@ -141,9 +141,7 @@ public class HierarchyWidget extends Table implements Observer {
                         GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
                         gameObjects.add(gameObject);
 
-                        GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
-                        gameObjectDeleted.setTarget(gameObject);
-                        Notifications.fireEvent(gameObjectDeleted);
+                        SceneUtils.deleteGameObject(currentContainer, gameObject);
                     }
                 }
             }
@@ -339,9 +337,7 @@ public class HierarchyWidget extends Table implements Observer {
                 }
 
                 for (GameObject object : gameObjects) {
-                    GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
-                    gameObjectDeleted.setTarget(object);
-                    Notifications.fireEvent(gameObjectDeleted);
+                    SceneUtils.deleteGameObject(currentContainer, object);
                 }
 
             }

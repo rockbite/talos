@@ -14,6 +14,8 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -217,6 +219,17 @@ public class SceneUtils {
 		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
 		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
+	}
+
+
+	public static void deleteGameObject (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+		DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
+		deSelectGameObjectExternallyEvent.setGameObject(gameObject);
+		Notifications.fireEvent(deSelectGameObjectExternallyEvent);
+
+		GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
+		gameObjectDeleted.setTarget(gameObject);
+		Notifications.fireEvent(gameObjectDeleted);
 	}
 
 	private static ObjectMap<GameObjectContainer, Array<GameObject>> copyPasteBuffer = new ObjectMap<>();

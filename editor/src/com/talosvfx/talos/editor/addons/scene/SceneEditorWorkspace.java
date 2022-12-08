@@ -1088,12 +1088,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 					if (deletedObjects != null) {
 						for (GameObject deletedObject : deletedObjects) {
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectDeleted.class).setTarget(deletedObject));
+							SceneUtils.deleteGameObject(currentContainer, deletedObject);
 						}
 					}
 
 				} else {
-					Notifications.fireEvent(Notifications.obtainEvent(GameObjectDeleted.class).setTarget(gameObject));
+					SceneUtils.deleteGameObject(currentContainer, gameObject);
 				}
 
 			}
