@@ -31,6 +31,7 @@ public class PropertiesPanelApp extends AppManager.BaseApp<Scene> {
 	@Override
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
+		propertyPanel.setGameAsset(gameAsset);
 	}
 
 	@Override

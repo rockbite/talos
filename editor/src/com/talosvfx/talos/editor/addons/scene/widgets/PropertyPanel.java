@@ -6,16 +6,19 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import lombok.Getter;
 
 import java.util.Comparator;
 
@@ -29,6 +32,9 @@ public class PropertyPanel extends Table implements Observer {
     private Array<PropertiesPanel> panelList = new Array<>();
     private ObjectMap<IPropertyProvider, PropertiesPanel> providerPanelMap = new ObjectMap<>();
     private IPropertyHolder currentPropertyHolder;
+
+    @Getter
+    private GameAsset<Scene> gameAsset;
 
     public PropertyPanel() {
         setSkin(SharedResources.skin);
@@ -92,7 +98,7 @@ public class PropertyPanel extends Table implements Observer {
         providerPanelMap.clear();
 
         for(IPropertyProvider provider: list) {
-            PropertiesPanel panel = new PropertiesPanel(provider, getSkin());
+            PropertiesPanel panel = new PropertiesPanel(provider, getSkin(), this);
 
             container.add(panel).growX().top().padBottom(5);
             container.row();
@@ -148,5 +154,9 @@ public class PropertyPanel extends Table implements Observer {
 
     public IPropertyHolder getCurrentHolder () {
         return currentPropertyHolder;
+    }
+
+    public void setGameAsset (GameAsset<Scene> gameAsset) {
+        this.gameAsset = gameAsset;
     }
 }

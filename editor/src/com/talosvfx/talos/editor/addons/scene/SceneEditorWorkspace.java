@@ -1112,6 +1112,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	@EventHandler
+	public void onComponentRemove (ComponentRemoved event) {
+		removeGizmos(event.getGameObject());
+		initGizmos(event.getGameObject(), this);
+	}
+
+	@EventHandler
 	public void onComponentUpdated (ComponentUpdated event) {
 		AComponent component = event.getComponent();
 		if (event.isNotifyUI()) {

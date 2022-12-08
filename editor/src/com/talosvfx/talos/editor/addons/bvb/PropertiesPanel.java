@@ -5,19 +5,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentRemoved;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PropertiesPanel extends Table {
 
     private static final Logger logger = LoggerFactory.getLogger(PropertiesPanel.class);
+    private final PropertyPanel parentPropertyPanel;
+
 
     Label titleLabel;
     Table propertyGroup = new Table();
@@ -25,7 +33,9 @@ public class PropertiesPanel extends Table {
 
     Array<PropertyWidget> propertyWidgets = new Array<>();
 
-    public PropertiesPanel(IPropertyProvider propertyProvider, Skin skin) {
+    public PropertiesPanel(IPropertyProvider propertyProvider, Skin skin, PropertyPanel propertyPanel) {
+        parentPropertyPanel = propertyPanel;
+
         setSkin(skin);
         setBackground(skin.getDrawable("panel"));
 
@@ -65,9 +75,13 @@ public class PropertiesPanel extends Table {
                     GameObject gameObject = component.getGameObject();
                     if (gameObject != null) {
 
-                        logger.info("Remove gizmo remove component reimpl");
-//                        SceneEditorWorkspace.getInstance().removeGizmos(gameObject);
-//                        SceneEditorWorkspace.getInstance().initGizmos(gameObject, SceneEditorWorkspace.getInstance());
+                        ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
+                        componentRemoved.setComponent(component);
+                        componentRemoved.setGameObject(gameObject);
+                        componentRemoved.setContainer(parentPropertyPanel.getGameAsset().getResource());
+                        Notifications.fireEvent(componentRemoved);
+
+
                     }
                     PropertiesPanel.this.remove();
                 }
