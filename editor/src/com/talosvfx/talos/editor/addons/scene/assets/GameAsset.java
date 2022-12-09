@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.assets;
 
 import com.badlogic.gdx.utils.Array;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * GameAsset is a potentially complex resource. It links 1+ {@link RawAsset} together to reference
@@ -19,6 +21,9 @@ public class GameAsset<T> {
 
 	private boolean broken;
 	private Exception brokenReason;
+
+	@Setter@Getter
+	private boolean nonFound;
 
 
 	public interface GameAssetUpdateListener {

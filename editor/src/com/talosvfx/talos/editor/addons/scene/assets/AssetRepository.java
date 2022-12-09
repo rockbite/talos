@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -47,7 +48,6 @@ import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
-import com.talosvfx.talos.runtime.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.talosvfx.talos.editor.serialization.VFXProjectSerializer.readTalosTLSProject;
-import static com.talosvfx.talos.editor.serialization.VFXProjectSerializer.writeTalosPExport;
 
 public class AssetRepository implements Observer {
 
@@ -83,6 +82,7 @@ public class AssetRepository implements Observer {
 		}
 		GameAsset<T> brokenAsset = new GameAsset<>(identifier, type);
 		brokenAsset.setBroken(new Exception("No asset found"));
+		brokenAsset.setNonFound(true);
 		return brokenAsset;
 	}
 
@@ -305,7 +305,7 @@ public class AssetRepository implements Observer {
 		try {
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
 
-			GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rootRawAsset, false);
+			GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rootRawAsset, false, gameAssetReference);
 			gameAssetReference.setResourcePayload(gameAsset.getResource());
 			gameAssetReference.setUpdated();
 
@@ -507,58 +507,20 @@ public class AssetRepository implements Observer {
 			throw new RuntimeException(e);
 		}
 
-		boolean shouldUpdate = false;
-		if (getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension) != null) {
-			shouldUpdate = true;
-		}
+		GameAsset<Object> exitingObject = getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension);
+		if (exitingObject != null && !exitingObject.isNonFound()) {
+			//Should just reload the resource not create new game asset
+			GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value, true, exitingObject);
 
-		GameAsset gameAsset = createGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value, true);
-
-
-		if (shouldUpdate) {
-			GameAsset<?> oldGameAsset = getAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension);
-			for (RawAsset dependentRawAsset : oldGameAsset.dependentRawAssets) {
-				dependentRawAsset.gameAssetReferences.removeValue(oldGameAsset, true);
-			}
-			Array<GameAsset.GameAssetUpdateListener> listeners = oldGameAsset.listeners;
-			gameAsset.listeners.addAll(listeners);
-			oldGameAsset.listeners.clear();
-
-			//Find all components in the current scene that was using this and reset their game asset to the new one
-			Array<GameObject> list = new Array<>();
-
-
-			logger.info("Redo searching game objects for updating");
-//
-//			SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
-//			if (sceneEditorWorkspace != null && sceneEditorWorkspace.getRootGO() != null) {
-//				sceneEditorWorkspace.getRootGO().getChildrenByComponent(GameResourceOwner.class, list);
-//				for (GameObject gameObject : list) {
-//					for (AComponent component : gameObject.getComponents()) {
-//						if (component instanceof GameResourceOwner) {
-//							GameResourceOwner<?> gameResourceOwner = (GameResourceOwner<?>)component;
-//
-//							GameAsset<?> gameResource = gameResourceOwner.getGameResource();
-//							if (gameResource.type == GameAssetType.SKELETON) {
-//								System.out.println();
-//							}
-//
-//							if (gameResourceOwner.getGameResource().equals(oldGameAsset)) {
-//								gameResourceOwner.setGameAsset(gameAsset);
-//							}
-//						}
-//					}
-//				}
-//			}
-		}
-
-		if (shouldUpdate) {
 			gameAsset.setUpdated();
+			return;
 		}
+
+		GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value, true);
 
 
 		if (gameAsset == null) return;
-		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension);
+		System.out.println("Registering game asset " + gameAssetIdentifier + " " + gameAsset + " " + value.handle.path() + " " + assetTypeFromExtension + " " + gameAsset.getResource());
 
 		putAssetForIdentifier(gameAssetIdentifier, assetTypeFromExtension, gameAsset);
 		dataMaps.putFileHandleGameAsset(key, gameAsset);
@@ -577,63 +539,70 @@ public class AssetRepository implements Observer {
 		return AssetRepository.getInstance().copyRawAsset(originalTls, preferredDestination);
 	}
 
-	public GameAsset<?> createGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
+	public GameAsset<?> createOrUpdateGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks) {
+		return createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, value, createLinks, null);
+	}
+	public GameAsset<?> createOrUpdateGameAssetForType (GameAssetType assetTypeFromExtension, String gameAssetIdentifier, RawAsset value, boolean createLinks, @Null GameAsset<?> in) {
 		if (!assetTypeFromExtension.isRootGameAsset()) {
 			throw new GdxRuntimeException("Trying to load a game asset from a non root asset");
 		}
 
-		GameAsset<?> gameAssetOut = null;
+		GameAsset<?> gameAssetOut = in;
 
 
 		try {
 			switch (assetTypeFromExtension) {
 			case SPRITE:
-				GameAsset<Texture> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = textureGameAsset;
 
+				if (gameAssetOut == null) {
+					GameAsset<Texture> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = textureGameAsset;
 
-				if (createLinks) {
-					value.gameAssetReferences.add(textureGameAsset);
-					textureGameAsset.dependentRawAssets.add(value);
-				}
-
-				textureGameAsset.setResourcePayload(new Texture(value.handle));
-
-
-				break;
-			case ATLAS:
-				GameAsset<TextureAtlas> textureAtlasGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = textureAtlasGameAsset;
-
-				TextureAtlas.TextureAtlasData textureAtlasData = new TextureAtlas.TextureAtlasData(value.handle, value.handle.parent(), false);
-				TextureAtlas atlas = new TextureAtlas(textureAtlasData);
-				textureAtlasGameAsset.setResourcePayload(atlas);
-
-				if (createLinks) {
-					value.gameAssetReferences.add(textureAtlasGameAsset);
-					textureAtlasGameAsset.dependentRawAssets.add(value);
-
-					for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
-						FileHandle textureFile = page.textureFile;
-						if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
-							throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
-						}
-
-						RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
-
-						rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
-						textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
+					if (createLinks) {
+						value.gameAssetReferences.add(textureGameAsset);
+						textureGameAsset.dependentRawAssets.add(value);
 					}
 				}
 
 
+				((GameAsset<Texture>)gameAssetOut).setResourcePayload(new Texture(value.handle));
+
+
+				break;
+			case ATLAS:
+
+				TextureAtlas.TextureAtlasData textureAtlasData = new TextureAtlas.TextureAtlasData(value.handle, value.handle.parent(), false);
+
+				if (gameAssetOut == null) {
+					GameAsset<TextureAtlas> textureAtlasGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = textureAtlasGameAsset;
+
+
+
+					if (createLinks) {
+						value.gameAssetReferences.add(textureAtlasGameAsset);
+						textureAtlasGameAsset.dependentRawAssets.add(value);
+
+						for (TextureAtlas.TextureAtlasData.Page page : textureAtlasData.getPages()) {
+							FileHandle textureFile = page.textureFile;
+							if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
+								throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+							}
+
+							RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
+
+							rawAssetForPage.gameAssetReferences.add(textureAtlasGameAsset);
+							textureAtlasGameAsset.dependentRawAssets.add(rawAssetForPage);
+						}
+					}
+				}
+
+				TextureAtlas atlas = new TextureAtlas(textureAtlasData);
+				((GameAsset<TextureAtlas>)gameAssetOut).setResourcePayload(atlas);
 
 				break;
 
 			case SKELETON:
-
-				GameAsset<SkeletonData> skeletonDataGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = skeletonDataGameAsset;
 
 				//Gotta try load the atlas
 				String skeleName = value.handle.nameWithoutExtension();
@@ -641,184 +610,253 @@ public class AssetRepository implements Observer {
 				TextureAtlas.TextureAtlasData skeleAtlasData = new TextureAtlas.TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				TextureAtlas skeleAtlas = new TextureAtlas(skeleAtlasData);
 
-				if (atlasFile.exists()) {
-					SkeletonBinary skeletonBinary = new SkeletonBinary(skeleAtlas);
+				SkeletonBinary skeletonBinary = new SkeletonBinary(skeleAtlas);
+				SpineMetadata metaData = (SpineMetadata)value.metaData;
+				skeletonBinary.setScale(1f / metaData.pixelsPerUnit);
 
-					SpineMetadata metaData = (SpineMetadata)value.metaData;
+				SkeletonData skeletonData = skeletonBinary.readSkeletonData(value.handle);
 
-					skeletonBinary.setScale(1f/metaData.pixelsPerUnit);
 
-					SkeletonData skeletonData = skeletonBinary.readSkeletonData(value.handle);
-					skeletonDataGameAsset.setResourcePayload(skeletonData);
+				if (gameAssetOut == null) {
+					GameAsset<SkeletonData> skeletonDataGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = skeletonDataGameAsset;
 
-					if (createLinks) {
-						value.gameAssetReferences.add(skeletonDataGameAsset);
-						skeletonDataGameAsset.dependentRawAssets.add(value);
+					if (atlasFile.exists()) {
 
-						RawAsset skeleAtlasRawAsset = dataMaps.fileHandleRawAssetMap.get(atlasFile);
-						skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
+						if (createLinks) {
+							value.gameAssetReferences.add(skeletonDataGameAsset);
+							skeletonDataGameAsset.dependentRawAssets.add(value);
 
-						for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
-							FileHandle textureFile = page.textureFile;
-							if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
-								throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+							RawAsset skeleAtlasRawAsset = dataMaps.fileHandleRawAssetMap.get(atlasFile);
+							skeletonDataGameAsset.dependentRawAssets.add(skeleAtlasRawAsset);
+
+							for (TextureAtlas.TextureAtlasData.Page page : skeleAtlasData.getPages()) {
+								FileHandle textureFile = page.textureFile;
+								if (!dataMaps.fileHandleRawAssetMap.containsKey(textureFile)) {
+									throw new GdxRuntimeException("Corruption, texture file does not exist" + textureFile);
+								}
+
+								RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
+								rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
+								skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 							}
-
-							RawAsset rawAssetForPage = dataMaps.fileHandleRawAssetMap.get(textureFile);
-							rawAssetForPage.gameAssetReferences.add(skeletonDataGameAsset);
-							skeletonDataGameAsset.dependentRawAssets.add(rawAssetForPage);
 						}
-					}
 
+					}
 				}
+
+				((GameAsset<SkeletonData>)gameAssetOut).setResourcePayload(skeletonData);
+
 
 				break;
 			case SOUND:
 				break;
 			case VFX_OUTPUT:
 
-				GameAsset<ParticleEffectDescriptor> particleEffectDescriptorGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				if (gameAssetOut == null) {
 
-				gameAssetOut = particleEffectDescriptorGameAsset;
+					GameAsset<ParticleEffectDescriptor> particleEffectDescriptorGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 
-				if (createLinks) {
-					particleEffectDescriptorGameAsset.dependentRawAssets.add(value);
-				}
+					gameAssetOut = particleEffectDescriptorGameAsset;
 
-				ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
-				particleEffectDescriptor.setAssetProvider(new AssetProvider() {
-					@Override
-					public <T> T findAsset (String assetName, Class<T> clazz) {
-
-						if (Sprite.class.isAssignableFrom(clazz)) {
-							GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-
-							if (gameAsset != null) {
-								if (createLinks) {
-									for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-										particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
-									}
-								}
-								return (T)new Sprite(gameAsset.getResource());
-							} else {
-								particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
-							}
-						}
-
-						throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+					if (createLinks) {
+						particleEffectDescriptorGameAsset.dependentRawAssets.add(value);
 					}
-				});
 
-				RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
+					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
+					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
+						@Override
+						public <T> T findAsset (String assetName, Class<T> clazz) {
 
-				try {
-					particleEffectDescriptor.load(rawAssetPFile.handle);
-				} catch (Exception e) {
-					System.out.println("Failure to load particle effect");
-					throw e;
-				}
+							if (Sprite.class.isAssignableFrom(clazz)) {
+								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
-				particleEffectDescriptorGameAsset.setResourcePayload(particleEffectDescriptor);
+								if (gameAsset != null) {
+									if (createLinks) {
+										for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+											particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
+										}
+									}
+									return (T)new Sprite(gameAsset.getResource());
+								} else {
+									particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
+								}
+							}
 
-				if (createLinks) {
-					value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
-					particleEffectDescriptorGameAsset.dependentRawAssets.add(rawAssetPFile);
+							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+						}
+					});
+
+					RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
+
+					try {
+						particleEffectDescriptor.load(rawAssetPFile.handle);
+					} catch (Exception e) {
+						System.out.println("Failure to load particle effect");
+						throw e;
+					}
+
+					particleEffectDescriptorGameAsset.setResourcePayload(particleEffectDescriptor);
+
+					if (createLinks) {
+						value.gameAssetReferences.add(particleEffectDescriptorGameAsset);
+						particleEffectDescriptorGameAsset.dependentRawAssets.add(rawAssetPFile);
+					}
+				} else {
+					GameAsset<ParticleEffectDescriptor> assetToUpdate = ((GameAsset<ParticleEffectDescriptor>)gameAssetOut);
+
+					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
+					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
+						@Override
+						public <T> T findAsset (String assetName, Class<T> clazz) {
+
+							if (Sprite.class.isAssignableFrom(clazz)) {
+								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+
+								if (gameAsset != null) {
+									return (T)new Sprite(gameAsset.getResource());
+								} else {
+									assetToUpdate.setBroken(new Exception("Cannot find " + assetName));
+								}
+							}
+
+							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+						}
+					});
+					try {
+						RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
+
+						particleEffectDescriptor.load(rawAssetPFile.handle);
+					} catch (Exception e) {
+						System.out.println("Failure to load particle effect");
+						throw e;
+					}
+
+					assetToUpdate.setResourcePayload(particleEffectDescriptor);
+
 				}
 
 				break;
 			case VFX:
 
-				GameAsset<VFXProjectData> vfxProjectDataGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+				if (gameAssetOut == null) {
 
-				gameAssetOut = vfxProjectDataGameAsset;
+					GameAsset<VFXProjectData> vfxProjectDataGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 
-				if (createLinks) {
-					vfxProjectDataGameAsset.dependentRawAssets.add(value);
+					gameAssetOut = vfxProjectDataGameAsset;
+
+					if (createLinks) {
+						vfxProjectDataGameAsset.dependentRawAssets.add(value);
+					}
+
+
+					RawAsset rawAssetTLSFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
+
+
+					if (createLinks) {
+						value.gameAssetReferences.add(vfxProjectDataGameAsset);
+						vfxProjectDataGameAsset.dependentRawAssets.add(rawAssetTLSFile);
+					}
 				}
 
 				VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
+				((GameAsset<VFXProjectData>)gameAssetOut).setResourcePayload(projectData);
 
-				RawAsset rawAssetTLSFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
-
-				vfxProjectDataGameAsset.setResourcePayload(projectData);
-
-				if (createLinks) {
-					value.gameAssetReferences.add(vfxProjectDataGameAsset);
-					vfxProjectDataGameAsset.dependentRawAssets.add(rawAssetTLSFile);
-				}
 
 				break;
 			case SCRIPT:
+				if (gameAssetOut == null) {
 
-				GameAsset<String> scriptGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = scriptGameAsset;
+					GameAsset<String> scriptGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = scriptGameAsset;
 
-				scriptGameAsset.setResourcePayload("ScriptDummy");
 
-				if (createLinks) {
-					value.gameAssetReferences.add(scriptGameAsset);
-					scriptGameAsset.dependentRawAssets.add(value);
+					if (createLinks) {
+						value.gameAssetReferences.add(scriptGameAsset);
+						scriptGameAsset.dependentRawAssets.add(value);
+					}
 				}
+				((GameAsset<String>)gameAssetOut).setResourcePayload("ScriptDummy");
 
 				break;
 			case TWEEN:
-				GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = tweenGameAsset;
-				tweenGameAsset.setResourcePayload("Dummy");
 
-				if (createLinks) {
-					value.gameAssetReferences.add(tweenGameAsset);
-					tweenGameAsset.dependentRawAssets.add(value);
+				if (gameAssetOut == null) {
+					GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = tweenGameAsset;
+
+					if (createLinks) {
+						value.gameAssetReferences.add(tweenGameAsset);
+						tweenGameAsset.dependentRawAssets.add(value);
+					}
 				}
+				((GameAsset<String>)gameAssetOut).setResourcePayload("Dummy");
+
 
 				break;
 			case PREFAB:
-				GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = prefabGameAsset;
 
-				Prefab prefab = Prefab.from(value.handle);
+				if (gameAssetOut == null) {
 
-				prefabGameAsset.setResourcePayload(prefab);
+					GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = prefabGameAsset;
 
-				if (createLinks) {
-					value.gameAssetReferences.add(prefabGameAsset);
-					prefabGameAsset.dependentRawAssets.add(value);
+
+
+					if (createLinks) {
+						value.gameAssetReferences.add(prefabGameAsset);
+						prefabGameAsset.dependentRawAssets.add(value);
+					}
 				}
+				Prefab prefab = Prefab.from(value.handle);
+				((GameAsset<Prefab>)gameAssetOut).setResourcePayload(prefab);
 
 				break;
 			case SCENE:
-				GameAsset<Scene> sceneGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = sceneGameAsset;
+				if (gameAssetOut == null) {
+					GameAsset<Scene> sceneGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = sceneGameAsset;
+
+
+
+					if (createLinks) {
+						value.gameAssetReferences.add(sceneGameAsset);
+						sceneGameAsset.dependentRawAssets.add(value);
+					}
+				}
 
 				Scene scene = new Scene();
 				scene.path = value.handle.path();
 				scene.loadFromHandle(value.handle);
 
-				sceneGameAsset.setResourcePayload(scene);
-
-				if (createLinks) {
-					value.gameAssetReferences.add(sceneGameAsset);
-					sceneGameAsset.dependentRawAssets.add(value);
-				}
+				((GameAsset<Scene>)gameAssetOut).setResourcePayload(scene);
 
 				break;
 			case TILE_PALETTE:
-				GameAsset<TilePaletteData> paletteGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-				gameAssetOut = paletteGameAsset;
 
-				TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
+				if (gameAssetOut == null) {
+					GameAsset<TilePaletteData> paletteGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = paletteGameAsset;
 
-				paletteGameAsset.setResourcePayload(paletteData);
+					TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
 
-				if (createLinks) {
-					value.gameAssetReferences.add(paletteGameAsset);
-					paletteGameAsset.dependentRawAssets.add(value);
+					paletteGameAsset.setResourcePayload(paletteData);
 
-					for (ObjectMap.Entry<UUID, GameAsset<?>> reference : paletteData.references) {
-						//Add the dependent game asset's root assets
-						paletteGameAsset.dependentGameAssets.addAll(reference.value);
+					if (createLinks) {
+						value.gameAssetReferences.add(paletteGameAsset);
+						paletteGameAsset.dependentRawAssets.add(value);
+
+						for (ObjectMap.Entry<UUID, GameAsset<?>> reference : paletteData.references) {
+							//Add the dependent game asset's root assets
+							paletteGameAsset.dependentGameAssets.addAll(reference.value);
+						}
 					}
+				} else {
+					TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
+					((GameAsset<TilePaletteData>)gameAssetOut).setResourcePayload(paletteData);
 				}
+
+
 
 				break;
 			case DIRECTORY:
