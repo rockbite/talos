@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -11,14 +12,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -27,6 +31,8 @@ public class CameraPreview extends Actor {
 
     private FrameBuffer frameBuffer;
     private PolygonSpriteBatch polygonSpriteBatch;
+    private MainRenderer mainRenderer;
+
     private Viewport viewport;
 
     TextureRegion white;
@@ -37,12 +43,14 @@ public class CameraPreview extends Actor {
     private GameObject cameraObject;
 
     private float presumedRotation = 0;
+    private GameObjectContainer gameObjectContainer;
 
     public CameraPreview () {
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 200, 200, false);
         polygonSpriteBatch = new PolygonSpriteBatch();
         viewport = new FitViewport(10, 10);
         white = SharedResources.skin.getRegion("white");
+        mainRenderer = new MainRenderer();
     }
 
     @Override
@@ -77,6 +85,8 @@ public class CameraPreview extends Actor {
     public void draw (Batch batch, float parentAlpha) {
         if(component == null || cameraObject == null) return;
 
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+
         batch.end();
 
         viewport.setWorldSize(worldSize.x, worldSize.y);
@@ -96,6 +106,7 @@ public class CameraPreview extends Actor {
         frameBuffer.end();
 
         batch.begin();
+        Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
         Texture colorBufferTexture = frameBuffer.getColorBufferTexture();
         float u = (1f - (pixelSize.x/200f))/2f;
@@ -107,18 +118,14 @@ public class CameraPreview extends Actor {
 
     private void drawPreview () {
 
+        GameObject rootGO = gameObjectContainer.getSelfObject();
 
-//        SceneEditorWorkspace workspace = SceneEditorAddon.get().workspace;
-//        GameObject rootGO = workspace.getRootGO();
-//        MainRenderer renderer = SceneEditorAddon.get().workspace.getRenderer();
-//
-//        renderer.skipUpdates = true;
-//
-//        renderer.setCamera(SceneEditorWorkspace.getInstance().getCamera());
-//        renderer.update(rootGO);
-//        renderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
-//
-//        renderer.skipUpdates = false;
+        mainRenderer.setLayers(SharedResources.currentProject.getSceneData().getRenderLayers());
+        mainRenderer.skipUpdates = true;
+        mainRenderer.setCamera(viewport.getCamera());
+        mainRenderer.update(rootGO);
+        mainRenderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
+
     }
 
     public void setViewport (float worldWidth, float worldHeight, float width, float height) {
@@ -126,7 +133,8 @@ public class CameraPreview extends Actor {
         pixelSize.set(width, height);
     }
 
-    public void setCamera (GameObject cameraObject) {
+    public void setCamera (GameObjectContainer gameObjectContainer, GameObject cameraObject) {
+        this.gameObjectContainer = gameObjectContainer;
         this.cameraObject = cameraObject;
         this.component = cameraObject.getComponent(CameraComponent.class);
     }

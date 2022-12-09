@@ -618,13 +618,13 @@ public abstract class ViewportWidget extends Table {
 		gizmos.gizmoMap.remove(gameObject);
 	}
 
-	public void initGizmos (GameObject gameObject, ViewportWidget parent) {
-		makeGizmosFor(gameObject, parent);
+	public void initGizmos (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
+		makeGizmosFor(gameObjectContainer, gameObject, parent);
 		Array<GameObject> childObjects = gameObject.getGameObjects();
 		if (childObjects != null) {
 			for (GameObject childObject : childObjects) {
-				makeGizmosFor(childObject, parent);
-				initGizmos(childObject, parent);
+				makeGizmosFor(gameObjectContainer, childObject, parent);
+				initGizmos(gameObjectContainer,childObject, parent);
 			}
 		}
 	}
@@ -633,12 +633,12 @@ public abstract class ViewportWidget extends Table {
 		Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
 		if (childObjects != null) {
 			for (GameObject childObject : childObjects) {
-				initGizmos(childObject, parent);
+				initGizmos(gameObjectContainer, childObject, parent);
 			}
 		}
 	}
 
-	public void makeGizmosFor (GameObject gameObject, ViewportWidget parent) {
+	public void makeGizmosFor (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
 		ObjectMap<GameObject, Array<Gizmo>> gizmoMap = parent.gizmos.gizmoMap;
 		Array<Gizmo> gizmoList = parent.gizmos.gizmoList;
 		if (gizmoMap.containsKey(gameObject)) {
@@ -659,7 +659,7 @@ public abstract class ViewportWidget extends Table {
 				if (gizmo != null) {
 					gameObjectGizmoMap.put(gizmo.getClass(), gizmo);
 
-					gizmo.setGameObject(gameObject);
+					gizmo.setGameObject(gameObjectContainer, gameObject);
 
 					Array<Gizmo> list = gizmoMap.get(gameObject);
 					if (list == null)

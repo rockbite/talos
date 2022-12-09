@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -70,10 +71,10 @@ public class SmartTransformGizmo extends Gizmo {
         }
     }
 
-    @Override
-    public void setGameObject (GameObject gameObject) {
-        super.setGameObject(gameObject);
 
+    @Override
+    public void setGameObject (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+        super.setGameObject(gameObjectContainer, gameObject);
         updatePointsFromComponent();
     }
 

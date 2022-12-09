@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -49,6 +50,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     protected AComponent component;
     protected GameObject gameObject;
+    protected GameObjectContainer gameObjectContainer;
 
     Vector2 tmp = new Vector2();
 
@@ -64,7 +66,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         circle = new Image(SharedResources.skin.getDrawable("vfx-green"));
     }
 
-    public void setGameObject(GameObject gameObject) {
+    public void setGameObject(GameObjectContainer gameObjectContainer, GameObject gameObject) {
+        this.gameObjectContainer = gameObjectContainer;
         this.gameObject = gameObject;
     }
 

@@ -104,9 +104,8 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 		super.setSelected(selected);
 
 		if (selected) {
-			Stage stage = TalosMain.Instance().UIStage().getStage();
-			stage.addActor(cameraPane);
-			cameraPane.setFrom(gameObject);
+			viewport.addActor(cameraPane);
+			cameraPane.setFrom(gameObjectContainer, gameObject);
 		} else {
 			cameraPane.remove();
 		}
