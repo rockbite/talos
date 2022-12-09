@@ -800,7 +800,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				addToSelection(gameObject);
 			}
 
-			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+			logger.info("Paste shuld trigger a save too, pasted event that goes through SceneUtils is the way to do this");
+
+//			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
 
 		} catch (Exception e) {
 			e.printStackTrace();
