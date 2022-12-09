@@ -25,6 +25,17 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 			public Actor getMainContent () {
 				return projectExplorerWidget;
 			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				SharedResources.stage.setScrollFocus(projectExplorerWidget.getDirectoryViewWidget().getScrollPane());
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+			}
 		};
 
 		this.gridAppReference = assetDirectoryApp;

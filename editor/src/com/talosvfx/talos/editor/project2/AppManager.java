@@ -164,6 +164,7 @@ public class AppManager {
 			return gameAssetTypeToAppsMap.containsKey(type);
 		}
 
+
 	}
 
 	private ObjectMap<GameAsset<?>, Array<? extends BaseApp<?>>> baseAppsOpenForGameAsset = new ObjectMap<>();
@@ -173,7 +174,9 @@ public class AppManager {
 	public AppManager () {
 		appRegistry.addExternalClass(ProjectExplorerApp.class);
 
-		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, PropertiesPanelApp.class, SceneHierarchyApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
+
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
 	}

@@ -2,15 +2,14 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
-import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.widgets.SEPropertyPanel;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 @SingletonApp
-public class PropertiesPanelApp extends AppManager.BaseApp<Scene> {
+public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> {
 
 	private final SEPropertyPanel propertyPanel;
 
@@ -29,9 +28,9 @@ public class PropertiesPanelApp extends AppManager.BaseApp<Scene> {
 	}
 
 	@Override
-	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
+	public void updateForGameAsset (GameAsset<IPropertyHolder> gameAsset) {
 		super.updateForGameAsset(gameAsset);
-		propertyPanel.setGameAsset(gameAsset);
+		propertyPanel.showPanel(gameAsset.getResource(), gameAsset.getResource().getPropertyProviders());
 	}
 
 	@Override

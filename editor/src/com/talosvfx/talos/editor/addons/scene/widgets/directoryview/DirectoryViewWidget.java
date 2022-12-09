@@ -219,6 +219,8 @@ public class DirectoryViewWidget extends Table {
 		fileHandle = Gdx.files.absolute(path);
 
 		fillItems(directory);
+		invalidateHierarchy();
+		layout();
 	}
 
 	private Array<FileHandle> convertToFileArray (Array<Item> selected) {
@@ -583,6 +585,10 @@ public class DirectoryViewWidget extends Table {
 			}
 
 		}
+	}
+
+	public ScrollPane getScrollPane () {
+		return scrollPane;
 	}
 
 	/**

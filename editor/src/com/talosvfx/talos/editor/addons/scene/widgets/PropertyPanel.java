@@ -4,15 +4,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -32,9 +33,6 @@ public class PropertyPanel extends Table implements Observer {
     private Array<PropertiesPanel> panelList = new Array<>();
     private ObjectMap<IPropertyProvider, PropertiesPanel> providerPanelMap = new ObjectMap<>();
     private IPropertyHolder currentPropertyHolder;
-
-    @Getter
-    private GameAsset<Scene> gameAsset;
 
     public PropertyPanel() {
         setSkin(SharedResources.skin);
@@ -66,6 +64,18 @@ public class PropertyPanel extends Table implements Observer {
         if(event.getTarget().getPropertyProviders() == null) return;
 
         showPanel(event.getTarget(), event.getTarget().getPropertyProviders());
+    }
+
+    @EventHandler
+    public void onPropertyHolderEdited (PropertyHolderEdited event) {
+        Object parentOfPropertyHolder = event.parentOfPropertyHolder;
+
+        if (!event.fastChange) {
+            if (parentOfPropertyHolder instanceof AMetadata) {
+                System.out.println("Meta data save");
+            }
+        }
+
     }
 
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
@@ -156,7 +166,4 @@ public class PropertyPanel extends Table implements Observer {
         return currentPropertyHolder;
     }
 
-    public void setGameAsset (GameAsset<Scene> gameAsset) {
-        this.gameAsset = gameAsset;
-    }
 }
