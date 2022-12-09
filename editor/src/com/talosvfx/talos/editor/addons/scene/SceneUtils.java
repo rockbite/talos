@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentAdded;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
@@ -21,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExter
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
@@ -33,6 +35,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
+import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +118,9 @@ public class SceneUtils {
 		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
 		selectGameObjectExternallyEvent.setGameObject(gameObject);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
+
+		saveContainer(gameObjectContainer);
+
 	}
 
 	public static GameObject createObjectByTypeName (GameObjectContainer gameObjectContainer, String idName, Vector2 position, GameObject parent, String nameHint) {
@@ -204,7 +210,7 @@ public class SceneUtils {
 		}
 	}
 
-	public static  void repositionGameObject (GameObjectContainer currentContainer, GameObject parentToMoveTo, GameObject childThatHasMoved) {
+	public static void repositionGameObject (GameObjectContainer currentContainer, GameObject parentToMoveTo, GameObject childThatHasMoved) {
 		if (parentToMoveTo == null) {
 			parentToMoveTo = currentContainer.getSelfObject();
 		}
@@ -221,6 +227,9 @@ public class SceneUtils {
 		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
 		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
+
+		saveContainer(currentContainer);
+
 	}
 
 
@@ -232,6 +241,9 @@ public class SceneUtils {
 		GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
 		gameObjectDeleted.setTarget(gameObject);
 		Notifications.fireEvent(gameObjectDeleted);
+
+		saveContainer(gameObjectContainer);
+
 	}
 
 	private static ObjectMap<GameObjectContainer, Array<GameObject>> copyPasteBuffer = new ObjectMap<>();
@@ -249,11 +261,59 @@ public class SceneUtils {
 		}
 	}
 
-	public static void componentAdded (GameObjectContainer currentHolder, GameObject gameObject, ScriptComponent scriptComponent) {
+	public static void componentAdded (GameObjectContainer currentHolder, GameObject gameObject, AComponent component) {
 		ComponentAdded componentAdded = Notifications.obtainEvent(ComponentAdded.class);
 		componentAdded.setContainer(currentHolder);
 		componentAdded.setParent(gameObject);
-		componentAdded.setComponent(scriptComponent);
+		componentAdded.setComponent(component);
 		Notifications.fireEvent(componentAdded);
+
+		saveContainer(currentHolder);
 	}
+
+	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component) {
+		componentUpdated(gameObjectContainer, gameObject, component, false);
+	}
+
+	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component, boolean isRapid) {
+		ComponentUpdated componentUpdated = Notifications.obtainEvent(ComponentUpdated.class);
+		componentUpdated.setComponent(component);
+		componentUpdated.setParent(gameObject);
+		componentUpdated.setRapid(isRapid);
+		componentUpdated.setContainer(gameObjectContainer);
+		Notifications.fireEvent(componentUpdated);
+
+		if (!isRapid) {
+			saveContainer(gameObjectContainer);
+		}
+	}
+	private static void saveContainer (GameObjectContainer currentHolder) {
+		if (currentHolder instanceof Scene) {
+			GameAsset<Scene> sceneGameAsset = AssetRepository.getInstance().getAssetForResource((Scene)currentHolder);
+			if (sceneGameAsset != null) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(sceneGameAsset, true);
+			} else {
+				logger.error("Couldn't find game asset for resource {}", currentHolder);
+				Toasts.getInstance().showErrorToast("Couldn't save scene");
+			}
+		} else if (currentHolder instanceof Prefab) {
+			GameAsset<Prefab> prefabGameAsset = AssetRepository.getInstance().getAssetForResource((Prefab)currentHolder);
+			if (prefabGameAsset != null) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(prefabGameAsset, true);
+			} else {
+				logger.error("Couldn't find game asset for resource {}", currentHolder);
+				Toasts.getInstance().showErrorToast("Couldn't save prefab");
+			}
+		} else if (currentHolder instanceof GameObject) {
+			//We need to find the scene that this game object belongs to, and get the game asset for that and save it
+
+			GameObjectContainer gameObjectContainerRoot = ((GameObject)currentHolder).getGameObjectContainerRoot();
+			saveContainer(gameObjectContainerRoot);
+		} else {
+			logger.info("Not something we can save");
+		}
+	}
+
+
+
 }

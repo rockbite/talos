@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
@@ -226,9 +227,10 @@ public class SmartTransformGizmo extends Gizmo {
         }
     }
 
-    protected void reportResizeUpdated(boolean isRapid) {
+    protected void reportResizeUpdated (boolean isRapid) {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+
+        SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform, isRapid);
     }
 
     private void applyRotationChange(float x, float y) {

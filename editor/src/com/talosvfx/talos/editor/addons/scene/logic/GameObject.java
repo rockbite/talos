@@ -46,6 +46,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
     public transient boolean isPlacing = false;
+    private GameObjectContainer rootGameObjectContainer;
 
     public GameObject () {
         uuid = UUID.randomUUID();
@@ -522,5 +523,17 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     public boolean isEditorTransformLocked (){
         return editorTransformLocked;
+    }
+
+    public GameObjectContainer getGameObjectContainerRoot () {
+        if (getParent() == null) {
+            return rootGameObjectContainer;
+        } else {
+            return getParent().getGameObjectContainerRoot();
+        }
+    }
+
+    public void setGameObjectContainer (GameObjectContainer rootGameObjectContainer) {
+        this.rootGameObjectContainer = rootGameObjectContainer;
     }
 }

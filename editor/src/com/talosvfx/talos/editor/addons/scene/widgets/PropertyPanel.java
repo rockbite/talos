@@ -5,28 +5,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentAdded;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Comparator;
 
 public class PropertyPanel extends Table implements Observer {
+
+    @Setter
+    boolean ignoringEvents;
 
     Table container;
     Table fakeContainer;
@@ -72,17 +71,17 @@ public class PropertyPanel extends Table implements Observer {
         showPanel(event.getTarget(), event.getTarget().getPropertyProviders());
     }
 
-    @EventHandler
-    public void onPropertyHolderEdited (PropertyHolderEdited event) {
-        Object parentOfPropertyHolder = event.parentOfPropertyHolder;
-
-        if (!event.fastChange) {
-            if (parentOfPropertyHolder instanceof AMetadata) {
-                AssetRepository.getInstance().saveMetaData((AMetadata)parentOfPropertyHolder, true);
-            }
-        }
-
-    }
+//    @EventHandler
+//    public void onPropertyHolderEdited (PropertyHolderEdited event) {
+//        Object parentOfPropertyHolder = event.parentOfPropertyHolder;
+//
+//        if (!event.fastChange) {
+//            if (parentOfPropertyHolder instanceof AMetadata) {
+//                AssetRepository.getInstance().saveMetaData((AMetadata)parentOfPropertyHolder, true);
+//            }
+//        }
+//
+//    }
 
     @EventHandler
     public void onMetaDataReloadedEvent (MetaDataReloadedEvent event) {
@@ -161,7 +160,9 @@ public class PropertyPanel extends Table implements Observer {
     }
     @EventHandler
     public void onComponentUpdate (ComponentUpdated componentUpdated) {
-        propertyProviderUpdated(componentUpdated.getComponent());
+        if (!ignoringEvents) {
+            propertyProviderUpdated(componentUpdated.getComponent());
+        }
     }
 
     public void propertyProviderUpdated (IPropertyProvider propertyProvider) {

@@ -3,12 +3,17 @@ package com.talosvfx.talos.editor.addons.scene.events;
 import com.badlogic.gdx.utils.Json;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import lombok.Data;
 
+@Data
 public class ComponentUpdated implements TalosEvent {
 
+    private GameObjectContainer container;
+    private GameObject parent;
     private AComponent component;
     private boolean rapid;
 
@@ -19,33 +24,6 @@ public class ComponentUpdated implements TalosEvent {
         component = null;
         rapid = false;
         notifyUI = false;
-    }
-
-    public ComponentUpdated set (AComponent component, boolean rapid, boolean notifyUI) {
-        this.rapid = rapid;
-        this.component = component;
-        this.notifyUI = notifyUI;
-        return this;
-    }
-
-    public ComponentUpdated set (AComponent component) {
-        return set(component, false, true);
-    }
-
-    public ComponentUpdated set (AComponent component, boolean rapid) {
-        return set(component, rapid, true);
-    }
-
-    public AComponent getComponent () {
-        return component;
-    }
-
-    public boolean wasRapid () {
-        return rapid;
-    }
-
-    public boolean isNotifyUI () {
-        return notifyUI;
     }
 
     @Override

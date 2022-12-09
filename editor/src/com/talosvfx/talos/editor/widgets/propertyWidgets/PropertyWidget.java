@@ -12,15 +12,28 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 public abstract class PropertyWidget<T> extends Table {
+
+	private static final Logger logger = LoggerFactory.getLogger(PropertyWidget.class);
 
 	protected Label propertyName;
 	protected Table valueContainer;
@@ -35,6 +48,8 @@ public abstract class PropertyWidget<T> extends Table {
 
 	private boolean hasName = true;
 
+	@Setter
+	private PropertyPanel topLevelPropertiesPanel;
 
 	public void toggleHide (boolean hidden) {
 		//Check if we are in a cell
@@ -126,12 +141,39 @@ public abstract class PropertyWidget<T> extends Table {
 	protected void callValueChanged (T value) {
 		valueChanged(value);
 		PropertyHolderEdited event = Notifications.obtainEvent(PropertyHolderEdited.class);
+		event.topLevelPropertiesPanel = topLevelPropertiesPanel;
 		event.parentOfPropertyHolder = this.parent;
-		event.fastChange = isFastChange(this);
+		boolean isFastChange = isFastChange(this);
+		event.fastChange = isFastChange;
 		Notifications.fireEvent(event);
+
+		topLevelPropertiesPanel.setIgnoringEvents(true);
+		//Fire the component update that wont manipulate this properties panel
+
+		if (parent instanceof AComponent) {
+			//WE need the context of what scene this shit belongs to
+			IPropertyHolder currentHolder = topLevelPropertiesPanel.getCurrentHolder();
+
+			if (currentHolder instanceof GameObjectContainer) {
+				GameObject gameObject = ((AComponent)parent).getGameObject();
+				SceneUtils.componentUpdated((GameObjectContainer)currentHolder, gameObject, (AComponent)parent, isFastChange);
+			} else {
+				logger.error("this should be a game object container");
+			}
+		} else if (parent instanceof AMetadata) {
+			if (!isFastChange) {
+				AssetRepository.getInstance().saveMetaData((AMetadata)parent, true);
+			}
+		}
+
+		topLevelPropertiesPanel.setIgnoringEvents(false);
+
+
+
+
 	}
 
-	protected boolean  isFastChange (PropertyWidget<?> propertyWidget) {
+	protected boolean isFastChange (PropertyWidget<?> propertyWidget) {
 		return false;
 	}
 

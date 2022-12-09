@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
@@ -88,10 +89,10 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 	@Override
 	protected void reportResizeUpdated (boolean isRapid) {
 		TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform, isRapid);
 
 		CameraComponent camera = gameObject.getComponent(CameraComponent.class);
-		Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(camera, isRapid));
+		SceneUtils.componentUpdated(gameObjectContainer, gameObject, camera, isRapid);
 	}
 
 	@Override

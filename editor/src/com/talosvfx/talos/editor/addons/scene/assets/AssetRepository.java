@@ -103,6 +103,23 @@ public class AssetRepository implements Observer {
 		Notifications.fireEvent(metaDataReloadedEvent);
 	}
 
+	public <T> GameAsset<T> getAssetForResource (T resource) {
+		ObjectMap.Entries<GameAssetType, ObjectMap<String, GameAsset<?>>> iterator = identifierGameAssetMap.iterator();
+		while (iterator.hasNext()) {
+			ObjectMap.Entry<GameAssetType, ObjectMap<String, GameAsset<?>>> next = iterator.next();
+
+			ObjectMap<String, GameAsset<?>> mapForIdentifier = next.value;
+			ObjectMap.Entries<String, GameAsset<?>> assetsForIdentifier = mapForIdentifier.iterator();
+
+			for (ObjectMap.Entry<String, GameAsset<?>> stringGameAssetEntry : assetsForIdentifier) {
+				GameAsset<?> asset = stringGameAssetEntry.value;
+				if (asset.getResource() == resource) {
+					return (GameAsset<T>)asset;
+				}
+			}
+		}
+		return null;
+	}
 
 	static class DataMaps {
 		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();

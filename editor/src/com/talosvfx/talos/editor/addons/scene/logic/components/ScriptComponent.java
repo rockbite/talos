@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -84,12 +85,6 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         this.scriptResource = gameAsset;
         scriptProperties.clear();
         importScriptPropertiesFromMeta(false);
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run () {
-                Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(ScriptComponent.this, false));
-            }
-        });
     }
 
     @Override

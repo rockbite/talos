@@ -9,7 +9,7 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 @SingletonApp
-public class SceneHierarchyApp extends AppManager.BaseApp<Scene> {
+public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener {
 
 	private final HierarchyWidget hierarchyWidget;
 
@@ -43,6 +43,11 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> {
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
+		if (!gameAsset.listeners.contains(this, true)) {
+			gameAsset.listeners.add(this);
+		}
+
+
 		hierarchyWidget.loadEntityContainer(gameAsset.getResource());
 	}
 
@@ -58,6 +63,11 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> {
 	@Override
 	public void onRemove () {
 			
+	}
+
+	@Override
+	public void onUpdate () {
+		hierarchyWidget.loadEntityContainer(gameAsset.getResource());
 	}
 }
 

@@ -1113,7 +1113,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		AComponent component = event.getComponent();
 		if (event.isNotifyUI()) {
 
-			if (!event.wasRapid()) {
+			if (!event.isRapid()) {
 //				TalosMain.Instance().ProjectController().setDirty();
 			}
 		}
@@ -1383,7 +1383,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			@Override
 			public void run () {
 				for (AComponent component : list) {
-					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
+					//Dont think we need this
+//					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
 				}
 			}
 		});

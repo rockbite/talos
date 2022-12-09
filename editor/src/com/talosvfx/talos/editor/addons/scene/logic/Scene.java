@@ -141,15 +141,6 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
     @Override
     protected void writeData (Json json) {
-//        SceneEditorWorkspace sceneEditorWorkspace = SceneEditorWorkspace.getInstance();
-//        String relativePath = sceneEditorWorkspace.getRelativePath(path);
-//        SceneProjectSettings sceneProjectSettings = sceneEditorWorkspace.projectSettingsObjectMap.get(relativePath);
-//        if (sceneProjectSettings != null) {
-//            sceneProjectSettings.updateValues();
-//        }
-
-        logger.info("redo scene saving, should be just a game asset");
-
         json.writeValue("name", getName());
         super.writeData(json);
     }

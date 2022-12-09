@@ -3,11 +3,13 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
@@ -118,10 +120,16 @@ public class TransformGizmo extends Gizmo {
     public void touchDown (float x, float y, int button) {
         wasDragged = false;
         prevTouch.set(x, y);
+        deltaXCache = x;
+        deltaYCache = y;
     }
+
+    private float deltaXCache;
+    private float deltaYCache;
 
     @Override
     public void touchDragged (float x, float y) {
+
         tmp.set(x, y).sub(prevTouch);
         // render position
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
@@ -136,14 +144,16 @@ public class TransformGizmo extends Gizmo {
 
         wasDragged = true;
 
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, true));
+        SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform, true);
     }
 
     @Override
     public void touchUp (float x, float y) {
-        if(wasDragged) {
+        boolean shouldUpdate = (!MathUtils.isEqual(deltaXCache, x) || !MathUtils.isEqual(deltaYCache, y));
+
+        if(wasDragged && shouldUpdate) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-            Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform));
+            SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform);
         }
     }
 

@@ -23,10 +23,12 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 
 	public SavableContainer () {
 		root = new GameObject();
+		root.setGameObjectContainer(this);
 	}
 
 	public SavableContainer (String path) {
 		root = new GameObject();
+		root.setGameObjectContainer(this);
 		this.path = path;
 	}
 
@@ -173,6 +175,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 		Json json = new Json();
 		JsonValue gameObjectsJson = jsonValue.get("gameObjects");
 		root = new GameObject();
+		root.setGameObjectContainer(this);
 		for (JsonValue gameObjectJson : gameObjectsJson) {
 			GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
 			root.addGameObject(gameObject);

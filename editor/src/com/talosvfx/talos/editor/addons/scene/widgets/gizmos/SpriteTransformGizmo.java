@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -150,10 +151,10 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
     @Override
     protected void reportResizeUpdated (boolean isRapid) {
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(transform, isRapid));
+        SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform, isRapid);
 
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
-        Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(spriteRendererComponent, isRapid));
+        SceneUtils.componentUpdated(gameObjectContainer, gameObject, spriteRendererComponent, isRapid);
     }
 
 

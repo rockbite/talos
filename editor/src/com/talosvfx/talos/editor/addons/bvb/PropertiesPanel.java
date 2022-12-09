@@ -133,6 +133,7 @@ public class PropertiesPanel extends Table {
 
             if(listOfProperties != null) {
                 for (PropertyWidget propertyWidget : listOfProperties) {
+                    propertyWidget.setTopLevelPropertiesPanel(parentPropertyPanel);
                     propertyWidgets.add(propertyWidget);
                     propertyWidget.updateValue();
                     propertyTable.add(propertyWidget).growX().pad(5f).padBottom(0);
