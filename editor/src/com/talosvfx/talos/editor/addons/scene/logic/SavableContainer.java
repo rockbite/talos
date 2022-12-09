@@ -178,11 +178,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
         }
     }
 
-    public void loadFromPath() {
-        logger.info("Redo load from path");
-        //        FileHandle dataFile = AssetImporter.get(path);
-//        load(dataFile.readString());
-    }
+
 
     public void loadFromHandle (FileHandle handle) {
         load(handle.readString());

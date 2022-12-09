@@ -13,7 +13,6 @@ public class Prefab extends SavableContainer {
     public static Prefab from(FileHandle fileHandle) {
         Prefab prefab = new Prefab();
         prefab.path = fileHandle.path();
-        prefab.loadFromPath();
 
         prefab.name = fileHandle.nameWithoutExtension();
 
