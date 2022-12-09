@@ -22,6 +22,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
@@ -90,6 +91,16 @@ public class AssetRepository implements Observer {
 			identifierGameAssetMap.put(type, new ObjectMap<>());
 		}
 		identifierGameAssetMap.get(type).put(identifier, asset);
+	}
+
+	public void reloadMetaData (AMetadata metadata) {
+		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(metadata.link.handle);
+		JsonValue jsonValue = new JsonReader().parse(metadataHandleFor);
+		metadata.read(json, jsonValue);
+
+		MetaDataReloadedEvent metaDataReloadedEvent = Notifications.obtainEvent(MetaDataReloadedEvent.class);
+		metaDataReloadedEvent.setMetadata(metadata);
+		Notifications.fireEvent(metaDataReloadedEvent);
 	}
 
 
@@ -805,6 +816,20 @@ public class AssetRepository implements Observer {
 		}
 
 		return gameAssetOut;
+	}
+
+	public void saveMetaData (AMetadata metaData, boolean useGlobalState) {
+		if (useGlobalState) {
+			GlobalSaveStateSystem.MetaDataUpdateStateObject metaDataUpdateStateObject = new GlobalSaveStateSystem.MetaDataUpdateStateObject(metaData);
+			SharedResources.globalSaveStateSystem.pushItem(metaDataUpdateStateObject);
+		}
+		saveMetaDataToFile(metaData);
+	}
+
+	public void saveMetaDataToFile (AMetadata metadata) {
+		RawAsset link = metadata.link;
+		FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(link.handle);
+		metadataHandleFor.writeString(json.prettyPrint(metadata), false);
 	}
 
 	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {

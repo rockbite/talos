@@ -5,11 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
@@ -72,10 +74,17 @@ public class PropertyPanel extends Table implements Observer {
 
         if (!event.fastChange) {
             if (parentOfPropertyHolder instanceof AMetadata) {
-                System.out.println("Meta data save");
+                AssetRepository.getInstance().saveMetaData((AMetadata)parentOfPropertyHolder, true);
             }
         }
 
+    }
+
+    @EventHandler
+    public void onMetaDataReloadedEvent (MetaDataReloadedEvent event) {
+        if (currentPropertyHolder == event.getMetadata()) {
+            updateValues();
+        }
     }
 
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {

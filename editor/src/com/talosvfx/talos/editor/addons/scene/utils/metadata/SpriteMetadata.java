@@ -59,6 +59,7 @@ public class SpriteMetadata extends AMetadata {
         super.write(json);
         json.writeValue("borderData", borderData);
         json.writeValue("pixelsPerUnit", pixelsPerUnit);
+        json.writeValue("filter", filterMode);
     }
 
     @Override
@@ -69,6 +70,7 @@ public class SpriteMetadata extends AMetadata {
             borderData = json.readValue(int[].class, borderDataJsonValue);
         }
         pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", 100);
+        filterMode = json.readValue("filter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
     }
 
     public boolean isSlice () {

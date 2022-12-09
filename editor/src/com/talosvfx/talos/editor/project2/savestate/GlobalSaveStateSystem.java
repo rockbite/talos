@@ -1,8 +1,11 @@
 package com.talosvfx.talos.editor.project2.savestate;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.utils.Toasts;
@@ -20,6 +23,29 @@ public class GlobalSaveStateSystem implements Observer {
 	}
 
 
+	public static class MetaDataUpdateStateObject extends StateObject {
+		private AMetadata metadata;
+		private String asString;
+
+		public MetaDataUpdateStateObject (AMetadata metadata) {
+			this.metadata = metadata;
+
+			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
+			asString = metaHandle.readString();
+		}
+
+		@Override
+		void restore () {
+
+			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
+
+			metaHandle.writeString(asString, false);
+
+			AssetRepository.getInstance().reloadMetaData(metadata);
+
+			Toasts.getInstance().showInfoToast("Undone " + metadata.getClass().getSimpleName() + " state");
+		}
+	}
 	public static class GameAssetUpdateStateObject extends StateObject {
 
 		private GameAsset<?> gameAsset;
@@ -51,7 +77,7 @@ public class GlobalSaveStateSystem implements Observer {
 		Notifications.registerObserver(this);
 	}
 
-	public void pushItem (GameAssetUpdateStateObject assetUpdateStateObject) {
+	public void pushItem (StateObject assetUpdateStateObject) {
 		stateObjects.push(assetUpdateStateObject);
 	}
 	public void onUndoRequest () {
