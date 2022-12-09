@@ -31,7 +31,9 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
     private AssetListPopup<T> assetListPopup;
-
+    public AssetSelectWidget() {
+        super();
+    }
     public AssetSelectWidget (String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
         super(name, supplier, valueChanged);
         assetListPopup = new AssetListPopup<>();
