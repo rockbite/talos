@@ -22,6 +22,17 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> {
 			public Actor getMainContent () {
 				return propertyPanel;
 			}
+
+			@Override
+			public void onInputProcessorAdded () {
+				super.onInputProcessorAdded();
+				SharedResources.stage.setScrollFocus(propertyPanel.getScrollPane());
+			}
+
+			@Override
+			public void onInputProcessorRemoved () {
+				super.onInputProcessorRemoved();
+			}
 		};
 
 		this.gridAppReference = propertyPanelApp;

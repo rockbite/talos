@@ -29,6 +29,8 @@ public class PropertyPanel extends Table implements Observer {
 
     Table container;
     Table fakeContainer;
+
+    @Getter
     ScrollPane scrollPane;
 
     private Array<IPropertyProvider> providerSet = new Array<>();
