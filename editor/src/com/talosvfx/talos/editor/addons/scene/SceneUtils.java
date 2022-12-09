@@ -13,6 +13,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentAdded;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
@@ -23,6 +24,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -243,8 +245,15 @@ public class SceneUtils {
 		if (copyPasteBuffer.containsKey(currentContainer)) {
 			if (copyPasteBuffer.get(currentContainer).isEmpty()) {
 
-
 			}
 		}
+	}
+
+	public static void componentAdded (GameObjectContainer currentHolder, GameObject gameObject, ScriptComponent scriptComponent) {
+		ComponentAdded componentAdded = Notifications.obtainEvent(ComponentAdded.class);
+		componentAdded.setContainer(currentHolder);
+		componentAdded.setParent(gameObject);
+		componentAdded.setComponent(scriptComponent);
+		Notifications.fireEvent(componentAdded);
 	}
 }

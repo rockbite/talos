@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentAdded;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
@@ -61,6 +62,7 @@ public class PropertyPanel extends Table implements Observer {
             propertiesPanel.updateValues();
         }
     }
+
 
     @EventHandler
     public void onPropertyHolderSelected(PropertyHolderSelected event) {
@@ -151,6 +153,12 @@ public class PropertyPanel extends Table implements Observer {
         currentPropertyHolder = null;
     }
 
+    @EventHandler
+    public void onComponentAdded (ComponentAdded componentAdded) {
+        if (this.currentPropertyHolder == componentAdded.getParent()) {
+            showPanel(this.currentPropertyHolder, this.currentPropertyHolder.getPropertyProviders());
+        }
+    }
     @EventHandler
     public void onComponentUpdate (ComponentUpdated componentUpdated) {
         propertyProviderUpdated(componentUpdated.getComponent());
