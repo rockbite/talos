@@ -394,6 +394,9 @@ public class MainRenderer implements Observer {
             SpriteMetadata metadata = (SpriteMetadata)metaData;
 
             Texture resource = spriteRenderer.getGameResource().getResource();
+            if (resource.getMagFilter() != metadata.magFilter || resource.getMinFilter() != metadata.minFilter) {
+                resource.setFilter(metadata.minFilter, metadata.magFilter);
+            }
             textureRegion.setRegion(resource);
             if(textureRegion != null) {
                 batch.setColor(spriteRenderer.color);

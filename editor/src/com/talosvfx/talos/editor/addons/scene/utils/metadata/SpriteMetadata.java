@@ -23,7 +23,8 @@ public class SpriteMetadata extends AMetadata {
 
     public float pixelsPerUnit = DefaultConstants.PIXELS_PER_UNIT;
 
-    public Texture.TextureFilter filterMode = Texture.TextureFilter.Nearest;
+    public Texture.TextureFilter minFilter = Texture.TextureFilter.Nearest;
+    public Texture.TextureFilter magFilter = Texture.TextureFilter.Nearest;
 
     public SpriteMetadata() {
         super();
@@ -34,7 +35,8 @@ public class SpriteMetadata extends AMetadata {
         Array<PropertyWidget> propertyWidgets = new Array<>();
 
         propertyWidgets.add(WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld"));
-        propertyWidgets.add(WidgetFactory.generate(this, "filterMode", "Filter"));
+        propertyWidgets.add(WidgetFactory.generate(this, "minFilter", "MinFilter"));
+        propertyWidgets.add(WidgetFactory.generate(this, "magFilter", "MagFilter"));
 
         ButtonPropertyWidget<String> spriteEditor = new ButtonPropertyWidget<String>("Sprite Editor", new ButtonPropertyWidget.ButtonListener<String>() {
             @Override
@@ -59,7 +61,8 @@ public class SpriteMetadata extends AMetadata {
         super.write(json);
         json.writeValue("borderData", borderData);
         json.writeValue("pixelsPerUnit", pixelsPerUnit);
-        json.writeValue("filter", filterMode);
+        json.writeValue("minFilter", minFilter);
+        json.writeValue("minFilter", magFilter);
     }
 
     @Override
@@ -70,7 +73,8 @@ public class SpriteMetadata extends AMetadata {
             borderData = json.readValue(int[].class, borderDataJsonValue);
         }
         pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", 100);
-        filterMode = json.readValue("filter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
+        minFilter = json.readValue("minFilter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
+        magFilter = json.readValue("magFilter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
     }
 
     public boolean isSlice () {
