@@ -16,178 +16,171 @@ import java.util.function.Supplier;
 
 public abstract class SavableContainer implements GameObjectContainer, Json.Serializable, IPropertyHolder {
 
-    private static final Logger logger = LoggerFactory.getLogger(SavableContainer.class);
+	private static final Logger logger = LoggerFactory.getLogger(SavableContainer.class);
 
-    public String path;
-    public GameObject root;
+	public String path;
+	public GameObject root;
 
-    public SavableContainer() {
-        root = new GameObject();
-    }
+	public SavableContainer () {
+		root = new GameObject();
+	}
 
-    public SavableContainer(String path) {
-        root = new GameObject();
-        this.path = path;
-    }
+	public SavableContainer (String path) {
+		root = new GameObject();
+		this.path = path;
+	}
 
-    @Override
-    public void write (Json json) {
-        root.write(json);
-    }
+	@Override
+	public void write (Json json) {
+		root.write(json);
+	}
 
-    @Override
-    public void read (Json json, JsonValue jsonData) {
-        root.read(json, jsonData);
-    }
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		root.read(json, jsonData);
+	}
 
-    @Override
-    public String getName () {
-        return root.getName();
-    }
+	@Override
+	public String getName () {
+		return root.getName();
+	}
 
-    @Override
-    public void setName (String name) {
-        root.setName(name);
-    }
+	@Override
+	public void setName (String name) {
+		root.setName(name);
+	}
 
-    @Override
-    public Array<GameObject> getGameObjects () {
-        return root.getGameObjects();
-    }
+	@Override
+	public Array<GameObject> getGameObjects () {
+		return root.getGameObjects();
+	}
 
-    @Override
-    public Iterable<AComponent> getComponents () {
-        return null;
-    }
+	@Override
+	public Iterable<AComponent> getComponents () {
+		return null;
+	}
 
-    @Override
-    public void addGameObject (GameObject gameObject) {
-        root.addGameObject(gameObject);
-    }
+	@Override
+	public void addGameObject (GameObject gameObject) {
+		root.addGameObject(gameObject);
+	}
 
-    @Override
-    public Array<GameObject> deleteGameObject (GameObject gameObject) {
-        return root.deleteGameObject(gameObject);
-    }
+	@Override
+	public Array<GameObject> deleteGameObject (GameObject gameObject) {
+		return root.deleteGameObject(gameObject);
+	}
 
-    @Override
-    public void removeObject (GameObject gameObject) {
-        root.removeObject(gameObject);
-    }
+	@Override
+	public void removeObject (GameObject gameObject) {
+		root.removeObject(gameObject);
+	}
 
-    @Override
-    public void addComponent (AComponent component) {
+	@Override
+	public void addComponent (AComponent component) {
 
-    }
+	}
 
-    @Override
-    public void removeComponent (AComponent component) {
+	@Override
+	public void removeComponent (AComponent component) {
 
-    }
+	}
 
-    @Override
-    public boolean hasGOWithName (String name) {
-        return root.hasGOWithName(name);
-    }
+	@Override
+	public boolean hasGOWithName (String name) {
+		return root.hasGOWithName(name);
+	}
 
-    @Override
-    public void clearChildren (Array<GameObject> tmp) {
-        root.clearChildren(tmp);
-    }
+	@Override
+	public void clearChildren (Array<GameObject> tmp) {
+		root.clearChildren(tmp);
+	}
 
-    @Override
-    public GameObject getParent () {
-        return null;
-    }
+	@Override
+	public GameObject getParent () {
+		return null;
+	}
 
-    @Override
-    public GameObject getSelfObject () {
-        return root;
-    }
+	@Override
+	public GameObject getSelfObject () {
+		return root;
+	}
 
-    @Override
-    public void setParent (GameObject gameObject) {
-        // do nothing
-    }
+	@Override
+	public void setParent (GameObject gameObject) {
+		// do nothing
+	}
 
-    private ArrayList<String> goNames = new ArrayList<>();
-    @Override
-    public Supplier<Collection<String>> getAllGONames () {
-        goNames.clear();
-        addNamesToList(goNames, root);
-        return new Supplier<Collection<String>>() {
-            @Override
-            public Collection<String> get () {
-                return goNames;
-            }
-        };
-    }
+	private ArrayList<String> goNames = new ArrayList<>();
 
-    private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
-        goNames.add(gameObject.getName());
-        if (gameObject.getGameObjects() != null) {
-            Array<GameObject> gameObjects = gameObject.getGameObjects();
-            for (int i = 0; i < gameObjects.size; i++) {
-                GameObject child = gameObjects.get(i);
-                addNamesToList(goNames, child);
+	@Override
+	public Supplier<Collection<String>> getAllGONames () {
+		goNames.clear();
+		addNamesToList(goNames, root);
+		return new Supplier<Collection<String>>() {
+			@Override
+			public Collection<String> get () {
+				return goNames;
+			}
+		};
+	}
 
-            }
-        }
-    }
+	private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
+		goNames.add(gameObject.getName());
+		if (gameObject.getGameObjects() != null) {
+			Array<GameObject> gameObjects = gameObject.getGameObjects();
+			for (int i = 0; i < gameObjects.size; i++) {
+				GameObject child = gameObjects.get(i);
+				addNamesToList(goNames, child);
 
-    protected void writeData (Json json) {
-        json.writeArrayStart("gameObjects");
-        Array<GameObject> gameObjects = getGameObjects();
-        if(gameObjects != null) {
-            for (GameObject gameObject : gameObjects) {
-                json.writeValue(gameObject);
-            }
-        }
-        json.writeArrayEnd();
-    }
+			}
+		}
+	}
 
-    public String getAsString () {
-        try {
+	protected void writeData (Json json) {
+		json.writeArrayStart("gameObjects");
+		Array<GameObject> gameObjects = getGameObjects();
+		if (gameObjects != null) {
+			for (GameObject gameObject : gameObjects) {
+				json.writeValue(gameObject);
+			}
+		}
+		json.writeArrayEnd();
+	}
 
-            StringWriter stringWriter = new StringWriter();
-            Json json = new Json();
-            json.setOutputType(JsonWriter.OutputType.json);
-            json.setWriter(stringWriter);
-            json.getWriter().object();
+	public String getAsString () {
+		try {
 
-            writeData(json);
+			StringWriter stringWriter = new StringWriter();
+			Json json = new Json();
+			json.setOutputType(JsonWriter.OutputType.json);
+			json.setWriter(stringWriter);
+			json.getWriter().object();
 
-            String finalString = stringWriter.toString() + "}";
+			writeData(json);
 
-            return finalString;
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Error saving scene", e);
-            return null;
-        }
-    }
+			String finalString = stringWriter.toString() + "}";
 
-    public void load(String data) {
-        JsonValue jsonValue = new JsonReader().parse(data);
-        Json json = new Json();
-        JsonValue gameObjectsJson = jsonValue.get("gameObjects");
-        root = new GameObject();
-        for(JsonValue gameObjectJson: gameObjectsJson) {
-            GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
-            root.addGameObject(gameObject);
-        }
-    }
+			return finalString;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Error saving scene", e);
+			return null;
+		}
+	}
 
+	public void load (String data) {
+		JsonValue jsonValue = new JsonReader().parse(data);
+		Json json = new Json();
+		JsonValue gameObjectsJson = jsonValue.get("gameObjects");
+		root = new GameObject();
+		for (JsonValue gameObjectJson : gameObjectsJson) {
+			GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
+			root.addGameObject(gameObject);
+		}
+	}
 
+	public void loadFromHandle (FileHandle handle) {
+		load(handle.readString());
+	}
 
-    public void loadFromHandle (FileHandle handle) {
-        load(handle.readString());
-    }
-
-    public void save() {
-        logger.info("redo save to path");
-//        FileHandle file = AssetImporter.get(path);
-//        String data = getAsString();
-//        file.writeString(data, false);
-    }
 }

@@ -376,7 +376,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
                     String path = files.first().path();
                     FileHandle sceneDestination = AssetImporter.suggestNewNameForFileHandle(path, "New Scene", "scn");
                     Scene mainScene = new Scene(sceneDestination.path());
-                    mainScene.save();
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
                 }

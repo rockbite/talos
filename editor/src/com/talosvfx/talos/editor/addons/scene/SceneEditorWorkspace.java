@@ -695,9 +695,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 
 	public void openPrefab (FileHandle fileHandle) {
-		if (currentContainer != null) {
-			currentContainer.save();
-		}
 		Prefab scene = new Prefab();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
@@ -705,9 +702,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void openScene (FileHandle fileHandle) {
-		if (currentContainer != null) {
-			currentContainer.save();
-		}
 		Scene scene = new Scene();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
@@ -734,7 +728,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			Prefab prefab = new Prefab();
 			prefab.path = handle.path();
 			prefab.root = gamePrefab;
-			prefab.save();
 			AssetRepository.getInstance().rawAssetCreated(handle, true);
 //			SceneEditorAddon.get().projectExplorer.reload();
 		}
