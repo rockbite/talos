@@ -89,9 +89,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private String changeVersion = "";
 	private SnapshotService snapshotService;
 
-	private AssetListPopup assetListPopup;
-	private GameObjectListPopup gameObjectListPopup;
-
 	private FileTracker fileTracker = new FileTracker();
 	private FileWatching fileWatching = new FileWatching();
 	private float reloadScheduled = -1;
@@ -171,8 +168,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		GizmoRegister.init(SharedResources.configData.getGameObjectConfigurationXMLRoot());
 
-		assetListPopup = new AssetListPopup<>();
-		gameObjectListPopup = new GameObjectListPopup();
 		templateListPopup = new TemplateListPopup(SharedResources.configData.getGameObjectConfigurationXMLRoot());
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
@@ -1336,13 +1331,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return projectPath;
 	}
 
-	public AssetListPopup getAssetListPopup () {
-		return assetListPopup;
-	}
-
-	public GameObjectListPopup getGameObjectListPopup () {
-		return gameObjectListPopup;
-	}
 
 	public FileHandle getProjectFolder () {
 		return Gdx.files.absolute(projectPath);

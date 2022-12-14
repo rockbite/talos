@@ -49,7 +49,7 @@ public abstract class PropertyWidget<T> extends Table {
 	private boolean hasName = true;
 
 	@Setter
-	private PropertyPanel topLevelPropertiesPanel;
+	protected PropertyPanel topLevelPropertiesPanel;
 
 	public void toggleHide (boolean hidden) {
 		//Check if we are in a cell

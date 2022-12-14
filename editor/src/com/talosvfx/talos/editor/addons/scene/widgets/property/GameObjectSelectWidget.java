@@ -10,6 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.widgets.GameObjectListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -20,92 +23,99 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-
 public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GameObjectSelectWidget.class);
+	private static final Logger logger = LoggerFactory.getLogger(GameObjectSelectWidget.class);
 
-    private Label nameLabel;
-    private GameObject gameObject;
+	private Label nameLabel;
+	private GameObject gameObject;
 
-    private Predicate<FilteredTree.Node<GameObject>> filter;
+	private Predicate<FilteredTree.Node<GameObject>> filter;
 
-    public GameObjectSelectWidget() {
-        super();
-    }
+	public GameObjectSelectWidget () {
+		super();
+	}
 
-    public GameObjectSelectWidget (String name, Supplier<GameObject> supplier, ValueChanged<GameObject> valueChanged) {
-        super(name, supplier, valueChanged);
-        this.filter = new Predicate<FilteredTree.Node<GameObject>>() {
-            @Override
-            public boolean evaluate (FilteredTree.Node<GameObject> node) {
-                return true;
-            }
-        };
-    }
+	public GameObjectSelectWidget (String name, Supplier<GameObject> supplier, ValueChanged<GameObject> valueChanged) {
+		super(name, supplier, valueChanged);
+		this.filter = new Predicate<FilteredTree.Node<GameObject>>() {
+			@Override
+			public boolean evaluate (FilteredTree.Node<GameObject> node) {
+				return true;
+			}
+		};
+	}
 
-    @Override
-    public PropertyWidget clone() {
-        GameObjectSelectWidget clone = (GameObjectSelectWidget) super.clone();
-        clone.filter = filter;
-        return clone;
-    }
+	@Override
+	public PropertyWidget clone () {
+		GameObjectSelectWidget clone = (GameObjectSelectWidget)super.clone();
+		clone.filter = filter;
+		return clone;
+	}
 
-    @Override
-    public GameObject getValue () {
-        return gameObject;
-    }
+	@Override
+	public GameObject getValue () {
+		return gameObject;
+	}
 
-    @Override
-    public Actor getSubWidget () {
-        Table table = new Table();
-        Skin skin = SharedResources.skin;
-        final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select game object");
+	@Override
+	public Actor getSubWidget () {
+		Table table = new Table();
+		Skin skin = SharedResources.skin;
+		final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select game object");
 
-        nameLabel = new Label("", skin);
-        nameLabel.setEllipsis(true);
-        nameLabel.setAlignment(Align.right);
+		nameLabel = new Label("", skin);
+		nameLabel.setEllipsis(true);
+		nameLabel.setAlignment(Align.right);
 
-        table.right();
-        table.add(nameLabel).growX().maxWidth(130).padRight(2);
-        table.add(button);
+		table.right();
+		table.add(nameLabel).growX().maxWidth(130).padRight(2);
+		table.add(button);
 
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                Vector2 pos = new Vector2(button.getWidth()/2f, button.getHeight()/2f);
-                button.localToStageCoordinates(pos);
+		button.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				Vector2 pos = new Vector2(button.getWidth() / 2f, button.getHeight() / 2f);
+				button.localToStageCoordinates(pos);
 
-                logger.info("GAme object list popup needs redoing");
+				GameObjectListPopup gameObjectListPopup = new GameObjectListPopup();
+				IPropertyHolder currentHolder = GameObjectSelectWidget.this.topLevelPropertiesPanel.getCurrentHolder();
 
-//                GameObjectListPopup gameObjectListPopup = SceneEditorAddon.get().workspace.getGameObjectListPopup();
-//                gameObjectListPopup.showPopup(getStage(), pos, filter, new FilteredTree.ItemListener<GameObject>() {
-//
-//                    @Override
-//                    public void selected (FilteredTree.Node<GameObject> node) {
-//                        GameObject gameObject = node.getObject();
-//
-//                        updateWidget(gameObject);
-//                        callValueChanged(gameObject);
-//                        gameObjectListPopup.remove();
-//                    }
-//                });
-            }
-        });
+				GameObjectContainer rootGO = null;
+				if (currentHolder instanceof GameObject) {
+					rootGO = ((GameObject)currentHolder).getGameObjectContainerRoot();
+				} else if (currentHolder instanceof SavableContainer) {
+					rootGO = (GameObjectContainer)currentHolder;
+				}
 
-        return table;
-    }
+				gameObjectListPopup.showPopup(getStage(), rootGO.getSelfObject(), pos, filter, new FilteredTree.ItemListener<GameObject>() {
 
-    @Override
-    public void updateWidget (GameObject value) {
-        if(value == null) {
-            nameLabel.setText("No Game Object");
-            gameObject = null;
-            return;
-        }
+					@Override
+					public void selected (FilteredTree.Node<GameObject> node) {
+						GameObject gameObject = node.getObject();
 
-        this.gameObject = value;
-        this.nameLabel.setText(gameObject.getName());
-    }
+						updateWidget(gameObject);
+						callValueChanged(gameObject);
+						gameObjectListPopup.remove();
+					}
+				});
+
+			}
+		});
+
+		return table;
+	}
+
+	@Override
+	public void updateWidget (GameObject value) {
+		if (value == null) {
+			nameLabel.setText("No Game Object");
+			gameObject = null;
+			return;
+		}
+
+		this.gameObject = value;
+		this.nameLabel.setText(gameObject.getName());
+	}
 
 }

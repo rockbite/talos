@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -76,6 +77,8 @@ public class WidgetFactory {
                 } else {
                     generatedWidget = generateForString(parent, field, object, title);
                 }
+            } else if (field.getType().equals(GameObject.class)) {
+                return generateForGameObject(parent, field, object, title);
             }
             if (generatedWidget == null) {
                 return null;
@@ -90,6 +93,31 @@ public class WidgetFactory {
         }
 
         return null;
+    }
+
+    private static PropertyWidget generateForGameObject (Object parent, Field field, Object object, String title) {
+       GameObjectSelectWidget gameObjectSelectWidget = new GameObjectSelectWidget(title, new Supplier<GameObject>() {
+           @Override
+           public GameObject get () {
+               try {
+                   GameObject gameObject = (GameObject)field.get(parent);
+                   return gameObject;
+               } catch (IllegalAccessException e) {
+                   throw new RuntimeException(e);
+               }
+           }
+       }, new PropertyWidget.ValueChanged<GameObject>() {
+           @Override
+           public void report (GameObject value) {
+               try {
+                   field.set(parent, value);
+               } catch (IllegalAccessException e) {
+                   throw new RuntimeException(e);
+               }
+           }
+       });
+
+       return gameObjectSelectWidget;
     }
 
     private static Vector2PropertyWidget generateForVector2 (Object parent, Field field, Object object, String title) {
