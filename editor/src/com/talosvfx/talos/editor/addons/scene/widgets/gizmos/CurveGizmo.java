@@ -11,9 +11,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.components.CurveComponent;
 import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,13 +120,7 @@ public class CurveGizmo extends Gizmo {
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            IProject project = TalosMain.Instance().ProjectController().getProject();
-
-            logger.info("redo request slection clear from curve gizmo");
-//            if(project instanceof SceneEditorProject) {
-//                SceneEditorProject sceneEditorProject = (SceneEditorProject) project;
-//                sceneEditorProject.sceneEditorAddon.workspace.requestSelectionClear();
-//            }
+            FocusManager.resetFocus(SharedResources.stage);
         }
     }
 
@@ -210,7 +206,7 @@ public class CurveGizmo extends Gizmo {
     private void animateAnchor(int anchorIndex) {
         animatingAnchor = anchorIndex;
 
-        TalosMain.Instance().UIStage().getStage().addActor(animateActor);
+        SharedResources.stage.addActor(animateActor);
 
         animateActor.clearActions();
         animateActor.setX(0);
