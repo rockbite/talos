@@ -218,8 +218,12 @@ public class ProjectExplorerWidget extends Table implements Observer {
         Runnable runnable = new Runnable() {
             @Override
             public void run () {
+                if (paths.isEmpty()) {
+                    // nothing no remove
+                    return;
+                }
 
-                FileHandle parent = SharedResources.currentProject.rootProjectDir();
+                FileHandle parent = null;
 
                 for (String path : paths) {
                     FileHandle handle = Gdx.files.absolute(path);
