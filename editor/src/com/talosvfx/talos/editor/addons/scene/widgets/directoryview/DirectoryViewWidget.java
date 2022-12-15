@@ -426,57 +426,76 @@ public class DirectoryViewWidget extends Table {
 
 					openDirectory(targetItem.fileHandle.path());
 				} else {
-					if (payloadObject instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
-						Array<GlobalDragAndDrop.BaseDragAndDropPayload> items = ((GlobalDragAndDrop.ArrayDragAndDropPayload) payloadObject).getItems();
-						FileHandle lastCopiedFile = null;
-						for (GlobalDragAndDrop.BaseDragAndDropPayload item : items) {
-							if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-								AssetRepository assetRepository = AssetRepository.getInstance();
-								FileHandle handle = ((GlobalDragAndDrop.FileHandleDragAndDropPayload) item).getHandle();
-								if (fileHandle.child(handle.name()).exists()) {
-									// file is already present, see if it should be replaced
-									String title = "Oh no!";
-									String message = "An older item named \"" + handle.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
-									Runnable keep = new Runnable() {
-										@Override
-										public void run() {
-											FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle);
-											String projectPath = SharedResources.currentProject.rootProjectDir().path();
-											projectExplorerWidget.loadDirectoryTree(projectPath);
-											projectExplorerWidget.expand(newHandle.parent().path());
-											projectExplorerWidget.select(newHandle.parent().path());
-										}
-									};
-									Runnable stop = new Runnable() {
-										@Override
-										public void run() {
-											// do nothing
-										}
-									};
-									Runnable replace = new Runnable() {
-										@Override
-										public void run() {
-											FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle, true);
-											String projectPath = SharedResources.currentProject.rootProjectDir().path();
-											projectExplorerWidget.loadDirectoryTree(projectPath);
-											projectExplorerWidget.expand(newHandle.parent().path());
-											projectExplorerWidget.select(newHandle.parent().path());
-										}
-									};
-
-									projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
-								} else {
-									lastCopiedFile = assetRepository.copyRawAsset(handle, fileHandle);
-								}
-							}
-						}
-						if (lastCopiedFile != null) {
-							String projectPath = SharedResources.currentProject.rootProjectDir().path();
-							projectExplorerWidget.loadDirectoryTree(projectPath);
-							projectExplorerWidget.expand(lastCopiedFile.parent().path());
-							projectExplorerWidget.select(lastCopiedFile.parent().path());
+					if (payloadObject instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+						handleDragAndDrop((GlobalDragAndDrop.FileHandleDragAndDropPayload) payloadObject);
+					} else if (payloadObject instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
+						handleDragAndDrop((GlobalDragAndDrop.ArrayDragAndDropPayload) payloadObject);
+					}
+				}
+			}
+			private void handleDragAndDrop (GlobalDragAndDrop.ArrayDragAndDropPayload payloadObjects) {
+				Array<GlobalDragAndDrop.BaseDragAndDropPayload> items = payloadObjects.getItems();
+				FileHandle lastCopiedFile = null;
+				for (GlobalDragAndDrop.BaseDragAndDropPayload item : items) {
+					if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+						FileHandle file = handle((GlobalDragAndDrop.FileHandleDragAndDropPayload) item);
+						if (file != null) {
+							lastCopiedFile = file;
 						}
 					}
+				}
+
+				if (lastCopiedFile != null) {
+					// open current directory
+					String projectPath = SharedResources.currentProject.rootProjectDir().path();
+					projectExplorerWidget.loadDirectoryTree(projectPath);
+					projectExplorerWidget.expand(lastCopiedFile.parent().path());
+					projectExplorerWidget.select(lastCopiedFile.parent().path());
+				}
+			}
+
+			private void handleDragAndDrop (GlobalDragAndDrop.FileHandleDragAndDropPayload payloadObject) {
+				FileHandle copiedFile = handle(payloadObject);
+				if (copiedFile != null) {
+					// open current directory
+					String projectPath = SharedResources.currentProject.rootProjectDir().path();
+					projectExplorerWidget.loadDirectoryTree(projectPath);
+					projectExplorerWidget.expand(copiedFile.parent().path());
+					projectExplorerWidget.select(copiedFile.parent().path());
+				}
+			}
+
+			private FileHandle handle (GlobalDragAndDrop.FileHandleDragAndDropPayload item) {
+				AssetRepository assetRepository = AssetRepository.getInstance();
+				FileHandle handle = item.getHandle();
+				if (fileHandle.child(handle.name()).exists()) {
+					// file is already present, see if it should be replaced
+					String title = "Oh no!";
+					String message = "An older item named \"" + handle.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
+					Runnable keep = () -> {
+						// copy new file to current directory with new name
+						FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle);
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						projectExplorerWidget.expand(newHandle.parent().path());
+						projectExplorerWidget.select(newHandle.parent().path());
+					};
+					Runnable stop = () -> {
+						// do nothing
+					};
+					Runnable replace = () -> {
+						// replace file in directory with new file
+						FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle, true);
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						projectExplorerWidget.expand(newHandle.parent().path());
+						projectExplorerWidget.select(newHandle.parent().path());
+					};
+
+					projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
+					return null;
+				} else {
+					return assetRepository.copyRawAsset(handle, fileHandle);
 				}
 			}
 		});
