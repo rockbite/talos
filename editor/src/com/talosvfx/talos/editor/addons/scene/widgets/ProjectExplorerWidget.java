@@ -372,11 +372,17 @@ public class ProjectExplorerWidget extends Table implements Observer {
             createSubMenuItem(popupMenu, "New Scene", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
-                    String path = files.first().path();
-                    FileHandle sceneDestination = AssetImporter.suggestNewNameForFileHandle(path, "New Scene", "scn");
-                    Scene mainScene = new Scene(sceneDestination.path());
+                    FileHandle currentFolder = getCurrentFolder();
+                    FileHandle sceneFileHandle = AssetRepository.getInstance().copySampleSceneToProject(currentFolder);
                     // TODO: refactor directory view widget to update itself
                     select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            directoryViewWidget.scrollTo(sceneFileHandle);
+                        }
+                    });
                 }
             });
 

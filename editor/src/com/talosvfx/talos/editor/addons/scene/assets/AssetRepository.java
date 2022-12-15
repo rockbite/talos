@@ -121,6 +121,13 @@ public class AssetRepository implements Observer {
 		return null;
 	}
 
+	public FileHandle copySampleSceneToProject(FileHandle preferredDestination) {
+		FileHandle originalScene = Gdx.files.internal("addons/scene/missing/New Scene.scn");
+
+		return AssetRepository.getInstance().copyRawAsset(originalScene, preferredDestination);
+	}
+
+
 	static class DataMaps {
 		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
 		private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
