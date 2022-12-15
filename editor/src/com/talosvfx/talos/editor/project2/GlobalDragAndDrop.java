@@ -77,10 +77,6 @@ public class GlobalDragAndDrop {
 		Array<BaseDragAndDropPayload> items = arrayDragAndDropPayload.getItems();
 		for (String absoluteFileHandle : absoluteFiles) {
 			FileHandle absolute = Gdx.files.absolute(absoluteFileHandle);
-			AssetFileDroppedEvent fileDropEvent = Notifications.obtainEvent(AssetFileDroppedEvent.class);
-			fileDropEvent.setFileHandle(absolute);
-			fileDropEvent.setScreenPos(screenX, screenY);
-			Notifications.fireEvent(fileDropEvent);
 			items.add(new FileHandleDragAndDropPayload(absolute));
 		}
 
