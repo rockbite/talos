@@ -73,16 +73,6 @@ public class GlobalDragAndDrop {
 	}
 
 	public void fakeDragDrop (int screenX, int screenY, String[] absoluteFiles) {
-		if (absoluteFiles.length == 1) {
-			FileHandle handle = Gdx.files.absolute(absoluteFiles[0]);
-			if (handle.extension().equals(TalosProjectData.TALOS_PROJECT_EXTENSION)) {
-				// load the project
-				TalosProjectData data = TalosProjectData.loadFromFile(handle);
-				SharedResources.projectLoader.loadProject(data);
-				return;
-			}
-		}
-
 		ArrayDragAndDropPayload arrayDragAndDropPayload = new ArrayDragAndDropPayload();
 		Array<BaseDragAndDropPayload> items = arrayDragAndDropPayload.getItems();
 		for (String absoluteFileHandle : absoluteFiles) {
