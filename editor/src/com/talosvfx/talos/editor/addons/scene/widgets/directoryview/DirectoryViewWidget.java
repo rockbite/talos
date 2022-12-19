@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -425,7 +426,76 @@ public class DirectoryViewWidget extends Table {
 
 					openDirectory(targetItem.fileHandle.path());
 				} else {
-					logger.info("TODO COPY INTO DIRECTORY and do asset stuff");
+					if (payloadObject instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+						handleDragAndDrop((GlobalDragAndDrop.FileHandleDragAndDropPayload) payloadObject);
+					} else if (payloadObject instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
+						handleDragAndDrop((GlobalDragAndDrop.ArrayDragAndDropPayload) payloadObject);
+					}
+				}
+			}
+			private void handleDragAndDrop (GlobalDragAndDrop.ArrayDragAndDropPayload payloadObjects) {
+				Array<GlobalDragAndDrop.BaseDragAndDropPayload> items = payloadObjects.getItems();
+				FileHandle lastCopiedFile = null;
+				for (GlobalDragAndDrop.BaseDragAndDropPayload item : items) {
+					if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+						FileHandle file = handle((GlobalDragAndDrop.FileHandleDragAndDropPayload) item);
+						if (file != null) {
+							lastCopiedFile = file;
+						}
+					}
+				}
+
+				if (lastCopiedFile != null) {
+					// open current directory
+					String projectPath = SharedResources.currentProject.rootProjectDir().path();
+					projectExplorerWidget.loadDirectoryTree(projectPath);
+					projectExplorerWidget.expand(lastCopiedFile.parent().path());
+					projectExplorerWidget.select(lastCopiedFile.parent().path());
+				}
+			}
+
+			private void handleDragAndDrop (GlobalDragAndDrop.FileHandleDragAndDropPayload payloadObject) {
+				FileHandle copiedFile = handle(payloadObject);
+				if (copiedFile != null) {
+					// open current directory
+					String projectPath = SharedResources.currentProject.rootProjectDir().path();
+					projectExplorerWidget.loadDirectoryTree(projectPath);
+					projectExplorerWidget.expand(copiedFile.parent().path());
+					projectExplorerWidget.select(copiedFile.parent().path());
+				}
+			}
+
+			private FileHandle handle (GlobalDragAndDrop.FileHandleDragAndDropPayload item) {
+				AssetRepository assetRepository = AssetRepository.getInstance();
+				FileHandle handle = item.getHandle();
+				if (fileHandle.child(handle.name()).exists()) {
+					// file is already present, see if it should be replaced
+					String title = "Oh no!";
+					String message = "An older item named \"" + handle.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
+					Runnable keep = () -> {
+						// copy new file to current directory with new name
+						FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle);
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						projectExplorerWidget.expand(newHandle.parent().path());
+						projectExplorerWidget.select(newHandle.parent().path());
+					};
+					Runnable stop = () -> {
+						// do nothing
+					};
+					Runnable replace = () -> {
+						// replace file in directory with new file
+						FileHandle newHandle = assetRepository.copyRawAsset(handle, fileHandle, true);
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						projectExplorerWidget.expand(newHandle.parent().path());
+						projectExplorerWidget.select(newHandle.parent().path());
+					};
+
+					projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
+					return null;
+				} else {
+					return assetRepository.copyRawAsset(handle, fileHandle);
 				}
 			}
 		});

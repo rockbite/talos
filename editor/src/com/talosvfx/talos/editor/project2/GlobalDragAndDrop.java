@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import lombok.Data;
 
@@ -74,7 +76,8 @@ public class GlobalDragAndDrop {
 		ArrayDragAndDropPayload arrayDragAndDropPayload = new ArrayDragAndDropPayload();
 		Array<BaseDragAndDropPayload> items = arrayDragAndDropPayload.getItems();
 		for (String absoluteFileHandle : absoluteFiles) {
-			items.add(new FileHandleDragAndDropPayload(Gdx.files.absolute(absoluteFileHandle)));
+			FileHandle absolute = Gdx.files.absolute(absoluteFileHandle);
+			items.add(new FileHandleDragAndDropPayload(absolute));
 		}
 
 		Table dummyActor = new Table();

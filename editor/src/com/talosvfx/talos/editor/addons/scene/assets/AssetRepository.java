@@ -121,6 +121,13 @@ public class AssetRepository implements Observer {
 		return null;
 	}
 
+	public FileHandle copySampleSceneToProject(FileHandle preferredDestination) {
+		FileHandle originalScene = Gdx.files.internal("addons/scene/missing/New Scene.scn");
+
+		return AssetRepository.getInstance().copyRawAsset(originalScene, preferredDestination);
+	}
+
+
 	static class DataMaps {
 		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
 		private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
@@ -1188,8 +1195,12 @@ public class AssetRepository implements Observer {
 	}
 
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory) {
+		return copyRawAsset(file, directory, false);
+	}
+
+	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
 		String fileName = file.name();
-		if (directory.child(fileName).exists()) {
+		if (directory.child(fileName).exists() && !replace) {
 			String baseName = file.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
