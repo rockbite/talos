@@ -1090,6 +1090,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
+		GameObject gameObject = event.getTarget();
+		makeGizmosFor(getRootSceneObject(), gameObject, this);
+
+
 		// call set dirty method on the next frame so that the game asset is already set
 		// TODO: refactor the order of the event and setting data
 		Gdx.app.postRunnable(new Runnable() {
