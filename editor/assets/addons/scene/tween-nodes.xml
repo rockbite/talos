@@ -1,4 +1,4 @@
-<modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
+<modules classPath="com.talosvfx.talos.editor.addons.scene.apps.routines.nodes">
     <category name="main" title="Main">
         <!--
         <module name = "RoutineNode" title = "Routine" keywords = "tween, system" class = "RoutineNodeWidget">

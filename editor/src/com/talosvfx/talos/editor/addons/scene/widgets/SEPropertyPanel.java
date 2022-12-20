@@ -18,6 +18,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -421,11 +422,11 @@ public class SEPropertyPanel extends PropertyPanel {
                                     FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
                                     newDestination.writeString("", false);
                                     AssetRepository.getInstance().rawAssetCreated(newDestination, true);
-                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
+                                    GameAsset<RoutineData> assetForPath = (GameAsset<RoutineData>) AssetRepository.getInstance().getAssetForPath(newDestination, false);
 
                                     if (assetForPath != null) {
                                         RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
+                                        routineRendererComponent.setGameAsset(assetForPath);
                                         gameObject.addComponent(routineRendererComponent);
 
                                         Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(assetDir.path()));

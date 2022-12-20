@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
@@ -796,17 +797,18 @@ public class AssetRepository implements Observer {
 			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-					gameAssetOut = tweenGameAsset;
-					tweenGameAsset.setResourcePayload(value.handle.readString());
+					GameAsset<RoutineData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = asset;
+
 
 					if (createLinks) {
-						value.gameAssetReferences.add(tweenGameAsset);
-						tweenGameAsset.dependentRawAssets.add(value);
+						value.gameAssetReferences.add(asset);
+						asset.dependentRawAssets.add(value);
 					}
 				}
-				((GameAsset<String>)gameAssetOut).setResourcePayload("Dummy");
 
+				RoutineData data = RoutineData.readFrom(value.handle);
+				((GameAsset<RoutineData>)gameAssetOut).setResourcePayload(data);
 
 				break;
 			case PREFAB:

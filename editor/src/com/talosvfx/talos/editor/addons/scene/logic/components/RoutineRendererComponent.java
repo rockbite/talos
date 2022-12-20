@@ -6,8 +6,9 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -20,9 +21,9 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<String> {
+public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineData> {
 
-    GameAsset<String> routineResource;
+    GameAsset<RoutineData> routineResource;
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
@@ -57,7 +58,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             }
         }
 
-        GameAsset<String> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
+        GameAsset<RoutineData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
@@ -108,14 +109,14 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public Array<PropertyWidget> getListOfProperties() {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget<String> widget = new AssetSelectWidget<String>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<String>>() {
+        AssetSelectWidget<RoutineData> widget = new AssetSelectWidget<RoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineData>>() {
             @Override
-            public GameAsset<String> get () {
+            public GameAsset<RoutineData> get() {
                 return routineResource;
             }
-        }, new PropertyWidget.ValueChanged<GameAsset<String>>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<RoutineData>>() {
             @Override
-            public void report (GameAsset<String> value) {
+            public void report(GameAsset<RoutineData> value) {
                 setGameAsset(value);
             }
         });
@@ -153,12 +154,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     }
 
     @Override
-    public GameAsset<String> getGameResource() {
+    public GameAsset<RoutineData> getGameResource() {
         return routineResource;
     }
 
     @Override
-    public void setGameAsset(GameAsset<String> gameAsset) {
+    public void setGameAsset(GameAsset<RoutineData> gameAsset) {
         this.routineResource = gameAsset;
 
         Gdx.app.postRunnable(new Runnable() {
@@ -172,7 +173,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         // this needs changing
         RoutineConfigMap routineConfigMap = new RoutineConfigMap();
         routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
-        routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource(), routineConfigMap);
+        routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource().jsonString, routineConfigMap);
         updatePropertyWrappers(true);
     }
 
