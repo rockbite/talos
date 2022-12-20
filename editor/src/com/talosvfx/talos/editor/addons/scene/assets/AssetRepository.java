@@ -74,6 +74,8 @@ public class AssetRepository implements Observer {
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 
+	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
+
 	public <T> GameAsset<T> getAssetForIdentifier (String identifier, GameAssetType type) {
 		if (identifierGameAssetMap.containsKey(type)) {
 			if (identifierGameAssetMap.get(type).containsKey(identifier)) {
@@ -268,6 +270,8 @@ public class AssetRepository implements Observer {
 		checkGameAssetCreation(GameAssetType.SCENE);
 
 		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
+
+		newFilesSeen.clear();
 	}
 
 	private void checkGameAssetCreation (GameAssetType type) {
@@ -279,6 +283,9 @@ public class AssetRepository implements Observer {
 
 
 			if (key.isDirectory()) continue;
+			if (!newFilesSeen.contains(key)) {
+				continue;
+			}
 
 			try {
 				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
@@ -992,6 +999,7 @@ public class AssetRepository implements Observer {
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
+		newFilesSeen.add(fileHandle);
 		try {
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
