@@ -1425,8 +1425,11 @@ public class AssetRepository implements Observer {
 						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
 
 						if (assetForIdentifier != null) {
+							dataMaps.fileHandleGameAssetObjectMap.remove(file);
+
 							GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
 							putAssetForIdentifier(destination.nameWithoutExtension(), removedGameAsset.type, removedGameAsset);
+							dataMaps.fileHandleGameAssetObjectMap.put(destination, removedGameAsset);
 
 							removedGameAsset.setUpdated();
 						} else {
