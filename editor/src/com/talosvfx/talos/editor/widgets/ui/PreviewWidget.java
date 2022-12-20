@@ -41,10 +41,14 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 public abstract class PreviewWidget extends ViewportWidget {
+
+	private static final Logger logger = LoggerFactory.getLogger(PreviewWidget.class);
 
 	Vector2 mid = new Vector2();
 
@@ -218,7 +222,9 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 						backgroundImagePath = fileHandle.path();
 
-						TalosMain.Instance().ProjectController().setDirty();
+						logger.error("Should be saving and using undo system");
+
+//						TalosMain.Instance().ProjectController().setDirty();
 					}
 				}
 			}

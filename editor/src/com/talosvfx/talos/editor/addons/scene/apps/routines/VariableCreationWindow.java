@@ -101,30 +101,32 @@ public class VariableCreationWindow extends Table {
             });
         }
 
-        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.getContainer()) {
+        //todo use global drag and drop instead
 
-            private Vector2 temp = new Vector2();
-
-            @Override
-            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                return true;
-            }
-
-            @Override
-            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                temp.set(x, y);
-                routineStage.getContainer().localToScreenCoordinates(temp);
-                routineStage.getStage().screenToStageCoordinates(temp);
-                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
-                PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
-                if (exposedVariable != null) {
-                    NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
-                    exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
-                    exposedVariable.update(propertyWrapper);
-                }
-            }
-        });
+//        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.getContainer()) {
+//
+//            private Vector2 temp = new Vector2();
+//
+//            @Override
+//            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                return true;
+//            }
+//
+//            @Override
+//            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+//                temp.set(x, y);
+//                routineStage.getContainer().localToScreenCoordinates(temp);
+//                routineStage.getStage().screenToStageCoordinates(temp);
+//                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
+//                PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
+//                if (exposedVariable != null) {
+//                    NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
+//                    exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
+//                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
+//                    exposedVariable.update(propertyWrapper);
+//                }
+//            }
+//        });
     }
 
     private void addButton() {

@@ -19,30 +19,30 @@ import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
 
-    private final NodeStageActor container;
     protected XmlReader.Element nodeData;
     public Skin skin;
     protected NodeBoard nodeBoard;
     private Image selectionRect;
 
     private NodeListPopup nodeListPopup;
+    private Stage stageSentIn;
 
     public DynamicNodeStage (Skin skin) {
         super();
         this.skin = skin;
         nodeData = loadData();
 
-        container = new NodeStageActor(this);
     }
 
     protected abstract XmlReader.Element loadData();
 
     @Override
     public void init () {
-        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
+//        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
 
         nodeListPopup = new NodeListPopup(nodeData);
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
@@ -77,9 +77,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     public void showPopup() {
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         final Vector2 vec2 = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        Stage uiStage = TalosMain.Instance().UIStage().getStage();
+
+        Stage uiStage = SharedResources.stage;
         uiStage.screenToStageCoordinates(vec);
-        stage.screenToStageCoordinates(vec2);
 
         nodeListPopup.showPopup(uiStage, vec, vec2);
     }
@@ -87,26 +87,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
         return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), x, y);
     }
+    public void sendInStage (Stage stage) {
+        stageSentIn = stage;
 
-    protected void initActors() {
-        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
-        stage.addActor(gridRenderer);
-
-        nodeBoard = new NodeBoard(skin, this);
-
-        stage.addActor(nodeBoard);
-
-        selectionRect = new Image(skin.getDrawable("orange_row"));
-        selectionRect.setSize(0, 0);
-        selectionRect.setVisible(false);
-        stage.addActor(selectionRect);
-    }
-
-    @Override
-    protected void initListeners () {
-        super.initListeners();
-
-        stage.addListener(new InputListener() {
+        stageSentIn.addListener(new InputListener() {
 
             boolean dragged = false;
             Vector2 startPos = new Vector2();
@@ -115,7 +99,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                getCameraController().scrolled(amountX, amountY);
+//                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
@@ -123,19 +107,31 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 dragged = false;
 
+                boolean shouldHandle = false;
+
                 if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
+                    shouldHandle = true;
                 }
 
                 NodeBoard.NodeConnection hoveredConnection = nodeBoard.getHoveredConnection();
 
                 if(hoveredConnection != null && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && button == 0) {
                     onConnectionClicked(hoveredConnection);
+                    shouldHandle = true;
                 }
 
-                return true;
+                if (button == 1) {
+                    shouldHandle = true;
+                }
+
+                if (shouldHandle) {
+                    return true;
+                } else {
+                    return super.touchDown(event, x, y, pointer, button);
+                }
             }
 
             @Override
@@ -169,7 +165,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
                 if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
-                    FocusManager.resetFocus(getStage());
+//                    FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
                 }
 
@@ -186,11 +182,11 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-
-                if(keycode == Input.Keys.F5) {
-                    stage.getCamera().position.set(0, 0, 0);
-                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
-                }
+//
+//                if(keycode == Input.Keys.F5) {
+//                    stage.getCamera().position.set(0, 0, 0);
+//                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
+//                }
 
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     nodeBoard.createGroupFromSelectedNodes();
@@ -215,6 +211,26 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 return super.keyDown(event, keycode);
             }
         });
+
+    }
+    protected void initActors() {
+//        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
+//        stage.addActor(gridRenderer);
+
+        nodeBoard = new NodeBoard(skin, this);
+
+        getRootActor().addActor(nodeBoard);
+
+        selectionRect = new Image(skin.getDrawable("orange_row"));
+        selectionRect.setSize(0, 0);
+        selectionRect.setVisible(false);
+        getRootActor().addActor(selectionRect);
+    }
+
+    @Override
+    protected void initListeners () {
+        super.initListeners();
+
     }
 
     protected void onConnectionClicked(NodeBoard.NodeConnection hoveredConnection) {
@@ -269,7 +285,6 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
         IntMap<NodeWidget> nodeMap = new IntMap<>();
 
-        stage.setKeyboardFocus(stage.getRoot());
 
         if (nodes == null) {
             return;
@@ -331,9 +346,6 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         return nodeBoard;
     }
 
-    public NodeStageActor getContainer() {
-        return container;
-    }
 
     @Override
     public void fileDrop (String[] paths, float x, float y) {

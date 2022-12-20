@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
@@ -21,11 +22,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
-    public ScenePreviewStage scenePreviewStage;
-
-    public SplitPane splitPane;
-
-    private Table content;
+//    public ScenePreviewStage scenePreviewStage;
 
     public RoutineEditorApp() {
         routineConfigMap = new RoutineConfigMap();
@@ -34,28 +31,15 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         //variableCreationWindow = new VariableCreationWindow();
         //variableCreationWindow.reloadWidgets(routineStage);
 
-        initContent();
 
-        DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
-            @Override
-            public Actor getMainContent() {
-                return content;
-            }
-        };
-
-        this.gridAppReference = app;
-
-    }
-
-    public void initContent() {
-
-        content = new Table();
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStage.init();
         routineStage.routineConfigMap = routineConfigMap;
-        scenePreviewStage = new ScenePreviewStage();
+//        scenePreviewStage = new ScenePreviewStage();
 
-        GenericStageWrappedViewportWidget routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getContainer());
+        GenericStageWrappedViewportWidget routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+
+        routineStage.sendInStage(routineStageWrapper.getStage());
         try {
 
             routineStage.loadFrom(gameAsset);
@@ -63,13 +47,37 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
             e.printStackTrace();
         }
 
-        Table table = new Table();
-        table.add(routineStageWrapper).grow();
-        //table.addActor(variableCreationWindow);
-        splitPane = new SplitPane(scenePreviewStage, table,  false, SharedResources.skin);
-        splitPane.setSplitAmount(0.2f);
-        content.add(splitPane).grow();
+        DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+            @Override
+            public Actor getMainContent() {
+                return routineStageWrapper;
+            }
+
+            @Override
+            public void onInputProcessorAdded () {
+                super.onInputProcessorAdded();
+                routineStageWrapper.restoreListeners();
+                SharedResources.stage.setScrollFocus(routineStageWrapper);
+                SharedResources.inputHandling.addPriorityInputProcessor(routineStageWrapper.getStage());
+                SharedResources.inputHandling.setGDXMultiPlexer();
+            }
+
+            @Override
+            public void onInputProcessorRemoved () {
+                super.onInputProcessorRemoved();
+                routineStageWrapper.disableListeners();
+                SharedResources.inputHandling.removePriorityInputProcessor(routineStageWrapper.getStage());
+                SharedResources.inputHandling.setGDXMultiPlexer();
+
+                Stage stage = routineStageWrapper.getStage();
+            }
+        };
+
+        this.gridAppReference = app;
+
     }
+
+
 
     public void deleteParamTemplateWithIndex (int index) {
         RoutineInstance routineInstance = routineStage.routineInstance;

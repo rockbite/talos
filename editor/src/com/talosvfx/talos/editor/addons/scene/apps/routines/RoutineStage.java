@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
@@ -46,17 +47,6 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     public RoutineStage(RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
         this.routineEditorApp = routineEditorApp;
-
-        // todo: handle saving
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.S && ctrlPressed()) {
-                   // writeData(routineEditorApp.getAsset());
-                }
-                return super.keyDown(event, keycode);
-            }
-        });
 
         routineInstance = new RoutineInstance();
 
@@ -245,17 +235,17 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         Array<RoutineInstance> result = new Array<>();
         Array<GameObject> list = new Array<>();
 
-        if(routineEditorApp.scenePreviewStage != null) {
-            GameObject root = routineEditorApp.scenePreviewStage.currentScene.root;
-            root.findGOsWithComponents(list, RoutineRendererComponent.class);
-
-            for (GameObject gameObject : list) {
-                RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-                if (component.routineInstance.uuid.equals(routineInstance.uuid)) {
-                    result.add(component.routineInstance);
-                }
-            }
-        }
+//        if(routineEditorApp.scenePreviewStage != null) {
+//            GameObject root = routineEditorApp.scenePreviewStage.currentScene.root;
+//            root.findGOsWithComponents(list, RoutineRendererComponent.class);
+//
+//            for (GameObject gameObject : list) {
+//                RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+//                if (component.routineInstance.uuid.equals(routineInstance.uuid)) {
+//                    result.add(component.routineInstance);
+//                }
+//            }
+//        }
 
         result.add(routineInstance);
 
@@ -337,4 +327,6 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     public float getDelta() {
         return Gdx.graphics.getDeltaTime() * timeScale;
     }
+
+
 }

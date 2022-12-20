@@ -29,8 +29,12 @@ import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class NodeBoard extends WidgetGroup implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(NodeBoard.class);
 
     private Skin skin;
 
@@ -271,7 +275,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
     private boolean segmentHit(Vector2 p1, Vector2 p2) {
 
         vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        nodeStage.getCamera().unproject(vec3);
+        logger.error("Info redo segment hit");
+
+//        nodeStage.getCamera().unproject(vec3);
         tmp3.set(vec3.x, vec3.y);
 
         float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
@@ -306,7 +312,6 @@ public class NodeBoard extends WidgetGroup implements Observer {
             e.printStackTrace();
         }
 
-        TalosMain.Instance().ProjectController().setDirty();
 
         return node;
     }
@@ -338,7 +343,8 @@ public class NodeBoard extends WidgetGroup implements Observer {
 
         node.notifyRemoved();
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public <T extends AbstractModule> void tryAndConnectLasCC(NodeWidget nodeWidget) {
@@ -405,7 +411,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
 
         Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void setActiveCurve(float x, float y, float toX, float toY, boolean isInput) {
@@ -519,7 +527,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
         from.attachNodeToMyOutput(to, slotFrom, slotTo);
         to.attachNodeToMyInput(from, slotTo, slotFrom);
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
 
         Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionCreatedEvent.class).set(connection));
     }
@@ -796,7 +806,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
     public void nodeClickedUp(NodeWidget node) {
 
         if(wasNodeDragged != null) {
-            TalosMain.Instance().ProjectController().setDirty();
+            logger.error("Should be saving and using undo system");
+
+//            TalosMain.Instance().ProjectController().setDirty();
         } else {
             // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
             if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -875,7 +887,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
 
         groupContainer.addActor(group);
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
 
         clearSelection();
 
@@ -898,7 +912,9 @@ public class NodeBoard extends WidgetGroup implements Observer {
             other.removeWrappers(nodes);
         }
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void removeGroup(NodeGroup nodeGroup) {

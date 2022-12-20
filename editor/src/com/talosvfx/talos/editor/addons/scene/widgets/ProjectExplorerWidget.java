@@ -444,7 +444,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
                     FileHandle currentFolder = getCurrentFolder();
 
-                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Routine", "rw");
+                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Routine", "rt");
                     newScriptDestination.writeString("{}", false);
 
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);

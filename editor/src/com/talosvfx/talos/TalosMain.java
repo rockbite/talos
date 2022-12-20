@@ -132,7 +132,7 @@ public class TalosMain extends ApplicationAdapter {
 		projectController = new ProjectController();
 
 
-		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
+//		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		inputMultiplexer = new InputMultiplexer();
 		setInputProcessors();
@@ -206,14 +206,14 @@ public class TalosMain extends ApplicationAdapter {
 		currentWorkplaceStage = stage;
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
 	public void enableNodeStage() {
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
@@ -229,7 +229,7 @@ public class TalosMain extends ApplicationAdapter {
 		}
 
 		if (currentWorkplaceStage != null) {
-			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
+//			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {
 			Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
 		}
@@ -237,8 +237,8 @@ public class TalosMain extends ApplicationAdapter {
 
 		if (currentWorkplaceStage != null) {
 			currentWorkplaceStage.act();
-			currentWorkplaceStage.getStage().act();
-			currentWorkplaceStage.getStage().draw();
+//			currentWorkplaceStage.getStage().act();
+//			currentWorkplaceStage.getStage().draw();
 		}
 
 		fileTracker.update();
@@ -262,9 +262,9 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
-		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
-			currentWorkplaceStage.getStage().dispose();
-		}
+//		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
+//			currentWorkplaceStage.getStage().dispose();
+//		}
 		uiStage.getStage().dispose();
 		Render.instance().dispose();
 		SocketServer.dispose();
@@ -277,7 +277,8 @@ public class TalosMain extends ApplicationAdapter {
 	public CameraController getCameraController() {
 		if(currentWorkplaceStage == null) return null;
 
-		return currentWorkplaceStage.getCameraController();
+		return null;
+//		return currentWorkplaceStage.getCameraController();
 	}
 
 	public FileTracker FileTracker() {
