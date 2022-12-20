@@ -23,7 +23,7 @@ public class ButtonLabel extends Table {
         label = new Label(text, SharedResources.skin);
         label.setColor(Color.GRAY);
 
-        add(icon).size(30).pad(3);
+        add(icon).size(30).pad(3).padLeft(-5);
         add(label);
 
         addListener(new ClickListener() {
