@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -65,8 +66,10 @@ public class ProjectExplorerWidget extends Table implements Observer {
         Skin skin = SharedResources.skin;
         Notifications.registerObserver(this);
 
+        setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#282828ff")));
+
         Table horizontalPanel = new Table();
-        horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+        horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.DARK_GRAY));
         add(horizontalPanel).growX().row();
 
         SearchWidget searchWidget = new SearchWidget();

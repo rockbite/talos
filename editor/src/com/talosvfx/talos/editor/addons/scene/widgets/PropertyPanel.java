@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
@@ -41,6 +42,8 @@ public class PropertyPanel extends Table implements Observer {
 
     public PropertyPanel() {
         setSkin(SharedResources.skin);
+
+        setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#353535ff")));
 
         container = new Table();
         fakeContainer = new Table();
