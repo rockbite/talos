@@ -175,7 +175,7 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
+		SharedResources.stage.addActor(fileChooser.fadeIn());
 	}
 
 	@Override
@@ -192,6 +192,6 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
+		SharedResources.stage.addActor(fileChooser.fadeIn());
 	}
 }

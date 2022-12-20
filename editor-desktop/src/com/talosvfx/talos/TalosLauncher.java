@@ -46,6 +46,7 @@ public class TalosLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
+		config.setMaximized(true);
 		config.useVsync(true);
 		config.setHdpiMode(HdpiMode.Logical);
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);

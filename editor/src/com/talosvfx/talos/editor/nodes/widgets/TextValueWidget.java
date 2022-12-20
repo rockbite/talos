@@ -37,6 +37,10 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     private EventListener stageListener;
 
+    public TextValueWidget(Skin skin) {
+        this();
+        init(skin);
+    }
     public TextValueWidget() {
         editing = new Table();
         main = new Table();

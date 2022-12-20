@@ -104,7 +104,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 
 	private void openProjectExplorer () {
-		ProjectSplash projectSplash = new ProjectSplash("Projects");
+		ProjectSplash projectSplash = new ProjectSplash();
 		projectSplash.show(stage);
 	}
 
@@ -113,7 +113,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		CursorUtil.checkAndReset();
 
 		super.render();
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
+		Gdx.gl.glClearColor(0.13f, 0.13f, 0.13f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		stage.act();
