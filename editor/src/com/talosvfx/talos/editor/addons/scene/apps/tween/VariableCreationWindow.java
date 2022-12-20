@@ -10,8 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorProject;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
@@ -20,8 +18,12 @@ import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VariableCreationWindow extends Table {
+    private static final Logger logger = LoggerFactory.getLogger(VariableCreationWindow.class);
+
     private DragAndDrop dragAndDrop;
     private Array<VariableTemplateRow<?>> templateRowArray = new Array<>();
 
@@ -132,10 +134,12 @@ public class VariableCreationWindow extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                squareButton.setChecked(false);
-
-                RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
-                routineEditor.createNewVariable();
+                logger.info("routines - create new variable redo");
+                // TODO: 20.12.22 SCENEEDITORADDON 
+//                squareButton.setChecked(false);
+//
+//                RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
+//                routineEditor.createNewVariable();
             }
         });
         add(squareButton).growX();
@@ -144,17 +148,18 @@ public class VariableCreationWindow extends Table {
     @Override
     public void act (float delta) {
         super.act(delta);
-        if (!(TalosMain.Instance().Project() instanceof SceneEditorProject)) {
-            return;
-        }
-
-        RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
-        if (routineEditor == null) {
-            return;
-        }
-
-        float height = getHeight();
-
-        setPosition(0, routineEditor.getContent().getHeight() - height);
+        // TODO: 20.12.22 FIX TALOSMAININSTANCE
+//        if (!(TalosMain.Instance().Project() instanceof SceneEditorProject)) {
+//            return;
+//        }
+//
+//        RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
+//        if (routineEditor == null) {
+//            return;
+//        }
+//
+//        float height = getHeight();
+//
+//        setPosition(0, routineEditor.getContent().getHeight() - height);
     }
 }

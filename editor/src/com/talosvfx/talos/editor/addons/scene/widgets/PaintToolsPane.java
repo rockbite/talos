@@ -1,18 +1,14 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
@@ -22,9 +18,10 @@ import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
-public class PaintToolsPane extends Table implements Notifications.Observer {
+public class PaintToolsPane extends Table implements Observer {
 
     public final SquareButton paint;
     public final SquareButton erase;
@@ -148,7 +145,7 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
     public void onComponentUpdated(ComponentUpdated event) {
         AComponent component = event.getComponent();
         PaintSurfaceComponent surface = paintSurfaceGizmo.getGameObject().getComponent(PaintSurfaceComponent.class);
-        if (component == surface && !event.wasRapid()) {
+        if (component == surface && !event.isRapid()) {
             applyChannelFilterToColor();
         }
     }
@@ -169,31 +166,31 @@ public class PaintToolsPane extends Table implements Notifications.Observer {
     @Override
     public void act(float delta) {
         super.act(delta);
-
-        Vector2 vec = Pools.get(Vector2.class).obtain();
-        // position specifically
-        Table workspace = SceneEditorAddon.get().workspaceContainer;
-        workspace.localToStageCoordinates(vec.set(0, workspace.getHeight()));
-        setPosition(vec.x + 25, vec.y - getHeight() - 25);
-        Pools.get(Vector2.class).free(vec);
-
-        if(bracketDown > 0) {
-            bracketStartCoolDown -= Gdx.graphics.getDeltaTime();
-
-            if(bracketStartCoolDown <= 0) {
-                bracketStartCoolDown = 0f;
-
-                bracketCoolDown -= Gdx.graphics.getDeltaTime();
-                if(bracketCoolDown <= 0) {
-                    bracketCoolDown = 0.1f;
-                    if (bracketDown == Input.Keys.LEFT_BRACKET) {
-                        decreaseSize();
-                    } else if (bracketDown == Input.Keys.RIGHT_BRACKET) {
-                        increaseSize();
-                    }
-                }
-            }
-        }
+        // TODO: 20.12.22 FIX SCENEEDITORADDON
+//        Vector2 vec = Pools.get(Vector2.class).obtain();
+//        // position specifically
+//        Table workspace = SceneEditorAddon.get().workspaceContainer;
+//        workspace.localToStageCoordinates(vec.set(0, workspace.getHeight()));
+//        setPosition(vec.x + 25, vec.y - getHeight() - 25);
+//        Pools.get(Vector2.class).free(vec);
+//
+//        if(bracketDown > 0) {
+//            bracketStartCoolDown -= Gdx.graphics.getDeltaTime();
+//
+//            if(bracketStartCoolDown <= 0) {
+//                bracketStartCoolDown = 0f;
+//
+//                bracketCoolDown -= Gdx.graphics.getDeltaTime();
+//                if(bracketCoolDown <= 0) {
+//                    bracketCoolDown = 0.1f;
+//                    if (bracketDown == Input.Keys.LEFT_BRACKET) {
+//                        decreaseSize();
+//                    } else if (bracketDown == Input.Keys.RIGHT_BRACKET) {
+//                        increaseSize();
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void setFrom(GameObject gameObject) {

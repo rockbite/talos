@@ -73,7 +73,7 @@ public class RoutineRenderer {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
 
-            OrthographicCamera camera = mainRenderer.getCamera();
+            OrthographicCamera camera = (OrthographicCamera) mainRenderer.getCamera();
             cameraViewportRect.setSize(camera.viewportWidth * camera.zoom + cameraCull, camera.viewportHeight * camera.zoom + cameraCull).setCenter(camera.position.x, camera.position.y);
             objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);
             Intersector.intersectRectangles(cameraViewportRect, objectViewportRect, intersectionRect);

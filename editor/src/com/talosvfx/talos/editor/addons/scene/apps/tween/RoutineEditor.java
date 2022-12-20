@@ -5,20 +5,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 
 public class RoutineEditor extends AEditorApp<FileHandle> {
 
@@ -50,8 +43,10 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         addAppListener(new AppListener() {
             @Override
             public void closeRequested () {
-                SceneEditorAddon.get().routineEditor = null;
-                TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
+                // TODO: 20.12.22 FIX SCENEEDITORADDON
+                // TODO: 20.12.22 FIX TALOSMAININSTANCE
+//                SceneEditorAddon.get().routineEditor = null;
+//                TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
             }
         });
 
@@ -86,8 +81,8 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         splitPane.setSplitAmount(0.2f);
 
         content.add(splitPane).grow();
-
-        TalosMain.Instance().getInputMultiplexer().addProcessor(routineStage.getStage());
+        // TODO: 20.12.22 FIX TALOSMAININSTANCE
+//        TalosMain.Instance().getInputMultiplexer().addProcessor(routineStage.getStage());
 
     }
 

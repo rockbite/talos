@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
 import com.talosvfx.talos.editor.nodes.widgets.LabelWidget;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
@@ -45,7 +44,8 @@ public class VariableTemplateRow<T> extends Table {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 int index = propertyWrapper.index;
-                SceneEditorAddon.get().routineEditor.changeKeyFor(index, textValueWidget.getValue());
+                // TODO: 20.12.22 FIX SCENEEDITORADDON
+//                SceneEditorAddon.get().routineEditor.changeKeyFor(index, textValueWidget.getValue());
             }
         });
         add(textValueWidget);
@@ -64,7 +64,8 @@ public class VariableTemplateRow<T> extends Table {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 int index = propertyWrapper.index;
-                SceneEditorAddon.get().routineEditor.changeTypeFor(index, typeSelectWidget.getValue());
+                // TODO: 20.12.22 FIX SCENEEDITORADDON
+//                SceneEditorAddon.get().routineEditor.changeTypeFor(index, typeSelectWidget.getValue());
             }
         });
         add(typeSelectWidget).growX();
@@ -75,7 +76,7 @@ public class VariableTemplateRow<T> extends Table {
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 int index = propertyWrapper.index;
-                SceneEditorAddon.get().routineEditor.deleteParamTemplateWithIndex(index);
+//                SceneEditorAddon.get().routineEditor.deleteParamTemplateWithIndex(index);
             }
         });
         add(deleteButton);

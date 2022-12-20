@@ -8,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.TalosInputProcessor;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
@@ -31,9 +29,12 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
 
-public class RoutineStage extends DynamicNodeStage implements Notifications.Observer {
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
+public class RoutineStage extends DynamicNodeStage implements Observer {
 
     public final RoutineEditor routineEditor;
 
@@ -52,7 +53,7 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.S && TalosInputProcessor.ctrlPressed()) {
+                if(keycode == Input.Keys.S && ctrlPressed()) {
                     writeData(routineEditor.targetFileHandle);
                 }
                 return super.keyDown(event, keycode);
@@ -65,18 +66,19 @@ public class RoutineStage extends DynamicNodeStage implements Notifications.Obse
     }
 
     public void routineUpdated() {
-        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
-        Array<RoutineRendererComponent> updatedComponents = new Array<>();
-        updatePropertiesForGOs(rootGO, updatedComponents);
-
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run () {
-                for (RoutineRendererComponent updatedComponent : updatedComponents) {
-                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
-                }
-            }
-        });
+        // TODO: 20.12.22 FIX SCENEEDITORWORKSPACE
+//        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+//        updatePropertiesForGOs(rootGO, updatedComponents);
+//
+//        Gdx.app.postRunnable(new Runnable() {
+//            @Override
+//            public void run () {
+//                for (RoutineRendererComponent updatedComponent : updatedComponents) {
+//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+//                }
+//            }
+//        });
     }
 
     private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {

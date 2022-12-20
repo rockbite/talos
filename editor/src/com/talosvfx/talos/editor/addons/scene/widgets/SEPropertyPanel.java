@@ -17,7 +17,6 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -331,17 +330,19 @@ public class SEPropertyPanel extends PropertyPanel {
                             return;
                         }
                         if (gameAsset.type == GameAssetType.ROUTINE) {
-                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-                            routineRendererComponent.setGameAsset((GameAsset<String>)gameAsset);
-                            gameObject.addComponent(routineRendererComponent);
-
-                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                            projectExplorer.reload();
-
-                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-
-                            remove();
+                            logger.info("property panel routines redo");
+                            // TODO: 20.12.22 FIX SCENEEDITORADDON 
+//                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+//                            routineRendererComponent.setGameAsset((GameAsset<String>)gameAsset);
+//                            gameObject.addComponent(routineRendererComponent);
+//
+//                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+//                            projectExplorer.reload();
+//
+//                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+//                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+//
+//                            remove();
                             return;
                         }
 
@@ -398,28 +399,30 @@ public class SEPropertyPanel extends PropertyPanel {
                             setToNameAndCreate("RR Name", "Use characters [a-Z] only", "[a-zA-Z]*", new Consumer<String>() {
                                 @Override
                                 public void accept(String newFileName) {
-                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
-
-                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "rw");
-                                    newDestination.writeString("", false);
-
-                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
-
-                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
-
-                                    if (assetForPath != null) {
-                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
-                                        gameObject.addComponent(routineRendererComponent);
-
-                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-                                        projectExplorer.reload();
-
-                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-                                    }
-
-                                    remove();
+                                    logger.info("routine rename redo");
+                                    // TODO: 20.12.22 FIX SCENEEDITORADDON
+//                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
+//
+//                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "rw");
+//                                    newDestination.writeString("", false);
+//
+//                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
+//
+//                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
+//
+//                                    if (assetForPath != null) {
+//                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+//                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
+//                                        gameObject.addComponent(routineRendererComponent);
+//
+//                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
+//                                        projectExplorer.reload();
+//
+//                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
+//                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
+//                                    }
+//
+//                                    remove();
                                 }
                             });
 

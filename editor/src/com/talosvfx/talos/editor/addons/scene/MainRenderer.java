@@ -685,4 +685,8 @@ public class MainRenderer implements Observer {
     public Texture getWhiteTexture() {
         return white;
     }
+
+    public Camera getCamera() {
+        return camera;
+    }
 }
