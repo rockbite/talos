@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class ScriptPropertyIntegerWrapper extends ScriptPropertyNumberWrapper<Integer> {
+public class PropertyIntegerWrapper extends PropertyNumberWrapper<Integer> {
 
     @Override
     public void collectAttributes (Array<String> attributes) {
@@ -39,9 +39,9 @@ public class ScriptPropertyIntegerWrapper extends ScriptPropertyNumberWrapper<In
         defaultValue = jsonData.getInt("defaultValue", 0);
         value = jsonData.getInt("value", defaultValue);
 
-        minValue = jsonData.getInt("minValue");
-        maxValue = jsonData.getInt("maxValue");
-        step = jsonData.getInt("step");
+        minValue = jsonData.getInt("minValue", Integer.MIN_VALUE);
+        maxValue = jsonData.getInt("maxValue", Integer.MAX_VALUE);
+        step = jsonData.getInt("step", 1);
     }
 
     @Override

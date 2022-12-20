@@ -1,8 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -11,11 +9,8 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyFloatWrapper;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.ScriptPropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
@@ -26,7 +21,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
     GameAsset<String> scriptResource;
 
-    Array<ScriptPropertyWrapper<?>> scriptProperties = new Array<>();
+    Array<PropertyWrapper<?>> scriptProperties = new Array<>();
 
     @Override
     public Array<PropertyWidget> getListOfProperties () {
@@ -46,8 +41,8 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
         properties.add(widget);
 
-        for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
-            PropertyWidget generate = WidgetFactory.generateForScriptProperty(scriptProperty);
+        for (PropertyWrapper<?> scriptProperty : scriptProperties) {
+            PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(scriptProperty);
             generate.setParent(this);
             properties.add(generate);
         }
@@ -104,7 +99,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         JsonValue propertiesJson = jsonData.get("properties");
         if (propertiesJson != null) {
             for (JsonValue propertyJson : propertiesJson) {
-                scriptProperties.add(json.readValue(ScriptPropertyWrapper.class, propertyJson));
+                scriptProperties.add(json.readValue(PropertyWrapper.class, propertyJson));
             }
         }
     }
@@ -115,20 +110,20 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     }
 
     public void importScriptPropertiesFromMeta (boolean tryToMerge) {
-        Array<ScriptPropertyWrapper<?>> copyWrappers = new Array<>();
+        Array<PropertyWrapper<?>> copyWrappers = new Array<>();
         copyWrappers.addAll(scriptProperties);
 
         scriptProperties.clear();
         if (getGameResource() != null) {
             ScriptMetadata metadata = ((ScriptMetadata) getGameResource().getRootRawAsset().metaData);
-            for (ScriptPropertyWrapper<?> scriptPropertyWrapper : metadata.scriptPropertyWrappers) {
-                scriptProperties.add(scriptPropertyWrapper.clone());
+            for (PropertyWrapper<?> propertyWrapper : metadata.scriptPropertyWrappers) {
+                scriptProperties.add(propertyWrapper.clone());
             }
         }
 
         if (tryToMerge) {
-            for (ScriptPropertyWrapper copyWrapper : copyWrappers) {
-                for (ScriptPropertyWrapper scriptProperty : scriptProperties) {
+            for (PropertyWrapper copyWrapper : copyWrappers) {
+                for (PropertyWrapper scriptProperty : scriptProperties) {
                     if (copyWrapper.propertyName.equals(scriptProperty.propertyName) && copyWrapper.getClass().equals(scriptProperty.getClass())) {
                         scriptProperty.setValue(copyWrapper.getValue());
                         break;
@@ -136,14 +131,14 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
                 }
             }
 
-            for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
+            for (PropertyWrapper<?> scriptProperty : scriptProperties) {
                 if (scriptProperty.getValue() == null) {
                     scriptProperty.setDefault();
                 }
             }
 
         } else {
-            for (ScriptPropertyWrapper<?> scriptProperty : scriptProperties) {
+            for (PropertyWrapper<?> scriptProperty : scriptProperties) {
                 scriptProperty.setDefault();
             }
         }

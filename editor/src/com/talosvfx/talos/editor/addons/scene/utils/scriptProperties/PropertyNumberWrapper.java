@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
-public abstract class ScriptPropertyNumberWrapper<T> extends ScriptPropertyWrapper<T> {
+public abstract class PropertyNumberWrapper<T extends Number> extends PropertyWrapper<T> {
 
     public T minValue;
     public T maxValue;
@@ -27,8 +27,8 @@ public abstract class ScriptPropertyNumberWrapper<T> extends ScriptPropertyWrapp
     }
 
     @Override
-    public ScriptPropertyNumberWrapper<T> clone () {
-        ScriptPropertyNumberWrapper<T> clone = (ScriptPropertyNumberWrapper<T>) super.clone();
+    public PropertyNumberWrapper<T> clone () {
+        PropertyNumberWrapper<T> clone = (PropertyNumberWrapper<T>) super.clone();
         clone.maxValue = this.maxValue;
         clone.minValue = this.minValue;
         clone.step = this.step;

@@ -7,7 +7,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponen
 
 import java.util.Comparator;
 
-public class StaggerNode extends AbstractTweenNode {
+public class StaggerNode extends AbstractRoutineNode {
 
     private final PositionComparator positionComparator;
 

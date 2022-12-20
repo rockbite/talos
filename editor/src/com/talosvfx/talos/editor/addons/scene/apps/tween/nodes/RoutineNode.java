@@ -4,13 +4,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineStage;
 import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 
-public class TweenNode extends AbstractTweenNode {
+public class RoutineNode extends AbstractRoutineNode {
 
     @Override
     protected void addAdditionalContent(Table contentTable) {
@@ -41,7 +40,7 @@ public class TweenNode extends AbstractTweenNode {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 
-                ((TweenStage)nodeBoard.getNodeStage()).playInitiated();
+                ((RoutineStage)nodeBoard.getNodeStage()).playInitiated();
 
                 playTween();
                 super.clicked(event, x, y);

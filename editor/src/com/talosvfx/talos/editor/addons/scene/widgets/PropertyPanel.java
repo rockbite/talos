@@ -11,6 +11,7 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -168,7 +169,7 @@ public class PropertyPanel extends Table implements Observer {
     public void propertyProviderUpdated (IPropertyProvider propertyProvider) {
         if(providerPanelMap.containsKey(propertyProvider)) {
             PropertiesPanel propertiesPanel = providerPanelMap.get(propertyProvider);
-            if (propertyProvider instanceof ScriptComponent) {
+            if (propertyProvider instanceof ScriptComponent || propertyProvider instanceof RoutineRendererComponent) {
                 propertiesPanel.reconstruct();
             } else {
                 propertiesPanel.updateValues();

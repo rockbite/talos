@@ -1,13 +1,14 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.tween.nodes">
     <category name="main" title="Main">
-        <module name = "TweenNode" title = "Tween" keywords = "tween, system">
-            <value port="input" name="startSignal" type="signal">play</value>
+        <!--
+        <module name = "RoutineNode" title = "Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
             <value port="output" name="startSignal" type="signal">start</value>
         </module>
-        <module name = "MoveByNode" title = "Move By" keywords = "movement">
+        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
@@ -18,13 +19,13 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name = "DelayNode" title = "Delay" keywords = "tween">
+        <module name = "DelayNode" title = "Delay" keywords = "tween" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name = "StaggerNode" title = "Stagger" keywords = "tween">
+        <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
                 <option value = "YPOS">Y Position</option>
@@ -40,12 +41,190 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
-        <module name = "NumberNode" title = "Number" keywords = "">
+        <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
             <dynamicValue port="output" name="value" type="float" min="-1000" max="1000">Value: </dynamicValue>
         </module>
-        <module name = "OneMinusNode" title = "One Minus" keywords = "">
+        <module name = "OneMinusNode" title = "One Minus" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="input" type="float">input</value>
             <value port="output" name="output" type="float">output</value>
+        </module>-->
+
+        <module name = "RenderRoutineNode" title = "Render Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
+            <inputText name="id" default="main">ID</inputText>
+            <group>
+                <value port="output" name="renderSignal" type="signal">next</value>
+                <value port="output" name="viewportPos" type="vec2">viewport pos</value>
+                <value port="output" name="viewportSize" type="vec2">viewport size</value>
+                <value port="output" name="position" type="vec2">position</value>
+            </group>
+        </module>
+        <module name = "RenderQuadNode" title = "Render Quad" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="sprite" type="SPRITE">sprite</asset>
+            <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+                <dynamicValue port="input" name="z" type="float" min="-1000" max="1000">Z: </dynamicValue>
+                <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
+                <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step="1">Rotation: </dynamicValue>
+            </group>
+            <group>
+                <value port="input" name="origin" type="vec2">Origin: </value>
+                <color port="input" name="color" type="color">Color: </color>
+            </group>
+        </module>
+        <module name = "Vector2Split" title = "Vector2 Split" keywords = "" class = "RoutineNodeWidget">
+            <group>
+                <value port="input" name="vector2" type="vec2">vector2</value>
+                <value port="output" name="x" type="float">X: </value>
+                <value port="output" name="y" type="float">Y: </value>
+            </group>
+        </module>
+        <module name = "Vector2Node" title = "Vector2" keywords = "" class = "RoutineNodeWidget">
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+            <value port="output" name="output" type="vec2">vector2: </value>
+        </module>
+        <module name = "MathModule" title = "Math Module" keywords = "" class = "RoutineNodeWidget">
+            <value port="output" name="outputValue" type="fluid">Output Value</value>
+            <select name="operation">
+                <option value = "ADD">Add</option>
+                <option value = "SUB">Subtract</option>
+                <option value = "MUL">Multiply</option>
+                <option value = "DIV">Divide</option>
+                <option value = "POW">Power</option>
+                <option value = "SIN">Sinus</option>
+                <option value = "COS">Cosinus</option>
+            </select>
+            <group>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.01">Value A</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.01">Value B</dynamicValue>
+            </group>
+        </module>
+        <module name = "LoopNode" title = "Loop" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="from" type="int" default="1">from</dynamicValue>
+                <dynamicValue port="input" name="to" type="int" default="10">to</dynamicValue>
+                <dynamicValue port="input" name="step" type="int" default="1">step</dynamicValue>
+            </group>
+            <group>
+                <value port="output" name="index" type="int">index</value>
+                <value port="output" name="body" type="signal">body</value>
+                <value port="output" name="onComplete" type="signal">onComplete</value>
+            </group>
+        </module>
+        <module name = "PerlinNoiseNode" title = "Perlin Noise" keywords = "" class = "PerlinNoiseNodeWidget">
+            <container name="preview"></container>
+            <dynamicValue port="input" name="scale" type="float" default="1" max = "999" step="0.01">scale</dynamicValue>
+            <group>
+                <value port="input" name="x" type="float">x</value>
+                <value port="input" name="y" type="float">y</value>
+            </group>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "ConditionNode" title = "Condition Node" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">signal</value>
+            <value port="input" name="value" type="float">value</value>
+            <select name="condition">
+                <option value = "bigger">BIGGER</option>
+                <option value = "smaller">SMALLER</option>
+                <option value = "equal">EQUAL</option>
+            </select>
+            <dynamicValue port="input" name="compare" type="float" default="1" max = "999" step="0.01">then: </dynamicValue>
+            <group>
+                <value port="output" name="trueOutput" type="signal">true</value>
+                <value port="output" name="falseOutput" type="signal">false</value>
+            </group>
+        </module>
+        <module name = "PixelPickerNode" title = "Pixel Picker" keywords = "" class = "RoutineNodeWidget">
+            <asset port="input" name="texture" type="SPRITE">texture</asset>
+            <group>
+                <value port="input" name="x" type="float">x</value>
+                <value port="input" name="y" type="float">y</value>
+            </group>
+            <value port="output" name="output" type="color">color</value>
+        </module>
+        <module name = "ColorSplitNode" title = "Color Split" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="color" type="color">color</value>
+            <group>
+                <value port="output" name="r" type="float">R</value>
+                <value port="output" name="g" type="float">G</value>
+                <value port="output" name="b" type="float">B</value>
+                <value port="output" name="a" type="float">A</value>
+            </group>
+        </module>
+        <module name = "ColorNode" title = "Color" keywords = "" class = "RoutineNodeWidget">
+            <color name="color" type="color">color</color>
+            <value port="output" name="output" type="color">output</value>
+        </module>
+        <module name="ModConditionDataNode" title="Even/Odd Switch" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="input" type="int">input</value>
+            <group>
+                <value port="input" name="valueA" type="fluid">value if even</value>
+                <value port="input" name="valueB" type="fluid">value if odd</value>
+            </group>
+            <value port="output" name="output" type="color">output</value>
+        </module>
+        <module name = "ColorModifyNode" title = "Color Modify" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="color" type="color">color</value>
+            <dynamicValue port="input" name="brightness" type="float" default="1" min = "0" max = "1" step="0.01">brightness: </dynamicValue>
+            <value port="output" name="output" type="color">output</value>
+        </module>
+        <module name = "RandomNode" title = "Random Number" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="seed" type="float">seed</value>
+            <group>
+                <dynamicValue port="input" name="min" type="float" default="0" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
+                <dynamicValue port="input" name="max" type="float" default="1" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
+            </group>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "AssetSelectNode" title = "Asset Select" keywords = "" class = "RoutineNodeWidget">
+            <asset name="asset" type="SPRITE">asset</asset>
+            <value port="output" name="output" type="asset">asset</value>
+        </module>
+        <module name = "ProbabilityChoiceNode" title = "Probability Choice" keywords = "" class = "ProbabilityChoiceWidget">
+            <container name="container"></container>
+            <value port="output" name="output" type="fluid">output</value>
+        </module>
+        <module name = "StoreMemoryNode" title = "Store Memory" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="start" type="signal">start</value>
+            <inputText name="name" default="varname">name</inputText>
+            <value port="input" name="input" type="float">input</value>
+            <value port="output" name="next" type="signal">next</value>
+        </module>
+        <module name = "GetMemoryNode" title = "Get Memory" keywords = "" class = "RoutineNodeWidget">
+            <inputText name="name" default="varname">name</inputText>
+            <value port="output" name="value" type="fluid">value</value>
+        </module>
+        <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
+            <dynamicValue name="value" type="float" default="0">value: </dynamicValue>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "RectangleNode" title = "Rectangle" keywords = "" class = "RoutineNodeWidget">
+            <group>
+                <value port="input" name="center" type="vec2">center</value>
+                <value port="input" name="size" type="vec2">size</value>
+            </group>
+            <group>
+                <value port="output" name="left" type="float">left</value>
+                <value port="output" name="right" type="float">right</value>
+            </group>
+            <group>
+                <value port="output" name="bottom" type="float">bottom</value>
+                <value port="output" name="top" type="float">top</value>
+            </group>
+        </module>
+        <module name = "ExposedVariableNode" title = "Exposed Variable" keywords = "" class = "RoutineExposedVariableNodeWidget">
+            <inputText name="key" default="">Key</inputText>
+            <group>
+                <value port="output" name="output" type="fluid">output</value>
+            </group>
         </module>
     </category>
 </modules>

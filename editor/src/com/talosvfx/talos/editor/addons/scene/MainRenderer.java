@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -71,6 +72,8 @@ public class MainRenderer implements Observer {
     private TalosMapRenderer mapRenderer;
     private ShapeRenderer shapeRenderer;
 
+    private RoutineRenderer routineRenderer;
+
     private TextureRegion textureRegion = new TextureRegion();
     private Camera camera;
 
@@ -101,6 +104,7 @@ public class MainRenderer implements Observer {
         spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
+        routineRenderer = new RoutineRenderer();
 
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
@@ -321,6 +325,10 @@ public class MainRenderer implements Observer {
                 renderSpine(batch, gameObject);
             } else if(gameObject.hasComponent(MapComponent.class)) {
                 renderMap(batch, gameObject);
+            } else if(gameObject.hasComponent(RoutineRendererComponent.class)) {
+                if (!renderingToEntitySelectionBuffer) {
+                    renderWithRoutine(batch, gameObject);
+                }
             }
         }
     }
@@ -552,6 +560,12 @@ public class MainRenderer implements Observer {
 
     }
 
+    private void renderWithRoutine (Batch batch, GameObject gameObject) {
+        //We render the map with its own main renderer, its own sorter
+        RoutineRendererComponent routineRendererComponent = gameObject.getComponent(RoutineRendererComponent.class);
+        routineRenderer.render(this, batch, gameObject, routineRendererComponent);
+    }
+
     private void renderMap (PolygonBatch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         MapComponent map = gameObject.getComponent(MapComponent.class);
@@ -641,6 +655,17 @@ public class MainRenderer implements Observer {
         if(event.getComponent() instanceof ParticleComponent) {
             particleCache.remove((ParticleComponent)event.getComponent());
         }
+
+        if (event.getComponent() instanceof RoutineRendererComponent) {
+            RoutineRendererComponent routineRendererComponent = (RoutineRendererComponent) event.getComponent();
+            routineRendererComponent.routineInstance.isDirty = true;
+        }
+
+        GameObject gameObject = event.getComponent().getGameObject();
+        if (event.getComponent() instanceof TransformComponent && gameObject.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+            component.routineInstance.isDirty = true;
+        }
     }
 
     public void setCamera (Camera camera) {
@@ -655,5 +680,9 @@ public class MainRenderer implements Observer {
 
     public void setRenderingEntitySelectionBuffer (boolean renderingToBuffer) {
         this.renderingToEntitySelectionBuffer = renderingToBuffer;
+    }
+
+    public Texture getWhiteTexture() {
+        return white;
     }
 }

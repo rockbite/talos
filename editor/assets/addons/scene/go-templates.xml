@@ -41,6 +41,12 @@
                 <component className="CurveComponent"></component>
             </components>
         </template>
+        <template name = "psurface" title = "Paintable Surface" nameTemplate = "Surface" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="PaintSurfaceComponent"></component>
+            </components>
+        </template>
     </templates>
     <components>
         <component className="TransformComponent">
@@ -72,6 +78,11 @@
         <component className="CurveComponent">
             <gizmos>
                 <gizmo className="CurveGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="PaintSurfaceComponent">
+            <gizmos>
+                <gizmo className="PaintSurfaceGizmo"></gizmo>
             </gizmos>
         </component>
     </components>

@@ -17,7 +17,7 @@ public enum GameAssetType {
 	VFX(new String[]{"tls"}, true),
 	VFX_OUTPUT(new String[]{"p"}, true),
 	SCRIPT(new String[]{"ts", "js"}, true),
-	TWEEN(new String[]{"tw"}, true),
+	ROUTINE(new String[]{"rw"}, true),
 	PREFAB(new String[]{"prefab"}, true),
 	SCENE(new String[]{"scn"}, true),
 	DIRECTORY(new String[]{}, false),
@@ -81,7 +81,7 @@ public enum GameAssetType {
 		case TILE_PALETTE:
 			return PaletteMetadata.class;
 		case VFX_OUTPUT:
-		case TWEEN:
+		case ROUTINE:
 		case SOUND:
 			return EmptyMetadata.class;
 		}

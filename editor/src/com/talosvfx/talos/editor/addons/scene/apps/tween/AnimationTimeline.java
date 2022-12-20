@@ -2,11 +2,11 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.TweenNode;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineNode;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
 
-public class AnimationTimeline extends TimelineWidget<TweenNode> {
+public class AnimationTimeline extends TimelineWidget<RoutineNode> {
 
     private Array<TrackRow> tracks = new Array<TrackRow>();
 
@@ -20,8 +20,8 @@ public class AnimationTimeline extends TimelineWidget<TweenNode> {
         });
     }
 
-    public void addTrack(TweenNode tweenNode) {
-        TrackRow track = new TrackRow(tweenNode, tracks.size);
+    public void addTrack(RoutineNode routineNode) {
+        TrackRow track = new TrackRow(routineNode, tracks.size);
         tracks.add(track);
         setData(tracks);
     }

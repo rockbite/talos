@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class ScriptPropertyBooleanWrapper extends ScriptPropertyWrapper<Boolean> {
+public class PropertyBooleanWrapper extends PropertyWrapper<Boolean> {
     @Override
     public Boolean parseValueFromString (String value) {
         return Boolean.valueOf(value);

@@ -9,16 +9,17 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
-    private final Table editing;
-    private final Table main;
-    private final Table progressContainer;
-    private final Table progress;
+    private Table editing;
+    private Table main;
+    private Table progressContainer;
+    private Table progress;
 
     private Label label;
     private Label valueLabel;
@@ -45,12 +46,18 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private boolean isDragging = false;
 
+    private boolean isDisabled;
+
     public ValueWidget() {
         editing = new Table();
         main = new Table();
         progressContainer = new Table();
         progress = new Table();
+    }
 
+    public ValueWidget(Skin skin) {
+        this();
+        init(skin);
     }
 
     @Override
@@ -117,6 +124,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(isDisabled) return false;
                 dragged = false;
                 lastPos = x;
 
@@ -190,6 +198,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     private void showEditMode() {
+        if(isDisabled) return;
         if(editing.isVisible()) return;
 
         getStage().setKeyboardFocus(textField);
@@ -350,5 +359,13 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     public void setNone() {
         valueLabel.setText("-");
+    }
+
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
     }
 }

@@ -3,16 +3,14 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScriptPropertyGameObjectWrapper extends ScriptPropertyWrapper<GameObject> {
+public class PropertyGameObjectWrapper extends PropertyWrapper<GameObject> {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(ScriptPropertyGameObjectWrapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(PropertyGameObjectWrapper.class);
 
     private String objectGOUUID;
     private String defaultGOUuid;

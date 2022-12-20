@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class ScriptPropertyStringWrapper extends ScriptPropertyWrapper<String> {
+public class PropertyStringWrapper extends PropertyWrapper<String> {
     @Override
     public String parseValueFromString (String value) {
         return value;

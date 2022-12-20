@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 
@@ -13,6 +14,7 @@ public class NodeStageActor extends Table {
     private Matrix4 transform;
 
     NodeStageActor(DynamicNodeStage nodeStage) {
+        setTouchable(Touchable.enabled);
         this.nodeStage = nodeStage;
         transform = new Matrix4();
     }

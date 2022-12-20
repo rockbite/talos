@@ -437,13 +437,13 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 }
             });
 
-            createSubMenuItem(popupMenu, "Tween", new ClickListener() {
+            createSubMenuItem(popupMenu, "Routine", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
 
                     FileHandle currentFolder = getCurrentFolder();
 
-                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Tween", "tw");
+                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Routine", "rw");
                     newScriptDestination.writeString("{}", false);
 
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);

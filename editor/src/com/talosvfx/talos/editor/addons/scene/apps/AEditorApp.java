@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 
 public abstract class AEditorApp<T> {
 
@@ -8,20 +9,20 @@ public abstract class AEditorApp<T> {
     protected String identifier;
     protected T object;
 
-    protected AppListener listener;
+    protected Array<AppListener> appListeners = new Array<>();
 
     public void onHide () {
 
     }
 
-    interface AppListener {
+    public interface AppListener {
         void closeRequested();
     }
 
     public boolean notifyClose() {
 
-        if(listener != null) {
-            listener.closeRequested();
+        for (AppListener appListener : appListeners) {
+            appListener.closeRequested();
         }
 
         return true;
@@ -46,6 +47,6 @@ public abstract class AEditorApp<T> {
     }
 
     public void addAppListener(AppListener listener) {
-        this.listener = listener;
+        this.appListeners.add(listener);
     }
 }

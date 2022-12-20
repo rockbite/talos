@@ -5,13 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.apps.tween.TweenStage;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class AbstractTweenNode extends NodeWidget {
+public abstract class AbstractRoutineNode extends NodeWidget {
 
     protected ObjectMap<String, Object> params = new ObjectMap<>();
 
@@ -85,7 +85,7 @@ public abstract class AbstractTweenNode extends NodeWidget {
                 return false;
             }
 
-            AbstractTweenNode targetNode = (AbstractTweenNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
+            AbstractRoutineNode targetNode = (AbstractRoutineNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
 
             // animate the signal
             animateSignal(portName, connection);
@@ -205,7 +205,7 @@ public abstract class AbstractTweenNode extends NodeWidget {
 
             animateInput(name, first);
 
-            AbstractTweenNode targetNode = (AbstractTweenNode) first.targetNode;
+            AbstractRoutineNode targetNode = (AbstractRoutineNode) first.targetNode;
             return targetNode.getOutputValue(first.targetSlot, params);
         }
     }
@@ -219,7 +219,7 @@ public abstract class AbstractTweenNode extends NodeWidget {
     }
 
     public float getDelta() {
-        return ((TweenStage)nodeBoard.getNodeStage()).getDelta();
+        return ((RoutineStage)nodeBoard.getNodeStage()).getDelta();
     }
 }
 

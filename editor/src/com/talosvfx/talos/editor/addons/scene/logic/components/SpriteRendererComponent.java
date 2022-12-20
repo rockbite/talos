@@ -186,7 +186,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         return 2;
     }
 
-    GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
+    transient GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
         @Override
         public void onUpdate () {
             if (gameAsset.isBroken()) {

@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -69,8 +70,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
-import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
@@ -1356,6 +1355,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onProjectDirectoryContentsChanged (ProjectDirectoryContentsChanged event) {
+		// TODO: 11/24/2022 THIS IS A TEMPORARY CHANGES BEFORE TOM's REFACTOR FOR THE WHOLE THING
+		for (FileHandle fileHandle : event.getChanges().changed) {
+			GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
+			if (assetForPath != null) {
+				for (GameAsset.GameAssetUpdateListener listener : assetForPath.listeners) {
+					listener.onUpdate();
+				}
+			}
+		}
+
 		if (event.getChanges().directoryStructureChange()) {
 			boolean nonMeta = false;
 			for (FileHandle added : event.getChanges().added) {
@@ -1412,6 +1421,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Camera camera = currentCameraSupplier.get();
 
 		super.drawEntitiesForSelection();
+		renderer.setRenderingEntitySelectionBuffer(true);
 		renderer.skipUpdates = true;
 
 		renderer.setRenderParentTiles(false);
@@ -1426,7 +1436,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		customBatch.end();
 		renderer.skipUpdates = false;
-
+		renderer.setRenderingEntitySelectionBuffer(false);
 	}
 
 	@Override
