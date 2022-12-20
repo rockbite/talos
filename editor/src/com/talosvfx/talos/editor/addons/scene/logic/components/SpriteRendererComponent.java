@@ -64,6 +64,13 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
         gameAssetUpdateListener.onUpdate();
 
+        if (fixAspectRatio) {
+            final Texture texture = this.gameAsset.getResource();
+
+            if (texture == null) return;
+            final float aspect = texture.getHeight() * 1f / texture.getWidth();
+            size.y = size.x * aspect;
+        }
     }
 
     public enum RenderMode {
@@ -116,7 +123,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         fixAspectRatioWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (!fixAspectRatio) return;;
+                if (!fixAspectRatio) return;
 
                 final Texture texture = getGameResource().getResource();
 
@@ -127,7 +134,6 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
                 final ValueWidget yValue = ((Vector2PropertyWidget) sizeWidget).yValue;
                 yValue.setValue(size.y, false);
-
             }
         });
 
