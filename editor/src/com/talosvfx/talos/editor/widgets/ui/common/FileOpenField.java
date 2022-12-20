@@ -22,7 +22,7 @@ public class FileOpenField extends Table {
         RoundedFlatButton selectDirectory = new RoundedFlatButton(); selectDirectory.makeRight("Open");
 
         Table inputContainer = new Table();
-        inputContainer.setBackground(ColorLibrary.createClippedPatch(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.DARK_GRAY));
+        inputContainer.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.DARK_GRAY));
 
         projectDirectory.getStyle().background = null;
         projectDirectory.getStyle().focusedBackground = null;

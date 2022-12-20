@@ -41,7 +41,7 @@ public class DummyLayoutApp implements LayoutApp {
 	private Table createTab (String tabName) {
 		Table tab = new Table();
 		tab.setTouchable(Touchable.enabled);
-		tab.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+		tab.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
 
 		tab.padLeft(10);
 		tab.padRight(10);
@@ -70,9 +70,9 @@ public class DummyLayoutApp implements LayoutApp {
 		this.active = active;
 
 		if (active) {
-			tabWidget.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+			tabWidget.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
 		} else {
-			tabWidget.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
+			tabWidget.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
 		}
 	}
 

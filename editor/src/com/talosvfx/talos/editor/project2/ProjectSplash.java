@@ -121,7 +121,7 @@ public class ProjectSplash extends Table {
 		table.row();
 
 		RoundedFlatButton createBtn = new RoundedFlatButton(); createBtn.make("Create");
-		createBtn.getStyle().up = ColorLibrary.createClippedPatch(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+		createBtn.getStyle().up = ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.LIGHT_BLUE);
 		table.add(createBtn).left().expand().padTop(15).width(100).padLeft(200);
 		table.row();
 
