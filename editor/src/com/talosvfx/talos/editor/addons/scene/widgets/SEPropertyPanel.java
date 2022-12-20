@@ -399,7 +399,7 @@ public class SEPropertyPanel extends PropertyPanel {
                             setToNameAndCreate("RR Name", "Use characters [a-Z] only", "[a-zA-Z]*", new Consumer<String>() {
                                 @Override
                                 public void accept(String newFileName) {
-                                    logger.info("routine rename redo");
+                                    logger.info("Reimplement create routine and register");
                                     // TODO: 20.12.22 FIX SCENEEDITORADDON
 //                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
 //
