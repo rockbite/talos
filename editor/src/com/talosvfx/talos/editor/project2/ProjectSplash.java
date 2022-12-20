@@ -48,7 +48,7 @@ public class ProjectSplash extends Table {
 
 		Image splash = new Image(new Texture(Gdx.files.internal("splash.png")));
 
-		add(splash).size(990, 495).pad(4);
+		add(splash).width(990).pad(4);
 		row();
 
 		Table content = new Table();
