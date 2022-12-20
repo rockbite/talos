@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.SceneMetadata;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
+import lombok.Getter;
 
 public enum GameAssetType {
 	SPRITE(new String[]{"png", "jpg", "jpeg"}, true),
@@ -17,12 +18,13 @@ public enum GameAssetType {
 	VFX(new String[]{"tls"}, true),
 	VFX_OUTPUT(new String[]{"p"}, true),
 	SCRIPT(new String[]{"ts", "js"}, true),
-	ROUTINE(new String[]{"rw"}, true),
+	ROUTINE(new String[]{"rt"}, true),
 	PREFAB(new String[]{"prefab"}, true),
 	SCENE(new String[]{"scn"}, true),
 	DIRECTORY(new String[]{}, false),
 	TILE_PALETTE(new String[]{"ttp"}, true);
 
+	@Getter
 	private ObjectSet<String> extensions;
 	private boolean isRootGameAsset;
 

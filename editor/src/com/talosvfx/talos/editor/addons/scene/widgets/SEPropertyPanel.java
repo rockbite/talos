@@ -27,8 +27,13 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
+import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -400,29 +405,38 @@ public class SEPropertyPanel extends PropertyPanel {
                                 @Override
                                 public void accept(String newFileName) {
                                     logger.info("Reimplement create routine and register");
-                                    // TODO: 20.12.22 FIX SCENEEDITORADDON
-//                                    FileHandle currentFolder = SceneEditorAddon.get().projectExplorer.getDirectoryViewWidget().getCurrentFolder();
-//
-//                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), newFileName, "rw");
-//                                    newDestination.writeString("", false);
-//
-//                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
-//
-//                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
-//
-//                                    if (assetForPath != null) {
-//                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-//                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
-//                                        gameObject.addComponent(routineRendererComponent);
-//
-//                                        ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-//                                        projectExplorer.reload();
-//
-//                                        SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-//                                        SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-//                                    }
-//
-//                                    remove();
+
+                                    // todo: but i want to ask explorer of it's current selected folder
+                                    // check if project explorer is open and has a directory selected
+                                    // if it does not use root root project dir
+                                    FileHandle assetDir = null;
+                                    ProjectExplorerApp projectExplorerApp = SharedResources.appManager.getSingletonAppInstance(ProjectExplorerApp.class);
+                                    if(projectExplorerApp != null) {
+                                        assetDir = projectExplorerApp.getCurrentSelectedFolder();
+                                    }
+                                    if(assetDir == null) {
+                                        assetDir = SharedResources.currentProject.rootProjectDir();
+                                    }
+
+                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
+                                    newDestination.writeString("", false);
+                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
+                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newDestination, false);
+
+                                    if (assetForPath != null) {
+                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                                        routineRendererComponent.setGameAsset((GameAsset<String>)assetForPath);
+                                        gameObject.addComponent(routineRendererComponent);
+
+                                        Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(assetDir.path()));
+
+                                        if (getCurrentHolder() instanceof GameObjectContainer) {
+                                            SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
+                                            showPanel(gameObject, gameObject.getPropertyProviders());
+                                        }
+                                    }
+
+                                    remove();
                                 }
                             });
 

@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -725,6 +726,13 @@ public class ProjectExplorerWidget extends Table implements Observer {
     public void onProjectLoad (ProjectLoadedEvent event) {
         TalosProjectData projectData = event.getProjectData();
         loadDirectoryTree(projectData.rootProjectDir().path());
+    }
+
+    @EventHandler
+    public void onDirectoryContentsChanged (DirectoryChangedEvent event) {
+        if(getCurrentFolder().path().equals(event.getDirectoryPath())) {
+            reload();
+        }
     }
 
     @EventHandler

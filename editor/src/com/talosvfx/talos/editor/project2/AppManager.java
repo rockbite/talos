@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.tween.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -84,6 +85,33 @@ public class AppManager {
 				}
 			}
 		}
+	}
+
+	public Array<BaseApp> getAppInstances() {
+		Array<BaseApp> result = new Array<>();
+		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
+			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
+			for (int i = apps.size - 1; i >= 0; i--) {
+				BaseApp<?> baseApp = apps.get(i);
+				result.add(baseApp);
+			}
+		}
+
+		return result;
+	}
+
+	public <T extends BaseApp> T getSingletonAppInstance(Class<T> appClass) {
+		// todo: write this
+		Array<BaseApp> appInstances = getAppInstances();
+		for(BaseApp app: appInstances) {
+			if(!app.singleton) {
+				continue;
+			}
+			if(app.getClass().equals(appClass)) {
+				return (T) app;
+			}
+		}
+		return null;
 	}
 
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
@@ -179,6 +207,7 @@ public class AppManager {
 
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.ROUTINE, RoutineEditorApp.class);
 	}
 
 	public <T> boolean canOpenInTalos (GameAsset<T> gameAsset) {

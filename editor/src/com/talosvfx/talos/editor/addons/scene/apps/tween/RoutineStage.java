@@ -14,14 +14,11 @@ import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -36,7 +33,7 @@ import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class RoutineStage extends DynamicNodeStage implements Observer {
 
-    public final RoutineEditor routineEditor;
+    public final RoutineEditorApp routineEditorApp;
 
     public RoutineConfigMap routineConfigMap;
 
@@ -46,15 +43,16 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
 
     public RoutineInstance routineInstance; // runtime
 
-    public RoutineStage(RoutineEditor routineEditor, Skin skin) {
+    public RoutineStage(RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
-        this.routineEditor = routineEditor;
+        this.routineEditorApp = routineEditorApp;
 
+        // todo: handle saving
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if(keycode == Input.Keys.S && ctrlPressed()) {
-                    writeData(routineEditor.targetFileHandle);
+                   // writeData(routineEditorApp.getAsset());
                 }
                 return super.keyDown(event, keycode);
             }
@@ -245,8 +243,8 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         Array<RoutineInstance> result = new Array<>();
         Array<GameObject> list = new Array<>();
 
-        if(routineEditor.scenePreviewStage != null) {
-            GameObject root = routineEditor.scenePreviewStage.currentScene.root;
+        if(routineEditorApp.scenePreviewStage != null) {
+            GameObject root = routineEditorApp.scenePreviewStage.currentScene.root;
             root.findGOsWithComponents(list, RoutineRendererComponent.class);
 
             for (GameObject gameObject : list) {

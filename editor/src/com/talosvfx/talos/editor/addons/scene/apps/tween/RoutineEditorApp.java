@@ -2,73 +2,61 @@ package com.talosvfx.talos.editor.addons.scene.apps.tween;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class RoutineEditor extends AEditorApp<FileHandle> {
+public class RoutineEditorApp extends AppManager.BaseApp<FileHandle> {
 
-    private final RoutineConfigMap routineConfigMap;
-    private String title;
+    private RoutineConfigMap routineConfigMap;
     public RoutineStage routineStage;
-    public AnimationTimeline animationTimeline;
     public VariableCreationWindow variableCreationWindow;
-
-    public FileHandle targetFileHandle;
 
     public ScenePreviewStage scenePreviewStage;
 
     public SplitPane splitPane;
 
-    public RoutineEditor(FileHandle twFileHandle) {
-        super(twFileHandle);
-        identifier = twFileHandle.path();
-        title = twFileHandle.name();
-        targetFileHandle = twFileHandle;
+    private Table content;
 
+    public RoutineEditorApp() {
         routineConfigMap = new RoutineConfigMap();
         FileHandle handle = Gdx.files.internal("addons/scene/tween-nodes.xml");
         routineConfigMap.loadFrom(handle);
-        variableCreationWindow = new VariableCreationWindow();
+        //variableCreationWindow = new VariableCreationWindow();
+        //variableCreationWindow.reloadWidgets(routineStage);
 
         initContent();
 
-        addAppListener(new AppListener() {
+        DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
             @Override
-            public void closeRequested () {
-                // TODO: 20.12.22 FIX SCENEEDITORADDON
-                // TODO: 20.12.22 FIX TALOSMAININSTANCE
-//                SceneEditorAddon.get().routineEditor = null;
-//                TalosMain.Instance().getInputMultiplexer().removeProcessor(routineStage.getStage());
+            public Actor getMainContent() {
+                return content;
             }
-        });
+        };
 
-        variableCreationWindow.reloadWidgets(routineStage);
+        this.gridAppReference = app;
+
     }
 
-    @Override
     public void initContent() {
+
         content = new Table();
-
-        Skin skin = TalosMain.Instance().UIStage().getSkin();
-
-        /*
-        animationTimeline = new AnimationTimeline(skin);
-        SplitPane splitPane = new SplitPane(animationTimeline, , false, skin);
-        */
-        routineStage = new RoutineStage(this, skin);
+        routineStage = new RoutineStage(this, SharedResources.skin);
         routineStage.init();
         routineStage.routineConfigMap = routineConfigMap;
 
         try {
-            routineStage.loadFrom(targetFileHandle);
+            //routineStage.loadFrom(gameAsset.getResource()); // todo: this is null
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,19 +64,10 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         scenePreviewStage = new ScenePreviewStage();
         Table table = new Table();
         table.add(routineStage.getContainer()).grow();
-        table.addActor(variableCreationWindow);
-        splitPane = new SplitPane(scenePreviewStage, table,  false, TalosMain.Instance().getSkin());
+        //table.addActor(variableCreationWindow);
+        splitPane = new SplitPane(scenePreviewStage, table,  false, SharedResources.skin);
         splitPane.setSplitAmount(0.2f);
-
         content.add(splitPane).grow();
-        // TODO: 20.12.22 FIX TALOSMAININSTANCE
-//        TalosMain.Instance().getInputMultiplexer().addProcessor(routineStage.getStage());
-
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
     }
 
     public void deleteParamTemplateWithIndex (int index) {
@@ -139,5 +118,18 @@ public class RoutineEditor extends AEditorApp<FileHandle> {
         routineInstance.createNewPropertyWrapper();
         variableCreationWindow.reloadWidgets(routineStage);
         routineStage.reloadRoutineInstancesFromMemory();
+    }
+
+    @Override
+    public String getAppName() {
+        if(gameAsset == null) {
+            return "null"; // lol wtf
+        }
+        return gameAsset.nameIdentifier;
+    }
+
+    @Override
+    public void onRemove() {
+        // remove listeners and stuff somehow
     }
 }
