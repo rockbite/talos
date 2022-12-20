@@ -125,9 +125,6 @@ public class ProjectSplash extends Table {
 		table.add(createBtn).left().expand().padTop(15).width(100).padLeft(200);
 		table.row();
 
-		table.add().left().expand().padTop(15).width(100).padLeft(200);
-		table.row();
-
 		table.add().grow();
 
 		createBtn.addListener(new ClickListener() {
