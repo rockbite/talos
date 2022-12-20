@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.util.UUID;
 
@@ -40,14 +41,14 @@ public class DummyLayoutApp implements LayoutApp {
 	private Table createTab (String tabName) {
 		Table tab = new Table();
 		tab.setTouchable(Touchable.enabled);
-		tab.setBackground(skin.getDrawable("tab-bg"));
+		tab.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
 
 		tab.padLeft(10);
 		tab.padRight(10);
 		VisLabel visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
-		tab.add(visLabel);
+		tab.add(visLabel).pad(5).padLeft(0);
 
-		VisImageButton actor = new VisImageButton(skin.getDrawable("ic-fileset-file-ignore"));
+		VisImageButton actor = new VisImageButton(skin.getDrawable("ic-small-compression"));
 		actor.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
@@ -69,9 +70,9 @@ public class DummyLayoutApp implements LayoutApp {
 		this.active = active;
 
 		if (active) {
-			tabWidget.setBackground(skin.getDrawable("tab-bg"));
+			tabWidget.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
 		} else {
-			tabWidget.setBackground(skin.newDrawable("tab-bg", 0.5f, 0.5f, 0.5f, 1f));
+			tabWidget.setBackground(ColorLibrary.createClippedPatch(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
 		}
 	}
 
