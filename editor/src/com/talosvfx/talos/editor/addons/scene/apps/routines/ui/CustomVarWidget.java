@@ -14,11 +14,14 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import lombok.Getter;
 
 public class CustomVarWidget extends Table {
 
     private final Table editing;
     private final Table main;
+    @Getter
+    private final int index;
 
     private Label label;
     private Label valueLabel;
@@ -41,7 +44,8 @@ public class CustomVarWidget extends Table {
     private ATypeWidget innerWidget;
     private Label typeLabel;
 
-    public CustomVarWidget(ATypeWidget innerWidget) {
+    public CustomVarWidget(ATypeWidget innerWidget, int index) {
+        this.index = index;
         editing = new Table();
         main = new Table();
 

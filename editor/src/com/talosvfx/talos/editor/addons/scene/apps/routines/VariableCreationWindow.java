@@ -19,7 +19,6 @@ import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
-import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class VariableCreationWindow extends Table {
     private final Table content;
     private final Cell<Table> contentCell;
     private DragAndDrop dragAndDrop;
-    private Array<VariableTemplateRow<?>> templateRowArray = new Array<>();
+    private Array<CustomVarWidget> templateRowArray = new Array<>();
 
     private RoutineStage routineStage;
 
@@ -85,82 +84,30 @@ public class VariableCreationWindow extends Table {
         for (int i = 0; i < propertyWrappers.size; i++) {
             PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
 
-            CustomVector2Widget widget = new CustomVector2Widget(); // todo, support types
-            CustomVarWidget test = new CustomVarWidget(widget);
-            test.setValue(propertyWrapper.propertyName);
-            inner.add(test).padTop(2).growX();
+            CustomVector2Widget innerWidget = new CustomVector2Widget(); // todo, support types
+            CustomVarWidget widget = new CustomVarWidget(innerWidget, propertyWrapper.index);
+            widget.setValue(propertyWrapper.propertyName);
+            inner.add(widget).padTop(2).growX();
             inner.row();
+
+            templateRowArray.add(widget);
         }
-
-        /*
-        CustomVector2Widget widget = new CustomVector2Widget();
-        CustomVarWidget test = new CustomVarWidget(widget);
-        test.setValue("name");
-        content.add(test).padTop(10).growX();*/
-
-
-
-        /*
-        clear();
-        setSize(420, 300);
-        defaults().pad(5);
-        bottom().left();
-
-        Table mainContent = new Table();
-        mainContent.setSkin(routineStage.skin);
-        mainContent.setBackground("background-fill");
-
-        Table contentTable = new Table();
-        contentTable.top().left();
-        ScrollPane scrollPane = new ScrollPane(contentTable);
-        scrollPane.setScrollingDisabled(true, false);
-
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
-        templateRowArray.clear();
-        for (int i = 0; i < propertyWrappers.size; i++) {
-            PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
-            VariableTemplateRow<?> variableTemplateRow = new VariableTemplateRow<>(propertyWrapper, routineStage);
-            if (i == 0) {
-                variableTemplateRow.textValueWidget.setType(ValueWidget.Type.TOP);
-            } else if (i == propertyWrappers.size - 1) {
-                variableTemplateRow.textValueWidget.setType(ValueWidget.Type.BOTTOM);
-            } else {
-                variableTemplateRow.textValueWidget.setType(ValueWidget.Type.MID);
-            }
-
-            if (propertyWrappers.size == 1) {
-                variableTemplateRow.textValueWidget.setType(ValueWidget.Type.NORMAL);
-            }
-
-            contentTable.add(variableTemplateRow).growX();
-            contentTable.row();
-            templateRowArray.add(variableTemplateRow);
-        }
-
-        mainContent.add(scrollPane).grow();
-        add(mainContent).grow();
-        row();
-
-        addButton();
 
         configureDragAndDrop();
-
-         */
     }
 
-    /*
+
     private void configureDragAndDrop() {
         dragAndDrop.clear();
-        for (VariableTemplateRow variableTemplateRow : templateRowArray) {
-            dragAndDrop.addSource(new DragAndDrop.Source(variableTemplateRow) {
+        for (CustomVarWidget row : templateRowArray) {
+            dragAndDrop.addSource(new DragAndDrop.Source(row) {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                    payload.setObject(routineStage.routineInstance.getPropertyWrapperWithIndex(variableTemplateRow.propertyWrapper.index));
+                    payload.setObject(routineStage.routineInstance.getPropertyWrapperWithIndex(row.getIndex()));
                     Table payloadTable = new Table();
-                    float width = variableTemplateRow.getWidth();
-                    float height = variableTemplateRow.getHeight();
+                    float width = row.getWidth();
+                    float height = row.getHeight();
                     payloadTable.setSize(width, height);
                     payloadTable.setSkin(routineStage.skin);
                     payloadTable.setBackground("button-over");
@@ -197,5 +144,5 @@ public class VariableCreationWindow extends Table {
                 }
             }
         });
-    }*/
+    }
 }
