@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -25,6 +26,12 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
+    private ColorLibrary.BackgroundColor mainBgColor = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+
+    public void setMainColor(ColorLibrary.BackgroundColor color) {
+        mainBgColor = color;
+        setBackgrounds();
+    }
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -34,8 +41,8 @@ public class ValueWidget extends AbstractWidget<Float> {
     private boolean isSelected;
     private boolean isHover;
 
-    private float minValue;
-    private float maxValue;
+    private float minValue = -9999;
+    private float maxValue = 9999;
     private float step = 0.01f;
 
     private float value;
@@ -247,7 +254,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     private void setBackgrounds () {
         String shape = getShape();
 
-        ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+        ColorLibrary.BackgroundColor color = mainBgColor;
 
         if(isSelected) {
             color = ColorLibrary.BackgroundColor.MID_GRAY;

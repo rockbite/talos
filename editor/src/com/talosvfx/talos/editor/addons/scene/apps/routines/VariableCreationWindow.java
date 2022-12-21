@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -9,6 +10,8 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomFloatWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomVector2Widget;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
@@ -31,6 +34,40 @@ public class VariableCreationWindow extends Table {
 
     private RoutineStage routineStage;
 
+    class TopBarButton extends Table {
+        private final ClickListener clickListener;
+        private final Image icon;
+
+        public TopBarButton() {
+            icon = new Image(SharedResources.skin.getDrawable("ic-plus"));
+            icon.setTouchable(Touchable.enabled);
+            add(icon).pad(5);
+            setTouchable(Touchable.enabled);
+
+            clickListener = new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                }
+            };
+
+            addListener(clickListener);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            if(clickListener.isOver()) {
+
+            } else {
+
+            }
+
+            setBackground(SharedResources.skin.getDrawable("mini-btn-bg"));
+        }
+    }
+
     public VariableCreationWindow (RoutineStage routineStage) {
         this.routineStage = routineStage;
         setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
@@ -47,6 +84,8 @@ public class VariableCreationWindow extends Table {
         topBar.add(label).left().pad(5).expandX();
 
 
+
+
         add(topBar).growX();
         row();
         contentCell = add(content).grow();
@@ -55,10 +94,14 @@ public class VariableCreationWindow extends Table {
     public void reloadWidgets() {
         content.clear();
 
-        CustomVarWidget test = new CustomVarWidget();
-        test.setValue("test");
+        CustomVector2Widget widget = new CustomVector2Widget();
 
-        content.add(test).pad(10);
+        CustomVarWidget test = new CustomVarWidget(widget);
+        test.setValue("name");
+
+        content.add(test).padTop(10).growX();
+
+
 
         /*
         clear();

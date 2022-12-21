@@ -1,16 +1,21 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class CustomVarWidget extends Table {
 
@@ -29,50 +34,137 @@ public class CustomVarWidget extends Table {
     private String value;
 
     private EventListener stageListener;
+    private ArrowButton arrowButton;
+    private Table top;
+    private Table bottom;
+    private Table fieldContainer;
+    private Cell<Table> contentCell;
 
-    public CustomVarWidget() {
+    private ATypeWidget innerWidget;
+    private Label typeLabel;
+
+    public CustomVarWidget(ATypeWidget innerWidget) {
         editing = new Table();
         main = new Table();
+
+        this.innerWidget = innerWidget;
+
         init(SharedResources.skin);
+    }
+
+    class ArrowButton extends Table {
+        private final ClickListener clickListener;
+        private final Image arrowIcon;
+
+        private boolean isCollapsed = true;
+
+        public ArrowButton() {
+            arrowIcon = new Image();
+            arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-right"));
+            arrowIcon.setTouchable(Touchable.enabled);
+
+            add(arrowIcon).pad(5);
+
+            setTouchable(Touchable.enabled);
+
+            clickListener = new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                }
+            };
+
+            addListener(clickListener);
+        }
+
+        public void setCollapsed(boolean isCollapsed) {
+            this.isCollapsed = isCollapsed;
+
+            if(isCollapsed) {
+                arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-right"));
+            } else {
+                arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-down"));
+            }
+        }
+
+        public void toggle() {
+            setCollapsed(!isCollapsed);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.BRIGHT_GRAY;
+            if(!clickListener.isOver()) {
+                color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+            }
+
+            setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUARE, color));
+        }
     }
 
     private void init(Skin skin) {
         setSkin(skin);
         isSelected = false;
 
-        Table top = new Table();
-        Table bottom = new Table();
+        top = new Table();
+        bottom = new Table();
+        fieldContainer = new Table();
 
         label = new Label("", skin);
         valueLabel = new Label("", skin);
         textField = new TextField("0", getSkin(), "no-bg");
 
+        typeLabel = new Label(innerWidget.getTypeName(), skin);
+        typeLabel.setColor(Color.GRAY);
+
         Stack mainStack = new Stack();
 
         editing.add(textField).growX().padLeft(12);
 
-        Image arrowIcon = new Image();
-        arrowIcon.setDrawable(skin.getDrawable("mini-arrow-right"));
-        arrowIcon.setTouchable(Touchable.enabled);
+        arrowButton = new ArrowButton();
+        top.add(arrowButton).growY().left();
 
-        main.add(arrowIcon).padLeft(5).left();
+        arrowButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                arrowButton.toggle();
+
+                if(arrowButton.isCollapsed) {
+                    bottom.clearChildren();
+                    bottom.pack();
+                    UIUtils.invalidateForDepth(bottom, 4);
+                } else {
+                    bottom.clearChildren();
+                    bottom.add(innerWidget);
+                    bottom.pack();
+                    UIUtils.invalidateForDepth(bottom, 4);
+                }
+            }
+        });
 
         main.add(valueLabel).padLeft(12).left().width(0).growX().expandX();
         valueLabel.setEllipsis(true);
         valueLabel.setAlignment(Align.left);
+
+        main.add(typeLabel).padRight(6).right().expandX();
 
         mainStack.add(editing);
         mainStack.add(main);
 
         hideEditMode();
 
-        top.add(mainStack).height(32).growX();
+        fieldContainer.add(mainStack).grow();
+
+        top.add(fieldContainer).height(32).growX();
 
         setTouchable(Touchable.enabled);
 
         setBackgrounds();
 
-        addListener(new ClickListener() {
+        fieldContainer.addListener(new ClickListener() {
 
             private boolean dragged = false;
 
@@ -143,7 +235,7 @@ public class CustomVarWidget extends Table {
                 Vector2 tmpVec = new Vector2();
                 tmpVec.set(x, y);
                 CustomVarWidget.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = CustomVarWidget.this.hit(tmpVec.x, tmpVec.y, false);
+                Actor touchTarget = fieldContainer.hit(tmpVec.x, tmpVec.y, false);
                 if (touchTarget == null) {
                     getStage().setKeyboardFocus(null);
                 }
@@ -153,6 +245,8 @@ public class CustomVarWidget extends Table {
         };
 
         add(top).growX();
+        row();
+        contentCell = add(bottom).growX();
     }
 
     @Override
@@ -206,7 +300,7 @@ public class CustomVarWidget extends Table {
             }
         }
 
-        setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_SQUIRCLE, color));
+        fieldContainer.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_SQUARE, color));
     }
 
     public void setLabel(String text) {
