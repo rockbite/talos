@@ -51,6 +51,12 @@ public class CustomVarWidget extends Table {
 
         editing.add(textField).growX().padLeft(12);
 
+        Image arrowIcon = new Image();
+        arrowIcon.setDrawable(skin.getDrawable("mini-arrow-right"));
+        arrowIcon.setTouchable(Touchable.enabled);
+
+        main.add(arrowIcon).padLeft(5).left();
+
         main.add(valueLabel).padLeft(12).left().width(0).growX().expandX();
         valueLabel.setEllipsis(true);
         valueLabel.setAlignment(Align.left);
