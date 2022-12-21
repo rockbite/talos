@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
 public class TalosMain2 extends ApplicationAdapter {
@@ -70,8 +71,12 @@ public class TalosMain2 extends ApplicationAdapter {
 		fullScreen.setFillParent(true);
 
 		Table topBar = new Table();
-		fullScreen.add(topBar).growX().height(64);
+		topBar.setBackground(SharedResources.skin.getDrawable("top-menu-bg"));
+		fullScreen.add(topBar).growX().height(30);
 		fullScreen.row();
+		MainMenu menu = new MainMenu();
+		menu.buildFrom(Gdx.files.internal("menu-bar.xml"));
+		topBar.add(menu).grow().padLeft(4);
 
 		fullScreen.add(layoutGridContainer).grow();
 
