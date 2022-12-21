@@ -1,9 +1,12 @@
 package com.talosvfx.talos.editor.project2;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
@@ -52,6 +55,11 @@ public class TalosProjectData implements Json.Serializable {
 
 		talosProjectData.projectFile = dirHandle.child(projectNameText + "." + TALOS_PROJECT_EXTENSION);
 		talosProjectData.createDefaultDirs();
+		talosProjectData.createDefaultFiles();
+
+		JsonReader jsonReader = new JsonReader();
+		JsonValue jsonValue = jsonReader.parse(Gdx.files.internal("layouts/basic.json"));
+		talosProjectData.jsonLayoutRepresentation = jsonValue;
 
 		talosProjectData.save();
 
@@ -71,11 +79,12 @@ public class TalosProjectData implements Json.Serializable {
 		return projectFile.parent();
 	}
 
+	public void createDefaultFiles () {
+		// create an empty scene file
+		AssetRepository.getInstance().copySampleSceneToProject(rootProjectDir().child("scenes"));
+	}
 	private void createDefaultDirs () {
 		rootProjectDir().child("scenes").mkdirs();
-		rootProjectDir().child("textures").mkdirs();
-		rootProjectDir().child("models").mkdirs();
-		rootProjectDir().child("vfx").mkdirs();
 	}
 
 	public String getAbsolutePathToProjectFile () {
@@ -95,6 +104,7 @@ public class TalosProjectData implements Json.Serializable {
 			jsonLayoutRepresentation = jsonData.getChild("currentLayout");
 		}
 	}
+
 	private JsonValue jsonLayoutRepresentation = null;
 
 	public void loadLayout () {
