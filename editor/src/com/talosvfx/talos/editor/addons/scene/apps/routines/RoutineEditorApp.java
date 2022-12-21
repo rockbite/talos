@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -40,12 +41,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         GenericStageWrappedViewportWidget routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
 
         routineStage.sendInStage(routineStageWrapper.getStage());
-        try {
-
-            routineStage.loadFrom(gameAsset);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
             @Override
@@ -77,7 +72,12 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
 
     }
 
+    @Override
+    public void updateForGameAsset (GameAsset<RoutineData> gameAsset) {
+        super.updateForGameAsset(gameAsset);
 
+        routineStage.loadFrom(gameAsset);
+    }
 
     public void deleteParamTemplateWithIndex (int index) {
         RoutineInstance routineInstance = routineStage.routineInstance;

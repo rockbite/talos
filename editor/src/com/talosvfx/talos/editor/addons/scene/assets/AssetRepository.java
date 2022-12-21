@@ -920,6 +920,15 @@ public class AssetRepository implements Observer {
 
 	{
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
+		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
+	}
+
+	private String serializeRoutine (GameAsset<RoutineData> gameAsset, Json json) {
+		RoutineData resource = gameAsset.getResource();
+
+		System.out.println("this is just not gonna work, instance data needs completely redone");
+
+		return resource.jsonString;
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {

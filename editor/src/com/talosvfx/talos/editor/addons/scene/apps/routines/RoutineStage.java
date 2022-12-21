@@ -200,21 +200,26 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     @EventHandler
     public void onNodeCreatedEvent(NodeCreatedEvent event) {
         reloadRoutineInstancesFromMemory();
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
+
     }
 
     @EventHandler
     public void onNodeRemovedEvent(NodeRemovedEvent event) {
         reloadRoutineInstancesFromMemory();
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
     }
 
     @EventHandler
     public void onNodeConnectionCreatedEvent(NodeConnectionCreatedEvent event) {
         reloadRoutineInstancesFromMemory();
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
     }
 
     @EventHandler
     public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
         reloadRoutineInstancesFromMemory();
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
     }
 
     @EventHandler
@@ -226,6 +231,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         for (RoutineInstance instance : routineInstances) {
             updateRoutineInstanceDataFromWidget(instance, node);
         }
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
     }
 
     /**
