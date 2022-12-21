@@ -51,7 +51,7 @@ public class TalosControl implements Observer {
             String fileName = (String) event.getPayload();
 
             // murderous code here
-            SharedResources.appManager.closeAllApps();
+            SharedResources.appManager.removeAll();
 
             LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
             JsonReader jsonReader = new JsonReader();
