@@ -162,13 +162,6 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public void setGameAsset(GameAsset<RoutineData> gameAsset) {
         this.routineResource = gameAsset;
 
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run () {
-                //Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(RoutineRendererComponent.this, false));
-            }
-        });
-
         routineInstance = new RoutineInstance();
         // this needs changing
         RoutineConfigMap routineConfigMap = new RoutineConfigMap();

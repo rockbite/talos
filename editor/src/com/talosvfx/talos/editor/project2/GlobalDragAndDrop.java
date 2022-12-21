@@ -29,6 +29,14 @@ public class GlobalDragAndDrop {
 		dragAndDrop = new DragAndDrop();
 	}
 
+	public void removeTarget (DragAndDrop.Target target) {
+		dragAndDrop.removeTarget(target);
+	}
+
+	public void removeSource (DragAndDrop.Source source) {
+		dragAndDrop.removeSource(source);
+	}
+
 	public void addTarget (DragAndDrop.Target targetObject) {
 		dragAndDrop.addTarget(targetObject);
 
