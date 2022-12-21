@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.widgets.ui.menu;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
 import com.rockbite.bongo.engine.collections.SerializableObjectIntMap;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -55,7 +58,12 @@ public class MainMenu extends Table implements Observer {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                    openMenu(menuTab);
+                    if(menuTab == currentlyActive) {
+                        collapseAll();
+                    } else {
+                        openMenu(menuTab);
+                    }
+
 
                     return super.touchDown(event, x, y, pointer, button);
                 }
@@ -155,11 +163,104 @@ public class MainMenu extends Table implements Observer {
     public void collapseAll() {
         if(currentlyActive != null) {
             currentlyActive.collapse();
+        } else {
+            return;
         }
         for(MenuPopup popup : openStack) {
             popup.remove();
         }
         openStack.clear();
         currentlyActive = null;
+    }
+
+    @Override
+    protected void setStage(Stage stage) {
+        super.setStage(stage);
+
+        if(stage == null) return;
+
+        final Vector2 tmp = new Vector2();
+
+        stage.addListener(new ClickListener() {
+
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+
+                if(currentlyActive == null) super.mouseMoved(event, x, y);
+
+                float distance = findDistanceFromClosestPopup(x, y);
+                System.out.println(distance);
+
+                if(distance > 80) {
+                    collapseAll();
+                }
+
+                return super.mouseMoved(event, x, y);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                boolean anyOfOurs = false;
+                for(MenuPopup popup : openStack) {
+                    tmp.set(x, y);
+                    popup.stageToLocalCoordinates(tmp);
+                    if(popup.hit(tmp.x, tmp.y, true) != null) {
+                        anyOfOurs = true;
+                        break;
+                    }
+                }
+
+                for(MenuTab tab : tabs) {
+                    tmp.set(x, y);
+                    tab.stageToLocalCoordinates(tmp);
+                    if(tab.hit(tmp.x, tmp.y, true) != null) {
+                        anyOfOurs = true;
+                        break;
+                    }
+                }
+
+                if(!anyOfOurs) {
+                    collapseAll();
+                }
+
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+    }
+
+    private float findDistanceFromClosestPopup(float x, float y) {
+        float min = Float.MAX_VALUE;
+        for(MenuPopup popup : openStack) {
+            Rectangle rectangle = Pools.obtain(Rectangle.class);
+
+            rectangle.set(popup.getX(), popup.getY(), popup.getWidth(), popup.getHeight());
+
+            if(rectangle.contains(x, y)) return 0;
+
+            float dx = Float.MAX_VALUE;
+            float dy = Float.MAX_VALUE;
+            if(x < rectangle.x) {
+                dx = rectangle.x - x;
+            } else if(x > rectangle.x + rectangle.width) {
+                dx = x - (rectangle.x + rectangle.width);
+            }
+
+            if(y < rectangle.y) {
+                dy = rectangle.y - y;
+            } else if(y > rectangle.y + rectangle.height) {
+                dy = y - (rectangle.y + rectangle.height);
+            }
+
+            float diff = Math.min(dy, dx);
+
+            if(min > diff) {
+                min = diff;
+            }
+
+            Pools.free(rectangle);
+        }
+
+        return min;
     }
 }
