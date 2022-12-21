@@ -57,20 +57,14 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
-import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {

@@ -912,11 +912,20 @@ public class AssetRepository implements Observer {
 
 	{
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
+		saveStrategyObjectMap.put(GameAssetType.PREFAB, this::serializePrefab);
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {
 
 		Scene resource = gameAsset.getResource();
+		String asString = resource.getAsString();
+
+		return asString;
+	}
+
+	private String serializePrefab (GameAsset<Prefab> gameAsset, Json json) {
+
+		Prefab resource = gameAsset.getResource();
 		String asString = resource.getAsString();
 
 		return asString;
