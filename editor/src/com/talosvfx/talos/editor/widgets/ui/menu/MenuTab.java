@@ -73,7 +73,7 @@ public class MenuTab extends Table {
     }
 
     public Vector2 getPreferredPopupPosition() {
-        Vector2 vec = new Vector2(-4, 4);
+        Vector2 vec = new Vector2(-4, 1);
 
         localToStageCoordinates(vec);
 

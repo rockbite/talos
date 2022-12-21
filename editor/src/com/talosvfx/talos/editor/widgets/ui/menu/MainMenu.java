@@ -79,7 +79,7 @@ public class MainMenu extends Table implements Observer {
     private void processHierarchy(XmlReader.Element parent, String path, boolean isPrimary) {
         if(parent.getName().equals("menu")) {
             String newPath = path + parent.getAttribute("name");
-            MenuPopup menuPopup = new MenuPopup(newPath);
+            MenuPopup menuPopup = new MenuPopup(this, newPath);
             menuPopup.buildFrom(parent, isPrimary);
             popupMap.put(menuPopup.getId(), menuPopup);
 
@@ -107,6 +107,9 @@ public class MainMenu extends Table implements Observer {
 
     @EventHandler
     public void menuPopupOpenCommand(MenuPopupOpenCommand command) {
+
+        collapseUnrelatedHierarchies(command.getPath());
+
         MenuPopup menuPopup = popupMap.get(command.getPath());
 
         Stage stage = SharedResources.stage;
@@ -118,12 +121,45 @@ public class MainMenu extends Table implements Observer {
         openStack.add(menuPopup);
     }
 
-    public void collapseHierarchyOf(String id) {
-
-        for(MenuPopup popup : openStack) {
-            if(popup.getId().startsWith(id)) {
+    public void collapseUnrelatedHierarchies(String path) {
+        for(int i = openStack.size - 1; i >= 0; i--) {
+            MenuPopup popup = openStack.get(i);
+            if(!path.startsWith(popup.getId())) {
                 popup.remove();
+                openStack.removeIndex(i);
             }
         }
+    }
+
+    public void collapseHierarchyOf(String id) {
+
+        for(int i = openStack.size - 1; i >= 0; i--) {
+            MenuPopup popup = openStack.get(i);
+            if(popup.getId().startsWith(id)) {
+                popup.remove();
+                openStack.removeIndex(i);
+            }
+        }
+    }
+
+    public boolean isPathOpen(String id) {
+        for(MenuPopup popup : openStack) {
+            if(popup.getId().equals(id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void collapseAll() {
+        if(currentlyActive != null) {
+            currentlyActive.collapse();
+        }
+        for(MenuPopup popup : openStack) {
+            popup.remove();
+        }
+        openStack.clear();
+        currentlyActive = null;
     }
 }

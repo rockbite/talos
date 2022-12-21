@@ -1,12 +1,12 @@
 <root>
     <menu name="file" title="File">
-        <menu name="new" title="New">
+        <menu name="new" title="New" icon="icon-folder-new">
             <menu name="project" title="Project" />
             <menu name="routine" title="Routine" />
             <menu name="vfx" title="VFX" />
             <menu name="shader" title="Shader" />
         </menu>
-        <menu name="open" title="Open"/>
+        <menu name="open" title="Open" icon="icon-folder"/>
         <menu name="open_recent" title="Open Recent">
             <inject name="open_recent" />
         </menu>
