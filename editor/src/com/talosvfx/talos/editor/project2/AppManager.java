@@ -124,6 +124,7 @@ public class AppManager {
 		@Getter
 		protected LayoutApp gridAppReference;
 
+		@Getter
 		protected GameAsset<T> gameAsset;
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {

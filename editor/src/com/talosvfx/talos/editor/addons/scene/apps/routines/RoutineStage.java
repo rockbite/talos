@@ -172,6 +172,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
 
     public void routineUpdated () {
         Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(routineInstance));
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
 
 
 //        SharedResources.appManager.getAppInstances()
