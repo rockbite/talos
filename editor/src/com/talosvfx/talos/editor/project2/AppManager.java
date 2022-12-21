@@ -398,4 +398,15 @@ public class AppManager implements Observer {
 	public void closeAllFloatingWindows() {
 		// todo: close all floating windows
 	}
+
+	public void closeAllApps() {
+		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
+			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
+			for (int i = apps.size - 1; i >= 0; i--) {
+				BaseApp<?> appToRemove = apps.removeIndex(i);
+				appToRemove.onRemove();
+				appToRemove.getGridAppReference().getDestroyCallback().onDestroyRequest();
+			}
+		}
+	}
 }
