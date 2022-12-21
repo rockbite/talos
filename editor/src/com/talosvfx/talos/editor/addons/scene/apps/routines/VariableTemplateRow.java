@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
 import com.talosvfx.talos.editor.nodes.widgets.LabelWidget;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
@@ -28,10 +27,10 @@ public class VariableTemplateRow<T> extends Table {
 
     private boolean isOver = false;
 
-    public VariableTemplateRow (PropertyWrapper<T> propertyWrapper) {
+    public VariableTemplateRow (PropertyWrapper<T> propertyWrapper, RoutineStage routineStage) {
         setTouchable(Touchable.enabled);
         defaults().pad(5);
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = routineStage.skin;
         keyLabel = new LabelWidget();
         keyLabel.init(skin);
         keyLabel.set("Key", Align.center);
@@ -44,8 +43,7 @@ public class VariableTemplateRow<T> extends Table {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 int index = propertyWrapper.index;
-                // TODO: 20.12.22 FIX SCENEEDITORADDON
-//                SceneEditorAddon.get().routineEditor.changeKeyFor(index, textValueWidget.getValue());
+                routineStage.routineEditorApp.changeKeyFor(index, textValueWidget.getValue());
             }
         });
         add(textValueWidget);
@@ -64,8 +62,7 @@ public class VariableTemplateRow<T> extends Table {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 int index = propertyWrapper.index;
-                // TODO: 20.12.22 FIX SCENEEDITORADDON
-//                SceneEditorAddon.get().routineEditor.changeTypeFor(index, typeSelectWidget.getValue());
+                routineStage.routineEditorApp.changeTypeFor(index, typeSelectWidget.getValue());
             }
         });
         add(typeSelectWidget).growX();
@@ -76,7 +73,7 @@ public class VariableTemplateRow<T> extends Table {
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 int index = propertyWrapper.index;
-//                SceneEditorAddon.get().routineEditor.deleteParamTemplateWithIndex(index);
+                routineStage.routineEditorApp.deleteParamTemplateWithIndex(index);
             }
         });
         add(deleteButton);
