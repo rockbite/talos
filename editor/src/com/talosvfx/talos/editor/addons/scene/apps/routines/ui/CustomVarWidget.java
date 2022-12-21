@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
@@ -15,7 +14,6 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class CustomVarWidget extends Table {
 
@@ -159,6 +157,10 @@ public class CustomVarWidget extends Table {
         fieldContainer.add(mainStack).grow();
 
         top.add(fieldContainer).height(32).growX();
+
+
+        DeleteButton deleteButton = new DeleteButton();
+        top.add(deleteButton).growY();
 
         setTouchable(Touchable.enabled);
 

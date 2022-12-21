@@ -1,28 +1,28 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomFloatWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomVector2Widget;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
-import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
-import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class VariableCreationWindow extends Table {
 
@@ -33,40 +33,6 @@ public class VariableCreationWindow extends Table {
     private Array<VariableTemplateRow<?>> templateRowArray = new Array<>();
 
     private RoutineStage routineStage;
-
-    class TopBarButton extends Table {
-        private final ClickListener clickListener;
-        private final Image icon;
-
-        public TopBarButton() {
-            icon = new Image(SharedResources.skin.getDrawable("ic-plus"));
-            icon.setTouchable(Touchable.enabled);
-            add(icon).pad(5);
-            setTouchable(Touchable.enabled);
-
-            clickListener = new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                }
-            };
-
-            addListener(clickListener);
-        }
-
-        @Override
-        public void act(float delta) {
-            super.act(delta);
-
-            if(clickListener.isOver()) {
-
-            } else {
-
-            }
-
-            setBackground(SharedResources.skin.getDrawable("mini-btn-bg"));
-        }
-    }
 
     public VariableCreationWindow (RoutineStage routineStage) {
         this.routineStage = routineStage;
@@ -80,11 +46,20 @@ public class VariableCreationWindow extends Table {
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
         Label label = new Label("gavno.rt", skin);
-
         topBar.add(label).left().pad(5).expandX();
 
 
+        ImageButton plusButton = new ImageButton(
+                SharedResources.skin.newDrawable("mini-btn-bg", Color.WHITE),
+                SharedResources.skin.newDrawable("ic-plus", Color.WHITE));
+        topBar.add(plusButton).right().pad(5).expandX();
 
+        plusButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                routineStage.routineEditorApp.createNewVariable();
+            }
+        });
 
         add(topBar).growX();
         row();
@@ -94,12 +69,34 @@ public class VariableCreationWindow extends Table {
     public void reloadWidgets() {
         content.clear();
 
-        CustomVector2Widget widget = new CustomVector2Widget();
+        Table inner = new Table();
+        ScrollPane scrollPane = new ScrollPane(inner);
+        scrollPane.setScrollingDisabled(true, false);
+        content.add(scrollPane).grow().maxHeight(300);
 
+        //todo: add this to scroll pane
+
+        RoutineInstance routineInstance = routineStage.routineInstance;
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+
+        inner.add().padTop(5).row();
+
+        templateRowArray.clear();
+        for (int i = 0; i < propertyWrappers.size; i++) {
+            PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
+
+            CustomVector2Widget widget = new CustomVector2Widget(); // todo, support types
+            CustomVarWidget test = new CustomVarWidget(widget);
+            test.setValue(propertyWrapper.propertyName);
+            inner.add(test).padTop(2).growX();
+            inner.row();
+        }
+
+        /*
+        CustomVector2Widget widget = new CustomVector2Widget();
         CustomVarWidget test = new CustomVarWidget(widget);
         test.setValue("name");
-
-        content.add(test).padTop(10).growX();
+        content.add(test).padTop(10).growX();*/
 
 
 
@@ -152,6 +149,7 @@ public class VariableCreationWindow extends Table {
          */
     }
 
+    /*
     private void configureDragAndDrop() {
         dragAndDrop.clear();
         for (VariableTemplateRow variableTemplateRow : templateRowArray) {
@@ -199,19 +197,5 @@ public class VariableCreationWindow extends Table {
                 }
             }
         });
-    }
-
-    private void addButton() {
-        Skin skin = routineStage.skin;
-        SquareButton squareButton = new SquareButton(skin, new Label("New Variable", skin), "Add a new Variable");
-        squareButton.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                squareButton.setChecked(false);
-                routineStage.routineEditorApp.createNewVariable();
-            }
-        });
-        add(squareButton).growX();
-    }
+    }*/
 }
