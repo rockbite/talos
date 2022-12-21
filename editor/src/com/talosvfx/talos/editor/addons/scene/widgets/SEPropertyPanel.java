@@ -336,19 +336,16 @@ public class SEPropertyPanel extends PropertyPanel {
                             return;
                         }
                         if (gameAsset.type == GameAssetType.ROUTINE) {
-                            logger.info("property panel routines redo");
-                            // TODO: 20.12.22 FIX SCENEEDITORADDON 
-//                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-//                            routineRendererComponent.setGameAsset((GameAsset<String>)gameAsset);
-//                            gameObject.addComponent(routineRendererComponent);
-//
-//                            ProjectExplorerWidget projectExplorer = SceneEditorAddon.get().projectExplorer;
-//                            projectExplorer.reload();
-//
-//                            SceneEditorAddon.get().propertyPanel.notifyPropertyHolderRemoved(gameObject);
-//                            SceneEditorAddon.get().workspace.selectPropertyHolder(gameObject);
-//
-//                            remove();
+                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                            routineRendererComponent.setGameAsset((GameAsset<RoutineData>)gameAsset);
+                            gameObject.addComponent(routineRendererComponent);
+
+                            if (getCurrentHolder() instanceof GameObjectContainer) {
+                                SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
+                                showPanel(gameObject, gameObject.getPropertyProviders());
+                            }
+
+                            remove();
                             return;
                         }
 
