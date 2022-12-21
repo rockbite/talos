@@ -105,6 +105,7 @@ public class TalosProjectData implements Json.Serializable {
 		}
 	}
 
+	@Getter
 	private JsonValue jsonLayoutRepresentation = null;
 
 	public void loadLayout () {
@@ -119,5 +120,22 @@ public class TalosProjectData implements Json.Serializable {
 		} else {
 			SharedResources.appManager.openApp(AppManager.singletonAsset, ProjectExplorerApp.class);
 		}
+	}
+
+	public FileHandle getProjectDir() {
+		String absolutePathToProjectFile = getAbsolutePathToProjectFile();
+		FileHandle handle = Gdx.files.absolute(absolutePathToProjectFile).parent();
+
+		return handle;
+	}
+
+	public boolean isPathInsideProject(String path) {
+		String projectDirPath = getProjectDir().path();
+
+		if(path.startsWith(projectDirPath)) {
+			return true;
+		}
+
+		return false;
 	}
 }

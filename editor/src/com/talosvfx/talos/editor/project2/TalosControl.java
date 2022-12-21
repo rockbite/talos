@@ -1,10 +1,13 @@
 package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
+import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -13,7 +16,11 @@ import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.MenuItemClickedEvent;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 
+import java.io.StringWriter;
+
 public class TalosControl implements Observer {
+
+    private MainMenu.IMenuProvider customLayoutListProvider;
 
     public TalosControl() {
         Notifications.registerObserver(this);
@@ -23,6 +30,7 @@ public class TalosControl implements Observer {
     @EventHandler
     public void onMenuItemClickedEvent(MenuItemClickedEvent event) {
         // TODO: switch this to some kind of reflection thing? or like map to instance thing *but how about startsWith things
+        // or at least start delegating this into methods
 
         if(event.getPath().startsWith("file/open_recent")) {
             String path = (String) event.getPayload();
@@ -47,18 +55,44 @@ public class TalosControl implements Observer {
             return;
         }
 
-        if(event.getPath().startsWith("window/layouts/")) {
-            String fileName = (String) event.getPayload();
+        if(event.getPath().equals("window/layouts/save_layout")) {
+            JsonValue jsonValue = SharedResources.currentProject.getJsonLayoutRepresentation();
+            String data = jsonValue.toJson(JsonWriter.OutputType.json);
 
-            // murderous code here
-            SharedResources.appManager.removeAll();
+            String ext = GameAssetType.LAYOUT_DATA.getExtensions().first();
+            FileSystemInteraction.instance().showSaveFileChooser(ext, new FileChooserListener() {
+                @Override
+                public void selected(Array<FileHandle> files) {
+                    FileHandle file = files.first();
+                    boolean pathInsideProject = SharedResources.currentProject.isPathInsideProject(file.path());
+                    if(pathInsideProject) {
+                        // use file chooser to get the file path
+                        FileHandle destination = AssetImporter.suggestNewNameForFileHandle(file.parent().path(), file.nameWithoutExtension(), ext);
+                        destination.writeString(data, false);
 
-            LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
-            JsonReader jsonReader = new JsonReader();
-            JsonValue jsonValue = jsonReader.parse(Gdx.files.internal("layouts/" + fileName));
-            layoutGrid.readFromJson(jsonValue);
+                        AssetRepository.getInstance().rawAssetCreated(destination, false);
 
-            return;
+                        SharedResources.mainMenu.askToInject(customLayoutListProvider, "window/layouts/custom_list");
+                    } else {
+                        // show error message
+                    }
+                }
+            });
+        } else {
+            if (event.getPath().startsWith("window/layouts/")) {
+                // todo: also add custom ones here
+                String fileName = (String) event.getPayload();
+
+                // murderous code here
+                SharedResources.appManager.removeAll();
+
+                LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
+                JsonReader jsonReader = new JsonReader();
+                JsonValue jsonValue = jsonReader.parse(Gdx.files.internal("layouts/" + fileName));
+                layoutGrid.readFromJson(jsonValue);
+
+                return;
+            }
         }
 
         if(event.getPath().equals("file/quit")) {
@@ -87,6 +121,16 @@ public class TalosControl implements Observer {
                 }
             }
         }, "window/layouts/list");
+
+        // load custom layout lists
+        customLayoutListProvider = new MainMenu.IMenuProvider() {
+            @Override
+            public void inject(String path, MainMenu menu) {
+                //AssetRepository.getInstance().
+                // find all files with .tlslt extension, and load their names here
+            }
+        };
+        SharedResources.mainMenu.registerMenuProvider(customLayoutListProvider, "window/layouts/custom_list");
 
     }
 }

@@ -39,7 +39,11 @@
         </menu>
         <separator/>
         <menu name="layouts" title="Layouts">
+            <menu name="save_layout" title="Save As New"/>
+            <separator/>
             <inject name="list"/>
+            <separator/>
+            <inject name="custom_list"/>
         </menu>
         <separator/>
         <menu name="apps" title="Apps">

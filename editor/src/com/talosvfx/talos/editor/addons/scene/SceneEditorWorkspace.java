@@ -686,14 +686,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Prefab scene = new Prefab();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
-		TalosMain.Instance().UIStage().saveProjectAction();
+		//TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
 	public void openScene (FileHandle fileHandle) {
 		Scene scene = new Scene();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
-		TalosMain.Instance().UIStage().saveProjectAction();
+		//TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
 	public void convertToPrefab (GameObject gameObject) {

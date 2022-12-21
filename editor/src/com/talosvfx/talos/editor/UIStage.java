@@ -256,58 +256,8 @@ public class UIStage {
 //		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
-	public void openProjectAction(final IProject projectType) {
-		FileSystemInteraction.instance().openProject(projectType);
-	}
-
 	public void openProjectAction() {
 //		openProjectAction(ProjectController.TLS);
-	}
-
-	public void saveProjectAction() {
-		if(!TalosMain.Instance().ProjectController().isBoundToFile()) {
-			saveAsProjectAction();
-		} else {
-			TalosMain.Instance().ProjectController().saveProject();
-		}
-	}
-	public void exportAction() {
-		String path = TalosMain.Instance().ProjectController().getExportPath();
-		if(path == null || path.isEmpty()) {
-			exportAsAction();
-		} else {
-			TalosMain.Instance().ProjectController().exportProject(Gdx.files.absolute(path));
-		}
-	}
-
-	public void exportAsAction() {
-		FileSystemInteraction.instance().export();
-	}
-
-	public void saveAsProjectAction() {
-		FileSystemInteraction.instance().save();
-	}
-
-	public void openDialog(VisWindow dialog) {
-		stage.addActor(dialog.fadeIn());
-	}
-
-
-	public void legacyImportAction() {
-//		fileChooser.setMode(FileChooser.Mode.OPEN);
-//		fileChooser.setMultiSelectionEnabled(false);
-//		fileChooser.setFileFilter(new FileChooser.DefaultFileFilter(fileChooser));
-//		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-//
-//		fileChooser.setListener(new FileChooserAdapter() {
-//			@Override
-//			public void selected (Array<FileHandle> file) {
-//				TalosMain.Instance().TalosProject().importFromLegacyFormat(file.get(0));
-//				TalosMain.Instance().ProjectController().unbindFromFile();
-//			}
-//		});
-//
-//		stage.addActor(fileChooser.fadeIn());
 	}
 
 	public void legacyBatchConvertAction() {

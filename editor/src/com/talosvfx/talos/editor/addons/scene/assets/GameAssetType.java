@@ -22,7 +22,8 @@ public enum GameAssetType {
 	PREFAB(new String[]{"prefab"}, true),
 	SCENE(new String[]{"scn"}, true),
 	DIRECTORY(new String[]{}, false),
-	TILE_PALETTE(new String[]{"ttp"}, true);
+	TILE_PALETTE(new String[]{"ttp"}, true),
+	LAYOUT_DATA(new String[]{"tlslt"}, true);
 
 	@Getter
 	private ObjectSet<String> extensions;
@@ -84,6 +85,7 @@ public enum GameAssetType {
 			return PaletteMetadata.class;
 		case VFX_OUTPUT:
 		case ROUTINE:
+		case LAYOUT_DATA:
 		case SOUND:
 			return EmptyMetadata.class;
 		}

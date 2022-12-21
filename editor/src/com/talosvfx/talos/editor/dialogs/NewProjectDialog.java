@@ -48,7 +48,7 @@ public class NewProjectDialog extends VisWindow {
     public static void show (String typeName, String projectName, NewProjectListener listener) {
         NewProjectDialog dialog = TalosMain.Instance().UIStage().newProjectDialog;
         dialog.setData(typeName, projectName, listener);
-        TalosMain.Instance().UIStage().openDialog(dialog);
+//        TalosMain.Instance().UIStage().openDialog(dialog);
     }
 
     private void setData (String typeName, String projectName, NewProjectListener listener) {

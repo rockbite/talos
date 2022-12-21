@@ -152,46 +152,6 @@ public class MainMenuLegacy extends Table {
             }
         });
 
-        saveProject.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if(!saveProject.isDisabled()) stage.saveProjectAction();
-            }
-        });
-
-        export.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                stage.exportAction();
-            }
-        });
-
-        exportAs.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                stage.exportAsAction();
-            }
-        });
-
-        saveAsProject.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                stage.saveAsProjectAction();
-            }
-        });
-
-        legacyImportItem.addListener(new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                stage.legacyImportAction();
-            }
-        });
-
         legacyBatchImportItem.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -230,16 +190,6 @@ public class MainMenuLegacy extends Table {
                 if(keycode == Input.Keys.O && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     if(!openProject.isDisabled()) {
                         stage.openProjectAction();
-                    }
-                }
-                if(keycode == Input.Keys.S && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    if(!saveProject.isDisabled()) {
-                        stage.saveProjectAction();
-                    }
-                }
-                if(keycode == Input.Keys.E && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    if(!saveProject.isDisabled()) {
-                        stage.exportAction();
                     }
                 }
 
