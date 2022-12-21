@@ -45,7 +45,7 @@ public class VariableCreationWindow extends Table {
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
         Label label = new Label("gavno.rt", skin);
-        topBar.add(label).left().pad(5).expandX();
+        topBar.add(label).left().pad(5).expandX().padLeft(7);
 
 
         ImageButton plusButton = new ImageButton(
@@ -71,7 +71,7 @@ public class VariableCreationWindow extends Table {
         Table inner = new Table();
         ScrollPane scrollPane = new ScrollPane(inner);
         scrollPane.setScrollingDisabled(true, false);
-        content.add(scrollPane).grow().maxHeight(300);
+        content.add(scrollPane).grow().maxHeight(300).padBottom(10);
 
         //todo: add this to scroll pane
 
