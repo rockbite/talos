@@ -1,12 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
@@ -15,6 +11,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInsta
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -29,8 +26,8 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
-
-import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class RoutineStage extends DynamicNodeStage implements Observer {
 
@@ -44,29 +41,13 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
 
     public RoutineInstance routineInstance; // runtime
 
-    public RoutineStage(RoutineEditorApp routineEditorApp, Skin skin) {
+    public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
         this.routineEditorApp = routineEditorApp;
 
         routineInstance = new RoutineInstance();
 
         Notifications.registerObserver(this);
-    }
-
-    public void routineUpdated() {
-        // TODO: 20.12.22 FIX SCENEEDITORWORKSPACE
-//        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
-//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
-//        updatePropertiesForGOs(rootGO, updatedComponents);
-//
-//        Gdx.app.postRunnable(new Runnable() {
-//            @Override
-//            public void run () {
-//                for (RoutineRendererComponent updatedComponent : updatedComponents) {
-//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
-//                }
-//            }
-//        });
     }
 
     private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {
@@ -89,15 +70,15 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         }
     }
 
-    public void writeData(FileHandle target) {
+    public void writeData (FileHandle target) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         String data = json.prettyPrint(this);
         target.writeString(data, false);
     }
 
-    public void loadFrom(GameAsset<RoutineData> asset) {
-        if(asset == null) return;
+    public void loadFrom (GameAsset<RoutineData> asset) {
+        if (asset == null) return;
 
         Json json = new Json();
         JsonReader jsonReader = new JsonReader();
@@ -110,7 +91,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    public void read(Json json, JsonValue root) {
+    public void read (Json json, JsonValue root) {
         super.read(json, root);
         for (NodeWidget node : nodeBoard.nodes) {
             if (node instanceof RoutineExposedVariableNodeWidget) {
@@ -137,7 +118,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    protected XmlReader.Element loadData() {
+    protected XmlReader.Element loadData () {
         FileHandle list = Gdx.files.internal("addons/scene/tween-nodes.xml");
         XmlReader xmlReader = new XmlReader();
         XmlReader.Element root = xmlReader.parse(list);
@@ -146,7 +127,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    protected void onConnectionClicked(NodeBoard.NodeConnection connection) {
+    protected void onConnectionClicked (NodeBoard.NodeConnection connection) {
 
         // create delay widget
         connection.fromNode.getOutputSlotPos(connection.fromId, tmp);
@@ -159,7 +140,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         String toType = connection.toNode.getType(connection.toId);
         String fromType = connection.fromNode.getType(connection.fromId);
 
-        if(toType.equals("signal") && fromType.equals("signal")) {
+        if (toType.equals("signal") && fromType.equals("signal")) {
 
             tmp.set((x + toX) / 2f, (y + toY) / 2f); // midpoint
 
@@ -182,80 +163,56 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         }
     }
 
-    private void reloadRoutineInstanceFromMemory(RoutineInstance instance) {
-        Json json = new Json();
-        json.setOutputType(JsonWriter.OutputType.json);
-        String data = json.prettyPrint(this);
-        instance.loadFrom(instance.uuid, data, routineConfigMap);
+    public void routineUpdated () {
+        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(routineInstance));
+
+
+//        SharedResources.appManager.getAppInstances()
+//        AppManager.BaseApp
+//        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
+//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+//        updatePropertiesForGOs(rootGO, updatedComponents);
+//
+//        Gdx.app.postRunnable(new Runnable() {
+//            @Override
+//            public void run () {
+//                for (RoutineRendererComponent updatedComponent : updatedComponents) {
+//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
+//                }
+//            }
+//        });
+    }
+
+    @EventHandler
+    public void onNodeCreatedEvent (NodeCreatedEvent event) {
         routineUpdated();
     }
 
-    public void reloadRoutineInstancesFromMemory() {
-        Array<RoutineInstance> routineInstances = collectRoutineInstances();
-        for (RoutineInstance instance : routineInstances) {
-            reloadRoutineInstanceFromMemory(instance);
-        }
+    @EventHandler
+    public void onNodeRemovedEvent (NodeRemovedEvent event) {
+        routineUpdated();
     }
 
     @EventHandler
-    public void onNodeCreatedEvent(NodeCreatedEvent event) {
-        reloadRoutineInstancesFromMemory();
+    public void onNodeConnectionCreatedEvent (NodeConnectionCreatedEvent event) {
+        routineUpdated();
     }
 
     @EventHandler
-    public void onNodeRemovedEvent(NodeRemovedEvent event) {
-        reloadRoutineInstancesFromMemory();
+    public void onNodeConnectionRemovedEvent (NodeConnectionRemovedEvent event) {
+        routineUpdated();
     }
 
     @EventHandler
-    public void onNodeConnectionCreatedEvent(NodeConnectionCreatedEvent event) {
-        reloadRoutineInstancesFromMemory();
-    }
-
-    @EventHandler
-    public void onNodeConnectionRemovedEvent(NodeConnectionRemovedEvent event) {
-        reloadRoutineInstancesFromMemory();
-    }
-
-    @EventHandler
-    public void onNodeDataModifiedEvent(NodeDataModifiedEvent event) {
+    public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
-
-        Array<RoutineInstance> routineInstances = collectRoutineInstances();
-
-        for (RoutineInstance instance : routineInstances) {
-            updateRoutineInstanceDataFromWidget(instance, node);
-        }
+        updateRoutineInstanceDataFromWidget(routineInstance, node);
     }
 
-    /**
-     * I need my psychiatrist to talk about this.
-     */
-    private Array<RoutineInstance> collectRoutineInstances() {
-        Array<RoutineInstance> result = new Array<>();
-        Array<GameObject> list = new Array<>();
-
-//        if(routineEditorApp.scenePreviewStage != null) {
-//            GameObject root = routineEditorApp.scenePreviewStage.currentScene.root;
-//            root.findGOsWithComponents(list, RoutineRendererComponent.class);
-//
-//            for (GameObject gameObject : list) {
-//                RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-//                if (component.routineInstance.uuid.equals(routineInstance.uuid)) {
-//                    result.add(component.routineInstance);
-//                }
-//            }
-//        }
-
-        result.add(routineInstance);
-
-        return result;
-    }
-
-    private void updateRoutineInstanceDataFromWidget(RoutineInstance routineInstance, NodeWidget nodeWidget) {
+    private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {
         RoutineNode logicNode = routineInstance.getNodeById(nodeWidget.getUniqueId());
 
-        if(logicNode == null) return;
+        if (logicNode == null) return;
 
         boolean setRoutineDirty = false;
 
@@ -264,7 +221,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
             String key = stringAbstractWidgetEntry.key;
             AbstractWidget value = stringAbstractWidgetEntry.value;
 
-            if(value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
+            if (value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
                 logicNode.setProperty(key, value.getValue());
                 setRoutineDirty = true;
             }
@@ -272,6 +229,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
 
         if (setRoutineDirty) {
             routineInstance.isDirty = true;
+            routineUpdated();
         }
     }
 
@@ -279,9 +237,9 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
      * reset data to normal if needed
      * keep data defaults for next time
      */
-    public void playInitiated() {
+    public void playInitiated () {
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
-        for(NodeWidget node : nodes) {
+        for (NodeWidget node : nodes) {
             if (node instanceof AbstractRoutineNode) {
                 AbstractRoutineNode tweenNode = (AbstractRoutineNode) node;
 
@@ -296,35 +254,35 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     /**
      * Time to reset everything to normal and reset any defaults
      */
-    private void playFinished() {
+    private void playFinished () {
         Notifications.fireEvent(Notifications.obtainEvent(TweenFinishedEvent.class));
     }
 
     /**
      * is reported when any node is completed, even though other oe can be started
      */
-    public void nodeReportedComplete() {
+    public void nodeReportedComplete () {
 
         boolean isRunning = false;
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
-        for(NodeWidget node : nodes) {
+        for (NodeWidget node : nodes) {
             if (node instanceof AbstractGenericRoutineNode) {
                 AbstractGenericRoutineNode tweenNode = (AbstractGenericRoutineNode) node;
 
-                if(tweenNode.isRunning()) {
+                if (tweenNode.isRunning()) {
                     isRunning = true;
                     break;
                 }
             }
         }
 
-        if(!isRunning) {
+        if (!isRunning) {
             // seems like all is Complete
             playFinished();
         }
     }
 
-    public float getDelta() {
+    public float getDelta () {
         return Gdx.graphics.getDeltaTime() * timeScale;
     }
 

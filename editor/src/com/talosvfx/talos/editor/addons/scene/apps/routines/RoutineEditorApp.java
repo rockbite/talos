@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
@@ -28,16 +26,19 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineConfigMap = new RoutineConfigMap();
         FileHandle handle = Gdx.files.internal("addons/scene/tween-nodes.xml");
         routineConfigMap.loadFrom(handle);
-        //variableCreationWindow = new VariableCreationWindow();
-        //variableCreationWindow.reloadWidgets(routineStage);
-
 
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStage.init();
         routineStage.routineConfigMap = routineConfigMap;
 //        scenePreviewStage = new ScenePreviewStage();
 
+        variableCreationWindow = new VariableCreationWindow(routineStage);
+        variableCreationWindow.reloadWidgets();
+
+
         GenericStageWrappedViewportWidget routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+        routineStageWrapper.left().bottom();
+        routineStageWrapper.add(variableCreationWindow);
 
         routineStage.sendInStage(routineStageWrapper.getStage());
         try {
@@ -74,7 +75,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         };
 
         this.gridAppReference = app;
-
     }
 
 
@@ -82,7 +82,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
     public void deleteParamTemplateWithIndex (int index) {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.removeExposedVariablesWithIndex(index);
-        variableCreationWindow.reloadWidgets(routineStage);
+        variableCreationWindow.reloadWidgets();
 
         NodeBoard nodeBoard = routineStage.getNodeBoard();
 
@@ -95,7 +95,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
             }
         }
 
-        routineStage.reloadRoutineInstancesFromMemory();
+        routineStage.routineUpdated();
     }
 
     public void changeKeyFor (int index, String value) {
@@ -111,22 +111,22 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
                 }
             }
         }
-        routineStage.reloadRoutineInstancesFromMemory();
+        routineStage.routineUpdated();
     }
 
     public void changeTypeFor (int index, String newType) {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.changeExposedVariableType(index, newType);
 
-        variableCreationWindow.reloadWidgets(routineStage);
-        routineStage.reloadRoutineInstancesFromMemory();
+        variableCreationWindow.reloadWidgets();
+        routineStage.routineUpdated();
     }
 
     public void createNewVariable () {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.createNewPropertyWrapper();
-        variableCreationWindow.reloadWidgets(routineStage);
-        routineStage.reloadRoutineInstancesFromMemory();
+        variableCreationWindow.reloadWidgets();
+        routineStage.routineUpdated();
     }
 
     @Override

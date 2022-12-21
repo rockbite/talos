@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -9,37 +8,35 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
-import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VariableCreationWindow extends Table {
-    private static final Logger logger = LoggerFactory.getLogger(VariableCreationWindow.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(VariableCreationWindow.class);
     private DragAndDrop dragAndDrop;
     private Array<VariableTemplateRow<?>> templateRowArray = new Array<>();
 
-    public VariableCreationWindow () {
-        setBackground(TalosMain.Instance().getSkin().getDrawable("window-bg"));
+    private RoutineStage routineStage;
+
+    public VariableCreationWindow (RoutineStage routineStage) {
+        this.routineStage = routineStage;
+        setBackground(routineStage.skin.getDrawable("window-bg"));
         dragAndDrop = new DragAndDrop();
     }
 
-    public void reloadWidgets(RoutineStage routineStage) {
+    public void reloadWidgets() {
         clear();
         setSize(420, 300);
         defaults().pad(5);
         bottom().left();
 
         Table mainContent = new Table();
-        mainContent.setSkin(TalosMain.Instance().getSkin());
+        mainContent.setSkin(routineStage.skin);
         mainContent.setBackground("background-fill");
 
         Table contentTable = new Table();
@@ -52,7 +49,7 @@ public class VariableCreationWindow extends Table {
         templateRowArray.clear();
         for (int i = 0; i < propertyWrappers.size; i++) {
             PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
-            VariableTemplateRow<?> variableTemplateRow = new VariableTemplateRow<>(propertyWrapper);
+            VariableTemplateRow<?> variableTemplateRow = new VariableTemplateRow<>(propertyWrapper, routineStage);
             if (i == 0) {
                 variableTemplateRow.textValueWidget.setType(ValueWidget.Type.TOP);
             } else if (i == propertyWrappers.size - 1) {
@@ -91,7 +88,7 @@ public class VariableCreationWindow extends Table {
                     float width = variableTemplateRow.getWidth();
                     float height = variableTemplateRow.getHeight();
                     payloadTable.setSize(width, height);
-                    payloadTable.setSkin(TalosMain.Instance().getSkin());
+                    payloadTable.setSkin(routineStage.skin);
                     payloadTable.setBackground("button-over");
                     payloadTable.getColor().a = 0.5f;
                     dragAndDrop.setDragActorPosition(width / 2f, -height / 2f);
@@ -130,38 +127,16 @@ public class VariableCreationWindow extends Table {
     }
 
     private void addButton() {
-        Skin skin = TalosMain.Instance().getSkin();
+        Skin skin = routineStage.skin;
         SquareButton squareButton = new SquareButton(skin, new Label("New Variable", skin), "Add a new Variable");
         squareButton.addListener(new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                logger.info("routines - create new variable redo");
-                // TODO: 20.12.22 SCENEEDITORADDON 
-//                squareButton.setChecked(false);
-//
-//                RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
-//                routineEditor.createNewVariable();
+                squareButton.setChecked(false);
+                routineStage.routineEditorApp.createNewVariable();
             }
         });
         add(squareButton).growX();
-    }
-
-    @Override
-    public void act (float delta) {
-        super.act(delta);
-        // TODO: 20.12.22 FIX TALOSMAININSTANCE
-//        if (!(TalosMain.Instance().Project() instanceof SceneEditorProject)) {
-//            return;
-//        }
-//
-//        RoutineEditor routineEditor = SceneEditorAddon.get().routineEditor;
-//        if (routineEditor == null) {
-//            return;
-//        }
-//
-//        float height = getHeight();
-//
-//        setPosition(0, routineEditor.getContent().getHeight() - height);
     }
 }
