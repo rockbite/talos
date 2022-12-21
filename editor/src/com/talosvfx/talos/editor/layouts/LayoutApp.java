@@ -20,7 +20,6 @@ public interface LayoutApp {
 	Actor getMainContent ();
 	Actor getCopyMainContent ();
 
-	DestroyCallback getDestroyCallback ();
 	void setDestroyCallback (DestroyCallback destroyCallback);
 
 	void setScrollFocus ();
