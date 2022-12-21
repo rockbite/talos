@@ -24,9 +24,14 @@ public class TalosControl implements Observer {
         }
 
         if(event.getPath().equals("window/panels/close_all")) {
-            SharedResources.appManager.closeAll();
+            SharedResources.appManager.closeAllFloatingWindows();
         } else if(event.getPath().startsWith("window/panels/")) {
             AppManager.BaseApp app = (AppManager.BaseApp) event.getPayload();
+        }
+
+        if(event.getPath().startsWith("window/apps/")) {
+            Class<AppManager.BaseApp> clazz = (Class<AppManager.BaseApp>) event.getPayload();
+            SharedResources.appManager.openApp(AppManager.singletonAsset, clazz);
         }
     }
 }

@@ -269,6 +269,10 @@ public class AppManager implements Observer {
 			createAppAndPlaceInGrid(gameAsset, layoutGrid, baseApp);
 		}
 
+		if(!appsToCreate.isEmpty()) {
+			SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
+		}
+
 		for (BaseApp<T> baseApp : appsToUpdate) {
 			baseApp.updateForGameAsset(gameAsset);
 		}
@@ -391,7 +395,7 @@ public class AppManager implements Observer {
 		SharedResources.mainMenu.registerMenuProvider(menuAppListProvider, APP_LIST_MENU_PATH);
 	}
 
-	public void closeAll() {
-
+	public void closeAllFloatingWindows() {
+		// todo: close all floating windows
 	}
 }
