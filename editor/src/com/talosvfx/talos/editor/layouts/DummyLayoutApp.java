@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.layouts;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import lombok.Getter;
 
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public class DummyLayoutApp implements LayoutApp {
 	private transient Table tabWidget;
 	private transient Actor mainContent;
 	private transient Skin skin;
+	@Getter
 	private DestroyCallback destroyCallback;
 	private boolean active;
 
@@ -48,7 +51,7 @@ public class DummyLayoutApp implements LayoutApp {
 		VisLabel visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
 		tab.add(visLabel).pad(5).padLeft(0);
 
-		VisImageButton actor = new VisImageButton(skin.getDrawable("ic-small-compression"));
+		ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
 		actor.addListener(new ClickListener() {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
@@ -60,7 +63,7 @@ public class DummyLayoutApp implements LayoutApp {
 		});
 		actor.getStyle().up = null;
 		actor.getImage().setScaling(Scaling.fill);
-		tab.add(actor).size(16).padLeft(5);
+		tab.add(actor).size(16).padLeft(5).padRight(-10);
 
 		return tab;
 	}

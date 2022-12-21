@@ -878,6 +878,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 	}
 
 	public void readFromJson (JsonValue jsonLayoutRepresentation) {
+
 		Json json = new Json();
 		LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonLayoutRepresentation);
 

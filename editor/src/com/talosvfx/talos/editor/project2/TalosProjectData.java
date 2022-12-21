@@ -10,6 +10,7 @@ import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.Toasts;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class TalosProjectData implements Json.Serializable {
 	//Store any specific data here for the specific project settings that should be shared with anyone that
 	//is loading the same project
 
-	@Getter
+	@Getter@Setter
 	private transient LayoutGrid layoutGrid;
 
 	//Always non null, points to a project file that represents the root of the project
