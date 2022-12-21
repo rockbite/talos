@@ -189,7 +189,6 @@ public class MainMenu extends Table implements Observer {
                 if(currentlyActive == null) super.mouseMoved(event, x, y);
 
                 float distance = findDistanceFromClosestPopup(x, y);
-                System.out.println(distance);
 
                 if(distance > 80) {
                     collapseAll();
