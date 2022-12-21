@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -8,9 +9,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,10 +79,10 @@ public class VariableCreationWindow extends Table {
 
         addButton();
 
-        configureDragAndDrop(routineStage);
+        configureDragAndDrop();
     }
 
-    private void configureDragAndDrop(RoutineStage routineStage) {
+    private void configureDragAndDrop() {
         dragAndDrop.clear();
         for (VariableTemplateRow variableTemplateRow : templateRowArray) {
             dragAndDrop.addSource(new DragAndDrop.Source(variableTemplateRow) {
@@ -98,32 +104,31 @@ public class VariableCreationWindow extends Table {
             });
         }
 
-        //todo use global drag and drop instead
+        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.routineEditorApp.routineStageWrapper) {
 
-//        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.getContainer()) {
-//
-//            private Vector2 temp = new Vector2();
-//
-//            @Override
-//            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//                return true;
-//            }
-//
-//            @Override
-//            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-//                temp.set(x, y);
-//                routineStage.getContainer().localToScreenCoordinates(temp);
-//                routineStage.getStage().screenToStageCoordinates(temp);
-//                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
-//                PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
-//                if (exposedVariable != null) {
-//                    NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
-//                    exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
-//                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
-//                    exposedVariable.update(propertyWrapper);
-//                }
-//            }
-//        });
+            private Vector2 temp = new Vector2();
+
+            @Override
+            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                return true;
+            }
+
+            @Override
+            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                temp.set(x, y);
+                // x and y are in routineStageWrapper coordinate system
+                // we need to convert them to nodeBoard's stage coordinate
+
+                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
+                PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
+                if (exposedVariable != null) {
+                    NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
+                    exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
+                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
+                    exposedVariable.update(propertyWrapper);
+                }
+            }
+        });
     }
 
     private void addButton() {

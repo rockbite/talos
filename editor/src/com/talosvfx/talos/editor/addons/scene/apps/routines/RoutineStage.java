@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
@@ -48,6 +49,12 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         routineInstance = new RoutineInstance();
 
         Notifications.registerObserver(this);
+    }
+
+    @Override
+    protected void initActors () {
+        super.initActors();
+        nodeBoard.setTouchable(Touchable.enabled);
     }
 
     private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {

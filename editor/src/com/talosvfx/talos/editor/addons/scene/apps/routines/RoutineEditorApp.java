@@ -20,6 +20,8 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
+    public GenericStageWrappedViewportWidget routineStageWrapper;
+
 //    public ScenePreviewStage scenePreviewStage;
 
     public RoutineEditorApp() {
@@ -28,6 +30,8 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineConfigMap.loadFrom(handle);
 
         routineStage = new RoutineStage(this, SharedResources.skin);
+        routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+
         routineStage.init();
         routineStage.routineConfigMap = routineConfigMap;
 //        scenePreviewStage = new ScenePreviewStage();
@@ -36,7 +40,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         variableCreationWindow.reloadWidgets();
 
 
-        GenericStageWrappedViewportWidget routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+
         routineStageWrapper.left().bottom();
         routineStageWrapper.add(variableCreationWindow);
 
