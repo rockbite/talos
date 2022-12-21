@@ -13,6 +13,10 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.apps.ParticlePreviewApp;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
@@ -20,16 +24,22 @@ import com.talosvfx.talos.editor.project2.apps.PropertiesPanelApp;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
 import com.talosvfx.talos.editor.project2.apps.SingletonApp;
+import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
-public class AppManager {
+public class AppManager implements Observer {
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
+	private static final String APP_LIST_MENU_PATH = "window/apps/list";
+	private static final String PANEL_LIST_MENU_PATH = "window/panels/panel_list";
 
 	static {
 		singletonAsset.setResourcePayload(dummyObject);
 	}
+
+	private MainMenu.IMenuProvider menuOpenAppListProvider;
+	private MainMenu.IMenuProvider menuAppListProvider;
 
 	public BaseApp getAppForLayoutApp (LayoutApp app) {
 
@@ -71,6 +81,8 @@ public class AppManager {
 		Array<BaseApp<T>> baseApps = (Array<BaseApp<T>>)baseAppsOpenForGameAsset.get(gameAsset);
 		baseApps.add(baseAppForGameAsset);
 
+		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
+
 		return baseAppForGameAsset;
 	}
 
@@ -85,6 +97,8 @@ public class AppManager {
 				}
 			}
 		}
+
+		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 	}
 
 	public Array<BaseApp> getAppInstances() {
@@ -209,6 +223,8 @@ public class AppManager {
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.ROUTINE, RoutineEditorApp.class);
+
+		Notifications.registerObserver(this);
 	}
 
 	public <T> boolean canOpenInTalos (GameAsset<T> gameAsset) {
@@ -218,6 +234,8 @@ public class AppManager {
 	public <T, U extends BaseApp<T>> void openApp (GameAsset<T> asset, Class<U> app) {
 		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
 		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
+
+		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 	}
 
 	private static class LayoutGridTargetConfig {
@@ -345,4 +363,35 @@ public class AppManager {
 		return baseAppsToCreate;
 	}
 
+	@EventHandler
+	public void onFinishInitializing(FinishInitializingEvent event) {
+		menuOpenAppListProvider = new MainMenu.IMenuProvider() {
+			@Override
+			public void inject(String path, MainMenu menu) {
+				Array<BaseApp> appInstances = getAppInstances();
+
+				for(BaseApp app: appInstances) {
+					menu.addItem(path, app.getAppName(), app.getAppName(), null, app);
+				}
+			}
+		};
+
+		menuAppListProvider = new MainMenu.IMenuProvider() {
+			@Override
+			public void inject(String path, MainMenu menu) {
+				for(ObjectMap.Entry<String, Class<? extends BaseApp<?>>> entry: appRegistry.simpleNameMap) {
+					String name = entry.key;
+					Class<? extends BaseApp<?>> clazz = entry.value;
+					menu.addItem(path, name, name, null, clazz);
+				}
+			}
+		};
+
+		SharedResources.mainMenu.registerMenuProvider(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
+		SharedResources.mainMenu.registerMenuProvider(menuAppListProvider, APP_LIST_MENU_PATH);
+	}
+
+	public void closeAll() {
+
+	}
 }

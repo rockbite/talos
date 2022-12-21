@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.utils.WindowUtils;
+import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 
 public class SharedResources {
 	public static Skin skin;
@@ -26,4 +27,7 @@ public class SharedResources {
 	public static ConfigData configData;
 
 	public static GlobalSaveStateSystem globalSaveStateSystem;
+	public static MainMenu mainMenu;
+
+	public static TalosControl talosControl;
 }

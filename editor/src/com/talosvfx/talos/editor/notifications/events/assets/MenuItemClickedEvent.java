@@ -8,8 +8,13 @@ public class MenuItemClickedEvent implements TalosEvent {
     @Getter
     private String path;
 
-    public MenuItemClickedEvent set(String path) {
+    @Getter
+    private Object payload;
+
+    public MenuItemClickedEvent set(String path, Object payload) {
         this.path = path;
+
+        this.payload = payload;
 
         return this;
     }
@@ -17,5 +22,6 @@ public class MenuItemClickedEvent implements TalosEvent {
     @Override
     public void reset() {
         path = null;
+        payload = null;
     }
 }

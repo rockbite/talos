@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
-import com.rockbite.bongo.engine.collections.SerializableObjectIntMap;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -27,6 +26,9 @@ public class MainMenu extends Table implements Observer {
     private ObjectMap<String, MenuPopup> popupMap = new ObjectMap<>();
 
     private Array<MenuPopup> openStack = new Array<>();
+    private ObjectMap<String, Table> injectableContainerMap = new ObjectMap<>();
+    private ObjectMap<Table, Table> containerPopupMap = new ObjectMap<>();
+    private ObjectMap<String, Array<IMenuProvider>> menuProviderMap = new ObjectMap<>();
 
     public MainMenu() {
         Notifications.registerObserver(this);
@@ -261,5 +263,48 @@ public class MainMenu extends Table implements Observer {
         }
 
         return min;
+    }
+
+    public void registerContainer(MenuPopup popup, String path, String name, Table container) {
+        injectableContainerMap.put(path + "/" + name, container);
+        containerPopupMap.put(container, popup);
+    }
+
+    private void clearContainer(String path) {
+        injectableContainerMap.get(path).clearChildren();
+    }
+
+    public void addItem(String path, String name, String title, String icon, Object payload) {
+        MenuRow menuRow = new MenuRow(this, path + "/" + name);
+        menuRow.buildFrom(title, icon, payload);
+        injectableContainerMap.get(path).add(menuRow).pad(0).padLeft(10).padRight(10).growX();
+        injectableContainerMap.get(path).row();
+    }
+
+    private void finishContainer(String path) {
+        Table table = injectableContainerMap.get(path);
+        containerPopupMap.get(table).pack();
+    }
+
+    public interface IMenuProvider {
+        void inject(String path, MainMenu menu);
+    }
+
+    public void registerMenuProvider(IMenuProvider menuProvider, String path) {
+        if(injectableContainerMap.containsKey(path)) {
+            if (!menuProviderMap.containsKey(path)) {
+                menuProviderMap.put(path, new Array<>());
+            }
+            Array<IMenuProvider> menuProviders = menuProviderMap.get(path);
+            menuProviders.add(menuProvider);
+
+            askToInject(menuProvider, path);
+        }
+    }
+
+    public void askToInject(IMenuProvider menuProvider, String path) {
+        clearContainer(path);
+        menuProvider.inject(path, this); // this can be called later
+        finishContainer(path);
     }
 }

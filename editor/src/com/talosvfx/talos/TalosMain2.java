@@ -14,15 +14,10 @@ import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
-import com.talosvfx.talos.editor.project2.AppManager;
-import com.talosvfx.talos.editor.project2.ConfigData;
-import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
-import com.talosvfx.talos.editor.project2.ProjectSplash;
-import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.*;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.project2.TalosProjectData;
-import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.input.Shortcuts;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
@@ -76,6 +71,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		fullScreen.row();
 		MainMenu menu = new MainMenu();
 		menu.buildFrom(Gdx.files.internal("menu-bar.xml"));
+		SharedResources.mainMenu = menu;
 		topBar.add(menu).grow().padLeft(4);
 
 		fullScreen.add(layoutGridContainer).grow();
@@ -87,6 +83,10 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
 		openProjectExplorer();
+
+		SharedResources.talosControl = new TalosControl();
+
+		Notifications.quickFire(FinishInitializingEvent.class);
 
 	}
 

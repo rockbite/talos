@@ -2,10 +2,13 @@ package com.talosvfx.talos.editor.project2.localprefs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.talosvfx.talos.editor.project2.RecentProject;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Data;
 
 public class TalosLocalPrefs {
@@ -50,11 +53,28 @@ public class TalosLocalPrefs {
 
 	}
 
+	private void injectRecentFilesToMenu() {
+		SharedResources.mainMenu.registerMenuProvider(new MainMenu.IMenuProvider() {
+			@Override
+			public void inject(String path, MainMenu menu) {
+				Array<RecentProject> recentProjects = TalosLocalPrefs.Instance().getRecentProjects();
+
+				for(RecentProject project: recentProjects) {
+					FileHandle handle = Gdx.files.absolute(project.getProjectPath());
+					menu.addItem(path, handle.path(), handle.name(), "icon-folder", handle.path());
+				}
+			}
+		}, "file/open_recent/list");
+
+	}
+
 	private static TalosLocalPrefs talosLocalPrefs;
 
 	public static TalosLocalPrefs Instance () {
 		if (talosLocalPrefs == null) {
 			talosLocalPrefs = new TalosLocalPrefs();
+
+			talosLocalPrefs.injectRecentFilesToMenu();
 		}
 		return talosLocalPrefs;
 	}
@@ -74,7 +94,7 @@ public class TalosLocalPrefs {
 	}
 
 	public void updateProject (TalosProjectData talosProjectData) {
-		//Lets update the recents with our latest one
+		//Let's update the recents with our latest one
 		String absolutePathToProjectFile = talosProjectData.getAbsolutePathToProjectFile();
 
 		localPrefData.updateProject(absolutePathToProjectFile);

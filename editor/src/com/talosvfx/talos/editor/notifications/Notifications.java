@@ -163,6 +163,10 @@ public class Notifications {
 		getInstance().registerObserverInner(observer);
 	}
 
+	public static void quickFire (Class clazz) {
+		getInstance().fireEventInner(obtainEvent(clazz));
+	}
+
 	public static void fireEvent (TalosEvent event) {
 		getInstance().fireEventInner(event);
 	}

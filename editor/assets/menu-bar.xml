@@ -8,7 +8,7 @@
         </menu>
         <menu name="open" title="Open" icon="icon-folder"/>
         <menu name="open_recent" title="Open Recent">
-            <inject name="open_recent" />
+            <inject name="list" />
         </menu>
         <separator/>
         <menu name="save" title="Save"/>

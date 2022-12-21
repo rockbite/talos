@@ -35,6 +35,8 @@ public class MenuRow extends Table {
 
     private boolean hasSubMenu = false;
 
+    private Object payload;
+
     public MenuRow(MainMenu mainMenu, String id) {
         this.mainMenu = mainMenu;
         this.id = id;
@@ -64,7 +66,7 @@ public class MenuRow extends Table {
                 super.clicked(event, x, y);
 
                 if(!hasSubMenu) {
-                    Notifications.fireEvent(Notifications.obtainEvent(MenuItemClickedEvent.class).set(id));
+                    Notifications.fireEvent(Notifications.obtainEvent(MenuItemClickedEvent.class).set(id, payload));
                     mainMenu.collapseAll();
                 }
             }
@@ -85,6 +87,8 @@ public class MenuRow extends Table {
         } else {
             collapseImage.setVisible(false);
         }
+
+        payload = id;
 
         if(item.hasAttribute("icon")) {
             String iconName = item.getAttribute("icon");
@@ -134,5 +138,17 @@ public class MenuRow extends Table {
         localToStageCoordinates(vec);
 
         return vec;
+    }
+
+    public void buildFrom(String title, String iconName, Object payload) {
+        this.payload = payload;
+
+        label.setText(title);
+
+        collapseImage.setVisible(false);
+
+        if(iconName != null) {
+            icon.setDrawable(SharedResources.skin.getDrawable(iconName));
+        }
     }
 }

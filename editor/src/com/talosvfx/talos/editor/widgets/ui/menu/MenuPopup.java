@@ -19,9 +19,15 @@ public class MenuPopup extends Table {
 
     public void buildFrom(XmlReader.Element parent, boolean isPrimary) {
 
-        add().pad(2).row();
-
         int childCount = parent.getChildCount();
+
+        int topPad = 2;
+        if(!isPrimary) {
+            topPad = 6;
+        }
+
+        add().pad(2).padTop(topPad).row();
+
         for (int i = 0; i < childCount; i++) {
             XmlReader.Element item = parent.getChild(i);
 
@@ -35,6 +41,14 @@ public class MenuPopup extends Table {
             } else if(item.getName().equals("separator")) {
                 row = makeSeparator();
                 add(row).growX().height(1).pad(10).padTop(4).padBottom(4);
+            } else if(item.getName().equals("inject")) {
+                String injectorName = item.getAttribute("name");
+
+                Table table = new Table();
+                row = table;
+                add(row).grow().minWidth(200);
+
+                mainMenu.registerContainer(this, id, injectorName, table);
             }
 
             if(row != null) {
