@@ -1,20 +1,18 @@
-package com.talosvfx.talos.editor.nodes.widgets;
+package com.talosvfx.talos.editor.addons.scene.apps.routines.ui;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public class TextValueWidget extends AbstractWidget<String> {
+public class CustomVarWidget extends Table {
 
     private final Table editing;
     private final Table main;
@@ -25,11 +23,6 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     private Stage stageRef;
 
-    public enum Type {
-        NORMAL, TOP, MID, BOTTOM
-    }
-
-    private ValueWidget.Type type = ValueWidget.Type.MID;
     private boolean isSelected;
     private boolean isHover;
 
@@ -37,30 +30,18 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     private EventListener stageListener;
 
-    public TextValueWidget(Skin skin) {
-        this(skin, false);
-    }
-
-    public TextValueWidget(Skin skin, boolean noLabel) {
-        this();
-        init(skin, noLabel);
-    }
-    public TextValueWidget() {
+    public CustomVarWidget() {
         editing = new Table();
         main = new Table();
-
+        init(SharedResources.skin);
     }
 
-    @Override
-    public void init(Skin skin) {
-        init(skin, false);
-    }
-
-    public void init(Skin skin, boolean noLabel) {
-        super.init(skin);
-
-        type = ValueWidget.Type.NORMAL;
+    private void init(Skin skin) {
+        setSkin(skin);
         isSelected = false;
+
+        Table top = new Table();
+        Table bottom = new Table();
 
         label = new Label("", skin);
         valueLabel = new Label("", skin);
@@ -70,25 +51,16 @@ public class TextValueWidget extends AbstractWidget<String> {
 
         editing.add(textField).growX().padLeft(12);
 
-        if(!noLabel) {
-            main.add(label).padLeft(12).left().expandX();
-            main.add(valueLabel).padRight(12).right().width(0).growX();
-            valueLabel.setEllipsis(true);
-            valueLabel.setAlignment(Align.right);
-        } else {
-            main.add(valueLabel).padLeft(12).left().width(0).growX().expandX();
-            valueLabel.setEllipsis(true);
-            valueLabel.setAlignment(Align.left);
-        }
-
-
+        main.add(valueLabel).padLeft(12).left().width(0).growX().expandX();
+        valueLabel.setEllipsis(true);
+        valueLabel.setAlignment(Align.left);
 
         mainStack.add(editing);
         mainStack.add(main);
 
         hideEditMode();
 
-        content.add(mainStack).height(32).growX();
+        top.add(mainStack).height(32).growX();
 
         setTouchable(Touchable.enabled);
 
@@ -164,8 +136,8 @@ public class TextValueWidget extends AbstractWidget<String> {
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 Vector2 tmpVec = new Vector2();
                 tmpVec.set(x, y);
-                TextValueWidget.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = TextValueWidget.this.hit(tmpVec.x, tmpVec.y, false);
+                CustomVarWidget.this.stageToLocalCoordinates(tmpVec);
+                Actor touchTarget = CustomVarWidget.this.hit(tmpVec.x, tmpVec.y, false);
                 if (touchTarget == null) {
                     getStage().setKeyboardFocus(null);
                 }
@@ -173,6 +145,8 @@ public class TextValueWidget extends AbstractWidget<String> {
                 return false;
             }
         };
+
+        add(top).growX();
     }
 
     @Override
@@ -214,21 +188,7 @@ public class TextValueWidget extends AbstractWidget<String> {
         setBackgrounds();
     }
 
-    private String getShape() {
-        String shape = ColorLibrary.SHAPE_SQUIRCLE;
-        if (type == ValueWidget.Type.TOP) {
-            shape = ColorLibrary.SHAPE_SQUIRCLE_TOP;
-        } else if (type == ValueWidget.Type.BOTTOM) {
-            shape = ColorLibrary.SHAPE_SQUIRCLE_BOTTOM;
-        } else if (type == ValueWidget.Type.MID) {
-            shape = ColorLibrary.SHAPE_SQUARE;
-        }
-
-        return shape;
-    }
-
     private void setBackgrounds () {
-        String shape = getShape();
 
         ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
 
@@ -240,7 +200,7 @@ public class TextValueWidget extends AbstractWidget<String> {
             }
         }
 
-        setBackground(ColorLibrary.obtainBackground(getSkin(), shape, color));
+        setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_SQUIRCLE, color));
     }
 
     public void setLabel(String text) {
@@ -256,38 +216,23 @@ public class TextValueWidget extends AbstractWidget<String> {
         fireChangedEvent();
     }
 
-
-    @Override
-    public void loadFromXML(XmlReader.Element element) {
-        String text = element.getText();
-        String defaultValue = element.getAttribute("default", "");
-
-        setValue(defaultValue);
-
-        setLabel(text);
-    }
-
-    @Override
     public String getValue () {
         return value;
     }
 
-    @Override
-    public void read (Json json, JsonValue jsonValue) {
-        setValue(jsonValue.asString());
+    protected boolean fireChangedEvent() {
+        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+
+        boolean var2 = false;
+        try {
+            var2 = fire(changeEvent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Pools.free(changeEvent);
+        }
+
+        return var2;
     }
 
-    @Override
-    public void write (Json json, String name) {
-        json.writeValue(name, getValue());
-    }
-
-    public void setType(ValueWidget.Type type) {
-        this.type = type;
-        setBackgrounds();
-    }
-
-    public void setNone() {
-        valueLabel.setText("-");
-    }
 }

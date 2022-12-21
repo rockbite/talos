@@ -69,7 +69,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#282828ff")));
 
         Table horizontalPanel = new Table();
-        horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.DARK_GRAY));
+        horizontalPanel.setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#505050ff")));
         add(horizontalPanel).growX().row();
 
         SearchWidget searchWidget = new SearchWidget();

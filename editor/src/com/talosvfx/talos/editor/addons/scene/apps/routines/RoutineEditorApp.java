@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
@@ -32,6 +34,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
 
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+        routineStageWrapper.getDropdownForWorld().setVisible(false);
+
+        final Table content = new Table();
+        Table separator = new Table();
+        separator.setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#505050ff")));
+        content.add(separator).growX().height(3).row();
+        content.add(routineStageWrapper).grow();
 
         routineStage.init();
         routineStage.routineConfigMap = routineConfigMap;
@@ -41,16 +50,15 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         variableCreationWindow.reloadWidgets();
 
 
-
-        routineStageWrapper.left().bottom();
-        routineStageWrapper.add(variableCreationWindow);
+        routineStageWrapper.left().top();
+        routineStageWrapper.add(variableCreationWindow).pad(10).width(240);
 
         routineStage.sendInStage(routineStageWrapper.getStage());
 
         DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
             @Override
             public Actor getMainContent() {
-                return routineStageWrapper;
+                return content;
             }
 
             @Override
@@ -136,7 +144,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
     @Override
     public String getAppName() {
         if(gameAsset == null) {
-            return "null"; // lol wtf
+            return "Routine"; // lol wtf
         }
         return gameAsset.nameIdentifier;
     }

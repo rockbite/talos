@@ -2,21 +2,21 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
+import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 public class VariableCreationWindow extends Table {
 
     private static final Logger logger = LoggerFactory.getLogger(VariableCreationWindow.class);
+    private final Table content;
+    private final Cell<Table> contentCell;
     private DragAndDrop dragAndDrop;
     private Array<VariableTemplateRow<?>> templateRowArray = new Array<>();
 
@@ -31,11 +33,34 @@ public class VariableCreationWindow extends Table {
 
     public VariableCreationWindow (RoutineStage routineStage) {
         this.routineStage = routineStage;
-        setBackground(routineStage.skin.getDrawable("window-bg"));
+        setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
         dragAndDrop = new DragAndDrop();
+
+        content = new Table();
+
+        Skin skin = SharedResources.skin;
+
+        Table topBar = new Table();
+        topBar.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+        Label label = new Label("gavno.rt", skin);
+
+        topBar.add(label).left().pad(5).expandX();
+
+
+        add(topBar).growX();
+        row();
+        contentCell = add(content).grow();
     }
 
     public void reloadWidgets() {
+        content.clear();
+
+        CustomVarWidget test = new CustomVarWidget();
+        test.setValue("test");
+
+        content.add(test).pad(10);
+
+        /*
         clear();
         setSize(420, 300);
         defaults().pad(5);
@@ -80,6 +105,8 @@ public class VariableCreationWindow extends Table {
         addButton();
 
         configureDragAndDrop();
+
+         */
     }
 
     private void configureDragAndDrop() {

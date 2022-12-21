@@ -71,6 +71,7 @@ import com.talosvfx.talos.editor.utils.grid.GridRenderer;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,9 @@ public abstract class ViewportWidget extends Table {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
+
+	@Getter
+	private final VisImageButton dropdownForWorld;
 
 	protected Matrix4 emptyTransform = new Matrix4();
 	private Matrix4 prevTransform = new Matrix4();
@@ -158,7 +162,7 @@ public abstract class ViewportWidget extends Table {
 		float iconSize = 15;
 
 
-		VisImageButton dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
+		dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
 		dropdownForWorld.getImage().setScaling(Scaling.fill);
 
 		VisTable viewTable = createViewSettingsDialog();
