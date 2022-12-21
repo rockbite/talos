@@ -19,16 +19,12 @@ package com.talosvfx.talos.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -41,7 +37,6 @@ import com.kotcrab.vis.ui.widget.VisSplitPane;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
@@ -50,15 +45,10 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
-import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.AssetFileDroppedEvent;
 import com.talosvfx.talos.editor.project.IProject;
-import com.talosvfx.talos.editor.project.ProjectController;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.*;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
@@ -67,8 +57,6 @@ import com.talosvfx.talos.runtime.modules.Vector2Module;
 import com.talosvfx.talos.runtime.modules.Vector3Module;
 import lombok.Getter;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Comparator;
 
 public class UIStage {
@@ -100,7 +88,7 @@ public class UIStage {
 	private Table bottomContainer;
 	private Cell<PreviewWidget> previewWidgetCell;
 	private Table previewWidgetContainer;
-	private MainMenu mainMenu;
+	private MainMenuLegacy mainMenu;
 	private VisSplitPane horizontalPane;
 	private VisSplitPane verticalPane;
 	private Table mainLayout;
@@ -193,7 +181,7 @@ public class UIStage {
 	}
 
 	private void constructMenu () {
-		mainMenu = new MainMenu(this);
+		mainMenu = new MainMenuLegacy(this);
 		mainMenu.build();
 		fullScreenTable.add(mainMenu).growX();
 	}
@@ -526,7 +514,7 @@ public class UIStage {
 		return previewWidget;
 	}
 
-	public MainMenu Menu() {
+	public MainMenuLegacy Menu() {
 		return mainMenu;
 	}
 

@@ -13,9 +13,9 @@ import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.UIStage;
-import com.talosvfx.talos.editor.project.ProjectController;
 
-public class MainMenu extends Table {
+@Deprecated
+public class MainMenuLegacy extends Table {
 
     UIStage stage;
     private MenuItem saveProject;
@@ -29,7 +29,7 @@ public class MainMenu extends Table {
     private MenuItem ungroupSelectedModules;
     private PopupMenu openRecentPopup;
 
-    public MainMenu(UIStage stage) {
+    public MainMenuLegacy(UIStage stage) {
         setSkin(stage.getSkin());
         this.stage = stage;
 

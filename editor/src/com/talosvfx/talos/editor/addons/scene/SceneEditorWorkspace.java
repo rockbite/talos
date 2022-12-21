@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -21,10 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.*;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -58,16 +56,12 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
@@ -1117,6 +1111,37 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 //				TalosMain.Instance().ProjectController().setDirty();
 			}
 		}
+	}
+
+	@EventHandler
+	public void onRoutineUpdated (RoutineUpdated event) {
+//        GameObject rootGO = getRootGO();
+//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+//        updateRoutinePropertiesForGOs(rootGO, event.routineInstance, updatedComponents);
+//		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+//			SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform);
+//		}
+	}
+
+	private void updateRoutinePropertiesForGOs (GameObject gameObject, RoutineInstance routineInstance, Array<RoutineRendererComponent> updatedComponents) {
+//		if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+//			RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+//			if (component.routineInstance != null) {
+//				if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
+//					component.routineInstance.loadFrom(routineInstance.uuid, routineInstance.toString(), );
+//					component.updatePropertyWrappers(true, routineInstance);
+//					updatedComponents.add(component);
+//				}
+//			}
+//		}
+//
+//		Array<GameObject> children = gameObject.getGameObjects();
+//		if (children != null) {
+//			for (int i = 0; i < children.size; i++) {
+//				GameObject child = children.get(i);
+//				updateRoutinePropertiesForGOs(child, routineInstance, updatedComponents);
+//			}
+//		}
 	}
 
 	@EventHandler

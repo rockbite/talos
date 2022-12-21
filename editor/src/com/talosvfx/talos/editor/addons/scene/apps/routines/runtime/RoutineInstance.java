@@ -40,6 +40,7 @@ public class RoutineInstance {
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
+        uuid = UUID.randomUUID();
     }
 
     public int getExposedPropertyIndex() {
