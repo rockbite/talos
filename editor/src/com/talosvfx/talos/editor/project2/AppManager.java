@@ -174,6 +174,8 @@ public class AppManager {
 	public AppManager () {
 		appRegistry.addExternalClass(ProjectExplorerApp.class);
 
+		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, SceneEditorApp.class, SceneHierarchyApp.class );
+//		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, PropertiesPanelApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
 
