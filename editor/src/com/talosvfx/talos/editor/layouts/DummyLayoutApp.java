@@ -128,6 +128,11 @@ public class DummyLayoutApp implements LayoutApp {
 	}
 
 	@Override
+	public DestroyCallback getDestroyCallback () {
+		return destroyCallback;
+	}
+
+	@Override
 	public void setDestroyCallback (DestroyCallback destroyCallback) {
 		this.destroyCallback = destroyCallback;
 	}
