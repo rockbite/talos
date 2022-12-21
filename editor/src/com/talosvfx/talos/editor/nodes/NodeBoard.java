@@ -480,8 +480,6 @@ public class NodeBoard extends WidgetGroup implements Observer {
             // removing
             // show popup (but maybe not in case of removing of existing curve)
             if(activeCurve.getFrom().dst(activeCurve.getTo()) > 20 && !ccCurrentlyRemoving) {
-                final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-                (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
                 ccFromNode = currentNode;
                 ccFromSlot = currentSlot;
                 ccCurrentIsInput = currentIsInput;
@@ -912,9 +910,6 @@ public class NodeBoard extends WidgetGroup implements Observer {
             other.removeWrappers(nodes);
         }
 
-        logger.error("Should be saving and using undo system");
-
-//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void removeGroup(NodeGroup nodeGroup) {
