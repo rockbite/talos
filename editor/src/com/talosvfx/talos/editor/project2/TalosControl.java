@@ -60,6 +60,10 @@ public class TalosControl implements Observer {
 
             return;
         }
+
+        if(event.getPath().equals("file/quit")) {
+            Gdx.app.exit();
+        }
     }
 
     @EventHandler
