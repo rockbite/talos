@@ -279,6 +279,18 @@ public class AppManager implements Observer {
 
 	}
 
+	public void removeAll () {
+		Array<BaseApp> appsToRemove = new Array<>();
+		for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> gameAssetArrayEntry : baseAppsOpenForGameAsset) {
+			Array<? extends BaseApp<?>> apps = gameAssetArrayEntry.value;
+			appsToRemove.addAll(apps);
+		}
+		for (BaseApp baseApp : appsToRemove) {
+			baseApp.getGridAppReference().getDestroyCallback().onDestroyRequest();
+		}
+		baseAppsOpenForGameAsset.clear();
+	}
+
 	private <T, U extends BaseApp<T>> void createAppAndPlaceInGrid (GameAsset<T> gameAsset, LayoutGrid layoutGrid, U baseApp) {
 		LayoutGridTargetConfig placementConfig = getBestPlacementForApp(baseApp, layoutGrid);
 
