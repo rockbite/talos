@@ -30,4 +30,7 @@ public class SharedResources {
 	public static MainMenu mainMenu;
 
 	public static TalosControl talosControl;
+
+
+	public static UIController ui;
 }

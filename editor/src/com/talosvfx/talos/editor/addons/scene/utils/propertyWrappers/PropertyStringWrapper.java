@@ -1,19 +1,19 @@
-package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
+package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class PropertyBooleanWrapper extends PropertyWrapper<Boolean> {
+public class PropertyStringWrapper extends PropertyWrapper<String> {
     @Override
-    public Boolean parseValueFromString (String value) {
-        return Boolean.valueOf(value);
+    public String parseValueFromString (String value) {
+        return value;
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        defaultValue = jsonData.getBoolean("defaultValue", false);
-        value = jsonData.getBoolean("value", defaultValue);
+        defaultValue = jsonData.getString("defaultValue", "");
+        value = jsonData.getString("value", defaultValue);
     }
 
     @Override

@@ -60,6 +60,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 
 		SharedResources.stage = stage;
+		SharedResources.ui = new UIController();
 
 		layoutGridContainer = new Table();
 

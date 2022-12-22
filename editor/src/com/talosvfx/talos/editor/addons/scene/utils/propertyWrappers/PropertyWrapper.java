@@ -1,9 +1,11 @@
-package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
+package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable {
 
@@ -14,6 +16,9 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public T defaultValue;
 
     public int index;
+
+    @Getter @Setter
+    private transient PropertyType type;
 
     public void collectAttributes (Array<String> attributes) {
         for (int i = 0; i < attributes.size; i+=2) {

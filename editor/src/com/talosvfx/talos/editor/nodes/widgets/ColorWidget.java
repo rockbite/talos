@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ColorWidget extends AbstractWidget<Color> {
@@ -42,7 +43,7 @@ public class ColorWidget extends AbstractWidget<Color> {
         colorButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                SharedResources.ui.showColorPicker(new ColorPickerAdapter() {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);

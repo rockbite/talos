@@ -8,11 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomVector2Widget;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -21,6 +24,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
+import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +62,20 @@ public class VariableCreationWindow extends Table {
         plusButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                routineStage.routineEditorApp.createNewVariable();
+                Vector2 tmp = new Vector2(x, y);
+                plusButton.localToStageCoordinates(tmp);
+                BasicPopup.build(PropertyType.class)
+                        .addItem("Float", PropertyType.FLOAT)
+                        .addItem("Vector2", PropertyType.VECTOR2)
+                        .addItem("Color", PropertyType.COLOR)
+                        .addItem("Asset", PropertyType.ASSET)
+                        .onClick(new BasicPopup.PopupListener<PropertyType>() {
+                            @Override
+                            public void itemClicked(PropertyType type) {
+                                routineStage.routineEditorApp.createNewVariable(type);
+                            }
+                        })
+                        .show(tmp.x, tmp.y);
             }
         });
 
@@ -75,8 +92,6 @@ public class VariableCreationWindow extends Table {
         scrollPane.setScrollingDisabled(true, false);
         content.add(scrollPane).grow().maxHeight(300).padBottom(10);
 
-        //todo: add this to scroll pane
-
         RoutineInstance routineInstance = routineStage.routineInstance;
         Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
 
@@ -86,13 +101,18 @@ public class VariableCreationWindow extends Table {
         for (int i = 0; i < propertyWrappers.size; i++) {
             PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
 
-            CustomVector2Widget innerWidget = new CustomVector2Widget(); // todo, support types
-            CustomVarWidget widget = new CustomVarWidget(innerWidget, propertyWrapper.index);
-            widget.setValue(propertyWrapper.propertyName);
-            inner.add(widget).padTop(2).growX();
-            inner.row();
+            try {
+                PropertyType type = propertyWrapper.getType();
+                ATypeWidget innerWidget = ClassReflection.newInstance(type.getWidgetClass());
+                CustomVarWidget widget = new CustomVarWidget(innerWidget, propertyWrapper.index);
+                widget.setValue(propertyWrapper.propertyName);
+                inner.add(widget).padTop(2).growX();
+                inner.row();
 
-            templateRowArray.add(widget);
+                templateRowArray.add(widget);
+            } catch (ReflectionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         configureDragAndDrop();
