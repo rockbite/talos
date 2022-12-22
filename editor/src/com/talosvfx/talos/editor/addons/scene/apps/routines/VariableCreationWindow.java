@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -40,6 +41,8 @@ public class VariableCreationWindow extends Table {
     private RoutineStage routineStage;
 
     public VariableCreationWindow (RoutineStage routineStage) {
+        setTouchable(Touchable.enabled);
+
         this.routineStage = routineStage;
         setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
         dragAndDrop = new DragAndDrop();

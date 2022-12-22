@@ -16,6 +16,6 @@ public class CustomColorWidget extends ATypeWidget {
         colorWidget = new ColorWidget();
         colorWidget.init(SharedResources.skin, "color");
 
-        add(colorWidget).padLeft(4).padRight(4).width(220).padTop(9);
+        add(colorWidget).padLeft(4).padRight(4).width(220).padTop(9).padBottom(5);
     }
 }

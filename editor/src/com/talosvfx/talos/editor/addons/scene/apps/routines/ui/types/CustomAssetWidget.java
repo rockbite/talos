@@ -31,6 +31,6 @@ public class CustomAssetWidget extends ATypeWidget {
             }
         });
 
-        add(assetWidget).padLeft(4).padRight(4).width(220).padTop(9);
+        add(assetWidget).padLeft(4).padRight(4).width(220).padTop(9).padBottom(4);
     }
 }
