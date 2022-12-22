@@ -34,7 +34,12 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineConfigMap.loadFrom(handle);
 
         routineStage = new RoutineStage(this, SharedResources.skin);
-        routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor());
+        routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
+            @Override
+            protected boolean canMoveAround() {
+                return true;
+            }
+        };
         routineStageWrapper.getDropdownForWorld().setVisible(false);
 
         final Table content = new Table();
