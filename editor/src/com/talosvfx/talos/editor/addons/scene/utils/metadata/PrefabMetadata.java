@@ -25,8 +25,7 @@ public class PrefabMetadata extends AMetadata {
 
         propertyProviders.add(new FilePropertyProvider(link.handle));
 
-        Prefab prefab = new Prefab();
-        prefab.path = link.handle.path();
+        Prefab prefab = new Prefab(link.handle);
 
         GameObject root = prefab.root;
         Iterable<IPropertyProvider> rootProviders = root.getPropertyProviders();

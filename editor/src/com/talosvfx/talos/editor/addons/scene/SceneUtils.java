@@ -1,13 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -19,14 +15,10 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -39,7 +31,10 @@ import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SmartTransformGizmo.getLatestFreeOrderingIndex;
@@ -90,7 +85,7 @@ public class SceneUtils {
 
 	public static GameObject createFromPrefab (GameObjectContainer gameObjectContainer, GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
 
-		Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
+		Prefab prefab = new Prefab(prefabToCopy.getRootRawAsset().handle);
 
 		GameObject gameObject = prefab.root.getGameObjects().first();
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
@@ -314,6 +309,23 @@ public class SceneUtils {
 		}
 	}
 
+	public static void convertToPrefab (GameObject gameObject) {
+		FileHandle root = SharedResources.currentProject.rootProjectDir();
+		FileHandle prefabs = root.child("prefabs");
+		FileHandle[] children = prefabs.list();
+		List<String> names = Arrays.stream(children).map((FileHandle child) -> child.name()).collect(Collectors.toList());
+		String name = gameObject.getName() + ".prefab";
+		String newName = NamingUtils.getNewName(name, names);
+		FileHandle prefabHandle = prefabs.child(newName);
 
+		GameObject gamePrefab = new GameObject();
+		gamePrefab.setName("Prefab");
+		gamePrefab.addGameObject(gameObject);
+
+		Prefab prefab = new Prefab(gamePrefab);
+
+		prefabHandle.writeString(prefab.getAsString(), false);
+		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);
+	}
 
 }

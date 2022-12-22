@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -10,13 +11,14 @@ public class Prefab extends SavableContainer {
 
     public String name;
 
-    public static Prefab from(FileHandle fileHandle) {
-        Prefab prefab = new Prefab();
-        prefab.path = fileHandle.path();
+    public Prefab (FileHandle fileHandle) {
+        path = fileHandle.path();
+        name = fileHandle.nameWithoutExtension();
+        loadFromHandle(fileHandle);
+    }
 
-        prefab.name = fileHandle.nameWithoutExtension();
-
-        return prefab;
+    public Prefab(GameObject root) {
+        this.root = root;
     }
 
     @Override
@@ -29,6 +31,7 @@ public class Prefab extends SavableContainer {
         JsonValue jsonValue = new JsonReader().parse(data);
         Json json = new Json();
         root = json.readValue(GameObject.class, jsonValue.get("root"));
+        root.setGameObjectContainer(this);
         name = root.getName();
 
         //Lets add a fake root
@@ -36,6 +39,6 @@ public class Prefab extends SavableContainer {
 
     @Override
     public Iterable<IPropertyProvider> getPropertyProviders() {
-        return null;
+        return new Array<>();
     }
 }
