@@ -1,39 +1,36 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
 
 import java.util.function.Supplier;
 
 public class GameAssetWidget extends AbstractWidget<GameAsset> {
 
-    private AssetSelectWidget widget;
     private GameAsset gameAsset;
     private GameAssetType type;
+    private AssetSelector<Object> widget;
 
 
     @Override
     public void loadFromXML(XmlReader.Element element) {
 
         String typeString = element.getAttribute("type");
-        type = GameAssetType.valueOf(typeString);
 
-        widget = new AssetSelectWidget<>(element.getText(), type, new Supplier<GameAsset<Texture>>() {
+        type = GameAssetType.valueOf(typeString);
+        String text = element.getText();
+
+        widget = new AssetSelector<>(element.getText(), type);
+        widget.addListener(new ChangeListener() {
             @Override
-            public GameAsset<Texture> get() {
-                return gameAsset;
-            }
-        }, new PropertyWidget.ValueChanged<GameAsset<Texture>>() {
-            @Override
-            public void report(GameAsset<Texture> value) {
-                gameAsset = value;
+            public void changed(ChangeEvent event, Actor actor) {
                 fireChangedEvent();
             }
         });
