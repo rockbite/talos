@@ -14,10 +14,12 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomFloatWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomVector2Widget;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
@@ -116,7 +118,7 @@ public class VariableCreationWindow extends Table {
     private void configureDragAndDrop() {
         dragAndDrop.clear();
         for (CustomVarWidget row : templateRowArray) {
-            dragAndDrop.addSource(new DragAndDrop.Source(row) {
+            dragAndDrop.addSource(new DragAndDrop.Source(row.getFieldContainer()) {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
@@ -147,8 +149,14 @@ public class VariableCreationWindow extends Table {
             @Override
             public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 temp.set(x, y);
-                // x and y are in routineStageWrapper coordinate system
+                // x and y are in routineStageWrapper's local coordinate system
                 // we need to convert them to nodeBoard's stage coordinate
+
+                GenericStageWrappedViewportWidget routineStageWrapper = routineStage.routineEditorApp.routineStageWrapper;
+                routineStageWrapper.localToScreenCoordinates(temp);
+                NodeBoard nodeBoard = routineStage.getNodeBoard();
+                nodeBoard.screenToLocalCoordinates(temp);
+                nodeBoard.localToStageCoordinates(temp);
 
                 RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
                 PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();

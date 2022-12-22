@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
@@ -36,8 +38,11 @@ public class CustomVarWidget extends Table {
 
     private EventListener stageListener;
     private ArrowButton arrowButton;
+
     private Table top;
     private Table bottom;
+
+    @Getter
     private Table fieldContainer;
     private Cell<Table> contentCell;
 
@@ -160,7 +165,6 @@ public class CustomVarWidget extends Table {
 
         fieldContainer.add(mainStack).grow();
         fieldContainer.setTouchable(Touchable.enabled);
-
         top.add(fieldContainer).height(32).growX();
 
 
@@ -281,6 +285,14 @@ public class CustomVarWidget extends Table {
 
         isSelected = true;
         setBackgrounds();
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (isHover) {
+            CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_ALL_DIRECTIONS);
+        }
     }
 
     private void hideEditMode() {
