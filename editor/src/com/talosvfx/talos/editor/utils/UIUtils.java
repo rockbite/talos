@@ -1,7 +1,10 @@
 package com.talosvfx.talos.editor.utils;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class UIUtils {
 
@@ -13,5 +16,14 @@ public class UIUtils {
             parent.invalidate();
             invalidateForDepth(group.getParent(), depth - 1);
         }
+    }
+
+    public static Table makeSeparator() {
+        Table table = new Table();
+
+        table.setBackground(SharedResources.skin.getDrawable("white"));
+        table.setColor(Color.valueOf("444444ff"));
+
+        return table;
     }
 }

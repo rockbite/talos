@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -41,6 +42,14 @@ public class DummyLayoutApp implements LayoutApp {
 		mainContent = createMainContent();
 	}
 
+	/**
+	 * please override this in your apps to do shit with it
+	 * @param popup
+	 */
+	protected void createPopupActions(BasicPopup<String> popup) {
+
+	}
+
 	private Table createTab (String tabName) {
 		Table tab = new Table();
 		tab.setTouchable(Touchable.enabled);
@@ -56,9 +65,23 @@ public class DummyLayoutApp implements LayoutApp {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				if (destroyCallback != null) {
-					destroyCallback.onDestroyRequest();
-				}
+
+				BasicPopup<String> popup = BasicPopup.build(String.class)
+						.addItem("Maximize", "maximize")
+						.addItem("Close Tab", "close");
+
+				createPopupActions(popup);
+				popup.onClick(new BasicPopup.PopupListener<String>() {
+					@Override
+					public void itemClicked(String payload) {
+						if(payload.equals("close")) {
+							if (destroyCallback != null) {
+								destroyCallback.onDestroyRequest();
+							}
+						}
+					}
+				}).show(actor, x, y);
+
 			}
 		});
 		actor.getStyle().up = null;

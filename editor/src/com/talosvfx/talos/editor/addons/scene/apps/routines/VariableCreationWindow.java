@@ -62,8 +62,6 @@ public class VariableCreationWindow extends Table {
         plusButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Vector2 tmp = new Vector2(x, y);
-                plusButton.localToStageCoordinates(tmp);
                 BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
@@ -75,7 +73,7 @@ public class VariableCreationWindow extends Table {
                                 routineStage.routineEditorApp.createNewVariable(type);
                             }
                         })
-                        .show(tmp.x, tmp.y);
+                        .show(plusButton, x, y);
             }
         });
 
