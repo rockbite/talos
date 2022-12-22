@@ -50,6 +50,10 @@ public class DummyLayoutApp implements LayoutApp {
 
 	}
 
+	protected void popupButtonClicked(String payload) {
+
+	}
+
 	private Table createTab (String tabName) {
 		Table tab = new Table();
 		tab.setTouchable(Touchable.enabled);
@@ -78,7 +82,11 @@ public class DummyLayoutApp implements LayoutApp {
 							if (destroyCallback != null) {
 								destroyCallback.onDestroyRequest();
 							}
+
+							return;
 						}
+
+						popupButtonClicked(payload);
 					}
 				}).show(actor, x, y);
 
