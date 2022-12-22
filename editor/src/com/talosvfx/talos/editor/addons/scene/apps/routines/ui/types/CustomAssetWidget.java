@@ -15,6 +15,6 @@ public class CustomAssetWidget extends ATypeWidget {
         gameAssetWidget = new GameAssetWidget();
         gameAssetWidget.init(SharedResources.skin);
 
-        add(gameAssetWidget).padLeft(4).padRight(4).width(220);
+        add(gameAssetWidget).padLeft(4).padRight(4).width(220).padTop(9);
     }
 }

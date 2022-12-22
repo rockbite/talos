@@ -62,7 +62,6 @@ public class MenuPopup extends Table {
             setBackground(SharedResources.skin.getDrawable("top-menu-popup-main-bg"));
         } else {
             setBackground(SharedResources.skin.getDrawable("top-menu-popup-sub-bg"));
-
         }
 
         pack();
