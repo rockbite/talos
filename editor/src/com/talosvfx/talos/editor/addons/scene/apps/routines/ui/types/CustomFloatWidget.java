@@ -17,8 +17,7 @@ public class CustomFloatWidget extends ATypeWidget {
     private final Table content;
 
     private final Table rangeTable;
-    private final ValueWidget valueWidget
-            ;
+    private final ValueWidget valueWidget;
     private final SelectWidget rangeWidget;
     private ValueWidget minWidget;
     private ValueWidget maxWidget;
@@ -110,6 +109,7 @@ public class CustomFloatWidget extends ATypeWidget {
     }
 
     private void expand() {
+        content.clearChildren();
         content.add(rangeTable);
         content.pack();
         UIUtils.invalidateForDepth(content, 6);
