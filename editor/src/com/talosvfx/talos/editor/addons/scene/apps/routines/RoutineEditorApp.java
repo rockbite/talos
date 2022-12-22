@@ -132,14 +132,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineStage.routineUpdated();
     }
 
-    public void changeTypeFor (int index, PropertyType newType) {
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        routineInstance.changeExposedVariableType(index, newType);
-
-        variableCreationWindow.reloadWidgets();
-        routineStage.routineUpdated();
-    }
-
     public void createNewVariable (PropertyType type) {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.createNewPropertyWrapper(type);

@@ -104,7 +104,7 @@ public class VariableCreationWindow extends Table {
             try {
                 PropertyType type = propertyWrapper.getType();
                 ATypeWidget innerWidget = ClassReflection.newInstance(type.getWidgetClass());
-                CustomVarWidget widget = new CustomVarWidget(innerWidget, propertyWrapper.index);
+                CustomVarWidget widget = new CustomVarWidget(routineStage, innerWidget, propertyWrapper.index);
                 widget.setValue(propertyWrapper.propertyName);
                 inner.add(widget).padTop(2).growX();
                 inner.row();

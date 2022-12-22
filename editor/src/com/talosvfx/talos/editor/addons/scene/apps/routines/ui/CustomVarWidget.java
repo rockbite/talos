@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
@@ -49,8 +50,11 @@ public class CustomVarWidget extends Table {
     private ATypeWidget innerWidget;
     private Label typeLabel;
 
-    public CustomVarWidget(ATypeWidget innerWidget, int index) {
+    private final RoutineStage routineStage;
+
+    public CustomVarWidget(RoutineStage routineStage, ATypeWidget innerWidget, int index) {
         this.index = index;
+        this.routineStage = routineStage;
         editing = new Table();
         main = new Table();
 
@@ -169,6 +173,13 @@ public class CustomVarWidget extends Table {
 
 
         DeleteButton deleteButton = new DeleteButton();
+        deleteButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                routineStage.routineInstance.removeExposedVariablesWithIndex(index);
+            }
+        });
         top.add(deleteButton).growY();
 
         setTouchable(Touchable.enabled);
@@ -228,6 +239,13 @@ public class CustomVarWidget extends Table {
                 }
 
                 return super.keyDown(event, keycode);
+            }
+        });
+
+        textField.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                routineStage.routineInstance.changeExposedVariableKey(index, textField.getText());
             }
         });
 
