@@ -76,7 +76,7 @@ public class DynamicNodeStageData implements Json.Serializable {
 
 		IntMap<NodeWidget> nodeMap = new IntMap<>();
 
-		if (nodes == null) {
+		if (jsonNodes == null) {
 			return;
 		}
 
@@ -96,18 +96,18 @@ public class DynamicNodeStageData implements Json.Serializable {
 
 		nodeBoard.globalNodeCounter = idCounter + 1;
 
-		if (jsonConnections == null);
+		if (jsonConnections != null) {
+			for (JsonValue connectionData : jsonConnections) {
+				int fromNode = connectionData.getInt("fromNode");
+				int toNode = connectionData.getInt("toNode");
+				String fromSlot = connectionData.getString("fromSlot");
+				String toSlot = connectionData.getString("toSlot");
 
-		for (JsonValue connectionData : jsonConnections) {
-			int fromNode = connectionData.getInt("fromNode");
-			int toNode = connectionData.getInt("toNode");
-			String fromSlot = connectionData.getString("fromSlot");
-			String toSlot = connectionData.getString("toSlot");
+				NodeWidget fromWidget = nodeMap.get(fromNode);
+				NodeWidget toWidget = nodeMap.get(toNode);
 
-			NodeWidget fromWidget = nodeMap.get(fromNode);
-			NodeWidget toWidget = nodeMap.get(toNode);
-
-			nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
+				nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
+			}
 		}
 
 		ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();

@@ -133,28 +133,11 @@ public class RoutineStageData extends DynamicNodeStageData {
 	public void changeExposedVariableKey (int index, String newKey) {
 		PropertyWrapper<?> propertyWrapper = getPropertyWrapperWithIndex(index);
 		propertyWrapper.propertyName = newKey;
-	}
-
-	public void changeExposedVariableType (int index, PropertyType newType) {
-		PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
-		PropertyWrapper<?> newInstance = createPropertyInstanceOfType(newType);
-		if (newInstance == null) {
-			System.out.println("CHECK TYPE, THERE IS NO TYPE MATCHING FOR - " + newType);
-			return;
-		}
-
-		newInstance.index = index;
-		newInstance.propertyName = propertyWrapperWithIndex.propertyName;
-		int i = propertyWrappers.indexOf(propertyWrapperWithIndex, true);
-		propertyWrappers.removeValue(propertyWrapperWithIndex, true);
-		propertyWrappers.insert(i, newInstance);
-
-		for (IntMap.Entry<RoutineNode> routineNodeEntry : routineInstance.lowLevelLookup) {
-			RoutineNode value = routineNodeEntry.value;
-			if (value instanceof ExposedVariableNode) {
-				ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
-				if (exposedVariableNode.index == index) {
-					exposedVariableNode.updateForPropertyWrapper(newInstance);
+		for (NodeWidget node : nodes) {
+			if (node instanceof RoutineExposedVariableNodeWidget) {
+				RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
+				if (widget.index == index) {
+					widget.update(routineInstance.getPropertyWrapperWithIndex(index));
 				}
 			}
 		}

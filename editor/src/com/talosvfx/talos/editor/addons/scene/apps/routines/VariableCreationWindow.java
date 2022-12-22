@@ -75,8 +75,8 @@ public class VariableCreationWindow extends Table {
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {
                             @Override
                             public void itemClicked(PropertyType type) {
-                                logger.error("todo Create new variable");
-//                                routineStage.routineEditorApp.createNewVariable(type);
+                                routineStage.data.createNewPropertyWrapper(type);
+                                reloadWidgets();
                             }
                         })
                         .show(plusButton, x, y);

@@ -177,7 +177,7 @@ public class CustomVarWidget extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                routineStage.routineInstance.removeExposedVariablesWithIndex(index);
+                routineStage.data.removeExposedVariablesWithIndex(index);
             }
         });
         top.add(deleteButton).growY();
@@ -252,7 +252,7 @@ public class CustomVarWidget extends Table {
         textField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                routineStage.routineInstance.changeExposedVariableKey(index, textField.getText());
+                routineStage.data.changeExposedVariableKey(index, textField.getText());
             }
         });
 

@@ -96,7 +96,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
 
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
-
     }
 
 //    public void changeKeyFor (int index, String value) {
