@@ -122,7 +122,7 @@ public class VariableCreationWindow extends Table {
                 });
 
                 templateRowArray.add(widget);
-            } catch (ReflectionException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

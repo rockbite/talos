@@ -11,7 +11,7 @@ public class SquareButton extends Button {
 
     public SquareButton(Skin skin, Drawable drawable, String tooltip) {
         build(skin, drawable, false);
-        addListener(new TextTooltip(tooltip, skin));
+        //addListener(new TextTooltip(tooltip, skin)); //bring this back when it works well
     }
 
     public SquareButton(Skin skin, Label label, String tooltip) {
