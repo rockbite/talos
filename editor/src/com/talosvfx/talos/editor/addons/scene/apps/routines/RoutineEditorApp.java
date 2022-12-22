@@ -10,6 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposed
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -126,7 +127,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineStage.routineUpdated();
     }
 
-    public void changeTypeFor (int index, String newType) {
+    public void changeTypeFor (int index, PropertyType newType) {
         RoutineInstance routineInstance = routineStage.routineInstance;
         routineInstance.changeExposedVariableType(index, newType);
 
@@ -134,9 +135,9 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
         routineStage.routineUpdated();
     }
 
-    public void createNewVariable () {
+    public void createNewVariable (PropertyType type) {
         RoutineInstance routineInstance = routineStage.routineInstance;
-        routineInstance.createNewPropertyWrapper();
+        routineInstance.createNewPropertyWrapper(type);
         variableCreationWindow.reloadWidgets();
         routineStage.routineUpdated();
     }

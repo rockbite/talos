@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.*;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 
 import java.util.UUID;
 
@@ -191,11 +191,23 @@ public class RoutineInstance {
         return memory.get(name);
     }
 
-    public void createNewPropertyWrapper () {
-        PropertyFloatWrapper propertyFloatWrapper = new PropertyFloatWrapper();
-        propertyFloatWrapper.index = exposedPropertyIndex;
+    public PropertyWrapper<?> createNewPropertyWrapper (PropertyType propertyType) {
+        PropertyWrapper<?> propertyWrapper = createPropertyInstanceOfType(propertyType);
+        propertyWrapper.index = exposedPropertyIndex;
         exposedPropertyIndex++;
-        propertyWrappers.add(propertyFloatWrapper);
+        propertyWrappers.add(propertyWrapper);
+        return propertyWrapper;
+    }
+
+    public PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
+        try {
+            PropertyWrapper<?> propertyWrapper = type.getWrapperClass().getConstructor().newInstance();
+            propertyWrapper.setType(type);
+            return propertyWrapper;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
@@ -228,9 +240,9 @@ public class RoutineInstance {
         propertyWrapper.propertyName = newKey;
     }
 
-    public void changeExposedVariableType (int index, String newType) {
+    public void changeExposedVariableType (int index, PropertyType newType) {
         PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
-        PropertyWrapper<?> newInstance = getPropertyForType(newType);
+        PropertyWrapper<?> newInstance = createPropertyInstanceOfType(newType);
         if (newInstance == null) {
             System.out.println("CHECK TYPE, THERE IS NO TYPE MATCHING FOR - " + newType);
             return;
@@ -251,26 +263,6 @@ public class RoutineInstance {
                 }
             }
         }
-    }
-
-    private PropertyWrapper<?> getPropertyForType (String type) {
-        type = type.toLowerCase();
-        switch (type) {
-            case "boolean":
-                return new PropertyBooleanWrapper();
-            case "integer":
-                return new PropertyIntegerWrapper();
-            case "float":
-                return new PropertyFloatWrapper();
-            case "game object":
-                return new PropertyGameObjectWrapper();
-            case "string":
-                return new PropertyStringWrapper();
-            case "vector2":
-                return new PropertyVec2Wrapper();
-        }
-
-        return null;
     }
 
     public void updateNodesFromProperties () {

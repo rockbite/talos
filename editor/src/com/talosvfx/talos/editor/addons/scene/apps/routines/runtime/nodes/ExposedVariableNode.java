@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 
 public class ExposedVariableNode extends RoutineNode {
 

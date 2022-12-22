@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
+package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;

@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 
 public class RoutineExposedVariableNodeWidget extends RoutineNodeWidget {

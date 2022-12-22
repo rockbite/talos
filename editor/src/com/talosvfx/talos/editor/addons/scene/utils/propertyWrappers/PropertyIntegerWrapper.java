@@ -1,47 +1,47 @@
-package com.talosvfx.talos.editor.addons.scene.utils.scriptProperties;
+package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
+public class PropertyIntegerWrapper extends PropertyNumberWrapper<Integer> {
 
     @Override
     public void collectAttributes (Array<String> attributes) {
         super.collectAttributes(attributes);
         if (minValue == null) {
-            minValue = -Float.MAX_VALUE;
+            minValue = Integer.MIN_VALUE;
         }
         if (maxValue == null) {
-            maxValue = Float.MAX_VALUE;
+            maxValue = Integer.MAX_VALUE;
         }
         if (step == null) {
-            step = 0.1f;
+            step = 1;
         }
         if (defaultValue == null) {
-            defaultValue = 0f;
+            defaultValue = 0;
         }
     }
 
     @Override
-    public Float parseValueFromString (String value) {
+    public Integer parseValueFromString (String value) {
         try {
-            return Float.valueOf(value);
+            return Integer.valueOf(value);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            return 0f;
+            return 0;
         }
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        defaultValue = jsonData.getFloat("defaultValue", 0);
-        value = jsonData.getFloat("value", defaultValue);
+        defaultValue = jsonData.getInt("defaultValue", 0);
+        value = jsonData.getInt("value", defaultValue);
 
-        minValue = jsonData.getFloat("minValue", -Float.MAX_VALUE);
-        maxValue = jsonData.getFloat("maxValue", Float.MAX_VALUE);
-        step = jsonData.getFloat("step", 0.1f);
+        minValue = jsonData.getInt("minValue", Integer.MIN_VALUE);
+        maxValue = jsonData.getInt("maxValue", Integer.MAX_VALUE);
+        step = jsonData.getInt("step", 1);
     }
 
     @Override
