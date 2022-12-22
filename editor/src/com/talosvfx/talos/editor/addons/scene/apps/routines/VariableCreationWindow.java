@@ -2,9 +2,12 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
@@ -40,6 +43,8 @@ public class VariableCreationWindow extends Table {
     private RoutineStage routineStage;
 
     public VariableCreationWindow (RoutineStage routineStage) {
+        setTouchable(Touchable.enabled);
+
         this.routineStage = routineStage;
         setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
         dragAndDrop = new DragAndDrop();
@@ -62,8 +67,6 @@ public class VariableCreationWindow extends Table {
         plusButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Vector2 tmp = new Vector2(x, y);
-                plusButton.localToStageCoordinates(tmp);
                 BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
@@ -76,7 +79,7 @@ public class VariableCreationWindow extends Table {
 //                                routineStage.routineEditorApp.createNewVariable(type);
                             }
                         })
-                        .show(tmp.x, tmp.y);
+                        .show(plusButton, x, y);
             }
         });
 
@@ -110,6 +113,14 @@ public class VariableCreationWindow extends Table {
                 inner.add(widget).padTop(2).growX();
                 inner.row();
 
+                widget.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        propertyWrapper.propertyName = widget.getPropertyName();
+                        widget.applyValueToWrapper(propertyWrapper);
+                    }
+                });
+
                 templateRowArray.add(widget);
             } catch (ReflectionException e) {
                 throw new RuntimeException(e);
@@ -129,8 +140,8 @@ public class VariableCreationWindow extends Table {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(routineStage.data.getRoutineInstance().getPropertyWrapperWithIndex(row.getIndex()));
                     Table payloadTable = new Table();
-                    float width = row.getWidth();
-                    float height = row.getHeight();
+                    float width = row.getFieldContainer().getWidth();
+                    float height = row.getFieldContainer().getHeight();
                     payloadTable.setSize(width, height);
                     payloadTable.setSkin(routineStage.skin);
                     payloadTable.setBackground("button-over");

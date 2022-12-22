@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.UIUtils;
 import lombok.Getter;
 
 public class MenuPopup extends Table {
@@ -39,7 +40,7 @@ public class MenuPopup extends Table {
                 row = menuRow;
                 add(row).pad(0).padLeft(10).padRight(10).growX();
             } else if(item.getName().equals("separator")) {
-                row = makeSeparator();
+                row = UIUtils.makeSeparator();
                 add(row).growX().height(1).pad(10).padTop(4).padBottom(4);
             } else if(item.getName().equals("inject")) {
                 String injectorName = item.getAttribute("name");
@@ -62,19 +63,9 @@ public class MenuPopup extends Table {
             setBackground(SharedResources.skin.getDrawable("top-menu-popup-main-bg"));
         } else {
             setBackground(SharedResources.skin.getDrawable("top-menu-popup-sub-bg"));
-
         }
 
         pack();
-    }
-
-    private Table makeSeparator() {
-        Table table = new Table();
-
-        table.setBackground(SharedResources.skin.getDrawable("white"));
-        table.setColor(Color.valueOf("444444ff"));
-
-        return table;
     }
 
     public String getId() {

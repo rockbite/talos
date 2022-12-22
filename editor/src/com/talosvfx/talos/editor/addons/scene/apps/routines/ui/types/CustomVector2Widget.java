@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -31,5 +32,10 @@ public class CustomVector2Widget extends ATypeWidget {
     @Override
     public String getTypeName() {
         return "vector2";
+    }
+
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
+
     }
 }
