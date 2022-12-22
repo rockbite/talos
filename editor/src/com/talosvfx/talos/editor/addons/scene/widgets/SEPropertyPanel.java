@@ -18,7 +18,6 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -28,10 +27,9 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
@@ -337,7 +335,7 @@ public class SEPropertyPanel extends PropertyPanel {
                         }
                         if (gameAsset.type == GameAssetType.ROUTINE) {
                             RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
-                            routineRendererComponent.setGameAsset((GameAsset<RoutineData>)gameAsset);
+                            routineRendererComponent.setGameAsset((GameAsset<RoutineStageData>)gameAsset);
                             gameObject.addComponent(routineRendererComponent);
 
                             if (getCurrentHolder() instanceof GameObjectContainer) {
@@ -419,7 +417,7 @@ public class SEPropertyPanel extends PropertyPanel {
                                     FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
                                     newDestination.writeString("", false);
                                     AssetRepository.getInstance().rawAssetCreated(newDestination, true);
-                                    GameAsset<RoutineData> assetForPath = (GameAsset<RoutineData>) AssetRepository.getInstance().getAssetForPath(newDestination, false);
+                                    GameAsset<RoutineStageData> assetForPath = (GameAsset<RoutineStageData>) AssetRepository.getInstance().getAssetForPath(newDestination, false);
 
                                     if (assetForPath != null) {
                                         RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();

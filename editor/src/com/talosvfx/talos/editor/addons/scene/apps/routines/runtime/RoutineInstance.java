@@ -6,18 +6,22 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
+import com.talosvfx.talos.editor.data.RoutineStageData;
+import lombok.Getter;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-import java.util.UUID;
 
 public class RoutineInstance {
 
+    private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
+
     private Array<RoutineNode> nodes = new Array<>();
 
-    public transient UUID uuid;
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
-    private IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
+    public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
 
     private RoutineConfigMap config;
 
@@ -28,69 +32,30 @@ public class RoutineInstance {
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
-    public Array<PropertyWrapper<?>> getPropertyWrappers () {
-        return propertyWrappers;
-    }
-
-    private int exposedPropertyIndex;
-
-    private Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
-
     public transient boolean isDirty = true;
+
+    @Getter
+    private Array<PropertyWrapper<?>> parentPropertyWrappers;
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
-        uuid = UUID.randomUUID();
     }
 
-    public int getExposedPropertyIndex() {
-        return exposedPropertyIndex;
-    }
 
-    public void setExposedPropertyIndex(int index) {
-        this.exposedPropertyIndex = index;
-    }
-
-    public void loadFrom(UUID uuid, String fileContent, RoutineConfigMap config) {
+    public void loadFrom (RoutineStageData routineStageData, RoutineConfigMap config) {
         this.config = config;
-        this.uuid = new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
         this.isDirty = true;
 
-        if(fileContent == null || fileContent.isEmpty()) return;
+        parentPropertyWrappers = routineStageData.getPropertyWrappers();
 
-        JsonReader jsonReader = new JsonReader();
-        JsonValue root = jsonReader.parse(fileContent);
-
-        if(root == null) return;
-
-        JsonValue list = root.get("list");
-        JsonValue connections = root.get("connections");
+        JsonValue list = routineStageData.getJsonNodes();
+        JsonValue connections = routineStageData.getJsonConnections();
 
         if (list == null || connections == null) {
             return;
         }
 
-        propertyWrappers.clear();
-        JsonValue propertiesJson = root.get("propertyWrappers");
-        Json json = new Json();
-        if (propertiesJson != null) {
-            for (JsonValue propertyJson : propertiesJson) {
-                String className = propertyJson.getString("className", "");
-                JsonValue property = propertyJson.get("property");
-                if (property != null) {
-                    try {
-                        Class clazz = ClassReflection.forName(className);
-                        PropertyWrapper propertyWrapper = (PropertyWrapper) ClassReflection.newInstance(clazz);
-                        propertyWrapper.read(json, property);
-                        propertyWrappers.add(propertyWrapper);
-                    } catch (ReflectionException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
 
-        exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
 
         IntMap<RoutineNode> idMap = new IntMap<>();
 
@@ -191,27 +156,8 @@ public class RoutineInstance {
         return memory.get(name);
     }
 
-    public PropertyWrapper<?> createNewPropertyWrapper (PropertyType propertyType) {
-        PropertyWrapper<?> propertyWrapper = createPropertyInstanceOfType(propertyType);
-        propertyWrapper.index = exposedPropertyIndex;
-        exposedPropertyIndex++;
-        propertyWrappers.add(propertyWrapper);
-        return propertyWrapper;
-    }
-
-    public PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
-        try {
-            PropertyWrapper<?> propertyWrapper = type.getWrapperClass().getConstructor().newInstance();
-            propertyWrapper.setType(type);
-            return propertyWrapper;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
-        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+        for (PropertyWrapper<?> propertyWrapper : parentPropertyWrappers) {
             if (propertyWrapper.index == index) {
                 return propertyWrapper;
             }
@@ -220,58 +166,15 @@ public class RoutineInstance {
         return null;
     }
 
-    public void removeExposedVariablesWithIndex (int index) {
-        PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
-        propertyWrappers.removeValue(propertyWrapperWithIndex, true);
-
-        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
-            RoutineNode value = routineNodeEntry.value;
-            if (value instanceof ExposedVariableNode) {
-                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
-                if (exposedVariableNode.index == index) {
-                    exposedVariableNode.propertyWrapper = null;
-                }
-            }
-        }
-    }
-
-    public void changeExposedVariableKey (int index, String newKey) {
-        PropertyWrapper<?> propertyWrapper = getPropertyWrapperWithIndex(index);
-        propertyWrapper.propertyName = newKey;
-    }
-
-    public void changeExposedVariableType (int index, PropertyType newType) {
-        PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
-        PropertyWrapper<?> newInstance = createPropertyInstanceOfType(newType);
-        if (newInstance == null) {
-            System.out.println("CHECK TYPE, THERE IS NO TYPE MATCHING FOR - " + newType);
-            return;
-        }
-
-        newInstance.index = index;
-        newInstance.propertyName = propertyWrapperWithIndex.propertyName;
-        int i = propertyWrappers.indexOf(propertyWrapperWithIndex, true);
-        propertyWrappers.removeValue(propertyWrapperWithIndex, true);
-        propertyWrappers.insert(i, newInstance);
-
-        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
-            RoutineNode value = routineNodeEntry.value;
-            if (value instanceof ExposedVariableNode) {
-                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
-                if (exposedVariableNode.index == index) {
-                    exposedVariableNode.updateForPropertyWrapper(newInstance);
-                }
-            }
-        }
-    }
-
     public void updateNodesFromProperties () {
         for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
             RoutineNode value = routineNodeEntry.value;
             if (value instanceof ExposedVariableNode) {
                 ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
                 int index = exposedVariableNode.index;
-                exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
+               // exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
+
+                logger.error("TOdo exposed variable fix");
             }
         }
     }

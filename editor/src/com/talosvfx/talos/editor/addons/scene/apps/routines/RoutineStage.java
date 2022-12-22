@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -27,8 +28,12 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RoutineStage extends DynamicNodeStage implements Observer {
+public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(RoutineStage.class);
 
     public final RoutineEditorApp routineEditorApp;
 
@@ -38,13 +43,10 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
 
     private float timeScale = 1f;
 
-    public RoutineInstance routineInstance; // runtime
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
         this.routineEditorApp = routineEditorApp;
-
-        routineInstance = new RoutineInstance();
 
         Notifications.registerObserver(this);
     }
@@ -59,10 +61,11 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         if (gameObject.hasComponent(RoutineRendererComponent.class)) {
             RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
             if (component.routineInstance != null) {
-                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
-                    component.updatePropertyWrappers(true);
-                    updatedComponents.add(component);
-                }
+                logger.error("todo don't do this with uuid do it with instance of the game asset");
+//                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
+//                    component.updatePropertyWrappers(true);
+//                    updatedComponents.add(component);
+//                }
             }
         }
 
@@ -82,45 +85,15 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
         target.writeString(data, false);
     }
 
-    public void loadFrom (GameAsset<RoutineData> asset) {
+    public void loadFrom (GameAsset<RoutineStageData> asset) {
         if (asset == null) return;
+        reset();
 
-        Json json = new Json();
-        JsonReader jsonReader = new JsonReader();
-
-        GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(asset.getRootRawAsset().handle, true);
-        AMetadata metaData = assetForPath.getRootRawAsset().metaData;
-        routineInstance.loadFrom(metaData.uuid, asset.getResource().jsonString, routineConfigMap);
-
-        read(json, jsonReader.parse(asset.getResource().jsonString));
+        setFromData(asset);
+        asset.getResource().constructForUI(this);
     }
 
-    @Override
-    public void read (Json json, JsonValue root) {
-        super.read(json, root);
-        for (NodeWidget node : nodeBoard.nodes) {
-            if (node instanceof RoutineExposedVariableNodeWidget) {
-                ((RoutineExposedVariableNodeWidget) node).update(routineInstance.getPropertyWrapperWithIndex(((RoutineExposedVariableNodeWidget) node).index));
-            }
-        }
-    }
 
-    @Override
-    public void write (Json json) {
-        super.write(json);
-        json.writeValue("propertyWrapperIndex", routineInstance.getExposedPropertyIndex());
-
-        json.writeObjectStart("propertyWrappers");
-        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
-        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-            json.writeObjectStart("property");
-            json.writeValue("className", propertyWrapper.getClass().getName());
-            json.writeValue("property", propertyWrapper);
-            json.writeObjectEnd();
-        }
-        json.writeObjectEnd();
-
-    }
 
     @Override
     protected XmlReader.Element loadData () {
@@ -169,7 +142,7 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     }
 
     public void routineUpdated () {
-        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(routineInstance));
+        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(data.getRoutineInstance()));
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
 
 
@@ -212,7 +185,8 @@ public class RoutineStage extends DynamicNodeStage implements Observer {
     @EventHandler
     public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
-        updateRoutineInstanceDataFromWidget(routineInstance, node);
+        updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node);
+
     }
 
     private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {

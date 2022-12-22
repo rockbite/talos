@@ -163,21 +163,21 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         Vector2 tmp = new Vector2();
         Vector2 targetSize = new Vector2(64, 64);
 
-        for(NodeWidget nodeWidget : nodeBoard.nodes) {
-            if(nodeWidget instanceof SampleTextureNode) {
-                SampleTextureNode node = (SampleTextureNode) nodeWidget;
-                Texture texture = node.getValue();
-
-                if(texture.getWidth() > targetSize.x) {
-                    targetSize.x = texture.getWidth();
-                }
-
-                if(texture.getHeight() > targetSize.y) {
-                    targetSize.y = texture.getHeight();
-                }
-            }
-
-        }
+//        for(NodeWidget nodeWidget : nodeBoard.nodes) {
+//            if(nodeWidget instanceof SampleTextureNode) {
+//                SampleTextureNode node = (SampleTextureNode) nodeWidget;
+//                Texture texture = node.getValue();
+//
+//                if(texture.getWidth() > targetSize.x) {
+//                    targetSize.x = texture.getWidth();
+//                }
+//
+//                if(texture.getHeight() > targetSize.y) {
+//                    targetSize.y = texture.getHeight();
+//                }
+//            }
+//
+//        }
 
         viewport.update((int)targetSize.x, (int)targetSize.y);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
