@@ -129,8 +129,8 @@ public class VariableCreationWindow extends Table {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(routineStage.routineInstance.getPropertyWrapperWithIndex(row.getIndex()));
                     Table payloadTable = new Table();
-                    float width = row.getWidth();
-                    float height = row.getHeight();
+                    float width = row.getFieldContainer().getWidth();
+                    float height = row.getFieldContainer().getHeight();
                     payloadTable.setSize(width, height);
                     payloadTable.setSkin(routineStage.skin);
                     payloadTable.setBackground("button-over");
