@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.project2.apps;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
@@ -60,6 +61,10 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 	@Override
 	public void onRemove () {
 
+	}
+
+	public FileHandle getCurrentSelectedFolder() {
+		return projectExplorerWidget.getCurrentFolder();
 	}
 }
 

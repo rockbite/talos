@@ -73,7 +73,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                 regionName = fileHandle.nameWithoutExtension();
                 filePath = fileHandle.path();
 
-                TalosMain.Instance().ProjectController().setDirty();
+//                TalosMain.Instance().ProjectController().setDirty();
 
                 TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
                     @Override

@@ -39,7 +39,7 @@ public class FileTab extends Tab {
     @Override
     public boolean save() {
         if(isSavable()) {
-            TalosMain.Instance().UIStage().saveProjectAction();
+            //TalosMain.Instance().UIStage().saveProjectAction();
         }
 
         return false;

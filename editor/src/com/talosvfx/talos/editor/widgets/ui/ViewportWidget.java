@@ -71,6 +71,7 @@ import com.talosvfx.talos.editor.utils.grid.GridRenderer;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.Gizmos;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,9 @@ public abstract class ViewportWidget extends Table {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
+
+	@Getter
+	private final VisImageButton dropdownForWorld;
 
 	protected Matrix4 emptyTransform = new Matrix4();
 	private Matrix4 prevTransform = new Matrix4();
@@ -120,6 +124,7 @@ public abstract class ViewportWidget extends Table {
 
 
 	protected GroupSelectionGizmo groupSelectionGizmo;
+	private boolean panRequiresSpace = false;
 
 	protected ViewportViewSettings viewportViewSettings;
 
@@ -157,7 +162,7 @@ public abstract class ViewportWidget extends Table {
 		float iconSize = 15;
 
 
-		VisImageButton dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
+		dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
 		dropdownForWorld.getImage().setScaling(Scaling.fill);
 
 		VisTable viewTable = createViewSettingsDialog();
@@ -574,6 +579,20 @@ public abstract class ViewportWidget extends Table {
 				}
 				return super.keyDown(event, keycode);
 			}
+
+			@Override
+			public boolean keyUp (InputEvent event, int keycode) {
+				if (locked) {
+					return true;
+				}
+
+				for (Gizmo gizmo : ViewportWidget.this.gizmos.gizmoList) {
+					if (gizmo.isSelected()) {
+						gizmo.keyUp(event, keycode);
+					}
+				}
+				return super.keyUp(event, keycode);
+			}
 		};
 
 		addListener(gizmoListener);
@@ -741,7 +760,7 @@ public abstract class ViewportWidget extends Table {
 //				float nextZoom = nextWidth / camera.viewportWidth;
 
 				float currentZoom = viewportViewSettings.getZoom();
-				currentZoom += amountY;
+				currentZoom += amountY * 0.5f;
 				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
 
 				viewportViewSettings.setZoom(currentZoom);
@@ -752,6 +771,9 @@ public abstract class ViewportWidget extends Table {
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+
+				if(panRequiresSpace && !Gdx.input.isKeyPressed(Input.Keys.SPACE)) return false;
+
 				canPan = canMoveAround();
 				InputAdapter inputAdapter = viewportViewSettings.getCurrentCameraControllerSupplier().get();
 				inputAdapter.touchDown((int)x, (int)y, pointer, button);
@@ -773,7 +795,6 @@ public abstract class ViewportWidget extends Table {
 				// can't move around disable dragging
 				if (!canPan)
 					return;
-
 				isDragging = true;
 				InputAdapter inputAdapter = viewportViewSettings.getCurrentCameraControllerSupplier().get();
 
@@ -1268,6 +1289,10 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public abstract void initializeGridPropertyProvider ();
+
+	public void panRequiresSpace(boolean panRequiresSpace) {
+		this.panRequiresSpace = panRequiresSpace;
+	}
 
 	public void resetToDefaults () {
 

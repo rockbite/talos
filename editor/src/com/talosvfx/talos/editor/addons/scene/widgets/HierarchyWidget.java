@@ -42,6 +42,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,8 @@ public class HierarchyWidget extends Table implements Observer {
         tree = new FilteredTree<>(SharedResources.skin, "modern");
         tree.draggable = true;
         //tree.getSelection().setMultiple(true);
+
+        setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#252525ff")));
 
         top();
         defaults().top();

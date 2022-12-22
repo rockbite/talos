@@ -458,7 +458,9 @@ public class ModuleBoardWidget extends WidgetGroup {
             group.removeWrapper(wrapper);
         }
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
         TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
@@ -886,7 +888,9 @@ public class ModuleBoardWidget extends WidgetGroup {
             other.removeWrappers(wrappers);
         }
 
-        TalosMain.Instance().ProjectController().setDirty();
+        logger.error("Should be saving and using undo system");
+
+//        TalosMain.Instance().ProjectController().setDirty();
     }
 
     public void ungroupSelectedWrappers() {

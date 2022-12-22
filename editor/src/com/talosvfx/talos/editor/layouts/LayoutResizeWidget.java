@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,7 +16,7 @@ public class LayoutResizeWidget extends Table {
 		this.skin = skin;
 		this.layoutGrid = layoutGrid;
 
-		setBackground(skin.newDrawable("white", 0, 0, 0, 1f));
+		setBackground(skin.newDrawable("white", Color.valueOf("333333ff")));
 
 		ClickListener listener = new ClickListener() {
 

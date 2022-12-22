@@ -2,6 +2,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,21 +15,17 @@ import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
-import com.talosvfx.talos.editor.project2.AppManager;
-import com.talosvfx.talos.editor.project2.ConfigData;
-import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
-import com.talosvfx.talos.editor.project2.ProjectSplash;
-import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.*;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.project2.TalosProjectData;
-import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.input.Shortcuts;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
 public class TalosMain2 extends ApplicationAdapter {
@@ -63,6 +60,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 
 		SharedResources.stage = stage;
+		SharedResources.ui = new UIController();
 
 		layoutGridContainer = new Table();
 
@@ -70,8 +68,13 @@ public class TalosMain2 extends ApplicationAdapter {
 		fullScreen.setFillParent(true);
 
 		Table topBar = new Table();
-		fullScreen.add(topBar).growX().height(64);
+		topBar.setBackground(SharedResources.skin.getDrawable("top-menu-bg"));
+		fullScreen.add(topBar).growX().height(30);
 		fullScreen.row();
+		MainMenu menu = new MainMenu();
+		menu.buildFrom(Gdx.files.internal("menu-bar.xml"));
+		SharedResources.mainMenu = menu;
+		topBar.add(menu).grow().padLeft(4);
 
 		fullScreen.add(layoutGridContainer).grow();
 
@@ -82,6 +85,10 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
 		openProjectExplorer();
+
+		SharedResources.talosControl = new TalosControl();
+
+		Notifications.quickFire(FinishInitializingEvent.class);
 
 	}
 
@@ -104,7 +111,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 
 	private void openProjectExplorer () {
-		ProjectSplash projectSplash = new ProjectSplash("Projects");
+		ProjectSplash projectSplash = new ProjectSplash();
 		projectSplash.show(stage);
 	}
 
@@ -113,11 +120,13 @@ public class TalosMain2 extends ApplicationAdapter {
 		CursorUtil.checkAndReset();
 
 		super.render();
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
+		Gdx.gl.glClearColor(0.13f, 0.13f, 0.13f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		stage.act();
 		stage.draw();
+
+
 	}
 
 	@Override

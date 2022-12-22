@@ -17,7 +17,6 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -25,11 +24,15 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.data.RoutineStageData;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -210,16 +213,27 @@ public class SEPropertyPanel extends PropertyPanel {
             scripts.setSelectable(false);
             tree.add(scripts);
 
+            // don't hardcode this
+            FilteredTree.Node<Object> customRenderers = new FilteredTree.Node<>("routinerenderers", new Label("Routine Renderers", getSkin()));
+            customRenderers.setSelectable(false);
+            tree.add(customRenderers);
+
             Label createScriptLabel = new Label("Create Script > ", getSkin());
             createScriptLabel.setColor(0.6f, 0.9f, 0.9f, 1f);
             FilteredTree.Node<Object> newScript = new FilteredTree.Node<>("createscript", createScriptLabel);
             scripts.add(newScript);
 
 
+            Label createRRLabel = new Label("New Renderer > ", getSkin());
+            createRRLabel.setColor(0.6f, 0.9f, 0.9f, 1f);
+            FilteredTree.Node<Object> newRR = new FilteredTree.Node<>("createRR", createRRLabel);
+            customRenderers.add(newRR);
+
             logger.info("Reimplement collecting of scripts");
             TalosProjectData currentProject = SharedResources.currentProject;
             FileHandle rootHandle = currentProject.rootProjectDir();
             collectAssets(GameAssetType.SCRIPT, rootHandle, scripts);
+            collectAssets(GameAssetType.ROUTINE, rootHandle, customRenderers);
 
             setToTree();
 
@@ -319,6 +333,19 @@ public class SEPropertyPanel extends PropertyPanel {
                             remove();
                             return;
                         }
+                        if (gameAsset.type == GameAssetType.ROUTINE) {
+                            RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                            routineRendererComponent.setGameAsset((GameAsset<RoutineStageData>)gameAsset);
+                            gameObject.addComponent(routineRendererComponent);
+
+                            if (getCurrentHolder() instanceof GameObjectContainer) {
+                                SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
+                                showPanel(gameObject, gameObject.getPropertyProviders());
+                            }
+
+                            remove();
+                            return;
+                        }
 
                     } else {
 
@@ -367,6 +394,50 @@ public class SEPropertyPanel extends PropertyPanel {
                             return;
                         }
                         //Check all the cases we might otherwise have
+
+                        if(name.equals("createRR")) {
+
+                            setToNameAndCreate("RR Name", "Use characters [a-Z] only", "[a-zA-Z]*", new Consumer<String>() {
+                                @Override
+                                public void accept(String newFileName) {
+                                    logger.info("Reimplement create routine and register");
+
+                                    // todo: but i want to ask explorer of it's current selected folder
+                                    // check if project explorer is open and has a directory selected
+                                    // if it does not use root root project dir
+                                    FileHandle assetDir = null;
+                                    ProjectExplorerApp projectExplorerApp = SharedResources.appManager.getSingletonAppInstance(ProjectExplorerApp.class);
+                                    if(projectExplorerApp != null) {
+                                        assetDir = projectExplorerApp.getCurrentSelectedFolder();
+                                    }
+                                    if(assetDir == null) {
+                                        assetDir = SharedResources.currentProject.rootProjectDir();
+                                    }
+
+                                    FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
+                                    newDestination.writeString("", false);
+                                    AssetRepository.getInstance().rawAssetCreated(newDestination, true);
+                                    GameAsset<RoutineStageData> assetForPath = (GameAsset<RoutineStageData>) AssetRepository.getInstance().getAssetForPath(newDestination, false);
+
+                                    if (assetForPath != null) {
+                                        RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                                        routineRendererComponent.setGameAsset(assetForPath);
+                                        gameObject.addComponent(routineRendererComponent);
+
+                                        Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(assetDir.path()));
+
+                                        if (getCurrentHolder() instanceof GameObjectContainer) {
+                                            SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
+                                            showPanel(gameObject, gameObject.getPropertyProviders());
+                                        }
+                                    }
+
+                                    remove();
+                                }
+                            });
+
+                            return;
+                        }
                     }
                     remove();
                 }

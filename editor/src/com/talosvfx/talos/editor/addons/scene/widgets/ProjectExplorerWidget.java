@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,6 +23,7 @@ import com.talosvfx.talos.editor.dialogs.YesNoDialog;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -64,8 +66,10 @@ public class ProjectExplorerWidget extends Table implements Observer {
         Skin skin = SharedResources.skin;
         Notifications.registerObserver(this);
 
+        setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#282828ff")));
+
         Table horizontalPanel = new Table();
-        horizontalPanel.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.BackgroundColor.LIGHT_GRAY));
+        horizontalPanel.setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#505050ff")));
         add(horizontalPanel).growX().row();
 
         SearchWidget searchWidget = new SearchWidget();
@@ -437,13 +441,13 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 }
             });
 
-            createSubMenuItem(popupMenu, "Tween", new ClickListener() {
+            createSubMenuItem(popupMenu, "Routine", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
 
                     FileHandle currentFolder = getCurrentFolder();
 
-                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Tween", "tw");
+                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "Routine", "rt");
                     newScriptDestination.writeString("{}", false);
 
                     AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
@@ -725,6 +729,13 @@ public class ProjectExplorerWidget extends Table implements Observer {
     public void onProjectLoad (ProjectLoadedEvent event) {
         TalosProjectData projectData = event.getProjectData();
         loadDirectoryTree(projectData.rootProjectDir().path());
+    }
+
+    @EventHandler
+    public void onDirectoryContentsChanged (DirectoryChangedEvent event) {
+        if(getCurrentFolder().path().equals(event.getDirectoryPath())) {
+            reload();
+        }
     }
 
     @EventHandler

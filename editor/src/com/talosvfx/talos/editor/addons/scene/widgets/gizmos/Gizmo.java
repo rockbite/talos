@@ -166,6 +166,10 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     }
 
+    public void keyUp(InputEvent event, int keycode) {
+
+    }
+
     public void snapIfRequired () {
         boolean hasTransform = gameObject.hasComponent(TransformComponent.class);
 

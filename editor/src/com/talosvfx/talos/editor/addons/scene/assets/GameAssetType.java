@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.SceneMetadata;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
+import lombok.Getter;
 
 public enum GameAssetType {
 	SPRITE(new String[]{"png", "jpg", "jpeg"}, true),
@@ -17,12 +18,14 @@ public enum GameAssetType {
 	VFX(new String[]{"tls"}, true),
 	VFX_OUTPUT(new String[]{"p"}, true),
 	SCRIPT(new String[]{"ts", "js"}, true),
-	TWEEN(new String[]{"tw"}, true),
+	ROUTINE(new String[]{"rt"}, true),
 	PREFAB(new String[]{"prefab"}, true),
 	SCENE(new String[]{"scn"}, true),
 	DIRECTORY(new String[]{}, false),
-	TILE_PALETTE(new String[]{"ttp"}, true);
+	TILE_PALETTE(new String[]{"ttp"}, true),
+	LAYOUT_DATA(new String[]{"tlslt"}, true);
 
+	@Getter
 	private ObjectSet<String> extensions;
 	private boolean isRootGameAsset;
 
@@ -81,7 +84,8 @@ public enum GameAssetType {
 		case TILE_PALETTE:
 			return PaletteMetadata.class;
 		case VFX_OUTPUT:
-		case TWEEN:
+		case ROUTINE:
+		case LAYOUT_DATA:
 		case SOUND:
 			return EmptyMetadata.class;
 		}

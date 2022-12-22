@@ -19,12 +19,6 @@ public abstract class FileSystemInteraction {
 		return instance;
 	}
 
-	public abstract void openProject (IProject projectType);
-
-	public abstract void export ();
-
-	public abstract void save ();
-
 	public abstract void showSaveFileChooser (String extension, FileChooserListener listener);
 	public abstract void showFileChooser (String extension, FileChooserListener listener);
 

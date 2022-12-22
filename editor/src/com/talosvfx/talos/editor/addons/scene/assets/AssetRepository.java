@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -258,7 +259,7 @@ public class AssetRepository implements Observer {
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
 		checkGameAssetCreation(GameAssetType.SCRIPT);
-		checkGameAssetCreation(GameAssetType.TWEEN);
+		checkGameAssetCreation(GameAssetType.ROUTINE);
 		checkGameAssetCreation(GameAssetType.ATLAS);
 		checkGameAssetCreation(GameAssetType.SOUND);
 
@@ -793,19 +794,21 @@ public class AssetRepository implements Observer {
 				((GameAsset<String>)gameAssetOut).setResourcePayload("ScriptDummy");
 
 				break;
-			case TWEEN:
+			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-					gameAssetOut = tweenGameAsset;
+					GameAsset<RoutineStageData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = asset;
+
 
 					if (createLinks) {
-						value.gameAssetReferences.add(tweenGameAsset);
-						tweenGameAsset.dependentRawAssets.add(value);
+						value.gameAssetReferences.add(asset);
+						asset.dependentRawAssets.add(value);
 					}
 				}
-				((GameAsset<String>)gameAssetOut).setResourcePayload("Dummy");
+				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
 
+				((GameAsset<RoutineStageData>)gameAssetOut).setResourcePayload(routineStageData);
 
 				break;
 			case PREFAB:
@@ -917,6 +920,12 @@ public class AssetRepository implements Observer {
 
 	{
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
+		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
+	}
+
+	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
+		RoutineStageData resource = gameAsset.getResource();
+		return json.prettyPrint(resource);
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {
