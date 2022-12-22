@@ -102,7 +102,7 @@ public class VariableCreationWindow extends Table {
     private void configureDragAndDrop() {
         dragAndDrop.clear();
         for (CustomVarWidget row : templateRowArray) {
-            dragAndDrop.addSource(new DragAndDrop.Source(row) {
+            dragAndDrop.addSource(new DragAndDrop.Source(row.getFieldContainer()) {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
