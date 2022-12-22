@@ -104,6 +104,7 @@ public abstract class ViewportWidget extends Table {
 	private float worldWidth = 1f;
 
 	private Vector3 tmp = new Vector3();
+	private Color tmpColor = new Color();
 	private Vector2 vec2 = new Vector2();
 
 	protected InputListener inputListener;
@@ -825,6 +826,7 @@ public abstract class ViewportWidget extends Table {
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
+		clearScreen(batch, parentAlpha);
 		batch.end();
 
 
@@ -911,6 +913,14 @@ public abstract class ViewportWidget extends Table {
 
 		super.draw(batch, parentAlpha);
 	}
+
+	 protected void clearScreen(Batch batch, float parentAlpha) {
+		 tmpColor.set(batch.getColor());
+		 Color backgroundColor = gridRenderer.gridPropertyProvider.getBackgroundColor();
+		 batch.setColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, parentAlpha);
+		 batch.draw(SharedResources.skin.getRegion("white"), 0, 0, getWidth(), getHeight());
+		 batch.setColor(tmpColor);
+	 }
 
 	protected void getEntityUnderMouse () {
 		Vector2 touchSpace = new Vector2(Gdx.input.getX(), Gdx.input.getY());

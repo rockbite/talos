@@ -13,11 +13,14 @@ public class NamingUtils {
 
 
 	public static String getNewName (String newNameAttempt, Supplier<Collection<String>> potentialConflicts) {
+		return getNewName(newNameAttempt, potentialConflicts.get());
+	}
+
+	public static String getNewName (String newNameAttempt, Collection<String> potentialConflicts) {
 		Pattern extractBase = Pattern.compile(  "(.*)\\([0-9]*\\)$");
 
-		Collection<String> potentialConflictStrings = potentialConflicts.get();
 
-		if (!potentialConflictStrings.contains(newNameAttempt)) {
+		if (!potentialConflicts.contains(newNameAttempt)) {
 			return newNameAttempt;
 		}
 
@@ -28,7 +31,7 @@ public class NamingUtils {
 		Pattern duplicatePattern = Pattern.compile(newNameAttempt + "\\([0-9]*\\)$");
 
 		Predicate<String> predicate = duplicatePattern.asPredicate();
-		long count = potentialConflictStrings.stream().filter(predicate).count();
+		long count = potentialConflicts.stream().filter(predicate).count();
 
 		if (count > 0) {
 			//We have things that match our regex
@@ -46,7 +49,7 @@ public class NamingUtils {
 				i++;
 
 
-				if (potentialConflictStrings.contains(test)) {
+				if (potentialConflicts.contains(test)) {
 					continue;
 				} else {
 					return test;

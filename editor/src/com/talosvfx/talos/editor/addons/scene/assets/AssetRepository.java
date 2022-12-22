@@ -825,7 +825,8 @@ public class AssetRepository implements Observer {
 						prefabGameAsset.dependentRawAssets.add(value);
 					}
 				}
-				Prefab prefab = Prefab.from(value.handle);
+				Prefab prefab = new Prefab(value.handle);
+
 				((GameAsset<Prefab>)gameAssetOut).setResourcePayload(prefab);
 
 				break;
@@ -920,6 +921,7 @@ public class AssetRepository implements Observer {
 
 	{
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
+		saveStrategyObjectMap.put(GameAssetType.PREFAB, this::serializePrefab);
 		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
 	}
 
@@ -931,6 +933,14 @@ public class AssetRepository implements Observer {
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {
 
 		Scene resource = gameAsset.getResource();
+		String asString = resource.getAsString();
+
+		return asString;
+	}
+
+	private String serializePrefab (GameAsset<Prefab> gameAsset, Json json) {
+
+		Prefab resource = gameAsset.getResource();
 		String asString = resource.getAsString();
 
 		return asString;

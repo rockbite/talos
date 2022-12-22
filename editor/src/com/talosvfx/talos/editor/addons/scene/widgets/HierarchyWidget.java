@@ -276,8 +276,7 @@ public class HierarchyWidget extends Table implements Observer {
             public void clicked (InputEvent event, float x, float y) {
                 FilteredTree.Node<GameObject> item = tree.getSelection().first();
                 GameObject gameObject = objectMap.get(item.getObject().uuid.toString());
-                logger.info("redo convert to prefab");
-//                SceneEditorAddon.get().workspace.convertToPrefab(gameObject);
+                SceneUtils.convertToPrefab(gameObject);
             }
         });
         contextualMenu.addSeparator();
