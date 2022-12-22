@@ -1170,10 +1170,20 @@ public abstract class ViewportWidget extends Table {
 	}
 
 	public void addToSelection (GameObject gameObject) {
-		if (!selection.contains(gameObject)) {
+		if (!hierarchicallyContains(gameObject)) {
 			selection.add(gameObject);
 		}
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+	}
+
+	// Checks if gameObject or its ancestors are already in the selection or not
+	private boolean hierarchicallyContains (GameObject gameObject) {
+		GameObject temp = gameObject;
+		while (temp != null) {
+			if (selection.contains(temp)) return true;
+			temp = temp.parent;
+		}
+		return false;
 	}
 
 	protected void setSelection (Array<GameObject> gameObjects) {
