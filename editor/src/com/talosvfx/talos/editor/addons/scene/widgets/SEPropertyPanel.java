@@ -415,7 +415,7 @@ public class SEPropertyPanel extends PropertyPanel {
                                     }
 
                                     FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
-                                    newDestination.writeString("", false);
+                                    newDestination.writeString("{}", false);
                                     AssetRepository.getInstance().rawAssetCreated(newDestination, true);
                                     GameAsset<RoutineStageData> assetForPath = (GameAsset<RoutineStageData>) AssetRepository.getInstance().getAssetForPath(newDestination, false);
 
