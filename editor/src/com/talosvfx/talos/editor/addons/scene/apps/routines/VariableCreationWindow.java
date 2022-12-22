@@ -72,7 +72,8 @@ public class VariableCreationWindow extends Table {
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {
                             @Override
                             public void itemClicked(PropertyType type) {
-                                routineStage.routineEditorApp.createNewVariable(type);
+                                logger.error("todo Create new variable");
+//                                routineStage.routineEditorApp.createNewVariable(type);
                             }
                         })
                         .show(tmp.x, tmp.y);
@@ -92,8 +93,8 @@ public class VariableCreationWindow extends Table {
         scrollPane.setScrollingDisabled(true, false);
         content.add(scrollPane).grow().maxHeight(300).padBottom(10);
 
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getPropertyWrappers();
+        RoutineInstance routineInstance = routineStage.data.getRoutineInstance();
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getParentPropertyWrappers();
 
         inner.add().padTop(5).row();
 
@@ -126,7 +127,7 @@ public class VariableCreationWindow extends Table {
                 @Override
                 public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                    payload.setObject(routineStage.routineInstance.getPropertyWrapperWithIndex(row.getIndex()));
+                    payload.setObject(routineStage.data.getRoutineInstance().getPropertyWrapperWithIndex(row.getIndex()));
                     Table payloadTable = new Table();
                     float width = row.getWidth();
                     float height = row.getHeight();

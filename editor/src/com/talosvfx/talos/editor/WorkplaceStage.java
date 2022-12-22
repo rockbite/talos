@@ -27,7 +27,6 @@ public abstract class WorkplaceStage {
         rootActor = new Table();
         rootActor.setFillParent(true);
         rootActor.setTouchable(Touchable.enabled);
-        rootActor.debugAll();
     }
 
 
