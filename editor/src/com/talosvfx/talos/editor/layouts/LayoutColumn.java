@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -143,8 +144,23 @@ public class LayoutColumn extends LayoutItem {
 		LayoutItem bottom = rows.get(idx);
 		LayoutItem top = rows.get(idx + 1);
 
-		top.setRelativeHeight(startRelativeHeightTop - heightChangeRelative);
-		bottom.setRelativeHeight(startRelativeHeightBottom + heightChangeRelative);
+		float topNewHeight = startRelativeHeightTop - heightChangeRelative;
+		float bottomNewHeight = startRelativeHeightBottom + heightChangeRelative;
+
+		float minPixelSize = 50;
+
+		float startTotalRelative = startRelativeHeightTop + startRelativeHeightBottom;
+
+		if (topNewHeight < 0 || (topNewHeight * totalPixelHeightToDistribute) < minPixelSize) {
+			topNewHeight = minPixelSize / totalPixelHeightToDistribute;
+			bottomNewHeight = startTotalRelative - topNewHeight;
+		} else if (bottomNewHeight < 0 || (bottomNewHeight * totalPixelHeightToDistribute) < minPixelSize) {
+			bottomNewHeight = minPixelSize / totalPixelHeightToDistribute;
+			topNewHeight = startTotalRelative - bottomNewHeight;
+		}
+
+		top.setRelativeHeight(topNewHeight);
+		bottom.setRelativeHeight(bottomNewHeight);
 
 		invalidateHierarchy();
 

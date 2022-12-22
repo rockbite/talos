@@ -203,8 +203,23 @@ public class LayoutRow extends LayoutItem {
 		LayoutItem left = columns.get(idx);
 		LayoutItem right = columns.get(idx + 1);
 
-		left.setRelativeWidth(startRelativeLeftWidth - widthChangeRelative);
-		right.setRelativeWidth(startRelativeRightWidth + widthChangeRelative);
+		float leftNewHeight = startRelativeLeftWidth - widthChangeRelative;
+		float rightNewHeight = startRelativeRightWidth + widthChangeRelative;
+
+		float minPixelSize = 50;
+
+		float startTotalRelative = startRelativeLeftWidth + startRelativeRightWidth;
+
+		if (leftNewHeight < 0 || (leftNewHeight * totalPixelWidthToDistribute) < minPixelSize) {
+			leftNewHeight = minPixelSize / totalPixelWidthToDistribute;
+			rightNewHeight = startTotalRelative - leftNewHeight;
+		} else if (rightNewHeight < 0 || (rightNewHeight * totalPixelWidthToDistribute) < minPixelSize) {
+			rightNewHeight = minPixelSize / totalPixelWidthToDistribute;
+			leftNewHeight = startTotalRelative - rightNewHeight;
+		}
+
+		left.setRelativeWidth(leftNewHeight);
+		right.setRelativeWidth(rightNewHeight);
 
 
 		invalidateHierarchy();
