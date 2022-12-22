@@ -85,7 +85,7 @@ public class SceneUtils {
 
 	public static GameObject createFromPrefab (GameObjectContainer gameObjectContainer, GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
 
-		Prefab prefab = Prefab.from(prefabToCopy.getRootRawAsset().handle);
+		Prefab prefab = new Prefab(prefabToCopy.getRootRawAsset().handle);
 
 		GameObject gameObject = prefab.root.getGameObjects().first();
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
@@ -322,8 +322,7 @@ public class SceneUtils {
 		gamePrefab.setName("Prefab");
 		gamePrefab.addGameObject(gameObject);
 
-		Prefab prefab = new Prefab();
-		prefab.path = prefabHandle.path();
+		Prefab prefab = new Prefab(prefabHandle);
 		prefab.root = gamePrefab;
 
 		prefabHandle.writeString(prefab.getAsString(), false);

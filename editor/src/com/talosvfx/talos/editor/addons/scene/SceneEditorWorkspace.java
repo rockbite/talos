@@ -219,6 +219,14 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.PREFAB) {
+						GameAsset<Prefab> gameAsset = (GameAsset<Prefab>)gameAssetPayload.getGameAsset();
+
+						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
+						vec.set(touchToWorld.x, touchToWorld.y);
+
+						SceneUtils.createFromPrefab(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 					}
 					return;
 				}
@@ -681,45 +689,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-
-
-	public void openPrefab (FileHandle fileHandle) {
-		Prefab scene = new Prefab();
-		scene.path = fileHandle.path();
-		openSavableContainer(scene);
-		TalosMain.Instance().UIStage().saveProjectAction();
-	}
-
 	public void openScene (FileHandle fileHandle) {
 		Scene scene = new Scene();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
 		TalosMain.Instance().UIStage().saveProjectAction();
-	}
-
-	public void convertToPrefab (GameObject gameObject) {
-		String name = gameObject.getName();
-
-		String path = getProjectPath() + File.separator + "assets";
-
-		logger.info("Redo convert to prefab");
-//		if (SceneEditorAddon.get().projectExplorer.getCurrentFolder() != null) {
-//			path = SceneEditorAddon.get().projectExplorer.getCurrentFolder().path();
-//		}
-
-		FileHandle handle = AssetImporter.suggestNewNameForFileHandle(path, name, "prefab");
-		if (handle != null) {
-			GameObject gamePrefab = new GameObject();
-			gamePrefab.setName("Prefab");
-
-			gamePrefab.addGameObject(gameObject);
-
-			Prefab prefab = new Prefab();
-			prefab.path = handle.path();
-			prefab.root = gamePrefab;
-			AssetRepository.getInstance().rawAssetCreated(handle, true);
-//			SceneEditorAddon.get().projectExplorer.reload();
-		}
 	}
 
 	public static class ClipboardPayload {
@@ -1151,6 +1125,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (currentContainer instanceof Scene) {
 					Scene scene = (Scene) currentContainer;
 					selectPropertyHolder(scene);
+				} else if (currentContainer instanceof Prefab) {
+					Prefab prefab = (Prefab) currentContainer;
+					selectPropertyHolder(prefab);
 				}
 			} else {
 				if (gameObjects.size == 1) {

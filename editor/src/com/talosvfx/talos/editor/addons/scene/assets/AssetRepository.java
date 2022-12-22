@@ -815,9 +815,8 @@ public class AssetRepository implements Observer {
 						prefabGameAsset.dependentRawAssets.add(value);
 					}
 				}
-				Prefab prefab = Prefab.from(value.handle);
-				prefab.path = value.handle.path();
-				prefab.loadFromHandle(value.handle);
+				Prefab prefab = new Prefab(value.handle);
+
 				((GameAsset<Prefab>)gameAssetOut).setResourcePayload(prefab);
 
 				break;

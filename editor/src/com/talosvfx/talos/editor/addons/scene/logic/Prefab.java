@@ -11,13 +11,10 @@ public class Prefab extends SavableContainer {
 
     public String name;
 
-    public static Prefab from(FileHandle fileHandle) {
-        Prefab prefab = new Prefab();
-        prefab.path = fileHandle.path();
-
-        prefab.name = fileHandle.nameWithoutExtension();
-
-        return prefab;
+    public Prefab (FileHandle fileHandle) {
+        path = fileHandle.path();
+        name = fileHandle.nameWithoutExtension();
+        loadFromHandle(fileHandle);
     }
 
     @Override
@@ -30,6 +27,7 @@ public class Prefab extends SavableContainer {
         JsonValue jsonValue = new JsonReader().parse(data);
         Json json = new Json();
         root = json.readValue(GameObject.class, jsonValue.get("root"));
+        root.setGameObjectContainer(this);
         name = root.getName();
 
         //Lets add a fake root
