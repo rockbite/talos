@@ -760,7 +760,7 @@ public abstract class ViewportWidget extends Table {
 //				float nextZoom = nextWidth / camera.viewportWidth;
 
 				float currentZoom = viewportViewSettings.getZoom();
-				currentZoom += amountY;
+				currentZoom += amountY * 0.5f;
 				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
 
 				viewportViewSettings.setZoom(currentZoom);
