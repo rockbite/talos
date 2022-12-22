@@ -1,0 +1,200 @@
+package com.talosvfx.talos.editor.dialogs;
+
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+
+public class PreferencesWindow extends Table {
+    public PreferencesWindow() {
+        setSize(500, 500);
+        setPosition(300, 300);
+
+        final Table titleSegment = constructTitleSegment();
+        final Table contentSegment = constructContentSegment();
+
+        // assemble
+        add(titleSegment).growX();
+        row();
+        add(contentSegment).grow();
+    }
+
+    private Table constructTitleSegment () {
+        final Label titleLabel = new Label("Preferences", SharedResources.skin);
+        final Table titleSegment = new Table();
+        titleSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
+        titleSegment.add(titleLabel).expandX().height(25);
+        return titleSegment;
+    }
+
+    private Table constructContentSegment () {
+        final Table contentSegment = new Table();
+        contentSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
+        contentSegment.defaults().space(10);
+
+        // left part where tabs are displayed
+        final Table tabsSegment = constructTabsSegment();
+        // right part where info of the tabs are displayed
+        final Table tabInfo = new Table();
+
+        contentSegment.add(tabsSegment).growY().width(160);
+        contentSegment.add(tabInfo).grow();
+        return contentSegment;
+    }
+
+    private Table constructTabsSegment () {
+        final Table tabsSegment = new Table();
+        tabsSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
+
+        final VerticalTabGroup tabsContent = new VerticalTabGroup();
+        final ScrollPane scrollPane = new ScrollPane(tabsContent);
+
+        tabsContent.startGroup();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.endGroup();
+
+        tabsContent.startGroup();
+        tabsContent.addTab();
+        tabsContent.endGroup();
+
+        tabsContent.startGroup();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.endGroup();
+
+        tabsContent.startGroup();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.addTab();
+        tabsContent.endGroup();
+
+        tabsSegment.add(scrollPane).pad(9).growX();
+        tabsSegment.row();
+        tabsSegment.add().expandY();
+
+        return tabsSegment;
+    }
+
+    public class VerticalTabGroup extends Table {
+        private int nextTabAlignment;
+        private boolean startGroup;
+
+        private final int breakSpace = 8;
+        private final int minSpace = 1;
+
+        private VerticalTab lastSelectedTab;
+
+        public VerticalTabGroup () {
+            defaults().height(25).growX();
+        }
+
+        public void addTab () {
+            final VerticalTab tab = new VerticalTab();
+            tab.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    if (lastSelectedTab != null) lastSelectedTab.deselect();
+                    tab.select();
+                    lastSelectedTab = tab;
+                }
+            });
+
+            if (startGroup) {
+                tab.roundTop();
+                startGroup = false;
+            }
+            add(tab).padBottom(minSpace).row();
+        }
+
+        public void startGroup () {
+            startGroup = true;
+        }
+
+        public void endGroup () {
+            // if group is ended change the background of the last tab into squircle bottom
+            final VerticalTab lastTab = (VerticalTab) getChildren().get(getChildren().size - 1);
+            lastTab.roundBottom();
+            getCell(lastTab).padBottom(breakSpace);
+        }
+    }
+
+    public class VerticalTab extends Table {
+        private boolean roundTop;
+        private boolean roundBottom;
+
+        private final ColorLibrary.BackgroundColor defaultBackgroundColor = ColorLibrary.BackgroundColor.PANEL_GRAY;
+        private ColorLibrary.BackgroundColor currentBackgroundColor = defaultBackgroundColor;
+        private ColorLibrary.BackgroundColor overBackgroundColor = ColorLibrary.BackgroundColor.BRIGHT_GRAY;
+        private ColorLibrary.BackgroundColor selectedBackgroundColor = ColorLibrary.BackgroundColor.LIGHT_BLUE;
+
+        private boolean selected;
+
+        public VerticalTab () {
+            updateBackground();
+
+            addListener(new ClickListener() {
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    if (selected) return;
+
+                    currentBackgroundColor = overBackgroundColor;
+                    updateBackground();
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    currentBackgroundColor = selected ? selectedBackgroundColor : defaultBackgroundColor;
+                    updateBackground();
+                }
+            });
+
+            setTouchable(Touchable.enabled);
+        }
+
+        public void select () {
+            selected = true;
+            currentBackgroundColor = selectedBackgroundColor;
+            updateBackground();
+        }
+
+        public void deselect () {
+            selected = false;
+            currentBackgroundColor = defaultBackgroundColor;
+            updateBackground();
+        }
+
+        public void updateBackground () {
+            if (roundBottom && roundTop) {
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, currentBackgroundColor));
+            } else if (roundTop) {
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP_2, currentBackgroundColor));
+            } else if (roundBottom) {
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM_2, currentBackgroundColor));
+            } else {
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUARE, currentBackgroundColor));
+            }
+        }
+
+        public void roundTop () {
+            this.roundTop = true;
+            updateBackground();
+        }
+
+        public void roundBottom () {
+            this.roundBottom = true;
+            updateBackground();
+        }
+    }
+ }
