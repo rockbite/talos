@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
@@ -37,6 +36,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -797,7 +797,7 @@ public class AssetRepository implements Observer {
 			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<RoutineData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<RoutineStageData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 					gameAssetOut = asset;
 
 
@@ -806,9 +806,9 @@ public class AssetRepository implements Observer {
 						asset.dependentRawAssets.add(value);
 					}
 				}
+				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
 
-				RoutineData data = RoutineData.readFrom(value.handle);
-				((GameAsset<RoutineData>)gameAssetOut).setResourcePayload(data);
+				((GameAsset<RoutineStageData>)gameAssetOut).setResourcePayload(routineStageData);
 
 				break;
 			case PREFAB:
@@ -923,12 +923,9 @@ public class AssetRepository implements Observer {
 		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
 	}
 
-	private String serializeRoutine (GameAsset<RoutineData> gameAsset, Json json) {
-		RoutineData resource = gameAsset.getResource();
-
-		System.out.println("this is just not gonna work, instance data needs completely redone");
-
-		return resource.jsonString;
+	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
+		RoutineStageData resource = gameAsset.getResource();
+		return json.prettyPrint(resource);
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {

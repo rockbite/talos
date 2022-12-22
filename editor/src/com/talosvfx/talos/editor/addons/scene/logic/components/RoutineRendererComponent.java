@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineData;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -15,15 +14,16 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineData> {
+public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData> {
 
-    GameAsset<RoutineData> routineResource;
+    GameAsset<RoutineStageData> routineResource;
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
@@ -58,7 +58,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             }
         }
 
-        GameAsset<RoutineData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
+        GameAsset<RoutineStageData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
@@ -71,7 +71,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         propertyWrappers.clear();
         if (routineInstance != null) {
-            for (PropertyWrapper<?> propertyWrapper : routineInstance.getPropertyWrappers()) {
+            for (PropertyWrapper<?> propertyWrapper : routineInstance.getParentPropertyWrappers()) {
                 propertyWrappers.add(propertyWrapper);
             }
         }
@@ -109,14 +109,14 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public Array<PropertyWidget> getListOfProperties() {
         Array<PropertyWidget> properties = new Array<>();
 
-        AssetSelectWidget<RoutineData> widget = new AssetSelectWidget<RoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineData>>() {
+        AssetSelectWidget<RoutineStageData> widget = new AssetSelectWidget<RoutineStageData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineStageData>>() {
             @Override
-            public GameAsset<RoutineData> get() {
+            public GameAsset<RoutineStageData> get() {
                 return routineResource;
             }
-        }, new PropertyWidget.ValueChanged<GameAsset<RoutineData>>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<RoutineStageData>>() {
             @Override
-            public void report(GameAsset<RoutineData> value) {
+            public void report(GameAsset<RoutineStageData> value) {
                 setGameAsset(value);
             }
         });
@@ -154,19 +154,19 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     }
 
     @Override
-    public GameAsset<RoutineData> getGameResource() {
+    public GameAsset<RoutineStageData> getGameResource() {
         return routineResource;
     }
 
     @Override
-    public void setGameAsset(GameAsset<RoutineData> gameAsset) {
+    public void setGameAsset(GameAsset<RoutineStageData> gameAsset) {
         this.routineResource = gameAsset;
 
-        routineInstance = new RoutineInstance();
         // this needs changing
         RoutineConfigMap routineConfigMap = new RoutineConfigMap();
         routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
-        routineInstance.loadFrom(gameAsset.getRootRawAsset().metaData.uuid, gameAsset.getResource().jsonString, routineConfigMap);
+
+        routineInstance = routineResource.getResource().createInstance();
         updatePropertyWrappers(true);
     }
 

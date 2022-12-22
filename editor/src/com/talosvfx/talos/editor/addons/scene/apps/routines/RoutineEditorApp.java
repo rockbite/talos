@@ -11,6 +11,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfi
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -18,7 +19,7 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
 
     private RoutineConfigMap routineConfigMap;
     public RoutineStage routineStage;
@@ -53,7 +54,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
 //        scenePreviewStage = new ScenePreviewStage();
 
         variableCreationWindow = new VariableCreationWindow(routineStage);
-        variableCreationWindow.reloadWidgets();
 
 
         routineStageWrapper.left().top();
@@ -91,53 +91,36 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineData> {
     }
 
     @Override
-    public void updateForGameAsset (GameAsset<RoutineData> gameAsset) {
+    public void updateForGameAsset (GameAsset<RoutineStageData> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
         routineStage.loadFrom(gameAsset);
-    }
-
-    public void deleteParamTemplateWithIndex (int index) {
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        routineInstance.removeExposedVariablesWithIndex(index);
         variableCreationWindow.reloadWidgets();
 
-        NodeBoard nodeBoard = routineStage.getNodeBoard();
-
-        for (NodeWidget node : nodeBoard.nodes) {
-            if (node instanceof RoutineExposedVariableNodeWidget) {
-                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
-                if (widget.index == index) {
-                    widget.update(null);
-                }
-            }
-        }
-
-        routineStage.routineUpdated();
     }
 
-    public void changeKeyFor (int index, String value) {
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        routineInstance.changeExposedVariableKey(index, value);
-        NodeBoard nodeBoard = routineStage.getNodeBoard();
-
-        for (NodeWidget node : nodeBoard.nodes) {
-            if (node instanceof RoutineExposedVariableNodeWidget) {
-                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
-                if (widget.index == index) {
-                    widget.update(routineInstance.getPropertyWrapperWithIndex(index));
-                }
-            }
-        }
-        routineStage.routineUpdated();
-    }
-
-    public void createNewVariable (PropertyType type) {
-        RoutineInstance routineInstance = routineStage.routineInstance;
-        routineInstance.createNewPropertyWrapper(type);
-        variableCreationWindow.reloadWidgets();
-        routineStage.routineUpdated();
-    }
+//    public void changeKeyFor (int index, String value) {
+//        RoutineInstance routineInstance = routineStage.routineInstance;
+//        routineInstance.changeExposedVariableKey(index, value);
+//        NodeBoard nodeBoard = routineStage.getNodeBoard();
+//
+//        for (NodeWidget node : nodeBoard.nodes) {
+//            if (node instanceof RoutineExposedVariableNodeWidget) {
+//                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
+//                if (widget.index == index) {
+//                    widget.update(routineInstance.getPropertyWrapperWithIndex(index));
+//                }
+//            }
+//        }
+//        routineStage.routineUpdated();
+//    }
+//
+//    public void createNewVariable (PropertyType type) {
+//        RoutineInstance routineInstance = routineStage.routineInstance;
+//        routineInstance.createNewPropertyWrapper(type);
+//        variableCreationWindow.reloadWidgets();
+//        routineStage.routineUpdated();
+//    }
 
     @Override
     public String getAppName() {

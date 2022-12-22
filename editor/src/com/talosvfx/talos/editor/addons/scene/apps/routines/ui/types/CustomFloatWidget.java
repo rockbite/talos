@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -29,6 +30,13 @@ public class CustomFloatWidget extends ATypeWidget {
         valueWidget.setMainColor(ColorLibrary.BackgroundColor.BLACK_TRANSPARENT);
         valueWidget.setLabel("Value");
 
+        valueWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+            }
+        });
+
         add(valueWidget).padLeft(4).padRight(4).width(220).padTop(9);
         row();
 
@@ -44,8 +52,10 @@ public class CustomFloatWidget extends ATypeWidget {
             public void changed(ChangeEvent event, Actor actor) {
                 String value = rangeWidget.getValue();
                 if(value.equals("RANGE")) {
+                    valueWidget.setShowProgress(true);
                     expand();
                 } else {
+                    valueWidget.setShowProgress(false);
                     collapse();
                 }
             }
@@ -73,12 +83,28 @@ public class CustomFloatWidget extends ATypeWidget {
         maxWidget = new ValueWidget();
         maxWidget.init(SharedResources.skin);
         maxWidget.setMainColor(ColorLibrary.BackgroundColor.BLACK_TRANSPARENT);
-        maxWidget.setLabel("Min");
+        maxWidget.setLabel("Max");
         maxWidget.setType(ValueWidget.Type.BOTTOM);
         table.add(maxWidget).padLeft(4).padRight(4).width(220);
         table.row();
 
         table.pack();
+
+        minWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
+                fireChangedEvent();
+            }
+        });
+
+        maxWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
+                fireChangedEvent();
+            }
+        });
 
         return table;
     }
@@ -97,5 +123,10 @@ public class CustomFloatWidget extends ATypeWidget {
     @Override
     public String getTypeName() {
         return "float";
+    }
+
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
+
     }
 }

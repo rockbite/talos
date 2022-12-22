@@ -17,19 +17,29 @@ import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.data.DynamicNodeStageData;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage {
+
+    private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
 
     protected XmlReader.Element nodeData;
     public Skin skin;
-    protected NodeBoard nodeBoard;
+    protected NodeBoard<T> nodeBoard;
     private Image selectionRect;
 
     private NodeListPopup nodeListPopup;
     private Stage stageSentIn;
+
+    public GameAsset<T> gameAsset;
+    public T data;
 
     public DynamicNodeStage (Skin skin) {
         super();
@@ -39,6 +49,21 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     }
 
     protected abstract XmlReader.Element loadData();
+
+    public void setFromData (GameAsset<T> data) {
+        this.gameAsset = data;
+        this.data = data.getResource();
+        gameAsset.listeners.add(new GameAsset.GameAssetUpdateListener() {
+            @Override
+            public void onUpdate () {
+                logger.warn("on game asset update todo");
+            }
+        });
+    }
+
+    public void saveGameAsset () {
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+    }
 
     @Override
     public void init () {
@@ -217,7 +242,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 //        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
 //        stage.addActor(gridRenderer);
 
-        nodeBoard = new NodeBoard(skin, this);
+        nodeBoard = new NodeBoard<T>(skin, this);
 
         getRootActor().addActor(nodeBoard);
 
@@ -237,112 +262,11 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
     }
 
-    public void write (Json json) {
-        Array<NodeWidget> nodes = nodeBoard.nodes;
-
-        json.writeArrayStart("list");
-        for (NodeWidget node: nodes) {
-            json.writeValue(node);
-        }
-        json.writeArrayEnd();
-
-        json.writeArrayStart("connections");
-        for (NodeBoard.NodeConnection connection: nodeBoard.nodeConnections) {
-            json.writeObjectStart();
-            json.writeValue("fromNode", connection.fromNode.getUniqueId());
-            json.writeValue("toNode", connection.toNode.getUniqueId());
-            json.writeValue("fromSlot", connection.fromId);
-            json.writeValue("toSlot", connection.toId);
-            json.writeObjectEnd();
-        }
-        json.writeArrayEnd();
-
-        json.writeArrayStart("groups");
-        for (NodeGroup group: nodeBoard.groups) {
-            json.writeObjectStart();
-            json.writeValue("name", group.getText());
-            json.writeValue("color", group.getFrameColor());
-            json.writeArrayStart("nodes");
-
-            for (NodeWidget nodeWidget: group.getNodes()) {
-                json.writeValue(nodeWidget.getUniqueId());
-            }
-
-            json.writeArrayEnd();
-            json.writeObjectEnd();
-        }
-        json.writeArrayEnd();
-    }
-
-    public void read (Json json, JsonValue root) {
-        reset();
-
-        JsonValue nodes = root.get("list");
-        JsonValue connections = root.get("connections");
-        JsonValue groups = root.get("groups");
-
-        int idCounter = 0;
-
-        IntMap<NodeWidget> nodeMap = new IntMap<>();
-
-
-        if (nodes == null) {
-            return;
-        }
-
-        for (JsonValue nodeData: nodes) {
-            String nodeName = nodeData.getString("name");
-
-            Class clazz = nodeListPopup.getNodeClassByName(nodeName);
-            String nodeClassName = nodeListPopup.getClassNameFromModuleName(nodeName);
-            if(clazz != null) {
-                NodeWidget node = createNode(nodeName, 0, 0);
-                node.constructNode(nodeListPopup.getModuleByName(nodeName));
-                node.read(json, nodeData);
-                idCounter = Math.max(idCounter, node.getUniqueId());
-                nodeMap.put(node.getUniqueId(), node);
-            }
-        }
-
-        nodeBoard.globalNodeCounter = idCounter + 1;
-
-        if (connections == null);
-
-        for (JsonValue connectionData: connections) {
-            int fromNode = connectionData.getInt("fromNode");
-            int toNode = connectionData.getInt("toNode");
-            String fromSlot = connectionData.getString("fromSlot");
-            String toSlot = connectionData.getString("toSlot");
-
-            NodeWidget fromWidget = nodeMap.get(fromNode);
-            NodeWidget toWidget = nodeMap.get(toNode);
-
-            nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
-        }
-
-        ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();
-        if(groups != null) {
-            for (JsonValue groupData : groups) {
-                String name = groupData.getString("name");
-                Color color = json.readValue(Color.class, groupData.get("color"));
-                JsonValue childNodeIds = groupData.get("nodes");
-                subNodeList.clear();
-                for (JsonValue idVal : childNodeIds) {
-                    int id = idVal.asInt();
-                    subNodeList.add(nodeMap.get(id));
-                }
-                NodeGroup nodeGroup = nodeBoard.createGroupForNodes(subNodeList);
-                nodeGroup.setText(name);
-                nodeGroup.setColor(color);
-            }
-        }
-    }
-
     public void reset () {
         nodeBoard.reset();
     }
 
-    public NodeBoard getNodeBoard () {
+    public NodeBoard<T> getNodeBoard () {
         return nodeBoard;
     }
 

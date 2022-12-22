@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -185,6 +185,13 @@ public class CustomVarWidget extends Table {
         setTouchable(Touchable.enabled);
 
         setBackgrounds();
+
+        innerWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                fireChangedEvent();
+            }
+        });
 
         fieldContainer.addListener(new ClickListener() {
 
@@ -370,6 +377,14 @@ public class CustomVarWidget extends Table {
         }
 
         return var2;
+    }
+
+    public String getPropertyName() {
+        return value;
+    }
+
+    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
+        innerWidget.applyValueToWrapper(propertyWrapper);
     }
 
 }
