@@ -273,8 +273,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	private boolean segmentHit (Vector2 p1, Vector2 p2) {
 
 		vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-		logger.error("Info redo segment hit");
-
 //        nodeStage.getCamera().unproject(vec3);
 		tmp3.set(vec3.x, vec3.y);
 
