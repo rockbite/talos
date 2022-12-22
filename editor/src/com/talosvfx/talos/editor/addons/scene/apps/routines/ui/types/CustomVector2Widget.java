@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
+import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -9,6 +10,8 @@ public class CustomVector2Widget extends ATypeWidget {
 
     private final ValueWidget xWidget;
     private final ValueWidget yWidget;
+
+    private Vector2 vec = new Vector2();
 
     public CustomVector2Widget() {
         xWidget = new ValueWidget();
@@ -35,7 +38,8 @@ public class CustomVector2Widget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
-
+    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
+        vec.set(xWidget.getValue(), yWidget.getValue());
+        propertyWrapper.setValue(vec);
     }
 }

@@ -126,7 +126,8 @@ public class CustomFloatWidget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
-
+    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
+        propertyWrapper.setValue(valueWidget.getValue());
     }
+
 }
