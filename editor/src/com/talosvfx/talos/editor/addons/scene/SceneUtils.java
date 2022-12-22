@@ -322,8 +322,7 @@ public class SceneUtils {
 		gamePrefab.setName("Prefab");
 		gamePrefab.addGameObject(gameObject);
 
-		Prefab prefab = new Prefab(prefabHandle);
-		prefab.root = gamePrefab;
+		Prefab prefab = new Prefab(gamePrefab);
 
 		prefabHandle.writeString(prefab.getAsString(), false);
 		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);

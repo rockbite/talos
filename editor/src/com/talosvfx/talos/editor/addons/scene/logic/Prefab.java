@@ -17,6 +17,10 @@ public class Prefab extends SavableContainer {
         loadFromHandle(fileHandle);
     }
 
+    public Prefab(GameObject root) {
+        this.root = root;
+    }
+
     @Override
     protected void writeData(Json json) {
         json.writeValue("root", root, GameObject.class);
