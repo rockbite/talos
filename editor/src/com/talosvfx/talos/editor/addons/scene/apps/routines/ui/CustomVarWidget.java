@@ -159,6 +159,7 @@ public class CustomVarWidget extends Table {
         hideEditMode();
 
         fieldContainer.add(mainStack).grow();
+        fieldContainer.setTouchable(Touchable.enabled);
 
         top.add(fieldContainer).height(32).growX();
 

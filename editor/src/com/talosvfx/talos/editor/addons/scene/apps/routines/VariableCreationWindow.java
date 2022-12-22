@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomFloatWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.CustomVector2Widget;
 import com.talosvfx.talos.editor.addons.scene.utils.scriptProperties.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
@@ -19,6 +20,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
+import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +58,21 @@ public class VariableCreationWindow extends Table {
         plusButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                routineStage.routineEditorApp.createNewVariable();
+                //routineStage.routineEditorApp.createNewVariable();
+                Vector2 tmp = new Vector2(x, y);
+                plusButton.localToStageCoordinates(tmp);
+                BasicPopup.build(String.class)
+                        .addItem("Float", "qaq")
+                        .addItem("Vector2", "qaq2")
+                        .addItem("Color", "qaq2")
+                        .addItem("Asset", "qaq2")
+                        .onClick(new BasicPopup.PopupListener<String>() {
+                            @Override
+                            public void itemClicked(String payload) {
+                                System.out.println(payload);
+                            }
+                        })
+                        .show(tmp.x, tmp.y);
             }
         });
 
@@ -84,7 +100,7 @@ public class VariableCreationWindow extends Table {
         for (int i = 0; i < propertyWrappers.size; i++) {
             PropertyWrapper<?> propertyWrapper = propertyWrappers.get(i);
 
-            CustomVector2Widget innerWidget = new CustomVector2Widget(); // todo, support types
+            CustomFloatWidget innerWidget = new CustomFloatWidget(); // todo, support types
             CustomVarWidget widget = new CustomVarWidget(innerWidget, propertyWrapper.index);
             widget.setValue(propertyWrapper.propertyName);
             inner.add(widget).padTop(2).growX();
