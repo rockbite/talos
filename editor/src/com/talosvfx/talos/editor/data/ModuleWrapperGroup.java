@@ -34,6 +34,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
@@ -105,7 +106,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
         changeColorMenuItem.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                SharedResources.ui.showColorPicker(new ColorPickerAdapter() {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);

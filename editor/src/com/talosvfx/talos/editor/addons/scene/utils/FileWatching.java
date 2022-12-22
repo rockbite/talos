@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.ProjectDirectoryContentsChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -179,7 +180,7 @@ public class FileWatching {
                 }
 
                 if(changes.hasChanges()) {
-                    //Notifications.fireEvent(Notifications.obtainEvent(ProjectDirectoryContentsChanged.class).set(changes));
+                    Notifications.fireEvent(Notifications.obtainEvent(ProjectDirectoryContentsChanged.class).set(changes));
                 }
 
                 Thread.sleep(1000);
@@ -227,12 +228,14 @@ public class FileWatching {
         }
 
         if (changes != null) {
-            if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-                changes.removed.add(pathToFileHandle(file));
-            } else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                changes.added.add(pathToFileHandle(file));
-            } else if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                changes.changed.add(pathToFileHandle(file));
+            if (file.getAbsolutePath().endsWith(".png")) {
+                if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+                    changes.removed.add(pathToFileHandle(file));
+                } else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                    changes.added.add(pathToFileHandle(file));
+                } else if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+                    changes.changed.add(pathToFileHandle(file));
+                }
             }
         }
     }

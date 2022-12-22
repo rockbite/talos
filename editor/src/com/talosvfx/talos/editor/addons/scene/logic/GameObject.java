@@ -536,4 +536,19 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     public void setGameObjectContainer (GameObjectContainer rootGameObjectContainer) {
         this.rootGameObjectContainer = rootGameObjectContainer;
     }
+
+    public Array<GameObject> findGOsWithComponents(Array<GameObject> result, Class<? extends AComponent> clazz) {
+        if(hasComponent(clazz)) {
+            result.add(this);
+            return result;
+        }
+
+        if(children != null) {
+            for (GameObject child : children) {
+                child.findGOsWithComponents(result, clazz);
+            }
+        }
+
+        return result;
+    }
 }

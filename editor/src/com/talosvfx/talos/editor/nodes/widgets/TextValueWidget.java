@@ -37,6 +37,14 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     private EventListener stageListener;
 
+    public TextValueWidget(Skin skin) {
+        this(skin, false);
+    }
+
+    public TextValueWidget(Skin skin, boolean noLabel) {
+        this();
+        init(skin, noLabel);
+    }
     public TextValueWidget() {
         editing = new Table();
         main = new Table();
@@ -45,6 +53,10 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     @Override
     public void init(Skin skin) {
+        init(skin, false);
+    }
+
+    public void init(Skin skin, boolean noLabel) {
         super.init(skin);
 
         type = ValueWidget.Type.NORMAL;
@@ -58,10 +70,18 @@ public class TextValueWidget extends AbstractWidget<String> {
 
         editing.add(textField).growX().padLeft(12);
 
-        main.add(label).padLeft(12).left().expandX();
-        main.add(valueLabel).padRight(12).right().width(0).growX();
-        valueLabel.setEllipsis(true);
-        valueLabel.setAlignment(Align.right);
+        if(!noLabel) {
+            main.add(label).padLeft(12).left().expandX();
+            main.add(valueLabel).padRight(12).right().width(0).growX();
+            valueLabel.setEllipsis(true);
+            valueLabel.setAlignment(Align.right);
+        } else {
+            main.add(valueLabel).padLeft(12).left().width(0).growX().expandX();
+            valueLabel.setEllipsis(true);
+            valueLabel.setAlignment(Align.left);
+        }
+
+
 
         mainStack.add(editing);
         mainStack.add(main);

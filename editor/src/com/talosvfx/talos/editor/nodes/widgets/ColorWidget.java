@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ColorWidget extends AbstractWidget<Color> {
@@ -19,16 +20,21 @@ public class ColorWidget extends AbstractWidget<Color> {
     private Color color = new Color();
     private Table colorButton;
 
-    @Override
-    public void init(Skin skin) {
+    public void init(Skin skin, String text) {
         super.init(skin);
 
-        Label label = new Label("Color", skin);
+        Label label = null;
+        if(text != null) {
+            label = new Label(text, skin);
+        }
+
 
         colorButton = new Table();
         colorButton.setBackground(skin.newDrawable(ColorLibrary.SHAPE_SQUIRCLE));
 
-        content.add(label).left().expandX().height(32);
+        if(label != null) {
+            content.add(label).left().expandX().height(32);
+        }
         content.add(colorButton).right().expandX().height(32).width(96);
         color.set(Color.CORAL);
         colorButton.setColor(color);
@@ -37,7 +43,7 @@ public class ColorWidget extends AbstractWidget<Color> {
         colorButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                SharedResources.ui.showColorPicker(new ColorPickerAdapter() {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);
@@ -49,6 +55,17 @@ public class ColorWidget extends AbstractWidget<Color> {
                 });
             }
         });
+    }
+
+    @Override
+    public void init(Skin skin) {
+        init(skin, "Color");
+    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color.set(color);
+        colorButton.setColor(color);
     }
 
     @Override

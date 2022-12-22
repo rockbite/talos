@@ -54,4 +54,8 @@ public class ComponentUpdated implements TalosEvent {
         json.writeValue("component", component);
         return json;
     }
+
+    public boolean isRapid() {
+        return rapid;
+    }
 }

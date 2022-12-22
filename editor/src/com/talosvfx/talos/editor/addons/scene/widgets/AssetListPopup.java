@@ -166,7 +166,7 @@ public class AssetListPopup<T> extends VisWindow {
                 }
                 if(listItemHandle.isDirectory()) {
                     node.add(newNode);
-                    traversePath(list[i], currDepth++, maxDepth, newNode, predicate);
+                    traversePath(listItemHandle, currDepth++, maxDepth, newNode, predicate);
                 }
             }
         }

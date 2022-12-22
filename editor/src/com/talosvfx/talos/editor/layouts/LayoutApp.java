@@ -22,6 +22,8 @@ public interface LayoutApp {
 
 	void setDestroyCallback (DestroyCallback destroyCallback);
 
+	DestroyCallback getDestroyCallback ();
+
 	void setScrollFocus ();
 
 	void onInputProcessorAdded ();

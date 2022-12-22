@@ -17,32 +17,57 @@ import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.data.DynamicNodeStageData;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Serializable {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage {
 
-    private final NodeStageActor container;
+    private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
+
     protected XmlReader.Element nodeData;
     public Skin skin;
-    protected NodeBoard nodeBoard;
+    protected NodeBoard<T> nodeBoard;
     private Image selectionRect;
 
     private NodeListPopup nodeListPopup;
+    private Stage stageSentIn;
+
+    public GameAsset<T> gameAsset;
+    public T data;
 
     public DynamicNodeStage (Skin skin) {
         super();
         this.skin = skin;
         nodeData = loadData();
 
-        container = new NodeStageActor(this);
     }
 
     protected abstract XmlReader.Element loadData();
 
+    public void setFromData (GameAsset<T> data) {
+        this.gameAsset = data;
+        this.data = data.getResource();
+        gameAsset.listeners.add(new GameAsset.GameAssetUpdateListener() {
+            @Override
+            public void onUpdate () {
+                logger.warn("on game asset update todo");
+            }
+        });
+    }
+
+    public void saveGameAsset () {
+        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+    }
+
     @Override
     public void init () {
-        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
+//        bgColor.set(0.15f, 0.15f, 0.15f, 1f);
 
         nodeListPopup = new NodeListPopup(nodeData);
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
@@ -55,6 +80,8 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
 
                         nodeBoard.tryAndConnectLasCC(node);
+
+                        node.finishedCreatingFresh();
                     }
                 }
             }
@@ -75,9 +102,9 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
     public void showPopup() {
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         final Vector2 vec2 = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        Stage uiStage = TalosMain.Instance().UIStage().getStage();
+
+        Stage uiStage = SharedResources.stage;
         uiStage.screenToStageCoordinates(vec);
-        stage.screenToStageCoordinates(vec2);
 
         nodeListPopup.showPopup(uiStage, vec, vec2);
     }
@@ -85,26 +112,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
         return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), x, y);
     }
+    public void sendInStage (Stage stage) {
+        stageSentIn = stage;
 
-    protected void initActors() {
-        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
-        stage.addActor(gridRenderer);
-
-        nodeBoard = new NodeBoard(skin, this);
-
-        stage.addActor(nodeBoard);
-
-        selectionRect = new Image(skin.getDrawable("orange_row"));
-        selectionRect.setSize(0, 0);
-        selectionRect.setVisible(false);
-        stage.addActor(selectionRect);
-    }
-
-    @Override
-    protected void initListeners () {
-        super.initListeners();
-
-        stage.addListener(new InputListener() {
+        stageSentIn.addListener(new InputListener() {
 
             boolean dragged = false;
             Vector2 startPos = new Vector2();
@@ -113,7 +124,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                getCameraController().scrolled(amountX, amountY);
+//                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
@@ -121,19 +132,31 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 dragged = false;
 
+                boolean shouldHandle = false;
+
                 if(button == 2 || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     selectionRect.setVisible(true);
                     selectionRect.setSize(0, 0);
                     startPos.set(x, y);
+                    shouldHandle = true;
                 }
 
                 NodeBoard.NodeConnection hoveredConnection = nodeBoard.getHoveredConnection();
 
                 if(hoveredConnection != null && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && button == 0) {
                     onConnectionClicked(hoveredConnection);
+                    shouldHandle = true;
                 }
 
-                return true;
+                if (button == 1) {
+                    shouldHandle = true;
+                }
+
+                if (shouldHandle) {
+                    return true;
+                } else {
+                    return super.touchDown(event, x, y, pointer, button);
+                }
             }
 
             @Override
@@ -167,7 +190,7 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
                 if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
-                    FocusManager.resetFocus(getStage());
+//                    FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
                 }
 
@@ -184,11 +207,11 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-
-                if(keycode == Input.Keys.F5) {
-                    stage.getCamera().position.set(0, 0, 0);
-                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
-                }
+//
+//                if(keycode == Input.Keys.F5) {
+//                    stage.getCamera().position.set(0, 0, 0);
+//                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
+//                }
 
                 if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     nodeBoard.createGroupFromSelectedNodes();
@@ -213,106 +236,29 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
                 return super.keyDown(event, keycode);
             }
         });
+
+    }
+    protected void initActors() {
+//        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
+//        stage.addActor(gridRenderer);
+
+        nodeBoard = new NodeBoard<T>(skin, this);
+
+        getRootActor().addActor(nodeBoard);
+
+        selectionRect = new Image(skin.getDrawable("orange_row"));
+        selectionRect.setSize(0, 0);
+        selectionRect.setVisible(false);
+        getRootActor().addActor(selectionRect);
+    }
+
+    @Override
+    protected void initListeners () {
+        super.initListeners();
+
     }
 
     protected void onConnectionClicked(NodeBoard.NodeConnection hoveredConnection) {
-
-    }
-
-    public void write (Json json) {
-        Array<NodeWidget> nodes = nodeBoard.nodes;
-
-        json.writeArrayStart("list");
-        for (NodeWidget node: nodes) {
-            json.writeValue(node);
-        }
-        json.writeArrayEnd();
-
-        json.writeArrayStart("connections");
-        for (NodeBoard.NodeConnection connection: nodeBoard.nodeConnections) {
-            json.writeObjectStart();
-            json.writeValue("fromNode", connection.fromNode.getUniqueId());
-            json.writeValue("toNode", connection.toNode.getUniqueId());
-            json.writeValue("fromSlot", connection.fromId);
-            json.writeValue("toSlot", connection.toId);
-            json.writeObjectEnd();
-        }
-        json.writeArrayEnd();
-
-        json.writeArrayStart("groups");
-        for (NodeGroup group: nodeBoard.groups) {
-            json.writeObjectStart();
-            json.writeValue("name", group.getText());
-            json.writeValue("color", group.getFrameColor());
-            json.writeArrayStart("nodes");
-
-            for (NodeWidget nodeWidget: group.getNodes()) {
-                json.writeValue(nodeWidget.getUniqueId());
-            }
-
-            json.writeArrayEnd();
-            json.writeObjectEnd();
-        }
-        json.writeArrayEnd();
-    }
-
-    public void read (Json json, JsonValue root) {
-        reset();
-
-        JsonValue nodes = root.get("list");
-        JsonValue connections = root.get("connections");
-        JsonValue groups = root.get("groups");
-
-        int idCounter = 0;
-
-        IntMap<NodeWidget> nodeMap = new IntMap<>();
-
-        for (JsonValue nodeData: nodes) {
-            String nodeName = nodeData.getString("name");
-
-            Class clazz = nodeListPopup.getNodeClassByName(nodeName);
-            String nodeClassName = nodeListPopup.getClassNameFromModuleName(nodeName);
-            if(clazz != null) {
-                NodeWidget node = createNode(nodeName, 0, 0);
-                node.constructNode(nodeListPopup.getModuleByName(nodeName));
-                node.read(json, nodeData);
-                idCounter = Math.max(idCounter, node.getUniqueId());
-                nodeMap.put(node.getUniqueId(), node);
-            }
-        }
-
-        nodeBoard.globalNodeCounter = idCounter + 1;
-
-        for (JsonValue connectionData: connections) {
-            int fromNode = connectionData.getInt("fromNode");
-            int toNode = connectionData.getInt("toNode");
-            String fromSlot = connectionData.getString("fromSlot");
-            String toSlot = connectionData.getString("toSlot");
-
-            NodeWidget fromWidget = nodeMap.get(fromNode);
-            NodeWidget toWidget = nodeMap.get(toNode);
-
-            nodeBoard.makeConnection(fromWidget, toWidget, fromSlot, toSlot);
-        }
-
-        ObjectSet<NodeWidget> subNodeList = new ObjectSet<>();
-        if(groups != null) {
-            for (JsonValue groupData : groups) {
-                String name = groupData.getString("name");
-                Color color = json.readValue(Color.class, groupData.get("color"));
-                JsonValue childNodeIds = groupData.get("nodes");
-                subNodeList.clear();
-                for (JsonValue idVal : childNodeIds) {
-                    int id = idVal.asInt();
-                    subNodeList.add(nodeMap.get(id));
-                }
-                NodeGroup nodeGroup = nodeBoard.createGroupForNodes(subNodeList);
-                nodeGroup.setText(name);
-                nodeGroup.setColor(color);
-            }
-        }
-
-        stage.setKeyboardFocus(stage.getRoot());
 
     }
 
@@ -320,13 +266,10 @@ public abstract class DynamicNodeStage extends WorkplaceStage implements Json.Se
         nodeBoard.reset();
     }
 
-    public NodeBoard getNodeBoard () {
+    public NodeBoard<T> getNodeBoard () {
         return nodeBoard;
     }
 
-    public NodeStageActor getContainer() {
-        return container;
-    }
 
     @Override
     public void fileDrop (String[] paths, float x, float y) {

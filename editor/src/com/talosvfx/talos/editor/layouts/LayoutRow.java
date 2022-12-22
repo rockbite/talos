@@ -140,7 +140,7 @@ public class LayoutRow extends LayoutItem {
 			float y = 0;
 			LayoutResizeWidget layoutResizeWidget = resizeWidgets.get(i);
 			layoutResizeWidget.toFront();
-			layoutResizeWidget.setBounds(x, y, 5, getHeight());
+			layoutResizeWidget.setBounds(x, y, 5, getHeight() - 30);
 
 		}
 	}

@@ -1,0 +1,75 @@
+{
+  "type": "ROW",
+  "children": [
+    {
+      "type": "COLUMN",
+      "relativeWidth": 0.85300004,
+      "children": [
+        {
+          "type": "CONTENT",
+          "relativeHeight": 0.2826534,
+          "children": [
+            {
+              "type": "APP",
+              "appID": "6c493957-39c5-4adc-87e8-febfea14821c",
+              "tabActive": true,
+              "baseAppClazz": "ProjectExplorerApp",
+              "gameAssetIdentifier": "singleton",
+              "gameAssetType": "DIRECTORY"
+            }
+          ]
+        },
+        {
+          "type": "ROW",
+          "relativeWidth": 1,
+          "relativeHeight": 0.7173466,
+          "children": [
+            {
+              "type": "CONTENT",
+              "relativeWidth": 0.2003536,
+              "children": [
+                {
+                  "type": "APP",
+                  "appID": "f52cbf3d-bf42-437b-a2e1-17d2de2671d4",
+                  "tabActive": true,
+                  "baseAppClazz": "SceneHierarchyApp",
+                  "gameAssetIdentifier": "New Scene",
+                  "gameAssetType": "SCENE"
+                }
+              ]
+            },
+            {
+              "type": "CONTENT",
+              "relativeWidth": 0.7996464,
+              "relativeHeight": 1,
+              "children": [
+                {
+                  "type": "APP",
+                  "appID": "dda652c1-0e5f-42b4-baa1-d88dc19cc33c",
+                  "tabActive": true,
+                  "baseAppClazz": "SceneEditorApp",
+                  "gameAssetIdentifier": "New Scene",
+                  "gameAssetType": "SCENE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "CONTENT",
+      "relativeWidth": 0.147,
+      "children": [
+        {
+          "type": "APP",
+          "appID": "4d359362-3763-497c-8bf8-a08bb25dd74e",
+          "tabActive": true,
+          "baseAppClazz": "PropertiesPanelApp",
+          "gameAssetIdentifier": "New Scene",
+          "gameAssetType": "SCENE"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
@@ -11,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -40,6 +42,8 @@ public class PropertyPanel extends Table implements Observer {
 
     public PropertyPanel() {
         setSkin(SharedResources.skin);
+
+        setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#353535ff")));
 
         container = new Table();
         fakeContainer = new Table();
@@ -168,7 +172,7 @@ public class PropertyPanel extends Table implements Observer {
     public void propertyProviderUpdated (IPropertyProvider propertyProvider) {
         if(providerPanelMap.containsKey(propertyProvider)) {
             PropertiesPanel propertiesPanel = providerPanelMap.get(propertyProvider);
-            if (propertyProvider instanceof ScriptComponent) {
+            if (propertyProvider instanceof ScriptComponent || propertyProvider instanceof RoutineRendererComponent) {
                 propertiesPanel.reconstruct();
             } else {
                 propertiesPanel.updateValues();

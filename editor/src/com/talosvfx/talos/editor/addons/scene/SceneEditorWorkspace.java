@@ -20,10 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.*;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -693,7 +692,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Scene scene = new Scene();
 		scene.path = fileHandle.path();
 		openSavableContainer(scene);
-		TalosMain.Instance().UIStage().saveProjectAction();
+		//TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
 	public static class ClipboardPayload {
@@ -1089,6 +1088,37 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	@EventHandler
+	public void onRoutineUpdated (RoutineUpdated event) {
+//        GameObject rootGO = getRootGO();
+//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+//        updateRoutinePropertiesForGOs(rootGO, event.routineInstance, updatedComponents);
+//		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+//			SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform);
+//		}
+	}
+
+	private void updateRoutinePropertiesForGOs (GameObject gameObject, RoutineInstance routineInstance, Array<RoutineRendererComponent> updatedComponents) {
+//		if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+//			RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+//			if (component.routineInstance != null) {
+//				if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
+//					component.routineInstance.loadFrom(routineInstance.uuid, routineInstance.toString(), );
+//					component.updatePropertyWrappers(true, routineInstance);
+//					updatedComponents.add(component);
+//				}
+//			}
+//		}
+//
+//		Array<GameObject> children = gameObject.getGameObjects();
+//		if (children != null) {
+//			for (int i = 0; i < children.size; i++) {
+//				GameObject child = children.get(i);
+//				updateRoutinePropertiesForGOs(child, routineInstance, updatedComponents);
+//			}
+//		}
+	}
+
+	@EventHandler
 	public void onGameObjectDeleted (GameObjectDeleted event) {
 		GameObject target = event.getTarget();
 
@@ -1327,6 +1357,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onProjectDirectoryContentsChanged (ProjectDirectoryContentsChanged event) {
+		// TODO: 11/24/2022 THIS IS A TEMPORARY CHANGES BEFORE TOM's REFACTOR FOR THE WHOLE THING
+		for (FileHandle fileHandle : event.getChanges().changed) {
+			GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
+			if (assetForPath != null) {
+				for (GameAsset.GameAssetUpdateListener listener : assetForPath.listeners) {
+					listener.onUpdate();
+				}
+			}
+		}
+
 		if (event.getChanges().directoryStructureChange()) {
 			boolean nonMeta = false;
 			for (FileHandle added : event.getChanges().added) {
@@ -1383,6 +1423,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Camera camera = currentCameraSupplier.get();
 
 		super.drawEntitiesForSelection();
+		renderer.setRenderingEntitySelectionBuffer(true);
 		renderer.skipUpdates = true;
 
 		renderer.setRenderParentTiles(false);
@@ -1397,7 +1438,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		customBatch.end();
 		renderer.skipUpdates = false;
-
+		renderer.setRenderingEntitySelectionBuffer(false);
 	}
 
 	@Override

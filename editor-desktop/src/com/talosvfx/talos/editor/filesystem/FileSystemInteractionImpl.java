@@ -25,112 +25,6 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 	}
 
 	@Override
-	public void openProject (IProject projectType) {
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Open", projectType);
-		if(defaultLocation.equals("")) {
-			TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
-		}
-		fileChooser.setDirectory(defaultLocation);
-
-		fileChooser.setMode(FileChooser.Mode.OPEN);
-		fileChooser.setMultiSelectionEnabled(false);
-
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(projectType.getExtension());
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected (Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				TalosMain.Instance().ProjectController().setProject(projectType);
-				TalosMain.Instance().ProjectController().loadProject(Gdx.files.absolute(path));
-			}
-		});
-
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
-	}
-
-	@Override
-	public void export () {
-		IProject projectType = TalosMain.Instance().ProjectController().getProject();
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Export", projectType);
-		fileChooser.setDirectory(defaultLocation);
-
-		final String ext = projectType.getExportExtension();
-
-		fileChooser.setMode(FileChooser.Mode.SAVE);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected(Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(ext)) {
-					if(path.indexOf(".") > 0) {
-						path = path.substring(0, path.indexOf("."));
-					}
-					path += ext;
-				}
-				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().ProjectController().exportProject(handle);
-			}
-		});
-
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().getCurrentExportNameSuggestion());
-
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
-	}
-
-	@Override
-	public void save () {
-		IProject projectType = TalosMain.Instance().ProjectController().getProject();
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
-		fileChooser.setDirectory(defaultLocation);
-
-		final String ext = projectType.getExtension();
-		fileChooser.setMode(FileChooser.Mode.SAVE);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(ext);
-			}
-		});
-		fileChooser.setSelectionMode(FileChooser.SelectionMode.FILES);
-
-		fileChooser.setListener(new FileChooserAdapter() {
-			@Override
-			public void selected(Array<FileHandle> file) {
-				String path = file.first().file().getAbsolutePath();
-				if(!path.endsWith(ext)) {
-					if(path.indexOf(".") > 0) {
-						path = path.substring(0, path.indexOf("."));
-					}
-					path += ext;
-				}
-				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().ProjectController().saveProject(handle);
-			}
-		});
-
-//		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.fileName);
-
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
-	}
-
-	@Override
 	public void showSaveFileChooser (String extension, FileChooserListener listener) {
 		fileChooser.setMode(FileChooser.Mode.SAVE);
 		fileChooser.setMultiSelectionEnabled(false);
@@ -151,7 +45,7 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
+		SharedResources.stage.addActor(fileChooser.fadeIn());
 	}
 
 	@Override
@@ -175,7 +69,7 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
+		SharedResources.stage.addActor(fileChooser.fadeIn());
 	}
 
 	@Override
@@ -192,6 +86,6 @@ public class FileSystemInteractionImpl extends FileSystemInteraction {
 			}
 		});
 
-		TalosMain.Instance().UIStage().getStage().addActor(fileChooser.fadeIn());
+		SharedResources.stage.addActor(fileChooser.fadeIn());
 	}
 }

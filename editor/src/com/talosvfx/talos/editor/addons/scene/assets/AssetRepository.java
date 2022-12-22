@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -73,6 +74,8 @@ public class AssetRepository implements Observer {
 	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
+
+	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
 	public <T> GameAsset<T> getAssetForIdentifier (String identifier, GameAssetType type) {
 		if (identifierGameAssetMap.containsKey(type)) {
@@ -256,7 +259,7 @@ public class AssetRepository implements Observer {
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
 		checkGameAssetCreation(GameAssetType.SCRIPT);
-		checkGameAssetCreation(GameAssetType.TWEEN);
+		checkGameAssetCreation(GameAssetType.ROUTINE);
 		checkGameAssetCreation(GameAssetType.ATLAS);
 		checkGameAssetCreation(GameAssetType.SOUND);
 
@@ -268,6 +271,8 @@ public class AssetRepository implements Observer {
 		checkGameAssetCreation(GameAssetType.SCENE);
 
 		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
+
+		newFilesSeen.clear();
 	}
 
 	private void checkGameAssetCreation (GameAssetType type) {
@@ -279,6 +284,9 @@ public class AssetRepository implements Observer {
 
 
 			if (key.isDirectory()) continue;
+			if (!newFilesSeen.contains(key)) {
+				continue;
+			}
 
 			try {
 				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
@@ -786,19 +794,21 @@ public class AssetRepository implements Observer {
 				((GameAsset<String>)gameAssetOut).setResourcePayload("ScriptDummy");
 
 				break;
-			case TWEEN:
+			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<String> tweenGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
-					gameAssetOut = tweenGameAsset;
+					GameAsset<RoutineStageData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = asset;
+
 
 					if (createLinks) {
-						value.gameAssetReferences.add(tweenGameAsset);
-						tweenGameAsset.dependentRawAssets.add(value);
+						value.gameAssetReferences.add(asset);
+						asset.dependentRawAssets.add(value);
 					}
 				}
-				((GameAsset<String>)gameAssetOut).setResourcePayload("Dummy");
+				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
 
+				((GameAsset<RoutineStageData>)gameAssetOut).setResourcePayload(routineStageData);
 
 				break;
 			case PREFAB:
@@ -912,6 +922,12 @@ public class AssetRepository implements Observer {
 	{
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
 		saveStrategyObjectMap.put(GameAssetType.PREFAB, this::serializePrefab);
+		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
+	}
+
+	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
+		RoutineStageData resource = gameAsset.getResource();
+		return json.prettyPrint(resource);
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {
@@ -1001,6 +1017,7 @@ public class AssetRepository implements Observer {
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
+		newFilesSeen.add(fileHandle);
 		try {
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
@@ -1427,8 +1444,11 @@ public class AssetRepository implements Observer {
 						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
 
 						if (assetForIdentifier != null) {
+							dataMaps.fileHandleGameAssetObjectMap.remove(file);
+
 							GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
 							putAssetForIdentifier(destination.nameWithoutExtension(), removedGameAsset.type, removedGameAsset);
+							dataMaps.fileHandleGameAssetObjectMap.put(destination, removedGameAsset);
 
 							removedGameAsset.setUpdated();
 						} else {
