@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
@@ -16,6 +17,11 @@ public class CustomAssetWidget extends ATypeWidget {
     @Override
     public String getTypeName() {
         return "asset";
+    }
+
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
+
     }
 
     public CustomAssetWidget() {
