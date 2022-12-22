@@ -20,8 +20,8 @@ public class CustomAssetWidget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
-
+    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
+        propertyWrapper.setValue(assetWidget.getValue());
     }
 
     public CustomAssetWidget() {

@@ -14,8 +14,8 @@ public class CustomColorWidget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper<?> propertyWrapper) {
-
+    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
+        propertyWrapper.setValue(colorWidget.getValue());
     }
 
     public CustomColorWidget() {

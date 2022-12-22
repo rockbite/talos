@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 
-public abstract class ATypeWidget extends Table {
+public abstract class ATypeWidget<T> extends Table {
 
     public abstract String getTypeName();
 
@@ -25,5 +25,5 @@ public abstract class ATypeWidget extends Table {
         return var2;
     }
 
-    public abstract void applyValueToWrapper(PropertyWrapper<?> propertyWrapper);
+    public abstract void applyValueToWrapper(PropertyWrapper<T> propertyWrapper);
 }
