@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
+import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,46 +51,42 @@ public class PropertiesPanel extends Table {
         if (propertyProvider instanceof AComponent && !(propertyProvider instanceof TransformComponent)) {
             AComponent component = ((AComponent) propertyProvider);
 
-            ImageButton settingButton = new ImageButton(SharedResources.skin.getDrawable("icon-edit"));
-            settingButton.setSize(17, 17);
-            titleContainer.add(settingButton).padTop(-titleLabel.getPrefHeight() - 3).right().row();
-
-            ContextualMenu contextualMenu = new ContextualMenu();
-
-            contextualMenu.addItem("Reset", new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                    component.reset();
-                    updateValues();
-                }
-            });
-
-            contextualMenu.addItem("Remove", new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                    component.remove();
-                    GameObject gameObject = component.getGameObject();
-                    if (gameObject != null) {
-
-                        if (parentPropertyPanel.getCurrentHolder() instanceof GameObjectContainer) {
-                            ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
-                            componentRemoved.setComponent(component);
-                            componentRemoved.setGameObject(gameObject);
-                            componentRemoved.setContainer((GameObjectContainer)parentPropertyPanel.getCurrentHolder());
-                            Notifications.fireEvent(componentRemoved);
-                        }
-                    }
-                    PropertiesPanel.this.remove();
-                }
-            });
+            ImageButton settingButton = new ImageButton(SharedResources.skin.getDrawable("ic-vertical-dots"));
+            titleContainer.add(settingButton).padTop(-titleLabel.getPrefHeight() - 3).right().width(20).padRight(2)
+                    .row();
 
             settingButton.addListener( new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    contextualMenu.show(getStage());
+
+                    BasicPopup.build(String.class)
+                            .addItem("Reset", "reset")
+                            .addItem("Remove", "remove")
+                            .onClick(new BasicPopup.PopupListener<String>() {
+                                @Override
+                                public void itemClicked(String payload) {
+                                    if(payload.equals("reset")) {
+                                        component.reset();
+                                        updateValues();
+                                    } else if(payload.equals("remove")) {
+                                        component.remove();
+                                        GameObject gameObject = component.getGameObject();
+                                        if (gameObject != null) {
+
+                                            if (parentPropertyPanel.getCurrentHolder() instanceof GameObjectContainer) {
+                                                ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
+                                                componentRemoved.setComponent(component);
+                                                componentRemoved.setGameObject(gameObject);
+                                                componentRemoved.setContainer((GameObjectContainer)parentPropertyPanel.getCurrentHolder());
+                                                Notifications.fireEvent(componentRemoved);
+                                            }
+                                        }
+                                        PropertiesPanel.this.remove();
+                                    }
+                                }
+                            })
+                            .show(settingButton, x, y);
                 }
             });
 

@@ -16,16 +16,10 @@ import com.badlogic.gdx.utils.Select;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectRepositionHierarchyEvent;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
+import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
@@ -379,6 +373,11 @@ public class HierarchyWidget extends Table implements Observer {
     @EventHandler
     public void gameActiveChanged (GameObjectActiveChanged event) {
         updateColourForActive(event.target);
+    }
+
+    @EventHandler
+    public void gameObjectsRestructured (GameObjectsRestructured event) {
+        restructureGameObjects(event.targets);
     }
 
     @EventHandler

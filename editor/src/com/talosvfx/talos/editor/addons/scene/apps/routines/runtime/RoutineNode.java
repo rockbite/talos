@@ -234,13 +234,17 @@ public abstract class RoutineNode {
             RoutineNode targetNode = connection.toPort.nodeRef;
             String targetPortName = connection.toPort.name;
 
-            GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
-            if (!gameAsset.listeners.contains(updateListener, true)) {
-                gameAsset.listeners.add(updateListener);
-            }
+            if(targetNode.queryValue(targetPortName) instanceof GameAsset) {
+                GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
+                if (!gameAsset.listeners.contains(updateListener, true)) {
+                    gameAsset.listeners.add(updateListener);
+                }
 
-            return gameAsset;
+                return gameAsset;
+            }
         }
+
+        return null;
     }
 
     protected String fetchStringValue(String key) {

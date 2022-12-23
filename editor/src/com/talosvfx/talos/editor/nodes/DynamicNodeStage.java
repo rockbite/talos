@@ -72,9 +72,9 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
         nodeListPopup = new NodeListPopup(nodeData);
         nodeListPopup.setListener(new NodeListPopup.NodeListListener() {
             @Override
-            public void chosen (Class clazz, XmlReader.Element module, float x, float y) {
+            public void chosen (Class clazz, XmlReader.Element module, float screenX, float screenY) {
                 if(ClassReflection.isAssignableFrom(NodeWidget.class, clazz)) {
-                    NodeWidget node = createNode(module.getAttribute("name"), x, y);
+                    NodeWidget node = createNode(module.getAttribute("name"), screenX, screenY);
                     if(node != null) {
                         node.constructNode(module);
                         Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
@@ -108,9 +108,9 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
         nodeListPopup.showPopup(uiStage, vec, vec2);
     }
-    public NodeWidget createNode (String nodeName, float x, float y) {
+    public NodeWidget createNode (String nodeName, float screenX, float screenY) {
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
-        return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), x, y);
+        return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), screenX, screenY);
     }
     public void sendInStage (Stage stage) {
         stageSentIn = stage;

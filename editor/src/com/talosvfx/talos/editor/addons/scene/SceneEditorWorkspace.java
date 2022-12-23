@@ -484,19 +484,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject dummyParent = SceneUtils.createEmpty(currentContainer, new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-
-				logger.info("Redo reposition game object and restructure on group");
-//				for (GameObject gameObject : selectedObjects) {
-//					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
-//				}
-//
-//				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
-//
-//				selectGameObjectExternally(dummyParent);
+		Gdx.app.postRunnable(() -> {
+			for (GameObject gameObject : selectedObjects) {
+				SceneUtils.repositionGameObject(rootGO, dummyParent, gameObject);
 			}
+
+			GameObjectsRestructured gameObjectsRestructured = Notifications.obtainEvent(GameObjectsRestructured.class);
+			gameObjectsRestructured.targets.addAll(selectedObjects);
+			Notifications.fireEvent(gameObjectsRestructured);
+
+			selectGameObjectExternally(dummyParent);
 		});
 	}
 

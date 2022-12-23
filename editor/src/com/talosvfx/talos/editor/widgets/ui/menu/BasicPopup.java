@@ -127,12 +127,15 @@ public class BasicPopup<T> extends Table {
     public void show(Actor actor, float x, float y) {
         Vector2 tmp = new Vector2(x, y);
         actor.localToStageCoordinates(tmp);
-
         show(tmp.x, tmp.y);
     }
 
     public void show(float x, float y) {
         pack();
+
+        if(x + getWidth() > SharedResources.stage.getWidth()) {
+            x -= getWidth();
+        }
 
         setPosition(x, y - this.getHeight());
         SharedResources.stage.addActor(this);

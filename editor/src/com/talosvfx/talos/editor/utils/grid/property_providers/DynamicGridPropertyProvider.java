@@ -18,7 +18,7 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
     public float distanceThatLinesShouldBe;
     float thickness;
 
-    Color backgroundColor = Color.BROWN;
+    Color backgroundColor = new Color(Color.BROWN);
 
     private Array<GridLine> gridLines = new Array<>();
     private boolean highlightZero = true;

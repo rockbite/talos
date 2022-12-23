@@ -5,6 +5,12 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class PropertyColorWrapper extends PropertyWrapper<Color> {
+
+    public PropertyColorWrapper() {
+        defaultValue = new Color(Color.WHITE);
+        value = new Color(defaultValue);
+    }
+
     @Override
     public Color parseValueFromString(String value) {
         return Color.valueOf(value);
