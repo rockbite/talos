@@ -272,9 +272,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	private boolean segmentHit (Vector2 p1, Vector2 p2) {
 
-		vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-//        nodeStage.getCamera().unproject(vec3);
-		tmp3.set(vec3.x, vec3.y);
+		tmp2.set(Gdx.input.getX(), Gdx.input.getY());
+		screenToLocalCoordinates(tmp2);
+		tmp3.set(tmp2.x, tmp2.y);
 
 		float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
 
