@@ -17,7 +17,7 @@ public class CollapsableWidget extends Table {
 
     public CollapsableWidget () {
         pad(5, 10, 5, 8).top();
-        setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.DARK_GRAY));
+        setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
 
         topSegment = constructTopSegment();
         content = constructContent();

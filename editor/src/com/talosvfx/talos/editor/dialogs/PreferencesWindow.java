@@ -210,11 +210,11 @@ public class PreferencesWindow extends Table {
 
         public void updateBackground () {
             if (roundBottom && roundTop) {
-                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, currentBackgroundColor));
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE, currentBackgroundColor));
             } else if (roundTop) {
-                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP_2, currentBackgroundColor));
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP, currentBackgroundColor));
             } else if (roundBottom) {
-                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM_2, currentBackgroundColor));
+                setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM, currentBackgroundColor));
             } else {
                 setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUARE, currentBackgroundColor));
             }
