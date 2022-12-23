@@ -37,7 +37,7 @@ public class PreferencesWindow extends Table {
     private Table constructContentSegment () {
         final Table contentSegment = new Table();
         contentSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
-        contentSegment.defaults().space(10);
+        contentSegment.defaults().space(5);
 
         // left part where tabs are displayed
         final Table tabsSegment = constructTabsSegment();
@@ -45,7 +45,7 @@ public class PreferencesWindow extends Table {
         scrollPane = new ScrollPane(null);
 
         contentSegment.add(tabsSegment).growY().width(160);
-        contentSegment.add(scrollPane).grow();
+        contentSegment.add(scrollPane).grow().pad(5);
         return contentSegment;
     }
 
