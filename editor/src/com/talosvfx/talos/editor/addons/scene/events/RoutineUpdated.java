@@ -1,19 +1,20 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 
 public class RoutineUpdated implements TalosEvent {
 
-    public RoutineInstance routineInstance;
+    public GameAsset<RoutineStageData> routineAsset;
 
-    public RoutineUpdated set(RoutineInstance routineInstance) {
-        this.routineInstance = routineInstance;
+    public RoutineUpdated set(GameAsset<RoutineStageData> routineAsset) {
+        this.routineAsset = routineAsset;
         return this;
     }
 
     @Override
     public void reset () {
-        routineInstance = null;
+        routineAsset = null;
     }
 }

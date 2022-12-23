@@ -20,8 +20,6 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
 public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
-
-    private RoutineConfigMap routineConfigMap;
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
@@ -30,10 +28,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
 //    public ScenePreviewStage scenePreviewStage;
 
     public RoutineEditorApp() {
-        routineConfigMap = new RoutineConfigMap();
-        FileHandle handle = Gdx.files.internal("addons/scene/tween-nodes.xml");
-        routineConfigMap.loadFrom(handle);
-
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
             @Override
@@ -50,7 +44,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
         content.add(routineStageWrapper).grow();
 
         routineStage.init();
-        routineStage.routineConfigMap = routineConfigMap;
 //        scenePreviewStage = new ScenePreviewStage();
 
         variableCreationWindow = new VariableCreationWindow(routineStage);

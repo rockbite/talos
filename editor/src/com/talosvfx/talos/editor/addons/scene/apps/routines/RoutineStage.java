@@ -37,8 +37,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     public final RoutineEditorApp routineEditorApp;
 
-    public RoutineConfigMap routineConfigMap;
-
     private Vector2 tmp = new Vector2();
 
     private float timeScale = 1f;
@@ -142,24 +140,8 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void routineUpdated () {
-        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(data.getRoutineInstance()));
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
-
-
-//        SharedResources.appManager.getAppInstances()
-//        AppManager.BaseApp
-//        GameObject rootGO = SceneEditorWorkspace.getInstance().getRootGO();
-//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
-//        updatePropertiesForGOs(rootGO, updatedComponents);
-//
-//        Gdx.app.postRunnable(new Runnable() {
-//            @Override
-//            public void run () {
-//                for (RoutineRendererComponent updatedComponent : updatedComponents) {
-//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(updatedComponent, false));
-//                }
-//            }
-//        });
+        gameAsset.setUpdated();
     }
 
     @EventHandler
@@ -186,7 +168,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
         updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node);
-
     }
 
     private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {

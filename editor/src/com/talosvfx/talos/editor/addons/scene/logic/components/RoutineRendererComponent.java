@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.data.RoutineStageData;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -25,6 +26,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     GameAsset<RoutineStageData> routineResource;
 
+    GameAsset.GameAssetUpdateListener updateListener;
+
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
 
@@ -34,7 +37,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
     public RoutineRendererComponent() {
-
+        updateListener = new GameAsset.GameAssetUpdateListener() {
+            @Override
+            public void onUpdate() {
+                routineInstance.loadFrom(RoutineRendererComponent.this.routineResource.getResource(), SharedResources.configData.getRoutineConfigMap());
+            }
+        };
     }
 
     @Override
@@ -160,11 +168,11 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     @Override
     public void setGameAsset(GameAsset<RoutineStageData> gameAsset) {
+        if (routineResource != null) {
+            routineResource.listeners.removeValue(updateListener, true);
+        }
         this.routineResource = gameAsset;
-
-        // this needs changing
-        RoutineConfigMap routineConfigMap = new RoutineConfigMap();
-        routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
+        gameAsset.listeners.add(updateListener);
 
         routineInstance = routineResource.getResource().createInstance();
         updatePropertyWrappers(true);

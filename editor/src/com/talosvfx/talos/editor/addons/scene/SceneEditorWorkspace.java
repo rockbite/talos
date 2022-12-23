@@ -38,11 +38,11 @@ import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
@@ -1091,31 +1091,33 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onRoutineUpdated (RoutineUpdated event) {
 //        GameObject rootGO = getRootGO();
 //        Array<RoutineRendererComponent> updatedComponents = new Array<>();
-//        updateRoutinePropertiesForGOs(rootGO, event.routineInstance, updatedComponents);
+//		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
+//		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
 //		for (RoutineRendererComponent updatedComponent : updatedComponents) {
-//			SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform);
+//			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
 //		}
 	}
 
-	private void updateRoutinePropertiesForGOs (GameObject gameObject, RoutineInstance routineInstance, Array<RoutineRendererComponent> updatedComponents) {
-//		if (gameObject.hasComponent(RoutineRendererComponent.class)) {
-//			RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-//			if (component.routineInstance != null) {
-//				if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
-//					component.routineInstance.loadFrom(routineInstance.uuid, routineInstance.toString(), );
-//					component.updatePropertyWrappers(true, routineInstance);
-//					updatedComponents.add(component);
-//				}
-//			}
-//		}
-//
-//		Array<GameObject> children = gameObject.getGameObjects();
-//		if (children != null) {
-//			for (int i = 0; i < children.size; i++) {
-//				GameObject child = children.get(i);
-//				updateRoutinePropertiesForGOs(child, routineInstance, updatedComponents);
-//			}
-//		}
+	private void updateRoutinePropertiesForGOs (GameObject gameObject, GameAsset<RoutineStageData> routineAsset, Array<RoutineRendererComponent> updatedComponents) {
+		if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+			RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
+			if (component.routineInstance != null) {
+				if (routineAsset.equals(component.getGameResource())) {
+					RoutineStageData resource = routineAsset.getResource();
+					component.routineInstance = resource.createInstance();
+//					component.updatePropertyWrappers(true, routineAsset);
+					updatedComponents.add(component);
+				}
+			}
+		}
+
+		Array<GameObject> children = gameObject.getGameObjects();
+		if (children != null) {
+			for (int i = 0; i < children.size; i++) {
+				GameObject child = children.get(i);
+				updateRoutinePropertiesForGOs(child, routineAsset, updatedComponents);
+			}
+		}
 	}
 
 	@EventHandler

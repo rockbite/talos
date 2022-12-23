@@ -1,10 +1,7 @@
 package com.talosvfx.talos.editor.data;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
@@ -31,9 +28,15 @@ public class RoutineStageData extends DynamicNodeStageData {
 	@Override
 	public void read (Json json, JsonValue root) {
 		super.read(json, root);
+		//Construct the routine instance from data
+		routineInstance = createInstance();
+	}
 
+	@Override
+	protected void serialize(Json json, JsonValue jsonData) {
+		super.serialize(json, jsonData);
 		propertyWrappers.clear();
-		JsonValue propertiesJson = root.get("propertyWrappers");
+		JsonValue propertiesJson = jsonData.get("propertyWrappers");
 		if (propertiesJson != null) {
 			for (JsonValue propertyJson : propertiesJson) {
 				String className = propertyJson.getString("className", "");
@@ -51,11 +54,7 @@ public class RoutineStageData extends DynamicNodeStageData {
 			}
 		}
 
-		exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
-
-		//Construct the routine instance from data
-
-		routineInstance = createInstance();
+		exposedPropertyIndex = jsonData.getInt("propertyWrapperIndex", 0);
 	}
 
 	@Override
@@ -144,11 +143,8 @@ public class RoutineStageData extends DynamicNodeStageData {
 	}
 
 	public RoutineInstance createInstance () {
-		RoutineConfigMap routineConfigMap = new RoutineConfigMap();
-		routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml")); //todo: totally not okay
-
 		RoutineInstance routine = new RoutineInstance();
-		routine.loadFrom(this, routineConfigMap);
+		routine.loadFrom(this, SharedResources.configData.getRoutineConfigMap());
 		return routine;
 	}
 }

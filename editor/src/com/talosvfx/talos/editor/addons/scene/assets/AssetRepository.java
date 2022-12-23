@@ -927,7 +927,11 @@ public class AssetRepository implements Observer {
 
 	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
 		RoutineStageData resource = gameAsset.getResource();
-		return json.prettyPrint(resource);
+		String jsonData = json.prettyPrint(gameAsset.getResource());
+		JsonReader jsonReader = new JsonReader();
+		JsonValue parse = jsonReader.parse(jsonData);
+		gameAsset.getResource().read(json, parse);
+		return jsonData;
 	}
 
 	private String serializeScene (GameAsset<Scene> gameAsset, Json json) {

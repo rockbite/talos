@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import lombok.Getter;
 
 public class ConfigData {
@@ -17,6 +18,9 @@ public class ConfigData {
 
 	@Getter
 	private XmlReader.Element gameObjectConfigurationXMLRoot;
+
+	@Getter
+	private RoutineConfigMap routineConfigMap;
 
 	public ConfigData () {
 		loadTemplateConfigData();
@@ -32,6 +36,9 @@ public class ConfigData {
 
 
 		traverseTree(gameObjectConfigurationXMLRoot.getChildByName("templates"));
+
+		routineConfigMap = new RoutineConfigMap();
+		routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml"));
 	}
 	private void traverseTree (XmlReader.Element root) {
 		Array<XmlReader.Element> templates = root.getChildrenByName("template");
