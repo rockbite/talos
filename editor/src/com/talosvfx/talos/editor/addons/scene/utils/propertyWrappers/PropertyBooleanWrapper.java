@@ -22,4 +22,10 @@ public class PropertyBooleanWrapper extends PropertyWrapper<Boolean> {
         json.writeValue("value", value);
         json.writeValue("defaultValue", defaultValue);
     }
+
+    @Override
+    public PropertyType getType() {
+        // TODO: 12/23/2022 IMPLEMENT THIS TYPE
+        return null;
+    }
 }

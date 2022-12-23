@@ -34,6 +34,11 @@ public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
     }
 
     @Override
+    public PropertyType getType() {
+        return PropertyType.FLOAT;
+    }
+
+    @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         defaultValue = jsonData.getFloat("defaultValue", 0);

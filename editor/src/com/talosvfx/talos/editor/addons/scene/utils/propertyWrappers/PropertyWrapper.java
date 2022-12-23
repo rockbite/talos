@@ -17,9 +17,6 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
 
     public int index;
 
-    @Getter @Setter
-    private transient PropertyType type;
-
     public void collectAttributes (Array<String> attributes) {
         for (int i = 0; i < attributes.size; i+=2) {
             String type = attributes.get(i);
@@ -27,7 +24,7 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
                 defaultValue = parseValueFromString(attributes.get(i+1));
             }
         }
-    };
+    }
 
     public void setValue (T value) {
         this.value = value;
@@ -65,6 +62,8 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     }
 
     public abstract T parseValueFromString (String value);
+
+    public abstract PropertyType getType();
 
     public void setDefault () {
         this.value = defaultValue;
