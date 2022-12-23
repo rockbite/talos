@@ -42,7 +42,6 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
             clone.defaultValue = defaultValue;
             clone.propertyName = propertyName;
             clone.index = index;
-            clone.type = type;
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -54,14 +53,12 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public void read (Json json, JsonValue jsonData) {
        propertyName = jsonData.getString("propertyName");
        index = jsonData.getInt("index");
-       type = json.readValue(PropertyType.class, jsonData.get("type"));
     }
 
     @Override
     public void write (Json json) {
         json.writeValue("propertyName", propertyName);
         json.writeValue("index", index);
-        json.writeValue("type", type);
     }
 
     public abstract T parseValueFromString (String value);
