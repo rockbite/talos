@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
@@ -536,6 +537,8 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void addNodeToSelection (NodeWidget node) {
+		SharedResources.stage.setKeyboardFocus(node);
+
 		selectedNodes.add(node);
 		updateSelectionBackgrounds();
 	}
