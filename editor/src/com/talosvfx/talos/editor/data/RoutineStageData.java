@@ -97,7 +97,6 @@ public class RoutineStageData extends DynamicNodeStageData {
 	public PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
 		try {
 			PropertyWrapper<?> propertyWrapper = type.getWrapperClass().getConstructor().newInstance();
-			propertyWrapper.setType(type);
 			return propertyWrapper;
 		} catch (Exception e) {
 			e.printStackTrace();

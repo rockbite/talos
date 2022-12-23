@@ -29,4 +29,9 @@ public class PropertyColorWrapper extends PropertyWrapper<Color> {
     public void write(Json json) {
         super.write(json);
     }
+
+    @Override
+    public PropertyType getType() {
+        return PropertyType.COLOR;
+    }
 }

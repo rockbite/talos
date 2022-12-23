@@ -80,4 +80,10 @@ public class PropertyGameObjectWrapper extends PropertyWrapper<GameObject> {
         objectGOUUID = jsonData.getString("valueGO");
         defaultGOUuid = jsonData.getString("defaultGO");
     }
+
+    @Override
+    public PropertyType getType() {
+        // TODO: 12/23/2022 IMPLEMENT THIS TYPE
+        return null;
+    }
 }

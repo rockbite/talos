@@ -141,7 +141,9 @@ public abstract class PropertyWidget<T> extends Table {
 		event.fastChange = isFastChange;
 		Notifications.fireEvent(event);
 
-		topLevelPropertiesPanel.setIgnoringEvents(true);
+		if (topLevelPropertiesPanel != null) {
+			topLevelPropertiesPanel.setIgnoringEvents(true);
+		}
 		//Fire the component update that wont manipulate this properties panel
 
 		if (parent instanceof AComponent) {
@@ -160,11 +162,9 @@ public abstract class PropertyWidget<T> extends Table {
 			}
 		}
 
-		topLevelPropertiesPanel.setIgnoringEvents(false);
-
-
-
-
+		if (topLevelPropertiesPanel != null) {
+			topLevelPropertiesPanel.setIgnoringEvents(false);
+		}
 	}
 
 	protected boolean isFastChange (PropertyWidget<?> propertyWidget) {

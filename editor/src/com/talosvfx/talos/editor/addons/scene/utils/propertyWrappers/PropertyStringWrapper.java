@@ -22,4 +22,10 @@ public class PropertyStringWrapper extends PropertyWrapper<String> {
         json.writeValue("value", value);
         json.writeValue("defaultValue", defaultValue);
     }
+
+    @Override
+    public PropertyType getType() {
+        // TODO: 12/23/2022 IMPLEMENT TYPE
+        return null;
+    }
 }

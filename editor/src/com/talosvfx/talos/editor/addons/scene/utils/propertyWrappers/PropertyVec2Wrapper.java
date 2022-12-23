@@ -46,4 +46,10 @@ public class PropertyVec2Wrapper extends PropertyWrapper<Vector2> {
         json.writeValue("value", value);
         json.writeValue("defaultValue", defaultValue);
     }
+
+
+    @Override
+    public PropertyType getType() {
+        return PropertyType.VECTOR2;
+    }
 }

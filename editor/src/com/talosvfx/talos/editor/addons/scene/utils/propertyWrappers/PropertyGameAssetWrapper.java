@@ -8,4 +8,9 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>>{
     public GameAsset<?> parseValueFromString(String value) {
         return null;
     }
+
+    @Override
+    public PropertyType getType() {
+        return PropertyType.ASSET;
+    }
 }
