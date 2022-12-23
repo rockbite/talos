@@ -38,7 +38,6 @@ import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
@@ -484,19 +483,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameObject dummyParent = SceneUtils.createEmpty(currentContainer, new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
 
 		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-
-				logger.info("Redo reposition game object and restructure on group");
-//				for (GameObject gameObject : selectedObjects) {
-//					SceneEditorAddon.get().workspace.repositionGameObject(dummyParent, gameObject);
-//				}
-//
-//				SceneEditorAddon.get().hierarchy.restructureGameObjects(selectedObjects);
-//
-//				selectGameObjectExternally(dummyParent);
+		Gdx.app.postRunnable(() -> {
+			for (GameObject gameObject : selectedObjects) {
+				SceneUtils.repositionGameObject(rootGO, dummyParent, gameObject);
 			}
+
+			GameObjectsRestructured gameObjectsRestructured = Notifications.obtainEvent(GameObjectsRestructured.class);
+			gameObjectsRestructured.targets.addAll(selectedObjects);
+			Notifications.fireEvent(gameObjectsRestructured);
+
+			selectGameObjectExternally(dummyParent);
 		});
 	}
 
