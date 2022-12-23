@@ -62,14 +62,11 @@ public class DynamicNodeStageData implements Json.Serializable {
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
-		serialize(json, jsonData);
-	}
-
-	protected void serialize(Json json, JsonValue jsonData) {
 		jsonNodes = jsonData.get("list");
 		jsonConnections = jsonData.get("connections");
 		jsonGroups = jsonData.get("groups");
 	}
+
 
 	public <T extends DynamicNodeStageData> void constructForUI (DynamicNodeStage<T> dynamicNodeStage) {
 		NodeBoard<T> nodeBoard = dynamicNodeStage.getNodeBoard();

@@ -40,7 +40,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         updateListener = new GameAsset.GameAssetUpdateListener() {
             @Override
             public void onUpdate() {
-                routineInstance.loadFrom(RoutineRendererComponent.this.routineResource.getResource(), SharedResources.configData.getRoutineConfigMap());
+                RoutineInstance instance = RoutineRendererComponent.this.routineResource.getResource().createInstance(true);
+                routineInstance = instance;
             }
         };
     }
@@ -174,7 +175,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         this.routineResource = gameAsset;
         gameAsset.listeners.add(updateListener);
 
-        routineInstance = routineResource.getResource().createInstance();
+        routineInstance = routineResource.getResource().createInstance(true);
         updatePropertyWrappers(true);
     }
 

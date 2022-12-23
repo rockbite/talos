@@ -1101,7 +1101,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			if (component.routineInstance != null) {
 				if (routineAsset.equals(component.getGameResource())) {
 					RoutineStageData resource = routineAsset.getResource();
-					component.routineInstance = resource.createInstance();
+//					component.routineInstance = resource.createInstance();
 //					component.updatePropertyWrappers(true, routineAsset);
 					updatedComponents.add(component);
 				}

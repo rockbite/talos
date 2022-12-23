@@ -28,15 +28,8 @@ public class RoutineStageData extends DynamicNodeStageData {
 	@Override
 	public void read (Json json, JsonValue root) {
 		super.read(json, root);
-		//Construct the routine instance from data
-		routineInstance = createInstance();
-	}
-
-	@Override
-	protected void serialize(Json json, JsonValue jsonData) {
-		super.serialize(json, jsonData);
 		propertyWrappers.clear();
-		JsonValue propertiesJson = jsonData.get("propertyWrappers");
+		JsonValue propertiesJson = root.get("propertyWrappers");
 		if (propertiesJson != null) {
 			for (JsonValue propertyJson : propertiesJson) {
 				String className = propertyJson.getString("className", "");
@@ -54,7 +47,9 @@ public class RoutineStageData extends DynamicNodeStageData {
 			}
 		}
 
-		exposedPropertyIndex = jsonData.getInt("propertyWrapperIndex", 0);
+		exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
+		//Construct the routine instance from data
+		routineInstance = createInstance(false);
 	}
 
 	@Override
@@ -142,8 +137,15 @@ public class RoutineStageData extends DynamicNodeStageData {
 		}
 	}
 
-	public RoutineInstance createInstance () {
+	public RoutineInstance createInstance (boolean external) {
 		RoutineInstance routine = new RoutineInstance();
+		if (external) {
+			Json json = new Json();
+			String jsonData = json.prettyPrint(this);
+			JsonReader jsonReader = new JsonReader();
+			JsonValue parse = jsonReader.parse(jsonData);
+			read(json, parse);
+		}
 		routine.loadFrom(this, SharedResources.configData.getRoutineConfigMap());
 		return routine;
 	}
