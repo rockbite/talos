@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -177,17 +178,8 @@ public class VariableCreationWindow extends Table {
 
             @Override
             public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                temp.set(x, y);
-                // x and y are in routineStageWrapper's local coordinate system
-                // we need to convert them to nodeBoard's stage coordinate
 
-                GenericStageWrappedViewportWidget routineStageWrapper = routineStage.routineEditorApp.routineStageWrapper;
-                routineStageWrapper.localToScreenCoordinates(temp);
-                NodeBoard nodeBoard = routineStage.getNodeBoard();
-                nodeBoard.screenToLocalCoordinates(temp);
-                nodeBoard.localToStageCoordinates(temp);
-
-                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", temp.x, temp.y));
+                RoutineExposedVariableNodeWidget exposedVariable = ((RoutineExposedVariableNodeWidget) routineStage.createNode("ExposedVariableNode", Gdx.input.getX(), Gdx.input.getY()));
                 PropertyWrapper<?> propertyWrapper = (PropertyWrapper<?>) payload.getObject();
                 if (exposedVariable != null) {
                     NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
