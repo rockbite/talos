@@ -14,7 +14,7 @@ import lombok.Getter;
 public class PreferencesWindow extends Table {
     private ScrollPane scrollPane;
     public PreferencesWindow() {
-        setSize(500, 500);
+        setSize(660, 540);
         setPosition(300, 300);
 
         final Table titleSegment = constructTitleSegment();

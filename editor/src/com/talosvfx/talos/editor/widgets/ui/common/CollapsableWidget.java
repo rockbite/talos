@@ -2,10 +2,10 @@ package com.talosvfx.talos.editor.widgets.ui.common;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class CollapsableWidget extends Table {
@@ -15,11 +15,11 @@ public class CollapsableWidget extends Table {
 
     private boolean isCollapsed = true;
 
-    public CollapsableWidget () {
+    public CollapsableWidget (String title) {
         pad(5, 10, 5, 8).top();
         setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
 
-        topSegment = constructTopSegment();
+        topSegment = constructTopSegment(title);
         content = constructContent();
 
         add(topSegment).growX();
@@ -27,22 +27,24 @@ public class CollapsableWidget extends Table {
         contentCell = add().grow();
     }
 
-    public Table constructTopSegment () {
-        final Image collapseButton = new Image(SharedResources.skin.getDrawable("white"));
-        final Label widgetLabel = new Label("Display", SharedResources.skin, "small");
-
-        collapseButton.addListener(new ClickListener() {
+    public Table constructTopSegment (String title) {
+        final CustomVarWidget.ArrowButton arrowButton = new CustomVarWidget.ArrowButton(false);
+        arrowButton.getCell(arrowButton.getArrowIcon()).pad(0);
+        arrowButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 isCollapsed = !isCollapsed;
                 contentCell.setActor(isCollapsed ? null : content);
+                arrowButton.toggle();
             }
         });
 
+        final Label widgetLabel = new Label(title, SharedResources.skin, "small");
+
         final Table topSegment = new Table();
         topSegment.defaults().space(6);
-        topSegment.add(collapseButton).size(10);
+        topSegment.add(arrowButton);
         topSegment.add(widgetLabel).expand().left();
         return topSegment;
     }

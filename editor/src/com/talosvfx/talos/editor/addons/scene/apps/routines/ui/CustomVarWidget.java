@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
+import lombok.Setter;
 
 public class CustomVarWidget extends Table {
 
@@ -63,13 +64,19 @@ public class CustomVarWidget extends Table {
         init(SharedResources.skin);
     }
 
-    class ArrowButton extends Table {
+    public static class ArrowButton extends Table {
         private final ClickListener clickListener;
+        @Getter
         private final Image arrowIcon;
 
         private boolean isCollapsed = true;
+        public boolean hasBackground;
 
-        public ArrowButton() {
+        public ArrowButton () {
+            this(true);
+        }
+        public ArrowButton(boolean hasBackground) {
+            this.hasBackground = hasBackground;
             arrowIcon = new Image();
             arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-right"));
             arrowIcon.setTouchable(Touchable.enabled);
@@ -106,12 +113,14 @@ public class CustomVarWidget extends Table {
         public void act(float delta) {
             super.act(delta);
 
-            ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.BRIGHT_GRAY;
-            if(!clickListener.isOver()) {
-                color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+            if (hasBackground) {
+                // change background if mouse is over
+                ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.BRIGHT_GRAY;
+                if(!clickListener.isOver()) {
+                    color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+                }
+                setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUARE, color));
             }
-
-            setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUARE, color));
         }
     }
 
