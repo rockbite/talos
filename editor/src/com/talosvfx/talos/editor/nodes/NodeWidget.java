@@ -162,7 +162,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         setMovable(true);
         setResizable(false);
 
-        addCaptureListener(new InputListener() {
+        addListener(new InputListener() {
 
             Vector2 tmp = new Vector2();
             Vector2 prev = new Vector2();

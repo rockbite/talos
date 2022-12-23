@@ -86,6 +86,19 @@ public class VariableCreationWindow extends Table {
         add(topBar).growX();
         row();
         contentCell = add(content).grow();
+
+        addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+               event.stop();
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                event.stop();
+            }
+        });
     }
 
     public void reloadWidgets() {
