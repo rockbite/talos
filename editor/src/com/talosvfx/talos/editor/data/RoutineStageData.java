@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyTyp
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import lombok.Data;
 
 @Data

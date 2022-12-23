@@ -272,9 +272,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	private boolean segmentHit (Vector2 p1, Vector2 p2) {
 
-		vec3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-//        nodeStage.getCamera().unproject(vec3);
-		tmp3.set(vec3.x, vec3.y);
+		tmp2.set(Gdx.input.getX(), Gdx.input.getY());
+		screenToLocalCoordinates(tmp2);
+		tmp3.set(tmp2.x, tmp2.y);
 
 		float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
 
@@ -285,11 +285,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return false;
 	}
 
-	public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {
+	public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float screenX, float screenY) {
 		NodeWidget node = null;
 		try {
-			tmp2.set(x, y);
-			stageToLocalCoordinates(tmp2);
+			tmp2.set(screenX, screenY);
+			screenToLocalCoordinates(tmp2);
 
 			node = ClassReflection.newInstance(clazz);
 			node.init(skin, this);

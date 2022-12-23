@@ -59,7 +59,7 @@ public class RoutineInstance {
 
         IntMap<RoutineNode> idMap = new IntMap<>();
 
-        String nodePackageName = "com.talosvfx.talos.editor.addons.scene.apps.tween.runtime.nodes.";
+        String nodePackageName = "com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.";
         for(JsonValue nodeData: list) {
             String nodeName = nodeData.getString("name");
             int id = nodeData.getInt("id");
@@ -80,7 +80,7 @@ public class RoutineInstance {
 
                 idMap.put(id, routineNode);
             } catch (ReflectionException e) {
-                //throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
 

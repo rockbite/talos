@@ -216,6 +216,9 @@ public abstract class RoutineNode {
         Port port = inputs.get(key);
 
         if(port.connections.isEmpty()) {
+            if (port.valueOverride == null) {
+                return null;
+            }
             if (port.valueOverride instanceof GameAsset) {
                 return (GameAsset) (port.valueOverride);
             } else {

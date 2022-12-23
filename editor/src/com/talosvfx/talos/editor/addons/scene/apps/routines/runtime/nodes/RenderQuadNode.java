@@ -25,6 +25,9 @@ public class RenderQuadNode extends RoutineNode {
         drawableQuad.size.set(width, height);
 
         GameAsset<Texture> asset = fetchAssetValue("sprite");
+        if (asset == null) {
+            return;
+        }
         Texture resource = asset.getResource();
         drawableQuad.texture = resource;
 

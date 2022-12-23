@@ -68,13 +68,13 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    public NodeWidget createNode (String nodeName, float x, float y) {
+    public NodeWidget createNode (String nodeName, float screenX, float screenY) {
 
         if(!nodeName.equals("ColorOutput")) {
-            return super.createNode(nodeName, x, y);
+            return super.createNode(nodeName, screenX, screenY);
         } else {
             if(colorOutput == null) {
-                NodeWidget node = super.createNode(nodeName, x, y);
+                NodeWidget node = super.createNode(nodeName, screenX, screenY);
                 colorOutput = (ColorOutput) node;
                 return node;
             }
