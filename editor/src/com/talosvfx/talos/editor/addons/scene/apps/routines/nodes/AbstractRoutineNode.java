@@ -36,8 +36,9 @@ public abstract class AbstractRoutineNode extends NodeWidget {
         super.read(json, jsonValue);
 
         JsonValue properties = jsonValue.get("properties");
-
-        for(String name: widgetMap.keys()) {
+        Array<String> keys = widgetMap.keys().toArray();
+        for (int i = 0; i < keys.size; i++) {
+            String name = keys.get(i);
             JsonValue value = properties.get(name);
 
             if (value != null) {

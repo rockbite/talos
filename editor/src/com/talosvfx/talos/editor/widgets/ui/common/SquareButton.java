@@ -11,7 +11,6 @@ public class SquareButton extends Button {
 
     public SquareButton(Skin skin, Drawable drawable, String tooltip) {
         build(skin, drawable, false);
-        //addListener(new TextTooltip(tooltip, skin)); //bring this back when it works well
     }
 
     public SquareButton(Skin skin, Label label, String tooltip) {
@@ -22,13 +21,10 @@ public class SquareButton extends Button {
         label.setAlignment(Align.center);
 
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
-
-        addListener(new TextTooltip(tooltip, skin));
     }
 
     public SquareButton(Skin skin, Drawable drawable, boolean toggle, String tooltip) {
         build(skin, drawable, toggle);
-        addListener(new TextTooltip(tooltip, skin));
     }
 
     private void build(Skin skin, Drawable drawable, boolean toggle) {
