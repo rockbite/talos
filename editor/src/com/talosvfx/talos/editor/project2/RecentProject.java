@@ -10,6 +10,6 @@ public class RecentProject implements Comparable<RecentProject> {
 
 	@Override
 	public int compareTo (RecentProject o) {
-		return Long.compare(saveTime, o.saveTime);
+		return -Long.compare(saveTime, o.saveTime);
 	}
 }

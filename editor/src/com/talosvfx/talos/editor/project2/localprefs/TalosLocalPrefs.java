@@ -89,6 +89,21 @@ public class TalosLocalPrefs {
 
 
 	public Array<RecentProject> getRecentProjects () {
+
+		// reevaluate this list
+		boolean listUpdated = false;
+		for(int i = localPrefData.recentProjects.size - 1; i >= 0; i--) {
+			RecentProject recentProject = localPrefData.recentProjects.get(i);
+			if(!Gdx.files.absolute(recentProject.getProjectPath()).exists()) {
+				localPrefData.recentProjects.removeIndex(i);
+				listUpdated = true;
+			}
+		}
+
+		if(listUpdated) {
+			save();
+		}
+
 		localPrefData.recentProjects.sort();
 		return localPrefData.recentProjects;
 	}
