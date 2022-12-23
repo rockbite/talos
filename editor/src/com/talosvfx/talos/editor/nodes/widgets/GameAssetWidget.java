@@ -31,6 +31,7 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
         widget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                gameAsset = widget.getValue();
                 fireChangedEvent();
             }
         });
