@@ -36,6 +36,7 @@ public class CollapsableWidget extends Table {
         final Label widgetLabel = new Label(title, SharedResources.skin, "small");
 
         final Table topSegment = new Table();
+        // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
         topSegment.pad(5, 10, 5, 8);
         // make top segment collapse and open instead of icon, so it was more comfortable to click
         topSegment.setTouchable(Touchable.enabled);
