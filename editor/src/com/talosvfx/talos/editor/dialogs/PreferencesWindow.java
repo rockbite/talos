@@ -1,14 +1,18 @@
 package com.talosvfx.talos.editor.dialogs;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.editor.dialogs.preference.tabs.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import lombok.Getter;
 
 public class PreferencesWindow extends Table {
+    private ScrollPane scrollPane;
     public PreferencesWindow() {
         setSize(500, 500);
         setPosition(300, 300);
@@ -25,7 +29,7 @@ public class PreferencesWindow extends Table {
     private Table constructTitleSegment () {
         final Label titleLabel = new Label("Preferences", SharedResources.skin);
         final Table titleSegment = new Table();
-        titleSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
+        titleSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY));
         titleSegment.add(titleLabel).expandX().height(25);
         return titleSegment;
     }
@@ -38,10 +42,10 @@ public class PreferencesWindow extends Table {
         // left part where tabs are displayed
         final Table tabsSegment = constructTabsSegment();
         // right part where info of the tabs are displayed
-        final Table tabInfo = new Table();
+        scrollPane = new ScrollPane(null);
 
         contentSegment.add(tabsSegment).growY().width(160);
-        contentSegment.add(tabInfo).grow();
+        contentSegment.add(scrollPane).grow();
         return contentSegment;
     }
 
@@ -50,31 +54,38 @@ public class PreferencesWindow extends Table {
         tabsSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
 
         final VerticalTabGroup tabsContent = new VerticalTabGroup();
+        tabsContent.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                scrollPane.setActor(tabsContent.getSelectedTab().getContent());
+            }
+        });
+
         final ScrollPane scrollPane = new ScrollPane(tabsContent);
 
         tabsContent.startGroup();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
+        tabsContent.addTab("Interface", new InterfaceTabContent());
+        tabsContent.addTab("Themes", null);
+        tabsContent.addTab("Viewport", null);
+        tabsContent.addTab("Lights", null);
+        tabsContent.addTab("Editing", null);
+        tabsContent.addTab("Animation", null);
         tabsContent.endGroup();
 
         tabsContent.startGroup();
-        tabsContent.addTab();
+        tabsContent.addTab("Add-ons", new AddOnsTabContent());
         tabsContent.endGroup();
 
         tabsContent.startGroup();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
+        tabsContent.addTab("Input", null);
+        tabsContent.addTab("Navigation", null);
+        tabsContent.addTab("Keymap", new KeymapTabContent());
         tabsContent.endGroup();
 
         tabsContent.startGroup();
-        tabsContent.addTab();
-        tabsContent.addTab();
-        tabsContent.addTab();
+        tabsContent.addTab("System", new SystemTabContent());
+        tabsContent.addTab("Save & Load", new SaveAndLoadTabContent());
+        tabsContent.addTab("File Paths", new FilePathsTabContent());
         tabsContent.endGroup();
 
         tabsSegment.add(scrollPane).pad(9).growX();
@@ -85,27 +96,34 @@ public class PreferencesWindow extends Table {
     }
 
     public class VerticalTabGroup extends Table {
-        private int nextTabAlignment;
         private boolean startGroup;
 
         private final int breakSpace = 8;
         private final int minSpace = 1;
 
-        private VerticalTab lastSelectedTab;
+        @Getter
+        private VerticalTab selectedTab;
 
         public VerticalTabGroup () {
             defaults().height(25).growX();
         }
 
-        public void addTab () {
-            final VerticalTab tab = new VerticalTab();
+        public void addTab (String title, PreferenceTabContent preferenceTabContent) {
+            final VerticalTab tab = new VerticalTab(title, preferenceTabContent);
             tab.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    if (lastSelectedTab != null) lastSelectedTab.deselect();
+                    if (tab == selectedTab) return;
+
+                    if (selectedTab != null) selectedTab.deselect();
                     tab.select();
-                    lastSelectedTab = tab;
+                    selectedTab = tab;
+
+                    // fire change event
+                    final ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+                    fire(changeEvent);
+                    Pools.free(changeEvent);
                 }
             });
 
@@ -138,10 +156,25 @@ public class PreferencesWindow extends Table {
         private ColorLibrary.BackgroundColor selectedBackgroundColor = ColorLibrary.BackgroundColor.LIGHT_BLUE;
 
         private boolean selected;
+        @Getter
+        private final PreferenceTabContent content;
 
-        public VerticalTab () {
+        public VerticalTab (String title, PreferenceTabContent content) {
+            this.content = content;
+
+            construct(title);
+            addListeners();
+
             updateBackground();
+        }
 
+        private void construct (String title) {
+            final Label titleLabel = new Label(title, SharedResources.skin, "small");
+            titleLabel.setAlignment(Align.left);
+            add(titleLabel).expandX().left().padLeft(8);
+        }
+
+        private void addListeners () {
             addListener(new ClickListener() {
                 @Override
                 public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {

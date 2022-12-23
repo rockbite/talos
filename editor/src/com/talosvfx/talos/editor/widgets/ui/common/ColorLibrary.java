@@ -43,6 +43,7 @@ public class ColorLibrary {
         MID_GRAY ("#434343"),
         DARK_GRAY ("#3a3a3a"),
         SUPER_DARK_GRAY ("#2a2a2a"),
+        ULTRA_DARK_GRAY ("#242626"),
         BLACK_TRANSPARENT ("#2a2a2add"),
         RED ("#92313a"),
         // fifty shades of grey :D
