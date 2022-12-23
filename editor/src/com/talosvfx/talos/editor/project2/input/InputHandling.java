@@ -5,13 +5,14 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class InputHandling {
 
-	private Array<InputProcessor> permanentInputProcessors = new Array<>();
+	private ObjectSet<InputProcessor> permanentInputProcessors = new ObjectSet<>();
 
-	private Array<InputProcessor> temporaryInputProcessors = new Array<>();
-	private Array<InputProcessor> priorityInputProcessors = new Array<>();
+	private ObjectSet<InputProcessor> temporaryInputProcessors = new ObjectSet<>();
+	private ObjectSet<InputProcessor> priorityInputProcessors = new ObjectSet<>();
 
 	private InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
@@ -31,7 +32,7 @@ public class InputHandling {
 		temporaryInputProcessors.add(inputProcessor);
 	}
 	public void removeTemporaryInputProcessor (InputProcessor inputProcessor) {
-		temporaryInputProcessors.removeValue(inputProcessor, true);
+		temporaryInputProcessors.remove(inputProcessor);
 	}
 	public void setGDXMultiPlexer () {
 		inputMultiplexer.clear();
@@ -56,6 +57,6 @@ public class InputHandling {
 	}
 
 	public void removePriorityInputProcessor (InputProcessor inputProcessor) {
-		priorityInputProcessors.removeValue(inputProcessor, true);
+		priorityInputProcessors.remove(inputProcessor);
 	}
 }
