@@ -30,6 +30,8 @@ public class WidgetFactory {
                 return generateForGameObject((PropertyGameObjectWrapper) wrapper);
             } else if (wrapper instanceof PropertyVec2Wrapper) {
                 return generateForVector2(wrapper, value, null, wrapper.propertyName);
+            } else if (wrapper instanceof PropertyColorWrapper) {
+                return generateForColor(wrapper, value, null, wrapper.propertyName);
             }
 
         } catch (NoSuchFieldException e) {
