@@ -127,12 +127,15 @@ public class GlobalDragAndDrop {
 
 		InputEvent obtain = Pools.obtain(InputEvent.class);
 		obtain.setStage(SharedResources.stage);
+		obtain.setStageX(screenCoords.x);
+		obtain.setStageY(screenCoords.y);
+		obtain.setType(InputEvent.Type.touchUp);
 
 		int dragTime = dragAndDrop.getDragTime();
 		dragAndDrop.setDragTime(0);
-		dragListener.dragStart(obtain, 0, 0, 0);
-		dragListener.drag(obtain, 0, 0, 0);
-		dragListener.dragStop(obtain, 0, 0, 0);
+		dragListener.dragStart(obtain, screenCoords.x, screenCoords.y, 0);
+		dragListener.drag(obtain, screenCoords.x, screenCoords.y, 0);
+		dragListener.dragStop(obtain, screenCoords.x, screenCoords.y, 0);
 
 		dragAndDrop.setDragTime(dragTime);
 		Pools.free(obtain);
