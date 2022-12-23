@@ -25,6 +25,8 @@ public class RoutineStageData extends DynamicNodeStageData {
 
 	private Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
+	private transient boolean canWrite;
+
 	@Override
 	public void read (Json json, JsonValue root) {
 		super.read(json, root);
@@ -56,6 +58,7 @@ public class RoutineStageData extends DynamicNodeStageData {
 	public <T extends DynamicNodeStageData> void constructForUI (DynamicNodeStage<T> dynamicNodeStage) {
 		super.constructForUI(dynamicNodeStage);
 
+		canWrite = true;
 		for (NodeWidget node : nodes) {
 			if (node instanceof RoutineExposedVariableNodeWidget) {
 				((RoutineExposedVariableNodeWidget) node).update(getPropertyWrapperWithIndex(((RoutineExposedVariableNodeWidget) node).index));
@@ -139,7 +142,7 @@ public class RoutineStageData extends DynamicNodeStageData {
 
 	public RoutineInstance createInstance (boolean external) {
 		RoutineInstance routine = new RoutineInstance();
-		if (external) {
+		if (external && canWrite) {
 			Json json = new Json();
 			String jsonData = json.prettyPrint(this);
 			JsonReader jsonReader = new JsonReader();
