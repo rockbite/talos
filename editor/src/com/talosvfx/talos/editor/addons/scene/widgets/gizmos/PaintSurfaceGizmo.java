@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,10 +12,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.components.PaintSurfaceComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
@@ -29,6 +33,8 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     private FrameBuffer frameBuffer;
     private Batch innerBatch;
+
+    private Vector2 mouseCordsOnScene = new Vector2();
 
     public PaintSurfaceGizmo() {
         if (paintToolsPane == null) {
@@ -56,19 +62,20 @@ public class PaintSurfaceGizmo extends Gizmo {
 
                 // time to draw the bush
                 if(!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    // TODO: 20.12.22 FIX SCENEEDITORADDON
-//                    Vector2 mouseCordsOnScene = SceneEditorAddon.get().workspace.getMouseCordsOnScene();
-//                    batch.end();
-//                    color.set(Color.WHITE);
-//                    color.a = 0.1f;
-//                    shapeRenderer.setColor(color);
-//                    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-//                    Gdx.gl.glEnable(GL20.GL_BLEND);
-//                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//                    drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
-//                    shapeRenderer.end();
-//                    Gdx.gl.glDisable(GL20.GL_BLEND);
-//                    batch.begin();
+                    //mouseCordsOnScene.set(SceneEditorAddon.get().workspace.getMouseCordsOnScene());
+                    mouseCordsOnScene.set(0, 0);
+
+                    batch.end();
+                    color.set(Color.WHITE);
+                    color.a = 0.1f;
+                    shapeRenderer.setColor(color);
+                    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                    Gdx.gl.glEnable(GL20.GL_BLEND);
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
+                    shapeRenderer.end();
+                    Gdx.gl.glDisable(GL20.GL_BLEND);
+                    batch.begin();
                 }
             }
         }
@@ -90,42 +97,45 @@ public class PaintSurfaceGizmo extends Gizmo {
     }
 
     private void drawBrushToBuffer() {
-        // TODO: 20.12.22 FIX SCENEEDITORADDON
-//        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-//        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-//        // figure out mouse pos on the texture
-//        Vector2 mouseCordsOnScene = SceneEditorAddon.get().workspace.getMouseCordsOnScene();
-//        tmp.set(transformComponent.position).sub(surface.size.x/2f, surface.size.y/2f).sub(mouseCordsOnScene).scl(-1);
-//
-//        frameBuffer.begin();
-//        innerBatch.begin();
-//
-//        if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
-//            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_REVERSE_SUBTRACT);
-//            innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-//        } else {
-//            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
-//            innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
-//        }
-//
-//        innerBatch.draw(brushTexture,
-//                tmp.x - brushTexture.getWidth()/2f, 400 - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
-//
-//        innerBatch.end();
-//
-//        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
-//
-//        frameBuffer.end();
-//        String path = surface.gameAsset.dependentRawAssets.first().handle.path();
-//        FileHandle handle = Gdx.files.absolute(path);
-//
-//        PixmapIO.writePNG(handle, pixmap);
-//        pixmap.dispose();
-//        Texture texture = new Texture(handle);
-//
-//        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-//        surface.gameAsset.setResourcePayload(texture);
-//        surface.gameAsset.setUpdated();
+
+        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        // figure out mouse pos on the texture
+
+        //mouseCordsOnScene.set(SceneEditorAddon.get().workspace.getMouseCordsOnScene());
+        mouseCordsOnScene.set(0, 0);
+
+        tmp.set(transformComponent.position).sub(surface.size.x/2f, surface.size.y/2f).sub(mouseCordsOnScene).scl(-1);
+
+        frameBuffer.begin();
+        innerBatch.begin();
+
+        if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_REVERSE_SUBTRACT);
+            innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        } else {
+            Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
+            innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        }
+
+        innerBatch.draw(brushTexture,
+                tmp.x - brushTexture.getWidth()/2f, 400 - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
+
+        innerBatch.end();
+
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
+
+        frameBuffer.end();
+        String path = surface.gameAsset.dependentRawAssets.first().handle.path();
+        FileHandle handle = Gdx.files.absolute(path);
+
+        PixmapIO.writePNG(handle, pixmap);
+        pixmap.dispose();
+        Texture texture = new Texture(handle);
+
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        surface.gameAsset.setResourcePayload(texture);
+        surface.gameAsset.setUpdated();
     }
 
     @Override
@@ -261,25 +271,23 @@ public class PaintSurfaceGizmo extends Gizmo {
     public void setSelected (boolean selected) {
         super.setSelected(selected);
 
-        // TODO: 20.12.22 FIX SCENEEDITORADDON
-//        if (selected) {
-//            Stage stage = SharedResources.stage;
-//            stage.addActor(paintToolsPane);
-//            paintToolsPane.setFrom(gameObject);
-//
-//            SceneEditorAddon.get().workspace.panRequiresSpace(true);
-//
-//            stage.setKeyboardFocus(this);
-//        } else {
-//            paintToolsPane.remove();
-//            SceneEditorAddon.get().workspace.panRequiresSpace(false);
-//        }
+        if (selected) {
+            Stage stage = SharedResources.stage;
+            stage.addActor(paintToolsPane);
+            paintToolsPane.setFrom(gameObject);
+
+            //SceneEditorAddon.get().workspace.panRequiresSpace(true);
+
+            stage.setKeyboardFocus(this);
+        } else {
+            paintToolsPane.remove();
+            //SceneEditorAddon.get().workspace.panRequiresSpace(false);
+        }
     }
 
     @Override
     public void notifyRemove () {
-        // TODO: 20.12.22 FIX SCENEEDITORADDON
-//        SceneEditorAddon.get().workspace.panRequiresSpace(false);
+        //SceneEditorAddon.get().workspace.panRequiresSpace(false);
         paintToolsPane.remove();
     }
 }
