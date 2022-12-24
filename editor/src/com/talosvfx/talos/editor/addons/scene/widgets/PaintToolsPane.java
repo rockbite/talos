@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class PaintToolsPane extends Table implements Observer {
@@ -48,7 +49,7 @@ public class PaintToolsPane extends Table implements Observer {
         this.paintSurfaceGizmo = paintSurfaceGizmo;
         Notifications.registerObserver(this);
 
-        setSkin(TalosMain.Instance().getSkin());
+        setSkin(SharedResources.skin);
 
         paint = new SquareButton(getSkin(), getSkin().getDrawable("brush_icon"), true, "Paintbrush");
         erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
@@ -62,7 +63,7 @@ public class PaintToolsPane extends Table implements Observer {
         add(erase).padRight(10).size(37);
 
         colorWidget = new ColorWidget();
-        colorWidget.init(TalosMain.Instance().getSkin(), null);
+        colorWidget.init(SharedResources.skin, null);
         colorWidget.setColor(Color.WHITE);
         add(colorWidget).padRight(10);
 
@@ -152,7 +153,7 @@ public class PaintToolsPane extends Table implements Observer {
 
 
     private ValueWidget createFloatWidget(String name, float min, float max, float value) {
-        ValueWidget hardnessWidget = new ValueWidget(TalosMain.Instance().getSkin());
+        ValueWidget hardnessWidget = new ValueWidget(SharedResources.skin);
         hardnessWidget.setRange(min, max);
         hardnessWidget.setStep(1);
         hardnessWidget.setValue(value);

@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.logic.components.PaintSurfaceComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class PaintSurfaceGizmo extends Gizmo {
 
@@ -129,7 +130,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void touchDown(float x, float y, int button) {
-        TalosMain.Instance().UIStage().getStage().setKeyboardFocus(this);
+        SharedResources.stage.setKeyboardFocus(this);
 
         if(brushTexture == null) {
             createBrushTexture();
@@ -262,7 +263,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         // TODO: 20.12.22 FIX SCENEEDITORADDON
 //        if (selected) {
-//            Stage stage = TalosMain.Instance().UIStage().getStage();
+//            Stage stage = SharedResources.stage;
 //            stage.addActor(paintToolsPane);
 //            paintToolsPane.setFrom(gameObject);
 //

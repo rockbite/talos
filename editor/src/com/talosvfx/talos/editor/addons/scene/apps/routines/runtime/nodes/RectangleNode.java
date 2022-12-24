@@ -5,10 +5,20 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 
 public class RectangleNode extends RoutineNode {
 
+    Vector2 pos = new Vector2();
+    Vector2 size = new Vector2();
+
     @Override
     public Object queryValue(String targetPortName) {
-        Vector2 pos = fetchVector2Value("center");
-        Vector2 size = fetchVector2Value("size");
+        Vector2 posGet = fetchVector2Value("center");
+        Vector2 sizeGet = fetchVector2Value("size");
+
+        if(posGet != null) {
+            pos.set(posGet);
+        }
+        if(sizeGet != null) {
+            size.set(sizeGet);
+        }
 
         if(targetPortName.equals("left")) {
             return  pos.x - size.x/2f;
