@@ -29,6 +29,11 @@
         <menu name="undo" title="Undo"/>
         <menu name="redo" title="Redo"/>
         <separator/>
+        <menu name="cut" title="Cut" />
+        <menu name="copy" title="Copy" />
+        <menu name="paste" title="Paste" />
+        <menu name="delete" title="Delete" />
+        <separator/>
         <menu name="preferences" title="Preferences"/>
     </menu>
     <menu name="window" title="Window">
