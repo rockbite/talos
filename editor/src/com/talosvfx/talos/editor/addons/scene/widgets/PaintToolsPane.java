@@ -173,10 +173,8 @@ public class PaintToolsPane extends Table implements Observer {
 
         Vector2 vec = Pools.get(Vector2.class).obtain();
 
-        Actor workspace = getParent();
+        setPosition(25, getParent().getHeight() - getHeight() - 25);
 
-        workspace.localToStageCoordinates(vec.set(0, workspace.getHeight()));
-        setPosition(vec.x + 25, vec.y - getHeight() - 25);
         Pools.get(Vector2.class).free(vec);
 
         if(bracketDown > 0) {

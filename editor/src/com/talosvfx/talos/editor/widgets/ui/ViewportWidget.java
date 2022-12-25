@@ -1308,4 +1308,11 @@ public abstract class ViewportWidget extends Table {
 
 
 	}
+
+	public Vector2 getMouseCordsOnScene () {
+		final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+		this.screenToLocalCoordinates(vec);
+		Vector2 local = getWorldFromLocal(vec.x, vec.y);
+		return local;
+	}
 }

@@ -759,6 +759,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				addToSelection(gameObject);
 			}
 
+			//todo: mm, why? i don't think it should trigger save
 			logger.info("Paste shuld trigger a save too, pasted event that goes through SceneUtils is the way to do this");
 
 //			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
@@ -1229,13 +1230,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		} else {
 			return super.getRootSceneObject();
 		}
-	}
-
-	public Vector2 getMouseCordsOnScene () {
-		final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-		this.screenToLocalCoordinates(vec);
-		Vector2 local = getWorldFromLocal(vec.x, vec.y);
-		return local;
 	}
 
 	public void loadFromScene (GameAsset<Scene> scene) {

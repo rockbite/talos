@@ -62,8 +62,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
                 // time to draw the bush
                 if(!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    //mouseCordsOnScene.set(SceneEditorAddon.get().workspace.getMouseCordsOnScene());
-                    mouseCordsOnScene.set(0, 0);
+                    mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
                     batch.end();
                     color.set(Color.WHITE);
@@ -102,8 +101,7 @@ public class PaintSurfaceGizmo extends Gizmo {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         // figure out mouse pos on the texture
 
-        //mouseCordsOnScene.set(SceneEditorAddon.get().workspace.getMouseCordsOnScene());
-        mouseCordsOnScene.set(0, 0);
+        mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
         tmp.set(transformComponent.position).sub(surface.size.x/2f, surface.size.y/2f).sub(mouseCordsOnScene).scl(-1);
 
@@ -272,22 +270,19 @@ public class PaintSurfaceGizmo extends Gizmo {
         super.setSelected(selected);
 
         if (selected) {
-            Stage stage = SharedResources.stage;
-            stage.addActor(paintToolsPane);
+            viewport.addActor(paintToolsPane);
             paintToolsPane.setFrom(gameObject);
 
-            //SceneEditorAddon.get().workspace.panRequiresSpace(true);
-
-            stage.setKeyboardFocus(this);
+            viewport.panRequiresSpace(true);
         } else {
             paintToolsPane.remove();
-            //SceneEditorAddon.get().workspace.panRequiresSpace(false);
+            viewport.panRequiresSpace(false);
         }
     }
 
     @Override
     public void notifyRemove () {
-        //SceneEditorAddon.get().workspace.panRequiresSpace(false);
+        viewport.panRequiresSpace(false);
         paintToolsPane.remove();
     }
 }
