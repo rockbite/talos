@@ -357,13 +357,9 @@ public class SEPropertyPanel extends PropertyPanel {
 
                                     logger.info("Reimplement create script and register");
 
-                                    FileHandle rootProjectDir = SharedResources.currentProject.rootProjectDir();
 
                                     //Sugggest to put it in scripts
-                                    FileHandle suggestedScriptsFolder = rootProjectDir.child("scripts");
-                                    if (!suggestedScriptsFolder.exists()) {
-                                        suggestedScriptsFolder.mkdirs();
-                                    }
+                                    FileHandle suggestedScriptsFolder = SceneUtils.getContextualFolderToCreateFile();
 
 //
                                     FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(suggestedScriptsFolder.path(), newFileName, "ts");
@@ -378,6 +374,8 @@ public class SEPropertyPanel extends PropertyPanel {
                                     GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScriptDestination, false);
 
                                     if (assetForPath != null) {
+
+                                        Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(suggestedScriptsFolder.path()));
 
                                         ScriptComponent scriptComponent = new ScriptComponent();
                                         scriptComponent.setGameAsset((GameAsset<String>)assetForPath);
@@ -405,14 +403,7 @@ public class SEPropertyPanel extends PropertyPanel {
                                     // todo: but i want to ask explorer of it's current selected folder
                                     // check if project explorer is open and has a directory selected
                                     // if it does not use root root project dir
-                                    FileHandle assetDir = null;
-                                    ProjectExplorerApp projectExplorerApp = SharedResources.appManager.getSingletonAppInstance(ProjectExplorerApp.class);
-                                    if(projectExplorerApp != null) {
-                                        assetDir = projectExplorerApp.getCurrentSelectedFolder();
-                                    }
-                                    if(assetDir == null) {
-                                        assetDir = SharedResources.currentProject.rootProjectDir();
-                                    }
+                                    FileHandle assetDir = SceneUtils.getContextualFolderToCreateFile();
 
                                     FileHandle newDestination = AssetImporter.suggestNewNameForFileHandle(assetDir.path(), newFileName, GameAssetType.ROUTINE.getExtensions().first());
                                     newDestination.writeString("{}", false);

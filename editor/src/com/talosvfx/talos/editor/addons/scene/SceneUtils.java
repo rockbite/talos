@@ -24,7 +24,9 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererCom
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
@@ -309,9 +311,24 @@ public class SceneUtils {
 		}
 	}
 
+	public static FileHandle getContextualFolderToCreateFile() {
+		FileHandle assetDir = null;
+		ProjectExplorerApp projectExplorerApp = SharedResources.appManager.getSingletonAppInstance(ProjectExplorerApp.class);
+		if(projectExplorerApp != null) {
+			assetDir = projectExplorerApp.getCurrentSelectedFolder();
+		}
+		if(assetDir == null) {
+			assetDir = SharedResources.currentProject.rootProjectDir();
+		}
+
+		return assetDir;
+	}
+
 	public static void convertToPrefab (GameObject gameObject) {
 		FileHandle root = SharedResources.currentProject.rootProjectDir();
-		FileHandle prefabs = root.child("prefabs");
+
+		FileHandle prefabs = getContextualFolderToCreateFile();
+
 		FileHandle[] children = prefabs.list();
 		List<String> names = Arrays.stream(children).map((FileHandle child) -> child.name()).collect(Collectors.toList());
 		String name = gameObject.getName() + ".prefab";
@@ -326,6 +343,8 @@ public class SceneUtils {
 
 		prefabHandle.writeString(prefab.getAsString(), false);
 		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);
+
+		Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(prefabs.path()));
 	}
 
 }
