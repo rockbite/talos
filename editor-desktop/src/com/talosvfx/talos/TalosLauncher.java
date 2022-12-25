@@ -24,14 +24,14 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
-import com.talosvfx.talos.editor.UIStage;
-import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.dialogs.AWindowDialog;
 import com.talosvfx.talos.editor.dialogs.IWindowDialog;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
@@ -44,7 +44,11 @@ import org.lwjgl.glfw.GLFWDropCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class TalosLauncher {
+public class TalosLauncher implements ILauncher {
+
+	public Array<Lwjgl3Window> openedWindows = new Array<>();
+	public ObjectMap<IWindowDialog, Lwjgl3Window> windowMap = new ObjectMap<>();
+
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
@@ -54,7 +58,9 @@ public class TalosLauncher {
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
-		TalosMain2 talos = new TalosMain2() {
+		TalosLauncher launcher = new TalosLauncher();
+
+		TalosMain2 talos = new TalosMain2(launcher) {
 			@Override
 			public void create () {
 				super.create();
@@ -140,9 +146,25 @@ public class TalosLauncher {
 				}, config);
 			}
 
+			public void disposeWindow(Lwjgl3Window window) {
+				launcher.openedWindows.removeValue(window, true);
+				IWindowDialog key = launcher.windowMap.findKey(window, true);
+				if(key != null){
+					launcher.windowMap.remove(key);
+				}
+
+			}
+
 			@Override
 			public void openWindow(IWindowDialog dialog) {
-				Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+				if(launcher.windowMap.containsKey(dialog)) {
+					Lwjgl3Window window = launcher.windowMap.get(dialog);
+
+					window.focusWindow();
+
+					return;
+				}
+
 				Lwjgl3Application lwjgl3App = (Lwjgl3Application)Gdx.app;
 
 				config.setMaximized(false);
@@ -150,41 +172,18 @@ public class TalosLauncher {
 				config.setResizable(false);
 				config.setTitle(dialog.getTitle());
 
-				Lwjgl3Window window = lwjgl3App.newWindow(new ApplicationAdapter() {
 
-					private Stage stage;
-
+				DialogAppAdapter dialogWindowApplicationAdapter = new DialogAppAdapter(dialog);
+				final Lwjgl3Window window = lwjgl3App.newWindow(dialogWindowApplicationAdapter, config);
+				dialogWindowApplicationAdapter.setDisposeRunnable(new Runnable() {
 					@Override
-					public void create() {
-						stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
-						SharedResources.inputHandling.addPriorityInputProcessor(stage);
-						SharedResources.inputHandling.setGDXMultiPlexer();
-
-						Table content = dialog.getContent();
-						stage.addActor(content);
-						content.setFillParent(true);
+					public void run() {
+						disposeWindow(window);
 					}
+				});
 
-					@Override
-					public void render() {
-						ScreenUtils.clear(0, 0, 0, 1f, true);
-						stage.act();
-						stage.draw();
-					}
-
-					@Override
-					public void resize(int width, int height) {
-						super.resize(width, height);
-						stage.getViewport().update(width, height, true);
-					}
-
-					@Override
-					public void dispose() {
-						SharedResources.inputHandling.removePriorityInputProcessor(stage);
-						SharedResources.inputHandling.setGDXMultiPlexer();
-						stage.dispose();
-					}
-				}, config);
+				launcher.openedWindows.add(window);
+				launcher.windowMap.put(dialog, window);
 			}
 
 		};
@@ -216,5 +215,14 @@ public class TalosLauncher {
 				});
 			}
 		});
+	}
+
+	@Override
+	public void dispose() {
+		for(Lwjgl3Window window: openedWindows) {
+			window.closeWindow();
+		}
+		openedWindows.clear();
+		windowMap.clear();
 	}
 }

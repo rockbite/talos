@@ -2,7 +2,6 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -29,10 +28,15 @@ import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
 public class TalosMain2 extends ApplicationAdapter {
+	private final ILauncher launcher;
 	@Getter
 	private Skin skin;
 	private Stage stage;
 	private Table layoutGridContainer;
+
+	public TalosMain2(ILauncher launcher) {
+		this.launcher = launcher;
+	}
 
 	@Override
 	public void create () {
@@ -144,5 +148,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		stage.dispose();
 		VisUI.dispose();
 		SocketServer.dispose();
+
+		launcher.dispose();
 	}
 }

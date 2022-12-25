@@ -1,0 +1,58 @@
+package com.talosvfx.talos;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
+import com.talosvfx.talos.editor.dialogs.IWindowDialog;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Setter;
+
+public class DialogAppAdapter extends ApplicationAdapter {
+
+    private final IWindowDialog dialog;
+    @Setter
+    private Runnable disposeRunnable;
+    private Stage stage;
+
+    public DialogAppAdapter(IWindowDialog dialog) {
+        this.dialog = dialog;
+    }
+
+    @Override
+    public void create() {
+        stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+        SharedResources.inputHandling.addPriorityInputProcessor(stage);
+        SharedResources.inputHandling.setGDXMultiPlexer();
+
+        Table content = dialog.getContent();
+        stage.addActor(content);
+        content.setFillParent(true);
+    }
+
+    @Override
+    public void render() {
+        ScreenUtils.clear(0, 0, 0, 1f, true);
+        stage.act();
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        SharedResources.inputHandling.removePriorityInputProcessor(stage);
+        SharedResources.inputHandling.setGDXMultiPlexer();
+        stage.dispose();
+
+        if(disposeRunnable != null) {
+            disposeRunnable.run();
+        }
+    }
+}
