@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 
 public class ColorLibrary {
@@ -42,6 +43,7 @@ public class ColorLibrary {
         MID_GRAY ("#434343"),
         DARK_GRAY ("#3a3a3a"),
         SUPER_DARK_GRAY ("#2a2a2a"),
+        ULTRA_DARK_GRAY ("#242626"),
         BLACK_TRANSPARENT ("#2a2a2add"),
         RED ("#92313a"),
         // fifty shades of grey :D
@@ -116,6 +118,19 @@ public class ColorLibrary {
             return instance().drawableCache.get(code);
         } else {
             Drawable drawable = skin.newDrawable(name, backgroundColor.getColor());
+            instance().drawableCache.put(code, drawable);
+
+            return drawable;
+        }
+    }
+
+    public static Drawable obtainBackground(String name, BackgroundColor backgroundColor) {
+        int colorInteger = backgroundColor.color.toIntBits();
+        int code = name.hashCode() * 31 + colorInteger;
+        if (instance().drawableCache.containsKey(code)) {
+            return instance().drawableCache.get(code);
+        } else {
+            Drawable drawable = SharedResources.skin.newDrawable(name, backgroundColor.getColor());
             instance().drawableCache.put(code, drawable);
 
             return drawable;

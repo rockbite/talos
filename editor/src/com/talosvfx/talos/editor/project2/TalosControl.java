@@ -103,6 +103,14 @@ public class TalosControl implements Observer {
             }
         }
 
+        if (event.getPath().startsWith("edit")) {
+            if (event.getPath().endsWith("preferences")) {
+                System.out.println("magic");
+                SharedResources.ui.showPreferencesWindow();
+                return;
+            }
+        }
+
         if(event.getPath().equals("file/quit")) {
             Gdx.app.exit();
         }
