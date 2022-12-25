@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -485,6 +487,28 @@ public class ProjectExplorerWidget extends Table implements Observer {
                         @Override
                         public void run () {
                             directoryViewWidget.scrollTo(newPaletteDestination);
+                        }
+                    });
+                }
+            });
+
+            createSubMenuItem(popupMenu, "Empty Sprite PNG", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+
+                    FileHandle currentFolder = getCurrentFolder();
+                    FileHandle destination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "new-sprite", "png");
+
+                    Pixmap pixmap = new Pixmap(100, 100, Pixmap.Format.RGBA8888);
+                    PixmapIO.writePNG(destination, pixmap);
+                    pixmap.dispose();
+
+                    AssetRepository.getInstance().rawAssetCreated(destination, true);
+                    select(getCurrentFolder().path());
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(destination);
                         }
                     });
                 }
