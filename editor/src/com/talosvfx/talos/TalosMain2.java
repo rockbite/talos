@@ -106,7 +106,6 @@ public class TalosMain2 extends ApplicationAdapter {
 		Notifications.fireEvent(projectLoadedEvent);
 
 		projectData.loadLayout();
-
 	}
 
 

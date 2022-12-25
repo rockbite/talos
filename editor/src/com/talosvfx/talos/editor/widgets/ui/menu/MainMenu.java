@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.MenuPopupOpenCommand;
+import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class MainMenu extends Table implements Observer {
@@ -286,6 +287,10 @@ public class MainMenu extends Table implements Observer {
         containerPopupMap.get(table).pack();
     }
 
+    public void hide() {
+        setVisible(false);
+    }
+
     public interface IMenuProvider {
         void inject(String path, MainMenu menu);
     }
@@ -306,5 +311,10 @@ public class MainMenu extends Table implements Observer {
         clearContainer(path);
         menuProvider.inject(path, this); // this can be called later
         finishContainer(path);
+    }
+
+    @EventHandler
+    public void onProjectLoadedEvent(ProjectLoadedEvent event) {
+        setVisible(true);
     }
 }

@@ -69,13 +69,10 @@ public class ProjectSplash extends Table {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				// open
-				FileSystemInteraction.instance().showFileChooser("tlsprj", new FileChooserListener() {
+				SharedResources.talosControl.openProjectByChoosingFile(new Runnable() {
 					@Override
-					public void selected(Array<FileHandle> files) {
-						boolean success = validateAndOpenProject(files.first());
-						if (success) {
-							ProjectSplash.this.hide();
-						}
+					public void run() {
+						ProjectSplash.this.hide();
 					}
 				});
 			}
@@ -174,7 +171,7 @@ public class ProjectSplash extends Table {
 			recentProjectLabel.addListener(new ClickListener() {
 				@Override
 				public void clicked (InputEvent event, float x, float y) {
-					boolean success = validateAndOpenProject(Gdx.files.absolute(recentProject.getProjectPath()));
+					boolean success = SharedResources.talosControl.validateAndOpenProject(Gdx.files.absolute(recentProject.getProjectPath()));
 					if (success) {
 						ProjectSplash.this.hide();
 					}
@@ -195,46 +192,11 @@ public class ProjectSplash extends Table {
 	}
 
 
-	private boolean validateAndOpenProject (FileHandle first) {
-		FileHandle projectToTryToLoad = null;
-		if (first.isDirectory()) {
-			FileHandle[] list = first.list();
-			for (FileHandle handle : list) {
-				if (handle.extension().equals(TALOS_PROJECT_EXTENSION)) {
-					projectToTryToLoad = handle;
-					break;
-				}
-			}
-		} else {
-			if (first.extension().equals(TALOS_PROJECT_EXTENSION)) {
-				projectToTryToLoad = first;
-			}
-		}
-
-		if (projectToTryToLoad != null) {
-			TalosProjectData talosProjectData = TalosProjectData.loadFromFile(projectToTryToLoad);
-			if (talosProjectData != null) {
-				try {
-					SharedResources.projectLoader.loadProject(talosProjectData);
-					return true;
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
-			} else {
-				Dialogs.showErrorDialog(SharedResources.stage, "No valid project found to load");
-			}
-		} else {
-			Dialogs.showErrorDialog(SharedResources.stage, "No valid project found to load");
-		}
-
-		return false;
-
-	}
-
 	public void show(Stage stage) {
 		stage.addActor(this);
 		setPosition(stage.getWidth()/2f - getWidth()/2f, stage.getHeight()/2f - getHeight()/2f);
+
+		SharedResources.mainMenu.hide();
 	}
 
 	public void hide() {

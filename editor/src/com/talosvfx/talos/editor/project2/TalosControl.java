@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.project2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -18,6 +19,8 @@ import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 
 import java.io.StringWriter;
 
+import static com.talosvfx.talos.editor.project2.TalosProjectData.TALOS_PROJECT_EXTENSION;
+
 public class TalosControl implements Observer {
 
     private MainMenu.IMenuProvider customLayoutListProvider;
@@ -31,6 +34,11 @@ public class TalosControl implements Observer {
     public void onMenuItemClickedEvent(MenuItemClickedEvent event) {
         // TODO: switch this to some kind of reflection thing? or like map to instance thing *but how about startsWith things
         // or at least start delegating this into methods
+
+        if(event.getPath().startsWith("file/open")) {
+            openProjectByChoosingFile();
+            return;
+        }
 
         if(event.getPath().startsWith("file/open_recent")) {
             String path = (String) event.getPayload();
@@ -131,6 +139,61 @@ public class TalosControl implements Observer {
             }
         };
         SharedResources.mainMenu.registerMenuProvider(customLayoutListProvider, "window/layouts/custom_list");
+
+    }
+
+    public void openProjectByChoosingFile() {
+        openProjectByChoosingFile(null);
+    }
+
+    public void openProjectByChoosingFile(Runnable after) {
+        FileSystemInteraction.instance().showFileChooser("tlsprj", new FileChooserListener() {
+            @Override
+            public void selected(Array<FileHandle> files) {
+                boolean success = validateAndOpenProject(files.first());
+                if (success) {
+                    if(after != null) {
+                        after.run();
+                    }
+                }
+            }
+        });
+    }
+
+    public boolean validateAndOpenProject (FileHandle first) {
+        FileHandle projectToTryToLoad = null;
+        if (first.isDirectory()) {
+            FileHandle[] list = first.list();
+            for (FileHandle handle : list) {
+                if (handle.extension().equals(TALOS_PROJECT_EXTENSION)) {
+                    projectToTryToLoad = handle;
+                    break;
+                }
+            }
+        } else {
+            if (first.extension().equals(TALOS_PROJECT_EXTENSION)) {
+                projectToTryToLoad = first;
+            }
+        }
+
+        if (projectToTryToLoad != null) {
+            TalosProjectData talosProjectData = TalosProjectData.loadFromFile(projectToTryToLoad);
+            if (talosProjectData != null) {
+                try {
+                    SharedResources.projectLoader.loadProject(talosProjectData);
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            } else {
+                Dialogs.showErrorDialog(SharedResources.stage, "No valid project found to load");
+            }
+        } else {
+            Dialogs.showErrorDialog(SharedResources.stage, "No valid project found to load");
+        }
+
+        return false;
 
     }
 }
