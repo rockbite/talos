@@ -1172,6 +1172,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void changeGOName (GameObject gameObject, String suggestedName) {
+		if(suggestedName == null || suggestedName.isEmpty()) {
+			suggestedName = "gameObject";
+		}
 		if (suggestedName.equals(gameObject.getName()))
 			return;
 

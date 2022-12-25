@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectActiveChanged;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
+import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
@@ -282,10 +284,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
-
-                //todo
-                System.out.println("Add change GO name report");
-//                SceneEditorAddon.get().workspace.changeGOName(GameObject.this, value);
+                GONameChangeCommand command = Notifications.obtainEvent(GONameChangeCommand.class).set(GameObject.this, value);
+                Notifications.fireEvent(command);
             }
         });
 

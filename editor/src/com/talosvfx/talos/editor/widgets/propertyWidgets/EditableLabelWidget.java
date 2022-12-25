@@ -31,7 +31,7 @@ public class EditableLabelWidget extends PropertyWidget<String> {
             @Override
             public void keyboardFocusChanged (FocusEvent event, Actor actor, boolean focused) {
                 super.keyboardFocusChanged(event, actor, focused);
-                if (!propertyValue.hasKeyboardFocus()) {
+                if (!focused) {
                     propertyValue.finishTextEdit();
                 }
             }

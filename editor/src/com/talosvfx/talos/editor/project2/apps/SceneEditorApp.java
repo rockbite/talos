@@ -3,14 +3,18 @@ package com.talosvfx.talos.editor.project2.apps;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 
 @SingletonApp
-public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener {
+public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer {
 
 	private final SceneEditorWorkspace workspaceWidget;
 
@@ -54,7 +58,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 
 
 		workspaceWidget.loadFromScene(gameAsset);
-
+		Notifications.registerObserver(this);
 	}
 
 	@Override
@@ -69,11 +73,18 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@Override
 	public void onRemove () {
 		gameAsset.listeners.removeValue(this, true);
+
+		Notifications.unregisterObserver(this);
 	}
 
 	@Override
 	public void onUpdate () {
 		workspaceWidget.loadFromScene(gameAsset);
+	}
+
+	@EventHandler
+	public void GONameChangeCommand(GONameChangeCommand command) {
+		workspaceWidget.changeGOName(command.getGo(), command.getSuggestedName());
 	}
 }
 
