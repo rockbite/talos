@@ -131,6 +131,8 @@ public class ValueWidget extends AbstractWidget<Float> {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getTarget() == portBorder) return false;
+
                 if(isDisabled) return false;
                 dragged = false;
                 lastPos = x;

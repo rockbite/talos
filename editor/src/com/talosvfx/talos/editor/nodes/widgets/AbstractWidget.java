@@ -15,6 +15,7 @@ public abstract class AbstractWidget<T> extends Table {
 
     private boolean isInput;
     private Table portBody;
+    protected Image portBorder;
 
     public AbstractWidget() {
         content = new Table();
@@ -40,7 +41,7 @@ public abstract class AbstractWidget<T> extends Table {
         this.isInput = isInput;
 
         portBody = new Table();
-        Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", ColorLibrary.BackgroundColor.BROKEN_WHITE));
+        portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, ColorLibrary.BackgroundColor.BROKEN_WHITE));
         portBody.add(portBorder).growX().pad(-1f);
 
