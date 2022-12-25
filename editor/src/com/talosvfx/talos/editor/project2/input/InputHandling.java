@@ -28,6 +28,10 @@ public class InputHandling {
 		permanentInputProcessors.add(inputProcessor);
 	}
 
+	public void removePermanentInputProcessor (InputProcessor inputProcessor) {
+		permanentInputProcessors.remove(inputProcessor);
+	}
+
 	public void addTemporaryInputProcessor (InputProcessor inputProcessor) {
 		temporaryInputProcessors.add(inputProcessor);
 	}

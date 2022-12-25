@@ -33,7 +33,6 @@ public class UIController {
     }
 
     public void showPreferencesWindow () {
-        System.out.println("showing preferences");
-        SharedResources.stage.addActor(preferencesWindow);
+        SharedResources.windowUtils.openWindow(preferencesWindow);
     }
 }

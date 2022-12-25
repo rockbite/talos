@@ -11,27 +11,22 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 
-public class PreferencesWindow extends Table {
+public class PreferencesWindow extends AWindowDialog {
     private ScrollPane scrollPane;
-    public PreferencesWindow() {
-        setSize(660, 540);
-        setPosition(300, 300);
 
-        final Table titleSegment = constructTitleSegment();
-        final Table contentSegment = constructContentSegment();
 
-        // assemble
-        add(titleSegment).growX();
-        row();
-        add(contentSegment).grow();
+    @Override
+    public Table build() {
+        Table table = constructContentSegment();
+        table.pack();
+        table.setSize(660, 540);
+
+        return table;
     }
 
-    private Table constructTitleSegment () {
-        final Label titleLabel = new Label("Preferences", SharedResources.skin);
-        final Table titleSegment = new Table();
-        titleSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY));
-        titleSegment.add(titleLabel).expandX().height(25);
-        return titleSegment;
+    @Override
+    public String getTitle() {
+        return null;
     }
 
     private Table constructContentSegment () {

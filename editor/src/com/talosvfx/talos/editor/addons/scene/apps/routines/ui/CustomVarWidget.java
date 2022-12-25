@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWra
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.UIUtils;
+import com.talosvfx.talos.editor.widgets.ui.common.ArrowButton;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,66 +65,6 @@ public class CustomVarWidget extends Table {
         init(SharedResources.skin);
     }
 
-    public static class ArrowButton extends Table {
-        private final ClickListener clickListener;
-        @Getter
-        private final Image arrowIcon;
-
-        private boolean isCollapsed = true;
-        public boolean hasBackground;
-
-        public ArrowButton () {
-            this(true);
-        }
-        public ArrowButton(boolean hasBackground) {
-            this.hasBackground = hasBackground;
-            arrowIcon = new Image();
-            arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-right"));
-            arrowIcon.setTouchable(Touchable.enabled);
-
-            add(arrowIcon).pad(5);
-
-            setTouchable(Touchable.enabled);
-
-            clickListener = new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                }
-            };
-
-            addListener(clickListener);
-        }
-
-        public void setCollapsed(boolean isCollapsed) {
-            this.isCollapsed = isCollapsed;
-
-            if(isCollapsed) {
-                arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-right"));
-            } else {
-                arrowIcon.setDrawable(SharedResources.skin.getDrawable("mini-arrow-down"));
-            }
-        }
-
-        public void toggle() {
-            setCollapsed(!isCollapsed);
-        }
-
-        @Override
-        public void act(float delta) {
-            super.act(delta);
-
-            if (hasBackground) {
-                // change background if mouse is over
-                ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.BRIGHT_GRAY;
-                if(!clickListener.isOver()) {
-                    color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
-                }
-                setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUARE, color));
-            }
-        }
-    }
-
     private void init(Skin skin) {
         setSkin(skin);
         isSelected = false;
@@ -152,7 +93,7 @@ public class CustomVarWidget extends Table {
                 super.clicked(event, x, y);
                 arrowButton.toggle();
 
-                if(arrowButton.isCollapsed) {
+                if(arrowButton.isCollapsed()) {
                     bottom.clearChildren();
                     bottom.pack();
                     UIUtils.invalidateForDepth(bottom, 4);

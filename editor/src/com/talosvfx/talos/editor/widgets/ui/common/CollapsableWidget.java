@@ -31,7 +31,7 @@ public class CollapsableWidget extends Table {
 
     public Table constructTopSegment (String title) {
         // init components
-        final CustomVarWidget.ArrowButton arrowButton = new CustomVarWidget.ArrowButton(false);
+        final ArrowButton arrowButton = new ArrowButton(false);
         arrowButton.getCell(arrowButton.getArrowIcon()).pad(0);
         final Label widgetLabel = new Label(title, SharedResources.skin, "small");
 
