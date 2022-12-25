@@ -60,20 +60,7 @@ public class PreferencesWindow extends AWindowDialog {
 
         tabsContent.startGroup();
         tabsContent.addTab("Interface", new InterfaceTabContent());
-        tabsContent.addTab("Themes", null);
-        tabsContent.addTab("Viewport", null);
-        tabsContent.addTab("Lights", null);
-        tabsContent.addTab("Editing", null);
-        tabsContent.addTab("Animation", null);
-        tabsContent.endGroup();
-
-        tabsContent.startGroup();
         tabsContent.addTab("Add-ons", new AddOnsTabContent());
-        tabsContent.endGroup();
-
-        tabsContent.startGroup();
-        tabsContent.addTab("Input", null);
-        tabsContent.addTab("Navigation", null);
         tabsContent.addTab("Keymap", new KeymapTabContent());
         tabsContent.endGroup();
 
