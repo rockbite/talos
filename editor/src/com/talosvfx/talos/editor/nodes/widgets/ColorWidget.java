@@ -36,7 +36,7 @@ public class ColorWidget extends AbstractWidget<Color> {
             content.add(label).left().expandX().height(32);
         }
         content.add(colorButton).right().expandX().height(32).width(96);
-        color.set(Color.CORAL);
+        color.set(Color.WHITE);
         colorButton.setColor(color);
 
         colorButton.setTouchable(Touchable.enabled);
