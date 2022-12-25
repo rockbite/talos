@@ -195,8 +195,13 @@ public class DirectoryViewWidget extends Table {
 	}
 
 	public void rename () {
-		if (selected.size == 1) {
+		if (selected.size >= 1) {
 			Item item = selected.first();
+
+			clearSelection();
+			selected.add(item);
+			item.select();
+
 			item.rename();
 		}
 	}
@@ -529,9 +534,12 @@ public class DirectoryViewWidget extends Table {
 		boolean shiftSelectRange = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
 
 		if (rightClick) {
-			clearSelection();
-			selected.add(item);
-			item.select();
+			// if it's selected and possibly others, keep the entire selection
+			if(!selected.contains(item, true)) {
+				clearSelection();
+				selected.add(item);
+				item.select();
+			}
 			Array<FileHandle> handles = convertToFileArray(selected);
 
 			projectExplorerWidget.showContextMenu(handles, true);
