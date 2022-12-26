@@ -114,12 +114,11 @@ public class RoutineStageData extends DynamicNodeStageData {
 		PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
 		propertyWrappers.removeValue(propertyWrapperWithIndex, true);
 
-		for (IntMap.Entry<RoutineNode> routineNodeEntry : routineInstance.lowLevelLookup) {
-			RoutineNode value = routineNodeEntry.value;
-			if (value instanceof ExposedVariableNode) {
-				ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
-				if (exposedVariableNode.index == index) {
-					exposedVariableNode.propertyWrapper = null;
+		for (NodeWidget node : nodes) {
+			if (node instanceof RoutineExposedVariableNodeWidget) {
+				RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
+				if (widget.index == index) {
+					widget.update(null);
 				}
 			}
 		}
