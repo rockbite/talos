@@ -458,8 +458,11 @@ public class HierarchyWidget extends Table implements Observer {
     @EventHandler
     public void onGameObjectDeleted(GameObjectDeleted event) {
         FilteredTree.Node node = nodeMap.get(event.getTarget());
-        tree.remove(node);
-        nodeMap.remove(event.getTarget());
+        logger.warn("there can be 2 hierarchy widgets open (like prefab and scene), handle to find right instance");
+        if (node != null) {
+            tree.remove(node);
+            nodeMap.remove(event.getTarget());
+        }
     }
 
     @EventHandler
