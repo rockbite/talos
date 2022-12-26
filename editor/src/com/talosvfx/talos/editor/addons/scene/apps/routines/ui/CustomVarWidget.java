@@ -224,7 +224,7 @@ public class CustomVarWidget extends Table {
                 tmpVec.set(x, y);
                 CustomVarWidget.this.stageToLocalCoordinates(tmpVec);
                 Actor touchTarget = fieldContainer.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null) {
+                if (touchTarget == null && getStage() != null) {
                     getStage().setKeyboardFocus(null);
                 }
 

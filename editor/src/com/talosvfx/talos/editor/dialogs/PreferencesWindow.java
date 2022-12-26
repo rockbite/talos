@@ -26,7 +26,7 @@ public class PreferencesWindow extends AWindowDialog {
 
     @Override
     public String getTitle() {
-        return null;
+        return "Talos Preferences";
     }
 
     private Table constructContentSegment () {

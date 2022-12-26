@@ -78,7 +78,9 @@ public class VariableCreationWindow extends Table {
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {
                             @Override
                             public void itemClicked(PropertyType type) {
-                                routineStage.data.createNewPropertyWrapper(type);
+                                PropertyWrapper<?> newPropertyWrapper = routineStage.data.createNewPropertyWrapper(type);
+                                giveEmptyNameTo(newPropertyWrapper);
+
                                 routineStage.routineUpdated();
                                 reloadWidgets();
                             }
@@ -103,6 +105,25 @@ public class VariableCreationWindow extends Table {
                 event.stop();
             }
         });
+    }
+
+    private void giveEmptyNameTo(PropertyWrapper<?> wrapper) {
+        RoutineInstance routineInstance = routineStage.data.getRoutineInstance();
+        Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getParentPropertyWrappers();
+        Array<String> names = new Array<>();
+        for(PropertyWrapper tmp: propertyWrappers) {
+            if(tmp != wrapper) {
+                names.add(tmp.propertyName);
+            }
+        }
+
+        String suggestion = "value";
+        int iterator = 0;
+        while(names.contains(suggestion + iterator, false)) {
+            iterator++;
+        }
+
+        wrapper.propertyName = suggestion + iterator;
     }
 
     public void reloadWidgets() {
