@@ -28,6 +28,7 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +143,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void routineUpdated () {
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
         gameAsset.setUpdated();
+        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
     }
 
     @EventHandler

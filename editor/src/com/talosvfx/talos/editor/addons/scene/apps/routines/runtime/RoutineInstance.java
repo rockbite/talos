@@ -55,8 +55,6 @@ public class RoutineInstance {
             return;
         }
 
-
-
         IntMap<RoutineNode> idMap = new IntMap<>();
 
         String nodePackageName = "com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.";
@@ -99,8 +97,6 @@ public class RoutineInstance {
                 fromNode.addConnection(toNode, fromSlot, toSlot);
             }
         }
-
-        updateNodesFromProperties();
     }
 
     public RoutineNode getNodeById(String id) {
@@ -164,16 +160,5 @@ public class RoutineInstance {
         }
 
         return null;
-    }
-
-    public void updateNodesFromProperties () {
-        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
-            RoutineNode value = routineNodeEntry.value;
-            if (value instanceof ExposedVariableNode) {
-                ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
-                int index = exposedVariableNode.index;
-                exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
-            }
-        }
     }
 }
