@@ -9,7 +9,7 @@ public class ExposedVariableNode extends RoutineNode {
 
     public int index;
 
-    public transient PropertyWrapper<?> propertyWrapper;
+    private transient PropertyWrapper<?> propertyWrapper;
 
     public void updateForPropertyWrapper (PropertyWrapper<?> propertyWrapper) {
         index = propertyWrapper.index;
@@ -18,7 +18,7 @@ public class ExposedVariableNode extends RoutineNode {
     @Override
     public Object queryValue (String targetPortName) {
         if (propertyWrapper == null) {
-            return 0;
+            return null;
         }
 
         return propertyWrapper.value;

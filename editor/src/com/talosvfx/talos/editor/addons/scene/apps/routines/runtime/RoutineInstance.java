@@ -172,9 +172,7 @@ public class RoutineInstance {
             if (value instanceof ExposedVariableNode) {
                 ExposedVariableNode exposedVariableNode = (ExposedVariableNode) value;
                 int index = exposedVariableNode.index;
-//                exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
-
-                logger.error("TOdo exposed variable fix");
+                exposedVariableNode.updateForPropertyWrapper(getPropertyWrapperWithIndex(index));
             }
         }
     }
