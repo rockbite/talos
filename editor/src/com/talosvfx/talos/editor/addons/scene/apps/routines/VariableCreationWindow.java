@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
@@ -187,6 +189,12 @@ public class VariableCreationWindow extends Table {
                     exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
                     Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
                     exposedVariable.update(propertyWrapper);
+                }
+                RoutineInstance routineInstance = routineStage.data.getRoutineInstance();
+                RoutineNode nodeById = routineInstance.getNodeById(exposedVariable.getId());
+                if (nodeById instanceof ExposedVariableNode) {
+                    ExposedVariableNode exposedVariableNode = (ExposedVariableNode) nodeById;
+                    exposedVariableNode.updateForPropertyWrapper(propertyWrapper);
                 }
             }
         });
