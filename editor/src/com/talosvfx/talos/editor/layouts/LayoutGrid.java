@@ -845,7 +845,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 		APP
 	}
 
-	static class LayoutJsonStructure {
+	public static class LayoutJsonStructure {
 		LayoutType type;
 		String appID;
 
@@ -877,11 +877,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
 	}
 
-	public void readFromJson (JsonValue jsonLayoutRepresentation) {
-
-		Json json = new Json();
-		LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonLayoutRepresentation);
-
+	public void readFromJsonStructure (LayoutJsonStructure layoutJsonStructure) {
 		LayoutItem parent = null;
 
 		if (layoutJsonStructure.type == LayoutType.COLUMN) {
@@ -902,6 +898,12 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
 
 		addContent(parent);
+	}
+
+	public void readFromJson (JsonValue jsonLayoutRepresentation) {
+		Json json = new Json();
+		LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonLayoutRepresentation);
+		readFromJsonStructure(layoutJsonStructure);
 	}
 
 	private void loadChildren (LayoutItem parent, LayoutJsonStructure layoutJsonStructure) {
