@@ -89,7 +89,7 @@ public class SceneUtils {
 
 		Prefab prefab = new Prefab(prefabToCopy.getRootRawAsset().handle);
 
-		GameObject gameObject = prefab.root.getGameObjects().first();
+		GameObject gameObject = prefab.root;
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		transformComponent.position.set(position);
 
