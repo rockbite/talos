@@ -15,11 +15,13 @@ import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.FilePropertyProvider;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import org.slf4j.LoggerFactory;
@@ -168,6 +170,18 @@ public class DirectoryViewWidget extends Table {
 				if (item.gameAsset != null) {
 					if (!item.gameAsset.isBroken()) {
 						holder = item.gameAsset.getRootRawAsset().metaData;
+					}
+				} else {
+					if (item.fileHandle != null) {
+						IPropertyProvider provider = new FilePropertyProvider(item.fileHandle);
+						holder = new IPropertyHolder() {
+							@Override
+							public Iterable<IPropertyProvider> getPropertyProviders() {
+								Array<IPropertyProvider> arr = new Array<>();
+								arr.add(provider);
+								return arr;
+							}
+						};
 					}
 				}
 			} else if (selected.size > 1) {
