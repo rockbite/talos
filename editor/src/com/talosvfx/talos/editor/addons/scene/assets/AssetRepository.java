@@ -65,7 +65,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.talosvfx.talos.editor.serialization.VFXProjectSerializer.readTalosTLSProject;
+import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
 public class AssetRepository implements Observer {
 
@@ -271,6 +271,8 @@ public class AssetRepository implements Observer {
 		checkGameAssetCreation(GameAssetType.SCENE);
 
 		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
+
+		checkGameAssetCreation(GameAssetType.LAYOUT_DATA);
 
 		newFilesSeen.clear();
 	}
@@ -873,9 +875,29 @@ public class AssetRepository implements Observer {
 					TilePaletteData paletteData = json.fromJson(TilePaletteData.class, value.handle);
 					((GameAsset<TilePaletteData>)gameAssetOut).setResourcePayload(paletteData);
 				}
+				break;
+			case LAYOUT_DATA:
+				if (gameAssetOut == null) {
+					GameAsset<LayoutJsonStructure> layoutGridGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = layoutGridGameAsset;
 
+					JsonReader jsonReader = new JsonReader();
+					JsonValue jsonValue = jsonReader.parse(value.handle);
+					LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonValue);
 
+					layoutGridGameAsset.setResourcePayload(layoutJsonStructure);
 
+					if (createLinks) {
+						value.gameAssetReferences.add(layoutGridGameAsset);
+						layoutGridGameAsset.dependentRawAssets.add(value);
+					}
+				} else {
+					JsonReader jsonReader = new JsonReader();
+					JsonValue jsonValue = jsonReader.parse(value.handle);
+					LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonValue);
+
+					((GameAsset<LayoutJsonStructure>)gameAssetOut).setResourcePayload(layoutJsonStructure);
+				}
 				break;
 			case DIRECTORY:
 				break;
@@ -1176,6 +1198,16 @@ public class AssetRepository implements Observer {
 			}
 		}
 		return null;
+	}
+
+	public <T> Array<GameAsset<T>> getAssetsForType (GameAssetType type) {
+		Array<GameAsset<T>> assets = new Array<>();
+		for (GameAsset value : dataMaps.fileHandleGameAssetObjectMap.values()) {
+			if (value.type == type) {
+				assets.add(value);
+			}
+		}
+		return assets;
 	}
 
 	private void deleteFileImpl (FileHandle handle) {

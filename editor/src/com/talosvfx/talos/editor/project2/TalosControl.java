@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
@@ -14,10 +15,12 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
+import com.talosvfx.talos.editor.notifications.events.MenuPopupOpenCommand;
+import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.MenuItemClickedEvent;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 
-import java.io.StringWriter;
+import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
 import static com.talosvfx.talos.editor.project2.TalosProjectData.TALOS_PROJECT_EXTENSION;
 
@@ -29,6 +32,13 @@ public class TalosControl implements Observer {
         Notifications.registerObserver(this);
     }
 
+
+    @EventHandler
+    public void onMenuPopupOpenCommand (MenuPopupOpenCommand menuPopupOpenCommand) {
+       if (menuPopupOpenCommand.getPath().equals("window/layouts")) {
+            SharedResources.mainMenu.askToInject(customLayoutListProvider, "window/layouts/custom_list");
+       }
+    }
 
     @EventHandler
     public void onMenuItemClickedEvent(MenuItemClickedEvent event) {
@@ -78,9 +88,7 @@ public class TalosControl implements Observer {
                         FileHandle destination = AssetImporter.suggestNewNameForFileHandle(file.parent().path(), file.nameWithoutExtension(), ext);
                         destination.writeString(data, false);
 
-                        AssetRepository.getInstance().rawAssetCreated(destination, false);
-
-                        SharedResources.mainMenu.askToInject(customLayoutListProvider, "window/layouts/custom_list");
+                        AssetRepository.getInstance().rawAssetCreated(destination, true);
                     } else {
                         // show error message
                     }
@@ -88,15 +96,13 @@ public class TalosControl implements Observer {
             });
         } else {
             if (event.getPath().startsWith("window/layouts/")) {
-                // todo: also add custom ones here
-                String fileName = (String) event.getPayload();
-
+                FileHandle handle = (FileHandle) event.getPayload();
                 // murderous code here
                 SharedResources.appManager.removeAll();
 
                 LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
                 JsonReader jsonReader = new JsonReader();
-                JsonValue jsonValue = jsonReader.parse(Gdx.files.internal("layouts/" + fileName));
+                JsonValue jsonValue = jsonReader.parse(handle);
                 layoutGrid.readFromJson(jsonValue);
 
                 return;
@@ -134,7 +140,7 @@ public class TalosControl implements Observer {
                     String fileName = layout.getAttribute("file");
                     String title = layout.getText();
 
-                    menu.addItem(path, fileName, title, null, fileName);
+                    menu.addItem(path, fileName, title, null, Gdx.files.internal("layouts/" + fileName));
                 }
             }
         }, "window/layouts/list");
@@ -143,8 +149,11 @@ public class TalosControl implements Observer {
         customLayoutListProvider = new MainMenu.IMenuProvider() {
             @Override
             public void inject(String path, MainMenu menu) {
-                //AssetRepository.getInstance().
-                // find all files with .tlslt extension, and load their names here
+                Array<GameAsset<LayoutJsonStructure>> layouts = AssetRepository.getInstance().getAssetsForType(GameAssetType.LAYOUT_DATA);
+                for (GameAsset<LayoutJsonStructure> layout : layouts) {
+                    FileHandle handle = layout.getRootRawAsset().handle;
+                    menu.addItem(path, handle.name(), handle.nameWithoutExtension(), null, handle);
+                }
             }
         };
         SharedResources.mainMenu.registerMenuProvider(customLayoutListProvider, "window/layouts/custom_list");
@@ -204,5 +213,17 @@ public class TalosControl implements Observer {
 
         return false;
 
+    }
+
+    @EventHandler
+    public void onGameAssetOpenEvent(GameAssetOpenEvent event) {
+        if (event.getGameAsset().type == GameAssetType.LAYOUT_DATA) {
+            GameAsset<LayoutJsonStructure> gameAsset = (GameAsset<LayoutJsonStructure>) event.getGameAsset();
+            // murderous code here
+            SharedResources.appManager.removeAll();
+
+            LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
+            layoutGrid.readFromJsonStructure(gameAsset.getResource());
+        }
     }
 }
