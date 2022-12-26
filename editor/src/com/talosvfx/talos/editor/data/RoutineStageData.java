@@ -82,8 +82,6 @@ public class RoutineStageData extends DynamicNodeStageData {
 
 	}
 
-
-
 	public PropertyWrapper<?> createNewPropertyWrapper (PropertyType propertyType) {
 		PropertyWrapper<?> propertyWrapper = createPropertyInstanceOfType(propertyType);
 		propertyWrapper.index = exposedPropertyIndex;
@@ -92,7 +90,7 @@ public class RoutineStageData extends DynamicNodeStageData {
 		return propertyWrapper;
 	}
 
-	public PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
+	private PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
 		try {
 			PropertyWrapper<?> propertyWrapper = type.getWrapperClass().getConstructor().newInstance();
 			return propertyWrapper;

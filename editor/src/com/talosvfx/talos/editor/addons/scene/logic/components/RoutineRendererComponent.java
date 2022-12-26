@@ -42,6 +42,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             public void onUpdate() {
                 RoutineInstance instance = RoutineRendererComponent.this.routineResource.getResource().createInstance(true);
                 routineInstance = instance;
+                updatePropertyWrappers(true);
             }
         };
     }

@@ -91,29 +91,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
         variableCreationWindow.reloadWidgets();
     }
 
-//    public void changeKeyFor (int index, String value) {
-//        RoutineInstance routineInstance = routineStage.routineInstance;
-//        routineInstance.changeExposedVariableKey(index, value);
-//        NodeBoard nodeBoard = routineStage.getNodeBoard();
-//
-//        for (NodeWidget node : nodeBoard.nodes) {
-//            if (node instanceof RoutineExposedVariableNodeWidget) {
-//                RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
-//                if (widget.index == index) {
-//                    widget.update(routineInstance.getPropertyWrapperWithIndex(index));
-//                }
-//            }
-//        }
-//        routineStage.routineUpdated();
-//    }
-//
-//    public void createNewVariable (PropertyType type) {
-//        RoutineInstance routineInstance = routineStage.routineInstance;
-//        routineInstance.createNewPropertyWrapper(type);
-//        variableCreationWindow.reloadWidgets();
-//        routineStage.routineUpdated();
-//    }
-
     @Override
     public String getAppName() {
         if(gameAsset == null) {

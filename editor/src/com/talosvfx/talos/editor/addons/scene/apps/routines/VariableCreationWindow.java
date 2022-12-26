@@ -77,6 +77,7 @@ public class VariableCreationWindow extends Table {
                             @Override
                             public void itemClicked(PropertyType type) {
                                 routineStage.data.createNewPropertyWrapper(type);
+                                routineStage.routineUpdated();
                                 reloadWidgets();
                             }
                         })

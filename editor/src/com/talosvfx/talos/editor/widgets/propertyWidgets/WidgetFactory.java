@@ -4,8 +4,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
 
 import java.lang.reflect.Field;
@@ -32,9 +35,11 @@ public class WidgetFactory {
                 return generateForVector2(wrapper, value, null, wrapper.propertyName);
             } else if (wrapper instanceof PropertyColorWrapper) {
                 return generateForColor(wrapper, value, null, wrapper.propertyName);
+            } else if (wrapper instanceof PropertyGameAssetWrapper) {
+                return generateForGameAsset(wrapper, value, null, wrapper.propertyName, GameAssetType.SPRITE);
             }
 
-        } catch (NoSuchFieldException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -92,6 +97,8 @@ public class WidgetFactory {
         return null;
     }
 
+
+
     private static PropertyWidget generateForGameObject (Object parent, Field field, Object object, String title) {
        GameObjectSelectWidget gameObjectSelectWidget = new GameObjectSelectWidget(title, new Supplier<GameObject>() {
            @Override
@@ -115,6 +122,31 @@ public class WidgetFactory {
        });
 
        return gameObjectSelectWidget;
+    }
+
+    private static <T> PropertyWidget generateForGameAsset (Object parent, Field field, Object object, String title, GameAssetType assetType) {
+        AssetSelectWidget<T> textureWidget = new AssetSelectWidget<>(title, assetType, new Supplier<GameAsset<T>>() {
+            @Override
+            public GameAsset<T> get() {
+                try {
+                    return ((GameAsset<T>) field.get(parent));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }, new PropertyWidget.ValueChanged<GameAsset<T>>() {
+            @Override
+            public void report(GameAsset<T> value) {
+                try {
+                    field.set(parent, value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return textureWidget;
     }
 
     private static Vector2PropertyWidget generateForVector2 (Object parent, Field field, Object object, String title) {

@@ -128,6 +128,8 @@ public class CustomVarWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 routineStage.data.removeExposedVariablesWithIndex(index);
+                routineStage.routineUpdated();
+                routineStage.routineEditorApp.variableCreationWindow.reloadWidgets();
             }
         });
         top.add(deleteButton).growY();
