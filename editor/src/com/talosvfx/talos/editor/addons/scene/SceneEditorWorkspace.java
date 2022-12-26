@@ -1087,13 +1087,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onRoutineUpdated (RoutineUpdated event) {
-//        GameObject rootGO = getRootGO();
-//        Array<RoutineRendererComponent> updatedComponents = new Array<>();
-//		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
-//		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
-//		for (RoutineRendererComponent updatedComponent : updatedComponents) {
-//			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
-//		}
+        GameObject rootGO = getRootGO();
+        Array<RoutineRendererComponent> updatedComponents = new Array<>();
+		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
+		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
+		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
+		}
 	}
 
 	private void updateRoutinePropertiesForGOs (GameObject gameObject, GameAsset<RoutineStageData> routineAsset, Array<RoutineRendererComponent> updatedComponents) {
@@ -1101,9 +1101,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
 			if (component.routineInstance != null) {
 				if (routineAsset.equals(component.getGameResource())) {
-					RoutineStageData resource = routineAsset.getResource();
-//					component.routineInstance = resource.createInstance();
-//					component.updatePropertyWrappers(true, routineAsset);
 					updatedComponents.add(component);
 				}
 			}

@@ -453,7 +453,6 @@ public abstract class ViewportWidget extends Table {
 						} else {
 							countOfSameTouchDown = 0;
 
-
 							if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 								if (entityUnderMouse != null) {
 									addToSelection(entityUnderMouse);
@@ -462,6 +461,17 @@ public abstract class ViewportWidget extends Table {
 							} else {
 								//We aren't over the pixel or the gizmo, unselect
 								requestSelectionClear();
+								if (entityUnderMouse != null) {
+									hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, entityUnderMouse);
+									selectGameObject(entityUnderMouse);
+
+									if (hitGizmo != null) {
+										hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+									}
+									getStage().setKeyboardFocus(ViewportWidget.this);
+									event.handle();
+									return true;
+								}
 							}
 
 						}
