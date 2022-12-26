@@ -6,15 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class CollapsableWidget extends Table {
-    private final Table topSegment;
-    private final Table content;
-    private final Cell contentCell;
+    protected final Table topSegment;
+    protected final Table content;
+    protected final Cell contentCell;
+    protected ArrowButton arrowButton;
 
-    private boolean isCollapsed = true;
+    protected boolean isCollapsed = true;
 
     public CollapsableWidget (String title) {
         setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
@@ -27,17 +27,28 @@ public class CollapsableWidget extends Table {
         add(topSegment).growX();
         row();
         contentCell = add().grow();
+
+        addListeners();
     }
 
     public Table constructTopSegment (String title) {
         // init components
-        final ArrowButton arrowButton = new ArrowButton(false);
+        arrowButton = new ArrowButton(false);
         arrowButton.getCell(arrowButton.getArrowIcon()).pad(0);
         final Label widgetLabel = new Label(title, SharedResources.skin, "small");
 
         final Table topSegment = new Table();
         // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
         topSegment.pad(5, 10, 5, 8);
+
+        // assemble top segment
+        topSegment.defaults().space(6);
+        topSegment.add(arrowButton);
+        topSegment.add(widgetLabel).expand().left();
+        return topSegment;
+    }
+
+    protected void addListeners () {
         // make top segment collapse and open instead of icon, so it was more comfortable to click
         topSegment.setTouchable(Touchable.enabled);
         topSegment.addListener(new ClickListener() {
@@ -52,12 +63,6 @@ public class CollapsableWidget extends Table {
                 arrowButton.toggle();
             }
         });
-
-        // assemble top segment
-        topSegment.defaults().space(6);
-        topSegment.add(arrowButton);
-        topSegment.add(widgetLabel).expand().left();
-        return topSegment;
     }
 
     public Table constructContent () {
