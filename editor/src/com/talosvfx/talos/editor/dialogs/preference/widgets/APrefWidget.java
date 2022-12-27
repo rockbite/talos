@@ -16,7 +16,9 @@ public abstract class APrefWidget extends Table {
 
     public APrefWidget(String parentPath, XmlReader.Element xml) {
 
-        id = xml.getAttribute("name");
+        if(xml != null) {
+            id = xml.getAttribute("name");
+        }
         path = parentPath + "." + id;
 
         this.xml = xml;
@@ -32,7 +34,7 @@ public abstract class APrefWidget extends Table {
 
     public void read() {
         String str = TalosLocalPrefs.Instance().getGlobalData(path);
-        if(str == null || str.isEmpty()) {
+        if(str == null || str.isEmpty() && xml != null) {
             str = xml.getAttribute("default", "0");
         }
         fromString(str);

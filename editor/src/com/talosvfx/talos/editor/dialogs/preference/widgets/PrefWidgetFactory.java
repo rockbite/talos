@@ -5,8 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.nodes.widgets.CheckBoxWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.notifications.GlobalActions;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class PrefWidgetFactory {
@@ -37,6 +37,39 @@ public class PrefWidgetFactory {
         }
 
         return null;
+    }
+
+    public static class KeyInputWidget extends APrefWidget {
+
+        private Label label;
+
+        public KeyInputWidget(String parentPath, XmlReader.Element xml) {
+            super(parentPath, xml);
+        }
+
+        public KeyInputWidget(String parentPath) {
+            super(parentPath, null);
+            build();
+        }
+
+        private void build() {
+            label = new Label("", SharedResources.skin);
+            add(label).growX();
+        }
+
+        @Override
+        protected void fromString(String str) {
+
+        }
+
+        @Override
+        protected String writeString() {
+            return null;
+        }
+
+        public void configure(GlobalActions action) {
+            label.setText(action.name());
+        }
     }
 
     public static class BooleanWidget extends PrefRowWidget {

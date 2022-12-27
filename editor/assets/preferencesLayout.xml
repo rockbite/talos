@@ -7,10 +7,10 @@
             </block>
         </tab>
         <tab name="addons" title="Addons">
-            <injectable id = "addons"></injectable>
+            <injectable name = "addons"></injectable>
         </tab>
         <tab name="keymap" title="Keymap">
-            <injectable id = "keymap"></injectable>
+            <injectable name = "keymap">KeymapBlock</injectable>
         </tab>
     </group>
     <group>

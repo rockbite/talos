@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.APrefWidget;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.PrefWidgetFactory;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Getter;
+import lombok.Setter;
 
 public class CollapsableWidget extends Table {
     protected final Table topSegment;
@@ -18,6 +20,9 @@ public class CollapsableWidget extends Table {
     protected ArrowButton arrowButton;
 
     protected boolean isCollapsed = true;
+
+    @Getter
+    protected Label widgetLabel;
 
     public CollapsableWidget (String title) {
         setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.DARK_GRAY));
@@ -38,7 +43,7 @@ public class CollapsableWidget extends Table {
         // init components
         arrowButton = new ArrowButton(false);
         arrowButton.getCell(arrowButton.getArrowIcon()).pad(0);
-        final Label widgetLabel = new Label(title, SharedResources.skin, "small");
+        widgetLabel = new Label(title, SharedResources.skin, "small");
 
         final Table topSegment = new Table();
         // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
