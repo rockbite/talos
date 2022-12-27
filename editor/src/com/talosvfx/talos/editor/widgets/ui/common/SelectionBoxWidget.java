@@ -31,7 +31,7 @@ public class SelectionBoxWidget extends Table {
         pad(2, 5, 2, 5);
 
         selectionNameLabel = new Label("nothing selected", SharedResources.skin, "small");
-        add(selectionNameLabel).grow().left().minWidth(70);
+        add(selectionNameLabel).grow().left();
         setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY));
     }
 

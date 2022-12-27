@@ -1,11 +1,13 @@
 package com.talosvfx.talos.editor.widgets.ui.common;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class KeymapRowWidget extends CollapsableWidget {
@@ -60,8 +62,8 @@ public class KeymapRowWidget extends CollapsableWidget {
         topSegment.defaults().space(6);
         topSegment.add(arrowButton);
         topSegment.add(checkBox);
-        topSegment.add(selectionBoxWidget);
-        topSegment.add(keymapBox);
+        topSegment.add(selectionBoxWidget).width(100);
+        topSegment.add(keymapBox).minWidth(80);
         topSegment.add().expand();
         return topSegment;
     }
@@ -69,8 +71,73 @@ public class KeymapRowWidget extends CollapsableWidget {
 
     // TODO: 26.12.22 implement
     public class KeymapBox extends Table {
-        public KeymapBox () {
+        private String keyName;
+        private Label keyLabel;
 
+        private boolean inWaitingMode;
+
+        private Drawable defaultBackgroundDrawable = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.BRIGHT_GRAY);
+        private Drawable clickedBackgroundDrawable = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+
+        public KeymapBox () {
+            constructContent();
+            addListeners();
+        }
+
+        private void constructContent () {
+            setBackground(defaultBackgroundDrawable);
+            keyLabel = new Label("", SharedResources.skin, "small");
+            keyLabel.setAlignment(Align.center);
+            add(keyLabel).growX().center();
+        }
+
+
+        private void addListeners() {
+            setTouchable(Touchable.enabled);
+            addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    inWaitingMode = !inWaitingMode;
+
+                    if (inWaitingMode) {
+                        enterWaitingForInputMode();
+                    } else {
+                        resetDefaults();
+                    }
+                }
+            });
+
+            // listen to key input
+            SharedResources.inputHandling.addPermanentInputProcessor(new InputAdapter() {
+                @Override
+                public boolean keyTyped(char character) {
+                    // TODO: 27.12.22 do key binding
+                    if (inWaitingMode) {
+                        setKey(character);
+                        inWaitingMode = false;
+                    }
+
+                    System.out.println(character);
+                    return super.keyTyped(character);
+                }
+            });
+        }
+
+        private void setKey (char keycode) {
+            setBackground(defaultBackgroundDrawable);
+            keyName = String.valueOf(keycode);
+            keyLabel.setText(keyName);
+        }
+
+        private void enterWaitingForInputMode () {
+            setBackground(clickedBackgroundDrawable);
+            keyLabel.setText("Press a key");
+        }
+
+        private void resetDefaults () {
+            setBackground(defaultBackgroundDrawable);
+            keyLabel.setText(keyName);
         }
     }
 }
