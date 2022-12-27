@@ -101,6 +101,7 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
+                valueWidget.setStep(stepWidget.getValue());
                 fireChangedEvent();
             }
         });
@@ -109,6 +110,7 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
+                valueWidget.setStep(stepWidget.getValue());
                 fireChangedEvent();
             }
         });
@@ -116,6 +118,7 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
         stepWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
                 valueWidget.setStep(stepWidget.getValue());
                 fireChangedEvent();
             }
@@ -151,6 +154,9 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
         PropertyFloatWrapper floatWrapper = (PropertyFloatWrapper) propertyWrapper;
         if (floatWrapper.isRanged) {
             rangeWidget.setValue("RANGE");
+            stepWidget.setValue(floatWrapper.step);
+            minWidget.setValue(floatWrapper.minValue);
+            maxWidget.setValue(floatWrapper.maxValue);
         } else {
             rangeWidget.setValue("NORMAL");
         }
