@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
@@ -44,6 +45,7 @@ import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.function.Supplier;
 
 public abstract class PreviewWidget extends ViewportWidget {
@@ -212,7 +214,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 			final String extension = fileHandle.extension();
 
-			if (extension.endsWith("png") || extension.endsWith("jpg")) {
+			if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
 				fileHandle = TalosMain.Instance().ProjectController().findFile(fileHandle);
 				if (fileHandle != null && fileHandle.exists()) {
 					final TextureRegion textureRegion = new TextureRegion(new Texture(fileHandle));

@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
@@ -35,6 +36,7 @@ import com.talosvfx.talos.editor.widgets.TextureDropWidget;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
 import java.io.File;
+import java.util.Locale;
 
 public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends ModuleWrapper<T> {
 
@@ -62,7 +64,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
 
             final String extension = fileHandle.extension();
 
-            if (extension.endsWith("png") || extension.endsWith("jpg")) {
+            if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
                 final Texture texture = new Texture(fileHandle);
                 final Sprite region = new Sprite(texture);
                 final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
