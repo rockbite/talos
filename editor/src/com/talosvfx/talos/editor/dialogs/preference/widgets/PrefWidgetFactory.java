@@ -3,11 +3,15 @@ package com.talosvfx.talos.editor.dialogs.preference.widgets;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.GlobalActions;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.CollapsableWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class PrefWidgetFactory {
 
@@ -40,21 +44,45 @@ public class PrefWidgetFactory {
     }
 
     public static class KeyInputWidget extends APrefWidget {
-
-        private Label label;
-
+        private CheckBox checkBox;
+        private SelectBox selectBox;
+        private KeymapBox keymapBox;
         public KeyInputWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
         }
 
         public KeyInputWidget(String parentPath) {
             super(parentPath, null);
+
             build();
+
+            // TODO: 27.12.22 remove later, added for testing
+            selectBox.setItems("selection 1", "selection 2", "selection 3", "selection 4");
         }
 
         private void build() {
-            label = new Label("", SharedResources.skin);
-            add(label).growX();
+            this.checkBox = new CheckBox("checkboxtext", SharedResources.skin);
+
+            final SelectBox.SelectBoxStyle keyInputWidgetSelectBoxStyle = new SelectBox.SelectBoxStyle(SharedResources.skin.get(SelectBox.SelectBoxStyle.class));
+            keyInputWidgetSelectBoxStyle.font = SharedResources.skin.getFont("small-font");
+            keyInputWidgetSelectBoxStyle.listStyle.font = SharedResources.skin.getFont("small-font");
+            keyInputWidgetSelectBoxStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
+            keyInputWidgetSelectBoxStyle.backgroundOver = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY);
+            keyInputWidgetSelectBoxStyle.backgroundOpen = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+            keyInputWidgetSelectBoxStyle.listStyle.selection = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+            keyInputWidgetSelectBoxStyle.listStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
+            keyInputWidgetSelectBoxStyle.scrollStyle.background =ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
+
+            this.selectBox = new SelectBox<>(keyInputWidgetSelectBoxStyle);
+            this.keymapBox = new KeymapBox();
+
+            // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
+            pad(5, 10, 5, 8).defaults().space(8);
+
+            // assemble top segment
+            add(checkBox).expandX().left();
+            add(selectBox).minWidth(90);
+            add(keymapBox).width(90);
         }
 
         @Override
@@ -68,7 +96,7 @@ public class PrefWidgetFactory {
         }
 
         public void configure(GlobalActions action) {
-            label.setText(action.name());
+            keymapBox.setKey(action.name());
         }
     }
 
