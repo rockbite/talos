@@ -261,6 +261,9 @@ public class SEPropertyPanel extends PropertyPanel {
             nameAndCreateTable.setProperties(field, rulesHint, regexAllowed, createComponentNameConsumer);
             container.clearChildren();
             container.add(nameAndCreateTable).grow();
+
+            // focus on text field when popup created
+            nameAndCreateTable.textField.focusField();
         }
 
         private void collectAssets (GameAssetType assetType, FileHandle handle, FilteredTree.Node<Object> scripts) {
