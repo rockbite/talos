@@ -15,10 +15,18 @@
     </group>
     <group>
         <tab name="system" title="System">
+            <block name = "realtimeSync" title="Realtime Sync">
+                <boolean name = "enable" default = "false">Enable</boolean>
+                <string name = "host" default="127.0.0.1">Host</string>
+                <number name = "port" default="3001">Port</number>
+            </block>
         </tab>
         <tab name="saveLoad" title="Save &amp; Load">
         </tab>
         <tab name="filePaths" title="File Paths">
+            <block name = "general" title="General">
+                <path name = "defaultProjectPath" default="{usr}">Default Project Path</path>
+            </block>
         </tab>
     </group>
 </preferences>

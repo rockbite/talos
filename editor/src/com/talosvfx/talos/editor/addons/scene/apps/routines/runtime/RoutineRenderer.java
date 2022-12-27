@@ -60,7 +60,7 @@ public class RoutineRenderer {
         boolean reset = false;
 
         if(renderCoolDown <= 0f && routineInstance.isDirty) {
-            renderCoolDown = 0.1f;
+            renderCoolDown = routineRendererComponent.cacheCoolDown;
             reset = true;
         }
 

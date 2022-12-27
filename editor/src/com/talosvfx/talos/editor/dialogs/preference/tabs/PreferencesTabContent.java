@@ -15,9 +15,12 @@ public class PreferencesTabContent extends Table {
     @Getter
     Array<APrefWidget> widgetArray;
 
+    Array<BlockWidget> blocks;
+
     public PreferencesTabContent(XmlReader.Element content) {
         widgetArray = new Array<>();
-        padTop(1).defaults().space(2).top().growX();
+        blocks = new Array<>();
+        padTop(3).defaults().space(2).top().growX();
 
         String tabName = content.getAttribute("name");
 
@@ -36,8 +39,10 @@ public class PreferencesTabContent extends Table {
 
             if(blockWidget != null) {
                 widgetArray.addAll(blockWidget.getWidgetArray());
-                add(blockWidget);
+                add(blockWidget).padTop(2);
                 row();
+
+                blocks.add(blockWidget);
             }
         }
 
@@ -67,5 +72,12 @@ public class PreferencesTabContent extends Table {
     private BlockWidget buildBlock(String id, XmlReader.Element block) {
         BlockWidget blockWidget = new BlockWidget(id, block);
         return blockWidget;
+    }
+
+    public void expandFirstBlock() {
+        if(blocks.size > 0) {
+            BlockWidget first = blocks.first();
+            first.expand();
+        }
     }
 }

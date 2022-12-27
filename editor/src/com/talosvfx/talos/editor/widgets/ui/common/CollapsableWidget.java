@@ -78,4 +78,10 @@ public class CollapsableWidget extends Table {
 
         return content;
     }
+
+    public void expand() {
+        isCollapsed = false;
+        contentCell.setActor(content).padLeft(topSegment.getPadLeft()).padRight(topSegment.getPadRight()).padBottom(8);
+        arrowButton.setCollapsed(isCollapsed);
+    }
 }

@@ -109,6 +109,7 @@ public class ProjectSplash extends Table {
 		table.row();
 
 		FileOpenField fileOpener = new FileOpenField();
+		fileOpener.setPath(TalosLocalPrefs.Instance().getGlobalData(PrefKeys.FILE_PATHS.GENERAL.DEFAULT_PROJECT_PATH));
 		fileOpener.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -194,9 +195,6 @@ public class ProjectSplash extends Table {
 
 
 	public void show(Stage stage) {
-
-		String test = TalosLocalPrefs.Instance().getGlobalData(PrefKeys.INTERFACE.DISPLAY.SHOW_SPLASH);
-		System.out.println(test);
 
 		stage.addActor(this);
 		setPosition(stage.getWidth()/2f - getWidth()/2f, stage.getHeight()/2f - getHeight()/2f);

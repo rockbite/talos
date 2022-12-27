@@ -34,7 +34,7 @@ public abstract class APrefWidget extends Table {
 
     public void read() {
         String str = TalosLocalPrefs.Instance().getGlobalData(path);
-        if(str == null || str.isEmpty() && xml != null) {
+        if((str == null || str.isEmpty()) && xml != null) {
             str = xml.getAttribute("default", "0");
         }
         fromString(str);

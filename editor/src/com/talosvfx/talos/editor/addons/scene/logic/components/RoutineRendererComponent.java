@@ -32,6 +32,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
 
+    @ValueProperty(min = 0, max = 999, step=0.1f)
+    public float cacheCoolDown = 0.1f;
 
     public transient RoutineInstance routineInstance;
 
@@ -53,6 +55,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         super.write(json);
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("size", viewportSize, Vector2.class);
+        json.writeValue("cache", cacheCoolDown);
         json.writeValue("properties", propertyWrappers);
     }
 
@@ -74,6 +77,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
         if (viewportSize == null) viewportSize = new Vector2(6, 4);
+
+        cacheCoolDown = jsonData.getFloat("cache", 0.1f);
     }
 
     public void updatePropertyWrappers (boolean tryToMerge) {
@@ -138,6 +143,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "viewportSize", "Viewport");
         properties.add(sizeWidget);
+
+        PropertyWidget cacheWidget = WidgetFactory.generate(this, "cacheCoolDown", "Cache");
+        properties.add(cacheWidget);
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -30,11 +31,22 @@ public class PropertyColorWrapper extends PropertyWrapper<Color> {
     @Override
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
+        defaultValue.set(Color.WHITE);
+        value.set(Color.WHITE);
+        if (jsonData.has("defaultValue")) {
+            JsonValue defaultValueJSON = jsonData.get("defaultValue");
+            defaultValue = json.readValue(Color.class, defaultValueJSON);
+        }
+        if (jsonData.has("value")) {
+            value = json.readValue(Color.class, jsonData.get("value"));
+        }
     }
 
     @Override
     public void write(Json json) {
         super.write(json);
+        json.writeValue("value", value);
+        json.writeValue("defaultValue", defaultValue);
     }
 
     @Override
