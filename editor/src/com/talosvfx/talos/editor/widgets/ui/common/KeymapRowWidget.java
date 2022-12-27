@@ -27,6 +27,10 @@ public class KeymapRowWidget extends CollapsableWidget {
         selectionBoxWidget.addSelection(new SelectionBoxWidget.SelectionBox("selection 4"));
     }
 
+    public void addSelection (SelectionBoxWidget.SelectionBox selectionBox) {
+        selectionBoxWidget.addSelection(selectionBox);
+    }
+
     @Override
     protected void addListeners() {
         arrowButton.setTouchable(Touchable.enabled);
@@ -59,12 +63,12 @@ public class KeymapRowWidget extends CollapsableWidget {
         topSegment.pad(5, 10, 5, 8);
 
         // assemble top segment
-        topSegment.defaults().space(6);
+        topSegment.defaults().space(8);
         topSegment.add(arrowButton);
-        topSegment.add(checkBox);
-        topSegment.add(selectionBoxWidget).width(100);
-        topSegment.add(keymapBox).minWidth(80);
-        topSegment.add().expand();
+        topSegment.add(checkBox).expandX().left();
+        topSegment.add(selectionBoxWidget).width(90);
+        topSegment.add(keymapBox).width(90);
+
         return topSegment;
     }
 
@@ -76,7 +80,7 @@ public class KeymapRowWidget extends CollapsableWidget {
 
         private boolean inWaitingMode;
 
-        private Drawable defaultBackgroundDrawable = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.BRIGHT_GRAY);
+        private Drawable defaultBackgroundDrawable = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.PANEL_GRAY);
         private Drawable clickedBackgroundDrawable = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
 
         public KeymapBox () {
@@ -86,7 +90,7 @@ public class KeymapRowWidget extends CollapsableWidget {
 
         private void constructContent () {
             setBackground(defaultBackgroundDrawable);
-            keyLabel = new Label("", SharedResources.skin, "small");
+            keyLabel = new Label("---", SharedResources.skin, "small");
             keyLabel.setAlignment(Align.center);
             add(keyLabel).growX().center();
         }
@@ -109,19 +113,13 @@ public class KeymapRowWidget extends CollapsableWidget {
             });
 
             // listen to key input
-            SharedResources.inputHandling.addPermanentInputProcessor(new InputAdapter() {
-                @Override
-                public boolean keyTyped(char character) {
-                    // TODO: 27.12.22 do key binding
-                    if (inWaitingMode) {
-                        setKey(character);
-                        inWaitingMode = false;
-                    }
-
-                    System.out.println(character);
-                    return super.keyTyped(character);
-                }
-            });
+//            // TODO: 27.12.22 do key binding
+//            if (inWaitingMode) {
+//                setKey(character);
+//                inWaitingMode = false;
+//            }
+//
+//            System.out.println(character);
         }
 
         private void setKey (char keycode) {

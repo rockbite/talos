@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.widgets.ui.common;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -28,10 +29,13 @@ public class SelectionBoxWidget extends Table {
     }
 
     private void constructContent () {
-        pad(2, 5, 2, 5);
+        pad(2, 5, 2, 2);
 
-        selectionNameLabel = new Label("nothing selected", SharedResources.skin, "small");
+        selectionNameLabel = new Label("---", SharedResources.skin, "small");
+        final Image downPointerArrow = new Image(SharedResources.skin.getDrawable("mini-arrow-down"));
+
         add(selectionNameLabel).grow().left();
+        add(downPointerArrow);
         setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY));
     }
 
@@ -113,7 +117,7 @@ public class SelectionBoxWidget extends Table {
             pad(1, 5, 1, 5);
 
             selectionNameLabel = new Label(name, SharedResources.skin, "small");
-            add(selectionNameLabel).height(15).growX().minWidth(100).left();
+            add(selectionNameLabel).height(15).growX().minWidth(95).left();
         }
 
         private void addListeners () {
