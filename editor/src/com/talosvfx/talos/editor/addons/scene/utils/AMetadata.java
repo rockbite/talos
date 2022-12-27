@@ -72,4 +72,10 @@ public abstract class AMetadata implements IPropertyProvider, IPropertyHolder, J
     public void read (Json json, JsonValue jsonData) {
         uuid = UUID.fromString(jsonData.getString("uuid"));
     }
+
+    @Override
+    public String getName(){
+        return "metadata";
+    }
+
 }
