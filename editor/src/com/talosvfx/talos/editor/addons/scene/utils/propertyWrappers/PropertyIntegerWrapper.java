@@ -42,6 +42,7 @@ public class PropertyIntegerWrapper extends PropertyNumberWrapper<Integer> {
         minValue = jsonData.getInt("minValue", Integer.MIN_VALUE);
         maxValue = jsonData.getInt("maxValue", Integer.MAX_VALUE);
         step = jsonData.getInt("step", 1);
+        isRanged = jsonData.getBoolean("isRanged", false);
     }
 
     @Override

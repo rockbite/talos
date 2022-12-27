@@ -29,6 +29,9 @@ public class RenderQuadNode extends RoutineNode {
             return;
         }
         Texture resource = asset.getResource();
+        if (resource == null) {
+            return;
+        }
         drawableQuad.texture = resource;
 
         drawableQuad.rotation = fetchFloatValue("rotation");

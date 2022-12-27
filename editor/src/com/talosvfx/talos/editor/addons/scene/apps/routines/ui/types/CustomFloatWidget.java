@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyFloatWrapper;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
@@ -11,7 +12,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public class CustomFloatWidget extends ATypeWidget {
+public class CustomFloatWidget extends ATypeWidget<Float> {
 
     private final Cell<Table> contentCell;
     private final Table content;
@@ -21,9 +22,9 @@ public class CustomFloatWidget extends ATypeWidget {
     private final SelectWidget rangeWidget;
     private ValueWidget minWidget;
     private ValueWidget maxWidget;
+    private ValueWidget stepWidget;
 
     public CustomFloatWidget() {
-
         valueWidget = new ValueWidget();
         valueWidget.init(SharedResources.skin);
         valueWidget.setMainColor(ColorLibrary.BackgroundColor.BLACK_TRANSPARENT);
@@ -49,8 +50,7 @@ public class CustomFloatWidget extends ATypeWidget {
         rangeWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String value = rangeWidget.getValue();
-                if(value.equals("RANGE")) {
+                if(isRanged()) {
                     valueWidget.setShowProgress(true);
                     expand();
                 } else {
@@ -87,6 +87,14 @@ public class CustomFloatWidget extends ATypeWidget {
         table.add(maxWidget).padLeft(4).padRight(4).width(220);
         table.row();
 
+        stepWidget = new ValueWidget();
+        stepWidget.init(SharedResources.skin);
+        stepWidget.setMainColor(ColorLibrary.BackgroundColor.BLACK_TRANSPARENT);
+        stepWidget.setLabel("Step");
+        stepWidget.setType(ValueWidget.Type.NORMAL);
+        table.add(stepWidget).padTop(5).padLeft(4).padRight(4).width(220);
+        table.row();
+
         table.pack();
 
         minWidget.addListener(new ChangeListener() {
@@ -101,6 +109,14 @@ public class CustomFloatWidget extends ATypeWidget {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 valueWidget.setRange(minWidget.getValue(), maxWidget.getValue());
+                fireChangedEvent();
+            }
+        });
+
+        stepWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                valueWidget.setStep(stepWidget.getValue());
                 fireChangedEvent();
             }
         });
@@ -120,14 +136,36 @@ public class CustomFloatWidget extends ATypeWidget {
         UIUtils.invalidateForDepth(content, 6);
     }
 
+    private boolean isRanged() {
+        String value = rangeWidget.getValue();
+        return value.equalsIgnoreCase("range");
+    }
+
     @Override
     public String getTypeName() {
         return "float";
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
-        propertyWrapper.setValue(valueWidget.getValue());
+    public void updateFromPropertyWrapper(PropertyWrapper<Float> propertyWrapper) {
+        PropertyFloatWrapper floatWrapper = (PropertyFloatWrapper) propertyWrapper;
+        if (floatWrapper.isRanged) {
+            rangeWidget.setValue("RANGE");
+        } else {
+            rangeWidget.setValue("NORMAL");
+        }
     }
 
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<Float> propertyWrapper) {
+        PropertyFloatWrapper floatPropertyWrapper = (PropertyFloatWrapper) propertyWrapper;
+        boolean ranged = isRanged();
+        floatPropertyWrapper.isRanged = ranged;
+        if (ranged) {
+            floatPropertyWrapper.minValue = minWidget.getValue();
+            floatPropertyWrapper.maxValue = maxWidget.getValue();
+            floatPropertyWrapper.step = stepWidget.getValue();
+        }
+        floatPropertyWrapper.defaultValue = valueWidget.getValue();
+    }
 }

@@ -23,6 +23,7 @@ public class PropertyColorWrapper extends PropertyWrapper<Color> {
         clone.defaultValue.set(defaultValue);
         clone.propertyName = propertyName;
         clone.index = index;
+        clone.isValueOverridden = isValueOverridden;
         return clone;
     }
 
@@ -39,5 +40,10 @@ public class PropertyColorWrapper extends PropertyWrapper<Color> {
     @Override
     public PropertyType getType() {
         return PropertyType.COLOR;
+    }
+
+    @Override
+    public void setDefault() {
+        value.set(defaultValue);
     }
 }
