@@ -1,12 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -15,7 +15,6 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.data.RoutineStageData;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -27,6 +26,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     GameAsset<RoutineStageData> routineResource;
 
     GameAsset.GameAssetUpdateListener updateListener;
+
+    Array<PropertyWidget> properties = new Array<>();
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
@@ -89,8 +90,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         if (tryToMerge) {
             for (PropertyWrapper copyWrapper : copyWrappers) {
                 for (PropertyWrapper propertyWrapper : propertyWrappers) {
-                    if (copyWrapper.index == propertyWrapper.index && copyWrapper.getClass().equals(propertyWrapper.getClass())) {
-                        propertyWrapper.setValue(copyWrapper.getValue());
+                    if (copyWrapper.index == propertyWrapper.index) {
+                        if (copyWrapper.isValueOverridden) {
+                            propertyWrapper.setValue(copyWrapper.getValue());
+                        } else {
+                            propertyWrapper.setValue(copyWrapper.defaultValue);
+                        }
                         break;
                     }
                 }
@@ -114,11 +119,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     }
 
-
     @Override
     public Array<PropertyWidget> getListOfProperties() {
-        Array<PropertyWidget> properties = new Array<>();
-
+        properties.clear();
         AssetSelectWidget<RoutineStageData> widget = new AssetSelectWidget<RoutineStageData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineStageData>>() {
             @Override
             public GameAsset<RoutineStageData> get() {
@@ -141,6 +144,13 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
             PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
+            generate.setInjectedChangeListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    propertyWrapper.isValueOverridden = true;
+                    RoutineRendererComponent.this.routineInstance.isDirty = true;
+                }
+            });
             generate.setParent(this);
             properties.add(generate);
         }

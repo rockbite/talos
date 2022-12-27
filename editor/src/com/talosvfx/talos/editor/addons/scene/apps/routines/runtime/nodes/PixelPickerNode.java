@@ -19,6 +19,9 @@ public class PixelPickerNode extends RoutineNode {
         int y = (int)fetchFloatValue("y");
 
         GameAsset<Texture> asset = fetchAssetValue("texture");
+        if (asset == null) {
+            return Color.BLACK;
+        }
         Texture texture = asset.getResource();
 
         if(assetName == null || (assetName != null && !assetName.equals(asset.nameIdentifier)) || nodeDirty) {

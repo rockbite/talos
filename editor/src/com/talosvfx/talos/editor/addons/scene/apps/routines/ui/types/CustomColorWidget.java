@@ -1,10 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
+import com.badlogic.gdx.graphics.Color;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class CustomColorWidget extends ATypeWidget {
+public class CustomColorWidget extends ATypeWidget<Color> {
 
     private final ColorWidget colorWidget;
 
@@ -14,8 +15,13 @@ public class CustomColorWidget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
-        propertyWrapper.setValue(colorWidget.getValue());
+    public void updateFromPropertyWrapper(PropertyWrapper<Color> propertyWrapper) {
+        colorWidget.setColor(propertyWrapper.defaultValue);
+    }
+
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<Color> propertyWrapper) {
+        propertyWrapper.defaultValue.set(colorWidget.getValue());
     }
 
     public CustomColorWidget() {

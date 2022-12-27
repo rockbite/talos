@@ -23,6 +23,7 @@ public class PropertyVec2Wrapper extends PropertyWrapper<Vector2> {
         clone.defaultValue.set(defaultValue);
         clone.propertyName = propertyName;
         clone.index = index;
+        clone.isValueOverridden = isValueOverridden;
         return clone;
     }
 
@@ -51,5 +52,10 @@ public class PropertyVec2Wrapper extends PropertyWrapper<Vector2> {
     @Override
     public PropertyType getType() {
         return PropertyType.VECTOR2;
+    }
+
+    @Override
+    public void setDefault() {
+        value.set(defaultValue);
     }
 }

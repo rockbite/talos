@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -14,10 +15,10 @@ import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
 import java.util.function.Supplier;
 
 /**
- * todo: this needs to support all types not hust sprites
+ * todo: this needs to support all types not just sprites
  */
-public class CustomAssetWidget extends ATypeWidget {
-    private final AssetSelector assetWidget;
+public class CustomAssetWidget extends ATypeWidget<GameAsset<Texture>> {
+    private final AssetSelector<Texture> assetWidget;
 
     @Override
     public String getTypeName() {
@@ -25,8 +26,13 @@ public class CustomAssetWidget extends ATypeWidget {
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper propertyWrapper) {
-        propertyWrapper.setValue(assetWidget.getValue());
+    public void updateFromPropertyWrapper(PropertyWrapper<GameAsset<Texture>> propertyWrapper) {
+        assetWidget.updateWidget(propertyWrapper.defaultValue);
+    }
+
+    @Override
+    public void applyValueToWrapper(PropertyWrapper<GameAsset<Texture>> propertyWrapper) {
+        propertyWrapper.defaultValue = assetWidget.getValue();
     }
 
     public CustomAssetWidget() {

@@ -36,10 +36,12 @@ import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.text.Style;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,6 +97,11 @@ public class SEPropertyPanel extends PropertyPanel {
             defaults().pad(5);
 
             textField = new VisTextField("");
+            // update background to brighter drawable
+            final VisTextField.VisTextFieldStyle newStyleWithBrighterBackground = new VisTextField.VisTextFieldStyle(textField.getStyle());
+            newStyleWithBrighterBackground.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.DARK_GRAY);
+            textField.setStyle(newStyleWithBrighterBackground);
+
             label = new VisLabel("");
             hint = new VisLabel("");
             Color color = new Color(Color.YELLOW);
@@ -254,6 +261,9 @@ public class SEPropertyPanel extends PropertyPanel {
             nameAndCreateTable.setProperties(field, rulesHint, regexAllowed, createComponentNameConsumer);
             container.clearChildren();
             container.add(nameAndCreateTable).grow();
+
+            // focus on text field when popup created
+            nameAndCreateTable.textField.focusField();
         }
 
         private void collectAssets (GameAssetType assetType, FileHandle handle, FilteredTree.Node<Object> scripts) {

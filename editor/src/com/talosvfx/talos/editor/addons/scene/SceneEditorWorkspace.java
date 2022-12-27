@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
@@ -47,11 +48,13 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -142,6 +145,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return null;
+	}
+
+	public void getChildrenHavingComponentClass (GameObject root, Class<? extends AComponent> componentClass, Array<GameObject> array) {
+		if (root.hasComponent(componentClass)) {
+			array.add(root);
+		}
+
+		Array<GameObject> children = root.getGameObjects();
+
+		if (children == null) {
+			return;
+		}
+
+		for (int i = 0; i < children.size; i++) {
+			GameObject child = children.get(i);
+			getChildrenHavingComponentClass(child, componentClass, array);
+		}
 	}
 
 	// selections
@@ -449,6 +469,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void selectExternal (SelectGameObjectExternallyEvent event) {
 		selectGameObjectExternally(event.getGameObject());
 	}
+
+	@EventHandler
+	public void onSave (SaveRequest event) {
+		Array<GameObject> components = new Array<>();
+		getChildrenHavingComponentClass(getRootGO(), PaintSurfaceComponent.class, components);
+		for (GameObject gameObjects : components) {
+			PaintSurfaceComponent paintSurfaceComponent = gameObjects.getComponent(PaintSurfaceComponent.class);
+			paintSurfaceComponent.saveOnFile();
+		}
+	}
+
 	@EventHandler
 	public void deSelectEternal (DeSelectGameObjectExternallyEvent event) {
 		removeFromSelection(event.getGameObject());

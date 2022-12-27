@@ -4,8 +4,6 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import lombok.Getter;
-import lombok.Setter;
 
 public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable {
 
@@ -16,6 +14,8 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public T defaultValue;
 
     public int index;
+
+    public boolean isValueOverridden = false;
 
     public void collectAttributes (Array<String> attributes) {
         for (int i = 0; i < attributes.size; i+=2) {
@@ -42,6 +42,7 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
             clone.defaultValue = defaultValue;
             clone.propertyName = propertyName;
             clone.index = index;
+            clone.isValueOverridden = isValueOverridden;
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -53,12 +54,14 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public void read (Json json, JsonValue jsonData) {
        propertyName = jsonData.getString("propertyName");
        index = jsonData.getInt("index");
+       isValueOverridden = jsonData.getBoolean("isValueOverridden", false);
     }
 
     @Override
     public void write (Json json) {
         json.writeValue("propertyName", propertyName);
         json.writeValue("index", index);
+        json.writeValue("isValueOverridden", isValueOverridden);
     }
 
     public abstract T parseValueFromString (String value);

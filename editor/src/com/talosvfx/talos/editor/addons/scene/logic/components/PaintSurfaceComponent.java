@@ -1,6 +1,10 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -124,6 +128,15 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("overlay", overlay);
         json.writeValue("size", size, Vector2.class);
+    }
+
+    public void saveOnFile () {
+        GameAsset<Texture> gameResource = getGameResource();
+        FileHandle handle = gameResource.getRootRawAsset().handle;
+
+        TextureData textureData = gameResource.getResource().getTextureData();
+        textureData.prepare();
+        PixmapIO.writePNG(handle, textureData.consumePixmap());
     }
 
     @Override
