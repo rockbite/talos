@@ -10,6 +10,8 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.*;
 import lombok.Getter;
 
+import java.util.Locale;
+
 public enum GameAssetType {
 	SPRITE(new String[]{"png", "jpg", "jpeg"}, true),
 	ATLAS(new String[]{"atlas"}, true),
@@ -54,8 +56,9 @@ public enum GameAssetType {
 	}
 
 	public static GameAssetType getAssetTypeFromExtension (String extension) throws NoAssetTypeException {
+		extension = extension.toLowerCase();
 		for (GameAssetType value : GameAssetType.values()) {
-			if (value.extensions.contains(extension)) {
+			if (value.extensions.contains(extension.toLowerCase(Locale.US))) {
 				return value;
 			}
 		}

@@ -15,11 +15,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+
+import java.util.Locale;
 
 class Item extends Widget implements ActorCloneable<Item> {
 	private Image icon;
@@ -68,7 +71,7 @@ class Item extends Widget implements ActorCloneable<Item> {
 		} else {
 			icon.setDrawable(SharedResources.skin.getDrawable("ic-file-big"));
 			String extension = fileHandle.extension();
-			if (extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg")) {
+			if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
 				Texture texture = new Texture(fileHandle);
 				TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
 				icon.setDrawable(drawable);
