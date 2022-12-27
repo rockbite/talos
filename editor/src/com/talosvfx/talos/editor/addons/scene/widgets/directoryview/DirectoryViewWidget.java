@@ -181,6 +181,11 @@ public class DirectoryViewWidget extends Table {
 								arr.add(provider);
 								return arr;
 							}
+
+							@Override
+							public String getName() {
+								return item.fileHandle.name();
+							}
 						};
 					}
 				}

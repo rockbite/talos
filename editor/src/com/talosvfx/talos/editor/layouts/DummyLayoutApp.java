@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -63,7 +64,9 @@ public class DummyLayoutApp implements LayoutApp {
 		tab.padLeft(10);
 		tab.padRight(10);
 		visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
-		tab.add(visLabel).pad(5).padLeft(0);
+		tab.add(visLabel).pad(5).padLeft(0).left().maxWidth(300).minWidth(0);
+		visLabel.setAlignment(Align.left);
+		visLabel.setEllipsis(true);
 
 		ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
 		actor.addListener(new ClickListener() {

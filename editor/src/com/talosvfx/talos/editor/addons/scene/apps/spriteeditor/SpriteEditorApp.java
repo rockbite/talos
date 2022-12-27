@@ -58,7 +58,11 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
 
     @Override
     public String getAppName () {
-        return "Sprite";
+        if (gameAsset != null) {
+            return "Sprite - " + gameAsset.nameIdentifier;
+        } else {
+            return "Sprite - ";
+        }
     }
 
     @Override
