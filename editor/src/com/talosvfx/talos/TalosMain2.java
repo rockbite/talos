@@ -76,7 +76,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		fullScreen.add(topBar).growX().height(30);
 		fullScreen.row();
 		MainMenu menu = new MainMenu();
-		menu.buildFrom(Gdx.files.internal("menu-bar.xml"));
+		menu.buildFrom(Gdx.files.internal("menuBar.xml"));
 		SharedResources.mainMenu = menu;
 		topBar.add(menu).grow().padLeft(4);
 

@@ -5,11 +5,13 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.project2.RecentProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Data;
+import lombok.Getter;
 
 public class TalosLocalPrefs {
 
@@ -20,6 +22,9 @@ public class TalosLocalPrefs {
 	@Data
 	public static class LocalPrefData {
 		private Array<RecentProject> recentProjects = new Array<>();
+
+		@Getter
+		private ObjectMap<String, String> globalPrefs = new ObjectMap<>();
 
 		public void updateProject (String absolutePathToProjectFile) {
 			for (RecentProject recentProject : recentProjects) {
@@ -106,6 +111,14 @@ public class TalosLocalPrefs {
 
 		localPrefData.recentProjects.sort();
 		return localPrefData.recentProjects;
+	}
+
+	public void setGlobalData(String key, String value) {
+		localPrefData.globalPrefs.put(key, value);
+	}
+
+	public String getGlobalData(String key) {
+		return localPrefData.globalPrefs.get(key, "");
 	}
 
 	public void updateProject (TalosProjectData talosProjectData) {
