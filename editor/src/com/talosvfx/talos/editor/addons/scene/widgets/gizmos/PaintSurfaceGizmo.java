@@ -117,19 +117,14 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
 
         innerBatch.draw(brushTexture,
-                tmp.x - brushTexture.getWidth()/2f, 400 - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
+                tmp.x - brushTexture.getWidth()/2f, surface.size.y - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
 
         innerBatch.end();
 
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
 
         frameBuffer.end();
-        String path = surface.gameAsset.dependentRawAssets.first().handle.path();
-        FileHandle handle = Gdx.files.absolute(path);
-
-        PixmapIO.writePNG(handle, pixmap);
-        pixmap.dispose();
-        Texture texture = new Texture(handle);
+        Texture texture = new Texture(pixmap);
 
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         surface.gameAsset.setResourcePayload(texture);

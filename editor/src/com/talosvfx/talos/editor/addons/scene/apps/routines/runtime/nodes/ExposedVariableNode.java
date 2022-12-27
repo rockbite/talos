@@ -20,7 +20,7 @@ public class ExposedVariableNode extends RoutineNode {
     @Override
     public Object queryValue (String targetPortName) {
         if (propertyWrapper == null) {
-            return null;
+            return 0;
         }
 
         return propertyWrapper.value;
