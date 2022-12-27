@@ -46,11 +46,7 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> {
 
 	@Override
 	public String getAppName () {
-		if (gameAsset != null) {
-			return "Properties - " + gameAsset.nameIdentifier;
-		} else {
-			return "Properties - ";
-		}
+		return "Properties";
 	}
 
 	@Override

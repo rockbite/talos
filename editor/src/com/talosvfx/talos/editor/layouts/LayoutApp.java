@@ -1,7 +1,6 @@
 package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 
 public interface LayoutApp {
 
@@ -28,5 +27,7 @@ public interface LayoutApp {
 
 	void onInputProcessorAdded ();
 	void onInputProcessorRemoved ();
+
+	void updateTabName(String name);
 
 }

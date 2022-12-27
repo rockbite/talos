@@ -53,11 +53,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 	@Override
 	public String getAppName () {
-		if (gameAsset != null) {
-			return "Hierarchy - " + gameAsset.nameIdentifier;
-		} else {
-			return "Hierarchy - ";
-		}
+		return "Hierarchy";
 	}
 
 	@Override

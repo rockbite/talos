@@ -28,6 +28,7 @@ public class DummyLayoutApp implements LayoutApp {
 	@Getter
 	private DestroyCallback destroyCallback;
 	private boolean active;
+	private VisLabel visLabel;
 
 	public DummyLayoutApp (Skin skin, String tabName) {
 		this.tabName = tabName;
@@ -61,7 +62,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 		tab.padLeft(10);
 		tab.padRight(10);
-		VisLabel visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
+		visLabel = new VisLabel(tabName.substring(0, Math.min(10, tabName.length())));
 		tab.add(visLabel).pad(5).padLeft(0);
 
 		ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
@@ -181,5 +182,9 @@ public class DummyLayoutApp implements LayoutApp {
 	@Override
 	public void onInputProcessorRemoved () {
 
+	}
+	@Override
+	public void updateTabName(String name){
+		visLabel.setText(name);
 	}
 }
