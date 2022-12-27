@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.dialogs.preference.widgets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -7,11 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.GlobalActions;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.CollapsableWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.FileOpenField;
 
 public class PrefWidgetFactory {
 
@@ -25,6 +28,12 @@ public class PrefWidgetFactory {
         }
         if(item.getName().equals("number")) {
             widget = new NumberWidget(parentPath, item);
+        }
+        if(item.getName().equals("string")) {
+            widget = new StringWidget(parentPath, item);
+        }
+        if(item.getName().equals("path")) {
+            widget = new PathWidget(parentPath, item);
         }
 
         if(widget != null) {
@@ -162,6 +171,59 @@ public class PrefWidgetFactory {
         @Override
         protected String writeString() {
             return Float.toString(valueWidget.getValue());
+        }
+    }
+
+    public static class StringWidget extends PrefRowWidget {
+        private final TextValueWidget widget;
+
+        public StringWidget(String parentPath, XmlReader.Element xml) {
+            super(parentPath, xml);
+            Label label = new Label(xml.getText(), SharedResources.skin);
+            leftContent.add(label).right().expandX();
+
+            widget = new TextValueWidget(SharedResources.skin);
+            rightContent.add(widget).left().expandX().padLeft(7).padBottom(5);
+        }
+
+        @Override
+        protected void fromString(String str) {
+            widget.setValue(str);
+        }
+
+        @Override
+        protected String writeString() {
+            return widget.getValue();
+        }
+    }
+
+    public static class PathWidget extends PrefRowWidget {
+
+
+        private final FileOpenField fileOpener;
+
+        public PathWidget(String parentPath, XmlReader.Element xml) {
+            super(parentPath, xml);
+
+            Label label = new Label(xml.getText(), SharedResources.skin);
+            leftContent.add(label).right().expandX();
+
+            fileOpener = new FileOpenField();
+            fileOpener.getInputContainer().setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
+            rightContent.add(fileOpener).left().expand().growX().padLeft(5).padRight(5);
+        }
+
+        @Override
+        protected void fromString(String str) {
+            if(str.equals("{usr}")) {
+                str = Gdx.files.absolute(System.getProperty("user.home")).file().getAbsolutePath();
+            }
+            fileOpener.setPath(str);
+        }
+
+        @Override
+        protected String writeString() {
+            return fileOpener.getPath();
         }
     }
 }

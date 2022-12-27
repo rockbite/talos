@@ -24,6 +24,7 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
     private XmlReader.Element xmlRoot;
 
     private Array<APrefWidget> widgetArray;
+    private VerticalTabGroup tabsContent;
 
     @Override
     public Table build() {
@@ -50,10 +51,11 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
         contentSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
         contentSegment.defaults().space(5);
 
+        scrollPane = new ScrollPane(null);
+
         // left part where tabs are displayed
         final Table tabsSegment = constructTabsSegment();
         // right part where info of the tabs are displayed
-        scrollPane = new ScrollPane(null);
 
         contentSegment.add(tabsSegment).growY().width(160);
         contentSegment.add(scrollPane).grow().pad(5);
@@ -64,15 +66,19 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
         final Table tabsSegment = new Table();
         tabsSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
 
-        final VerticalTabGroup tabsContent = new VerticalTabGroup();
+        tabsContent = new VerticalTabGroup();
         tabsContent.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 scrollPane.setActor(tabsContent.getSelectedTab().getContent());
+                tabsContent.getSelectedTab().getContent().expandFirstBlock();
             }
         });
 
         final ScrollPane scrollPane = new ScrollPane(tabsContent);
+
+        VerticalTab firstTab = null;
+        int iterator = 0;
 
         Array<XmlReader.Element> groups = xmlRoot.getChildrenByName("group");
         for(XmlReader.Element group : groups) {
@@ -82,7 +88,12 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
                 String title = tab.getAttribute("title");
                 PreferencesTabContent preferencesTabContent = new PreferencesTabContent(tab);
                 widgetArray.addAll(preferencesTabContent.getWidgetArray());
-                tabsContent.addTab(title, preferencesTabContent);
+                VerticalTab verticalTab = tabsContent.addTab(title, preferencesTabContent);
+
+                if(iterator == 0) {
+                    firstTab = verticalTab;
+                }
+                iterator++;
             }
 
             tabsContent.endGroup();
@@ -92,7 +103,17 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
         tabsSegment.row();
         tabsSegment.add().expandY();
 
+        openTab(firstTab);
+
         return tabsSegment;
+    }
+
+    private void openTab(VerticalTab tab) {
+        tabsContent.selectedTab = tab;
+        tab.select();
+        scrollPane.setActor(tabsContent.getSelectedTab().getContent());
+        PreferencesTabContent content = tabsContent.getSelectedTab().getContent();
+        content.expandFirstBlock();
     }
 
     public class VerticalTabGroup extends Table {
@@ -108,7 +129,7 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
             defaults().height(25).growX();
         }
 
-        public void addTab (String title, PreferencesTabContent preferenceTabContent) {
+        public VerticalTab addTab (String title, PreferencesTabContent preferenceTabContent) {
             final VerticalTab tab = new VerticalTab(title, preferenceTabContent);
             tab.addListener(new ClickListener() {
                 @Override
@@ -132,6 +153,8 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
                 startGroup = false;
             }
             add(tab).padBottom(minSpace).row();
+
+            return tab;
         }
 
         public void startGroup () {

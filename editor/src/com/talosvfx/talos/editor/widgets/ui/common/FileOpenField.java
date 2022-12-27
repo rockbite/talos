@@ -12,16 +12,19 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Getter;
 
 public class FileOpenField extends Table {
 
     private final VisTextField projectDirectory;
+    @Getter
+    private final Table inputContainer;
 
     public FileOpenField() {
         projectDirectory = new VisTextField(Gdx.files.absolute(System.getProperty("user.home")).file().getAbsolutePath());
         RoundedFlatButton selectDirectory = new RoundedFlatButton(); selectDirectory.makeRight("Open");
 
-        Table inputContainer = new Table();
+        inputContainer = new Table();
         inputContainer.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.DARK_GRAY));
 
         projectDirectory.getStyle().background = null;
@@ -65,5 +68,9 @@ public class FileOpenField extends Table {
         }
 
         return var2;
+    }
+
+    public void setPath(String path) {
+        projectDirectory.setText(path);
     }
 }

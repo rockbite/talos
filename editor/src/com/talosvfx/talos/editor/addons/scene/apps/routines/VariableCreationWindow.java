@@ -73,6 +73,7 @@ public class VariableCreationWindow extends Table {
                 BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
+                        .addItem("Boolean", PropertyType.BOOLEAN)
                         .addItem("Color", PropertyType.COLOR)
                         .addItem("Asset", PropertyType.ASSET)
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {

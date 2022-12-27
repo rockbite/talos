@@ -142,6 +142,14 @@
                 <value port="output" name="falseOutput" type="signal">false</value>
             </group>
         </module>
+        <module name = "ConditionBooleanNode" title = "Condition Boolean" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">signal</value>
+            <value port="input" name="value" type="float">value</value>
+            <group>
+                <value port="output" name="trueOutput" type="signal">true</value>
+                <value port="output" name="falseOutput" type="signal">false</value>
+            </group>
+        </module>
         <module name = "PixelPickerNode" title = "Pixel Picker" keywords = "" class = "RoutineNodeWidget">
             <asset port="input" name="texture" type="SPRITE">texture</asset>
             <group>
