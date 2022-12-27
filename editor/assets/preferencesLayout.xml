@@ -2,8 +2,7 @@
     <group>
         <tab name="interface" title="Interface">
             <block name = "display" title="Display">
-                <number name = "test" min="0" max="10" step="1">Test</number>
-                <boolean name = "showSplash">Splash Screen</boolean>
+                <boolean name = "showSplash" default = "true">Splash Screen</boolean>
                 <boolean name = "showTooltips" label="Tooltips">User Tooltips</boolean>
             </block>
         </tab>

@@ -88,12 +88,11 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
-		openProjectExplorer();
-
 		SharedResources.talosControl = new TalosControl();
 
 		Notifications.quickFire(FinishInitializingEvent.class);
 
+		openProjectExplorer();
 	}
 
 	private void projectLoader (TalosProjectData projectData) {
