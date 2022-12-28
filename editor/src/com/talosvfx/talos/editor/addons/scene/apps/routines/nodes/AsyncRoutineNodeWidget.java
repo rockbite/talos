@@ -35,6 +35,8 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     private SelectBox interpolationSelectBox;
     private InterpolationTimeline timelineWidget;
 
+    private boolean runningFlag = false;
+
     public AsyncRoutineNodeWidget() {
 
     }
@@ -304,12 +306,33 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
             Array<? extends AsyncRoutineNodeState<?>> states = node.getStates();
 
             if (states.size > 0) {
+                if(!runningFlag) {
+                    runningFlag = true;
+                    onRunStart();
+                }
                 for (AsyncRoutineNodeState<?> state : states) {
                     Object target = state.getTarget();
                     timelineWidget.setProgress(target, state.alpha);
                     microNodeView.setProgress(target, state.alpha);
                 }
+            } else {
+                if(runningFlag) {
+                    runningFlag = false;
+                    onRunStop();
+                }
             }
+        }
+    }
+
+    private void onRunStart() {
+        if(isMicroView) {
+            microNodeView.showProgressDisc();
+        }
+    }
+
+    private void onRunStop() {
+        if(isMicroView) {
+            microNodeView.hideProgressDisc();
         }
     }
 
