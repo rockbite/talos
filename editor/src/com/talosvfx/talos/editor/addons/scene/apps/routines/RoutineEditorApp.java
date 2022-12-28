@@ -1,25 +1,21 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.editor.addons.scene.events.FileNameChanged;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements Observer {
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
@@ -81,6 +77,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
         };
 
         this.gridAppReference = app;
+        Notifications.registerObserver(this);
     }
 
     @Override
@@ -89,6 +86,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
 
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
+        variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
     }
 
     @Override
@@ -103,4 +101,14 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
     public void onRemove() {
         // remove listeners and stuff somehow
     }
+
+    @EventHandler
+    public void onFileNameChanged(FileNameChanged fileNameChanged){
+        if(gameAsset == null) return;
+        if (gameAsset.type == fileNameChanged.assetType && fileNameChanged.oldName.equals(gameAsset.nameIdentifier)) {
+            gameAsset.nameIdentifier = fileNameChanged.newName;
+            variableCreationWindow.setRoutineName(fileNameChanged.newName);
+        }
+    }
+
 }
