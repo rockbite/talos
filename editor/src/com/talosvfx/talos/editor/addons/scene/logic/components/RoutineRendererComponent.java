@@ -88,33 +88,28 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         propertyWrappers.clear();
         if (routineInstance != null) {
             for (PropertyWrapper<?> propertyWrapper : routineInstance.getParentPropertyWrappers()) {
-                propertyWrappers.add(propertyWrapper);
-            }
-        }
-
-        if (tryToMerge) {
-            for (PropertyWrapper copyWrapper : copyWrappers) {
-                for (PropertyWrapper propertyWrapper : propertyWrappers) {
-                    if (copyWrapper.index == propertyWrapper.index) {
-                        if (copyWrapper.isValueOverridden) {
-                            propertyWrapper.setValue(copyWrapper.getValue());
-                        } else {
-                            propertyWrapper.setValue(copyWrapper.defaultValue);
+                if (tryToMerge) {
+                    boolean foundCopy = false;
+                    for (PropertyWrapper<?> copyWrapper : copyWrappers) {
+                        if (copyWrapper.index == propertyWrapper.index) {
+                            foundCopy = true;
+                            if (copyWrapper.isValueOverridden) {
+                                propertyWrappers.add(copyWrapper.clone());
+                            } else {
+                                PropertyWrapper<?> cloneWrapper = propertyWrapper.clone();
+                                cloneWrapper.setDefault();
+                                propertyWrappers.add(cloneWrapper);
+                            }
+                            break;
                         }
-                        break;
                     }
-                }
-            }
 
-            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-                if (propertyWrapper.getValue() == null) {
-                    propertyWrapper.setDefault();
+                    if (!foundCopy) {
+                        propertyWrappers.add(propertyWrapper.clone());
+                    }
+                } else {
+                    propertyWrappers.add(propertyWrapper.clone());
                 }
-            }
-
-        } else {
-            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-                propertyWrapper.setDefault();
             }
         }
     }
@@ -194,8 +189,10 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         this.routineResource = gameAsset;
         gameAsset.listeners.add(updateListener);
 
-        routineInstance = routineResource.getResource().createInstance(true);
-        updatePropertyWrappers(true);
+        if (!routineResource.isBroken()) {
+            routineInstance = routineResource.getResource().createInstance(true);
+            updatePropertyWrappers(true);
+        }
     }
 
 

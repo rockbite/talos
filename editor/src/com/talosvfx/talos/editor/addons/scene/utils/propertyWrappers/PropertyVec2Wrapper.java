@@ -42,6 +42,11 @@ public class PropertyVec2Wrapper extends PropertyWrapper<Vector2> {
     }
 
     @Override
+    public void setValue(Vector2 value) {
+        this.value.set(value);
+    }
+
+    @Override
     public void write (Json json) {
         super.write(json);
         json.writeValue("value", value);
