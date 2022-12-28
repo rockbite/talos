@@ -9,6 +9,9 @@ public class AsyncRoutineNodeState<T> implements Pool.Poolable {
     @Setter@Getter
     T target;
 
+    @Setter@Getter
+    private float duration;
+
     @Override
     public void reset() {
         alpha = 0;

@@ -9,7 +9,7 @@ import lombok.Getter;
 public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
 
     @Getter
-    protected Array<AsyncRoutineNodeState<U>> states = new Array<>();
+    protected Array<T> states = new Array<>();
 
     private Array<U> tmpArr = new Array<>();
 
@@ -30,6 +30,15 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         T state = obtainState();
         state.setTarget(signalPayload);
         states.add(state);
+
+        float duration = fetchFloatValue("duration");
+        state.setDuration(duration);
+
+        targetAdded(state);
+    }
+
+    protected void targetAdded(T state) {
+
     }
 
     public void tick(float delta) {
@@ -44,13 +53,12 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         // when it's finished call the end signal
 
-        float duration = fetchFloatValue("duration"); //todo: this might need caching
 
         tmpArr.clear();
 
         for(int i = states.size - 1; i >= 0; i--) {
-            AsyncRoutineNodeState<U> state = states.get(i);
-            state.alpha += delta/duration;
+            T state = states.get(i);
+            state.alpha += delta/state.getDuration();
 
             // todo: apply interpolations here
             // todo apply yoyo logic here
@@ -73,5 +81,5 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         tmpArr.clear();
     }
 
-    protected abstract void stateTick(AsyncRoutineNodeState<U> state, float delta);
+    protected abstract void stateTick(T state, float delta);
 }

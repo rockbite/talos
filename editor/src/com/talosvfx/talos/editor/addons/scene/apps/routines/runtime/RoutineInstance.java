@@ -30,6 +30,8 @@ public class RoutineInstance {
 
     public ObjectMap<String, Object> memory = new ObjectMap<>();
 
+    public ObjectMap<String, Object> globalMap = new ObjectMap<>();
+
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
@@ -158,6 +160,14 @@ public class RoutineInstance {
 
     public Object fetchMemory(String name) {
         return memory.get(name);
+    }
+
+    public void storeGlobal(String name, Object value) {
+        globalMap.put(name, value);
+    }
+
+    public Object fetchGlobal(String name) {
+        return globalMap.get(name);
     }
 
     public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
