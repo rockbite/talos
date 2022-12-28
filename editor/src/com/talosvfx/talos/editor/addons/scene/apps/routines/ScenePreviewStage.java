@@ -1,12 +1,15 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -15,6 +18,7 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +28,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
+	@Getter
 	public Scene currentScene;
 
 	private MainRenderer renderer;
@@ -36,7 +41,8 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		renderer = new MainRenderer();
 		addActor(rulerRenderer);
 		Notifications.registerObserver(this);
-		updateWorkspaceState(false);
+
+
 	}
 
 	@Override
@@ -75,6 +81,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if (currentScene == null)
 			return;
 
+		renderer.setLayers(SharedResources.currentProject.getSceneData().getRenderLayers());
 		renderer.update(currentScene.getSelfObject());
 		renderer.render(batch, new MainRenderer.RenderState(), currentScene.getSelfObject());
 	}
@@ -82,8 +89,10 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 	@Override
 	public void initializeGridPropertyProvider () {
 		gridPropertyProvider = new DynamicGridPropertyProvider();
+		gridPropertyProvider.getBackgroundColor().set(Color.BLACK);
 	}
 
+	/*
 	@EventHandler
 	public void onTweenPlay (TweenPlayedEvent event) {
 		updateWorkspaceState(true);
@@ -94,18 +103,15 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 	public void onTweenFinish (TweenFinishedEvent event) {
 		updateWorkspaceState(false);
 		isPlaying = false;
-	}
+	}*/
 
-	public void updateWorkspaceState (boolean copy) {
-		logger.info("Scene preview stage update redo");
-//        SavableContainer currentContainer = SceneEditorWorkspace.getInstance().getCurrentContainer();
-//
-//        if (copy) {
-//            Scene scene = new Scene();
-//            scene.load(currentContainer.getAsString());
-//            currentScene = scene;
-//        } else {
-//            currentScene = ((Scene) currentContainer);
-//        }
+	public void setFromGameAsset(GameAsset<Scene> gameAsset) {
+		if(gameAsset != null) {
+			SavableContainer currentContainer = gameAsset.getResource();
+			Scene scene = new Scene();
+			scene.load(currentContainer.getAsString());
+
+			currentScene = scene;
+		}
 	}
 }

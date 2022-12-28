@@ -72,6 +72,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     }
 
+    /*
     protected boolean sendSignal(String portName, String command, ObjectMap<String, Object> payload) {
         Array<Connection> connections = outputs.get(portName);
 
@@ -95,7 +96,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
         }
 
         return true;
-    }
+    }*/
 
     private void animateInput(String fromSlot, Connection connection) {
         Color color = Color.valueOf("#0957a8");
@@ -158,9 +159,6 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
         ));
     }
 
-    protected void onSignalReceived(String command, ObjectMap<String, Object> payload) {
-
-    }
 
     protected float getWidgetFloatValue(String name) {
         return getWidgetFloatValue(name, null);

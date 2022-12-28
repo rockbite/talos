@@ -30,6 +30,7 @@ public class DummyLayoutApp implements LayoutApp {
 	private DestroyCallback destroyCallback;
 	private boolean active;
 	private VisLabel visLabel;
+	private LayoutContent layoutContent;
 
 	public DummyLayoutApp (Skin skin, String tabName) {
 		this.tabName = tabName;
@@ -189,5 +190,15 @@ public class DummyLayoutApp implements LayoutApp {
 	@Override
 	public void updateTabName(String name){
 		visLabel.setText(name);
+	}
+
+	@Override
+	public void setLayoutContent(LayoutContent layoutContent) {
+		this.layoutContent = layoutContent;
+	}
+
+	@Override
+	public LayoutContent getLayoutContent() {
+		return layoutContent;
 	}
 }

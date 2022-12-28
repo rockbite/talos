@@ -99,7 +99,7 @@ public class LayoutContent extends LayoutItem {
 		});
 	}
 
-	private void swapToApp (LayoutApp result) {
+	public void swapToApp (LayoutApp result) {
 		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
 			if (app.value.isTabActive()) {
 				app.value.onInputProcessorRemoved();
@@ -129,6 +129,8 @@ public class LayoutContent extends LayoutItem {
 				layoutApp.setDestroyCallback(null);
 			}
 		});
+
+		layoutApp.setLayoutContent(this);
 
 		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
 

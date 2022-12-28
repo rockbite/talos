@@ -20,6 +20,7 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
@@ -254,7 +255,7 @@ public class AppManager implements Observer {
 
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, SceneEditorApp.class, SceneHierarchyApp.class );
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, PropertiesPanelApp.class);
-		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class, ScenePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
 
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
@@ -268,11 +269,28 @@ public class AppManager implements Observer {
 		return appRegistry.hasAssetType(gameAsset.type);
 	}
 
-	public <T, U extends BaseApp<T>> void openApp (GameAsset<T> asset, Class<U> app) {
+	public <T, U extends BaseApp<T>> U openAppIfNotOpened (GameAsset<T> asset, Class<U> app) {
+		Array<? extends BaseApp<?>> baseApps = baseAppsOpenForGameAsset.get(asset);
+		for (BaseApp<?> baseApp : baseApps) {
+			if(baseApp.getClass().equals(app)) {
+				if(!baseApp.gridAppReference.isTabActive()) {
+					baseApp.gridAppReference.getLayoutContent().swapToApp(baseApp.getGridAppReference());
+				}
+				return (U) baseApp;
+			}
+		}
+
+		return openApp(asset, app);
+	}
+
+
+	public <T, U extends BaseApp<T>> U openApp (GameAsset<T> asset, Class<U> app) {
 		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
 		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
 
 		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
+
+		return baseAppForGameAsset;
 	}
 
 	private static class LayoutGridTargetConfig {

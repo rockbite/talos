@@ -30,4 +30,7 @@ public interface LayoutApp {
 
 	void updateTabName(String name);
 
+	void setLayoutContent(LayoutContent layoutContent);
+	LayoutContent getLayoutContent();
+
 }

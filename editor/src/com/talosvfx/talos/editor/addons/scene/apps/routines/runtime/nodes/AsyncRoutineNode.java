@@ -1,14 +1,63 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 
-public abstract class AsyncRoutineNode<T extends AsyncRoutineNode.AsyncRoutineNodeState> extends RoutineNode {
+public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
 
-    public static class AsyncRoutineNodeState {
-        float alpha;
+    protected Array<AsyncRoutineNodeState<U>> states = new Array<>();
+
+    // override fetching of variables, so that before fetching it sets "fetch payload",
+    // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
+    // this is similar to for depth info
+    // in this case the payload here will be: GO, and it's index (idl if index should be somehow mixed with depth shit)
+
+    protected T obtainState() {
+        AsyncRoutineNodeState<U> state = Pools.obtain(AsyncRoutineNodeState.class);
+
+        return (T) state;
     }
 
-    public void tick() {
-
+    @Override
+    public void receiveSignal(String portName) {
+        U signalPayload = (U)routineInstanceRef.getSignalPayload();
+        T state = obtainState();
+        state.setTarget(signalPayload);
+        states.add(state);
     }
+
+    public void tick(float delta) {
+        if(states.isEmpty()) return;
+
+        // for each state process it's alpha
+        // make sure to use interpolations
+        // make sure to perform yoyo logic
+
+        // delegate to some other tick method of whoever extends this so they can set some vars based on this alpha
+        // make sure to provide state in question
+
+        // when it's finished call the end signal
+
+        float duration = fetchFloatValue("duration"); //todo: this might need caching
+
+        for(int i = states.size - 1; i >= 0; i--) {
+            AsyncRoutineNodeState<U> state = states.get(i);
+            state.alpha += delta/duration;
+
+            // todo: apply interpolations here
+            // todo apply yoyo logic here
+            stateTick(state, delta);
+
+            if(state.alpha >= 1) { //todo: change this with yoyo
+                states.removeIndex(i);
+                Pools.free(state);
+
+                System.out.println("FINISHED");
+            }
+        }
+    }
+
+    protected abstract void stateTick(AsyncRoutineNodeState<U> state, float delta);
 }
