@@ -5,17 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.events.FileNameChanged;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
-import com.talosvfx.talos.editor.notifications.EventHandler;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements Observer {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements GameAsset.GameAssetUpdateListener {
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
@@ -77,11 +73,18 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         };
 
         this.gridAppReference = app;
-        Notifications.registerObserver(this);
     }
 
     @Override
     public void updateForGameAsset (GameAsset<RoutineStageData> gameAsset) {
+        if (this.gameAsset != null) {
+            this.gameAsset.listeners.removeValue(this, true);
+        }
+
+        if (!gameAsset.listeners.contains(this, true)) {
+            gameAsset.listeners.add(this);
+        }
+
         super.updateForGameAsset(gameAsset);
 
         routineStage.loadFrom(gameAsset);
@@ -102,13 +105,9 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         // remove listeners and stuff somehow
     }
 
-    @EventHandler
-    public void onFileNameChanged(FileNameChanged fileNameChanged){
-        if(gameAsset == null) return;
-        if (gameAsset.type == fileNameChanged.assetType && fileNameChanged.oldName.equals(gameAsset.nameIdentifier)) {
-            gameAsset.nameIdentifier = fileNameChanged.newName;
-            variableCreationWindow.setRoutineName(fileNameChanged.newName);
-        }
+    @Override
+    public void onUpdate() {
+        variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
     }
 
 }
