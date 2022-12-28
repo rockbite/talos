@@ -61,4 +61,8 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
     public void onRemove() {
         Notifications.unregisterObserver(this);
     }
+
+    public void reload() {
+        workspaceWidget.setFromGameAsset(gameAsset);
+    }
 }

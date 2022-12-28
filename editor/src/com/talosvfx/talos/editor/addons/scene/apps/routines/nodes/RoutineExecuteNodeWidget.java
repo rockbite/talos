@@ -51,6 +51,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 SavableContainer container = null;
                 if(sceneAsset.type == GameAssetType.SCENE) {
                     ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
+                    scenePreviewApp.reload();
                     container = scenePreviewApp.getWorkspaceWidget().currentScene;
                 } else {
                     return;
