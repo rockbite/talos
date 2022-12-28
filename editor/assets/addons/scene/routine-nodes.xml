@@ -1,13 +1,22 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.routines.nodes">
-    <category name="main" title="Main">
-        <!--
-        <module name = "RoutineNode" title = "Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+    <category name="async" title="Animation">
+        <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
             <value port="output" name="startSignal" type="signal">start</value>
         </module>
+        <module name = "DelayNode" title = "Delay" keywords = "tween" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+    </category>
+    <category name="main" title="Main">
+        <!--
+
         <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
@@ -19,12 +28,7 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name = "DelayNode" title = "Delay" keywords = "tween" class = "RoutineNodeWidget">
-            <value port="input" name="startSignal" type="signal">start</value>
-            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
-            <container name="timeline"></container>
-            <value port="output" name="onComplete" type="signal">onComplete</value>
-        </module>
+
         <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
@@ -41,13 +45,7 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
-        <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
-            <dynamicValue port="output" name="value" type="float" min="-1000" max="1000">Value: </dynamicValue>
-        </module>
-        <module name = "OneMinusNode" title = "One Minus" keywords = "" class = "RoutineNodeWidget">
-            <value port="input" name="input" type="float">input</value>
-            <value port="output" name="output" type="float">output</value>
-        </module>-->
+        -->
 
         <module name = "RenderRoutineNode" title = "Render Routine" keywords = "tween, system" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
@@ -212,6 +210,10 @@
         </module>
         <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
             <dynamicValue name="value" type="float" default="0">value: </dynamicValue>
+            <value port="output" name="output" type="float">output</value>
+        </module>
+        <module name = "OneMinusNode" title = "One Minus" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="input" type="float">input</value>
             <value port="output" name="output" type="float">output</value>
         </module>
         <module name = "RectangleNode" title = "Rectangle" keywords = "" class = "RoutineNodeWidget">

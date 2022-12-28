@@ -2,18 +2,18 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExecuteNodeWidget;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
 
-class TrackRow implements TimelineItemDataProvider<RoutineNode> {
+class TrackRow implements TimelineItemDataProvider<RoutineExecuteNodeWidget> {
 
     private float duration = 10;
     private int index;
 
-    private RoutineNode routineNode;
+    private RoutineExecuteNodeWidget routineExecuteNodeWidget;
 
-    public TrackRow(RoutineNode routineNode, int index) {
-        this.routineNode = routineNode;
+    public TrackRow(RoutineExecuteNodeWidget routineExecuteNodeWidget, int index) {
+        this.routineExecuteNodeWidget = routineExecuteNodeWidget;
         this.index = index;
     }
 
@@ -29,12 +29,12 @@ class TrackRow implements TimelineItemDataProvider<RoutineNode> {
 
     @Override
     public String getItemName() {
-        return routineNode.getTweenTitle() + " track " + getIndex();
+        return routineExecuteNodeWidget.getTweenTitle() + " track " + getIndex();
     }
 
     @Override
-    public RoutineNode getIdentifier() {
-        return routineNode;
+    public RoutineExecuteNodeWidget getIdentifier() {
+        return routineExecuteNodeWidget;
     }
 
     @Override

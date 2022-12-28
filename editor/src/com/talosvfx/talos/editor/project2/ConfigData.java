@@ -38,7 +38,7 @@ public class ConfigData {
 		traverseTree(gameObjectConfigurationXMLRoot.getChildByName("templates"));
 
 		routineConfigMap = new RoutineConfigMap();
-		routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/tween-nodes.xml"));
+		routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/routine-nodes.xml"));
 	}
 	private void traverseTree (XmlReader.Element root) {
 		Array<XmlReader.Element> templates = root.getChildrenByName("template");

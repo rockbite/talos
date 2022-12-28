@@ -22,9 +22,13 @@ import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 import java.lang.reflect.Field;
 
+public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
 
-public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
+    public AsyncRoutineNodeWidget() {
 
+    }
+
+    /*
     boolean running = false;
 
     private Vector2 vec = new Vector2();
@@ -40,7 +44,10 @@ public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
     protected ObjectMap<String, GenericTweenData> dataMap = new ObjectMap<>();
     private boolean minimized = false;
     private SelectBox interpolationSelectBox;
+     */
 
+
+    /*
     protected class GenericTweenData {
         public float chunkIndex;
         public GameObject target;
@@ -53,8 +60,9 @@ public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
         public boolean complete = false;
         public ObjectMap<String, Object> misc;
         public Array<GameObject> neighbours = new Array<>();
-    }
+    }*/
 
+    /*
     @Override
     public void reset() {
         running = false;
@@ -300,7 +308,7 @@ public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                nodeBoard.selectNode(AbstractGenericRoutineNode.this);
+                nodeBoard.selectNode(AsyncRoutineNodeWidget.this);
                 event.cancel();
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -832,5 +840,6 @@ public abstract class AbstractGenericRoutineNode extends AbstractRoutineNode {
 
         json.writeValue("minimized", minimized);
     }
+     */
 }
 
