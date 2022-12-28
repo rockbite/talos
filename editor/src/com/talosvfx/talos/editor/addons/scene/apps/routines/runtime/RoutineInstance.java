@@ -16,9 +16,6 @@ public class RoutineInstance {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
-    private Array<RoutineNode> nodes = new Array<>();
-
-
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
