@@ -34,6 +34,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
             protected boolean canMoveAround() {
                 return true;
             }
+
+            @Override
+            public void act(float delta) {
+                super.act(delta);
+
+                routineStage.act();
+            }
         };
         routineStageWrapper.getDropdownForWorld().setVisible(false);
 

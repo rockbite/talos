@@ -186,4 +186,50 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 		load(handle.readString());
 	}
 
+	public Array<GameObject> findGameObjects(String targetString) {
+		Array<GameObject> list = new Array<>();
+
+		findGameObjects(list, root, targetString);
+
+		return list;
+	}
+
+	public void findGameObjects(Array<GameObject> list, GameObject parent, String targetString) {
+
+		int dotIndex = targetString.indexOf(".");
+		String lastPart = "";
+
+		String levelName = targetString;
+		if(dotIndex >= 0) {
+			levelName = targetString.substring(0, targetString.indexOf("."));
+
+			if(targetString.length() > dotIndex + 1) {
+				lastPart = targetString.substring(targetString.indexOf(".") + 1);
+			} else {
+				//irrelevant dot
+				lastPart = "";
+			}
+		}
+
+		Array<GameObject> gameObjects = parent.getGameObjects();
+
+		for(GameObject gameObject : gameObjects) {
+
+			boolean matchCriteria = false;
+			if(levelName.contains("*")) {
+				String expression = levelName.replaceAll("\\*", ".*");
+				matchCriteria = gameObject.getName().matches(expression);
+			} else {
+				matchCriteria = gameObject.getName().equals(levelName);
+			}
+
+			if(matchCriteria) {
+				if(lastPart.length() == 0) {
+					list.add(gameObject);
+				} else {
+					findGameObjects(list, gameObject, lastPart);
+				}
+			}
+		}
+	}
 }

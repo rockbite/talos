@@ -1,23 +1,30 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 
 public class RoutineExecutorNode extends RoutineNode {
 
+    private SavableContainer container;
 
     @Override
     public void receiveSignal(String portName) {
+        if(container == null) return;
+
         String target = fetchStringValue("target");
 
-        // make sure there is a way to inject GameObjectContainer to this node as the parent to search from.
-        // maybe it should be part of the whole instance, and it can be injected on which container it's running
+        Array<GameObject> gameObjects = container.findGameObjects(target);
 
-        // get reference to GameObjectContainer
-        // find all matching GameObject targets in the game object container using a method from RoutineNode
-        // make sure sendSignal supports payloads
-        // call sendSignal with payload of each target (so call it multiple times)
+        for(GameObject gameObject: gameObjects) {
+            // make sure sendSignal supports payloads
+            routineInstanceRef.setSignalPayload(gameObject);
+            sendSignal("outSignal");
+        }
+    }
 
-        sendSignal("outSignal");
-
+    public void setContainer(SavableContainer container) {
+        this.container = container;
     }
 }

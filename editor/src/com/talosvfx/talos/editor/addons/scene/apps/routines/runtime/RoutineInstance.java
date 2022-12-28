@@ -4,7 +4,9 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
@@ -17,6 +19,8 @@ public class RoutineInstance {
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
+
+    private Array<AsyncRoutineNode> asyncNodes = new Array<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
 
@@ -33,6 +37,9 @@ public class RoutineInstance {
 
     @Getter
     private Array<PropertyWrapper<?>> parentPropertyWrappers;
+
+    @Getter
+    private Object signalPayload;
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
@@ -74,6 +81,10 @@ public class RoutineInstance {
                 }
 
                 idMap.put(id, routineNode);
+
+                if(routineNode instanceof AsyncRoutineNode) {
+                    asyncNodes.add((AsyncRoutineNode) routineNode);
+                }
             } catch (ReflectionException e) {
                 e.printStackTrace();
             }
@@ -157,5 +168,15 @@ public class RoutineInstance {
         }
 
         return null;
+    }
+
+    public void setSignalPayload(Object payload) {
+        this.signalPayload = payload;
+    }
+
+    public void tick(float delta) {
+        for(AsyncRoutineNode node: asyncNodes) {
+            node.tick(delta);
+        }
     }
 }

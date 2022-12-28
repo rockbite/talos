@@ -1,10 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
-public class DelayNode extends AsyncRoutineNode {
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 
+public class DelayNode extends AsyncRoutineNode<GameObject, AsyncRoutineNodeState<GameObject>> {
 
-    // in the delegate tick method, fetch the state, fetch alpha from it
-    // then from that alpha decide on time passed based on delay duration
-    // provide this for access so the Widget class can showcase it
-
+    @Override
+    protected void stateTick(AsyncRoutineNodeState<GameObject> state, float delta) {
+        // literally do nothing here :D Delay is all about wasting time
+    }
 }

@@ -3,6 +3,7 @@
         <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineExecuteNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
+            <asset name="scene" type="SCENE">scene</asset>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
             <value port="output" name="outSignal" type="signal">start</value>
