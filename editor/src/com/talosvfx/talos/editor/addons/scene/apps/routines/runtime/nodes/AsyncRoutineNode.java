@@ -4,10 +4,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import lombok.Getter;
 
 public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
 
+    @Getter
     protected Array<AsyncRoutineNodeState<U>> states = new Array<>();
+
+    private Array<U> tmpArr = new Array<>();
 
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
@@ -42,6 +46,8 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         float duration = fetchFloatValue("duration"); //todo: this might need caching
 
+        tmpArr.clear();
+
         for(int i = states.size - 1; i >= 0; i--) {
             AsyncRoutineNodeState<U> state = states.get(i);
             state.alpha += delta/duration;
@@ -51,12 +57,20 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
             stateTick(state, delta);
 
             if(state.alpha >= 1) { //todo: change this with yoyo
+                U target = state.getTarget();
+                tmpArr.add(target);
+
                 states.removeIndex(i);
                 Pools.free(state);
-
-                System.out.println("FINISHED");
             }
         }
+
+        for(U target: tmpArr) {
+            // this now needs to send signal to next guy
+            routineInstanceRef.setSignalPayload(target);
+            sendSignal("onComplete");
+        }
+        tmpArr.clear();
     }
 
     protected abstract void stateTick(AsyncRoutineNodeState<U> state, float delta);

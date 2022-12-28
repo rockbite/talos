@@ -15,7 +15,7 @@ public class ProgressWidget extends Table {
     private final TextureAtlas.AtlasRegion region;
     private final Image progressImage;
 
-    private ObjectFloatMap<String> progressMap = new ObjectFloatMap<>();
+    private ObjectFloatMap<Object> progressMap = new ObjectFloatMap<>();
 
     private ShaderProgram shaderProgram;
 
@@ -50,7 +50,7 @@ public class ProgressWidget extends Table {
             shaderProgram.setUniformf("regionV2", region.getV2());
 
             int i = 0;
-            for(ObjectFloatMap.Entry<String> entry : progressMap) {
+            for(ObjectFloatMap.Entry<Object> entry : progressMap) {
                 float progress = entry.value;
                 shaderProgram.setUniformf("alpha[" + (i++) + "]", progress);
             }
@@ -65,11 +65,11 @@ public class ProgressWidget extends Table {
         }
     }
 
-    public void setProgress(ObjectFloatMap<String> progressMap) {
+    public void setProgress(ObjectFloatMap<Object> progressMap) {
         this.progressMap = progressMap;
 
         float min = 1;
-        for(ObjectFloatMap.Entry<String> entry : progressMap) {
+        for(ObjectFloatMap.Entry<Object> entry : progressMap) {
             float progress = entry.value;
             if(min > progress) min = progress;
         }

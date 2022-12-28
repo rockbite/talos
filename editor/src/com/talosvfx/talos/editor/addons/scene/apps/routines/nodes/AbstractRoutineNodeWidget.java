@@ -6,6 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
@@ -219,6 +222,15 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     public float getDelta() {
         return ((RoutineStage)nodeBoard.getNodeStage()).getDelta();
+    }
+
+    public <T> T getNodeInstance() {
+        RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
+        RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
+        int uniqueId = getUniqueId();
+        T node = (T)routineInstance.getNodeById(uniqueId);
+
+        return node;
     }
 }
 
