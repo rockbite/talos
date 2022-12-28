@@ -43,6 +43,11 @@ public class PropertyColorWrapper extends PropertyWrapper<Color> {
     }
 
     @Override
+    public void setValue(Color value) {
+        this.value.set(value);
+    }
+
+    @Override
     public void write(Json json) {
         super.write(json);
         json.writeValue("value", value);

@@ -135,7 +135,9 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
         FileHandle handle = gameResource.getRootRawAsset().handle;
 
         TextureData textureData = gameResource.getResource().getTextureData();
-        textureData.prepare();
+        if (!textureData.isPrepared()) {
+            textureData.prepare();
+        }
         PixmapIO.writePNG(handle, textureData.consumePixmap());
     }
 
