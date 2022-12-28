@@ -1479,7 +1479,9 @@ public class AssetRepository implements Observer {
 							dataMaps.fileHandleGameAssetObjectMap.remove(file);
 
 							GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
-							putAssetForIdentifier(destination.nameWithoutExtension(), removedGameAsset.type, removedGameAsset);
+							String newAssetName = destination.nameWithoutExtension();
+							putAssetForIdentifier(newAssetName, removedGameAsset.type, removedGameAsset);
+							removedGameAsset.nameIdentifier = newAssetName;
 							dataMaps.fileHandleGameAssetObjectMap.put(destination, removedGameAsset);
 
 							removedGameAsset.setUpdated();

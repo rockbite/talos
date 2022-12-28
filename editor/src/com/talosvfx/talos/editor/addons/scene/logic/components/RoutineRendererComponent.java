@@ -194,8 +194,10 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         this.routineResource = gameAsset;
         gameAsset.listeners.add(updateListener);
 
-        routineInstance = routineResource.getResource().createInstance(true);
-        updatePropertyWrappers(true);
+        if (!routineResource.isBroken()) {
+            routineInstance = routineResource.getResource().createInstance(true);
+            updatePropertyWrappers(true);
+        }
     }
 
 
