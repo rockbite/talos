@@ -51,11 +51,7 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 
 	@Override
 	public String getAppName () {
-		if (gameAsset != null) {
-			return "Explorer - ";
-		} else {
-			return "Explorer - ";
-		}
+		return "Explorer";
 	}
 
 	@Override

@@ -1,0 +1,32 @@
+<preferences>
+    <group>
+        <tab name="interface" title="Interface">
+            <block name = "display" title="Display">
+                <boolean name = "showSplash" default = "true">Splash Screen</boolean>
+                <boolean name = "showTooltips" label="Tooltips">User Tooltips</boolean>
+            </block>
+        </tab>
+        <tab name="addons" title="Addons">
+            <injectable name = "addons"></injectable>
+        </tab>
+        <tab name="keymap" title="Keymap">
+            <injectable name = "keymap">KeymapBlock</injectable>
+        </tab>
+    </group>
+    <group>
+        <tab name="system" title="System">
+            <block name = "realtimeSync" title="Realtime Sync">
+                <boolean name = "enable" default = "false">Enable</boolean>
+                <string name = "host" default="127.0.0.1">Host</string>
+                <number name = "port" default="3001">Port</number>
+            </block>
+        </tab>
+        <tab name="saveLoad" title="Save &amp; Load">
+        </tab>
+        <tab name="filePaths" title="File Paths">
+            <block name = "general" title="General">
+                <path name = "defaultProjectPath" default="{usr}">Default Project Path</path>
+            </block>
+        </tab>
+    </group>
+</preferences>

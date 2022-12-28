@@ -377,6 +377,7 @@ public class AppManager implements Observer {
 			throw new RuntimeException(e);
 		}
 		baseApp.updateForGameAsset(gameAsset);
+		baseApp.getGridAppReference().updateTabName(baseApp.getAppName());
 		return baseApp;
 	}
 

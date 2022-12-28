@@ -263,6 +263,10 @@ public abstract class RoutineNode {
             return (float) result;
         }
 
+        if (!(object instanceof Float)) {
+            return 0;
+        }
+
         return (float)object;
     }
 

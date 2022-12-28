@@ -39,6 +39,8 @@ public class WidgetFactory {
                 return generateForGameAsset(wrapper, value, null, wrapper.propertyName, GameAssetType.SPRITE);
             }
 
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -346,7 +348,9 @@ public class WidgetFactory {
 
         if (parent instanceof PropertyFloatWrapper) {
             PropertyFloatWrapper numberWrapper = (PropertyFloatWrapper) parent;
-            widget.configureFromValues(numberWrapper.minValue, numberWrapper.maxValue, numberWrapper.step);
+            if (numberWrapper.isRanged) {
+                widget.configureFromValues(numberWrapper.minValue, numberWrapper.maxValue, numberWrapper.step);
+            }
         } else {
             widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
         }

@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class AbstractRoutineNode extends NodeWidget {
+public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     protected ObjectMap<String, Object> params = new ObjectMap<>();
 
@@ -86,7 +86,7 @@ public abstract class AbstractRoutineNode extends NodeWidget {
                 return false;
             }
 
-            AbstractRoutineNode targetNode = (AbstractRoutineNode) connection.targetNode; // this is a bold assumption, but I'll go with it :D
+            AbstractRoutineNodeWidget targetNode = (AbstractRoutineNodeWidget) connection.targetNode; // this is a bold assumption, but I'll go with it :D
 
             // animate the signal
             animateSignal(portName, connection);
@@ -206,7 +206,7 @@ public abstract class AbstractRoutineNode extends NodeWidget {
 
             animateInput(name, first);
 
-            AbstractRoutineNode targetNode = (AbstractRoutineNode) first.targetNode;
+            AbstractRoutineNodeWidget targetNode = (AbstractRoutineNodeWidget) first.targetNode;
             return targetNode.getOutputValue(first.targetSlot, params);
         }
     }

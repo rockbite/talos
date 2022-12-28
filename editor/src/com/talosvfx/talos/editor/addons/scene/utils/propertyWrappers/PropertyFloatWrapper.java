@@ -47,6 +47,8 @@ public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
         minValue = jsonData.getFloat("minValue", -Float.MAX_VALUE);
         maxValue = jsonData.getFloat("maxValue", Float.MAX_VALUE);
         step = jsonData.getFloat("step", 0.1f);
+
+        isRanged = jsonData.getBoolean("isRanged", false);
     }
 
     @Override

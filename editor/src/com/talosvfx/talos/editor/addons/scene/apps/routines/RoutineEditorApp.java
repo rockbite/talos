@@ -96,7 +96,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
         if(gameAsset == null) {
             return "Routine"; // lol wtf
         }
-        return gameAsset.nameIdentifier;
+        return "Routine - " + gameAsset.nameIdentifier;
     }
 
     @Override

@@ -45,6 +45,9 @@ public abstract class PropertyWidget<T> extends Table {
 	@Setter
 	protected PropertyPanel topLevelPropertiesPanel;
 
+	@Setter
+	public ChangeListener injectedChangeListener;
+
 	public void toggleHide (boolean hidden) {
 		//Check if we are in a cell
 		if (getParent() instanceof Table) {
@@ -174,6 +177,9 @@ public abstract class PropertyWidget<T> extends Table {
 	public void valueChanged(T value) {
 		fire(new ChangeListener.ChangeEvent());
 		valueChanged.report(value);
+		if (injectedChangeListener != null) {
+			injectedChangeListener.changed(new ChangeListener.ChangeEvent(), this);
+		}
 	}
 
 	protected boolean isFullSize() {

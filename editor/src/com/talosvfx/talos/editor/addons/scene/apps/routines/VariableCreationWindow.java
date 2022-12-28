@@ -73,6 +73,7 @@ public class VariableCreationWindow extends Table {
                 BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
+                        .addItem("Boolean", PropertyType.BOOLEAN)
                         .addItem("Color", PropertyType.COLOR)
                         .addItem("Asset", PropertyType.ASSET)
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {
@@ -154,16 +155,18 @@ public class VariableCreationWindow extends Table {
                 widget.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
-                        propertyWrapper.propertyName = widget.getPropertyName();
-                        widget.applyValueToWrapper(propertyWrapper);
+                        widget.applyValueToWrapper(routineInstance.getPropertyWrapperWithIndex(propertyWrapper.index));
+                        routineStage.routineUpdated();
                     }
                 });
+                innerWidget.updateFromPropertyWrapper(propertyWrapper);
 
                 templateRowArray.add(widget);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+
 
         configureDragAndDrop();
     }

@@ -25,5 +25,7 @@ public abstract class ATypeWidget<T> extends Table {
         return var2;
     }
 
+    public abstract void updateFromPropertyWrapper(PropertyWrapper<T> propertyWrapper);
+
     public abstract void applyValueToWrapper(PropertyWrapper<T> propertyWrapper);
 }

@@ -58,6 +58,11 @@ public class MultiPropertyHolder<T extends IPropertyHolder> implements IProperty
         return list;
     }
 
+    @Override
+    public String getName() {
+        return "selection";
+    }
+
     public static class MultiPropertyProvider implements IPropertyProvider {
 
         private Array<IPropertyProvider> providers = new Array<>();

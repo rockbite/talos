@@ -8,8 +8,8 @@ public enum PropertyType {
     FLOAT(PropertyFloatWrapper.class, CustomFloatWidget.class),
     VECTOR2(PropertyVec2Wrapper.class, CustomVector2Widget.class),
     COLOR(PropertyColorWrapper.class, CustomColorWidget.class),
-    ASSET(PropertyGameAssetWrapper.class, CustomAssetWidget.class);
-    //BOOLEAN(),
+    ASSET(PropertyGameAssetWrapper.class, CustomAssetWidget.class),
+    BOOLEAN(PropertyBooleanWrapper.class, CustomBooleanWidget.class);
     //STRING(),
     //GAME_OBJECT();
 

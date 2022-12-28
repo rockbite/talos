@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
 import com.talosvfx.talos.editor.nodes.widgets.LabelWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
+import com.talosvfx.talos.editor.project2.localprefs.PrefKeys;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ButtonLabel;
@@ -108,6 +109,7 @@ public class ProjectSplash extends Table {
 		table.row();
 
 		FileOpenField fileOpener = new FileOpenField();
+		fileOpener.setPath(TalosLocalPrefs.Instance().getGlobalData(PrefKeys.FILE_PATHS.GENERAL.DEFAULT_PROJECT_PATH));
 		fileOpener.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -193,6 +195,7 @@ public class ProjectSplash extends Table {
 
 
 	public void show(Stage stage) {
+
 		stage.addActor(this);
 		setPosition(stage.getWidth()/2f - getWidth()/2f, stage.getHeight()/2f - getHeight()/2f);
 

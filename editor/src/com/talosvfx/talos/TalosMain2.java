@@ -76,7 +76,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		fullScreen.add(topBar).growX().height(30);
 		fullScreen.row();
 		MainMenu menu = new MainMenu();
-		menu.buildFrom(Gdx.files.internal("menu-bar.xml"));
+		menu.buildFrom(Gdx.files.internal("menuBar.xml"));
 		SharedResources.mainMenu = menu;
 		topBar.add(menu).grow().padLeft(4);
 
@@ -88,12 +88,11 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
-		openProjectExplorer();
-
 		SharedResources.talosControl = new TalosControl();
 
 		Notifications.quickFire(FinishInitializingEvent.class);
 
+		openProjectExplorer();
 	}
 
 	private void projectLoader (TalosProjectData projectData) {

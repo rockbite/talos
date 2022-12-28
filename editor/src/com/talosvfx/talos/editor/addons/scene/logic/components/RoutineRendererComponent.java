@@ -1,12 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -15,7 +15,6 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.data.RoutineStageData;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -28,9 +27,13 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     GameAsset.GameAssetUpdateListener updateListener;
 
+    Array<PropertyWidget> properties = new Array<>();
+
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
 
+    @ValueProperty(min = 0, max = 999, step=0.1f)
+    public float cacheCoolDown = 0.1f;
 
     public transient RoutineInstance routineInstance;
 
@@ -52,6 +55,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         super.write(json);
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("size", viewportSize, Vector2.class);
+        json.writeValue("cache", cacheCoolDown);
         json.writeValue("properties", propertyWrappers);
     }
 
@@ -73,6 +77,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
         if (viewportSize == null) viewportSize = new Vector2(6, 4);
+
+        cacheCoolDown = jsonData.getFloat("cache", 0.1f);
     }
 
     public void updatePropertyWrappers (boolean tryToMerge) {
@@ -82,29 +88,28 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         propertyWrappers.clear();
         if (routineInstance != null) {
             for (PropertyWrapper<?> propertyWrapper : routineInstance.getParentPropertyWrappers()) {
-                propertyWrappers.add(propertyWrapper);
-            }
-        }
-
-        if (tryToMerge) {
-            for (PropertyWrapper copyWrapper : copyWrappers) {
-                for (PropertyWrapper propertyWrapper : propertyWrappers) {
-                    if (copyWrapper.index == propertyWrapper.index && copyWrapper.getClass().equals(propertyWrapper.getClass())) {
-                        propertyWrapper.setValue(copyWrapper.getValue());
-                        break;
+                if (tryToMerge) {
+                    boolean foundCopy = false;
+                    for (PropertyWrapper<?> copyWrapper : copyWrappers) {
+                        if (copyWrapper.index == propertyWrapper.index) {
+                            foundCopy = true;
+                            if (copyWrapper.isValueOverridden) {
+                                propertyWrappers.add(copyWrapper.clone());
+                            } else {
+                                PropertyWrapper<?> cloneWrapper = propertyWrapper.clone();
+                                cloneWrapper.setDefault();
+                                propertyWrappers.add(cloneWrapper);
+                            }
+                            break;
+                        }
                     }
-                }
-            }
 
-            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-                if (propertyWrapper.getValue() == null) {
-                    propertyWrapper.setDefault();
+                    if (!foundCopy) {
+                        propertyWrappers.add(propertyWrapper.clone());
+                    }
+                } else {
+                    propertyWrappers.add(propertyWrapper.clone());
                 }
-            }
-
-        } else {
-            for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-                propertyWrapper.setDefault();
             }
         }
     }
@@ -114,11 +119,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     }
 
-
     @Override
     public Array<PropertyWidget> getListOfProperties() {
-        Array<PropertyWidget> properties = new Array<>();
-
+        properties.clear();
         AssetSelectWidget<RoutineStageData> widget = new AssetSelectWidget<RoutineStageData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineStageData>>() {
             @Override
             public GameAsset<RoutineStageData> get() {
@@ -136,11 +139,21 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         PropertyWidget sizeWidget = WidgetFactory.generate(this, "viewportSize", "Viewport");
         properties.add(sizeWidget);
 
+        PropertyWidget cacheWidget = WidgetFactory.generate(this, "cacheCoolDown", "Cache");
+        properties.add(cacheWidget);
+
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
 
         for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
             PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
+            generate.setInjectedChangeListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    propertyWrapper.isValueOverridden = true;
+                    RoutineRendererComponent.this.routineInstance.isDirty = true;
+                }
+            });
             generate.setParent(this);
             properties.add(generate);
         }
@@ -176,8 +189,10 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         this.routineResource = gameAsset;
         gameAsset.listeners.add(updateListener);
 
-        routineInstance = routineResource.getResource().createInstance(true);
-        updatePropertyWrappers(true);
+        if (!routineResource.isBroken()) {
+            routineInstance = routineResource.getResource().createInstance(true);
+            updatePropertyWrappers(true);
+        }
     }
 
 

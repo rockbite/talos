@@ -1,22 +1,39 @@
 package com.talosvfx.talos.editor.dialogs;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.dialogs.preference.tabs.*;
+import com.talosvfx.talos.editor.dialogs.preference.widgets.APrefWidget;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 
-public class PreferencesWindow extends AWindowDialog {
+public class PreferencesWindow extends AWindowDialog implements Observer {
     private ScrollPane scrollPane;
+    private XmlReader.Element xmlRoot;
 
+    private Array<APrefWidget> widgetArray;
+    private VerticalTabGroup tabsContent;
 
     @Override
     public Table build() {
+        widgetArray = new Array<>();
+        Notifications.registerObserver(this);
+
+        XmlReader xmlReader = new XmlReader();
+        xmlRoot = xmlReader.parse(Gdx.files.internal("preferencesLayout.xml"));
+
         Table table = constructContentSegment();
         table.pack();
         table.setSize(660, 540);
@@ -34,10 +51,11 @@ public class PreferencesWindow extends AWindowDialog {
         contentSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
         contentSegment.defaults().space(5);
 
+        scrollPane = new ScrollPane(null);
+
         // left part where tabs are displayed
         final Table tabsSegment = constructTabsSegment();
         // right part where info of the tabs are displayed
-        scrollPane = new ScrollPane(null);
 
         contentSegment.add(tabsSegment).growY().width(160);
         contentSegment.add(scrollPane).grow().pad(5);
@@ -48,33 +66,54 @@ public class PreferencesWindow extends AWindowDialog {
         final Table tabsSegment = new Table();
         tabsSegment.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
 
-        final VerticalTabGroup tabsContent = new VerticalTabGroup();
+        tabsContent = new VerticalTabGroup();
         tabsContent.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 scrollPane.setActor(tabsContent.getSelectedTab().getContent());
+                tabsContent.getSelectedTab().getContent().expandFirstBlock();
             }
         });
 
         final ScrollPane scrollPane = new ScrollPane(tabsContent);
 
-        tabsContent.startGroup();
-        tabsContent.addTab("Interface", new InterfaceTabContent());
-        tabsContent.addTab("Add-ons", new AddOnsTabContent());
-        tabsContent.addTab("Keymap", new KeymapTabContent());
-        tabsContent.endGroup();
+        VerticalTab firstTab = null;
+        int iterator = 0;
 
-        tabsContent.startGroup();
-        tabsContent.addTab("System", new SystemTabContent());
-        tabsContent.addTab("Save & Load", new SaveAndLoadTabContent());
-        tabsContent.addTab("File Paths", new FilePathsTabContent());
-        tabsContent.endGroup();
+        Array<XmlReader.Element> groups = xmlRoot.getChildrenByName("group");
+        for(XmlReader.Element group : groups) {
+            tabsContent.startGroup();
+            Array<XmlReader.Element> tabs = group.getChildrenByName("tab");
+            for(XmlReader.Element tab : tabs) {
+                String title = tab.getAttribute("title");
+                PreferencesTabContent preferencesTabContent = new PreferencesTabContent(tab);
+                widgetArray.addAll(preferencesTabContent.getWidgetArray());
+                VerticalTab verticalTab = tabsContent.addTab(title, preferencesTabContent);
+
+                if(iterator == 0) {
+                    firstTab = verticalTab;
+                }
+                iterator++;
+            }
+
+            tabsContent.endGroup();
+        }
 
         tabsSegment.add(scrollPane).pad(9).growX();
         tabsSegment.row();
         tabsSegment.add().expandY();
 
+        openTab(firstTab);
+
         return tabsSegment;
+    }
+
+    private void openTab(VerticalTab tab) {
+        tabsContent.selectedTab = tab;
+        tab.select();
+        scrollPane.setActor(tabsContent.getSelectedTab().getContent());
+        PreferencesTabContent content = tabsContent.getSelectedTab().getContent();
+        content.expandFirstBlock();
     }
 
     public class VerticalTabGroup extends Table {
@@ -90,7 +129,7 @@ public class PreferencesWindow extends AWindowDialog {
             defaults().height(25).growX();
         }
 
-        public void addTab (String title, PreferenceTabContent preferenceTabContent) {
+        public VerticalTab addTab (String title, PreferencesTabContent preferenceTabContent) {
             final VerticalTab tab = new VerticalTab(title, preferenceTabContent);
             tab.addListener(new ClickListener() {
                 @Override
@@ -114,6 +153,8 @@ public class PreferencesWindow extends AWindowDialog {
                 startGroup = false;
             }
             add(tab).padBottom(minSpace).row();
+
+            return tab;
         }
 
         public void startGroup () {
@@ -139,9 +180,9 @@ public class PreferencesWindow extends AWindowDialog {
 
         private boolean selected;
         @Getter
-        private final PreferenceTabContent content;
+        private final PreferencesTabContent content;
 
-        public VerticalTab (String title, PreferenceTabContent content) {
+        public VerticalTab (String title, PreferencesTabContent content) {
             this.content = content;
 
             construct(title);
@@ -210,6 +251,13 @@ public class PreferencesWindow extends AWindowDialog {
         public void roundBottom () {
             this.roundBottom = true;
             updateBackground();
+        }
+    }
+
+    @EventHandler
+    public void onFinishInitializingEvent(FinishInitializingEvent event) {
+        for(APrefWidget widget: widgetArray) {
+            widget.read();
         }
     }
  }

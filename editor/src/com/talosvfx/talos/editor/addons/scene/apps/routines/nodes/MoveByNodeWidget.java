@@ -5,8 +5,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
-public class MoveByNode extends AbstractGenericRoutineNode {
+public class MoveByNodeWidget extends AsyncRoutineNodeWidget {
 
+    /*
     @Override
     protected void startTween(GameObject target, GenericTweenData data) {
         TransformComponent transform = target.getComponent(TransformComponent.class);
@@ -30,5 +31,5 @@ public class MoveByNode extends AbstractGenericRoutineNode {
 
         transform.position.x = original.x + offset.x * alpha;
         transform.position.y = original.y + offset.y * alpha;
-    }
+    }*/
 }

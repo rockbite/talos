@@ -9,7 +9,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
 import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 
-public class RoutineNode extends AbstractRoutineNode {
+public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
 
     @Override
     protected void addAdditionalContent(Table contentTable) {

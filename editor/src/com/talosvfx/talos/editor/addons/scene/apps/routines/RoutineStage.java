@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -15,11 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.data.RoutineStageData;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -28,7 +23,6 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +90,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     protected XmlReader.Element loadData () {
-        FileHandle list = Gdx.files.internal("addons/scene/tween-nodes.xml");
+        FileHandle list = Gdx.files.internal("addons/scene/routine-nodes.xml");
         XmlReader xmlReader = new XmlReader();
         XmlReader.Element root = xmlReader.parse(list);
 
@@ -121,7 +115,8 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
             tmp.set((x + toX) / 2f, (y + toY) / 2f); // midpoint
 
-            DelayNode delayNode = (DelayNode) createNode("DelayNode", tmp.x, tmp.y);
+            /*
+            DelayNodeWidget delayNode = (DelayNodeWidget) createNode("DelayNode", tmp.x, tmp.y);
             if (delayNode != null) {
                 delayNode.constructNode(getNodeListPopup().getModuleByName("DelayNode"));
                 Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(delayNode));
@@ -137,6 +132,9 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
             nodeBoard.makeConnection(connection.fromNode, delayNode, connection.fromId, "startSignal");
             nodeBoard.makeConnection(delayNode, connection.toNode, "onComplete", connection.toId);
+
+          */
+            // do this with any async
         }
     }
 
@@ -203,8 +201,8 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void playInitiated () {
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for (NodeWidget node : nodes) {
-            if (node instanceof AbstractRoutineNode) {
-                AbstractRoutineNode tweenNode = (AbstractRoutineNode) node;
+            if (node instanceof AbstractRoutineNodeWidget) {
+                AbstractRoutineNodeWidget tweenNode = (AbstractRoutineNodeWidget) node;
 
                 tweenNode.reset();
             }
@@ -226,11 +224,12 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
      */
     public void nodeReportedComplete () {
 
+        /*
         boolean isRunning = false;
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for (NodeWidget node : nodes) {
-            if (node instanceof AbstractGenericRoutineNode) {
-                AbstractGenericRoutineNode tweenNode = (AbstractGenericRoutineNode) node;
+            if (node instanceof AsyncRoutineNodeWidget) {
+                AsyncRoutineNodeWidget tweenNode = (AsyncRoutineNodeWidget) node;
 
                 if (tweenNode.isRunning()) {
                     isRunning = true;
@@ -242,7 +241,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         if (!isRunning) {
             // seems like all is Complete
             playFinished();
-        }
+        }*/
     }
 
     public float getDelta () {
