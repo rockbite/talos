@@ -1,11 +1,11 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.routines.nodes">
     <category name="async" title="Animation">
-        <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineNodeWidget">
+        <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineExecuteNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
-            <value port="output" name="startSignal" type="signal">start</value>
+            <value port="output" name="outSignal" type="signal">start</value>
         </module>
         <module name = "DelayNode" title = "Delay" keywords = "tween" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>

@@ -199,6 +199,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
      * keep data defaults for next time
      */
     public void playInitiated () {
+        /*
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for (NodeWidget node : nodes) {
             if (node instanceof AbstractRoutineNodeWidget) {
@@ -209,6 +210,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
 
         Notifications.fireEvent(Notifications.obtainEvent(TweenPlayedEvent.class));
+         */
 
     }
 
