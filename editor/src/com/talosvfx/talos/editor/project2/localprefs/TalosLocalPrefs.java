@@ -5,15 +5,20 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.RecentProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.project2.apps.AppPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Data;
 
 public class TalosLocalPrefs {
 
 	private static final String LOCAL_PREFS = "talos_local_prefs";
+
+	private static final String PROJECT_PREFS_PREFIX = "talos_project_prefs_";
 
 	private static final Json json = new Json();
 
@@ -124,4 +129,65 @@ public class TalosLocalPrefs {
 		prefs.flush();
 	}
 
+	/**
+	 * Pushes data into app based on its game asset.
+	 * @param gameAsset
+	 * @param baseApp
+	 */
+	public static void getPrefs (GameAsset<?> gameAsset, AppManager.BaseApp<?> baseApp) {
+		String prefName = getCurrentProjectPrefName();
+		Preferences preferences = Gdx.app.getPreferences(prefName);
+		Class<? extends AppManager.BaseApp> clazz = baseApp.getClass();
+
+		if (preferences.contains(clazz.getName())) {
+			String prefsString = preferences.getString(clazz.getName());
+			AppPrefs prefs = json.fromJson(AppPrefs.class, prefsString);
+			if (prefs.hasPrefFor(gameAsset)) {
+				Object appPreference = prefs.getPrefFor(gameAsset);
+				baseApp.applyPreferences(appPreference);
+			}
+		}
+	}
+
+
+	/**
+	 * Stores preferences based on app and its asset.
+	 * Note: do not forget to call {@link #setPrefs(GameAsset, AppManager.BaseApp) setPrefs} method to actually save to file.
+	 * @param gameAsset
+	 * @param baseApp
+	 */
+	public static void setPrefs (GameAsset<?> gameAsset, AppManager.BaseApp<?> baseApp) {
+		String prefName = getCurrentProjectPrefName();
+		Preferences preferences = Gdx.app.getPreferences(prefName);
+		Class<? extends AppManager.BaseApp> clazz = baseApp.getClass();
+
+		AppPrefs appPrefs;
+		Object appPreference = baseApp.getCurrentPreference();
+		// nothing to set, skip
+		if (appPreference == null) {
+			return;
+		}
+		if (!preferences.contains(clazz.getName())) {
+			appPrefs = new AppPrefs();
+		} else {
+			String prefsString = preferences.getString(clazz.getName());
+			appPrefs = json.fromJson(AppPrefs.class, prefsString);
+		}
+		appPrefs.setPrefFor(gameAsset, appPreference);
+		String appPrefsStr = json.toJson(appPrefs);
+		preferences.putString(clazz.getName(), appPrefsStr);
+	}
+
+	/**
+	 * Persist the preferences.
+	 */
+	public static void savePrefs () {
+		String prefName = getCurrentProjectPrefName();
+		Preferences preferences = Gdx.app.getPreferences(prefName);
+		preferences.flush();
+	}
+
+	private static String getCurrentProjectPrefName() {
+		return PROJECT_PREFS_PREFIX + SharedResources.currentProject.rootProjectDir().nameWithoutExtension();
+	}
 }

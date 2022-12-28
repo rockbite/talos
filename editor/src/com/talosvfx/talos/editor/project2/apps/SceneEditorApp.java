@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.project2.apps;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -17,7 +18,6 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer {
 
 	private final SceneEditorWorkspace workspaceWidget;
-
 
 	public SceneEditorApp () {
 		this.singleton = true;
@@ -85,6 +85,27 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@EventHandler
 	public void GONameChangeCommand(GONameChangeCommand command) {
 		workspaceWidget.changeGOName(command.getGo(), command.getSuggestedName());
+	}
+
+	@Override
+	public void applyPreferences(Object appPreferences) {
+		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) appPreferences;
+		workspaceWidget.setCameraPos(prefs.cameraPos);
+		workspaceWidget.setCameraZoom(prefs.cameraZoom);
+	}
+
+	@Override
+	public Object getCurrentPreference() {
+		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) super.getCurrentPreference();
+		prefs.cameraPos = workspaceWidget.getCameraPos();
+		prefs.cameraZoom = workspaceWidget.getCameraZoom();
+		return prefs;
+	}
+
+	@AppPreference
+	private static class SceneEditorAppPrefs {
+		private Vector3 cameraPos;
+		private float cameraZoom;
 	}
 }
 
