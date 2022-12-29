@@ -331,7 +331,9 @@ public class AssetImporter {
 
         if(file.path().equals(newHandle.path())) return file;
 
-        if(!file.isDirectory()) {
+        AssetRepository.getInstance().moveFile(file, newHandle, true);
+
+        if(!newHandle.isDirectory()) {
             FileNameChanged event = Notifications.obtainEvent(FileNameChanged.class);
             try {
                 event.assetType = GameAssetType.getAssetTypeFromExtension(file.extension());
@@ -342,8 +344,6 @@ public class AssetImporter {
                 throw new RuntimeException(e);
             }
         }
-
-        AssetRepository.getInstance().moveFile(file, newHandle, true);
 
         return newHandle;
     }
