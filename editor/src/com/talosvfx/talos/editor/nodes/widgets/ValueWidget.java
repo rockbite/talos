@@ -285,15 +285,14 @@ public class ValueWidget extends AbstractWidget<Float> {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
-        float precision = (int) (1/step);
+        float precision = 1 / step;
         value = MathUtils.round((value) * precision) / precision;
+
+        String text = value + "";
         this.value = value;
 
-        String text = "";
-        if (step < 1) {
-            text = value + ""; //todo format in gwt friendly way
-        } else if (step == 1) {
-            text = Math.round(value) + "";
+        if (MathUtils.round(step) == step) {
+            text = MathUtils.round(value) + "";
         }
 
         valueLabel.setText(text);
