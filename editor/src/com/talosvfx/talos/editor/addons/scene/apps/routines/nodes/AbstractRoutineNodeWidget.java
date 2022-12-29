@@ -18,9 +18,6 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     protected ObjectMap<String, Object> params = new ObjectMap<>();
 
-    private boolean animatingSignal = false;
-    private boolean animatingInput = false;
-
     @Override
     public void init(Skin skin, NodeBoard nodeBoard) {
         super.init(skin, nodeBoard);
@@ -85,14 +82,14 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
             return;
         }
 
+
         for(Connection connection : connections) {
             String targetSlot = connection.targetSlot;
 
-            if (targetSlot == null) {
-                return;
+            if (targetSlot != null) {
+                // animate the signal
+                animateSignal(portName, connection);
             }
-            // animate the signal
-            animateSignal(portName, connection);
         }
     }
 
@@ -109,14 +106,13 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
     }
 
     public void animateInput(String fromSlot, Connection connection) {
-        if(animatingInput) return;
-
-        animatingInput = true;
+        NodeBoard.NodeConnection nodeConnection = nodeBoard.findConnection(connection.targetNode, this, connection.targetSlot, fromSlot);
+        if(nodeConnection.getDataActor() != null) return;
 
         Color color = Color.valueOf("#0957a8");
         Actor tmpActor = new Actor();
         addActor(tmpActor);
-        NodeBoard.NodeConnection nodeConnection = nodeBoard.findConnection(connection.targetNode, this, connection.targetSlot, fromSlot);
+
         nodeConnection.setHighlightActorBasic(tmpActor);
         tmpActor.setColor(NodeBoard.curveColor);
 
@@ -128,16 +124,15 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
                     public void run() {
                         nodeConnection.unsetHighlightActor();
                         tmpActor.remove();
-                        animatingInput = false;
                     }
                 })
         ));
     }
 
     public void animateSignal(String fromSlot, Connection connection) {
-        if(animatingSignal) return;
+        NodeBoard.NodeConnection nodeConnection = nodeBoard.findConnection(this, connection.targetNode, fromSlot, connection.targetSlot);
 
-        animatingSignal = true;
+        if(nodeConnection.getDataActor() != null) return;
 
         Actor source = getOutputSlotActor(fromSlot);
         Actor target = connection.targetNode.getInputSlotActor(connection.targetSlot);
@@ -155,7 +150,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
         Actor tmpActor = new Actor();
         addActor(tmpActor);
-        NodeBoard.NodeConnection nodeConnection = nodeBoard.findConnection(this, connection.targetNode, fromSlot, connection.targetSlot);
+
         nodeConnection.setHighlightActor(tmpActor);
         tmpActor.setColor(color);
 
@@ -166,7 +161,6 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
                     public void run() {
                         nodeConnection.unsetHighlightActor();
                         tmpActor.remove();
-                        animatingSignal = false;
                     }
                 })
         ));

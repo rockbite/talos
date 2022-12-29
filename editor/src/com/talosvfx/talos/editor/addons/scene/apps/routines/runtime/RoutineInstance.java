@@ -19,7 +19,7 @@ public class RoutineInstance {
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
-    private Array<AsyncRoutineNode> asyncNodes = new Array<>();
+    private Array<TickableNode> tickableNodes = new Array<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
 
@@ -102,8 +102,8 @@ public class RoutineInstance {
 
                 idMap.put(id, routineNode);
 
-                if(routineNode instanceof AsyncRoutineNode) {
-                    asyncNodes.add((AsyncRoutineNode) routineNode);
+                if(routineNode instanceof TickableNode) {
+                    tickableNodes.add((TickableNode) routineNode);
                 }
             } catch (ReflectionException e) {
                 e.printStackTrace();
@@ -203,7 +203,7 @@ public class RoutineInstance {
     }
 
     public void tick(float delta) {
-        for(AsyncRoutineNode node: asyncNodes) {
+        for(TickableNode node: tickableNodes) {
             node.tick(delta);
         }
     }

@@ -60,6 +60,15 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
+        <module name = "PulsingNode" title = "Pulsing Node" keywords = "movement" class = "RoutineNodeWidget">
+            <group>
+                <value port="input" name="startSignal" type="signal">start</value>
+                <value port="input" name="stopSignal" type="signal">stop</value>
+                <value port="input" name="flag" type="boolean">flag</value>
+            </group>
+            <dynamicValue name="interval" type="float" default="1">interval</dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
     </category>
     <category name="entities" title="Entities">
         <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">

@@ -6,12 +6,13 @@ import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.TickableNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.misc.InterpolationLibrary;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
 
-public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
+public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode implements TickableNode {
 
     @Getter
     protected Array<T> states = new Array<>();

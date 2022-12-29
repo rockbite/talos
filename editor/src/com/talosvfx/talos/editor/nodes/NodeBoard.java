@@ -31,6 +31,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -100,6 +101,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		public String fromId;
 		public String toId;
 
+		@Getter
 		private Actor dataActor = null;
 
 		public boolean basic = false;
