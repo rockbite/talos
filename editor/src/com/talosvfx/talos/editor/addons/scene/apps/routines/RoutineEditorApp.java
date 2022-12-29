@@ -17,9 +17,12 @@ import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences> {
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
@@ -93,6 +96,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
     @Override
     public void updateForGameAsset (GameAsset<RoutineStageData> gameAsset) {
         super.updateForGameAsset(gameAsset);
+        TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
@@ -109,5 +113,19 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
     @Override
     public void onRemove() {
         // remove listeners and stuff somehow
+    }
+
+    @Override
+    public void applyFromPreferences(ViewportPreferences prefs) {
+        routineStageWrapper.setCameraPos(prefs.cameraPos);
+        routineStageWrapper.setCameraZoom(prefs.cameraZoom);
+    }
+
+    @Override
+    public ViewportPreferences getPrefs() {
+        ViewportPreferences prefs = new ViewportPreferences();
+        prefs.cameraPos = routineStageWrapper.getCameraPos();
+        prefs.cameraZoom = routineStageWrapper.getCameraZoom();
+        return prefs;
     }
 }
