@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
@@ -36,8 +37,10 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         float duration = fetchFloatValue("duration");
         state.setDuration(duration);
         state.direction = 1;
-
         isYoyo = fetchBooleanValue("yoyo");
+        String interpolation = fetchStringValue("interpolation");
+
+        Interpolation.linear
 
         targetAdded(state);
     }
@@ -102,4 +105,15 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
     }
 
     protected abstract void stateTick(T state, float delta);
+
+    @Override
+    public void reset() {
+        super.reset();
+        for(int i = states.size - 1; i >= 0; i--) {
+            T state = states.get(i);
+            Pools.free(state);
+        }
+
+        states.clear();
+    }
 }

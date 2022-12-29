@@ -36,6 +36,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
+                nodeStage.resetNodes();
 
                 GameAssetWidget assetWidget = (GameAssetWidget)getWidget("scene");
                 GameAsset sceneAsset = assetWidget.getValue();
@@ -51,6 +52,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 // todo: reset instance and all also all visual widgets
 
                 RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
+                routineInstance.reset();
                 int uniqueId = getUniqueId();
                 RoutineExecutorNode node = (RoutineExecutorNode)routineInstance.getNodeById(uniqueId);
                 node.setContainer(container);

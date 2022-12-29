@@ -45,6 +45,16 @@ public class RoutineInstance {
     @Setter
     private RoutineListener listener;
 
+    public void reset() {
+        clearMemory();
+        globalMap.clear();
+        scopeNumbers.clear();
+
+        for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
+            entry.value.reset();
+        }
+    }
+
     public interface RoutineListener {
         void onSignalSent(int nodeId, String port);
 

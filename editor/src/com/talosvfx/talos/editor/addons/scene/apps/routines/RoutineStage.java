@@ -277,4 +277,8 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
         return scenePreviewApp;
     }
+
+    public void resetNodes() {
+        nodeBoard.resetNodes();
+    }
 }

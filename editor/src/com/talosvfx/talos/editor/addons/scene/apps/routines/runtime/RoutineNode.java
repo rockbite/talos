@@ -357,4 +357,8 @@ public abstract class RoutineNode {
         }
     }
 
+    public void reset() {
+
+    }
+
 }

@@ -92,6 +92,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         // for overriding
     }
 
+    public void resetNode() {
+
+    }
+
     public class Connection {
         public String targetSlot;
         public NodeWidget targetNode;

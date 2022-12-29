@@ -88,6 +88,12 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return hoveredConnection;
 	}
 
+	public void resetNodes() {
+		for (ObjectMap.Entry<Integer, NodeWidget> entry : nodeMap) {
+			entry.value.resetNode();
+		}
+	}
+
 	public static class NodeConnection {
 		public NodeWidget fromNode;
 		public NodeWidget toNode;

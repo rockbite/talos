@@ -352,8 +352,11 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+    public void resetNode() {
+        super.resetNode();
+
+        microNodeView.clearMap();
+        timelineWidget.clearMap();
     }
 }
 
