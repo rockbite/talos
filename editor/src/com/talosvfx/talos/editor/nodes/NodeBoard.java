@@ -970,6 +970,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return nodeStage;
 	}
 
+	public void clearMap() {
+		nodeMap.clear();
+	}
 	public void registerNodeId(NodeWidget node) {
 		nodeMap.put(node.getUniqueId(), node);
 

@@ -50,11 +50,13 @@ public class ProgressWidget extends Table {
             shaderProgram.setUniformf("regionV2", region.getV2());
 
             int i = 0;
+            final int MAX = 30;
             for(ObjectFloatMap.Entry<Object> entry : progressMap) {
+                if(i >= MAX) break;
                 float progress = entry.value;
                 shaderProgram.setUniformf("alpha[" + (i++) + "]", progress);
             }
-            shaderProgram.setUniformi("alphaCount", progressMap.size);
+            shaderProgram.setUniformi("alphaCount", Math.min(progressMap.size, MAX));
         }
 
         super.draw(batch, parentAlpha);

@@ -92,9 +92,12 @@ public class DynamicNodeStageData implements Json.Serializable {
 				node.read(json, nodeData);
 				idCounter = Math.max(idCounter, node.getUniqueId());
 				nodeMap.put(node.getUniqueId(), node);
-
-				nodeBoard.registerNodeId(node);
 			}
+		}
+
+		nodeBoard.clearMap();
+		for (IntMap.Entry<NodeWidget> entry : nodeMap) {
+			nodeBoard.registerNodeId(entry.value);
 		}
 
 		nodeBoard.globalNodeCounter = idCounter + 1;

@@ -18,6 +18,9 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     protected ObjectMap<String, Object> params = new ObjectMap<>();
 
+    private boolean animatingSignal = false;
+    private boolean animatingInput = false;
+
     @Override
     public void init(Skin skin, NodeBoard nodeBoard) {
         super.init(skin, nodeBoard);
@@ -106,6 +109,10 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
     }
 
     public void animateInput(String fromSlot, Connection connection) {
+        if(animatingInput) return;
+
+        animatingInput = true;
+
         Color color = Color.valueOf("#0957a8");
         Actor tmpActor = new Actor();
         addActor(tmpActor);
@@ -121,12 +128,17 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
                     public void run() {
                         nodeConnection.unsetHighlightActor();
                         tmpActor.remove();
+                        animatingInput = false;
                     }
                 })
         ));
     }
 
     public void animateSignal(String fromSlot, Connection connection) {
+        if(animatingSignal) return;
+
+        animatingSignal = true;
+
         Actor source = getOutputSlotActor(fromSlot);
         Actor target = connection.targetNode.getInputSlotActor(connection.targetSlot);
 
@@ -154,6 +166,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
                     public void run() {
                         nodeConnection.unsetHighlightActor();
                         tmpActor.remove();
+                        animatingSignal = false;
                     }
                 })
         ));
