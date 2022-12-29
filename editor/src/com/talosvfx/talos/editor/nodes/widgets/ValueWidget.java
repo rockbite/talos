@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -21,7 +22,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Table main;
     private Table progressContainer;
     private Table progress;
-
     private Label label;
     private Label valueLabel;
     private TextField textField;
@@ -284,13 +284,14 @@ public class ValueWidget extends AbstractWidget<Float> {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
+        float precision = 1 / step;
+        value = MathUtils.round((value) * precision) / precision;
+
+        String text = value + "";
         this.value = value;
 
-        String text = "";
-        if (step < 1) {
-            text = value + ""; //todo format in gwt friendly way
-        } else if (step == 1) {
-            text = Math.round(value) + "";
+        if (MathUtils.round(step) == step) {
+            text = MathUtils.round(value) + "";
         }
 
         valueLabel.setText(text);

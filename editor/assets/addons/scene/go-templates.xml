@@ -29,7 +29,7 @@
                 <component className="MapComponent"></component>
             </components>
         </template>
-        <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "" hidden="true">
+        <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
                 <component className="SpineRendererComponent"></component>

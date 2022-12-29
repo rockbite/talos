@@ -11,13 +11,15 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 
 
 @SingletonApp
-public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer {
+public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
 	private final SceneEditorWorkspace workspaceWidget;
-
 
 	public SceneEditorApp () {
 		this.singleton = true;
@@ -51,6 +53,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@Override
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
+		TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
 		if (!gameAsset.listeners.contains(this, true)) {
 			gameAsset.listeners.add(this);
@@ -85,6 +88,20 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@EventHandler
 	public void GONameChangeCommand(GONameChangeCommand command) {
 		workspaceWidget.changeGOName(command.getGo(), command.getSuggestedName());
+	}
+
+	@Override
+	public void applyFromPreferences(ViewportPreferences prefs) {
+		workspaceWidget.setCameraPos(prefs.cameraPos);
+		workspaceWidget.setCameraZoom(prefs.cameraZoom);
+	}
+
+	@Override
+	public ViewportPreferences getPrefs() {
+		ViewportPreferences prefs = new ViewportPreferences();
+		prefs.cameraPos = workspaceWidget.getCameraPos();
+		prefs.cameraZoom = workspaceWidget.getCameraZoom();
+		return prefs;
 	}
 }
 

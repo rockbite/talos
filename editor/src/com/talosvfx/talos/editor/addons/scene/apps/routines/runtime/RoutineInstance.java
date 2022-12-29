@@ -4,10 +4,11 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -16,10 +17,9 @@ public class RoutineInstance {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
-    private Array<RoutineNode> nodes = new Array<>();
-
-
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
+
+    private Array<TickableNode> tickableNodes = new Array<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
 
@@ -29,6 +29,8 @@ public class RoutineInstance {
 
     public ObjectMap<String, Object> memory = new ObjectMap<>();
 
+    public ObjectMap<String, Object> globalMap = new ObjectMap<>();
+
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
@@ -36,6 +38,28 @@ public class RoutineInstance {
 
     @Getter
     private Array<PropertyWrapper<?>> parentPropertyWrappers;
+
+    @Getter
+    private Object signalPayload;
+
+    @Setter
+    private RoutineListener listener;
+
+    public void reset() {
+        clearMemory();
+        globalMap.clear();
+        scopeNumbers.clear();
+
+        for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
+            entry.value.reset();
+        }
+    }
+
+    public interface RoutineListener {
+        void onSignalSent(int nodeId, String port);
+
+        void onInputFetched(int nodeId, String port);
+    }
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
@@ -77,6 +101,10 @@ public class RoutineInstance {
                 }
 
                 idMap.put(id, routineNode);
+
+                if(routineNode instanceof TickableNode) {
+                    tickableNodes.add((TickableNode) routineNode);
+                }
             } catch (ReflectionException e) {
                 e.printStackTrace();
             }
@@ -152,6 +180,14 @@ public class RoutineInstance {
         return memory.get(name);
     }
 
+    public void storeGlobal(String name, Object value) {
+        globalMap.put(name, value);
+    }
+
+    public Object fetchGlobal(String name) {
+        return globalMap.get(name);
+    }
+
     public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
         for (PropertyWrapper<?> propertyWrapper : parentPropertyWrappers) {
             if (propertyWrapper.index == index) {
@@ -160,5 +196,28 @@ public class RoutineInstance {
         }
 
         return null;
+    }
+
+    public void setSignalPayload(Object payload) {
+        this.signalPayload = payload;
+    }
+
+    public void tick(float delta) {
+        for(TickableNode node: tickableNodes) {
+            node.tick(delta);
+        }
+    }
+
+    public void onSignalSent(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onSignalSent(nodeId, portName);
+        }
+    }
+
+
+    public void onInputFetched(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onInputFetched(nodeId, portName);
+        }
     }
 }

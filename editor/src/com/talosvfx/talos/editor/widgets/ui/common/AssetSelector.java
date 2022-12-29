@@ -59,7 +59,7 @@ public class AssetSelector<T> extends Table {
         nameLabel.setAlignment(Align.right);
 
         table.right();
-        table.add(nameLabel).growX().maxWidth(130).padRight(2);
+        table.add(nameLabel).growX().maxWidth(130).minWidth(0).padRight(2);
         table.add(button);
 
         button.addListener(new ClickListener() {

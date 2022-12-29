@@ -14,14 +14,18 @@ public class LoopNode extends RoutineNode {
         int to = fetchIntValue("to");
         float step = fetchFloatValue("step");
 
+        Object signalPayload = routineInstanceRef.getSignalPayload();
+
         routineInstanceRef.beginDepth();
         for(int i = from; from < to ? i < to : i > to; i += step) {
             index = i;
+            routineInstanceRef.setSignalPayload(signalPayload);
             sendSignal("body");
             routineInstanceRef.setDepthValue(i);
         }
         routineInstanceRef.endDepth();
 
+        routineInstanceRef.setSignalPayload(signalPayload);
         sendSignal("onComplete");
     }
 

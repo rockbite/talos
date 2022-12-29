@@ -11,9 +11,11 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInsta
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
+import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -23,6 +25,8 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +44,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
         this.routineEditorApp = routineEditorApp;
-
         Notifications.registerObserver(this);
     }
 
@@ -84,8 +87,25 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
         setFromData(asset);
         asset.getResource().constructForUI(this);
+
+        setInstanceListeners();
     }
 
+    private void setInstanceListeners() {
+        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
+            @Override
+            public void onSignalSent(int nodeId, String port) {
+                AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
+                nodeWidget.animateSignal(port);
+            }
+
+            @Override
+            public void onInputFetched(int nodeId, String port) {
+                AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
+                nodeWidget.animateInput(port);
+            }
+        });
+    }
 
 
     @Override
@@ -139,9 +159,13 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void routineUpdated () {
+        //todo: this isn't right
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
         gameAsset.setUpdated();
+        data.setRoutineInstance(data.createInstance(true));
         Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+
+        setInstanceListeners();
     }
 
     @EventHandler
@@ -199,6 +223,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
      * keep data defaults for next time
      */
     public void playInitiated () {
+        /*
         Array<NodeWidget> nodes = getNodeBoard().getNodes();
         for (NodeWidget node : nodes) {
             if (node instanceof AbstractRoutineNodeWidget) {
@@ -209,6 +234,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
 
         Notifications.fireEvent(Notifications.obtainEvent(TweenPlayedEvent.class));
+         */
 
     }
 
@@ -248,5 +274,18 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         return Gdx.graphics.getDeltaTime() * timeScale;
     }
 
+    @Override
+    public void act() {
+        data.getRoutineInstance().tick(getDelta());
+    }
 
+    public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
+        ScenePreviewApp scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+
+        return scenePreviewApp;
+    }
+
+    public void resetNodes() {
+        nodeBoard.resetNodes();
+    }
 }

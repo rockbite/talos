@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 
 public abstract class RoutineNode {
 
@@ -93,7 +94,7 @@ public abstract class RoutineNode {
         uniqueId = nodeData.getInt("id");
     }
 
-    private void constructNode(XmlReader.Element config) {
+    protected void constructNode(XmlReader.Element config) {
         int rowCount = config.getChildCount();
         for (int i = 0; i < rowCount; i++) {
             XmlReader.Element row = config.getChild(i);
@@ -133,6 +134,9 @@ public abstract class RoutineNode {
             if(type.equals("vec3")) port.dataType = DataType.VECTOR3;
             if(type.equals("color")) port.dataType = DataType.COLOR;
             if(type.equals("asset")) port.dataType = DataType.ASSET;
+            if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
+            if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
         }
@@ -158,7 +162,15 @@ public abstract class RoutineNode {
                 Json json = new Json();
                 Color color = json.readValue(Color.class, jsonValue);
                 port.setValue(color);
-            } else {
+            } else if(port.dataType == DataType.ASSET) {
+                Json json = new Json();
+                try {
+                    GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
+                    String identifier = jsonValue.getString("id");
+                    GameAsset gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+                    port.setValue(gameAsset);
+                } catch (Exception e) {}
+            }else {
                 port.setValueFromString(properties.getString(name));
             }
         }
@@ -210,6 +222,8 @@ public abstract class RoutineNode {
                 }
             }
         }
+
+        routineInstanceRef.onSignalSent(uniqueId, portName);
     }
 
     protected GameAsset fetchAssetValue(String key) {
@@ -222,8 +236,7 @@ public abstract class RoutineNode {
             if (port.valueOverride instanceof GameAsset) {
                 return (GameAsset) (port.valueOverride);
             } else {
-                //todo: fix assumption that it is PNG
-                GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String) port.valueOverride, GameAssetType.SPRITE);
+                GameAsset asset = (GameAsset) port.valueOverride;
                 if (!asset.listeners.contains(updateListener, true)) {
                     asset.listeners.add(updateListener);
                 }
@@ -250,7 +263,7 @@ public abstract class RoutineNode {
     protected String fetchStringValue(String key) {
         Port port = inputs.get(key);
 
-
+        if(port == null) return "";
 
         return (String) port.valueOverride;
     }
@@ -277,10 +290,15 @@ public abstract class RoutineNode {
 
     protected boolean fetchBooleanValue(String key) {
         Object object = fetchValue(key);
+        if(object == null) {
+            return false;
+        }
+
         if(object instanceof String) {
             boolean result = Boolean.parseBoolean((String) object);
             return result;
         }
+
         return (boolean)object;
     }
 
@@ -320,6 +338,8 @@ public abstract class RoutineNode {
                 RoutineNode targetNode = connection.toPort.nodeRef;
                 String targetPortName = connection.toPort.name;
 
+                routineInstanceRef.onInputFetched(uniqueId, key);
+
                 return targetNode.queryValue(targetPortName);
             } else {
                 if(port.valueOverride == null && port.dataType == DataType.NUMBER) {
@@ -345,6 +365,10 @@ public abstract class RoutineNode {
         if(inputs.containsKey(key)) {
             inputs.get(key).valueOverride = value;
         }
+    }
+
+    public void reset() {
+
     }
 
 }

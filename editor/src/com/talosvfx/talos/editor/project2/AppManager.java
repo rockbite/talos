@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.project2;
 
 import com.artemis.utils.reflect.ClassReflection;
 import com.artemis.utils.reflect.ReflectionException;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -10,6 +12,9 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
@@ -17,20 +22,26 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
-import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
-import com.talosvfx.talos.editor.project2.apps.ParticlePreviewApp;
-import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
-import com.talosvfx.talos.editor.project2.apps.PropertiesPanelApp;
-import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
-import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
-import com.talosvfx.talos.editor.project2.apps.SingletonApp;
+import com.talosvfx.talos.editor.project2.apps.*;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
+
+import java.util.UUID;
 
 public class AppManager implements Observer {
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
+
+	static {
+		FileHandle singleton = Gdx.files.local("singleton");
+		RawAsset value = new RawAsset(singleton);
+		value.metaData = new EmptyMetadata();
+		value.metaData.uuid = new UUID(-1, -1);
+		singletonAsset.dependentRawAssets.add(value);
+	}
 	private static final String APP_LIST_MENU_PATH = "window/apps/list";
 	private static final String PANEL_LIST_MENU_PATH = "window/panels/panel_list";
 
@@ -57,7 +68,7 @@ public class AppManager implements Observer {
 		return null;
 	}
 
-	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier) {
+	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, String gameAssetUniqueIdentifier) {
 
 		Class<U> appForSimpleName = (Class<U>)appRegistry.getAppForSimpleName(baseAppClazz);
 
@@ -65,11 +76,16 @@ public class AppManager implements Observer {
 			throw new GdxRuntimeException("No app found for clazz " + baseAppClazz + " register it in AppManager");
 		}
 
-		GameAsset<T> gameAsset;
+		GameAsset<T> gameAsset = null;
 		if (gameAssetIdentifier.equals("singleton") && gameAssetType == GameAssetType.DIRECTORY) {
 			gameAsset = (GameAsset<T>)singletonAsset;
 		} else {
-			gameAsset = AssetRepository.getInstance().getAssetForIdentifier(gameAssetIdentifier, gameAssetType);
+			if (gameAssetUniqueIdentifier != null) {
+				gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(gameAssetUniqueIdentifier, gameAssetType);
+			}
+			if (gameAsset == null) {
+				gameAsset = AssetRepository.getInstance().getAssetForIdentifier(gameAssetIdentifier, gameAssetType);
+			}
 		}
 
 		U baseAppForGameAsset = createBaseAppForGameAsset(gameAsset, appForSimpleName);
@@ -143,6 +159,7 @@ public class AppManager implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
+
 		}
 
 		public abstract String getAppName ();
@@ -219,7 +236,7 @@ public class AppManager implements Observer {
 
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, SceneEditorApp.class, SceneHierarchyApp.class );
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, PropertiesPanelApp.class);
-		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class, ScenePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
 
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
@@ -233,11 +250,28 @@ public class AppManager implements Observer {
 		return appRegistry.hasAssetType(gameAsset.type);
 	}
 
-	public <T, U extends BaseApp<T>> void openApp (GameAsset<T> asset, Class<U> app) {
+	public <T, U extends BaseApp<T>> U openAppIfNotOpened (GameAsset<T> asset, Class<U> app) {
+		Array<? extends BaseApp<?>> baseApps = baseAppsOpenForGameAsset.get(asset);
+		for (BaseApp<?> baseApp : baseApps) {
+			if(baseApp.getClass().equals(app)) {
+				if(!baseApp.gridAppReference.isTabActive()) {
+					baseApp.gridAppReference.getLayoutContent().swapToApp(baseApp.getGridAppReference());
+				}
+				return (U) baseApp;
+			}
+		}
+
+		return openApp(asset, app);
+	}
+
+
+	public <T, U extends BaseApp<T>> U openApp (GameAsset<T> asset, Class<U> app) {
 		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
 		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
 
 		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
+
+		return baseAppForGameAsset;
 	}
 
 	private static class LayoutGridTargetConfig {
@@ -412,5 +446,21 @@ public class AppManager implements Observer {
 
 	public void closeAllFloatingWindows() {
 		// todo: close all floating windows
+	}
+
+	@EventHandler
+	public void onSave (SaveRequest event) {
+		// set preferences for all assets
+		Array<BaseApp> appInstances = getAppInstances();
+
+		for(BaseApp app: appInstances) {
+			if (ContainerOfPrefs.class.isAssignableFrom(app.getClass())) {
+				ContainerOfPrefs containerOfPrefs = (ContainerOfPrefs) app;
+				TalosLocalPrefs.setAppPrefs(app.gameAsset, containerOfPrefs);
+			}
+		}
+
+		// save preferences
+		TalosLocalPrefs.savePrefs();
 	}
 }

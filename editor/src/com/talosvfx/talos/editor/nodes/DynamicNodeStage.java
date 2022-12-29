@@ -45,7 +45,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
         super();
         this.skin = skin;
         nodeData = loadData();
-
     }
 
     protected abstract XmlReader.Element loadData();
@@ -110,7 +109,11 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     }
     public NodeWidget createNode (String nodeName, float screenX, float screenY) {
         Class clazz = nodeListPopup.getNodeClassByName(nodeName);
-        return nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), screenX, screenY);
+        NodeWidget node = nodeBoard.createNode(clazz, nodeListPopup.getConfigFor(nodeName), screenX, screenY);
+
+        nodeBoard.registerNodeId(node);
+
+        return node;
     }
     public void sendInStage (Stage stage) {
         stageSentIn = stage;

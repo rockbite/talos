@@ -1,13 +1,17 @@
-package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes;
+package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AbstractRoutineNodeWidget;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 import java.util.Comparator;
 
-public class StaggerNode extends AbstractRoutineNodeWidget {
+public class StaggerNode extends RoutineNode {
+
+    private Array<GameObject> orderedArray = new Array<>();
 
     private final PositionComparator positionComparator;
 
@@ -16,28 +20,29 @@ public class StaggerNode extends AbstractRoutineNodeWidget {
     }
 
     @Override
-    public Object getOutputValue(String name, ObjectMap<String, Object> params) {
+    public Object queryValue(String targetPortName) {
 
-        if(params != null) {
+        String strategy = fetchStringValue("strategy");
+        String sorting = fetchStringValue("sorting");
+        float min = fetchFloatValue("min");
+        float max = fetchFloatValue("max");
 
-            String strategy = (String) getWidgetValue("strategy");
-            String sorting = (String) getWidgetValue("sorting");
+        GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
 
-            Array<GameObject> neighbours = (Array<GameObject>) params.get("neighbours");
-            GameObject target = (GameObject) params.get("targetGO");
+        Array<GameObject> executedTargets = (Array<GameObject>) routineInstanceRef.fetchGlobal("executedTargets");
 
-            float interpolation = 0;
+        float interpolation = 0;
 
-            if(neighbours == null || neighbours.size == 0) return 0;
-
+        if(executedTargets != null && !executedTargets.isEmpty()) {
             if(strategy.equals("INDEX")) {
-                interpolation = (float) params.get("chunkIndex");
+                interpolation = (float)executedTargets.indexOf(target, true)/(executedTargets.size-1);
             } else if(strategy.equals("YPOS") || strategy.equals("XPOS")) {
+                orderedArray.clear();
+                orderedArray.addAll(executedTargets);
 
-                Array<GameObject> orderedArray = new Array<>();
-                orderedArray.addAll(neighbours);
                 PositionComparator.Dimension dimension = PositionComparator.Dimension.X;
                 PositionComparator.Order order = PositionComparator.Order.ASC;
+
                 if(strategy.equals("YPOS")) dimension = PositionComparator.Dimension.Y;
                 if(sorting.equals("DESC")) order = PositionComparator.Order.DESC;
 
@@ -45,15 +50,14 @@ public class StaggerNode extends AbstractRoutineNodeWidget {
 
                 orderedArray.sort(positionComparator);
 
-                interpolation = (float)orderedArray.indexOf(target, true)/orderedArray.size;
+                interpolation = (float)orderedArray.indexOf(target, true)/(orderedArray.size-1);
             }
 
-            float min = (float) getWidgetValue("min");
-            float max = (float) getWidgetValue("max");
+
             return min + (max - min) * interpolation;
         }
 
-        return 0;
+        return super.queryValue(targetPortName);
     }
 
     static class PositionComparator implements Comparator<GameObject> {

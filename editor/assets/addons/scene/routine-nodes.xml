@@ -1,11 +1,12 @@
 <modules classPath="com.talosvfx.talos.editor.addons.scene.apps.routines.nodes">
     <category name="async" title="Animation">
-        <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineNodeWidget">
+        <module name = "RoutineExecutorNode" title = "Executor" keywords = "tween, system" class = "RoutineExecuteNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="Tween">Title</inputText>
+            <asset name="scene" type="SCENE">scene</asset>
             <inputText name="target" default="">Target</inputText>
             <button name="playButton">Play</button>
-            <value port="output" name="startSignal" type="signal">start</value>
+            <value port="output" name="outSignal" type="signal">start</value>
         </module>
         <module name = "DelayNode" title = "Delay" keywords = "tween" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
@@ -13,11 +14,7 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-    </category>
-    <category name="main" title="Main">
-        <!--
-
-        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "RoutineNodeWidget">
+        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
@@ -28,7 +25,25 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-
+        <module name = "ColorToNode" title = "Color To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <color port="input" name="color" type="color">Color: </color>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "ScaleToNode" title = "Scale To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000">Scale X: </dynamicValue>
+                <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000">Scale Y: </dynamicValue>
+            </group>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
@@ -45,8 +60,71 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
-        -->
-
+        <module name = "PulsingNode" title = "Pulsing Node" keywords = "movement" class = "RoutineNodeWidget">
+            <group>
+                <value port="input" name="startSignal" type="signal">start</value>
+                <value port="input" name="stopSignal" type="signal">stop</value>
+                <value port="input" name="flag" type="boolean">flag</value>
+            </group>
+            <dynamicValue name="interval" type="float" default="1">interval</dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+    </category>
+    <category name="entities" title="Entities">
+        <module name = "RemoveEntityNode" title = "Remove Entity" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="addSignal" type="signal">add</value>
+            <value port="input" name="startSignal" type="signal">start</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SpawnSpriteNode" title = "Spawn Sprite" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="sprite" type="SPRITE">sprite</asset>
+            <group>
+                <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
+            </group>
+            <color port="input" name="color" type="color">Color: </color>
+            <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SpawnSpineNode" title = "Spawn Spine" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="spine" type="SKELETON">spine</asset>
+            <color port="input" name="color" type="color">Color: </color>
+            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SetSpineAnimationNode" title = "Set Spine Animation" keywords = "" class = "SetSpineAnimationNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="reference" type="SKELETON">reference</asset>
+            <container name="animation_list"></container>
+            <checkbox name="repeat" default = "true">repeat</checkbox>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SetTransformNode" title = "Set Transform" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000" default="1">Scale X: </dynamicValue>
+                <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000" default="1">Scale Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
+            </group>
+            <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step = "1" progress="true">Rotation: </dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+    </category>
+    <category name="main" title="Main">
         <module name = "RenderRoutineNode" title = "Render Routine" keywords = "tween, system" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="id" default="main">ID</inputText>

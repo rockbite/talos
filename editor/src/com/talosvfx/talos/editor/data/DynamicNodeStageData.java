@@ -95,6 +95,11 @@ public class DynamicNodeStageData implements Json.Serializable {
 			}
 		}
 
+		nodeBoard.clearMap();
+		for (IntMap.Entry<NodeWidget> entry : nodeMap) {
+			nodeBoard.registerNodeId(entry.value);
+		}
+
 		nodeBoard.globalNodeCounter = idCounter + 1;
 
 		if (jsonConnections != null) {

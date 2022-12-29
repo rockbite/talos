@@ -31,6 +31,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -71,6 +72,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	public Group mainContainer = new Group();
 	private Color tmpColor = new Color();
 	private NodeConnection hoveredConnection = null;
+	private ObjectMap<Integer, NodeWidget> nodeMap = new ObjectMap<>();
 
 	public void reset () {
 		nodeCounter = new ObjectIntMap<>();
@@ -87,12 +89,19 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return hoveredConnection;
 	}
 
+	public void resetNodes() {
+		for (ObjectMap.Entry<Integer, NodeWidget> entry : nodeMap) {
+			entry.value.resetNode();
+		}
+	}
+
 	public static class NodeConnection {
 		public NodeWidget fromNode;
 		public NodeWidget toNode;
 		public String fromId;
 		public String toId;
 
+		@Getter
 		private Actor dataActor = null;
 
 		public boolean basic = false;
@@ -305,6 +314,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 			int counter = nodeCounter.getAndIncrement(clazz, 0, 1);
 			node.setId(counter);
 			node.setUniqueId(globalNodeCounter++);
+
 		} catch (ReflectionException e) {
 			e.printStackTrace();
 		}
@@ -338,6 +348,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		mainContainer.removeActor(node);
 
 		node.notifyRemoved();
+		unRegisterNode(node);
 
 		updateSaveState();
 //        TalosMain.Instance().ProjectController().setDirty();
@@ -724,6 +735,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 				int uniqueId = node.getUniqueId();
 				node.read(json, nodeData);
 				node.setUniqueId(uniqueId);
+				registerNodeId(node);
 
 				node.moveBy(offset.x, offset.y);
 
@@ -958,6 +970,21 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	public DynamicNodeStage getNodeStage () {
 		return nodeStage;
+	}
+
+	public void clearMap() {
+		nodeMap.clear();
+	}
+	public void registerNodeId(NodeWidget node) {
+		nodeMap.put(node.getUniqueId(), node);
+
+	}
+	private void unRegisterNode(NodeWidget node) {
+		nodeMap.remove(node.getUniqueId());
+	}
+
+	public NodeWidget getNodeById(int nodeId) {
+		return nodeMap.get(nodeId);
 	}
 
 }

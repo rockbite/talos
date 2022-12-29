@@ -415,9 +415,12 @@ public class MainRenderer implements Observer {
                     float xSign = width < 0 ? -1 : 1;
                     float ySign = height < 0 ? -1 : 1;
 
+                    float pivotX = transformComponent.pivot.x;
+                    float pivotY = transformComponent.pivot.y;
+
                     patch.draw(batch,
-                            transformComponent.worldPosition.x - 0.5f * width * xSign, transformComponent.worldPosition.y - 0.5f * height * ySign,
-                            0.5f * width * xSign, 0.5f * height * ySign,
+                            transformComponent.worldPosition.x - pivotX * width * xSign, transformComponent.worldPosition.y - pivotY * height * ySign,
+                            pivotX * width * xSign, pivotY * height * ySign,
                             Math.abs(width), Math.abs(height),
                             xSign * transformComponent.worldScale.x, ySign * transformComponent.worldScale.y,
                             transformComponent.worldRotation);
@@ -542,9 +545,12 @@ public class MainRenderer implements Observer {
 //                            transformComponent.worldRotation);
                 } else if(spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.simple) {
 
+                    float pivotX = transformComponent.pivot.x;
+                    float pivotY = transformComponent.pivot.y;
+
                     batch.draw(textureRegion,
-                        transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
-                            0.5f, 0.5f,
+                        transformComponent.worldPosition.x - pivotX, transformComponent.worldPosition.y - pivotY,
+                            pivotX, pivotY,
                             1f, 1f,
                             width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
                             transformComponent.worldRotation);

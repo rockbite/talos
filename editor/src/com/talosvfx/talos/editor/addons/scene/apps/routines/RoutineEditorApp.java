@@ -9,15 +9,17 @@ import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements GameAsset.GameAssetUpdateListener {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
+
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
     public GenericStageWrappedViewportWidget routineStageWrapper;
-
-//    public ScenePreviewStage scenePreviewStage;
 
     public RoutineEditorApp() {
         routineStage = new RoutineStage(this, SharedResources.skin);
@@ -25,6 +27,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
             @Override
             protected boolean canMoveAround() {
                 return true;
+            }
+
+            @Override
+            public void act(float delta) {
+                super.act(delta);
+
+                routineStage.act();
             }
         };
         routineStageWrapper.getDropdownForWorld().setVisible(false);
@@ -36,7 +45,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         content.add(routineStageWrapper).grow();
 
         routineStage.init();
-//        scenePreviewStage = new ScenePreviewStage();
 
         variableCreationWindow = new VariableCreationWindow(routineStage);
 
@@ -86,6 +94,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         }
 
         super.updateForGameAsset(gameAsset);
+        TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
@@ -110,4 +119,16 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
     }
 
+    public void applyFromPreferences(ViewportPreferences prefs) {
+        routineStageWrapper.setCameraPos(prefs.cameraPos);
+        routineStageWrapper.setCameraZoom(prefs.cameraZoom);
+    }
+
+    @Override
+    public ViewportPreferences getPrefs() {
+        ViewportPreferences prefs = new ViewportPreferences();
+        prefs.cameraPos = routineStageWrapper.getCameraPos();
+        prefs.cameraZoom = routineStageWrapper.getCameraZoom();
+        return prefs;
+    }
 }
