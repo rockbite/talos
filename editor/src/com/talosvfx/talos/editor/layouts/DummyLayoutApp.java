@@ -44,9 +44,9 @@ public class DummyLayoutApp implements LayoutApp {
 			Table highlightPixel = new Table();
 			highlightPixel.setBackground(SharedResources.skin.newDrawable("white", ColorLibrary.BORDER_BLUE));
 
-			highlight.top();
-			highlight.defaults().top();
-			highlight.add(highlightPixel).growX().height(4).top();
+			highlight.bottom();
+			highlight.defaults().bottom();
+			highlight.add(highlightPixel).growX().height(4).bottom();
 
 			highlight.setVisible(false);
 		}
