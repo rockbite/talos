@@ -26,14 +26,6 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
 
     }
 
-    private void playTween() {
-        /*
-        String target = (String) (getWidget("target").getValue());
-        ObjectMap payload = new ObjectMap<String, Object>();
-        payload.put("target", target);
-        sendSignal("startSignal", "execute", payload);*/
-    }
-
     @Override
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
@@ -56,6 +48,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 } else {
                     return;
                 }
+                // todo: reset instance and all also all visual widgets
 
                 RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
                 int uniqueId = getUniqueId();

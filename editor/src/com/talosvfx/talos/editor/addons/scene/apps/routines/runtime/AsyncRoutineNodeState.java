@@ -12,8 +12,11 @@ public class AsyncRoutineNodeState<T> implements Pool.Poolable {
     @Setter@Getter
     private float duration;
 
+    public float direction;
+
     @Override
     public void reset() {
         alpha = 0;
+        direction = 1;
     }
 }

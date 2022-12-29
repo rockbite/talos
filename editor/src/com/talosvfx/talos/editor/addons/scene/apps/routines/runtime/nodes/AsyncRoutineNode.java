@@ -13,6 +13,8 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
     private Array<U> tmpArr = new Array<>();
 
+    private boolean isYoyo = false;
+
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
     // this is similar to for depth info
@@ -33,6 +35,9 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         float duration = fetchFloatValue("duration");
         state.setDuration(duration);
+        state.direction = 1;
+
+        isYoyo = fetchBooleanValue("yoyo");
 
         targetAdded(state);
     }
@@ -58,18 +63,24 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         for(int i = states.size - 1; i >= 0; i--) {
             T state = states.get(i);
-            state.alpha += delta/state.getDuration();
+            state.alpha += state.direction * delta/state.getDuration();
 
             // todo: apply interpolations here
-            // todo apply yoyo logic here
+            if(state.alpha > 1) state.alpha = 1;
+            if(state.alpha < 0) state.alpha = 0;
+
             stateTick(state, delta);
 
-            if(state.alpha >= 1) { //todo: change this with yoyo
-                U target = state.getTarget();
-                tmpArr.add(target);
+            if(state.alpha >= 1 && state.direction == 1) {
+                if(!isYoyo) {
+                    freeState(i);
+                } else {
+                    state.direction *= -1;
+                }
+            }
 
-                states.removeIndex(i);
-                Pools.free(state);
+            if(state.alpha <= 0 && state.direction == -1) {
+                freeState(i);
             }
         }
 
@@ -79,6 +90,15 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
             sendSignal("onComplete");
         }
         tmpArr.clear();
+    }
+
+    private void freeState(int i) {
+        T state = states.get(i);
+        U target = state.getTarget();
+        tmpArr.add(target);
+
+        states.removeIndex(i);
+        Pools.free(state);
     }
 
     protected abstract void stateTick(T state, float delta);

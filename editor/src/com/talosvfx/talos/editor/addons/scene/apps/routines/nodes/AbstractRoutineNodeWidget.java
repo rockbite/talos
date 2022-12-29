@@ -75,33 +75,37 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     }
 
-    /*
-    protected boolean sendSignal(String portName, String command, ObjectMap<String, Object> payload) {
+    public void animateSignal(String portName) {
         Array<Connection> connections = outputs.get(portName);
 
         if (connections == null) {
-            return false;
+            return;
         }
 
         for(Connection connection : connections) {
             String targetSlot = connection.targetSlot;
 
             if (targetSlot == null) {
-                return false;
+                return;
             }
-
-            AbstractRoutineNodeWidget targetNode = (AbstractRoutineNodeWidget) connection.targetNode; // this is a bold assumption, but I'll go with it :D
-
             // animate the signal
             animateSignal(portName, connection);
+        }
+    }
 
-            targetNode.onSignalReceived(command, payload);
+    public void animateInput(String portName) {
+        Array<Connection> connections = inputs.get(portName);
+
+        if (connections == null) {
+            return;
         }
 
-        return true;
-    }*/
+        Connection connection = connections.first();
 
-    private void animateInput(String fromSlot, Connection connection) {
+        animateInput(portName, connection);
+    }
+
+    public void animateInput(String fromSlot, Connection connection) {
         Color color = Color.valueOf("#0957a8");
         Actor tmpActor = new Actor();
         addActor(tmpActor);
@@ -122,7 +126,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
         ));
     }
 
-    private void animateSignal(String fromSlot, Connection connection) {
+    public void animateSignal(String fromSlot, Connection connection) {
         Actor source = getOutputSlotActor(fromSlot);
         Actor target = connection.targetNode.getInputSlotActor(connection.targetSlot);
 
@@ -232,5 +236,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
         return node;
     }
+
+
 }
 

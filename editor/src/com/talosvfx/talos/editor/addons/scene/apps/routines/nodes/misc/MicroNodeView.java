@@ -164,4 +164,8 @@ public class MicroNodeView extends Table {
     public void setLabel(String string) {
         label.setText(string);
     }
+
+    public void clearMap() {
+        progressMap.clear();
+    }
 }

@@ -211,6 +211,8 @@ public abstract class RoutineNode {
                 }
             }
         }
+
+        routineInstanceRef.onSignalSent(uniqueId, portName);
     }
 
     protected GameAsset fetchAssetValue(String key) {
@@ -278,10 +280,15 @@ public abstract class RoutineNode {
 
     protected boolean fetchBooleanValue(String key) {
         Object object = fetchValue(key);
+        if(object == null) {
+            return false;
+        }
+
         if(object instanceof String) {
             boolean result = Boolean.parseBoolean((String) object);
             return result;
         }
+
         return (boolean)object;
     }
 
@@ -320,6 +327,8 @@ public abstract class RoutineNode {
                 Connection connection = port.connections.first();
                 RoutineNode targetNode = connection.toPort.nodeRef;
                 String targetPortName = connection.toPort.name;
+
+                routineInstanceRef.onInputFetched(uniqueId, key);
 
                 return targetNode.queryValue(targetPortName);
             } else {

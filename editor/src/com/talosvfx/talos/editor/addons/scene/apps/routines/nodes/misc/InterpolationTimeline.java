@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AsyncRoutineNodeWidget;
 
 public class InterpolationTimeline extends Table {
@@ -23,10 +24,19 @@ public class InterpolationTimeline extends Table {
         addActor(container);
     }
 
+    public void clearMap() {
+        for (ObjectMap.Entry<Object, Image> objectImageEntry : progressMap) {
+            objectImageEntry.value.remove();
+            Pools.free(objectImageEntry.value);
+
+        }
+        progressMap.clear();
+    }
 
     public void setProgress(Object target, float value) {
         if(!progressMap.containsKey(target)) {
-            Image image = new Image(getSkin().getDrawable("white"));
+            Image image = Pools.obtain(Image.class);
+            image.setDrawable(getSkin().getDrawable("white"));
             image.setColor(Color.valueOf("#37574a"));
             progressMap.put(target, image);
             container.addActor(image);

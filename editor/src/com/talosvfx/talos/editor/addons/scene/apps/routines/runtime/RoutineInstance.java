@@ -5,11 +5,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -42,6 +41,15 @@ public class RoutineInstance {
 
     @Getter
     private Object signalPayload;
+
+    @Setter
+    private RoutineListener listener;
+
+    public interface RoutineListener {
+        void onSignalSent(int nodeId, String port);
+
+        void onInputFetched(int nodeId, String port);
+    }
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
@@ -187,6 +195,19 @@ public class RoutineInstance {
     public void tick(float delta) {
         for(AsyncRoutineNode node: asyncNodes) {
             node.tick(delta);
+        }
+    }
+
+    public void onSignalSent(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onSignalSent(nodeId, portName);
+        }
+    }
+
+
+    public void onInputFetched(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onInputFetched(nodeId, portName);
         }
     }
 }

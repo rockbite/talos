@@ -44,7 +44,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
         this.routineEditorApp = routineEditorApp;
-
         Notifications.registerObserver(this);
     }
 
@@ -88,6 +87,20 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
         setFromData(asset);
         asset.getResource().constructForUI(this);
+
+         data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
+            @Override
+            public void onSignalSent(int nodeId, String port) {
+                AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
+                nodeWidget.animateSignal(port);
+            }
+
+             @Override
+             public void onInputFetched(int nodeId, String port) {
+                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
+                 nodeWidget.animateInput(port);
+             }
+         });
     }
 
 
