@@ -236,7 +236,7 @@ public class AppManager implements Observer {
 
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, SceneEditorApp.class, SceneHierarchyApp.class );
 		appRegistry.registerAppsForAssetType(GameAssetType.PREFAB, PropertiesPanelApp.class);
-		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class, ScenePreviewApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
 
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
@@ -352,11 +352,62 @@ public class AppManager implements Observer {
 	private LayoutGridTargetConfig getBestPlacementForApp (BaseApp app, LayoutGrid layoutGrid) {
 		LayoutGridTargetConfig layoutGridTargetConfig = new LayoutGridTargetConfig();
 
+
+		if (checkCanTab(layoutGridTargetConfig, app)) {
+			return layoutGridTargetConfig;
+		}
+
 		//todo be smart
+
+		//Default
 		layoutGridTargetConfig.target = null;
 		layoutGridTargetConfig.direction = LayoutGrid.LayoutDirection.LEFT;
 
 		return layoutGridTargetConfig;
+	}
+
+	private boolean checkCanTab (LayoutGridTargetConfig layoutGridTargetConfig, BaseApp app) {
+
+		GameAssetType gameAssetType = app.getGameAssetType();
+
+
+		//Check exact types first
+		for (Array<? extends BaseApp<?>> baseAppArray : baseAppsOpenForGameAsset.values()) {
+			for (int i = 0; i < baseAppArray.size; i++) {
+				BaseApp<?> baseApp = baseAppArray.get(i);
+				if (baseApp.getClass().equals(app.getClass())) {
+					layoutGridTargetConfig.target = baseApp.gridAppReference.getLayoutContent();
+					layoutGridTargetConfig.direction = LayoutGrid.LayoutDirection.TAB;
+					return true;
+				}
+			}
+		}
+
+		for (Array<? extends BaseApp<?>> baseAppArray : baseAppsOpenForGameAsset.values()) {
+			for (int i = 0; i < baseAppArray.size; i++) {
+				BaseApp<?> baseApp = baseAppArray.get(i);
+				if (canTabTypes(baseApp.getGameAssetType(), gameAssetType)) {
+					layoutGridTargetConfig.target = baseApp.gridAppReference.getLayoutContent();
+					layoutGridTargetConfig.direction = LayoutGrid.LayoutDirection.TAB;
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean canTabTypes (GameAssetType gameAssetType, GameAssetType appToCreateType) {
+		if (gameAssetType == appToCreateType) return true;
+
+		if (gameAssetType == GameAssetType.ROUTINE && appToCreateType == GameAssetType.SCENE) return true;
+		if (gameAssetType == GameAssetType.ROUTINE && appToCreateType == GameAssetType.PREFAB) return true;
+		if (gameAssetType == GameAssetType.SCENE && appToCreateType == GameAssetType.ROUTINE) return true;
+		if (gameAssetType == GameAssetType.SCENE && appToCreateType == GameAssetType.PREFAB) return true;
+		if (gameAssetType == GameAssetType.PREFAB && appToCreateType == GameAssetType.ROUTINE) return true;
+		if (gameAssetType == GameAssetType.PREFAB && appToCreateType == GameAssetType.SCENE) return true;
+
+		return false;
 	}
 
 	private <T, U extends BaseApp<T>> Array<U> getAppsToUpdate (GameAsset<T> gameAsset) {
