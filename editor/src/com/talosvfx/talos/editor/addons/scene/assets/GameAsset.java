@@ -25,6 +25,8 @@ public class GameAsset<T> {
 	@Setter@Getter
 	private boolean nonFound;
 
+	@Getter@Setter
+	private boolean dummy;
 
 	public interface GameAssetUpdateListener {
 		void onUpdate ();

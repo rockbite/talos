@@ -79,6 +79,13 @@ public class AppManager implements Observer {
 		GameAsset<T> gameAsset = null;
 		if (gameAssetIdentifier.equals("singleton") && gameAssetType == GameAssetType.DIRECTORY) {
 			gameAsset = (GameAsset<T>)singletonAsset;
+		} else if (gameAssetIdentifier.equals("dummy")) {
+			//We find the first asset of the type and use that
+			gameAsset = AssetRepository.getInstance().findFirstOfType(gameAssetType);
+			if (gameAsset == null) {
+				//Create a dummy of that type
+				gameAsset = AssetRepository.getInstance().createDummyAsset(gameAssetType);
+			}
 		} else {
 			if (gameAssetUniqueIdentifier != null) {
 				gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(gameAssetUniqueIdentifier, gameAssetType);

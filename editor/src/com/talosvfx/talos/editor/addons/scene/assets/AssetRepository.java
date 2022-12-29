@@ -143,6 +143,22 @@ public class AssetRepository implements Observer {
 		return AssetRepository.getInstance().copyRawAsset(originalScene, preferredDestination);
 	}
 
+	public <T> GameAsset<T> findFirstOfType (GameAssetType gameAssetType) {
+		ObjectMap<String, GameAsset<?>> entries = identifierGameAssetMap.get(gameAssetType);
+		if (entries != null && entries.size > 0) {
+			for (ObjectMap.Entry<String, GameAsset<?>> entry : entries) {
+				return (GameAsset<T>) entry.value;
+			}
+		}
+		return null;
+	}
+
+	public <T> GameAsset<T> createDummyAsset (GameAssetType gameAssetType) {
+		GameAsset<T> gameAsset = new GameAsset<T>("dummy", gameAssetType);
+		gameAsset.setDummy(true);
+		return gameAsset;
+	}
+
 
 	static class DataMaps {
 		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
