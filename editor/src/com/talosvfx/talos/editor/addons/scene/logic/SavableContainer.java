@@ -189,6 +189,11 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 	public Array<GameObject> findGameObjects(String targetString) {
 		Array<GameObject> list = new Array<>();
 
+		if(targetString.isEmpty()) {
+			list.add(root);
+			return list;
+		}
+
 		findGameObjects(list, root, targetString);
 
 		return list;
@@ -212,6 +217,8 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 		}
 
 		Array<GameObject> gameObjects = parent.getGameObjects();
+
+		if(gameObjects == null) return;
 
 		for(GameObject gameObject : gameObjects) {
 

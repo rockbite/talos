@@ -39,7 +39,7 @@ public class MoveByNode extends AsyncRoutineNode<GameObject, MoveByNode.Position
     protected void stateTick(MoveByNode.PositionTargetState state, float delta) {
         GameObject target = state.getTarget();
         TransformComponent component = target.getComponent(TransformComponent.class);
-        component.position.x = state.getOriginalPosition().x + state.getOffset().x * state.alpha;
-        component.position.y = state.getOriginalPosition().y + state.getOffset().y * state.alpha;
+        component.position.x = state.getOriginalPosition().x + state.getOffset().x * state.interpolatedAlpha;
+        component.position.y = state.getOriginalPosition().y + state.getOffset().y * state.interpolatedAlpha;
     }
 }

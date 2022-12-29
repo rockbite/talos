@@ -3,9 +3,13 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.misc.InterpolationLibrary;
 import lombok.Getter;
+
+import java.lang.reflect.Field;
 
 public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
 
@@ -15,6 +19,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
     private Array<U> tmpArr = new Array<>();
 
     private boolean isYoyo = false;
+    private Interpolation interpolation = Interpolation.linear;
 
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
@@ -28,6 +33,19 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
     }
 
     @Override
+    protected void constructNode(XmlReader.Element config) {
+        super.constructNode(config);
+
+        // hack in the interpolation
+        Port port = new Port();
+        port.name = "interpolation";
+        port.nodeRef = this;
+        port.connectionType = ConnectionType.DATA;
+        port.portType = PortType.INPUT;
+        inputs.put(port.name, port);
+    }
+
+    @Override
     public void receiveSignal(String portName) {
         U signalPayload = (U)routineInstanceRef.getSignalPayload();
         T state = obtainState();
@@ -38,12 +56,12 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         state.setDuration(duration);
         state.direction = 1;
         isYoyo = fetchBooleanValue("yoyo");
-        String interpolation = fetchStringValue("interpolation");
-
-        Interpolation.linear
+        String interpolationName = fetchStringValue("interpolation");
+        interpolation = InterpolationLibrary.get(interpolationName);
 
         targetAdded(state);
     }
+
 
     protected void targetAdded(T state) {
 
@@ -67,10 +85,9 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         for(int i = states.size - 1; i >= 0; i--) {
             T state = states.get(i);
             state.alpha += state.direction * delta/state.getDuration();
-
-            // todo: apply interpolations here
             if(state.alpha > 1) state.alpha = 1;
             if(state.alpha < 0) state.alpha = 0;
+            state.interpolatedAlpha = interpolation.apply(state.alpha);
 
             stateTick(state, delta);
 

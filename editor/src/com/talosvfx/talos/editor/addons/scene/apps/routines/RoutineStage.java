@@ -88,21 +88,24 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         setFromData(asset);
         asset.getResource().constructForUI(this);
 
-         data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
+        setInstanceListeners();
+    }
+
+    private void setInstanceListeners() {
+        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
             @Override
             public void onSignalSent(int nodeId, String port) {
                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
                 nodeWidget.animateSignal(port);
             }
 
-             @Override
-             public void onInputFetched(int nodeId, String port) {
-                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
-                 nodeWidget.animateInput(port);
-             }
-         });
+            @Override
+            public void onInputFetched(int nodeId, String port) {
+                AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
+                nodeWidget.animateInput(port);
+            }
+        });
     }
-
 
 
     @Override
@@ -156,9 +159,13 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void routineUpdated () {
+        //todo: this isn't right
         AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
         gameAsset.setUpdated();
+        data.setRoutineInstance(data.createInstance(true));
         Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+
+        setInstanceListeners();
     }
 
     @EventHandler

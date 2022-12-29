@@ -42,14 +42,13 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 GameAsset sceneAsset = assetWidget.getValue();
 
                 SavableContainer container = null;
-                if(sceneAsset.type == GameAssetType.SCENE) {
+                if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
                     ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
                     scenePreviewApp.reload();
                     container = scenePreviewApp.getWorkspaceWidget().currentScene;
                 } else {
                     return;
                 }
-                // todo: reset instance and all also all visual widgets
 
                 RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
                 routineInstance.reset();

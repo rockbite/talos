@@ -6,6 +6,7 @@ import lombok.Setter;
 
 public class AsyncRoutineNodeState<T> implements Pool.Poolable {
     public float alpha;
+    public float interpolatedAlpha;
     @Setter@Getter
     T target;
 

@@ -94,7 +94,7 @@ public abstract class RoutineNode {
         uniqueId = nodeData.getInt("id");
     }
 
-    private void constructNode(XmlReader.Element config) {
+    protected void constructNode(XmlReader.Element config) {
         int rowCount = config.getChildCount();
         for (int i = 0; i < rowCount; i++) {
             XmlReader.Element row = config.getChild(i);
@@ -253,7 +253,7 @@ public abstract class RoutineNode {
     protected String fetchStringValue(String key) {
         Port port = inputs.get(key);
 
-
+        if(port == null) return "";
 
         return (String) port.valueOverride;
     }

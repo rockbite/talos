@@ -25,6 +25,17 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "ScaleToNode" title = "Scale To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000">Scale X: </dynamicValue>
+                <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000">Scale Y: </dynamicValue>
+            </group>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
@@ -40,6 +51,40 @@
                 <dynamicValue name="max" type="float" default="1">Max</dynamicValue>
             </group>
             <value port="output" name="output" type="float">output</value>
+        </module>
+    </category>
+    <category name="entities" title="Entities">
+        <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="addSignal" type="signal">add</value>
+            <value port="input" name="startSignal" type="signal">start</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SpawnSpriteNode" title = "Spawn Sprite" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="sprite" type="SPRITE">sprite</asset>
+            <group>
+                <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
+            </group>
+            <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SetTransformNode" title = "Set Transform" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000" default="1">Scale X: </dynamicValue>
+                <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000" default="1">Scale Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
+            </group>
+            <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step = "1" progress="true">Rotation: </dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
     </category>
     <category name="main" title="Main">

@@ -21,7 +21,6 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Table main;
     private Table progressContainer;
     private Table progress;
-
     private Label label;
     private Label valueLabel;
     private TextField textField;

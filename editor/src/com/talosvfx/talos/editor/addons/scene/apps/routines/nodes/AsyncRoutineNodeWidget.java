@@ -16,6 +16,8 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.MicroNode
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -32,7 +34,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     private Vector2 vec = new Vector2();
     private Vector2 vec2 = new Vector2();
 
-    private SelectBox interpolationSelectBox;
+    private SelectWidget interpolationSelectBox;
     private InterpolationTimeline timelineWidget;
 
     private boolean runningFlag = false;
@@ -56,11 +58,16 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
             }
         }
 
-        interpolationSelectBox = new SelectBox(getSkin(), "propertyValue");
-        interpolationSelectBox.setItems(interpolationList);
+        interpolationSelectBox = new SelectWidget();
+        interpolationSelectBox.init(SharedResources.skin);
+        interpolationSelectBox.setOptions(interpolationList);
+
+        String variableName = "interpolation";
+        widgetMap.put(variableName, interpolationSelectBox);
+        typeMap.put(variableName, "string");
+        defaultsMap.put(variableName, "linear");
+
         timeline.add(interpolationSelectBox).growX().row();
-
-
         timeline.add(timelineWidget).growX().height(58).row();
 
         microNodeView = new MicroNodeView(this);
