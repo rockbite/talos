@@ -26,11 +26,7 @@ public class AppPrefs {
     }
 
     private String getUUID (GameAsset<?> gameAsset) {
-        if (!gameAsset.dependentRawAssets.isEmpty()) {
-            return gameAsset.getRootRawAsset().metaData.uuid.toString();
-        } else {
-            return "singleton";
-        }
+        return gameAsset.getRootRawAsset().metaData.uuid.toString();
     }
 
     /**

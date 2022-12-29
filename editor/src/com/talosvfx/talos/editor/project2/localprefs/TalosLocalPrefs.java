@@ -177,10 +177,6 @@ public class TalosLocalPrefs {
 
 		AppPrefs appPrefs;
 		T appPreference =  baseApp.getPrefs();
-		// nothing to set, skip
-		if (appPreference == null) {
-			return;
-		}
 		if (!preferences.contains(clazz.getName())) {
 			appPrefs = new AppPrefs();
 		} else {
