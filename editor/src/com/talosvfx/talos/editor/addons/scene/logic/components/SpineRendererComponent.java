@@ -20,11 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
@@ -65,6 +61,38 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         properties.add(colorWidget);
+
+        SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
+            @Override
+            public String get() {
+                if(animationState != null && animationState.getCurrent(0) != null && animationState.getCurrent(0).getAnimation() != null) {
+                    return animationState.getCurrent(0).getAnimation().getName();
+                } else {
+                    return "";
+                }
+            }
+        }, new PropertyWidget.ValueChanged<String>() {
+            @Override
+            public void report(String value) {
+                Animation animation = skeleton.getData().findAnimation(value);
+                animationState.setAnimation(0, animation, true);
+            }
+        }, new Supplier<Array<String>>() {
+            @Override
+            public Array<String> get() {
+                Array<String> names = new Array<>();
+                if(skeleton == null || skeleton.getData() == null) {
+                    return names;
+                }
+                Array<Animation> animations = skeleton.getData().getAnimations();
+                for(Animation animation: animations) {
+                    names.add(animation.getName());
+                }
+                return names;
+            }
+        });
+        properties.add(animSelectWidget);
+
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
