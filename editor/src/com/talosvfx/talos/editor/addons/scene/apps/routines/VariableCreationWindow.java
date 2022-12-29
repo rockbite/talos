@@ -40,6 +40,7 @@ public class VariableCreationWindow extends Table {
     private static final Logger logger = LoggerFactory.getLogger(VariableCreationWindow.class);
     private final Table content;
     private final Cell<Table> contentCell;
+    private final Label routineName;
     private DragAndDrop dragAndDrop;
     private Array<CustomVarWidget> templateRowArray = new Array<>();
 
@@ -58,8 +59,8 @@ public class VariableCreationWindow extends Table {
 
         Table topBar = new Table();
         topBar.setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
-        Label label = new Label("gavno.rt", skin);
-        topBar.add(label).left().pad(5).expandX().padLeft(7);
+        routineName = new Label("gavno.rt", skin);
+        topBar.add(routineName).left().pad(5).expandX().padLeft(7);
 
 
         ImageButton plusButton = new ImageButton(
@@ -171,6 +172,9 @@ public class VariableCreationWindow extends Table {
         configureDragAndDrop();
     }
 
+    public void setRoutineName(String routineName){
+        this.routineName.setText(routineName);
+    }
 
     private void configureDragAndDrop() {
         dragAndDrop.clear();

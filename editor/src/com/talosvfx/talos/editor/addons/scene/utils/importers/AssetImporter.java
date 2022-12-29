@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.FileNameChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -332,8 +333,17 @@ public class AssetImporter {
 
         AssetRepository.getInstance().moveFile(file, newHandle, true);
 
-
-        logger.info("Rename file has happened, we should proapgate with events so things can respond");
+        if(!newHandle.isDirectory()) {
+            FileNameChanged event = Notifications.obtainEvent(FileNameChanged.class);
+            try {
+                event.assetType = GameAssetType.getAssetTypeFromExtension(file.extension());
+                event.oldName = file.nameWithoutExtension();
+                event.newName = newHandle.nameWithoutExtension();
+                Notifications.fireEvent(event);
+            } catch (GameAssetType.NoAssetTypeException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         return newHandle;
     }
