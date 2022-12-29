@@ -24,6 +24,7 @@ public class LayoutContent extends LayoutItem {
 	private final Table contentTable;
 	private ObjectMap<String, LayoutApp> apps = new ObjectMap<>();
 	private LayoutApp activeApp;
+	private boolean layoutFocused;
 
 	public LayoutContent (Skin skin, LayoutGrid layoutGrid, LayoutApp app) {
 		this(skin, layoutGrid);
@@ -109,6 +110,7 @@ public class LayoutContent extends LayoutItem {
 		contentTable.clearChildren();
 		contentTable.add(result.getMainContent()).grow();
 		result.setTabActive(true);
+		result.setTabFocused(layoutFocused);
 		activeApp = result;
 		activeApp.onInputProcessorAdded();
 	}
@@ -116,6 +118,13 @@ public class LayoutContent extends LayoutItem {
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
 
+	}
+
+	public void setLayoutFocused (boolean layoutFocused) {
+		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+			app.value.setTabFocused(layoutFocused);
+		}
+		this.layoutFocused = layoutFocused;
 	}
 
 	public void addContent (LayoutApp layoutApp, boolean copy) {

@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	private String uuid;
 
-	private transient Table tabWidget;
+	private transient TabWidget tabWidget;
 	private transient Actor mainContent;
 	private transient Skin skin;
 	@Getter
@@ -31,6 +31,31 @@ public class DummyLayoutApp implements LayoutApp {
 	private boolean active;
 	private VisLabel visLabel;
 	private LayoutContent layoutContent;
+
+	private static class TabWidget extends Table {
+
+		private Table highlight = new Table();
+
+
+		public TabWidget () {
+			highlight.setFillParent(true);
+			addActor(highlight);
+
+			Table highlightPixel = new Table();
+			highlightPixel.setBackground(SharedResources.skin.newDrawable("white", ColorLibrary.BORDER_BLUE));
+
+			highlight.top();
+			highlight.defaults().top();
+			highlight.add(highlightPixel).growX().height(4).top();
+
+			highlight.setVisible(false);
+		}
+
+		public void setFocused (boolean focused) {
+			highlight.setVisible(focused);
+			highlight.toFront();
+		}
+	}
 
 	public DummyLayoutApp (Skin skin, String tabName) {
 		this.tabName = tabName;
@@ -57,8 +82,8 @@ public class DummyLayoutApp implements LayoutApp {
 
 	}
 
-	private Table createTab (String tabName) {
-		Table tab = new Table();
+	private TabWidget createTab (String tabName) {
+		TabWidget tab = new TabWidget();
 		tab.setTouchable(Touchable.enabled);
 		tab.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.LIGHT_GRAY));
 
@@ -113,6 +138,11 @@ public class DummyLayoutApp implements LayoutApp {
 		} else {
 			tabWidget.setBackground(ColorLibrary.obtainBackground(skin, ColorLibrary.SHAPE_SQUIRCLE_TOP, ColorLibrary.BackgroundColor.DARK_GRAY));
 		}
+	}
+
+	@Override
+	public void setTabFocused(boolean focused) {
+		tabWidget.setFocused(focused);
 	}
 
 	@Override

@@ -7,6 +7,9 @@ public interface LayoutApp {
 //	change tis to focus
 
 	void setTabActive (boolean active);
+
+	void setTabFocused (boolean focused);
+
 	boolean isTabActive ();
 
 	String getUniqueIdentifier ();
