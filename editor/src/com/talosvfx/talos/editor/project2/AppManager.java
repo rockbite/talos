@@ -456,7 +456,7 @@ public class AppManager implements Observer {
 		for(BaseApp app: appInstances) {
 			if (ContainerOfPrefs.class.isAssignableFrom(app.getClass())) {
 				ContainerOfPrefs containerOfPrefs = (ContainerOfPrefs) app;
-				TalosLocalPrefs.setPrefs(app.gameAsset, containerOfPrefs);
+				TalosLocalPrefs.setAppPrefs(app.gameAsset, containerOfPrefs);
 			}
 		}
 

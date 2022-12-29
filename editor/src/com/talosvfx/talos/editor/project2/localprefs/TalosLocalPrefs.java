@@ -6,7 +6,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.project2.AppManager;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.project2.RecentProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -148,7 +147,7 @@ public class TalosLocalPrefs {
 	 * @param gameAsset
 	 * @param baseApp
 	 */
-	public static <T extends AppPrefs.AppPreference> void getPrefs (GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
+	public static <T extends AppPrefs.AppPreference> void getAppPrefs (GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
 		String prefName = getCurrentProjectPrefName();
 		Preferences preferences = Gdx.app.getPreferences(prefName);
 		Class<? extends ContainerOfPrefs> clazz = baseApp.getClass();
@@ -170,13 +169,17 @@ public class TalosLocalPrefs {
 	 * @param gameAsset
 	 * @param baseApp
 	 */
-	public static <T extends AppPrefs.AppPreference> void setPrefs (GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
+	public static <T extends AppPrefs.AppPreference> void setAppPrefs(GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
 		String prefName = getCurrentProjectPrefName();
 		Preferences preferences = Gdx.app.getPreferences(prefName);
 		Class<? extends ContainerOfPrefs> clazz = baseApp.getClass();
 
 		AppPrefs appPrefs;
 		T appPreference =  baseApp.getPrefs();
+		// nothing to set, skip
+		if (appPreference == null) {
+			return;
+		}
 		if (!preferences.contains(clazz.getName())) {
 			appPrefs = new AppPrefs();
 		} else {
