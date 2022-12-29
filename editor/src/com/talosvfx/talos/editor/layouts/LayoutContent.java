@@ -97,15 +97,23 @@ public class LayoutContent extends LayoutItem {
 					activeApp.onInputProcessorRemoved();
 				}
 			}
+
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				grid.setLayoutActive(LayoutContent.this);
+				return super.touchDown(event, x, y, pointer, button);
+			}
 		});
 	}
 
 	public void swapToApp (LayoutApp result) {
 		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
-			if (app.value.isTabActive()) {
-				app.value.onInputProcessorRemoved();
+			LayoutApp layoutApp = app.value;
+			if (layoutApp.isTabActive()) {
+				layoutApp.onInputProcessorRemoved();
 			}
-			app.value.setTabActive(false);
+			layoutApp.setTabActive(false);
+			layoutApp.setTabFocused(false);
 		}
 		contentTable.clearChildren();
 		contentTable.add(result.getMainContent()).grow();

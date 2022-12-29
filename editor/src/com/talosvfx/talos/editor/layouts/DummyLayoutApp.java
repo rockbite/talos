@@ -142,7 +142,7 @@ public class DummyLayoutApp implements LayoutApp {
 
 	@Override
 	public void setTabFocused(boolean focused) {
-		tabWidget.setFocused(focused);
+		tabWidget.setFocused(isTabActive() && focused);
 	}
 
 	@Override
