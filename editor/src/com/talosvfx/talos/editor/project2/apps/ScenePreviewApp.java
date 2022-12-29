@@ -9,9 +9,12 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import lombok.Getter;
 
-public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observer {
+public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observer, ContainerOfPrefs<ViewportPreferences> {
 
     @Getter
     private final ScenePreviewStage workspaceWidget;
@@ -50,6 +53,8 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
         super.updateForGameAsset(gameAsset);
 
         workspaceWidget.setFromGameAsset(gameAsset);
+
+        TalosLocalPrefs.getAppPrefs(gameAsset, this);
     }
 
     @Override
@@ -64,5 +69,19 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
 
     public void reload() {
         workspaceWidget.setFromGameAsset(gameAsset);
+    }
+
+    @Override
+    public void applyFromPreferences(ViewportPreferences prefs) {
+        workspaceWidget.setCameraPos(prefs.cameraPos);
+        workspaceWidget.setCameraZoom(prefs.cameraZoom);
+    }
+
+    @Override
+    public ViewportPreferences getPrefs() {
+        ViewportPreferences prefs = new ViewportPreferences();
+        prefs.cameraPos = workspaceWidget.getCameraPos();
+        prefs.cameraZoom = workspaceWidget.getCameraZoom();
+        return prefs;
     }
 }

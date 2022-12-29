@@ -46,15 +46,22 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
 
     @Override
     public void read(Json json, JsonValue jsonValue) {
-        String identifier = jsonValue.asString();
-        gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+        try {
+            GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
+            String identifier = jsonValue.getString("id");
 
-        widget.updateWidget(gameAsset);
+            gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+
+            widget.updateWidget(gameAsset);
+        } catch (Exception e) {}
     }
 
     @Override
     public void write(Json json, String name) {
         if(gameAsset == null) return;
-        json.writeValue(name, gameAsset.nameIdentifier);
+        json.writeObjectStart(name);
+        json.writeValue("type", gameAsset.type);
+        json.writeValue("id", gameAsset.nameIdentifier);
+        json.writeObjectEnd();
     }
 }

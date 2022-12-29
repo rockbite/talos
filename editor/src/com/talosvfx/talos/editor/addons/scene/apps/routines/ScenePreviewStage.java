@@ -63,18 +63,16 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		renderer.setRenderParentTiles(false);
 		batch.begin();
 
-		renderer.skipUpdates = !isPlaying;
 		if (camera instanceof OrthographicCamera) {
 			renderer.setCamera((OrthographicCamera)camera);
 		}
 
 		drawMainRenderer(batch, parentAlpha);
-		renderer.skipUpdates = !isPlaying;
 	}
 
 	@Override
 	protected boolean canMoveAround () {
-		return isDragging;
+		return true;
 	}
 
 	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
@@ -91,19 +89,6 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		gridPropertyProvider = new DynamicGridPropertyProvider();
 		gridPropertyProvider.getBackgroundColor().set(Color.BLACK);
 	}
-
-	/*
-	@EventHandler
-	public void onTweenPlay (TweenPlayedEvent event) {
-		updateWorkspaceState(true);
-		isPlaying = true;
-	}
-
-	@EventHandler
-	public void onTweenFinish (TweenFinishedEvent event) {
-		updateWorkspaceState(false);
-		isPlaying = false;
-	}*/
 
 	public void setFromGameAsset(GameAsset<Scene> gameAsset) {
 		if(gameAsset != null) {

@@ -1,31 +1,25 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
+
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
     public GenericStageWrappedViewportWidget routineStageWrapper;
-
-//    public ScenePreviewStage scenePreviewStage;
 
     public RoutineEditorApp() {
         routineStage = new RoutineStage(this, SharedResources.skin);
@@ -51,7 +45,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
         content.add(routineStageWrapper).grow();
 
         routineStage.init();
-//        scenePreviewStage = new ScenePreviewStage();
 
         variableCreationWindow = new VariableCreationWindow(routineStage);
 
@@ -92,10 +85,20 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
 
     @Override
     public void updateForGameAsset (GameAsset<RoutineStageData> gameAsset) {
+        if (this.gameAsset != null) {
+            this.gameAsset.listeners.removeValue(this, true);
+        }
+
+        if (!gameAsset.listeners.contains(this, true)) {
+            gameAsset.listeners.add(this);
+        }
+
         super.updateForGameAsset(gameAsset);
+        TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
+        variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
     }
 
     @Override
@@ -109,5 +112,23 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> {
     @Override
     public void onRemove() {
         // remove listeners and stuff somehow
+    }
+
+    @Override
+    public void onUpdate() {
+        variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
+    }
+
+    public void applyFromPreferences(ViewportPreferences prefs) {
+        routineStageWrapper.setCameraPos(prefs.cameraPos);
+        routineStageWrapper.setCameraZoom(prefs.cameraZoom);
+    }
+
+    @Override
+    public ViewportPreferences getPrefs() {
+        ViewportPreferences prefs = new ViewportPreferences();
+        prefs.cameraPos = routineStageWrapper.getCameraPos();
+        prefs.cameraZoom = routineStageWrapper.getCameraZoom();
+        return prefs;
     }
 }
