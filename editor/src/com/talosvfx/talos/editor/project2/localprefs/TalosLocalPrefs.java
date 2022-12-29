@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.project2.RecentProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
-import com.talosvfx.talos.editor.project2.apps.AppPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Data;
 import lombok.Getter;
@@ -156,7 +156,7 @@ public class TalosLocalPrefs {
 			String prefsString = preferences.getString(clazz.getName());
 			AppPrefs prefs = json.fromJson(AppPrefs.class, prefsString);
 			if (prefs.hasPrefFor(gameAsset)) {
-				Object appPreference = prefs.getPrefFor(gameAsset);
+				AppPrefs.AppPreference appPreference = prefs.getPrefFor(gameAsset);
 				baseApp.applyPreferences(appPreference);
 			}
 		}
@@ -175,7 +175,7 @@ public class TalosLocalPrefs {
 		Class<? extends AppManager.BaseApp> clazz = baseApp.getClass();
 
 		AppPrefs appPrefs;
-		Object appPreference = baseApp.getCurrentPreference();
+		AppPrefs.AppPreference appPreference = baseApp.getCurrentPreference();
 		// nothing to set, skip
 		if (appPreference == null) {
 			return;

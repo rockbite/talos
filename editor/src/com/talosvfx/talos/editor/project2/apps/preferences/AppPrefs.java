@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.project2.apps;
+package com.talosvfx.talos.editor.project2.apps.preferences;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -7,7 +7,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
  * App preferences per asset
  */
 public class AppPrefs {
-    private ObjectMap<String, Object> preferences;
+    private ObjectMap<String, AppPreference> preferences;
 
     public AppPrefs () {
         preferences = new ObjectMap<>();
@@ -17,11 +17,11 @@ public class AppPrefs {
         return preferences.containsKey(getUUID(gameAsset));
     }
 
-    public Object getPrefFor(GameAsset<?> gameAsset) {
+    public AppPreference getPrefFor(GameAsset<?> gameAsset) {
         return preferences.get(getUUID(gameAsset));
     }
 
-    public void setPrefFor(GameAsset<?> gameAsset, Object appPref) {
+    public void setPrefFor(GameAsset<?> gameAsset, AppPreference appPref) {
         preferences.put(getUUID(gameAsset), appPref);
     }
 
@@ -32,5 +32,10 @@ public class AppPrefs {
             return "singleton";
         }
     }
+
+    /**
+     * Tag interface.
+     */
+    public interface AppPreference {}
 }
 

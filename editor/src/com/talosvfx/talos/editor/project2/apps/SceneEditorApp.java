@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.project2.apps;
 
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -12,6 +11,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 
 
 @SingletonApp
@@ -88,7 +89,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	}
 
 	@Override
-	public void applyPreferences(Object appPreferences) {
+	public void applyPreferences(AppPrefs.AppPreference appPreferences) {
 		super.applyPreferences(appPreferences);
 		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) appPreferences;
 		workspaceWidget.setCameraPos(prefs.cameraPos);
@@ -96,17 +97,17 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	}
 
 	@Override
-	public Object getCurrentPreference() {
+	public AppPrefs.AppPreference getCurrentPreference() {
 		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) super.getCurrentPreference();
 		prefs.cameraPos = workspaceWidget.getCameraPos();
 		prefs.cameraZoom = workspaceWidget.getCameraZoom();
 		return prefs;
 	}
 
-	@AppPreference
-	private static class SceneEditorAppPrefs {
-		private Vector3 cameraPos;
-		private float cameraZoom;
-	}
+	/**
+	 * Implements {@link AppPrefs.AppPreference AppPreference},
+	 * so AppManager can see it.
+	 */
+	private static class SceneEditorAppPrefs extends ViewportPreferences {}
 }
 

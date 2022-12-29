@@ -19,8 +19,9 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
+import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.MemoryApp;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
@@ -143,7 +144,7 @@ public class AppManager implements Observer {
 		@Getter
 		protected GameAsset<T> gameAsset;
 
-		private Object currentPreference;
+		private AppPrefs.AppPreference currentPreference;
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
@@ -167,7 +168,7 @@ public class AppManager implements Observer {
 		public abstract void onRemove ();
 
 		@Override
-		public void applyPreferences(Object appPreferences) {
+		public void applyPreferences(AppPrefs.AppPreference appPreferences) {
 			currentPreference = appPreferences;
 		}
 
@@ -176,12 +177,12 @@ public class AppManager implements Observer {
 		 * @return Preferences of the app.
 		 */
 		@Override
-		public Object getCurrentPreference() {
+		public AppPrefs.AppPreference getCurrentPreference() {
 			Class<? extends BaseApp<?>> clazz = (Class<? extends BaseApp<?>>) this.getClass();
 			if (currentPreference == null && SharedResources.appManager.appToAppPreferenceMap.containsKey(clazz)) {
 				Class<?> prefClazz = SharedResources.appManager.appToAppPreferenceMap.get(clazz);
 				try {
-					Constructor prefConstructor = prefClazz.getDeclaredConstructor();
+					Constructor<? extends AppPrefs.AppPreference> prefConstructor = (Constructor<? extends AppPrefs.AppPreference>) prefClazz.getDeclaredConstructor();
 					prefConstructor.setAccessible(true);
 					currentPreference = prefConstructor.newInstance();
 				} catch (NoSuchMethodException e) {
@@ -443,7 +444,7 @@ public class AppManager implements Observer {
 			Class<? extends BaseApp<?>> clazz = entry.value;
 			Class<?>[] declaredClasses = clazz.getDeclaredClasses();
 			for (Class<?> declaredClass : declaredClasses) {
-				if (declaredClass.isAnnotationPresent(AppPreference.class)) {
+				if (AppPrefs.AppPreference.class.isAssignableFrom(declaredClass)) {
 					appToAppPreferenceMap.put(clazz, declaredClass);
 					break;
 				}

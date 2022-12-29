@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.project2.apps;
+package com.talosvfx.talos.editor.project2.apps.preferences;
 
 public interface MemoryApp {
 
@@ -7,12 +7,12 @@ public interface MemoryApp {
      * @see com.talosvfx.talos.editor.project2.apps.SceneEditorApp for example implementation.
      * @param appPreferences
      */
-    void applyPreferences(Object appPreferences);
+    void applyPreferences(AppPrefs.AppPreference appPreferences);
 
 
     /**
      * Get current preference. App should query the state of its widget and update preferences to be stored.
      * @see  com.talosvfx.talos.editor.project2.apps.SceneEditorApp for example implementation.
      */
-    Object getCurrentPreference();
+    AppPrefs.AppPreference getCurrentPreference();
 }
