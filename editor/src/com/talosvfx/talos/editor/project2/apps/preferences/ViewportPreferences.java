@@ -1,11 +1,10 @@
 package com.talosvfx.talos.editor.project2.apps.preferences;
 
 import com.badlogic.gdx.math.Vector3;
+import lombok.Data;
 
-/**
- * Subclasses should be implemented in the app itself, so AppManager can locate them.
- */
-public abstract class ViewportPreferences implements AppPrefs.AppPreference {
+@Data
+public class ViewportPreferences implements AppPrefs.AppPreference {
     public Vector3 cameraPos;
     public float cameraZoom;
 }

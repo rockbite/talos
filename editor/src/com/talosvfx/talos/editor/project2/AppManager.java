@@ -23,14 +23,10 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
-import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
-import com.talosvfx.talos.editor.project2.apps.preferences.MemoryApp;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import java.util.UUID;
 
@@ -55,8 +51,6 @@ public class AppManager implements Observer {
 
 	private MainMenu.IMenuProvider menuOpenAppListProvider;
 	private MainMenu.IMenuProvider menuAppListProvider;
-
-	ObjectMap<Class<? extends BaseApp<?>>, Class<?>> appToAppPreferenceMap;
 
 	public BaseApp getAppForLayoutApp (LayoutApp app) {
 
@@ -154,7 +148,7 @@ public class AppManager implements Observer {
 
 	//Grid layout needs to be able to be setup with layout specific in mind
 
-	public abstract static class BaseApp<T> implements MemoryApp {
+	public abstract static class BaseApp<T> {
 		protected boolean singleton;
 
 		@Getter
@@ -163,11 +157,9 @@ public class AppManager implements Observer {
 		@Getter
 		protected GameAsset<T> gameAsset;
 
-		private AppPrefs.AppPreference currentPreference;
-
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
-			TalosLocalPrefs.getPrefs(gameAsset, this);
+
 		}
 
 		public abstract String getAppName ();
@@ -185,37 +177,6 @@ public class AppManager implements Observer {
 		}
 
 		public abstract void onRemove ();
-
-		@Override
-		public void applyPreferences(AppPrefs.AppPreference appPreferences) {
-			currentPreference = appPreferences;
-		}
-
-		/**
-		 * Override this in children to get current prefs and update it corresponding to current app state.
-		 * @return Preferences of the app.
-		 */
-		@Override
-		public AppPrefs.AppPreference getCurrentPreference() {
-			Class<? extends BaseApp<?>> clazz = (Class<? extends BaseApp<?>>) this.getClass();
-			if (currentPreference == null && SharedResources.appManager.appToAppPreferenceMap.containsKey(clazz)) {
-				Class<?> prefClazz = SharedResources.appManager.appToAppPreferenceMap.get(clazz);
-				try {
-					Constructor<? extends AppPrefs.AppPreference> prefConstructor = (Constructor<? extends AppPrefs.AppPreference>) prefClazz.getDeclaredConstructor();
-					prefConstructor.setAccessible(true);
-					currentPreference = prefConstructor.newInstance();
-				} catch (NoSuchMethodException e) {
-					throw new RuntimeException(e);
-				} catch (InvocationTargetException e) {
-					throw new RuntimeException(e);
-				} catch (InstantiationException e) {
-					throw new RuntimeException(e);
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			return currentPreference;
-		}
 	}
 
 	private static class AppRegistry {
@@ -457,19 +418,6 @@ public class AppManager implements Observer {
 
 	@EventHandler
 	public void onFinishInitializing(FinishInitializingEvent event) {
-		// Iterate over all apps to get their preference classes
-		appToAppPreferenceMap = new ObjectMap<>();
-		for (ObjectMap.Entry<String, Class<? extends BaseApp<?>>> entry: appRegistry.simpleNameMap) {
-			Class<? extends BaseApp<?>> clazz = entry.value;
-			Class<?>[] declaredClasses = clazz.getDeclaredClasses();
-			for (Class<?> declaredClass : declaredClasses) {
-				if (AppPrefs.AppPreference.class.isAssignableFrom(declaredClass)) {
-					appToAppPreferenceMap.put(clazz, declaredClass);
-					break;
-				}
-			}
-		}
-
 		menuOpenAppListProvider = new MainMenu.IMenuProvider() {
 			@Override
 			public void inject(String path, MainMenu menu) {
@@ -506,7 +454,10 @@ public class AppManager implements Observer {
 		Array<BaseApp> appInstances = getAppInstances();
 
 		for(BaseApp app: appInstances) {
-			TalosLocalPrefs.setPrefs(app.gameAsset, app);
+			if (ContainerOfPrefs.class.isAssignableFrom(app.getClass())) {
+				ContainerOfPrefs containerOfPrefs = (ContainerOfPrefs) app;
+				TalosLocalPrefs.setPrefs(app.gameAsset, containerOfPrefs);
+			}
 		}
 
 		// save preferences

@@ -11,12 +11,13 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 
 
 @SingletonApp
-public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer {
+public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
 	private final SceneEditorWorkspace workspaceWidget;
 
@@ -52,6 +53,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@Override
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
+		TalosLocalPrefs.getPrefs(gameAsset, this);
 
 		if (!gameAsset.listeners.contains(this, true)) {
 			gameAsset.listeners.add(this);
@@ -89,25 +91,17 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	}
 
 	@Override
-	public void applyPreferences(AppPrefs.AppPreference appPreferences) {
-		super.applyPreferences(appPreferences);
-		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) appPreferences;
+	public void applyFromPreferences(ViewportPreferences prefs) {
 		workspaceWidget.setCameraPos(prefs.cameraPos);
 		workspaceWidget.setCameraZoom(prefs.cameraZoom);
 	}
 
 	@Override
-	public AppPrefs.AppPreference getCurrentPreference() {
-		SceneEditorAppPrefs prefs = (SceneEditorAppPrefs) super.getCurrentPreference();
+	public ViewportPreferences getPrefs() {
+		ViewportPreferences prefs = new ViewportPreferences();
 		prefs.cameraPos = workspaceWidget.getCameraPos();
 		prefs.cameraZoom = workspaceWidget.getCameraZoom();
 		return prefs;
 	}
-
-	/**
-	 * Implements {@link AppPrefs.AppPreference AppPreference},
-	 * so AppManager can see it.
-	 */
-	private static class SceneEditorAppPrefs extends ViewportPreferences {}
 }
 

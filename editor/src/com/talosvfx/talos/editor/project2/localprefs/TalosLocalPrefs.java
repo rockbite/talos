@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.project2.RecentProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.preferences.AppPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Data;
 import lombok.Getter;
@@ -147,17 +148,17 @@ public class TalosLocalPrefs {
 	 * @param gameAsset
 	 * @param baseApp
 	 */
-	public static void getPrefs (GameAsset<?> gameAsset, AppManager.BaseApp<?> baseApp) {
+	public static <T extends AppPrefs.AppPreference> void getPrefs (GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
 		String prefName = getCurrentProjectPrefName();
 		Preferences preferences = Gdx.app.getPreferences(prefName);
-		Class<? extends AppManager.BaseApp> clazz = baseApp.getClass();
+		Class<? extends ContainerOfPrefs> clazz = baseApp.getClass();
 
 		if (preferences.contains(clazz.getName())) {
 			String prefsString = preferences.getString(clazz.getName());
 			AppPrefs prefs = json.fromJson(AppPrefs.class, prefsString);
 			if (prefs.hasPrefFor(gameAsset)) {
-				AppPrefs.AppPreference appPreference = prefs.getPrefFor(gameAsset);
-				baseApp.applyPreferences(appPreference);
+				T appPreference = (T) prefs.getPrefFor(gameAsset);
+				baseApp.applyFromPreferences(appPreference);
 			}
 		}
 	}
@@ -165,17 +166,17 @@ public class TalosLocalPrefs {
 
 	/**
 	 * Stores preferences based on app and its asset.
-	 * Note: do not forget to call {@link #setPrefs(GameAsset, AppManager.BaseApp) setPrefs} method to actually save to file.
+	 * Note: do not forget to call {@link #save() save} method to actually save to file.
 	 * @param gameAsset
 	 * @param baseApp
 	 */
-	public static void setPrefs (GameAsset<?> gameAsset, AppManager.BaseApp<?> baseApp) {
+	public static <T extends AppPrefs.AppPreference> void setPrefs (GameAsset<?> gameAsset, ContainerOfPrefs<T> baseApp) {
 		String prefName = getCurrentProjectPrefName();
 		Preferences preferences = Gdx.app.getPreferences(prefName);
-		Class<? extends AppManager.BaseApp> clazz = baseApp.getClass();
+		Class<? extends ContainerOfPrefs> clazz = baseApp.getClass();
 
 		AppPrefs appPrefs;
-		AppPrefs.AppPreference appPreference = baseApp.getCurrentPreference();
+		T appPreference =  baseApp.getPrefs();
 		// nothing to set, skip
 		if (appPreference == null) {
 			return;
