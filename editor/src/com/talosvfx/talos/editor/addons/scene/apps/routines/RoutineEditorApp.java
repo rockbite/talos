@@ -28,8 +28,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
     public GenericStageWrappedViewportWidget routineStageWrapper;
 
-//    public ScenePreviewStage scenePreviewStage;
-
     public RoutineEditorApp() {
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {

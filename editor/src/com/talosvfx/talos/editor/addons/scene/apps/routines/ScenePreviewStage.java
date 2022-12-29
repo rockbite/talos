@@ -72,7 +72,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	@Override
 	protected boolean canMoveAround () {
-		return isDragging;
+		return true;
 	}
 
 	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
@@ -89,19 +89,6 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		gridPropertyProvider = new DynamicGridPropertyProvider();
 		gridPropertyProvider.getBackgroundColor().set(Color.BLACK);
 	}
-
-	/*
-	@EventHandler
-	public void onTweenPlay (TweenPlayedEvent event) {
-		updateWorkspaceState(true);
-		isPlaying = true;
-	}
-
-	@EventHandler
-	public void onTweenFinish (TweenFinishedEvent event) {
-		updateWorkspaceState(false);
-		isPlaying = false;
-	}*/
 
 	public void setFromGameAsset(GameAsset<Scene> gameAsset) {
 		if(gameAsset != null) {
