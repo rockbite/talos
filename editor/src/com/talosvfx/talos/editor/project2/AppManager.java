@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
@@ -22,6 +23,8 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
@@ -156,6 +159,7 @@ public class AppManager implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
+
 		}
 
 		public abstract String getAppName ();
@@ -442,5 +446,21 @@ public class AppManager implements Observer {
 
 	public void closeAllFloatingWindows() {
 		// todo: close all floating windows
+	}
+
+	@EventHandler
+	public void onSave (SaveRequest event) {
+		// set preferences for all assets
+		Array<BaseApp> appInstances = getAppInstances();
+
+		for(BaseApp app: appInstances) {
+			if (ContainerOfPrefs.class.isAssignableFrom(app.getClass())) {
+				ContainerOfPrefs containerOfPrefs = (ContainerOfPrefs) app;
+				TalosLocalPrefs.setAppPrefs(app.gameAsset, containerOfPrefs);
+			}
+		}
+
+		// save preferences
+		TalosLocalPrefs.savePrefs();
 	}
 }
