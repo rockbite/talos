@@ -63,13 +63,11 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		renderer.setRenderParentTiles(false);
 		batch.begin();
 
-		renderer.skipUpdates = !isPlaying;
 		if (camera instanceof OrthographicCamera) {
 			renderer.setCamera((OrthographicCamera)camera);
 		}
 
 		drawMainRenderer(batch, parentAlpha);
-		renderer.skipUpdates = !isPlaying;
 	}
 
 	@Override
