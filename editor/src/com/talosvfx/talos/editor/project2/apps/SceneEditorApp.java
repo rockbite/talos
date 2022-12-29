@@ -24,7 +24,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	public SceneEditorApp () {
 		this.singleton = true;
 
-		workspaceWidget = new SceneEditorWorkspace();
+		workspaceWidget = new SceneEditorWorkspace(this);
 		workspaceWidget.disableListeners();
 
 		DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
@@ -44,6 +44,11 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 			public void onInputProcessorRemoved () {
 				super.onInputProcessorRemoved();
 				workspaceWidget.disableListeners();
+			}
+
+			@Override
+			protected void onTouchFocused () {
+				SharedResources.stage.setKeyboardFocus(workspaceWidget);
 			}
 		};
 

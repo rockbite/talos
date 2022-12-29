@@ -34,6 +34,11 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 			public void onInputProcessorRemoved () {
 				super.onInputProcessorRemoved();
 			}
+
+			@Override
+			protected void onTouchFocused () {
+				SharedResources.stage.setKeyboardFocus(hierarchyWidget.getTree());
+			}
 		};
 
 		this.gridAppReference = hierarchyApp;

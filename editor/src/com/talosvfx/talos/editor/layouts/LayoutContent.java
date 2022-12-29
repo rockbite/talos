@@ -129,6 +129,8 @@ public class LayoutContent extends LayoutItem {
 	}
 
 	public void setLayoutFocused (boolean layoutFocused) {
+		if (this.layoutFocused == layoutFocused) return;
+
 		for (ObjectMap.Entry<String, LayoutApp> app : apps) {
 			app.value.setTabFocused(layoutFocused);
 		}

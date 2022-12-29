@@ -22,7 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -44,17 +43,17 @@ import com.talosvfx.talos.editor.addons.scene.widgets.*;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.data.RoutineStageData;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -73,6 +72,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;
+	private final SceneEditorApp sceneEditorApp;
 
 	private String projectPath;
 
@@ -167,7 +167,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	// selections
 	private Image selectionRect;
 
-	public SceneEditorWorkspace () {
+	public SceneEditorWorkspace (SceneEditorApp sceneEditorApp) {
+		this.sceneEditorApp = sceneEditorApp;
 
 		setSkin(SharedResources.skin);
 		setWorldSize(10);
@@ -238,6 +239,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
+						//forcefully make active if we aren't active
+						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
 					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.PREFAB) {
 						GameAsset<Prefab> gameAsset = (GameAsset<Prefab>)gameAssetPayload.getGameAsset();
 
@@ -246,6 +251,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						vec.set(touchToWorld.x, touchToWorld.y);
 
 						SceneUtils.createFromPrefab(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+
+						//forcefully make active if we aren't active
+						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
 					}
 					return;
 				}

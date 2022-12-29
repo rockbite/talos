@@ -37,6 +37,7 @@ import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,8 @@ public class HierarchyWidget extends Table implements Observer {
     private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
 
     private final ScrollPane scrollPane;
+
+    @Getter
     private FilteredTree<GameObject> tree;
 
     private ObjectMap<String, GameObject> objectMap = new ObjectMap<>();
