@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.project2;
 
 import com.artemis.utils.reflect.ClassReflection;
 import com.artemis.utils.reflect.ReflectionException;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -10,6 +12,8 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
@@ -21,10 +25,20 @@ import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
+import java.util.UUID;
+
 public class AppManager implements Observer {
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
+
+	static {
+		FileHandle singleton = Gdx.files.local("singleton");
+		RawAsset value = new RawAsset(singleton);
+		value.metaData = new EmptyMetadata();
+		value.metaData.uuid = new UUID(-1, -1);
+		singletonAsset.dependentRawAssets.add(value);
+	}
 	private static final String APP_LIST_MENU_PATH = "window/apps/list";
 	private static final String PANEL_LIST_MENU_PATH = "window/panels/panel_list";
 
@@ -51,7 +65,7 @@ public class AppManager implements Observer {
 		return null;
 	}
 
-	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier) {
+	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, String gameAssetUniqueIdentifier) {
 
 		Class<U> appForSimpleName = (Class<U>)appRegistry.getAppForSimpleName(baseAppClazz);
 
@@ -59,11 +73,16 @@ public class AppManager implements Observer {
 			throw new GdxRuntimeException("No app found for clazz " + baseAppClazz + " register it in AppManager");
 		}
 
-		GameAsset<T> gameAsset;
+		GameAsset<T> gameAsset = null;
 		if (gameAssetIdentifier.equals("singleton") && gameAssetType == GameAssetType.DIRECTORY) {
 			gameAsset = (GameAsset<T>)singletonAsset;
 		} else {
-			gameAsset = AssetRepository.getInstance().getAssetForIdentifier(gameAssetIdentifier, gameAssetType);
+			if (gameAssetUniqueIdentifier != null) {
+				gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(gameAssetUniqueIdentifier, gameAssetType);
+			}
+			if (gameAsset == null) {
+				gameAsset = AssetRepository.getInstance().getAssetForIdentifier(gameAssetIdentifier, gameAssetType);
+			}
 		}
 
 		U baseAppForGameAsset = createBaseAppForGameAsset(gameAsset, appForSimpleName);

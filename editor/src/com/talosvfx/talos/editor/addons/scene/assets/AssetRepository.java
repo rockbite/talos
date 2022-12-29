@@ -77,6 +77,19 @@ public class AssetRepository implements Observer {
 
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
+	public <T> GameAsset<T> getAssetForUniqueIdentifier (String uuid, GameAssetType type) {
+		ObjectMap<String, GameAsset<?>> allAssetsOfType = identifierGameAssetMap.get(type);
+		for (GameAsset<?> value : allAssetsOfType.values()) {
+			if (value.getRootRawAsset().metaData.uuid.toString().equals(uuid)) {
+				return (GameAsset<T>) value;
+			}
+		}
+		GameAsset<T> brokenAsset = new GameAsset<>(uuid, type);
+		brokenAsset.setBroken(new Exception("No asset found"));
+		brokenAsset.setNonFound(true);
+		return brokenAsset;
+	}
+
 	public <T> GameAsset<T> getAssetForIdentifier (String identifier, GameAssetType type) {
 		if (identifierGameAssetMap.containsKey(type)) {
 			if (identifierGameAssetMap.get(type).containsKey(identifier)) {
