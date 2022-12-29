@@ -760,6 +760,10 @@ public abstract class ViewportWidget extends Table {
 		}
 	}
 
+	// flag to check if already scrolled once in a frame.
+	boolean scrolledInFrame = false;
+	private Vector2 cameraPosTmp = new Vector2();
+	private Vector2 mousePosTmp = new Vector2();
 	protected void addPanListener () {
 		addListener(new InputListener() {
 			boolean canPan = false;
@@ -771,11 +775,21 @@ public abstract class ViewportWidget extends Table {
 //				float nextZoom = nextWidth / camera.viewportWidth;
 
 				float currentZoom = viewportViewSettings.getZoom();
-				currentZoom += amountY * 0.5f;
+				float stepScale = zoomStepScale(currentZoom, minZoom, maxZoom);
+				currentZoom += amountY * stepScale;
 				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
-
 				viewportViewSettings.setZoom(currentZoom);
 
+				if (amountY < 0 && !scrolledInFrame && !viewportViewSettings.is3D()) {
+					Vector3 cameraPos = viewportViewSettings.getCurrentCamera().position;
+					Vector2 cameraPosTmp = new Vector2(cameraPos.x, cameraPos.y);
+					Vector2 mousePosTmp = new Vector2(getMouseCordsOnScene());
+					float current = (currentZoom - minZoom) / (maxZoom - minZoom);
+					current = current > 0 ? 1 : 0;
+					cameraPosTmp.lerp(mousePosTmp, 0.05f * current);
+					cameraPos.set(cameraPosTmp.x, cameraPosTmp.y, cameraPos.z);
+					scrolledInFrame = true;
+				}
 
 				return true;
 			}
@@ -1014,9 +1028,12 @@ public abstract class ViewportWidget extends Table {
 	}
 
     public abstract void drawContent(PolygonBatch batch, float parentAlpha);
+
 	@Override
 	public void act (float delta) {
 		super.act(delta);
+
+		scrolledInFrame = false;
 
 		if (isDragging) {
 			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
@@ -1343,5 +1360,12 @@ public abstract class ViewportWidget extends Table {
 	public void setCameraZoom (float zoom) {
 		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
 		settings.setZoom(zoom);
+	}
+
+	private static float zoomStepScale (float currentZoom, float minZoom, float maxZoom) {
+		float current = (currentZoom - minZoom) / (maxZoom - minZoom);
+		current = MathUtils.clamp(current, 0, 1); // won't happen, but just in case lol
+		float scale = Interpolation.slowFast.apply(0.0025f,1, current);
+		return scale;
 	}
 }
