@@ -134,6 +134,9 @@ public abstract class RoutineNode {
             if(type.equals("vec3")) port.dataType = DataType.VECTOR3;
             if(type.equals("color")) port.dataType = DataType.COLOR;
             if(type.equals("asset")) port.dataType = DataType.ASSET;
+            if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
+            if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
         }
@@ -159,7 +162,15 @@ public abstract class RoutineNode {
                 Json json = new Json();
                 Color color = json.readValue(Color.class, jsonValue);
                 port.setValue(color);
-            } else {
+            } else if(port.dataType == DataType.ASSET) {
+                Json json = new Json();
+                try {
+                    GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
+                    String identifier = jsonValue.getString("id");
+                    GameAsset gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+                    port.setValue(gameAsset);
+                } catch (Exception e) {}
+            }else {
                 port.setValueFromString(properties.getString(name));
             }
         }
@@ -225,8 +236,7 @@ public abstract class RoutineNode {
             if (port.valueOverride instanceof GameAsset) {
                 return (GameAsset) (port.valueOverride);
             } else {
-                //todo: fix assumption that it is PNG
-                GameAsset asset = AssetRepository.getInstance().getAssetForIdentifier((String) port.valueOverride, GameAssetType.SPRITE);
+                GameAsset asset = (GameAsset) port.valueOverride;
                 if (!asset.listeners.contains(updateListener, true)) {
                     asset.listeners.add(updateListener);
                 }

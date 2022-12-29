@@ -71,6 +71,10 @@
         </module>
     </category>
     <category name="entities" title="Entities">
+        <module name = "RemoveEntityNode" title = "Remove Entity" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="addSignal" type="signal">add</value>
             <value port="input" name="startSignal" type="signal">start</value>
@@ -85,6 +89,13 @@
             </group>
             <color port="input" name="color" type="color">Color: </color>
             <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SpawnSpineNode" title = "Spawn Spine" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="spine" type="SKELETON">spine</asset>
+            <color port="input" name="color" type="color">Color: </color>
             <value port="input" name="layerOrder" type="int">Layer order</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>

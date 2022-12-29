@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -35,6 +36,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public Skeleton skeleton;
     public AnimationState animationState;
 
+    public Color color = new Color(Color.WHITE);
+
 
     @ValueProperty(prefix = {"scale"})
     public float scale = 1f;
@@ -60,6 +63,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         properties.add(WidgetFactory.generate(this, "scale", "Scale"));
 
+        PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
+        properties.add(colorWidget);
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);
