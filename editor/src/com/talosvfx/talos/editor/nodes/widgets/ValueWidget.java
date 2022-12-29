@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -284,6 +285,8 @@ public class ValueWidget extends AbstractWidget<Float> {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
+        float precision = (int) (1/step);
+        value = MathUtils.round((value) * precision) / precision;
         this.value = value;
 
         String text = "";
