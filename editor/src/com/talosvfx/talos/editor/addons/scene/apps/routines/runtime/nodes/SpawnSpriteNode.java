@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
@@ -30,7 +31,11 @@ public class SpawnSpriteNode extends RoutineNode {
             go.addComponent(transformComponent);
             go.addComponent(spriteRendererComponent);
             spriteRendererComponent.setGameAsset(asset);
+            spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
             target.addGameObject(go);
+
+            Color color = fetchColorValue("color");
+            spriteRendererComponent.color.set(color);
 
             routineInstanceRef.setSignalPayload(go);
             sendSignal("onComplete");

@@ -25,6 +25,14 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "ColorToNode" title = "Color To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <color port="input" name="color" type="color">Color: </color>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "ScaleToNode" title = "Scale To" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
@@ -66,7 +74,9 @@
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
                 <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
             </group>
+            <color port="input" name="color" type="color">Color: </color>
             <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <value port="input" name="layerOrder" type="int">Layer order</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetTransformNode" title = "Set Transform" keywords = "" class = "RoutineNodeWidget">
