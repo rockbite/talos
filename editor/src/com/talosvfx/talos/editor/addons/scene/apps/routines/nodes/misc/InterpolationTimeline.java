@@ -4,13 +4,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AsyncRoutineNodeWidget;
 
 public class InterpolationTimeline extends Table {
     private final MicroNodeView microNodeView;
     private final AsyncRoutineNodeWidget asyncRoutineNodeWidget;
     private Group container = new Group();
-    private ObjectMap<String, Image> progressMap = new ObjectMap<>();
+    private ObjectMap<Object, Image> progressMap = new ObjectMap<>();
 
     public InterpolationTimeline(AsyncRoutineNodeWidget asyncRoutineNodeWidget, Skin skin) {
         super(skin);
@@ -23,11 +24,19 @@ public class InterpolationTimeline extends Table {
         addActor(container);
     }
 
+    public void clearMap() {
+        for (ObjectMap.Entry<Object, Image> objectImageEntry : progressMap) {
+            objectImageEntry.value.remove();
+            Pools.free(objectImageEntry.value);
 
+        }
+        progressMap.clear();
+    }
 
-    private void positionTargetProgress(String target) {
+    public void setProgress(Object target, float value) {
         if(!progressMap.containsKey(target)) {
-            Image image = new Image(getSkin().getDrawable("white"));
+            Image image = Pools.obtain(Image.class);
+            image.setDrawable(getSkin().getDrawable("white"));
             image.setColor(Color.valueOf("#37574a"));
             progressMap.put(target, image);
             container.addActor(image);
@@ -37,8 +46,7 @@ public class InterpolationTimeline extends Table {
 
         image.getColor().a = 0.4f;
 
-        //todo:
-        float alpha = 0;
+        float alpha = value;
 
         image.setPosition(1, 1);
 
@@ -61,10 +69,6 @@ public class InterpolationTimeline extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
-    }
-
-    public void setTimeValue(float alpha) {
-        //this.alpha = alpha;
     }
 
     @Override

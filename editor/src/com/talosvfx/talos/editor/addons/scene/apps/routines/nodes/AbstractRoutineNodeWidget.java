@@ -6,6 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
@@ -72,33 +75,37 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
 
     }
 
-    /*
-    protected boolean sendSignal(String portName, String command, ObjectMap<String, Object> payload) {
+    public void animateSignal(String portName) {
         Array<Connection> connections = outputs.get(portName);
 
         if (connections == null) {
-            return false;
+            return;
         }
 
         for(Connection connection : connections) {
             String targetSlot = connection.targetSlot;
 
             if (targetSlot == null) {
-                return false;
+                return;
             }
-
-            AbstractRoutineNodeWidget targetNode = (AbstractRoutineNodeWidget) connection.targetNode; // this is a bold assumption, but I'll go with it :D
-
             // animate the signal
             animateSignal(portName, connection);
+        }
+    }
 
-            targetNode.onSignalReceived(command, payload);
+    public void animateInput(String portName) {
+        Array<Connection> connections = inputs.get(portName);
+
+        if (connections == null) {
+            return;
         }
 
-        return true;
-    }*/
+        Connection connection = connections.first();
 
-    private void animateInput(String fromSlot, Connection connection) {
+        animateInput(portName, connection);
+    }
+
+    public void animateInput(String fromSlot, Connection connection) {
         Color color = Color.valueOf("#0957a8");
         Actor tmpActor = new Actor();
         addActor(tmpActor);
@@ -119,7 +126,7 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
         ));
     }
 
-    private void animateSignal(String fromSlot, Connection connection) {
+    public void animateSignal(String fromSlot, Connection connection) {
         Actor source = getOutputSlotActor(fromSlot);
         Actor target = connection.targetNode.getInputSlotActor(connection.targetSlot);
 
@@ -220,5 +227,16 @@ public abstract class AbstractRoutineNodeWidget extends NodeWidget {
     public float getDelta() {
         return ((RoutineStage)nodeBoard.getNodeStage()).getDelta();
     }
+
+    public <T> T getNodeInstance() {
+        RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
+        RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
+        int uniqueId = getUniqueId();
+        T node = (T)routineInstance.getNodeById(uniqueId);
+
+        return node;
+    }
+
+
 }
 

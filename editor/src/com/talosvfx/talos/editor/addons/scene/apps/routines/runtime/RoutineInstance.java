@@ -5,11 +5,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -30,6 +29,8 @@ public class RoutineInstance {
 
     public ObjectMap<String, Object> memory = new ObjectMap<>();
 
+    public ObjectMap<String, Object> globalMap = new ObjectMap<>();
+
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
@@ -40,6 +41,15 @@ public class RoutineInstance {
 
     @Getter
     private Object signalPayload;
+
+    @Setter
+    private RoutineListener listener;
+
+    public interface RoutineListener {
+        void onSignalSent(int nodeId, String port);
+
+        void onInputFetched(int nodeId, String port);
+    }
 
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
@@ -160,6 +170,14 @@ public class RoutineInstance {
         return memory.get(name);
     }
 
+    public void storeGlobal(String name, Object value) {
+        globalMap.put(name, value);
+    }
+
+    public Object fetchGlobal(String name) {
+        return globalMap.get(name);
+    }
+
     public PropertyWrapper<?> getPropertyWrapperWithIndex (int index) {
         for (PropertyWrapper<?> propertyWrapper : parentPropertyWrappers) {
             if (propertyWrapper.index == index) {
@@ -177,6 +195,19 @@ public class RoutineInstance {
     public void tick(float delta) {
         for(AsyncRoutineNode node: asyncNodes) {
             node.tick(delta);
+        }
+    }
+
+    public void onSignalSent(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onSignalSent(nodeId, portName);
+        }
+    }
+
+
+    public void onInputFetched(int nodeId, String portName) {
+        if(listener != null) {
+            listener.onInputFetched(nodeId, portName);
         }
     }
 }

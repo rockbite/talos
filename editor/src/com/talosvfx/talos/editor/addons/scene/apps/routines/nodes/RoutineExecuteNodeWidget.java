@@ -26,14 +26,6 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
 
     }
 
-    private void playTween() {
-        /*
-        String target = (String) (getWidget("target").getValue());
-        ObjectMap payload = new ObjectMap<String, Object>();
-        payload.put("target", target);
-        sendSignal("startSignal", "execute", payload);*/
-    }
-
     @Override
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
@@ -51,10 +43,12 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 SavableContainer container = null;
                 if(sceneAsset.type == GameAssetType.SCENE) {
                     ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
+                    scenePreviewApp.reload();
                     container = scenePreviewApp.getWorkspaceWidget().currentScene;
                 } else {
                     return;
                 }
+                // todo: reset instance and all also all visual widgets
 
                 RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
                 int uniqueId = getUniqueId();

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -19,7 +20,7 @@ public class MicroNodeView extends Table {
 
     private Label label;
 
-    private ObjectFloatMap<String> progressMap = new ObjectFloatMap<>();
+    private ObjectFloatMap<Object> progressMap = new ObjectFloatMap<>();
 
     public MicroNodeView(AsyncRoutineNodeWidget asyncRoutineNodeWidget) {
         super(SharedResources.skin);
@@ -151,11 +152,20 @@ public class MicroNodeView extends Table {
         progressContainer.setProgress(progressMap);
     }
 
-    public void setProgress(String target, float alpha) {
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+    }
+
+    public void setProgress(Object target, float alpha) {
         progressMap.put(target, alpha);
     }
 
     public void setLabel(String string) {
         label.setText(string);
+    }
+
+    public void clearMap() {
+        progressMap.clear();
     }
 }

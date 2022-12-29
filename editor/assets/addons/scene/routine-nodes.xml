@@ -14,11 +14,7 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-    </category>
-    <category name="main" title="Main">
-        <!--
-
-        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "RoutineNodeWidget">
+        <module name = "MoveByNode" title = "Move By" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
@@ -29,7 +25,6 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-
         <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
@@ -46,8 +41,8 @@
             </group>
             <value port="output" name="output" type="float">output</value>
         </module>
-        -->
-
+    </category>
+    <category name="main" title="Main">
         <module name = "RenderRoutineNode" title = "Render Routine" keywords = "tween, system" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="id" default="main">ID</inputText>

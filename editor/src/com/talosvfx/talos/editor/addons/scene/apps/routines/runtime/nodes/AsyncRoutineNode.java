@@ -4,10 +4,16 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import lombok.Getter;
 
 public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> extends RoutineNode {
 
-    protected Array<AsyncRoutineNodeState<U>> states = new Array<>();
+    @Getter
+    protected Array<T> states = new Array<>();
+
+    private Array<U> tmpArr = new Array<>();
+
+    private boolean isYoyo = false;
 
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
@@ -26,6 +32,18 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         T state = obtainState();
         state.setTarget(signalPayload);
         states.add(state);
+
+        float duration = fetchFloatValue("duration");
+        state.setDuration(duration);
+        state.direction = 1;
+
+        isYoyo = fetchBooleanValue("yoyo");
+
+        targetAdded(state);
+    }
+
+    protected void targetAdded(T state) {
+
     }
 
     public void tick(float delta) {
@@ -40,24 +58,48 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         // when it's finished call the end signal
 
-        float duration = fetchFloatValue("duration"); //todo: this might need caching
+
+        tmpArr.clear();
 
         for(int i = states.size - 1; i >= 0; i--) {
-            AsyncRoutineNodeState<U> state = states.get(i);
-            state.alpha += delta/duration;
+            T state = states.get(i);
+            state.alpha += state.direction * delta/state.getDuration();
 
             // todo: apply interpolations here
-            // todo apply yoyo logic here
+            if(state.alpha > 1) state.alpha = 1;
+            if(state.alpha < 0) state.alpha = 0;
+
             stateTick(state, delta);
 
-            if(state.alpha >= 1) { //todo: change this with yoyo
-                states.removeIndex(i);
-                Pools.free(state);
+            if(state.alpha >= 1 && state.direction == 1) {
+                if(!isYoyo) {
+                    freeState(i);
+                } else {
+                    state.direction *= -1;
+                }
+            }
 
-                System.out.println("FINISHED");
+            if(state.alpha <= 0 && state.direction == -1) {
+                freeState(i);
             }
         }
+
+        for(U target: tmpArr) {
+            // this now needs to send signal to next guy
+            routineInstanceRef.setSignalPayload(target);
+            sendSignal("onComplete");
+        }
+        tmpArr.clear();
     }
 
-    protected abstract void stateTick(AsyncRoutineNodeState<U> state, float delta);
+    private void freeState(int i) {
+        T state = states.get(i);
+        U target = state.getTarget();
+        tmpArr.add(target);
+
+        states.removeIndex(i);
+        Pools.free(state);
+    }
+
+    protected abstract void stateTick(T state, float delta);
 }

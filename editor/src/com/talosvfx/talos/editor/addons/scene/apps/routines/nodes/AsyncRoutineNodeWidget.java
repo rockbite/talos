@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes;
 
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.InterpolationTimeline;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.MicroNodeView;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import lombok.Getter;
 
@@ -30,6 +33,9 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     private Vector2 vec2 = new Vector2();
 
     private SelectBox interpolationSelectBox;
+    private InterpolationTimeline timelineWidget;
+
+    private boolean runningFlag = false;
 
     public AsyncRoutineNodeWidget() {
 
@@ -39,7 +45,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
 
-        InterpolationTimeline widget = new InterpolationTimeline(this, getSkin());
+        timelineWidget = new InterpolationTimeline(this, getSkin());
         Table timeline = getCustomContainer("timeline");
 
         Field[] declaredFields = Interpolation.class.getDeclaredFields();
@@ -55,7 +61,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         timeline.add(interpolationSelectBox).growX().row();
 
 
-        timeline.add(widget).growX().height(58).row();
+        timeline.add(timelineWidget).growX().height(58).row();
 
         microNodeView = new MicroNodeView(this);
         microNodeView.setTouchable(Touchable.enabled);
@@ -288,6 +294,66 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
     @Override
     public void notifyRemoved() {
         microNodeView.remove();
+    }
+
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        AsyncRoutineNode<?, ?> node = getNodeInstance();
+        if(node != null) {
+            Array<? extends AsyncRoutineNodeState<?>> states = node.getStates();
+
+            if (states.size > 0) {
+                if(!runningFlag) {
+                    runningFlag = true;
+                    onRunStart();
+                }
+
+                timelineWidget.clearMap();
+                microNodeView.clearMap();
+
+                float maxDuration = (1 - states.first().alpha) * states.first().getDuration();
+                for (AsyncRoutineNodeState<?> state : states) {
+                    Object target = state.getTarget();
+                    timelineWidget.setProgress(target, state.alpha);
+                    microNodeView.setProgress(target, state.alpha);
+
+                    if(maxDuration < (1 - state.alpha) * state.getDuration() && state.alpha > 0) {
+                        maxDuration = (1 - state.alpha) * state.getDuration();
+                    }
+                }
+                maxDuration = (float) (Math.floor(maxDuration * 100f) / 100f);
+                microNodeView.setLabel(maxDuration + ""); // todo: use string builder here
+            } else {
+                timelineWidget.clearMap();
+                microNodeView.clearMap();
+                microNodeView.setLabel("0.0");
+
+                if(runningFlag) {
+                    runningFlag = false;
+                    onRunStop();
+                }
+            }
+        }
+    }
+
+    private void onRunStart() {
+        if(isMicroView) {
+            microNodeView.showProgressDisc();
+        }
+    }
+
+    private void onRunStop() {
+        if(isMicroView) {
+            microNodeView.hideProgressDisc();
+        }
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
     }
 }
 

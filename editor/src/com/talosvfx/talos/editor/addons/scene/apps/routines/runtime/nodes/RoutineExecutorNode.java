@@ -17,6 +17,8 @@ public class RoutineExecutorNode extends RoutineNode {
 
         Array<GameObject> gameObjects = container.findGameObjects(target);
 
+        routineInstanceRef.storeGlobal("executedTargets", gameObjects);
+
         for(GameObject gameObject: gameObjects) {
             // make sure sendSignal supports payloads
             routineInstanceRef.setSignalPayload(gameObject);

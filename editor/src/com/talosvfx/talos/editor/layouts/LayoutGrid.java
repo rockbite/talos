@@ -17,7 +17,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.Toasts;
@@ -853,6 +855,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
 		String baseAppClazz;
 		String gameAssetIdentifier;
+		String gameAssetUniqueIdentifier;
 		GameAssetType gameAssetType;
 
 		float relativeWidth;
@@ -942,11 +945,12 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 					String baseAppClazz = child.baseAppClazz;
 					String gameAssetIdentifier = child.gameAssetIdentifier;
 					GameAssetType gameAssetType = child.gameAssetType;
+					String gameAssetUniqueIdentifier = child.gameAssetUniqueIdentifier;
 
 					//We need to make the app
 
 					try {
-						AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier);
+						AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier, gameAssetUniqueIdentifier);
 
 						//We skip and just add it to the parent
 						if (!(parent instanceof LayoutContent)) {
@@ -1021,10 +1025,14 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 				child.type = LayoutType.APP;
 				child.appID = app.key;
 				child.tabActive = app.value.isTabActive();
-				AppManager.BaseApp appy = SharedResources.appManager.getAppForLayoutApp(app.value);
+				AppManager.BaseApp<?> appy = SharedResources.appManager.getAppForLayoutApp(app.value);
 				if (appy != null) {
 					child.baseAppClazz = appy.getClass().getSimpleName();
 					child.gameAssetIdentifier = appy.getAssetIdentifier();
+
+					RawAsset first = appy.getGameAsset().getRootRawAsset();
+					String uuid = first.metaData.uuid.toString();
+					child.gameAssetUniqueIdentifier = uuid;
 					child.gameAssetType = appy.getGameAssetType();
 				}
 				jsonStructure.children.add(child);
