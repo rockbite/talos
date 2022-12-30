@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Data
-public class ViewportViewSettings implements Consumer<ViewportPreferences>, Supplier<ViewportPreferences> {
+public class ViewportViewSettings {
 
 	private final ViewportWidget viewportWidget;
 	private final BongoCameraController threeDimensionalCameraController;
@@ -142,19 +142,5 @@ public class ViewportViewSettings implements Consumer<ViewportPreferences>, Supp
 		orthographicCamera.viewportHeight = orthographicCamera.viewportWidth / aspect;
 
 		orthographicCamera.update();
-	}
-
-	@Override
-	public void accept(ViewportPreferences viewportPreferences) {
-		getCurrentCamera().position.set(viewportPreferences.cameraPos);
-		setZoom(viewportPreferences.cameraZoom);
-	}
-
-	@Override
-	public ViewportPreferences get() {
-		ViewportPreferences viewportPreferences = new ViewportPreferences();
-		viewportPreferences.cameraPos = new Vector3(getCurrentCamera().position);
-		viewportPreferences.cameraZoom = getZoom();
-		return viewportPreferences;
 	}
 }

@@ -49,6 +49,7 @@ import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -68,7 +69,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
+public class SceneEditorWorkspace extends ViewportWidget<ViewportPreferences> implements Json.Serializable, Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;

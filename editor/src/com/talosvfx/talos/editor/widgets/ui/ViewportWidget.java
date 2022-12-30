@@ -50,6 +50,7 @@ import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -76,13 +77,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public abstract class ViewportWidget extends Table {
-
+public abstract class ViewportWidget<T extends ViewportPreferences> extends Table implements Consumer<T>, Supplier<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
@@ -1350,7 +1351,16 @@ public abstract class ViewportWidget extends Table {
 		return scale;
 	}
 
-	public ViewportViewSettings getViewportViewSettings() {
-		return viewportViewSettings;
+	public T get() {
+		T preferences = (T) new ViewportPreferences();
+		preferences.cameraZoom = viewportViewSettings.getZoom();
+		preferences.cameraPos = new Vector3(viewportViewSettings.getCurrentCamera().position);
+		return preferences;
+	}
+
+	@Override
+	public void accept(T preferences) {
+		viewportViewSettings.setZoom(preferences.cameraZoom);
+		viewportViewSettings.getCurrentCamera().position.set(preferences.cameraPos);
 	}
 }

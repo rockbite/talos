@@ -75,12 +75,12 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
     }
 
     @Override
-    public Supplier<ViewportPreferences> getPreferences() {
-        return workspaceWidget.getViewportViewSettings();
+    public ViewportPreferences getPreferences() {
+        return workspaceWidget.get();
     }
 
     @Override
-    public Consumer<ViewportPreferences> applyPreferences() {
-        return workspaceWidget.getViewportViewSettings();
+    public void applyPreferences(ViewportPreferences preferences) {
+        workspaceWidget.accept(preferences);
     }
 }

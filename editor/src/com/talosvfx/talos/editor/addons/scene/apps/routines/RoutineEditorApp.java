@@ -129,12 +129,12 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
     }
 
     @Override
-    public Supplier<ViewportPreferences> getPreferences() {
-        return routineStageWrapper.getViewportViewSettings();
+    public ViewportPreferences getPreferences() {
+        return routineStageWrapper.get();
     }
 
     @Override
-    public Consumer<ViewportPreferences> applyPreferences() {
-        return routineStageWrapper.getViewportViewSettings();
+    public void applyPreferences(ViewportPreferences preferences) {
+        routineStageWrapper.accept(preferences);
     }
 }

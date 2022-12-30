@@ -15,10 +15,6 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-
 @SingletonApp
 public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
@@ -99,13 +95,13 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	}
 
 	@Override
-	public Supplier<ViewportPreferences> getPreferences() {
-		return workspaceWidget.getViewportViewSettings();
+	public ViewportPreferences getPreferences() {
+		return workspaceWidget.get();
 	}
 
 	@Override
-	public Consumer<ViewportPreferences> applyPreferences() {
-		return workspaceWidget.getViewportViewSettings();
+	public void applyPreferences(ViewportPreferences preferences) {
+		workspaceWidget.accept(preferences);
 	}
 }
 

@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -48,7 +49,7 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 
-public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
+public class PaletteEditorWorkspace extends ViewportWidget<ViewportPreferences> implements Observer {
 
     private static final Logger logger = LoggerFactory.getLogger(PaletteEditorWorkspace.class);
     private PaletteEditor paletteEditor;
