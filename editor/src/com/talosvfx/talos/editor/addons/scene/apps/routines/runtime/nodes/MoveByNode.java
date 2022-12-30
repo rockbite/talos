@@ -24,15 +24,18 @@ public class MoveByNode extends AsyncRoutineNode<GameObject, MoveByNode.Position
     }
 
     @Override
-    protected void targetAdded(MoveByNode.PositionTargetState state) {
+    protected boolean targetAdded(MoveByNode.PositionTargetState state) {
         GameObject target = state.getTarget();
         TransformComponent component = target.getComponent(TransformComponent.class);
+        if(component == null) return false;
         state.getOriginalPosition().set(component.position);
 
         float x = fetchFloatValue("X");
         float y = fetchFloatValue("Y");
 
         state.getOffset().set(x, y);
+
+        return true;
     }
 
     @Override

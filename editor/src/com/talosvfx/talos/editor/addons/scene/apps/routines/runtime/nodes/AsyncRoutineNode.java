@@ -51,7 +51,6 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         U signalPayload = (U)routineInstanceRef.getSignalPayload();
         T state = obtainState();
         state.setTarget(signalPayload);
-        states.add(state);
 
         float duration = fetchFloatValue("duration");
         state.setDuration(duration);
@@ -60,12 +59,18 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         String interpolationName = fetchStringValue("interpolation");
         interpolation = InterpolationLibrary.get(interpolationName);
 
-        targetAdded(state);
+        boolean success = targetAdded(state);
+
+        if(success) {
+            states.add(state);
+        } else {
+            Pools.free(state);
+        }
     }
 
 
-    protected void targetAdded(T state) {
-
+    protected boolean targetAdded(T state) {
+        return false;
     }
 
     public void tick(float delta) {

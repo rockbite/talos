@@ -21,15 +21,18 @@ public class ScaleToNode extends AsyncRoutineNode<GameObject, ScaleToNode.ScaleS
     }
 
     @Override
-    protected void targetAdded(ScaleState state) {
+    protected boolean targetAdded(ScaleState state) {
         GameObject target = state.getTarget();
         TransformComponent component = target.getComponent(TransformComponent.class);
+        if(component == null) return false;
         state.originalScale.set(component.scale);
 
         float scaleX = fetchFloatValue("scaleX");
         float scaleY = fetchFloatValue("scaleY");
 
         state.targetScale.set(scaleX, scaleY);
+
+        return true;
     }
 
     @Override
