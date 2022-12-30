@@ -48,12 +48,14 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
-		if (!gameAsset.listeners.contains(this, true)) {
-			gameAsset.listeners.add(this);
+		if (gameAsset.getResource() != null) {
+			if (!gameAsset.listeners.contains(this, true)) {
+				gameAsset.listeners.add(this);
+			}
+
+			hierarchyWidget.loadEntityContainer(gameAsset.getResource());
 		}
 
-
-		hierarchyWidget.loadEntityContainer(gameAsset.getResource());
 	}
 
 	@Override
