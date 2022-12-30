@@ -1,13 +1,11 @@
 package com.talosvfx.talos.editor.project2.apps.preferences;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public interface ContainerOfPrefs<T extends AppPrefs.AppPreference> {
 
-    void applyFromPreferences(T prefs);
+    Supplier<T> getPreferences();
 
-
-    /**
-     * Get current preference. App should query the state of its widget and update preferences to be stored.
-     * @see  com.talosvfx.talos.editor.project2.apps.SceneEditorApp for example implementation.
-     */
-    T getPrefs();
+    Consumer<T> applyPreferences();
 }

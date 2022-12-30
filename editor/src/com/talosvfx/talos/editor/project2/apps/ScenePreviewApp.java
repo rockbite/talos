@@ -14,6 +14,9 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import lombok.Getter;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observer, ContainerOfPrefs<ViewportPreferences> {
 
     @Getter
@@ -72,16 +75,12 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
     }
 
     @Override
-    public void applyFromPreferences(ViewportPreferences prefs) {
-        workspaceWidget.setCameraPos(prefs.cameraPos);
-        workspaceWidget.setCameraZoom(prefs.cameraZoom);
+    public Supplier<ViewportPreferences> getPreferences() {
+        return workspaceWidget.getViewportViewSettings();
     }
 
     @Override
-    public ViewportPreferences getPrefs() {
-        ViewportPreferences prefs = new ViewportPreferences();
-        prefs.cameraPos = workspaceWidget.getCameraPos();
-        prefs.cameraZoom = workspaceWidget.getCameraZoom();
-        return prefs;
+    public Consumer<ViewportPreferences> applyPreferences() {
+        return workspaceWidget.getViewportViewSettings();
     }
 }

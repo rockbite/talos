@@ -15,6 +15,9 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 
 @SingletonApp
 public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
@@ -96,17 +99,13 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	}
 
 	@Override
-	public void applyFromPreferences(ViewportPreferences prefs) {
-		workspaceWidget.setCameraPos(prefs.cameraPos);
-		workspaceWidget.setCameraZoom(prefs.cameraZoom);
+	public Supplier<ViewportPreferences> getPreferences() {
+		return workspaceWidget.getViewportViewSettings();
 	}
 
 	@Override
-	public ViewportPreferences getPrefs() {
-		ViewportPreferences prefs = new ViewportPreferences();
-		prefs.cameraPos = workspaceWidget.getCameraPos();
-		prefs.cameraZoom = workspaceWidget.getCameraZoom();
-		return prefs;
+	public Consumer<ViewportPreferences> applyPreferences() {
+		return workspaceWidget.getViewportViewSettings();
 	}
 }
 

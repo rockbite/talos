@@ -1342,30 +1342,15 @@ public abstract class ViewportWidget extends Table {
 		Vector2 local = getWorldFromLocal(vec.x, vec.y);
 		return local;
 	}
-	public Vector3 getCameraPos () {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		return new Vector3(settings.getCurrentCamera().position);
-	}
-
-	public float getCameraZoom() {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		return settings.getZoom();
-	}
-
-	public void setCameraPos (Vector3 pos) {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		settings.getCurrentCamera().position.set(pos);
-	}
-
-	public void setCameraZoom (float zoom) {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		settings.setZoom(zoom);
-	}
 
 	private static float zoomStepScale (float currentZoom, float minZoom, float maxZoom) {
 		float current = (currentZoom - minZoom) / (maxZoom - minZoom);
 		current = MathUtils.clamp(current, 0, 1); // won't happen, but just in case lol
 		float scale = Interpolation.slowFast.apply(0.0025f,1, current);
 		return scale;
+	}
+
+	public ViewportViewSettings getViewportViewSettings() {
+		return viewportViewSettings;
 	}
 }

@@ -157,7 +157,7 @@ public class TalosLocalPrefs {
 			AppPrefs prefs = json.fromJson(AppPrefs.class, prefsString);
 			if (prefs.hasPrefFor(gameAsset)) {
 				T appPreference = (T) prefs.getPrefFor(gameAsset);
-				baseApp.applyFromPreferences(appPreference);
+				baseApp.applyPreferences().accept(appPreference);
 			}
 		}
 	}
@@ -175,7 +175,7 @@ public class TalosLocalPrefs {
 		Class<? extends ContainerOfPrefs> clazz = baseApp.getClass();
 
 		AppPrefs appPrefs;
-		T appPreference =  baseApp.getPrefs();
+		T appPreference = baseApp.getPreferences().get();
 		// nothing to set, skip
 		if (appPreference == null) {
 			return;

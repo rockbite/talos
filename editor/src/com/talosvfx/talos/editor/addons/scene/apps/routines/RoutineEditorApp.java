@@ -14,6 +14,9 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
 
     public RoutineStage routineStage;
@@ -125,16 +128,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
     }
 
-    public void applyFromPreferences(ViewportPreferences prefs) {
-        routineStageWrapper.setCameraPos(prefs.cameraPos);
-        routineStageWrapper.setCameraZoom(prefs.cameraZoom);
+    @Override
+    public Supplier<ViewportPreferences> getPreferences() {
+        return routineStageWrapper.getViewportViewSettings();
     }
 
     @Override
-    public ViewportPreferences getPrefs() {
-        ViewportPreferences prefs = new ViewportPreferences();
-        prefs.cameraPos = routineStageWrapper.getCameraPos();
-        prefs.cameraZoom = routineStageWrapper.getCameraZoom();
-        return prefs;
+    public Consumer<ViewportPreferences> applyPreferences() {
+        return routineStageWrapper.getViewportViewSettings();
     }
 }

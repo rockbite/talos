@@ -8,13 +8,15 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.utils.CameraController;
 import lombok.Data;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Data
-public class ViewportViewSettings {
+public class ViewportViewSettings implements Consumer<ViewportPreferences>, Supplier<ViewportPreferences> {
 
 	private final ViewportWidget viewportWidget;
 	private final BongoCameraController threeDimensionalCameraController;
@@ -142,4 +144,17 @@ public class ViewportViewSettings {
 		orthographicCamera.update();
 	}
 
+	@Override
+	public void accept(ViewportPreferences viewportPreferences) {
+		getCurrentCamera().position.set(viewportPreferences.cameraPos);
+		setZoom(viewportPreferences.cameraZoom);
+	}
+
+	@Override
+	public ViewportPreferences get() {
+		ViewportPreferences viewportPreferences = new ViewportPreferences();
+		viewportPreferences.cameraPos = new Vector3(getCurrentCamera().position);
+		viewportPreferences.cameraZoom = getZoom();
+		return viewportPreferences;
+	}
 }
