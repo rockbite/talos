@@ -69,9 +69,12 @@ public class VariableCreationWindow extends Table {
         topBar.add(plusButton).right().pad(5).expandX();
 
         plusButton.addListener(new ClickListener() {
+            private BasicPopup<PropertyType> popup;
+
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BasicPopup.build(PropertyType.class)
+                if(popup!=null)popup.hide();
+                popup = BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
                         .addItem("Boolean", PropertyType.BOOLEAN)

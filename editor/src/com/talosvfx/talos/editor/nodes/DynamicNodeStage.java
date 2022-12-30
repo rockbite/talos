@@ -127,12 +127,20 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                }
 //                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+
                 dragged = false;
 
                 boolean shouldHandle = false;
@@ -158,12 +166,21 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                 if (shouldHandle) {
                     return true;
                 } else {
+                    // unselect
+                    if(!event.isHandled()) {
+                        nodeBoard.clearSelection();
+                    }
+
                     return super.touchDown(event, x, y, pointer, button);
                 }
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return;
+                }
                 super.touchDragged(event, x, y, pointer);
 
                 dragged = true;
@@ -191,7 +208,10 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return;
+                }
                 if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
 //                    FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
@@ -210,6 +230,10 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return super.keyDown(event, keycode);
+                }
 //
 //                if(keycode == Input.Keys.F5) {
 //                    stage.getCamera().position.set(0, 0, 0);
