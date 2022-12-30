@@ -140,7 +140,11 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
         layoutContent.setLayoutFocused(true);
     }
 
-    public void getAllLayoutContentsFlat (LayoutItem root, Array<LayoutContent> out) {
+    public void getAllLayoutContentsFlat (Array<LayoutContent> out) {
+        getAllLayoutContentsFlat(root, out);
+    }
+
+    private void getAllLayoutContentsFlat (LayoutItem root, Array<LayoutContent> out) {
         if (root == null) return;
         if (root instanceof LayoutContent) {
             out.add((LayoutContent) root);
