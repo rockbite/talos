@@ -141,6 +141,7 @@ public class CustomVarWidget extends Table {
         innerWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                typeLabel.setText(innerWidget.getTypeName());
                 fireChangedEvent();
             }
         });
