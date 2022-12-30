@@ -839,7 +839,7 @@ public class AssetRepository implements Observer {
 				}
 				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
 
-				((GameAsset<RoutineStageData>)gameAssetOut).setResourcePayload(routineStageData);
+				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 
 				break;
 			case PREFAB:
@@ -932,8 +932,8 @@ public class AssetRepository implements Observer {
 				break;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (gameAssetOut != null) {
-				e.printStackTrace();
 				gameAssetOut.setBroken(e);
 				System.out.println("Marking asset as broken " + gameAssetOut + " " + value.handle.path());
 			}

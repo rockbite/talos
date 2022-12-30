@@ -63,7 +63,7 @@ public class PreferencesTabContent extends Table {
             block.build();
             return block;
         } catch (ReflectionException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return null;
