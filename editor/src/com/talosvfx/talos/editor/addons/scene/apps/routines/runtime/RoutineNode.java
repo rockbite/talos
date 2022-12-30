@@ -24,6 +24,7 @@ public abstract class RoutineNode {
         COLOR,
         ASSET,
         STRING,
+        BOOLEAN,
         FLUID
     }
 
@@ -135,6 +136,7 @@ public abstract class RoutineNode {
             if(type.equals("color")) port.dataType = DataType.COLOR;
             if(type.equals("asset")) port.dataType = DataType.ASSET;
             if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
+            if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
