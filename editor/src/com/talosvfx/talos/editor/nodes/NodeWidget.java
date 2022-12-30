@@ -471,6 +471,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
         Class<? extends AbstractWidget> clazz = widgetClassMap.get(tagName);
 
+        if(tagName.equals("button")) {
+            skipListener = true;
+        }
+
         if (clazz != null) {
             try {
                 AbstractWidget widget = ClassReflection.newInstance(clazz);

@@ -15,15 +15,22 @@ public interface GameResourceOwner<U> {
 
     void setGameAsset (GameAsset<U> gameAsset);
 
-    static <U> void writeGameAsset (Json json, GameResourceOwner<U> owner) {
-        GameAsset<U> gameResource = owner.getGameResource();
+    static <U> void writeGameAsset (String name, Json json, GameAsset<U> gameResource) {
         if (gameResource != null) {
-            json.writeValue("gameResource", gameResource.nameIdentifier);
+            json.writeValue(name, gameResource.nameIdentifier);
             if (!gameResource.isBroken()) {
                 json.writeValue("gameResourceExtension", gameResource.getRootRawAsset().handle.extension());
                 json.writeValue("type", gameResource.type);
             }
         }
+    }
+
+    static <U> void writeGameAsset (String name, Json json, GameResourceOwner<U> owner) {
+        writeGameAsset(name, json, owner.getGameResource());
+    }
+
+    static <U> void writeGameAsset (Json json, GameResourceOwner<U> owner) {
+        writeGameAsset("gameResource", json, owner);
     }
 
     static<U> GameAsset<U> readAsset(Json json, JsonValue jsonValue) {

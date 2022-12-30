@@ -54,7 +54,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                 routineInstance.reset();
                 int uniqueId = getUniqueId();
                 RoutineExecutorNode node = (RoutineExecutorNode)routineInstance.getNodeById(uniqueId);
-                node.setContainer(container);
+                routineInstance.setContainer(container);
                 node.receiveSignal("startSignal");
             }
         });

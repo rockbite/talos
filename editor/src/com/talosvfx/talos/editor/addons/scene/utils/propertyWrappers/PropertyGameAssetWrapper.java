@@ -32,8 +32,16 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> impl
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
 
-        GameAsset<?> asset = GameResourceOwner.readAsset(json, jsonData);
+        JsonValue value = jsonData.get("value");
+        JsonValue def = jsonData.get("default");
+
+        defaultValue = GameResourceOwner.readAsset(json, def);
+
+        GameAsset<?> asset = GameResourceOwner.readAsset(json, value);
         if (asset != null) {
+            if(asset.isBroken()) {
+                asset = defaultValue;
+            }
             setGameAsset(asset);
         }
     }
@@ -41,7 +49,12 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> impl
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeObjectStart("value");
         GameResourceOwner.writeGameAsset(json, this);
+        json.writeObjectEnd();
+        json.writeObjectStart("default");
+        GameResourceOwner.writeGameAsset("gameResource", json, defaultValue);
+        json.writeObjectEnd();
     }
 
     @Override

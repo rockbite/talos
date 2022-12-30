@@ -29,6 +29,7 @@ public class ExposedVariableNode extends RoutineNode {
     @Override
     public void loadFrom(RoutineInstance routineInstance, JsonValue nodeData) {
         super.loadFrom(routineInstance, nodeData);
+        configureNode(propertiesJson); //todo: this is hack due to booboo there
         propertyWrapper = routineInstance.getPropertyWrapperWithIndex(index);
     }
 

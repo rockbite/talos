@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -10,10 +11,12 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.data.RoutineStageData;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class CallRoutineNode extends RoutineNode {
 
 
+    RoutineInstance targetInstance;
 
     @Override
     protected void constructNode(XmlReader.Element config) {
@@ -23,13 +26,13 @@ public class CallRoutineNode extends RoutineNode {
     @Override
     protected void configureNode(JsonValue properties) {
         // pre construct the custom part before configuring from values?
+        // todo: IMPORTANT ASSET IS NOT LOADED YET, we do Runnable hack :/
         for(JsonValue item: properties) {
             if(item.has("type") && item.getString("type").equals("ROUTINE")) {
                 String name = item.name;
                 String routineAssetId = item.getString("id");
                 //TODO: this needs to be done in a "runtime" friendly way, leaving this task for another time
                 GameAsset<RoutineStageData> asset = AssetRepository.getInstance().getAssetForIdentifier(routineAssetId, GameAssetType.ROUTINE);
-
                 customConstruction(asset);
             }
         }
@@ -37,7 +40,7 @@ public class CallRoutineNode extends RoutineNode {
         super.configureNode(properties);
     }
 
-    private void customConstruction(GameAsset<RoutineStageData> asset) {
+    public void customConstruction(GameAsset<RoutineStageData> asset) {
         //todo: ths should be done in a runtime friendly way
         RoutineStageData resource = asset.getResource();
         Array<PropertyWrapper<?>> propertyWrappers = resource.getPropertyWrappers();
@@ -53,6 +56,17 @@ public class CallRoutineNode extends RoutineNode {
             port.portType = PortType.INPUT;
             inputs.put( port.name, port);
         }
+
+        Port port = new Port();
+        port.name = "executorName";
+        port.nodeRef = this;
+        port.connectionType = ConnectionType.DATA;
+        port.dataType = DataType.STRING;
+        port.portType = PortType.INPUT;
+        inputs.put( port.name, port);
+
+        // now create that routine
+        targetInstance = asset.getResource().createInstance(false);
     }
 
     private DataType makeDataType(PropertyType type) {
@@ -63,5 +77,26 @@ public class CallRoutineNode extends RoutineNode {
         if(type == PropertyType.VECTOR2) return DataType.VECTOR2;
 
         return DataType.NUMBER;
+    }
+
+    @Override
+    public void receiveSignal(String portName) {
+        if(targetInstance != null) {
+            //todo: setup custom var values (fetch them first)
+            Array<PropertyWrapper<?>> wrappers = targetInstance.getParentPropertyWrappers();
+            for (PropertyWrapper<?> wrapper : wrappers) {
+                String propertyName = wrapper.propertyName;
+                Object val = fetchValue(propertyName);
+                if(val != null) {
+                    wrapper.setValueUnsafe(val);
+                }
+            }
+
+            targetInstance.setContainer(routineInstanceRef.getContainer());
+
+            String executorName = fetchStringValue("executorName");
+            RoutineExecutorNode node = (RoutineExecutorNode) targetInstance.getCustomLookup().get(executorName);
+            node.receiveSignal("startSignal");
+        }
     }
 }

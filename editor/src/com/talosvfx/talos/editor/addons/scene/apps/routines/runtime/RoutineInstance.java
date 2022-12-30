@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
@@ -16,6 +18,9 @@ import org.slf4j.Logger;
 public class RoutineInstance {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
+
+    @Getter
+    private ObjectMap<String, RoutineNode> customLookup = new ObjectMap<>();
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
@@ -45,6 +50,9 @@ public class RoutineInstance {
     @Setter
     private RoutineListener listener;
 
+    @Getter@Setter
+    private SavableContainer container;
+
     public void reset() {
         clearMemory();
         globalMap.clear();
@@ -53,6 +61,17 @@ public class RoutineInstance {
         for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
             entry.value.reset();
         }
+    }
+
+    public <T extends RoutineNode> Array<T> getNodesByClass(Class<T> clazz) {
+        Array<T> result = new Array<>();
+        for (IntMap.Entry<RoutineNode> entry : lowLevelLookup) {
+            if(entry.value.getClass().isAssignableFrom(clazz)) {
+                result.add((T) entry.value);
+            }
+        }
+
+        return result;
     }
 
     public interface RoutineListener {

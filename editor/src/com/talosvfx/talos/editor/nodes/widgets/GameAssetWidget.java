@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -18,6 +19,21 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
     private GameAssetType type;
     private AssetSelector<Object> widget;
 
+    public void build(String typeString, String text) {
+
+        type = GameAssetType.valueOf(typeString);
+
+        widget = new AssetSelector<>(text, type);
+        widget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gameAsset = widget.getValue();
+                fireChangedEvent();
+            }
+        });
+
+        add(widget).growX();
+    }
 
     @Override
     public void loadFromXML(XmlReader.Element element) {
@@ -58,10 +74,11 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
 
     @Override
     public void write(Json json, String name) {
-        if(gameAsset == null) return;
         json.writeObjectStart(name);
-        json.writeValue("type", gameAsset.type);
-        json.writeValue("id", gameAsset.nameIdentifier);
+        if(gameAsset != null) {
+            json.writeValue("type", gameAsset.type);
+            json.writeValue("id", gameAsset.nameIdentifier);
+        }
         json.writeObjectEnd();
     }
 }

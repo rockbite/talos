@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
@@ -16,6 +17,7 @@ public abstract class RoutineNode {
     public int uniqueId;
 
     protected boolean nodeDirty = false;
+    protected JsonValue propertiesJson;
 
     public enum DataType {
         NUMBER,
@@ -89,8 +91,14 @@ public abstract class RoutineNode {
         XmlReader.Element config = routineInstanceRef.getConfig(name);
         constructNode(config);
 
-        JsonValue properties = nodeData.get("properties");
-        configureNode(properties);
+        //todo: fix later?
+        this.propertiesJson = nodeData.get("properties");
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                configureNode(propertiesJson);
+            }
+        });
 
         uniqueId = nodeData.getInt("id");
     }
