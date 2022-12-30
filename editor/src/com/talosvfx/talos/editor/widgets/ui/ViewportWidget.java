@@ -787,7 +787,7 @@ public abstract class ViewportWidget extends Table {
 					float current = (currentZoom - minZoom) / (maxZoom - minZoom);
 					current = current > 0 ? 1 : 0;
 					cameraPosTmp.lerp(mousePosTmp, 0.05f * current);
-					cameraPos.set(cameraPosTmp.x, cameraPosTmp.y, cameraPos.z);
+					//cameraPos.set(cameraPosTmp.x, cameraPosTmp.y, cameraPos.z);
 					scrolledInFrame = true;
 				}
 
