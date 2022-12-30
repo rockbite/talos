@@ -11,5 +11,7 @@ public class StoreMemoryNode extends RoutineNode {
         Object input = fetchValue("input");
 
         routineInstanceRef.storeMemory(name, input);
+
+        sendSignal("next");
     }
 }
