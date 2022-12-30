@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.TickableNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -13,7 +14,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWra
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class CallRoutineNode extends RoutineNode {
+public class CallRoutineNode extends RoutineNode implements TickableNode {
 
 
     RoutineInstance targetInstance;
@@ -97,6 +98,13 @@ public class CallRoutineNode extends RoutineNode {
             String executorName = fetchStringValue("executorName");
             RoutineExecutorNode node = (RoutineExecutorNode) targetInstance.getCustomLookup().get(executorName);
             node.receiveSignal("startSignal");
+        }
+    }
+
+    @Override
+    public void tick(float delta) {
+        if(targetInstance != null) {
+            targetInstance.tick(delta);
         }
     }
 }
