@@ -19,6 +19,7 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
 
     RoutineInstance targetInstance;
+    private RoutineInstance.RoutineListenerAdapter listener;
 
     @Override
     protected void constructNode(XmlReader.Element config) {
@@ -96,6 +97,15 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
             targetInstance.setContainer(routineInstanceRef.getContainer());
 
+            listener = new RoutineInstance.RoutineListenerAdapter() {
+                @Override
+                public void onComplete() {
+                    routineInstanceRef.setSignalPayload(targetInstance.getSignalPayload());
+                    sendSignal("onComplete");
+                }
+            };
+            targetInstance.setListener(listener);
+
             String executorName = fetchStringValue("executorName");
             RoutineExecutorNode node = (RoutineExecutorNode) targetInstance.getCustomLookup().get(executorName);
             node.receiveSignal("startSignal");
@@ -106,6 +116,18 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
     public void tick(float delta) {
         if(targetInstance != null) {
             targetInstance.tick(delta);
+        }
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        if(targetInstance != null) {
+            targetInstance.reset();
+            listener.terminate();
+            targetInstance.removeListener();
+
+            targetInstance = null;
         }
     }
 }

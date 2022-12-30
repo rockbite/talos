@@ -14,6 +14,9 @@
             <container name="customParams"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "CompleteRoutineNode" title = "Complete Routine" keywords = "tween, system" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
+        </module>
         <module name = "DelayNode" title = "Delay" keywords = "tween" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>

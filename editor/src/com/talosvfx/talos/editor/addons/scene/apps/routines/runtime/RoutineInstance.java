@@ -48,7 +48,7 @@ public class RoutineInstance {
     private Object signalPayload;
 
     @Setter
-    private RoutineListener listener;
+    private RoutineListenerAdapter listener;
 
     @Getter@Setter
     private SavableContainer container;
@@ -74,10 +74,49 @@ public class RoutineInstance {
         return result;
     }
 
+    public void complete() {
+        if(listener != null) {
+            if(!listener.isTerminated()) {
+                listener.onComplete();
+            }
+        }
+    }
+
+    public void removeListener() {
+        listener = null;
+    }
+
+    public static class RoutineListenerAdapter implements RoutineListener {
+
+        @Getter
+        private boolean terminated = false;
+
+        @Override
+        public void onSignalSent(int nodeId, String port) {
+
+        }
+
+        @Override
+        public void onInputFetched(int nodeId, String port) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+
+        public void terminate() {
+            terminated = true;
+        }
+    }
+
     public interface RoutineListener {
         void onSignalSent(int nodeId, String port);
 
         void onInputFetched(int nodeId, String port);
+
+        void onComplete();
     }
 
     public RoutineInstance() {

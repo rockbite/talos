@@ -92,7 +92,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     private void setInstanceListeners() {
-        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
+        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListenerAdapter() {
             @Override
             public void onSignalSent(int nodeId, String port) {
                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
@@ -103,6 +103,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             public void onInputFetched(int nodeId, String port) {
                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
                 nodeWidget.animateInput(port);
+            }
+
+            @Override
+            public void onComplete() {
+
             }
         });
     }
