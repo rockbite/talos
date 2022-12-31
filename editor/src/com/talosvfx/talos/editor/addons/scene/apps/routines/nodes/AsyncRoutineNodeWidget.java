@@ -53,7 +53,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         Field[] declaredFields = Interpolation.class.getDeclaredFields();
         Array<String> interpolationList = new Array<>();
         for(Field field: declaredFields) {
-            if(field.getType().isAssignableFrom(Interpolation.class)) {
+            if(Interpolation.class.isAssignableFrom(field.getType())) {
                 interpolationList.add(field.getName());
             }
         }
