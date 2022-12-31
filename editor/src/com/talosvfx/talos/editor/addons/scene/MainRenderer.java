@@ -96,7 +96,7 @@ public class MainRenderer implements Observer {
 
         Notifications.registerObserver(this);
 
-        talosRenderer = new SpriteBatchParticleRenderer(null);
+        talosRenderer = new SpriteBatchParticleRenderer(camera);
         spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
@@ -673,6 +673,7 @@ public class MainRenderer implements Observer {
     public void setCamera (Camera camera) {
 
         this.camera = camera;
+        talosRenderer.setCamera(camera);
     }
 
 

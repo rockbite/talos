@@ -108,7 +108,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             public boolean keyUp (InputEvent event, int keycode) {
                 if (event.isHandled()) return super.keyUp(event, keycode);
                 if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    //deleteSelectedWrappers();
+                    deleteSelectedWrappers();
                 }
                 return super.keyUp(event, keycode);
             }
@@ -157,7 +157,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         currentEmitterGraph.removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
         currentEmitterGraph.removeNode(connection.toModule.getModule(), connection.toSlot, true);
 
-//        TalosMain.Instance().ProjectController().setDirty();
+        app.dataModified();
     }
 
     public void setCurrentEmitter (ParticleEmitterWrapper currentEmitterWrapper) {
@@ -464,7 +464,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 deleteWrapper(wrapper);
             }
         } catch (Exception e) {
-            TalosMain.Instance().reportException(e);
+            //TalosMain.Instance().reportException(e);
         }
 
         clearSelection();
@@ -485,8 +485,8 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         logger.error("Should be saving and using undo system");
 
-//        TalosMain.Instance().ProjectController().setDirty();
-        TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
+        app.dataModified();
+        // TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
     public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float x, float y) {
@@ -871,7 +871,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void wrapperClickedUp (ModuleWrapper wrapper) {
 
         if (wasWrapperDragged != null) {
-//            TalosMain.Instance().ProjectController().setDirty();
+              app.dataModified();
         } else {
             // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
             if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -920,7 +920,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         logger.error("Should be saving and using undo system");
 
-//        TalosMain.Instance().ProjectController().setDirty();
+        app.dataModified();
     }
 
     public void ungroupSelectedWrappers () {

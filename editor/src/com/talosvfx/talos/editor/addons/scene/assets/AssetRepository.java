@@ -974,10 +974,16 @@ public class AssetRepository implements Observer {
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
 		saveStrategyObjectMap.put(GameAssetType.PREFAB, this::serializePrefab);
 		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
+		saveStrategyObjectMap.put(GameAssetType.VFX, this::serializeVFX);
 	}
 
 	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
 		RoutineStageData resource = gameAsset.getResource();
+		return json.prettyPrint(resource);
+	}
+
+	private String serializeVFX (GameAsset<VFXProjectData> gameAsset, Json json) {
+		VFXProjectData resource = gameAsset.getResource();
 		return json.prettyPrint(resource);
 	}
 

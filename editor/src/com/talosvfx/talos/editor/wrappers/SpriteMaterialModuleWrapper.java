@@ -58,7 +58,7 @@ public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<Sprite
     @Override
     protected void configureSlots() {
 
-        defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
+        defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
 
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin()) {
             @Override
@@ -72,7 +72,7 @@ public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<Sprite
 
         addOutputSlot("output", MaterialModule.MATERIAL_MODULE);
 
-        assetNameLabel = new Label("fire", getSkin());
+        assetNameLabel = new Label("white", getSkin());
 
         contentWrapper.add(assetNameLabel).padLeft(10).colspan(2).expand().fill().row();
 

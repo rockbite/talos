@@ -43,13 +43,13 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     protected TextureDropWidget<AbstractModule> dropWidget;
     protected TextureRegion defaultRegion;
 
-    protected String regionName = "fire";
+    protected String regionName = "white";
     protected String filePath = null;
 
     @Override
     protected void configureSlots() {
         final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
-        defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
+        defaultRegion = projectAssetProvider.findAsset("white", TextureRegion.class);
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
 

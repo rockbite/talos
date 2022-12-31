@@ -1,17 +1,13 @@
 package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -94,6 +90,10 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 				Stage stage = moduleGraphUIWrapper.getStage();
 			}
 		};
+	}
+
+	private void saveProjectToData(VFXProjectData projectData) {
+		projectData.setFrom(moduleBoardWidget);
 	}
 
 	private void loadProject (VFXProjectData projectData) {
@@ -259,6 +259,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	}
 
 	public void dataModified() {
+		saveProjectToData(gameAsset.getResource());
 		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
 		gameAsset.setUpdated();
 	}

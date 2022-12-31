@@ -29,7 +29,7 @@ public class SpriteMaterialModule extends MaterialModule {
 
 	private DrawableValue userDrawable;
 
-	public String regionName;
+	public String regionName = "white";
 
 	private ModuleValue<SpriteMaterialModule> moduleOutput;
 
