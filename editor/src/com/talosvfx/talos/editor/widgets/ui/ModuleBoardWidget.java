@@ -34,8 +34,12 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
@@ -48,6 +52,7 @@ import org.slf4j.Logger;
 public class ModuleBoardWidget extends WidgetGroup {
 
     private static Logger logger = LoggerFactory.getLogger(ModuleBoardWidget.class);
+    private final ParticleNodeEditorApp app;
     ShapeRenderer shapeRenderer;
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
@@ -80,8 +85,10 @@ public class ModuleBoardWidget extends WidgetGroup {
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
 
-    public ModuleBoardWidget () {
+    public ModuleBoardWidget (ParticleNodeEditorApp app) {
         super();
+
+        this.app = app;
 
         setTouchable(Touchable.enabled);
 
@@ -101,7 +108,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             public boolean keyUp (InputEvent event, int keycode) {
                 if (event.isHandled()) return super.keyUp(event, keycode);
                 if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    deleteSelectedWrappers();
+                    //deleteSelectedWrappers();
                 }
                 return super.keyUp(event, keycode);
             }
@@ -449,7 +456,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         uiStage.screenToStageCoordinates(vec);
 
         TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
-
     }
 
     public void deleteSelectedWrappers () {
@@ -493,7 +499,8 @@ public class ModuleBoardWidget extends WidgetGroup {
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(currentEmitterGraph);
 
-//                TalosMain.Instance().ProjectController().setDirty();
+                // save here
+                app.dataModified();
 
                 return (U) moduleWrapper;
             } else {
@@ -741,11 +748,15 @@ public class ModuleBoardWidget extends WidgetGroup {
             // show popup (but maybe not in case of removing of existing curve)
             if (activeCurve.getFrom().dst(activeCurve.getTo()) > 20 && !ccCurrentlyRemoving) {
                 final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-                (TalosMain.Instance().UIStage().getStage().getViewport()).unproject(vec);
+
+
+
                 ccFromWrapper = currentWrapper;
                 ccFromSlot = currentSlot;
                 ccCurrentIsInput = currentIsInput;
-                TalosMain.Instance().UIStage().createModuleListAdvancedPopup(vec);
+
+                showPopup();
+                //TalosMain.Instance().UIStage().createModuleListAdvancedPopup(vec);
             }
         } else {
             // yay we are connecting

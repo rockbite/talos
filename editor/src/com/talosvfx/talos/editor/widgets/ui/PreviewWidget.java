@@ -120,6 +120,11 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 	}
 
+	@Override
+	protected boolean canMoveAround() {
+		return true;
+	}
+
 	private void initListeners () {
 		inputListener = new InputListener() {
 

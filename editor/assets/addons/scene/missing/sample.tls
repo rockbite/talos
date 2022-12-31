@@ -249,11 +249,6 @@
 				"moduleFrom": 7,
 				"moduleTo": 1,
 				"slotTo": 7
-			},
-			{
-				"moduleFrom": 8,
-				"moduleTo": 1,
-				"slotTo": 2
 			}
 		]
 	}

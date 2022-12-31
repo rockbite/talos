@@ -56,10 +56,16 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	public ParticleNodeEditorApp () {
 		this.singleton = false;
 
-		moduleBoardWidget = new ModuleBoardWidget();
+		moduleBoardWidget = new ModuleBoardWidget(this);
 
-		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
+		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget) {
+			@Override
+			protected boolean canMoveAround() {
+				return true;
+			}
+		};
 		moduleGraphUIWrapper.disableListeners();
+		moduleGraphUIWrapper.panRequiresSpace(false);
 
 		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
 
@@ -100,6 +106,9 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 				if (Sprite.class.isAssignableFrom(clazz)) {
 					GameAsset<Texture> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+					if(gameAsset.getResource() == null) {
+						gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
+					}
 					return (T)new Sprite(gameAsset.getResource());
 				}
 
@@ -247,6 +256,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		prefs.cameraPos = moduleGraphUIWrapper.getCameraPos();
 		prefs.cameraZoom = moduleGraphUIWrapper.getCameraZoom();
 		return prefs;
+	}
+
+	public void dataModified() {
+		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+		gameAsset.setUpdated();
 	}
 }
 
