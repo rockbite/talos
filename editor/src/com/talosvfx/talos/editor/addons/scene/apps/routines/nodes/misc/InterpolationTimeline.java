@@ -1,8 +1,14 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AsyncRoutineNodeWidget;
@@ -12,6 +18,9 @@ public class InterpolationTimeline extends Table {
     private final AsyncRoutineNodeWidget asyncRoutineNodeWidget;
     private Group container = new Group();
     private ObjectMap<Object, Image> progressMap = new ObjectMap<>();
+    private Interpolation interpolation = Interpolation.linear;
+
+    private Image chartImage;
 
     public InterpolationTimeline(AsyncRoutineNodeWidget asyncRoutineNodeWidget, Skin skin) {
         super(skin);
@@ -21,6 +30,10 @@ public class InterpolationTimeline extends Table {
 
         setBackground(getSkin().getDrawable("timelinebg"));
 
+        chartImage = new Image();
+        chartImage.setFillParent(true);
+
+        addActor(chartImage);
         addActor(container);
     }
 
@@ -74,5 +87,36 @@ public class InterpolationTimeline extends Table {
     @Override
     public float getPrefHeight() {
         return 58;
+    }
+
+    public void setInterpolation(Interpolation interpolation) {
+        this.interpolation = interpolation;
+
+        buildChart();
+    }
+
+    private void buildChart() {
+        float width = 200;
+        float height = 58;
+        int res = 50;
+        Pixmap pixmap = new Pixmap((int)width, 58, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.valueOf("18db66ff"));
+
+        float margin = 0.2f;
+
+        Vector2 prev = new Vector2(0, height);
+        float result = interpolation.apply(0);
+        prev.set(0, (int) (height - (result*height*(1f-margin))- height * margin/2f));
+        for(int i = 1; i < res; i++) {
+            int posX = (int) (i * (width/res));
+            float a = (float)i/res;
+            result = interpolation.apply(a);
+            pixmap.drawLine((int) prev.x, (int) prev.y, posX, (int) (height - (result*height*(1f-margin))- height * margin/2f));
+            prev.set(posX, (int) (height - (result*height*(1f-margin))- height * margin/2f));
+        }
+
+        Texture texture = new Texture(pixmap);
+        TextureRegion region = new TextureRegion(texture);
+        chartImage.setDrawable(new TextureRegionDrawable(region));
     }
 }
