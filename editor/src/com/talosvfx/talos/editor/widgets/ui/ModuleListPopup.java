@@ -46,6 +46,7 @@ public class ModuleListPopup extends VisWindow {
     Vector2 createLocation = new Vector2();
 
     private ObjectMap<String, String> nameToModuleClass = new ObjectMap<>();
+    private ModuleBoardWidget moduleBoardWidget;
 
     public ModuleListPopup(XmlReader.Element root) {
         super("Add Module", "module-list");
@@ -101,11 +102,7 @@ public class ModuleListPopup extends VisWindow {
                     try {
                         Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
-
-
-
-                            logger.info("Creat emodule impl redo");
-//                            TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
+                            moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
@@ -157,7 +154,9 @@ public class ModuleListPopup extends VisWindow {
         WrapperRegistry.reg(EmitterModule.class, EmitterModuleWrapper.class);
     }
 
-    public void showPopup(Stage stage, Vector2 location) {
+    public void showPopup(Stage stage, Vector2 location, ModuleBoardWidget moduleBoardWidget) {
+        this.moduleBoardWidget = moduleBoardWidget;
+
         setPosition(location.x, location.y - getHeight());
         if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
         ActorUtils.keepWithinStage(stage, this);

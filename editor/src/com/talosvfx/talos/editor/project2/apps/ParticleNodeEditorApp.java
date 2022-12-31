@@ -61,6 +61,8 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
 		moduleGraphUIWrapper.disableListeners();
 
+		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
+
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
 			@Override
 			public Actor getMainContent () {
