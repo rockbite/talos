@@ -69,6 +69,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 timelineWidget.setInterpolation(InterpolationLibrary.get(interpolationSelectBox.getValue()));
+                reportNodeDataModified();
             }
         });
 

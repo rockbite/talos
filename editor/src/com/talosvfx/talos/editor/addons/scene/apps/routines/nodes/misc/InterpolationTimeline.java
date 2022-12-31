@@ -32,6 +32,7 @@ public class InterpolationTimeline extends Table {
 
         chartImage = new Image();
         chartImage.setFillParent(true);
+        chartImage.setPosition(1, 0);
 
         addActor(chartImage);
         addActor(container);
@@ -102,7 +103,7 @@ public class InterpolationTimeline extends Table {
         Pixmap pixmap = new Pixmap((int)width, 58, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.valueOf("18db66ff"));
 
-        float margin = 0.2f;
+        float margin = 0.5f;
 
         Vector2 prev = new Vector2(0, height);
         float result = interpolation.apply(0);

@@ -16,6 +16,8 @@ public class SelectWidget extends AbstractWidget<String> {
     private ObjectMap<String, String> titleMap = new ObjectMap<>();
     private ObjectMap<String, String> keyMap = new ObjectMap<>();
 
+    private boolean lockEvents = false;
+
     @Override
     public void init(Skin skin) {
         super.init(skin);
@@ -34,7 +36,9 @@ public class SelectWidget extends AbstractWidget<String> {
         selectBox.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent changeEvent, Actor actor) {
-               fireChangedEvent();
+                if(!lockEvents) {
+                    fireChangedEvent();
+                }
             }
         });
     }
@@ -59,8 +63,9 @@ public class SelectWidget extends AbstractWidget<String> {
             titleMap.put(option, option);
             keyMap.put(option, option);
         }
-
+        lockEvents = true;
         selectBox.setItems(options);
+        lockEvents = false;
     }
 
     public void setOptions(String[] options) {
@@ -69,7 +74,9 @@ public class SelectWidget extends AbstractWidget<String> {
             keyMap.put(option, option);
         }
 
+        lockEvents = true;
         selectBox.setItems(options);
+        lockEvents = false;
     }
 
     @Override
@@ -82,7 +89,9 @@ public class SelectWidget extends AbstractWidget<String> {
     }
 
     public void setValue(String value) {
+        lockEvents = true;
         selectBox.setSelected(keyMap.get(value));
+        lockEvents = false;
     }
 
     @Override
