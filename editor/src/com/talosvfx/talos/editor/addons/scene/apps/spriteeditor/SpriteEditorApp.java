@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
@@ -26,7 +27,7 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
                 metaData.borderData[2] = top;
                 metaData.borderData[3] = bottom;
 
-                // TODO: 05.12.22 Save to medatada file 
+                AssetRepository.getInstance().saveMetaDataToFile(metaData);
             }
         });
         DummyLayoutApp spriteEditorApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
