@@ -112,7 +112,7 @@ public class TransformGizmo extends Gizmo {
             return;
         }
 
-        float size = 30 * worldPerPixel;
+        float size = 60 * worldPerPixel;
         rectangle.set(getX() - size / 2f, getY() - size / 2f, size, size);
     }
 

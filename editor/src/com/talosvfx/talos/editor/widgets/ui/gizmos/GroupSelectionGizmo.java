@@ -47,6 +47,8 @@ public class GroupSelectionGizmo extends Gizmo {
 
 	@Override
 	public boolean hit (float x, float y) {
+		if(selectionBounds.getHeight() == 0 || selectionBounds.getWidth() == 0) return false;
+
 		return selectionBounds.contains(new Vector3(x, y, 0));
 	}
 

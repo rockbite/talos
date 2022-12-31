@@ -739,8 +739,11 @@ public abstract class ViewportWidget extends Table {
 		});
 
 		for (Gizmo gizmo : gizmos.gizmoList) {
-			if (gizmo.hit(x, y))
+
+			if(!(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) continue;
+			if (gizmo.hit(x, y)) {
 				return gizmo;
+			}
 		}
 
 		return null;
@@ -1247,7 +1250,13 @@ public abstract class ViewportWidget extends Table {
 	protected void setSelection (Array<GameObject> gameObjects) {
 		selection.clear();
 
-		selection.addAll(gameObjects);
+		// do not select locked GO's here
+		for (GameObject gameObject : gameObjects) {
+			if(!gameObject.isEditorTransformLocked()) {
+				selection.add(gameObject);
+			}
+		}
+
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 

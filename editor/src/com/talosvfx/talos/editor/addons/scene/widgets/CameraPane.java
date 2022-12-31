@@ -31,7 +31,7 @@ public class CameraPane extends Actor implements Observer {
     private GameObject cameraObject;
 
     public CameraPane () {
-        title = new Label("qaqov tolma", SharedResources.skin);
+        title = new Label("", SharedResources.skin);
         bg = new Image(SharedResources.skin.getDrawable("window"));
 
         cameraPreview = new CameraPreview();
