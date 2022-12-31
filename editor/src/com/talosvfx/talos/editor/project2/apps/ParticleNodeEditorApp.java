@@ -1,8 +1,10 @@
 package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -18,6 +20,9 @@ import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.GroupData;
@@ -32,9 +37,10 @@ import com.talosvfx.talos.runtime.assets.AssetProvider;
 
 import java.util.Comparator;
 
-public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
+public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences> {
 
 	private final ModuleBoardWidget moduleBoardWidget;
+	private final GenericStageWrappedViewportWidget moduleGraphUIWrapper;
 
 	private Comparator<ParticleEmitterWrapper> emitterComparator = new Comparator<ParticleEmitterWrapper>() {
 		@Override
@@ -52,7 +58,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 		moduleBoardWidget = new ModuleBoardWidget();
 
-		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
+		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
 		moduleGraphUIWrapper.disableListeners();
 
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
@@ -210,7 +216,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 		loadProject(gameAsset.getResource());
 
-
+		TalosLocalPrefs.getAppPrefs(gameAsset, this);
 	}
 
 	@Override
@@ -225,6 +231,20 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 	@Override
 	public void onRemove () {
 
+	}
+
+	@Override
+	public void applyFromPreferences(ViewportPreferences prefs) {
+		moduleGraphUIWrapper.setCameraPos(prefs.cameraPos);
+		moduleGraphUIWrapper.setCameraZoom(prefs.cameraZoom);
+	}
+
+	@Override
+	public ViewportPreferences getPrefs() {
+		ViewportPreferences prefs = new ViewportPreferences();
+		prefs.cameraPos = moduleGraphUIWrapper.getCameraPos();
+		prefs.cameraZoom = moduleGraphUIWrapper.getCameraZoom();
+		return prefs;
 	}
 }
 
