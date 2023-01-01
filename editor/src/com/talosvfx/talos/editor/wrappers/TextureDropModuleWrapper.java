@@ -109,7 +109,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                 filePath = filePath + ".png";
             }
         }
-    
+
+        /*
         final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
         final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
@@ -118,7 +119,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
         } else {
             //TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
-        }
+        }*/
     }
 
     @Override

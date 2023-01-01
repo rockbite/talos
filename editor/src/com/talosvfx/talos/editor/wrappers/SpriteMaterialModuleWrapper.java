@@ -16,24 +16,25 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
-import com.talosvfx.talos.editor.widgets.TextureDropWidget;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
 import com.talosvfx.talos.runtime.modules.MaterialModule;
 import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
-import com.talosvfx.talos.runtime.modules.TextureModule;
 
-public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<SpriteMaterialModule> {
+public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialModule> {
 
     private Label assetNameLabel;
+    private AssetSelector<Texture> selector;
+
+    private GameAsset<Texture> asset;
 
     public SpriteMaterialModuleWrapper() {
         super();
@@ -41,7 +42,7 @@ public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<Sprite
 
     @Override
     public void setModuleToDefaults () {
-        module.regionName = "fire";
+        module.assetIdentifier = "white";
     }
 
     @Override
@@ -50,46 +51,37 @@ public class SpriteMaterialModuleWrapper extends TextureDropModuleWrapper<Sprite
     }
 
     @Override
-    public void setModuleRegion (String name, Sprite region) {
-        module.setRegion(name, region);
-        assetNameLabel.setText(name);
-    }
-
-    @Override
     protected void configureSlots() {
 
-        defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("white.png")));
+        addOutputSlot("", MaterialModule.MATERIAL_MODULE);
 
-        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin()) {
+        asset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
+
+        selector = new AssetSelector<>("sprite", GameAssetType.SPRITE);
+        selector.setValue(asset);
+        contentWrapper.add(selector).growX().right().expandX();
+
+        selector.addListener(new ChangeListener() {
             @Override
-            public void onTextureSelected (TemporaryTextureSelectDialog.TextureSelection textureSelection) {
-                super.onTextureSelected(textureSelection);
-                final Texture texture = textureSelection.getTexture();
-                final Sprite sprite = new Sprite(texture);
-                setModuleRegion(textureSelection.getInternalAssetPath(), sprite);
+            public void changed(ChangeEvent event, Actor actor) {
+                asset = selector.getValue();
+                module.setAsset(asset.nameIdentifier);
             }
-        };
-
-        addOutputSlot("output", MaterialModule.MATERIAL_MODULE);
-
-        assetNameLabel = new Label("white", getSkin());
-
-        contentWrapper.add(assetNameLabel).padLeft(10).colspan(2).expand().fill().row();
-
-        contentWrapper.add(dropWidget).size(50).left().padLeft(10);
-        contentWrapper.add().expandX();
-
+        });
     }
 
 
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeValue("asset", asset.nameIdentifier);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
+        String identifier = jsonData.getString("asset", "white");
+        asset = AssetRepository.getInstance().getAssetForIdentifier(identifier, GameAssetType.SPRITE);
     }
 
 }
