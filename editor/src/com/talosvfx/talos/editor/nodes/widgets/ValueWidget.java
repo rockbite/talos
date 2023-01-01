@@ -159,7 +159,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
                 float change = diff * localStep;
 
-                setValue(value + change);
+                setValue(value + change, true);
 
                 lastPos = x;
 

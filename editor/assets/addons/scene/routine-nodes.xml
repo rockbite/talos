@@ -53,6 +53,17 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "SizeToNode" title = "Size To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
+            </group>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "StaggerNode" title = "Stagger" keywords = "tween" class = "RoutineNodeWidget">
             <select name="strategy">
                 <option value = "INDEX">By Index</option>
