@@ -33,6 +33,14 @@ public class SpawnSpriteNode extends RoutineNode {
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
             target.addGameObject(go);
 
+            spriteRendererComponent.size.x = fetchFloatValue("width");
+            spriteRendererComponent.size.y = fetchFloatValue("height");
+
+            String mode = fetchStringValue("mode");
+            if(mode == null) mode = "simple";
+
+            spriteRendererComponent.renderMode = SpriteRendererComponent.RenderMode.simple.valueOf(mode);
+
             Color color = fetchColorValue("color");
             spriteRendererComponent.color.set(color);
 

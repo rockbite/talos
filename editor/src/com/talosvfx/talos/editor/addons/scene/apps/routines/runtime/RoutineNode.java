@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
+import lombok.Getter;
 
 public abstract class RoutineNode {
 
@@ -18,6 +19,8 @@ public abstract class RoutineNode {
 
     protected boolean nodeDirty = false;
     protected JsonValue propertiesJson;
+    @Getter
+    protected boolean configured = false;
 
     public enum DataType {
         NUMBER,
@@ -77,7 +80,7 @@ public abstract class RoutineNode {
         updateListener = new GameAsset.GameAssetUpdateListener() {
             @Override
             public void onUpdate () {
-                RoutineNode.this.routineInstanceRef.isDirty = true;
+                RoutineNode.this.routineInstanceRef.setDirty();
                 RoutineNode.this.nodeDirty = true;
             }
         };
@@ -93,12 +96,15 @@ public abstract class RoutineNode {
 
         //todo: fix later?
         this.propertiesJson = nodeData.get("properties");
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                configureNode(propertiesJson);
-            }
-        });
+        configureNode(propertiesJson);
+        if(!configured) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    configureNode(propertiesJson); // try again next time
+                }
+            });
+        }
 
         uniqueId = nodeData.getInt("id");
     }
@@ -184,6 +190,8 @@ public abstract class RoutineNode {
                 port.setValueFromString(properties.getString(name));
             }
         }
+
+        configured = true;
     }
 
 

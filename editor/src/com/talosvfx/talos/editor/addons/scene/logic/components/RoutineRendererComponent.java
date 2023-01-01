@@ -151,7 +151,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     propertyWrapper.isValueOverridden = true;
-                    RoutineRendererComponent.this.routineInstance.isDirty = true;
+                    RoutineRendererComponent.this.routineInstance.setDirty();
                 }
             });
             generate.setParent(this);

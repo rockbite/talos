@@ -98,6 +98,11 @@
             </group>
             <color port="input" name="color" type="color">Color: </color>
             <checkbox name="aspect" default = "true">Force Aspect Ratio</checkbox>
+            <select name="mode">
+                <option value = "simple">Simple</option>
+                <option value = "sliced">Sliced</option>
+                <option value = "tiled">Tiled</option>
+            </select>
             <value port="input" name="layerOrder" type="int">Layer order</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
@@ -160,6 +165,10 @@
                 <value port="input" name="origin" type="vec2">Origin: </value>
                 <color port="input" name="color" type="color">Color: </color>
             </group>
+            <select name="mode">
+                <option value = "simple">Simple</option>
+                <option value = "sliced">Sliced</option>
+            </select>
         </module>
         <module name = "Vector2Split" title = "Vector2 Split" keywords = "" class = "RoutineNodeWidget">
             <group>

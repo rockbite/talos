@@ -39,7 +39,10 @@ public class RoutineInstance {
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
-    public transient boolean isDirty = true;
+    @Getter
+    private transient boolean isDirty = true;
+
+    public boolean configured = false;
 
     @Getter
     private Array<PropertyWrapper<?>> parentPropertyWrappers;
@@ -84,6 +87,15 @@ public class RoutineInstance {
 
     public void removeListener() {
         listener = null;
+    }
+
+    public void setDirty() {
+        configured = false;
+        this.isDirty = true;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.isDirty = dirty;
     }
 
     public static class RoutineListenerAdapter implements RoutineListener {
@@ -261,8 +273,10 @@ public class RoutineInstance {
     }
 
     public void tick(float delta) {
-        for(TickableNode node: tickableNodes) {
-            node.tick(delta);
+        if(checkConfigured()) {
+            for (TickableNode node : tickableNodes) {
+                node.tick(delta);
+            }
         }
     }
 
@@ -277,5 +291,19 @@ public class RoutineInstance {
         if(listener != null) {
             listener.onInputFetched(nodeId, portName);
         }
+    }
+
+    public boolean checkConfigured() {
+        if(!configured) {
+            for (IntMap.Entry<RoutineNode> entry : lowLevelLookup) {
+                if(!entry.value.isConfigured()) {
+                    return false;
+                }
+            }
+
+            configured = true;
+        }
+
+        return true;
     }
 }

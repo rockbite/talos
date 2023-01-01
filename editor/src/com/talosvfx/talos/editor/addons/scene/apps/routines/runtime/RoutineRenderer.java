@@ -3,17 +3,22 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RenderRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 import java.util.Comparator;
 
@@ -24,6 +29,8 @@ public class RoutineRenderer {
     private float renderCoolDown = 0f;
     private TextureRegion textureRegion = new TextureRegion();
 
+
+    private static ObjectMap<Texture, NinePatch> patchCache = new ObjectMap<>();
 
     public RoutineRenderer () {
         zComparator = new Comparator<DrawableQuad>() {
@@ -51,6 +58,8 @@ public class RoutineRenderer {
 
     public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject, RoutineRendererComponent routineRendererComponent) {
         RoutineInstance routineInstance = routineRendererComponent.routineInstance;
+        boolean configured = routineInstance.checkConfigured();
+
         Vector2 viewportSize = routineRendererComponent.viewportSize;
 
         TransformComponent transform = gameObject.getComponent(TransformComponent.class);
@@ -59,7 +68,7 @@ public class RoutineRenderer {
 
         boolean reset = false;
 
-        if(renderCoolDown <= 0f && routineInstance.isDirty) {
+        if(renderCoolDown <= 0f && routineInstance.isDirty()) {
             renderCoolDown = routineRendererComponent.cacheCoolDown;
             reset = true;
         }
@@ -86,32 +95,73 @@ public class RoutineRenderer {
 
             renderRoutineNode.position.set(transform.position);
 
+            if(!configured) {
+                reset = false;
+            }
+
             if(reset) {
                 routineInstance.clearMemory();
                 renderRoutineNode.receiveSignal("startSignal");
                 routineInstance.drawableQuads.sort(zComparator);
-                routineInstance.isDirty = false;
+                routineInstance.setDirty(false);
             }
 
             for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
-                boolean aspect = drawableQuad.aspect;
-                float scl = (float)drawableQuad.texture.getWidth() / drawableQuad.texture.getHeight();
-                float width = drawableQuad.size.x;
-                float height = drawableQuad.size.y;
-                if(aspect) {
-                    height = width / scl;
-                }
+                if(drawableQuad.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+                    drawSliced(batch, drawableQuad);
+                } else {
+                    boolean aspect = drawableQuad.aspect;
+                    float scl = (float) drawableQuad.texture.getWidth() / drawableQuad.texture.getHeight();
+                    float width = drawableQuad.size.x;
+                    float height = drawableQuad.size.y;
+                    if (aspect) {
+                        height = width / scl;
+                    }
 
-                textureRegion.setRegion(drawableQuad.texture);
-                batch.setColor(drawableQuad.color);
-                batch.draw(textureRegion,
-                        drawableQuad.position.x, drawableQuad.position.y,
-                        0.5f, 0.5f,
-                        width, height,
-                        1, 1,
-                        drawableQuad.rotation);
-                batch.setColor(Color.WHITE);
+                    textureRegion.setRegion(drawableQuad.texture);
+                    batch.setColor(drawableQuad.color);
+                    batch.draw(textureRegion,
+                            drawableQuad.position.x, drawableQuad.position.y,
+                            0.5f, 0.5f,
+                            width, height,
+                            1, 1,
+                            drawableQuad.rotation);
+                    batch.setColor(Color.WHITE);
+                }
             }
+        }
+    }
+
+    private void drawSliced(Batch batch, DrawableQuad drawableQuad) {
+        SpriteMetadata metadata = drawableQuad.metadata;
+        Texture texture = drawableQuad.texture;
+        NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
+
+        float width = drawableQuad.size.x;
+        float height = drawableQuad.size.y;
+
+        float xSign = width < 0 ? -1 : 1;
+        float ySign = height < 0 ? -1 : 1;
+
+        float pivotX = 0.5f;
+        float pivotY = 0.5f;
+
+        patch.draw(batch,
+                drawableQuad.position.x, drawableQuad.position.y,
+                pivotX * width * xSign, pivotY * height * ySign,
+                Math.abs(width), Math.abs(height),
+                xSign, ySign,
+                drawableQuad.rotation);
+    }
+
+    private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
+        if(patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
+            return patchCache.get(texture);
+        } else {
+            NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+            patch.scale(1/metadata.pixelsPerUnit, 1/metadata.pixelsPerUnit); // fix this later
+            patchCache.put(texture, patch);
+            return patch;
         }
     }
 }

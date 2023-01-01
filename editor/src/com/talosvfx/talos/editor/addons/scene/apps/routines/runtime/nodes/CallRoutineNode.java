@@ -30,17 +30,22 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
     protected void configureNode(JsonValue properties) {
         // pre construct the custom part before configuring from values?
         // todo: IMPORTANT ASSET IS NOT LOADED YET, we do Runnable hack :/
+        GameAsset<RoutineStageData> asset = null;
         for(JsonValue item: properties) {
             if(item.has("type") && item.getString("type").equals("ROUTINE")) {
                 String name = item.name;
                 String routineAssetId = item.getString("id");
                 //TODO: this needs to be done in a "runtime" friendly way, leaving this task for another time
-                GameAsset<RoutineStageData> asset = AssetRepository.getInstance().getAssetForIdentifier(routineAssetId, GameAssetType.ROUTINE);
-                customConstruction(asset);
+                asset = AssetRepository.getInstance().getAssetForIdentifier(routineAssetId, GameAssetType.ROUTINE);
+                if(asset != null) {
+                    customConstruction(asset);
+                }
             }
         }
 
         super.configureNode(properties);
+
+        configured = false;
     }
 
     public void customConstruction(GameAsset<RoutineStageData> asset) {

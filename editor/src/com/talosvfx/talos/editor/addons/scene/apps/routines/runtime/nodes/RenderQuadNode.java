@@ -7,6 +7,10 @@ import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 
 public class RenderQuadNode extends RoutineNode {
 
@@ -25,9 +29,21 @@ public class RenderQuadNode extends RoutineNode {
         drawableQuad.size.set(width, height);
 
         GameAsset<Texture> asset = fetchAssetValue("sprite");
-        if (asset == null) {
+
+        if (asset == null || asset.getRootRawAsset() == null) {
             return;
         }
+
+        RawAsset rawAsset = asset.getRootRawAsset();
+        AMetadata metaData = rawAsset.metaData;
+        if (metaData instanceof SpriteMetadata) {
+            SpriteMetadata sData = (SpriteMetadata) metaData;
+            if(sData.borderData != null) {
+                // this is a nine patch;
+                drawableQuad.metadata = sData;
+            }
+        }
+
         Texture resource = asset.getResource();
         if (resource == null) {
             return;
@@ -40,6 +56,9 @@ public class RenderQuadNode extends RoutineNode {
             drawableQuad.color = Color.WHITE;
         }
         drawableQuad.aspect = fetchBooleanValue("aspect");
+        String mode = fetchStringValue("mode");
+        if(mode == null) mode = "simple";
+        drawableQuad.renderMode = SpriteRendererComponent.RenderMode.simple.valueOf(mode);
 
         routineInstanceRef.drawableQuads.add(drawableQuad);
     }

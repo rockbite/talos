@@ -218,7 +218,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
 
         if (setRoutineDirty) {
-            routineInstance.isDirty = true;
+            routineInstance.setDirty();
             routineUpdated();
         }
     }
