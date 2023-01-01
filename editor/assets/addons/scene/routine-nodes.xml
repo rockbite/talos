@@ -134,6 +134,10 @@
                 <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
                 <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
             </group>
+            <group>
+                <dynamicValue port="input" name="width" type="float" step="0.1">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" step="0.1">Height: </dynamicValue>
+            </group>
             <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step = "1" progress="true">Rotation: </dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>

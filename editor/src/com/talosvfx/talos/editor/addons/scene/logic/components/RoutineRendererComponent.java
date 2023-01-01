@@ -21,7 +21,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData> {
+public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData>, ISizableComponent {
 
     GameAsset<RoutineStageData> routineResource;
 
@@ -200,5 +200,25 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {
         return false;
+    }
+
+    @Override
+    public float getWidth() {
+        return viewportSize.x;
+    }
+
+    @Override
+    public float getHeight() {
+        return viewportSize.y;
+    }
+
+    @Override
+    public void setWidth(float width) {
+        viewportSize.x = width;
+    }
+
+    @Override
+    public void setHeight(float height) {
+        viewportSize.y = height;
     }
 }

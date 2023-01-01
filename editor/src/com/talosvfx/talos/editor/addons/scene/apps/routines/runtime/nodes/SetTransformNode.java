@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.ISizableComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 
 public class SetTransformNode extends RoutineNode {
@@ -20,6 +21,12 @@ public class SetTransformNode extends RoutineNode {
             component.rotation = fetchFloatValue("rotation");
             component.pivot.x = fetchFloatValue("pivotX");
             component.pivot.y = fetchFloatValue("pivotY");
+
+            ISizableComponent sizeComponent = go.findComponent(ISizableComponent.class);
+            if(sizeComponent != null) {
+                sizeComponent.setWidth(fetchFloatValue("width"));
+                sizeComponent.setHeight(fetchFloatValue("height"));
+            }
 
             sendSignal("onComplete");
         }

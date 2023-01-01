@@ -352,6 +352,16 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return null;
     }
 
+    public <T> T findComponent (Class<T> clazz) {
+        for (AComponent component : components) {
+            if (clazz.isAssignableFrom(component.getClass())) {
+                return (T) component;
+            }
+        }
+        return null;
+
+    }
+
     public <T extends AComponent> T getComponent (Class<? extends T> clazz) {
         return (T) componentClasses.get(clazz);
     }
