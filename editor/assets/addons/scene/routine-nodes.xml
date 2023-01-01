@@ -12,6 +12,7 @@
             <value port="input" name="startSignal" type="signal">execute</value>
             <asset name="asset" type="ROUTINE">scene</asset>
             <container name="customParams"></container>
+            <checkbox name="payloadOverride" default = "false">Override Payload</checkbox>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "CompleteRoutineNode" title = "Complete Routine" keywords = "tween, system" class = "RoutineNodeWidget">
