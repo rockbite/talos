@@ -780,7 +780,7 @@ public abstract class ViewportWidget extends Table {
 				float currentZoom = viewportViewSettings.getZoom();
 				float stepScale = zoomStepScale(currentZoom, minZoom, maxZoom);
 				currentZoom += amountY * stepScale;
-				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
+				currentZoom = MathUtils.clamp(currentZoom, minZoom, 10);
 				viewportViewSettings.setZoom(currentZoom);
 
 				if (amountY < 0 && !scrolledInFrame && !viewportViewSettings.is3D()) {
@@ -1073,7 +1073,7 @@ public abstract class ViewportWidget extends Table {
 	}
 
 
-	protected void setWorldSize (float worldWidth) {
+	public void setWorldSize (float worldWidth) {
 		this.viewportViewSettings.setWorldWidth(worldWidth);
 		this.worldWidth = worldWidth;
 		updateNumbers();

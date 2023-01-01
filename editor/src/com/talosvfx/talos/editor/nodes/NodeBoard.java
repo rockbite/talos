@@ -531,7 +531,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		to.attachNodeToMyInput(from, slotTo, slotFrom);
 
 		updateSaveState();
-		updateSaveState();
 
 //        TalosMain.Instance().ProjectController().setDirty();
 

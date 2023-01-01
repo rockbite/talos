@@ -39,6 +39,8 @@ public class RoutineExecutorNode extends RoutineNode {
         String title = val != null ? (String) val : "";
 
         routineInstanceRef.getCustomLookup().put(title, this);
+
+        configured = true;
     }
 
     public String getTitle() {

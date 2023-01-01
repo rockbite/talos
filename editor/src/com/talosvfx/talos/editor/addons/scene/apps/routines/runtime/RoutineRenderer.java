@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererCo
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 
 import java.util.Comparator;
 
@@ -101,6 +102,12 @@ public class RoutineRenderer {
 
             if(reset) {
                 routineInstance.clearMemory();
+                routineInstance.getProperties().clear();
+
+                for (PropertyWrapper<?> propertyWrapper : routineRendererComponent.propertyWrappers) {
+                    routineInstance.getProperties().put(propertyWrapper.propertyName, propertyWrapper);
+                }
+
                 renderRoutineNode.receiveSignal("startSignal");
                 routineInstance.drawableQuads.sort(zComparator);
                 routineInstance.setDirty(false);
@@ -146,12 +153,14 @@ public class RoutineRenderer {
         float pivotX = 0.5f;
         float pivotY = 0.5f;
 
+        batch.setColor(drawableQuad.color);
         patch.draw(batch,
                 drawableQuad.position.x, drawableQuad.position.y,
                 pivotX * width * xSign, pivotY * height * ySign,
                 Math.abs(width), Math.abs(height),
                 xSign, ySign,
                 drawableQuad.rotation);
+        batch.setColor(Color.WHITE);
     }
 
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {

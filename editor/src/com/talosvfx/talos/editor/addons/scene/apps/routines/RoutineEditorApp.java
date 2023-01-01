@@ -24,6 +24,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
     public RoutineEditorApp() {
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
+
             @Override
             protected boolean canMoveAround() {
                 return true;

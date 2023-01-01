@@ -24,6 +24,9 @@ public class RoutineInstance {
 
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
 
+    @Getter
+    private ObjectMap<String, PropertyWrapper> properties = new ObjectMap<>();
+
     private Array<TickableNode> tickableNodes = new Array<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();

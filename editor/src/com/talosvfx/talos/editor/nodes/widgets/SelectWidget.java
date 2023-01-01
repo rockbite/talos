@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -90,6 +91,7 @@ public class SelectWidget extends AbstractWidget<String> {
 
     public void setValue(String value) {
         lockEvents = true;
+        selectBox.getSelection().setProgrammaticChangeEvents(false);
         selectBox.setSelected(keyMap.get(value));
         lockEvents = false;
     }

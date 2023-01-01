@@ -223,7 +223,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private void hideEditMode() {
         try {
-            setValue(Float.parseFloat(textField.getText()));
+            setValue(Float.parseFloat(textField.getText()), true);
         } catch (NumberFormatException exception) {
             // keep prev value
         }
@@ -277,7 +277,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
-        setValue(value, isChanged(value));
+        setValue(value, false);
     }
 
     public void setValue(float value, boolean notify) {
@@ -338,7 +338,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         setStep(step);
         setShowProgress(progress);
 
-        setValue(defaultValue);
+        setValue(defaultValue, false);
 
         setLabel(text);
     }

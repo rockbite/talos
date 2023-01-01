@@ -39,6 +39,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private Vector2 tmp = new Vector2();
 
     private float timeScale = 1f;
+    private boolean loading = false;
 
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
@@ -82,6 +83,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
+        loading = true;
         if (asset == null || asset.getResource() == null) return;
         reset();
 
@@ -89,6 +91,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
+        loading = false;
+    }
+
+    @Override
+    public void saveGameAsset() {
+        if(!loading) {
+            super.saveGameAsset();
+        }
     }
 
     private void setInstanceListeners() {
@@ -164,13 +174,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void routineUpdated () {
-        //todo: this isn't right
-        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
-        gameAsset.setUpdated();
-        data.setRoutineInstance(data.createInstance(true));
-        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+        if(!loading) {
+            //todo: this isn't right
+            AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
+            gameAsset.setUpdated();
+            data.setRoutineInstance(data.createInstance(true));
+            Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
-        setInstanceListeners();
+            setInstanceListeners();
+        }
     }
 
     @EventHandler
