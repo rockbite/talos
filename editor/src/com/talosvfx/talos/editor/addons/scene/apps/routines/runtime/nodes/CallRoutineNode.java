@@ -112,6 +112,9 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
             targetInstance.setListener(listener);
 
             String executorName = fetchStringValue("executorName");
+            if(fetchBooleanValue("payloadOverride")) {
+                targetInstance.setSignalPayload(routineInstanceRef.getSignalPayload());
+            }
             RoutineExecutorNode node = (RoutineExecutorNode) targetInstance.getCustomLookup().get(executorName);
             node.receiveSignal("startSignal");
         }

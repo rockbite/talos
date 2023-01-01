@@ -64,6 +64,8 @@ public class RoutineInstance {
         globalMap.clear();
         scopeNumbers.clear();
 
+        signalPayload = null;
+
         for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
             entry.value.reset();
         }

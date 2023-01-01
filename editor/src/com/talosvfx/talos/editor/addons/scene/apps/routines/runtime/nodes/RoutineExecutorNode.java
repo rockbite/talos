@@ -10,7 +10,9 @@ import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 public class RoutineExecutorNode extends RoutineNode {
 
-    String title;
+    private String title;
+
+    private Array<GameObject> gameObjects = new Array<>();
 
     @Override
     public void receiveSignal(String portName) {
@@ -18,10 +20,20 @@ public class RoutineExecutorNode extends RoutineNode {
 
         if(container == null) return;
 
-        String target = fetchStringValue("target");
-        if(target == null) target = "";
+        gameObjects.clear();
+        Object signalPayload = routineInstanceRef.getSignalPayload();
+        if(signalPayload != null && signalPayload instanceof GameObject) {
+            gameObjects.add((GameObject) signalPayload);
+        }
 
-        Array<GameObject> gameObjects = container.findGameObjects(target);
+        if(gameObjects.isEmpty()) {
+            String target = fetchStringValue("target");
+            if (target == null) {
+                gameObjects = container.findGameObjects("");
+            } else {
+                gameObjects = container.findGameObjects(target);
+            }
+        }
 
         routineInstanceRef.storeGlobal("executedTargets", gameObjects);
 
