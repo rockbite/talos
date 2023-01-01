@@ -42,6 +42,7 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +87,10 @@ public abstract class PreviewWidget extends ViewportWidget {
 	private String backgroundImagePath = "";
 	private float gridSize;
 	private VFXProjectData vfxProjectData;
+	@Getter
 	private ParticleEffectDescriptor descriptor;
+
+	@Getter
 	protected ParticleEffectInstance effectInstance;
 
 	public PreviewWidget () {

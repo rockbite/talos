@@ -46,6 +46,7 @@ import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
 import com.talosvfx.talos.runtime.*;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -57,7 +58,8 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
     public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
-    private ParticleEmitterWrapper currentEmitterWrapper;
+    public ParticleEmitterWrapper currentEmitterWrapper;
+    @Getter
     private ParticleEmitterDescriptor currentEmitterGraph;
     private ObjectSet<ModuleWrapper> selectedWrappers = new ObjectSet<>();
 
@@ -679,12 +681,6 @@ public class ModuleBoardWidget extends WidgetGroup {
     @Override
     public void layout () {
         super.layout();
-    }
-
-
-    @Deprecated
-    public ParticleEmitterDescriptor getCurrentEmitterGraph () {
-        return currentEmitterGraph;
     }
 
     public void setActiveCurve (float x, float y, float toX, float toY, boolean isInput) {

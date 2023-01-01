@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.project2.apps;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -12,8 +13,10 @@ import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
@@ -30,11 +33,13 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
+import lombok.Getter;
 
 import java.util.Comparator;
 
 public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences> {
 
+	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
 	private final GenericStageWrappedViewportWidget moduleGraphUIWrapper;
 
@@ -47,6 +52,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	ParticleEffectDescriptor particleEffectDescriptor;
 	ParticleEffectInstance particleEffect;
+	@Getter
 	private VFXEditorState editorState;
 
 	public ParticleNodeEditorApp () {
@@ -177,14 +183,13 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	}
 
-	private ParticleEmitterWrapper initEmitter (String emitterName) {
+	public ParticleEmitterWrapper initEmitter (String emitterName) {
 		ParticleEmitterWrapper emitterWrapper = new ParticleEmitterWrapper();
 		emitterWrapper.setName(emitterName);
 
 		ParticleEmitterDescriptor moduleGraph = particleEffectDescriptor.createEmitterDescriptor();
 		emitterWrapper.setModuleGraph(moduleGraph);
 
-//		particleEffect.addAdvancedEmitter(moduleGraph);
 		particleEffect.addEmitter(moduleGraph);
 
 		return emitterWrapper;
@@ -228,6 +233,13 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		loadProject(gameAsset.getResource());
 
 		TalosLocalPrefs.getAppPrefs(gameAsset, this);
+
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run() {
+				Notifications.fireEvent(Notifications.obtainEvent(VFXEditorActivated.class).set(gameAsset));
+			}
+		});
 	}
 
 	@Override
@@ -262,6 +274,10 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		saveProjectToData(gameAsset.getResource());
 		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
 		gameAsset.setUpdated();
+	}
+
+	public void resetToNew() {
+		// ?
 	}
 }
 
