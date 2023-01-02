@@ -67,8 +67,8 @@ public class RoutineInstance {
 
         signalPayload = null;
 
-        for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
-            entry.value.reset();
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            routineNodeEntry.value.reset();
         }
     }
 

@@ -45,4 +45,10 @@ public class PulsingNode extends RoutineNode implements TickableNode {
             }
         }
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        running = false;
+    }
 }

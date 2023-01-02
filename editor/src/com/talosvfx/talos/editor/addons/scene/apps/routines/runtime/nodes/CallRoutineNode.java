@@ -45,12 +45,18 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
         super.configureNode(properties);
 
-        configured = false;
+        if(!configured) {
+            configured = false;
+        }
     }
 
     public void customConstruction(GameAsset<RoutineStageData> asset) {
         //todo: ths should be done in a runtime friendly way
         RoutineStageData resource = asset.getResource();
+        if(resource == null) {
+            configured = false;
+            return;
+        }
         Array<PropertyWrapper<?>> propertyWrappers = resource.getPropertyWrappers();
 
         for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
@@ -132,10 +138,12 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
         super.reset();
         if(targetInstance != null) {
             targetInstance.reset();
-            listener.terminate();
+            if(listener != null) {
+                listener.terminate();
+            }
             targetInstance.removeListener();
 
-            targetInstance = null;
+            targetInstance.reset();
         }
     }
 }
