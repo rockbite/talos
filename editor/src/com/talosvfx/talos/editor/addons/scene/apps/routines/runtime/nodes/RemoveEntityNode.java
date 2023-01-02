@@ -10,5 +10,7 @@ public class RemoveEntityNode extends RoutineNode {
     public void receiveSignal(String portName) {
         GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
         target.parent.removeObject(target);
+
+        sendSignal("onComplete");
     }
 }
