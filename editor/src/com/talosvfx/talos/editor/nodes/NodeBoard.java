@@ -167,6 +167,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
+		if(nodeStage.data ==  null) return;
 		batch.end();
 		shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
 		Gdx.gl.glEnable(GL20.GL_BLEND);

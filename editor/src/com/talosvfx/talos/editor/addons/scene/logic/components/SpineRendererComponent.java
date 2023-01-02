@@ -34,6 +34,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
     public Color color = new Color(Color.WHITE);
 
+    private transient String currAnimation;
 
     @ValueProperty(prefix = {"scale"})
     public float scale = 1f;
@@ -76,6 +77,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             public void report(String value) {
                 Animation animation = skeleton.getData().findAnimation(value);
                 animationState.setAnimation(0, animation, true);
+                currAnimation = value;
             }
         }, new Supplier<Array<String>>() {
             @Override
@@ -125,7 +127,14 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
 
+        if(currAnimation == null || currAnimation.isEmpty()) {
+            if(animationState != null && animationState.getCurrent(0) != null && animationState.getCurrent(0).getAnimation() != null) {
+                currAnimation = animationState.getCurrent(0).getAnimation().getName();
+            }
+        }
+
         json.writeValue("scale", scale);
+        json.writeValue("animation", currAnimation);
         super.write(json);
     }
 
@@ -134,8 +143,14 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         scale = jsonData.getFloat("scale", 1/128f);
+        currAnimation = jsonData.getString("animation", "");
+
         loadSkeletonFromIdentifier(gameResourceIdentifier);
 
+        if(!currAnimation.isEmpty()) {
+            Animation animation = skeleton.getData().findAnimation(currAnimation);
+            animationState.setAnimation(0, animation, true);
+        }
 
         super.read(json, jsonData);
     }

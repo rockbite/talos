@@ -293,6 +293,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     public void act() {
+        if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
     }
 

@@ -138,6 +138,7 @@ public class VariableCreationWindow extends Table {
         ScrollPane scrollPane = new ScrollPane(inner);
         scrollPane.setScrollingDisabled(true, false);
         content.add(scrollPane).grow().maxHeight(300).padBottom(10);
+        if(routineStage.data == null) return;
 
         RoutineInstance routineInstance = routineStage.data.getRoutineInstance();
         Array<PropertyWrapper<?>> propertyWrappers = routineInstance.getParentPropertyWrappers();

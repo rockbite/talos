@@ -108,6 +108,10 @@ public class RoutineRenderer {
                 reset  = true;
             }
 
+            if(routineInstance.isDirty() && routineInstance.drawableQuads.size == 0) {
+                reset = true;
+            }
+
             if(!configured) {
                 reset = false;
             }

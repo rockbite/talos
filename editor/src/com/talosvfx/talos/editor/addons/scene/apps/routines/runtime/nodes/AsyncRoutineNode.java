@@ -51,6 +51,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         U signalPayload = (U)routineInstanceRef.getSignalPayload();
         T state = obtainState();
         state.setTarget(signalPayload);
+        state.alpha = 0;
 
         float duration = fetchFloatValue("duration");
         state.setDuration(duration);

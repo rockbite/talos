@@ -246,7 +246,9 @@ public abstract class RoutineNode {
                     RoutineNode targetNode = connection.toPort.nodeRef;
                     String targetName = connection.toPort.name;
 
+                    Object payload = routineInstanceRef.getSignalPayload();
                     targetNode.receiveSignal(targetName);
+                    routineInstanceRef.setSignalPayload(payload);
                 }
             }
         }

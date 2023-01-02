@@ -365,5 +365,10 @@
             <inputText name="target" default="">Target</inputText>
             <value port="output" name="outSignal" type="signal">out</value>
         </module>
+        <module name = "SetVisibilityNode" title = "Set Visibility" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="input" type="signal">in</value>
+            <checkbox name="isVisible" default = "true">isVisible</checkbox>
+            <value port="output" name="outSignal" type="signal">out</value>
+        </module>
     </category>
 </modules>

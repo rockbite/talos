@@ -362,6 +362,7 @@ public class MainRenderer implements Observer {
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.color);
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
