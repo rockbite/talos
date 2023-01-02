@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ISizableComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 
 public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeState> {
 
@@ -39,11 +40,17 @@ public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeStat
     @Override
     protected void stateTick(SizeToNode.SizeState state, float delta) {
         ISizableComponent component = state.component;
+        GameObject target = state.getTarget();
         float w = state.originalSize.x + (state.targetSize.x - state.originalSize.x) * state.interpolatedAlpha;
         float h = state.originalSize.y + (state.targetSize.y - state.originalSize.y) * state.interpolatedAlpha;
 
         component.setWidth(w);
         component.setHeight(h);
+
+        if(target.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent rt = target.getComponent(RoutineRendererComponent.class);
+            rt.routineInstance.setDirty();
+        }
     }
 
 }

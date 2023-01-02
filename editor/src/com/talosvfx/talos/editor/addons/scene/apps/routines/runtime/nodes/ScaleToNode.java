@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import lombok.Getter;
 
@@ -41,5 +42,10 @@ public class ScaleToNode extends AsyncRoutineNode<GameObject, ScaleToNode.ScaleS
         TransformComponent component = target.getComponent(TransformComponent.class);
         component.scale.x = state.originalScale.x + (state.targetScale.x - state.originalScale.x) * state.interpolatedAlpha;
         component.scale.y = state.originalScale.y + (state.targetScale.y - state.originalScale.y) * state.interpolatedAlpha;
+
+        if(target.hasComponent(RoutineRendererComponent.class)) {
+            RoutineRendererComponent rt = target.getComponent(RoutineRendererComponent.class);
+            rt.routineInstance.setDirty();
+        }
     }
 }

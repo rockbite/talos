@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -310,5 +311,11 @@ public class RoutineInstance {
         }
 
         return true;
+    }
+
+    public void applyQuadDiff(Vector2 diff) {
+        for (DrawableQuad drawableQuad : drawableQuads) {
+            drawableQuad.position.add(diff);
+        }
     }
 }

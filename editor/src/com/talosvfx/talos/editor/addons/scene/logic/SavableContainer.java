@@ -65,6 +65,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 	@Override
 	public void addGameObject (GameObject gameObject) {
 		root.addGameObject(gameObject);
+		gameObject.setParent(root);
 	}
 
 	@Override

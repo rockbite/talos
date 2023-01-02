@@ -15,6 +15,8 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RenderRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -80,10 +82,13 @@ public class RoutineRenderer {
         if (main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
-
             OrthographicCamera camera = (OrthographicCamera) mainRenderer.getCamera();
             cameraViewportRect.setSize(camera.viewportWidth * camera.zoom + cameraCull, camera.viewportHeight * camera.zoom + cameraCull).setCenter(camera.position.x, camera.position.y);
+
+            //todo: instead make a nice node to do it
             objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);
+            /*
+
             Intersector.intersectRectangles(cameraViewportRect, objectViewportRect, intersectionRect);
 
             intersectionRect.getCenter(positionTemp);
@@ -92,9 +97,16 @@ public class RoutineRenderer {
                 renderRoutineNode.viewportPosition.set(positionTemp);
                 renderRoutineNode.viewportSize.set(sizeTemp);
                 reset = true;
-            }
+            }*/
 
             renderRoutineNode.position.set(transform.position);
+            renderRoutineNode.size.set(routineRendererComponent.viewportSize);
+            renderRoutineNode.viewportPosition.set(camera.position.x, camera.position.y);
+            renderRoutineNode.viewportSize.set(cameraViewportRect.width, cameraViewportRect.height);
+
+            if(routineRendererComponent.cacheCoolDown == 0) {
+                reset  = true;
+            }
 
             if(!configured) {
                 reset = false;
@@ -108,6 +120,7 @@ public class RoutineRenderer {
                     routineInstance.getProperties().put(propertyWrapper.propertyName, propertyWrapper);
                 }
 
+                routineInstance.setContainer(findContainer(gameObject.parent));
                 renderRoutineNode.receiveSignal("startSignal");
                 routineInstance.drawableQuads.sort(zComparator);
                 routineInstance.setDirty(false);
@@ -137,6 +150,24 @@ public class RoutineRenderer {
                 }
             }
         }
+    }
+
+    private SavableContainer findContainer(GameObject go) {
+        GameObject root = findRootGO(go);
+        GameObjectContainer container = root.getGameObjectContainerRoot();
+        if(container instanceof SavableContainer) {
+            return (SavableContainer) container;
+        }
+        return null;
+
+    }
+
+    private GameObject findRootGO(GameObject go) {
+        if(go.getParent() != null) {
+            return findRootGO(go.getParent());
+        }
+        return go;
+
     }
 
     private void drawSliced(Batch batch, DrawableQuad drawableQuad) {

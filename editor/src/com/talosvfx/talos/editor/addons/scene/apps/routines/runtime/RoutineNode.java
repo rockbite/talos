@@ -155,6 +155,10 @@ public abstract class RoutineNode {
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
+
+            if(name.equals("asset")) {
+                port.dataType = DataType.ASSET;
+            }
         }
 
         if(portType.equals("input")) {
@@ -185,6 +189,12 @@ public abstract class RoutineNode {
                     String identifier = jsonValue.getString("id");
                     GameAsset gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
                     port.setValue(gameAsset);
+
+                    if(gameAsset.isBroken()) {
+                        configured = false;
+                        return;
+                    }
+
                 } catch (Exception e) {}
             }else {
                 port.setValueFromString(properties.getString(name));

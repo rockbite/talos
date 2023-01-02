@@ -8,6 +8,11 @@ public class GetMemoryNode extends RoutineNode {
     public Object queryValue(String targetPortName) {
         String name = fetchStringValue("name");
 
-        return routineInstanceRef.fetchMemory(name);
+        String key = name;
+        if(fetchBooleanValue("local") && routineInstanceRef.getSignalPayload() != null) {
+            key = name + (routineInstanceRef.getSignalPayload().hashCode() + "");
+        }
+
+        return routineInstanceRef.fetchMemory(key);
     }
 }

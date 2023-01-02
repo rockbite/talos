@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +49,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
     public transient boolean isPlacing = false;
+
+    @Getter
     private GameObjectContainer rootGameObjectContainer;
 
     public GameObject () {

@@ -47,6 +47,8 @@ public class RoutineExecutorNode extends RoutineNode {
     @Override
     protected void configureNode(JsonValue properties) {
         super.configureNode(properties);
+        if(!configured) return;
+
         Object val = inputs.get("title").valueOverride;
         String title = val != null ? (String) val : "";
 

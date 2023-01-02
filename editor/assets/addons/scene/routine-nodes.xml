@@ -163,6 +163,7 @@
                 <value port="output" name="viewportPos" type="vec2">viewport pos</value>
                 <value port="output" name="viewportSize" type="vec2">viewport size</value>
                 <value port="output" name="position" type="vec2">position</value>
+                <value port="output" name="size" type="vec2">size</value>
             </group>
         </module>
         <module name = "RenderQuadNode" title = "Render Quad" keywords = "" class = "RoutineNodeWidget">
@@ -303,7 +304,7 @@
             <value port="output" name="output" type="float">output</value>
         </module>
         <module name = "AssetSelectNode" title = "Asset Select" keywords = "" class = "RoutineNodeWidget">
-            <asset name="asset" type="SPRITE">asset</asset>
+            <asset name="asset">asset</asset>
             <value port="output" name="output" type="asset">asset</value>
         </module>
         <module name = "ProbabilityChoiceNode" title = "Probability Choice" keywords = "" class = "ProbabilityChoiceWidget">
@@ -313,15 +314,17 @@
         <module name = "StoreMemoryNode" title = "Store Memory" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="start" type="signal">start</value>
             <inputText name="name" default="varname">name</inputText>
+            <checkbox name="local" default = "false">Local to Payload</checkbox>
             <value port="input" name="input" type="float">input</value>
             <value port="output" name="next" type="signal">next</value>
         </module>
         <module name = "GetMemoryNode" title = "Get Memory" keywords = "" class = "RoutineNodeWidget">
             <inputText name="name" default="varname">name</inputText>
+            <checkbox name="local" default = "false">Local to Payload</checkbox>
             <value port="output" name="value" type="fluid">value</value>
         </module>
         <module name = "NumberNode" title = "Number" keywords = "" class = "RoutineNodeWidget">
-            <dynamicValue name="value" type="float" default="0">value: </dynamicValue>
+            <dynamicValue name="value" type="float" default="0" min="-9999" max="9999">value: </dynamicValue>
             <value port="output" name="output" type="float">output</value>
         </module>
         <module name = "OneMinusNode" title = "One Minus" keywords = "" class = "RoutineNodeWidget">
@@ -347,6 +350,20 @@
             <group>
                 <value port="output" name="output" type="fluid">output</value>
             </group>
+        </module>
+        <module name = "SignalAdapterNode" title = "Signal Adapter" keywords = "" class = "RoutineNodeWidget">
+            <inputText name="key" default="">Key</inputText>
+            <group>
+                <value port="input" name="in1" type="signal">in</value>
+                <value port="input" name="in2" type="signal">in</value>
+                <value port="input" name="in3" type="signal">in</value>
+            </group>
+            <value port="output" name="out" type="signal">out</value>
+        </module>
+        <module name = "GOSelectorNode" title = "Game Object Selector" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="input" type="signal">in</value>
+            <inputText name="target" default="">Target</inputText>
+            <value port="output" name="outSignal" type="signal">out</value>
         </module>
     </category>
 </modules>

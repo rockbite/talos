@@ -6,6 +6,8 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 public class RenderRoutineNode extends RoutineNode {
 
     public Vector2 position = new Vector2();
+
+    public Vector2 size = new Vector2();
     public Vector2 viewportPosition = new Vector2();
     public Vector2 viewportSize = new Vector2();
 
@@ -20,6 +22,9 @@ public class RenderRoutineNode extends RoutineNode {
     public Object queryValue(String targetPortName) {
         if(targetPortName.equals("position")) {
             return position;
+        }
+        if(targetPortName.equals("size")) {
+            return size;
         }
         if(targetPortName.equals("viewportSize")) {
             return viewportSize;

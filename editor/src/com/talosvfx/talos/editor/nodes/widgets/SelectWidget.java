@@ -1,10 +1,8 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -78,6 +76,10 @@ public class SelectWidget extends AbstractWidget<String> {
         lockEvents = true;
         selectBox.setItems(options);
         lockEvents = false;
+    }
+
+    public Array<String> getOptions() {
+        return selectBox.getItems();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.esotericsoftware.spine.Animation;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
@@ -22,6 +23,13 @@ public class SetSpineAnimationNode extends RoutineNode {
     }
 
     @Override
+    protected void configureNode(JsonValue properties) {
+        super.configureNode(properties);
+
+        inputs.get("animation").valueOverride = properties.getString("animation");
+    }
+
+    @Override
     public void receiveSignal(String portName) {
         String animationName = fetchStringValue("animation");
         boolean loop = fetchBooleanValue("repeat");
@@ -33,7 +41,11 @@ public class SetSpineAnimationNode extends RoutineNode {
 
             if(component != null) {
                 Animation animation = component.skeleton.getData().findAnimation(animationName);
-                component.animationState.setAnimation(0, animation, loop);
+                if(animation != null) {
+                    component.animationState.setAnimation(0, animation, loop);
+                } else {
+                    component.animationState.setAnimation(0, component.skeleton.getData().getAnimations().first(), loop);
+                }
             }
         }
 
