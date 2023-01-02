@@ -43,12 +43,15 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
+import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
+import com.talosvfx.talos.runtime.serialization.ConnectionData;
+import com.talosvfx.talos.runtime.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1061,16 +1064,17 @@ public class AssetRepository implements Observer {
 
 	}
 
-	public void updateVFXTLS (RawAsset tlsRawAsset, boolean checkGameResources) {
-//		if (checkGameResources) {
-//			ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
-//			String exportDataJson = writeTalosPExport(exportData);
-//
-//			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
-//			exportedPFile.writeString(exportDataJson, false);
-//
-//			rawAssetCreated(exportedPFile, checkGameResources);
-//		}
+	public void createPForTLSIfNotExist (RawAsset tlsRawAsset, boolean checkGameResources) {
+		if (checkGameResources) {
+			VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(tlsRawAsset.handle);
+			ExportData exportData = VFXProjectSerializer.exportTLSDataToP(projectData);
+			String exportDataJson = VFXProjectSerializer.writeTalosPExport(exportData);
+
+			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
+			exportedPFile.writeString(exportDataJson, false);
+
+			rawAssetCreated(exportedPFile, checkGameResources);
+		}
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
@@ -1079,10 +1083,6 @@ public class AssetRepository implements Observer {
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
 			RawAsset rawAsset = new RawAsset(fileHandle);
-
-//			if (assetTypeFromExtension == GameAssetType.VFX) {
-////				updateVFXTLS(rawAsset, checkGameResources);
-//			}
 
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
 			if (metadataHandleFor.exists()) {
@@ -1589,5 +1589,4 @@ public class AssetRepository implements Observer {
 					|| c == '"');
 		}
 	}
-
 }

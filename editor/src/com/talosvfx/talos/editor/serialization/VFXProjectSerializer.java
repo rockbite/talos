@@ -20,8 +20,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.modules.PolylineModule;
+import com.talosvfx.talos.runtime.modules.TextureModule;
+import com.talosvfx.talos.runtime.modules.VectorFieldModule;
+import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 
 public class VFXProjectSerializer {
@@ -98,5 +103,60 @@ public class VFXProjectSerializer {
         return data;
     }
 
+    public static ExportData exportTLSDataToP (VFXProjectData projectDataToConvert) {
+        Array<EmitterData> emitters = projectDataToConvert.getEmitters();
+
+        ExportData data = new ExportData();
+
+        for (EmitterData emitter : emitters) {
+            ExportData.EmitterExportData emitterData = new ExportData.EmitterExportData();
+            emitterData.name = emitter.name;
+            for (ModuleWrapper wrapper : emitter.modules) {
+                emitterData.modules.add(wrapper.getModule());
+
+                if (wrapper.getModule() instanceof TextureModule) {
+                    TextureModule textureModule = (TextureModule)wrapper.getModule();
+                    String name = textureModule.regionName;
+                    if (name == null)
+                        name = "fire";
+
+                    if (!data.metadata.resources.contains(name, false)) {
+                        data.metadata.resources.add(name);
+                    }
+                }
+                if (wrapper.getModule() instanceof PolylineModule) {
+                    PolylineModule module = (PolylineModule)wrapper.getModule();
+                    String name = module.regionName;
+                    if (name == null)
+                        name = "fire";
+
+                    if (!data.metadata.resources.contains(name, false)) {
+                        data.metadata.resources.add(name);
+                    }
+                }
+                if (wrapper.getModule() instanceof VectorFieldModule) {
+                    VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
+                    String fgaFileName = vectorFieldModule.fgaFileName;
+
+                    if (fgaFileName == null) {
+                        continue;
+                    }
+                    fgaFileName = fgaFileName + ".fga";
+                    if (!data.metadata.resources.contains(fgaFileName, false)) {
+                        data.metadata.resources.add(fgaFileName);
+                    }
+                }
+            }
+
+            Array<ConnectionData> connections = emitter.connections;
+            for (ConnectionData connection : connections) {
+                emitterData.connections.add(connection);
+            }
+
+            data.emitters.add(emitterData);
+        }
+
+        return data;
+    }
 
 }

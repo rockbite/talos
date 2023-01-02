@@ -169,7 +169,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public void act (float delta) {
         super.act(delta);
 
-        if(preview != null) {
+        if(preview != null && preview.getEffectInstance() != null) {
             float totalTime = preview.getEffectInstance().getTotalTime();
             float duration = estimateTotalEffectDuration();
             float time = totalTime % duration;
