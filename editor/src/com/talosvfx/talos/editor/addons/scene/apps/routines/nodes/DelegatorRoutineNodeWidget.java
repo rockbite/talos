@@ -36,7 +36,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
         customTypeMap.put(PropertyType.BOOLEAN, CheckBoxWidget.class);
         customTypeMap.put(PropertyType.COLOR, ColorWidget.class);
         customTypeMap.put(PropertyType.ASSET, GameAssetWidget.class);
-        //todo: need to support Vector2 as one widget.. or this will crash
+        customTypeMap.put(PropertyType.VECTOR2, Vector2Widget.class);
     }
 
     @Override

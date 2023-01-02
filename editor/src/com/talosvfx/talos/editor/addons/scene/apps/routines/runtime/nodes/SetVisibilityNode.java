@@ -19,5 +19,7 @@ public class SetVisibilityNode extends RoutineNode {
                 component.childrenVisible = res;
             }
         }
+
+        sendSignal("outSignal");
     }
 }

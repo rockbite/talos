@@ -15,7 +15,6 @@ public class AppPrefs {
 
     public boolean hasPrefFor(GameAsset<?> gameAsset) {
         if (gameAsset.nameIdentifier.equals("dummy")) return false;
-        if(gameAsset.dependentGameAssets == null || gameAsset.dependentGameAssets.isEmpty()) return false;
         return preferences.containsKey(getUUID(gameAsset));
     }
 

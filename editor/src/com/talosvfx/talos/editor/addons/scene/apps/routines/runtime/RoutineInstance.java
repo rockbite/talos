@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -59,6 +60,7 @@ public class RoutineInstance {
 
     @Getter@Setter
     private SavableContainer container;
+    private GameObject cameraGO;
 
     public void reset() {
         clearMemory();
@@ -102,6 +104,10 @@ public class RoutineInstance {
 
     public void setDirty(boolean dirty) {
         this.isDirty = dirty;
+    }
+
+    public void setCameraGO(GameObject cameraGO) {
+        this.cameraGO = cameraGO;
     }
 
     public static class RoutineListenerAdapter implements RoutineListener {

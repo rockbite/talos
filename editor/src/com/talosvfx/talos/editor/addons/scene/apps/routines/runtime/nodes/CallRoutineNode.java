@@ -103,6 +103,7 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
                 Object val = fetchValue(propertyName);
                 if(val != null) {
                     wrapper.setValueUnsafe(val);
+                    targetInstance.getProperties().put(wrapper.propertyName, wrapper);
                 }
             }
 

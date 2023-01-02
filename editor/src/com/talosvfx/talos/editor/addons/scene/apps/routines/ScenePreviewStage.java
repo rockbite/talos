@@ -9,9 +9,12 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
+import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -34,6 +37,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 	private MainRenderer renderer;
 
 	private boolean isPlaying = false;
+	private GameObject cameraGO;
 
 	public ScenePreviewStage () {
 		setSkin(SharedResources.skin);
@@ -79,6 +83,13 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if (currentScene == null)
 			return;
 
+		if(cameraGO != null) {
+			CameraComponent component = cameraGO.getComponent(CameraComponent.class);
+			TransformComponent transform = cameraGO.getComponent(TransformComponent.class);
+			renderer.getCamera().position.set(transform.position.x, transform.position.y, 0);
+			// todo: apply zoom later
+		}
+
 		renderer.setLayers(SharedResources.currentProject.getSceneData().getRenderLayers());
 		renderer.update(currentScene.getSelfObject());
 		renderer.render(batch, new MainRenderer.RenderState(), currentScene.getSelfObject());
@@ -98,5 +109,9 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 			currentScene = scene;
 		}
+	}
+
+	public void setCameraGO(GameObject cameraGO) {
+		this.cameraGO = cameraGO;
 	}
 }

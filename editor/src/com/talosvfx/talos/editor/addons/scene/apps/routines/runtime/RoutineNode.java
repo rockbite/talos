@@ -182,6 +182,11 @@ public abstract class RoutineNode {
                 Json json = new Json();
                 Color color = json.readValue(Color.class, jsonValue);
                 port.setValue(color);
+            } else if(port.dataType == DataType.VECTOR2) {
+                float x = jsonValue.getFloat("x");
+                float y = jsonValue.getFloat("y");
+                Vector2 vec = new Vector2(x, y);
+                port.valueOverride = vec;
             } else if(port.dataType == DataType.ASSET) {
                 Json json = new Json();
                 try {
@@ -197,7 +202,11 @@ public abstract class RoutineNode {
 
                 } catch (Exception e) {}
             }else {
-                port.setValueFromString(properties.getString(name));
+                try {
+                    port.setValueFromString(properties.getString(name));
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
         }
 
