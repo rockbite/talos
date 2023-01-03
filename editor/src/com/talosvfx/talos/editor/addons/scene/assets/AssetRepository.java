@@ -1560,6 +1560,9 @@ public class AssetRepository implements Observer {
 		}
 		PixmapIO.writePNG(fileHandle, newPixmap);
 
+		gameAsset.setResourcePayload(new Texture(newPixmap));
+		gameAsset.setUpdated();
+
 		oldPixmap.dispose();
 		newPixmap.dispose();
 

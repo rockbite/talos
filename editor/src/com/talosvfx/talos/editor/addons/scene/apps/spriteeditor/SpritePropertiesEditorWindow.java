@@ -62,7 +62,6 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 AssetRepository.getInstance().resizeAsset(gameAsset, (int) width, (int) height);
-                gameAsset.setUpdated();
             }
         });
 
