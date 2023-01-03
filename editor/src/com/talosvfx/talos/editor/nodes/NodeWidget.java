@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.nodes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,10 +15,9 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
@@ -546,7 +544,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     protected void reportNodeDataModified() {
-        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
+        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this));
     }
 
     public void constructNode(XmlReader.Element module) {
