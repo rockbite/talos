@@ -21,6 +21,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
     private boolean isYoyo = false;
     private Interpolation interpolation = Interpolation.linear;
+    private Object targets;
 
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
@@ -67,6 +68,8 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         } else {
             Pools.free(state);
         }
+
+        targets = routineInstanceRef.fetchGlobal("executedTargets");
     }
 
 
@@ -114,6 +117,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         for(U target: tmpArr) {
             // this now needs to send signal to next guy
             routineInstanceRef.setSignalPayload(target);
+            routineInstanceRef.storeGlobal("executedTargets", targets);
             sendSignal("onComplete");
         }
         tmpArr.clear();

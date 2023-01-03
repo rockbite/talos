@@ -9,6 +9,8 @@ import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererCo
 
 public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeState> {
 
+    private boolean additive;
+
     public static class SizeState extends AsyncRoutineNodeState<GameObject> {
         public Vector2 originalSize = new Vector2();
         public Vector2 targetSize = new Vector2();
@@ -27,10 +29,12 @@ public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeStat
         GameObject target = state.getTarget();
         state.component = target.findComponent(ISizableComponent.class);
         if(state.component == null) return false;
-        state.originalSize.set(state.component.getHeight(), state.component.getHeight());
+        state.originalSize.set(state.component.getWidth(), state.component.getHeight());
 
         float width = fetchFloatValue("width");
         float height = fetchFloatValue("height");
+
+        additive = fetchBooleanValue("additive");
 
         state.targetSize.set(width, height);
 
@@ -41,11 +45,17 @@ public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeStat
     protected void stateTick(SizeToNode.SizeState state, float delta) {
         ISizableComponent component = state.component;
         GameObject target = state.getTarget();
-        float w = state.originalSize.x + (state.targetSize.x - state.originalSize.x) * state.interpolatedAlpha;
-        float h = state.originalSize.y + (state.targetSize.y - state.originalSize.y) * state.interpolatedAlpha;
-
-        component.setWidth(w);
-        component.setHeight(h);
+        if(additive) {
+            float w = state.originalSize.x + state.targetSize.x * state.interpolatedAlpha;
+            float h = state.originalSize.y + state.targetSize.y * state.interpolatedAlpha;
+            component.setWidth(w);
+            component.setHeight(h);
+        } else {
+            float w = state.originalSize.x + (state.targetSize.x - state.originalSize.x) * state.interpolatedAlpha;
+            float h = state.originalSize.y + (state.targetSize.y - state.originalSize.y) * state.interpolatedAlpha;
+            component.setWidth(w);
+            component.setHeight(h);
+        }
 
         if(target.hasComponent(RoutineRendererComponent.class)) {
             RoutineRendererComponent rt = target.getComponent(RoutineRendererComponent.class);

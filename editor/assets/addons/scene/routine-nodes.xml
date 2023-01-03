@@ -60,6 +60,7 @@
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
                 <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
             </group>
+            <checkbox name="additive" default = "false">Additive</checkbox>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>

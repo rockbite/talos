@@ -256,8 +256,10 @@ public abstract class RoutineNode {
                     String targetName = connection.toPort.name;
 
                     Object payload = routineInstanceRef.getSignalPayload();
+                    Object targets = routineInstanceRef.fetchGlobal("executedTargets");
                     targetNode.receiveSignal(targetName);
                     routineInstanceRef.setSignalPayload(payload);
+                    routineInstanceRef.storeGlobal("executedTargets", targets);
                 }
             }
         }
