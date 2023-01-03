@@ -174,7 +174,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void routineUpdated () {
         if(!loading) {
             //todo: this isn't right
-            AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
+            saveGameAsset();
             gameAsset.setUpdated();
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));

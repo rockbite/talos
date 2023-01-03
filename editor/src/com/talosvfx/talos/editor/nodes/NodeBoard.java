@@ -813,9 +813,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		}
 	}
 
-	public void nodeClickedUp (NodeWidget node) {
+	public void nodeClickedUp (NodeWidget node, boolean hasMoved) {
 
-		if (wasNodeDragged != null) {
+		if (wasNodeDragged != null && hasMoved) {
 			updateSaveState();
 
 //            TalosMain.Instance().ProjectController().setDirty();
