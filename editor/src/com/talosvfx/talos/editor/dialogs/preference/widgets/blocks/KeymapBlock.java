@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.dialogs.preference.widgets.blocks;
 import com.badlogic.gdx.utils.Array;
 
 import com.talosvfx.talos.editor.dialogs.preference.widgets.PrefWidgetFactory;
-import com.talosvfx.talos.editor.notifications.GlobalActions;
+import com.talosvfx.talos.editor.notifications.actions.GlobalActions;
 
 public class KeymapBlock extends BlockWidget {
 
