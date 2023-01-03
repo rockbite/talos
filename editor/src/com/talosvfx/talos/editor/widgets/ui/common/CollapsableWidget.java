@@ -15,6 +15,7 @@ import lombok.Setter;
 
 public class CollapsableWidget extends Table {
     protected final Table topSegment;
+    @Getter
     protected Table content;
     protected final Cell contentCell;
     protected ArrowButton arrowButton;

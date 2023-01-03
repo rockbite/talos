@@ -20,6 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertyWidget.class);
 
+	@Getter
 	protected Label propertyName;
 	protected Table valueContainer;
 	protected T value;
