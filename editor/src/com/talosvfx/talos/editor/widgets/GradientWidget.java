@@ -134,8 +134,10 @@ public class GradientWidget extends Actor {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Array<ColorPoint> points = module.getPoints();
 
-                if(button == Input.Buttons.RIGHT) {
-                    event.handle();
+                if (button == Input.Buttons.RIGHT) {
+                    rightClick(event, x, y);
+                    event.stop();
+                    event.cancel();
                     return true;
                 }
 
@@ -179,11 +181,7 @@ public class GradientWidget extends Actor {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
 
-                if(button == Input.Buttons.RIGHT) {
-                    rightClick(event, x, y);
 
-                    return;
-                }
 
                 draggingPoint = -1;
             }

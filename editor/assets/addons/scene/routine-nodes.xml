@@ -125,6 +125,11 @@
             <value port="input" name="layerOrder" type="int">Layer order</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "SpawnParticleNode" title = "Spawn Particle" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="particle" type="VFX">spine</asset>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "SetSpineAnimationNode" title = "Set Spine Animation" keywords = "" class = "SetSpineAnimationNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <asset port="input" name="reference" type="SKELETON">reference</asset>

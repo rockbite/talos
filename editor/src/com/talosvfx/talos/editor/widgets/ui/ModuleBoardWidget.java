@@ -277,15 +277,20 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         stage.addListener(new InputListener() {
 
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                super.touchDown(event, x, y, pointer, button);
 
                 if (button == 1 && !event.isCancelled()) {
                     showPopup();
+                } else {
+                    TalosVFXUtils.getModuleListPopup().remove();
                 }
 
-                return super.touchDown(event, x, y, pointer, button);
+                return false;
             }
+
 
         });
     }

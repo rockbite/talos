@@ -152,6 +152,7 @@ public abstract class RoutineNode {
             if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
             if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("VFX")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
@@ -200,12 +201,14 @@ public abstract class RoutineNode {
                         return;
                     }
 
-                } catch (Exception e) {}
-            }else {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
                 try {
                     port.setValueFromString(properties.getString(name));
                 } catch (Exception e) {
-                    System.out.println(e);
+                    e.printStackTrace();
                 }
             }
         }

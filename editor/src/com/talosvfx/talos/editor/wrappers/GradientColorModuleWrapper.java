@@ -105,6 +105,6 @@ public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModul
     public void act (float delta) {
         super.act(delta);
 
-        ScreenshotService.testForPicker(picker);
+//        ScreenshotService.testForPicker(picker);
     }
 }
