@@ -8,7 +8,7 @@ public class AssetSelectNode extends RoutineNode {
 
     @Override
     public Object queryValue(String targetPortName) {
-        GameAsset<Texture> asset = fetchAssetValue("asset");
+        GameAsset asset = fetchAssetValue("asset");
 
         return asset;
     }

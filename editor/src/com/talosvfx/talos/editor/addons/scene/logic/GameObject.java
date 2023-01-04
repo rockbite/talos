@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +49,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
     public transient boolean isPlacing = false;
+
+    @Getter
     private GameObjectContainer rootGameObjectContainer;
 
     public GameObject () {
@@ -350,6 +353,16 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             }
         }
         return null;
+    }
+
+    public <T> T findComponent (Class<T> clazz) {
+        for (AComponent component : components) {
+            if (clazz.isAssignableFrom(component.getClass())) {
+                return (T) component;
+            }
+        }
+        return null;
+
     }
 
     public <T extends AComponent> T getComponent (Class<? extends T> clazz) {

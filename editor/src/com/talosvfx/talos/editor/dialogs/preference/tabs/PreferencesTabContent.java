@@ -53,6 +53,8 @@ public class PreferencesTabContent extends Table {
     private BlockWidget buildInjectable(String id, XmlReader.Element item) {
         String className = item.getText();
 
+        if(className == null) return null;
+
         String packageName = "com.talosvfx.talos.editor.dialogs.preference.widgets.blocks." + className;
 
         Class clazz = null;
@@ -63,7 +65,7 @@ public class PreferencesTabContent extends Table {
             block.build();
             return block;
         } catch (ReflectionException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return null;

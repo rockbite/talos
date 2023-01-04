@@ -10,6 +10,13 @@ public class StoreMemoryNode extends RoutineNode {
         String name = fetchStringValue("name");
         Object input = fetchValue("input");
 
-        routineInstanceRef.storeMemory(name, input);
+        String key = name;
+        if(fetchBooleanValue("local") && routineInstanceRef.getSignalPayload() != null) {
+            key = name + (routineInstanceRef.getSignalPayload().hashCode() + "");
+        }
+
+        routineInstanceRef.storeMemory(key, input);
+
+        sendSignal("next");
     }
 }

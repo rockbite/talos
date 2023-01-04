@@ -15,10 +15,10 @@ import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
 public abstract class AbstractShaderNode extends NodeWidget implements Observer {

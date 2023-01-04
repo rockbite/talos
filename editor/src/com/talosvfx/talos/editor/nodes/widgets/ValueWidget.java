@@ -159,7 +159,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
                 float change = diff * localStep;
 
-                setValue(value + change);
+                setValue(value + change, true);
 
                 lastPos = x;
 
@@ -223,7 +223,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private void hideEditMode() {
         try {
-            setValue(Float.parseFloat(textField.getText()));
+            setValue(Float.parseFloat(textField.getText()), true);
         } catch (NumberFormatException exception) {
             // keep prev value
         }
@@ -277,7 +277,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
-        setValue(value, isChanged(value));
+        setValue(value, false);
     }
 
     public void setValue(float value, boolean notify) {
@@ -338,7 +338,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         setStep(step);
         setShowProgress(progress);
 
-        setValue(defaultValue);
+        setValue(defaultValue, false);
 
         setLabel(text);
     }
@@ -354,7 +354,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     @Override
     public void read (Json json, JsonValue jsonValue) {
-        setValue(jsonValue.asFloat());
+        setValue(jsonValue.asFloat(), false);
     }
 
     @Override

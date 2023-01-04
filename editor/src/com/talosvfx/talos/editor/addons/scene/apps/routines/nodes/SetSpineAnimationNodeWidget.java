@@ -8,30 +8,28 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.esotericsoftware.spine.Animation;
-import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
 
-    private SelectWidget interpolationSelectBox;
+    private SelectWidget selectBox;
 
     @Override
     public void constructNode(XmlReader.Element module) {
         super.constructNode(module);
-        interpolationSelectBox = new SelectWidget();
-        interpolationSelectBox.init(SharedResources.skin);
+        selectBox = new SelectWidget();
+        selectBox.init(SharedResources.skin);
 
         String variableName = "animation";
-        widgetMap.put(variableName, interpolationSelectBox);
+        widgetMap.put(variableName, selectBox);
         typeMap.put(variableName, "string");
         defaultsMap.put(variableName, "linear");
         Table container = getCustomContainer("animation_list");
-        container.add(interpolationSelectBox).growX().row();
+        container.add(selectBox).growX().row();
 
         GameAssetWidget reference = (GameAssetWidget)getWidget("reference");
 
@@ -51,6 +49,9 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
         if(reference != null) {
             loadList(reference);
         }
+
+        String animation = jsonValue.get("properties").getString("animation", selectBox.getOptions().first());
+        selectBox.setValue(animation);
     }
 
     private void loadList(GameAssetWidget reference) {
@@ -61,6 +62,6 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
         for(Animation animation: animations) {
             names.add(animation.getName());
         }
-        interpolationSelectBox.setOptions(names);
+        selectBox.setOptions(names);
     }
 }

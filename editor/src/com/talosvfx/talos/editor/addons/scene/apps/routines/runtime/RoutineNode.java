@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
@@ -7,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
+import lombok.Getter;
 
 public abstract class RoutineNode {
 
@@ -16,6 +18,9 @@ public abstract class RoutineNode {
     public int uniqueId;
 
     protected boolean nodeDirty = false;
+    protected JsonValue propertiesJson;
+    @Getter
+    protected boolean configured = false;
 
     public enum DataType {
         NUMBER,
@@ -24,6 +29,7 @@ public abstract class RoutineNode {
         COLOR,
         ASSET,
         STRING,
+        BOOLEAN,
         FLUID
     }
 
@@ -74,7 +80,7 @@ public abstract class RoutineNode {
         updateListener = new GameAsset.GameAssetUpdateListener() {
             @Override
             public void onUpdate () {
-                RoutineNode.this.routineInstanceRef.isDirty = true;
+                RoutineNode.this.routineInstanceRef.setDirty();
                 RoutineNode.this.nodeDirty = true;
             }
         };
@@ -88,8 +94,17 @@ public abstract class RoutineNode {
         XmlReader.Element config = routineInstanceRef.getConfig(name);
         constructNode(config);
 
-        JsonValue properties = nodeData.get("properties");
-        configureNode(properties);
+        //todo: fix later?
+        this.propertiesJson = nodeData.get("properties");
+        configureNode(propertiesJson);
+        if(!configured) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    configureNode(propertiesJson); // try again next time
+                }
+            });
+        }
 
         uniqueId = nodeData.getInt("id");
     }
@@ -135,10 +150,15 @@ public abstract class RoutineNode {
             if(type.equals("color")) port.dataType = DataType.COLOR;
             if(type.equals("asset")) port.dataType = DataType.ASSET;
             if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
+            if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
+
+            if(name.equals("asset")) {
+                port.dataType = DataType.ASSET;
+            }
         }
 
         if(portType.equals("input")) {
@@ -162,6 +182,11 @@ public abstract class RoutineNode {
                 Json json = new Json();
                 Color color = json.readValue(Color.class, jsonValue);
                 port.setValue(color);
+            } else if(port.dataType == DataType.VECTOR2) {
+                float x = jsonValue.getFloat("x");
+                float y = jsonValue.getFloat("y");
+                Vector2 vec = new Vector2(x, y);
+                port.valueOverride = vec;
             } else if(port.dataType == DataType.ASSET) {
                 Json json = new Json();
                 try {
@@ -169,11 +194,23 @@ public abstract class RoutineNode {
                     String identifier = jsonValue.getString("id");
                     GameAsset gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
                     port.setValue(gameAsset);
+
+                    if(gameAsset.isBroken()) {
+                        configured = false;
+                        return;
+                    }
+
                 } catch (Exception e) {}
             }else {
-                port.setValueFromString(properties.getString(name));
+                try {
+                    port.setValueFromString(properties.getString(name));
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
         }
+
+        configured = true;
     }
 
 
@@ -218,7 +255,9 @@ public abstract class RoutineNode {
                     RoutineNode targetNode = connection.toPort.nodeRef;
                     String targetName = connection.toPort.name;
 
+                    Object payload = routineInstanceRef.getSignalPayload();
                     targetNode.receiveSignal(targetName);
+                    routineInstanceRef.setSignalPayload(payload);
                 }
             }
         }

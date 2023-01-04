@@ -119,4 +119,9 @@ public class AssetSelector<T> extends Table {
 
         return var2;
     }
+
+    public void setValue(GameAsset<T> value) {
+        gameAsset = value;
+        nameLabel.setText(value.nameIdentifier);
+    }
 }

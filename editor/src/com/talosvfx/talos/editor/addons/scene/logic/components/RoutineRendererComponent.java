@@ -18,10 +18,12 @@ import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData> {
+public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData>, ISizableComponent {
 
     GameAsset<RoutineStageData> routineResource;
 
@@ -38,6 +40,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     public transient RoutineInstance routineInstance;
 
     public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
+
+    @Setter@Getter
+    private boolean requiresWrite;
 
     public RoutineRendererComponent() {
         updateListener = new GameAsset.GameAssetUpdateListener() {
@@ -57,6 +62,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         json.writeValue("size", viewportSize, Vector2.class);
         json.writeValue("cache", cacheCoolDown);
         json.writeValue("properties", propertyWrappers);
+
+        requiresWrite = false;
     }
 
     @Override
@@ -87,6 +94,11 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         propertyWrappers.clear();
         if (routineInstance != null) {
+            boolean needsToUpdate = needsToUpdate(copyWrappers, routineInstance.getParentPropertyWrappers());
+            if (needsToUpdate) {
+                requiresWrite = true;
+            }
+
             for (PropertyWrapper<?> propertyWrapper : routineInstance.getParentPropertyWrappers()) {
                 if (tryToMerge) {
                     boolean foundCopy = false;
@@ -112,6 +124,38 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
                 }
             }
         }
+    }
+
+    private boolean needsToUpdate (Array<PropertyWrapper<?>> existingWrappers, Array<PropertyWrapper<?>> truthWrappers) {
+        for (int i = 0; i < truthWrappers.size; i++) {
+            PropertyWrapper<?> truthWrapper = truthWrappers.get(i);
+            int indexToFind = truthWrapper.index;
+
+            PropertyWrapper<?> wrapperForIndex = getWrapperForIndex(indexToFind, existingWrappers);
+            if (wrapperForIndex == null) {
+                return true;
+            }
+            if (wrapperForIndex.getType() != truthWrapper.getType()) {
+                return true;
+            }
+            if (!(wrapperForIndex.propertyName.equals(truthWrapper.propertyName))) {
+                return true;
+            }
+            if (!(wrapperForIndex.defaultValue.equals(truthWrapper.defaultValue))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private PropertyWrapper<?> getWrapperForIndex (int index, Array<PropertyWrapper<?>> wrappers) {
+        for (int i = 0; i < wrappers.size; i++) {
+            PropertyWrapper<?> propertyWrapper = wrappers.get(i);
+            if (propertyWrapper.index == index) {
+                return propertyWrapper;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -151,7 +195,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     propertyWrapper.isValueOverridden = true;
-                    RoutineRendererComponent.this.routineInstance.isDirty = true;
+                    RoutineRendererComponent.this.routineInstance.setDirty();
                 }
             });
             generate.setParent(this);
@@ -200,5 +244,25 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {
         return false;
+    }
+
+    @Override
+    public float getWidth() {
+        return viewportSize.x;
+    }
+
+    @Override
+    public float getHeight() {
+        return viewportSize.y;
+    }
+
+    @Override
+    public void setWidth(float width) {
+        viewportSize.x = width;
+    }
+
+    @Override
+    public void setHeight(float height) {
+        viewportSize.y = height;
     }
 }

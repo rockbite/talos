@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.nodes.widgets;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -15,6 +14,8 @@ public class SelectWidget extends AbstractWidget<String> {
 
     private ObjectMap<String, String> titleMap = new ObjectMap<>();
     private ObjectMap<String, String> keyMap = new ObjectMap<>();
+
+    private boolean lockEvents = false;
 
     @Override
     public void init(Skin skin) {
@@ -34,7 +35,9 @@ public class SelectWidget extends AbstractWidget<String> {
         selectBox.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent changeEvent, Actor actor) {
-               fireChangedEvent();
+                if(!lockEvents) {
+                    fireChangedEvent();
+                }
             }
         });
     }
@@ -59,8 +62,9 @@ public class SelectWidget extends AbstractWidget<String> {
             titleMap.put(option, option);
             keyMap.put(option, option);
         }
-
+        lockEvents = true;
         selectBox.setItems(options);
+        lockEvents = false;
     }
 
     public void setOptions(String[] options) {
@@ -69,7 +73,13 @@ public class SelectWidget extends AbstractWidget<String> {
             keyMap.put(option, option);
         }
 
+        lockEvents = true;
         selectBox.setItems(options);
+        lockEvents = false;
+    }
+
+    public Array<String> getOptions() {
+        return selectBox.getItems();
     }
 
     @Override
@@ -82,7 +92,10 @@ public class SelectWidget extends AbstractWidget<String> {
     }
 
     public void setValue(String value) {
+        lockEvents = true;
+        selectBox.getSelection().setProgrammaticChangeEvents(false);
         selectBox.setSelected(keyMap.get(value));
+        lockEvents = false;
     }
 
     @Override

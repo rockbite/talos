@@ -22,8 +22,6 @@ public class PerlinNoiseNodeWidget extends RoutineNodeWidget {
 
         Table previewTable = getCustomContainer("preview");
 
-
-
         image = new Image(makeTexture());
         image.setScaling(Scaling.fit);
         previewTable.add(image).growX();

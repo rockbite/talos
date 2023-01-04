@@ -24,19 +24,22 @@ public class ColorToNode extends AsyncRoutineNode<GameObject, ColorToNode.ColorS
     }
 
     @Override
-    protected void targetAdded(ColorToNode.ColorState state) {
+    protected boolean targetAdded(ColorToNode.ColorState state) {
         GameObject target = state.getTarget();
         if(target.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent component = target.getComponent(SpriteRendererComponent.class);
             state.originalColor.set(component.color);
-        }
-        if(target.hasComponent(SpineRendererComponent.class)) {
+        } else if(target.hasComponent(SpineRendererComponent.class)) {
             SpineRendererComponent component = target.getComponent(SpineRendererComponent.class);
             state.originalColor.set(component.color);
+        } else {
+            return false;
         }
 
         Color color = fetchColorValue("color");
         state.targetColor.set(color);
+
+        return true;
     }
 
     @Override

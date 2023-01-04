@@ -740,8 +740,11 @@ public abstract class ViewportWidget<T extends ViewportPreferences> extends Tabl
 		});
 
 		for (Gizmo gizmo : gizmos.gizmoList) {
-			if (gizmo.hit(x, y))
+
+			if(!(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) continue;
+			if (gizmo.hit(x, y)) {
 				return gizmo;
+			}
 		}
 
 		return null;
@@ -778,7 +781,7 @@ public abstract class ViewportWidget<T extends ViewportPreferences> extends Tabl
 				float currentZoom = viewportViewSettings.getZoom();
 				float stepScale = zoomStepScale(currentZoom, minZoom, maxZoom);
 				currentZoom += amountY * stepScale;
-				currentZoom = MathUtils.clamp(currentZoom, minZoom, maxZoom);
+				currentZoom = MathUtils.clamp(currentZoom, minZoom, 10);
 				viewportViewSettings.setZoom(currentZoom);
 
 				if (amountY < 0 && !scrolledInFrame && !viewportViewSettings.is3D()) {
@@ -788,7 +791,7 @@ public abstract class ViewportWidget<T extends ViewportPreferences> extends Tabl
 					float current = (currentZoom - minZoom) / (maxZoom - minZoom);
 					current = current > 0 ? 1 : 0;
 					cameraPosTmp.lerp(mousePosTmp, 0.05f * current);
-					cameraPos.set(cameraPosTmp.x, cameraPosTmp.y, cameraPos.z);
+					//cameraPos.set(cameraPosTmp.x, cameraPosTmp.y, cameraPos.z);
 					scrolledInFrame = true;
 				}
 
@@ -1071,7 +1074,7 @@ public abstract class ViewportWidget<T extends ViewportPreferences> extends Tabl
 	}
 
 
-	protected void setWorldSize (float worldWidth) {
+	public void setWorldSize (float worldWidth) {
 		this.viewportViewSettings.setWorldWidth(worldWidth);
 		this.worldWidth = worldWidth;
 		updateNumbers();
@@ -1248,7 +1251,13 @@ public abstract class ViewportWidget<T extends ViewportPreferences> extends Tabl
 	protected void setSelection (Array<GameObject> gameObjects) {
 		selection.clear();
 
-		selection.addAll(gameObjects);
+		// do not select locked GO's here
+		for (GameObject gameObject : gameObjects) {
+			if(!gameObject.isEditorTransformLocked()) {
+				selection.add(gameObject);
+			}
+		}
+
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
 	}
 

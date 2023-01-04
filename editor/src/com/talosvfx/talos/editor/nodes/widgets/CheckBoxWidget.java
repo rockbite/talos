@@ -31,6 +31,7 @@ public class CheckBoxWidget extends AbstractWidget<Boolean> {
 
     @Override
     public void read (Json json, JsonValue jsonValue) {
+        checkBox.setProgrammaticChangeEvents(false);
         checkBox.setChecked(jsonValue.asBoolean());
     }
 

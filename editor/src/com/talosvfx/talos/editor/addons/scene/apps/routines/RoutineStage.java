@@ -11,10 +11,8 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInsta
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
-import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
@@ -24,7 +22,7 @@ import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import org.slf4j.Logger;
@@ -39,6 +37,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private Vector2 tmp = new Vector2();
 
     private float timeScale = 1f;
+    private boolean loading = false;
 
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
@@ -82,17 +81,26 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
-        if (asset == null) return;
+        loading = true;
+        if (asset == null || asset.getResource() == null) return;
         reset();
 
         setFromData(asset);
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
+        loading = false;
+    }
+
+    @Override
+    public void saveGameAsset() {
+        if(!loading) {
+            super.saveGameAsset();
+        }
     }
 
     private void setInstanceListeners() {
-        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListener() {
+        data.getRoutineInstance().setListener(new RoutineInstance.RoutineListenerAdapter() {
             @Override
             public void onSignalSent(int nodeId, String port) {
                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
@@ -103,6 +111,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             public void onInputFetched(int nodeId, String port) {
                 AbstractRoutineNodeWidget nodeWidget = (AbstractRoutineNodeWidget)nodeBoard.getNodeById(nodeId);
                 nodeWidget.animateInput(port);
+            }
+
+            @Override
+            public void onComplete() {
+
             }
         });
     }
@@ -159,13 +172,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void routineUpdated () {
-        //todo: this isn't right
-        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
-        gameAsset.setUpdated();
-        data.setRoutineInstance(data.createInstance(true));
-        Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+        if(!loading) {
+            //todo: this isn't right
+            saveGameAsset();
+            gameAsset.setUpdated();
+            data.setRoutineInstance(data.createInstance(true));
+            Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
-        setInstanceListeners();
+            setInstanceListeners();
+        }
     }
 
     @EventHandler
@@ -206,14 +221,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             String key = stringAbstractWidgetEntry.key;
             AbstractWidget value = stringAbstractWidgetEntry.value;
 
-            if (value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
+            if (value instanceof TextValueWidget || value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
                 logicNode.setProperty(key, value.getValue());
                 setRoutineDirty = true;
             }
         }
 
         if (setRoutineDirty) {
-            routineInstance.isDirty = true;
+            routineInstance.setDirty();
             routineUpdated();
         }
     }
@@ -276,6 +291,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     public void act() {
+        if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
     }
 

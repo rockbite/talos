@@ -9,7 +9,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 
 
-public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<Texture>> implements GameResourceOwner<Texture> {
+public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> implements GameResourceOwner {
 
     private transient GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
         @Override
@@ -20,7 +20,7 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<Texture>
 
     @Override
     public GameAsset<Texture> parseValueFromString(String value) {
-        return AssetRepository.getInstance().getAssetForIdentifier(value, GameAssetType.SPRITE);
+        return null; // todo: this is important when we bring back the scripts
     }
 
     @Override
@@ -31,9 +31,17 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<Texture>
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        String valueIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-        GameAsset<Texture> asset = AssetRepository.getInstance().getAssetForIdentifier(valueIdentifier, GameAssetType.SPRITE);
+
+        JsonValue value = jsonData.get("value");
+        JsonValue def = jsonData.get("default");
+
+        defaultValue = GameResourceOwner.readAsset(json, def);
+
+        GameAsset<?> asset = GameResourceOwner.readAsset(json, value);
         if (asset != null) {
+            if(asset.isBroken()) {
+                asset = defaultValue;
+            }
             setGameAsset(asset);
         }
     }
@@ -41,21 +49,26 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<Texture>
     @Override
     public void write (Json json) {
         super.write(json);
+        json.writeObjectStart("value");
         GameResourceOwner.writeGameAsset(json, this);
+        json.writeObjectEnd();
+        json.writeObjectStart("default");
+        GameResourceOwner.writeGameAsset("gameResource", json, defaultValue);
+        json.writeObjectEnd();
     }
 
     @Override
     public GameAssetType getGameAssetType() {
-        return GameAssetType.SPRITE;
+        return value.type;
     }
 
     @Override
-    public GameAsset<Texture> getGameResource() {
+    public GameAsset getGameResource() {
         return value;
     }
 
     @Override
-    public void setGameAsset(GameAsset<Texture> newGameAsset) {
+    public void setGameAsset(GameAsset newGameAsset) {
         if (this.value != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.value.listeners.removeValue(gameAssetUpdateListener, true);

@@ -72,14 +72,16 @@ public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> implement
 
 	@Override
 	protected void wrapperSelected() {
+		/*
 		PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-		previewWidget.registerForDragPoints(this);
+		previewWidget.registerForDragPoints(this);*/
 	}
 
 	@Override
 	protected void wrapperDeselected() {
+		/*
 		PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-		previewWidget.unregisterDragPoints(this);
+		previewWidget.unregisterDragPoints(this);*/
 	}
 
 	@Override

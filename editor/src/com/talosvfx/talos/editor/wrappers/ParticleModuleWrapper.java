@@ -79,6 +79,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
 
+        /*
         //Mode
         if(slot.getIndex() == ParticleModule.SPAWN_POSITION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
         if(slot.getIndex() == ParticleModule.SPAWN_ROTATION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
@@ -93,6 +94,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
         if(slot.getIndex() == ParticleModule.POSITION_OVERRIDE) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
         if(slot.getIndex() == ParticleModule.ROTATION_OVERRIDE) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+         */
 
         return null;
     }

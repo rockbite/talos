@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 
@@ -151,6 +152,17 @@ public class AppManager implements Observer {
 		return null;
 	}
 
+	public <T extends BaseApp> T  getAppForAsset(Class<T> appClass, GameAsset<VFXProjectData> gameAsset) {
+		Array<BaseApp> appInstances = getAppInstances();
+		for(BaseApp app: appInstances) {
+			if(appClass.isAssignableFrom(app.getClass()) && app.gameAsset != null && app.gameAsset == gameAsset) {
+				return (T) app;
+			}
+		}
+
+		return null;
+	}
+
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 
 	//Grid layout needs to be able to be setup with layout specific in mind
@@ -246,7 +258,7 @@ public class AppManager implements Observer {
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, SceneEditorApp.class, SceneHierarchyApp.class, ScenePreviewApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SCENE, PropertiesPanelApp.class);
 
-		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class, EmitterTimelineApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.ROUTINE, RoutineEditorApp.class);
 

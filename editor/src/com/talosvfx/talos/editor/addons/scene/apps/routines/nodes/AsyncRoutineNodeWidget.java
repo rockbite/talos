@@ -4,16 +4,19 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.InterpolationTimeline;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.MicroNodeView;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.misc.InterpolationLibrary;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
@@ -53,7 +56,7 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         Field[] declaredFields = Interpolation.class.getDeclaredFields();
         Array<String> interpolationList = new Array<>();
         for(Field field: declaredFields) {
-            if(field.getType().isAssignableFrom(Interpolation.class)) {
+            if(Interpolation.class.isAssignableFrom(field.getType())) {
                 interpolationList.add(field.getName());
             }
         }
@@ -61,6 +64,14 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         interpolationSelectBox = new SelectWidget();
         interpolationSelectBox.init(SharedResources.skin);
         interpolationSelectBox.setOptions(interpolationList);
+
+        interpolationSelectBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                timelineWidget.setInterpolation(InterpolationLibrary.get(interpolationSelectBox.getValue()));
+                reportNodeDataModified();
+            }
+        });
 
         String variableName = "interpolation";
         widgetMap.put(variableName, interpolationSelectBox);
@@ -289,6 +300,9 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         if(minimized) {
             setMini();
         }
+
+        // interpolation
+        timelineWidget.setInterpolation(InterpolationLibrary.get(interpolationSelectBox.getValue()));
     }
 
     @Override

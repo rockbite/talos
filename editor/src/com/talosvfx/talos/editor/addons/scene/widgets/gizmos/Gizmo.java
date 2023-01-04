@@ -108,6 +108,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     }
 
     public boolean hit (float x, float y) {
+        if(gameObject == null) return false;
         getHitBox(hitBox);
 
         if (hitBox.contains(x, y)) {

@@ -1,16 +1,22 @@
 package com.talosvfx.talos.editor.project2.apps;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
+import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXPreviewActivated;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.Preview3D;
+import lombok.Getter;
 
 public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 
 
+	@Getter
 	private Preview3D preview3D;
 
 	public ParticlePreviewApp () {
@@ -43,6 +49,12 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 
 		preview3D.setParticleEffect(gameAsset.getResource());
 
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run() {
+				Notifications.fireEvent(Notifications.obtainEvent(VFXPreviewActivated.class).set(gameAsset));
+			}
+		});
 	}
 
 	@Override

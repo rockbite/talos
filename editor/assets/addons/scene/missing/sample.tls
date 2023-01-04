@@ -1,44 +1,41 @@
 {
-"metaData": {
-	"scopeDefaults": [
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ],
-		[ 1, 1, 1, 0 ]
-	],
-	"previewCamPos": {
-		"x": 0.09185186,
-		"y": 0.09643611
-	},
-	"previewCamZoom": 0.2953625,
-	"bgImagePath": "",
-	"isGridVisible": true,
-	"bgImageIsInBack": true,
-	"bgImageSize": 10,
-	"gridSize": 1,
-	"particlePositionX": 0,
-	"particlePositionY": 0,
-	"resourcePaths": []
-},
 "emitters": [
 	{
 		"name": "default_emitter",
 		"modules": [
 			{
-				"class": "EmitterModuleWrapper",
+				"class": "com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper",
 				"id": 0,
-				"x": 393,
-				"y": 138,
+				"x": 156,
+				"y": -304,
 				"module": {
 					"data": {
-						"class": "EmitterModule",
-						"index": 0,
+						"class": "com.talosvfx.talos.runtime.modules.ParticleModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.DrawableModuleWrapper",
+				"id": 1,
+				"x": 158,
+				"y": 241,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 1
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper",
+				"id": 2,
+				"x": 346,
+				"y": 197,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.EmitterModule",
+						"index": 2,
 						"delay": 0,
 						"duration": 2,
 						"rate": 50
@@ -46,95 +43,39 @@
 				}
 			},
 			{
-				"class": "ParticleModuleWrapper",
-				"id": 1,
-				"x": 396,
-				"y": -159,
-				"module": {
-					"data": {
-						"class": "ParticleModule",
-						"index": 1
-					}
-				}
-			},
-			{
-				"class": "DynamicRangeModuleWrapper",
-				"id": 2,
-				"x": -124,
-				"y": -51,
-				"module": {
-					"data": {
-						"class": "DynamicRangeModule",
-						"index": 2,
-						"points": [
-							{
-								"x": 0,
-								"y": 1
-							}
-						],
-						"lowMin": 0,
-						"lowMax": 0,
-						"highMin": 1,
-						"highMax": 1
-					}
-				},
-				"lowEquals": true,
-				"lowMirror": false,
-				"highEquals": true,
-				"highMirror": false
-			},
-			{
-				"class": "DynamicRangeModuleWrapper",
-				"id": 3,
-				"x": -120,
-				"y": -256,
-				"module": {
-					"data": {
-						"class": "DynamicRangeModule",
-						"index": 3,
-						"points": [
-							{
-								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 1,
-								"y": 1
-							}
-						],
-						"lowMin": 150,
-						"lowMax": 30,
-						"highMin": 90,
-						"highMax": 90
-					}
-				},
-				"lowEquals": false,
-				"lowMirror": true,
-				"highEquals": true,
-				"highMirror": false
-			},
-			{
-				"class": "StaticValueModuleWrapper",
+				"class": "com.talosvfx.talos.editor.wrappers.SingleParticlePointDataGeneratorModuleWrapper",
 				"id": 4,
-				"x": 133,
-				"y": -368,
+				"x": -191,
+				"y": 262,
 				"module": {
 					"data": {
-						"class": "StaticValueModule",
-						"index": 4,
-						"value": 0.2
+						"class": "com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule",
+						"index": 4
 					}
 				}
 			},
 			{
-				"class": "EmConfigModuleWrapper",
+				"class": "com.talosvfx.talos.editor.wrappers.QuadMeshGeneratorModuleWrapper",
 				"id": 5,
-				"x": 7,
-				"y": 237,
+				"x": -188,
+				"y": 161,
 				"module": {
 					"data": {
-						"class": "EmConfigModule",
+						"class": "com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule",
 						"index": 5,
+						"billboard": false
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.EmConfigModuleWrapper",
+				"id": 6,
+				"x": 147,
+				"y": 60,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.EmConfigModule",
+						"index": 6,
 						"additive": true,
 						"isBlendAdd": false,
 						"attached": false,
@@ -145,29 +86,95 @@
 				}
 			},
 			{
-				"class": "CurveModuleWrapper",
-				"id": 6,
-				"x": 36,
-				"y": -540,
+				"class": "com.talosvfx.talos.editor.wrappers.SpriteMaterialModuleWrapper",
+				"id": 7,
+				"x": -191,
+				"y": 345,
 				"module": {
 					"data": {
-						"class": "CurveModule",
-						"index": 6,
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 7,
+						"regionName": "white"
+					}
+				},
+				"filePath": null,
+				"regionName": "white"
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.RadToCartModuleWrapper",
+				"id": 10,
+				"x": -79,
+				"y": -141,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.RadToCartModule",
+						"index": 10
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.StaticValueModuleWrapper",
+				"id": 12,
+				"x": -282,
+				"y": -204,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.StaticValueModule",
+						"index": 12,
+						"value": 1
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.RandomRangeModuleWrapper",
+				"id": 13,
+				"x": -304,
+				"y": -94,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.RandomRangeModule",
+						"index": 13,
+						"min": 138,
+						"max": 42,
+						"distributed": false
+					}
+				},
+				"mirror": true,
+				"equals": false
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.StaticValueModuleWrapper",
+				"id": 14,
+				"x": -386,
+				"y": 157,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.StaticValueModule",
+						"index": 14,
+						"value": 0.2
+					}
+				}
+			},
+			{
+				"class": "com.talosvfx.talos.editor.wrappers.CurveModuleWrapper",
+				"id": 15,
+				"x": -283,
+				"y": -376,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.CurveModule",
+						"index": 15,
 						"points": [
 							{
 								"x": 0,
 								"y": 0
 							},
 							{
-								"x": 0.07818804,
-								"y": 0.9270811
+								"x": 0.1429891,
+								"y": 0.90169334
 							},
 							{
-								"x": 0.6790108,
-								"y": 0.6666645
-							},
-							{
-								"x": 1,
+								"x": 0.99086857,
 								"y": 0
 							}
 						]
@@ -175,85 +182,64 @@
 				}
 			},
 			{
-				"class": "DynamicRangeModuleWrapper",
-				"id": 7,
-				"x": -548,
-				"y": -51,
+				"class": "com.talosvfx.talos.editor.wrappers.StaticValueModuleWrapper",
+				"id": 16,
+				"x": -23,
+				"y": -46,
 				"module": {
 					"data": {
-						"class": "DynamicRangeModule",
-						"index": 7,
-						"points": [
-							{
-								"x": 0,
-								"y": 0
-							},
-							{
-								"x": 1,
-								"y": 1
-							}
-						],
-						"lowMin": 360,
-						"lowMax": 0,
-						"highMin": 0,
-						"highMax": 360
+						"class": "com.talosvfx.talos.runtime.modules.StaticValueModule",
+						"index": 16,
+						"value": 2
 					}
-				},
-				"lowEquals": false,
-				"lowMirror": false,
-				"highEquals": false,
-				"highMirror": false
-			},
-			{
-				"class": "TextureModuleWrapper",
-				"id": 8,
-				"x": -237,
-				"y": 182,
-				"module": {
-					"data": {
-						"class": "TextureModule",
-						"index": 8,
-						"regionName": "white"
-					}
-				},
-				"filePath": null,
-				"regionName": "white"
+				}
 			}
 		],
 		"connections": [
 			{
-				"moduleFrom": 2,
+				"moduleFrom": 5,
 				"moduleTo": 1,
-				"slotTo": 5
-			},
-			{
-				"moduleFrom": 3,
-				"moduleTo": 1,
-				"slotTo": 11
+				"slotTo": 3
 			},
 			{
 				"moduleFrom": 4,
 				"moduleTo": 1,
-				"slotTo": 13
-			},
-			{
-				"moduleFrom": 5,
-				"slotTo": 3
+				"slotTo": 2
 			},
 			{
 				"moduleFrom": 6,
-				"moduleTo": 1,
-				"slotTo": 10
+				"moduleTo": 2,
+				"slotTo": 3
 			},
 			{
 				"moduleFrom": 7,
-				"moduleTo": 1,
-				"slotTo": 7
+				"moduleTo": 1
 			},
 			{
-				"moduleFrom": 8,
-				"moduleTo": 1,
-				"slotTo": 2
+				"moduleFrom": 10,
+				"slotTo": 18
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 10,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 13,
+				"moduleTo": 10
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 5,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 15,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 16,
+				"slotTo": 4
 			}
 		]
 	}

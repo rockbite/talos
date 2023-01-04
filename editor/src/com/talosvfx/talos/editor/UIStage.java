@@ -248,7 +248,7 @@ public class UIStage {
 	}
 
 	public void createModuleListAdvancedPopup(Vector2 location) {
-		moduleListPopup.showPopup(stage, location);
+//		moduleListPopup.showPopup(stage, location);
 	}
 
 

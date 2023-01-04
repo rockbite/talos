@@ -33,7 +33,7 @@ public class StaggerNode extends RoutineNode {
 
         float interpolation = 0;
 
-        if(executedTargets != null && !executedTargets.isEmpty()) {
+        if(executedTargets != null && !executedTargets.isEmpty() && executedTargets.size > 1) {
             if(strategy.equals("INDEX")) {
                 interpolation = (float)executedTargets.indexOf(target, true)/(executedTargets.size-1);
             } else if(strategy.equals("YPOS") || strategy.equals("XPOS")) {
@@ -99,5 +99,11 @@ public class StaggerNode extends RoutineNode {
 
             return 0;
         }
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        orderedArray.clear();
     }
 }

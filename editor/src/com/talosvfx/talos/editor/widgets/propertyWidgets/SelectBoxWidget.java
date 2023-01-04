@@ -66,6 +66,7 @@ public class SelectBoxWidget extends PropertyWidget<String> {
         Array<String> list = optionListSupplier.get();
         if(list != null) {
             selectBox.removeListener(listener);
+            selectBox.getSelection().setProgrammaticChangeEvents(false);
             selectBox.setItems(list);
             selectBox.setVisible(true);
             noValueLabel.setVisible(false);

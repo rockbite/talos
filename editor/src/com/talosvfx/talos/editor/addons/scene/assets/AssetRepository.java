@@ -43,12 +43,15 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
+import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
+import com.talosvfx.talos.runtime.serialization.ConnectionData;
+import com.talosvfx.talos.runtime.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -839,7 +842,7 @@ public class AssetRepository implements Observer {
 				}
 				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
 
-				((GameAsset<RoutineStageData>)gameAssetOut).setResourcePayload(routineStageData);
+				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 
 				break;
 			case PREFAB:
@@ -932,8 +935,8 @@ public class AssetRepository implements Observer {
 				break;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (gameAssetOut != null) {
-				e.printStackTrace();
 				gameAssetOut.setBroken(e);
 				System.out.println("Marking asset as broken " + gameAssetOut + " " + value.handle.path());
 			}
@@ -957,6 +960,7 @@ public class AssetRepository implements Observer {
 	}
 
 	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {
+		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
 		if (useGlobalState) {
 			GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
 			SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
@@ -974,10 +978,16 @@ public class AssetRepository implements Observer {
 		saveStrategyObjectMap.put(GameAssetType.SCENE, this::serializeScene);
 		saveStrategyObjectMap.put(GameAssetType.PREFAB, this::serializePrefab);
 		saveStrategyObjectMap.put(GameAssetType.ROUTINE, this::serializeRoutine);
+		saveStrategyObjectMap.put(GameAssetType.VFX, this::serializeVFX);
 	}
 
 	private String serializeRoutine (GameAsset<RoutineStageData> gameAsset, Json json) {
 		RoutineStageData resource = gameAsset.getResource();
+		return json.prettyPrint(resource);
+	}
+
+	private String serializeVFX (GameAsset<VFXProjectData> gameAsset, Json json) {
+		VFXProjectData resource = gameAsset.getResource();
 		return json.prettyPrint(resource);
 	}
 
@@ -1055,16 +1065,17 @@ public class AssetRepository implements Observer {
 
 	}
 
-	public void updateVFXTLS (RawAsset tlsRawAsset, boolean checkGameResources) {
-//		if (checkGameResources) {
-//			ExportData exportData = exportTLSDataToP(tlsRawAsset.handle);
-//			String exportDataJson = writeTalosPExport(exportData);
-//
-//			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
-//			exportedPFile.writeString(exportDataJson, false);
-//
-//			rawAssetCreated(exportedPFile, checkGameResources);
-//		}
+	public void createPForTLSIfNotExist (RawAsset tlsRawAsset, boolean checkGameResources) {
+		if (checkGameResources) {
+			VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(tlsRawAsset.handle);
+			ExportData exportData = VFXProjectSerializer.exportTLSDataToP(projectData);
+			String exportDataJson = VFXProjectSerializer.writeTalosPExport(exportData);
+
+			FileHandle exportedPFile = tlsRawAsset.handle.parent().child(tlsRawAsset.handle.nameWithoutExtension() + ".p");
+			exportedPFile.writeString(exportDataJson, false);
+
+			rawAssetCreated(exportedPFile, checkGameResources);
+		}
 	}
 
 	public void rawAssetCreated (FileHandle fileHandle, boolean checkGameResources) {
@@ -1073,10 +1084,6 @@ public class AssetRepository implements Observer {
 			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(fileHandle.extension());
 
 			RawAsset rawAsset = new RawAsset(fileHandle);
-
-//			if (assetTypeFromExtension == GameAssetType.VFX) {
-////				updateVFXTLS(rawAsset, checkGameResources);
-//			}
 
 			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(fileHandle);
 			if (metadataHandleFor.exists()) {
@@ -1583,5 +1590,4 @@ public class AssetRepository implements Observer {
 					|| c == '"');
 		}
 	}
-
 }

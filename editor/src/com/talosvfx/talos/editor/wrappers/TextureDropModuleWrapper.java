@@ -43,13 +43,13 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
     protected TextureDropWidget<AbstractModule> dropWidget;
     protected TextureRegion defaultRegion;
 
-    protected String regionName = "fire";
+    protected String regionName = "white";
     protected String filePath = null;
 
     @Override
     protected void configureSlots() {
         final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
-        defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
+        defaultRegion = projectAssetProvider.findAsset("white", TextureRegion.class);
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
 
@@ -109,7 +109,8 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                 filePath = filePath + ".png";
             }
         }
-    
+
+        /*
         final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
         final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
@@ -118,7 +119,7 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
             dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
         } else {
             //TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
-        }
+        }*/
     }
 
     @Override

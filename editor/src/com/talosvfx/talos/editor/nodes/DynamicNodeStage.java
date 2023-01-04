@@ -2,8 +2,6 @@ package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,20 +11,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.kotcrab.vis.ui.FocusManager;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.data.DynamicNodeStageData;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
 
@@ -76,7 +72,7 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     NodeWidget node = createNode(module.getAttribute("name"), screenX, screenY);
                     if(node != null) {
                         node.constructNode(module);
-                        Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
+                        Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(DynamicNodeStage.this, node));
 
                         nodeBoard.tryAndConnectLasCC(node);
 
@@ -127,12 +123,20 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                }
 //                getCameraController().scrolled(amountX, amountY);
                 return super.scrolled(event, x, y, amountX, amountY);
             }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+
                 dragged = false;
 
                 boolean shouldHandle = false;
@@ -158,12 +162,21 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                 if (shouldHandle) {
                     return true;
                 } else {
+                    // unselect
+                    if(!event.isHandled()) {
+                        nodeBoard.clearSelection();
+                    }
+
                     return super.touchDown(event, x, y, pointer, button);
                 }
             }
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return;
+                }
                 super.touchDragged(event, x, y, pointer);
 
                 dragged = true;
@@ -191,7 +204,10 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return;
+                }
                 if(button == 0 && (!event.isCancelled())) { // previously there was event handled, dunno why
 //                    FocusManager.resetFocus(getStage());
                     nodeBoard.clearSelection();
@@ -210,6 +226,10 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if (stageSentIn != event.getStage()) {
+                    event.cancel();
+                    return super.keyDown(event, keycode);
+                }
 //
 //                if(keycode == Input.Keys.F5) {
 //                    stage.getCamera().position.set(0, 0, 0);
@@ -277,5 +297,10 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     @Override
     public void fileDrop (String[] paths, float x, float y) {
 
+    }
+
+    @Override
+    public DynamicNodeStage<?> getContext () {
+       return this;
     }
 }

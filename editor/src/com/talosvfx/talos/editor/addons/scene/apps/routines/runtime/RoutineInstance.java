@@ -1,10 +1,14 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import lombok.Getter;
@@ -17,7 +21,13 @@ public class RoutineInstance {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
+    @Getter
+    private ObjectMap<String, RoutineNode> customLookup = new ObjectMap<>();
+
     private ObjectMap<String, RoutineNode> lookup = new ObjectMap<>();
+
+    @Getter
+    private ObjectMap<String, PropertyWrapper> properties = new ObjectMap<>();
 
     private Array<TickableNode> tickableNodes = new Array<>();
 
@@ -34,7 +44,10 @@ public class RoutineInstance {
     public Array<Integer> scopeNumbers = new Array<>();
     private float requesterId;
 
-    public transient boolean isDirty = true;
+    @Getter
+    private transient boolean isDirty = true;
+
+    public boolean configured = false;
 
     @Getter
     private Array<PropertyWrapper<?>> parentPropertyWrappers;
@@ -43,15 +56,82 @@ public class RoutineInstance {
     private Object signalPayload;
 
     @Setter
-    private RoutineListener listener;
+    private RoutineListenerAdapter listener;
+
+    @Getter@Setter
+    private SavableContainer container;
+    private GameObject cameraGO;
 
     public void reset() {
         clearMemory();
         globalMap.clear();
         scopeNumbers.clear();
 
-        for (ObjectMap.Entry<String, RoutineNode> entry : lookup) {
-            entry.value.reset();
+        signalPayload = null;
+
+        for (IntMap.Entry<RoutineNode> routineNodeEntry : lowLevelLookup) {
+            routineNodeEntry.value.reset();
+        }
+    }
+
+    public <T extends RoutineNode> Array<T> getNodesByClass(Class<T> clazz) {
+        Array<T> result = new Array<>();
+        for (IntMap.Entry<RoutineNode> entry : lowLevelLookup) {
+            if(entry.value.getClass().isAssignableFrom(clazz)) {
+                result.add((T) entry.value);
+            }
+        }
+
+        return result;
+    }
+
+    public void complete() {
+        if(listener != null) {
+            if(!listener.isTerminated()) {
+                listener.onComplete();
+            }
+        }
+    }
+
+    public void removeListener() {
+        listener = null;
+    }
+
+    public void setDirty() {
+        configured = false;
+        this.isDirty = true;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.isDirty = dirty;
+    }
+
+    public void setCameraGO(GameObject cameraGO) {
+        this.cameraGO = cameraGO;
+    }
+
+    public static class RoutineListenerAdapter implements RoutineListener {
+
+        @Getter
+        private boolean terminated = false;
+
+        @Override
+        public void onSignalSent(int nodeId, String port) {
+
+        }
+
+        @Override
+        public void onInputFetched(int nodeId, String port) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+
+        public void terminate() {
+            terminated = true;
         }
     }
 
@@ -59,6 +139,8 @@ public class RoutineInstance {
         void onSignalSent(int nodeId, String port);
 
         void onInputFetched(int nodeId, String port);
+
+        void onComplete();
     }
 
     public RoutineInstance() {
@@ -203,8 +285,10 @@ public class RoutineInstance {
     }
 
     public void tick(float delta) {
-        for(TickableNode node: tickableNodes) {
-            node.tick(delta);
+        if(checkConfigured()) {
+            for (TickableNode node : tickableNodes) {
+                node.tick(delta);
+            }
         }
     }
 
@@ -218,6 +302,26 @@ public class RoutineInstance {
     public void onInputFetched(int nodeId, String portName) {
         if(listener != null) {
             listener.onInputFetched(nodeId, portName);
+        }
+    }
+
+    public boolean checkConfigured() {
+        if(!configured) {
+            for (IntMap.Entry<RoutineNode> entry : lowLevelLookup) {
+                if(!entry.value.isConfigured()) {
+                    return false;
+                }
+            }
+
+            configured = true;
+        }
+
+        return true;
+    }
+
+    public void applyQuadDiff(Vector2 diff) {
+        for (DrawableQuad drawableQuad : drawableQuads) {
+            drawableQuad.position.add(diff);
         }
     }
 }

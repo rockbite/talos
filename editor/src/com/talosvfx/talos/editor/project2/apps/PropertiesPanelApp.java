@@ -47,7 +47,9 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> impl
 	@Override
 	public void updateForGameAsset (GameAsset<IPropertyHolder> gameAsset) {
 		super.updateForGameAsset(gameAsset);
-		propertyPanel.showPanel(gameAsset.getResource(), gameAsset.getResource().getPropertyProviders());
+		if (gameAsset.getResource() != null) {
+			propertyPanel.showPanel(gameAsset.getResource(), gameAsset.getResource().getPropertyProviders());
+		}
 	}
 
 	@Override

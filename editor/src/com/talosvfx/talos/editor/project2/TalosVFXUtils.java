@@ -8,6 +8,7 @@ import com.rockbite.bongo.engine.collections.SerializableObjectIntMap;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
+import lombok.Getter;
 
 public class TalosVFXUtils {
 
@@ -15,6 +16,7 @@ public class TalosVFXUtils {
 
 	public static TalosAssetProvider talosAssetProvider;
 
+	@Getter
 	private static ModuleListPopup moduleListPopup;
 
 	public static void init () {

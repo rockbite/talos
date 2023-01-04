@@ -124,13 +124,13 @@ public class BasicPopup<T> extends Table {
         return this;
     }
 
-    public void show(Actor actor, float x, float y) {
+    public BasicPopup<T> show(Actor actor, float x, float y) {
         Vector2 tmp = new Vector2(x, y);
         actor.localToStageCoordinates(tmp);
-        show(tmp.x, tmp.y);
+        return show(tmp.x, tmp.y);
     }
 
-    public void show(float x, float y) {
+    public BasicPopup<T> show(float x, float y) {
         pack();
 
         if(x + getWidth() > SharedResources.stage.getWidth()) {
@@ -141,6 +141,8 @@ public class BasicPopup<T> extends Table {
         SharedResources.stage.addActor(this);
 
         SharedResources.stage.addListener(stageListener);
+
+        return this;
     }
 
     public void hide() {

@@ -26,6 +26,10 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
         }
     }
 
+    public void setValueUnsafe (Object value) {
+        this.value = (T) value;
+    }
+
     public void setValue (T value) {
         this.value = value;
     }
@@ -71,4 +75,5 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public void setDefault () {
         this.value = defaultValue;
     }
+
 }

@@ -21,7 +21,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture> {
+public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture>, ISizableComponent {
 
     public transient GameAsset<Texture> defaultGameAsset;
     public GameAsset<Texture> gameAsset;
@@ -277,5 +277,25 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         if (defaultGameAsset != null) {
             setGameAsset(defaultGameAsset);
         }
+    }
+
+    @Override
+    public float getWidth() {
+        return size.x;
+    }
+
+    @Override
+    public float getHeight() {
+        return size.y;
+    }
+
+    @Override
+    public void setWidth(float width) {
+        size.x = width;
+    }
+
+    @Override
+    public void setHeight(float height) {
+        size.y = height;
     }
 }

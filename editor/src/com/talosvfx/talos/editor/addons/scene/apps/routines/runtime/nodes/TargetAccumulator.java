@@ -20,6 +20,7 @@ public class TargetAccumulator extends RoutineNode {
                 routineInstanceRef.setSignalPayload(target);
                 sendSignal("onComplete");
             }
+            list.clear();
         }
     }
 

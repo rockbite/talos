@@ -96,7 +96,7 @@ public class MainRenderer implements Observer {
 
         Notifications.registerObserver(this);
 
-        talosRenderer = new SpriteBatchParticleRenderer(null);
+        talosRenderer = new SpriteBatchParticleRenderer(camera);
         spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
@@ -362,6 +362,7 @@ public class MainRenderer implements Observer {
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.color);
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -587,7 +588,7 @@ public class MainRenderer implements Observer {
     }
 
     private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
-        if(false && patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
+        if(patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(texture);
         } else {
             NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
@@ -660,19 +661,20 @@ public class MainRenderer implements Observer {
 
         if (event.getComponent() instanceof RoutineRendererComponent) {
             RoutineRendererComponent routineRendererComponent = (RoutineRendererComponent) event.getComponent();
-            routineRendererComponent.routineInstance.isDirty = true;
+            routineRendererComponent.routineInstance.setDirty();
         }
 
         GameObject gameObject = event.getComponent().getGameObject();
         if (event.getComponent() instanceof TransformComponent && gameObject.hasComponent(RoutineRendererComponent.class)) {
             RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-            component.routineInstance.isDirty = true;
+            component.routineInstance.setDirty();
         }
     }
 
     public void setCamera (Camera camera) {
 
         this.camera = camera;
+        talosRenderer.setCamera(camera);
     }
 
 

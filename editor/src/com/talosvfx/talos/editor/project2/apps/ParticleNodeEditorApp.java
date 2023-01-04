@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.project2.apps;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -8,16 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.GridRendererWrapper;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.GroupData;
@@ -29,12 +33,15 @@ import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
+import lombok.Getter;
 
 import java.util.Comparator;
 
-public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
+public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences> {
 
+	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
+	private final GenericStageWrappedViewportWidget moduleGraphUIWrapper;
 
 	private Comparator<ParticleEmitterWrapper> emitterComparator = new Comparator<ParticleEmitterWrapper>() {
 		@Override
@@ -45,15 +52,24 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 	ParticleEffectDescriptor particleEffectDescriptor;
 	ParticleEffectInstance particleEffect;
+	@Getter
 	private VFXEditorState editorState;
 
 	public ParticleNodeEditorApp () {
 		this.singleton = false;
 
-		moduleBoardWidget = new ModuleBoardWidget();
+		moduleBoardWidget = new ModuleBoardWidget(this);
 
-		GenericStageWrappedViewportWidget moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget);
+		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget) {
+			@Override
+			protected boolean canMoveAround() {
+				return true;
+			}
+		};
 		moduleGraphUIWrapper.disableListeners();
+		moduleGraphUIWrapper.panRequiresSpace(false);
+
+		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
 
 		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
 			@Override
@@ -82,6 +98,10 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 		};
 	}
 
+	private void saveProjectToData(VFXProjectData projectData) {
+		projectData.setFrom(moduleBoardWidget);
+	}
+
 	private void loadProject (VFXProjectData projectData) {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
@@ -92,6 +112,9 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 				if (Sprite.class.isAssignableFrom(clazz)) {
 					GameAsset<Texture> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+					if(gameAsset.getResource() == null) {
+						gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
+					}
 					return (T)new Sprite(gameAsset.getResource());
 				}
 
@@ -160,14 +183,13 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 	}
 
-	private ParticleEmitterWrapper initEmitter (String emitterName) {
+	public ParticleEmitterWrapper initEmitter (String emitterName) {
 		ParticleEmitterWrapper emitterWrapper = new ParticleEmitterWrapper();
 		emitterWrapper.setName(emitterName);
 
 		ParticleEmitterDescriptor moduleGraph = particleEffectDescriptor.createEmitterDescriptor();
 		emitterWrapper.setModuleGraph(moduleGraph);
 
-//		particleEffect.addAdvancedEmitter(moduleGraph);
 		particleEffect.addEmitter(moduleGraph);
 
 		return emitterWrapper;
@@ -210,7 +232,14 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 
 		loadProject(gameAsset.getResource());
 
+		TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run() {
+				Notifications.fireEvent(Notifications.obtainEvent(VFXEditorActivated.class).set(gameAsset));
+			}
+		});
 	}
 
 	@Override
@@ -225,6 +254,30 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> {
 	@Override
 	public void onRemove () {
 
+	}
+
+	@Override
+	public void applyFromPreferences(ViewportPreferences prefs) {
+		moduleGraphUIWrapper.setCameraPos(prefs.cameraPos);
+		moduleGraphUIWrapper.setCameraZoom(prefs.cameraZoom);
+	}
+
+	@Override
+	public ViewportPreferences getPrefs() {
+		ViewportPreferences prefs = new ViewportPreferences();
+		prefs.cameraPos = moduleGraphUIWrapper.getCameraPos();
+		prefs.cameraZoom = moduleGraphUIWrapper.getCameraZoom();
+		return prefs;
+	}
+
+	public void dataModified() {
+		saveProjectToData(gameAsset.getResource());
+		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+		gameAsset.setUpdated();
+	}
+
+	public void resetToNew() {
+		// ?
 	}
 }
 

@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.*;
+import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -227,6 +228,7 @@ public class SceneEditorWorkspace extends ViewportWidget<ViewportPreferences> im
 			@Override
 			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+				// TODO: this needs a nicer system
 
 				if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
 					//We support single game asset drops
@@ -256,6 +258,19 @@ public class SceneEditorWorkspace extends ViewportWidget<ViewportPreferences> im
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
 						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.SKELETON) {
+						GameAsset<SkeletonData> gameAsset = (GameAsset<SkeletonData>)gameAssetPayload.getGameAsset();
+
+						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
+						vec.set(touchToWorld.x, touchToWorld.y);
+
+						SceneUtils.createSpineObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+
+						//forcefully make active if we aren't active
+						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
 					}
 					return;
 				}
@@ -1133,7 +1148,16 @@ public class SceneEditorWorkspace extends ViewportWidget<ViewportPreferences> im
 		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
 		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
 		for (RoutineRendererComponent updatedComponent : updatedComponents) {
-			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
+			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent, true); //We set rapid to true so it doesn't save
+		}
+
+
+		//Check if any got updateed and we need to save
+		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+			if (updatedComponent.isRequiresWrite()) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, false); //Don't use global state because it came from routine
+				return;
+			}
 		}
 	}
 
@@ -1253,8 +1277,17 @@ public class SceneEditorWorkspace extends ViewportWidget<ViewportPreferences> im
 			return true;
 		}
 
-		if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
-			return true;
+		//if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
+		if(gizmo != null) {
+			if(!(gizmo instanceof GroupSelectionGizmo)) {
+				if(gizmo.getGameObject().isEditorTransformLocked()) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
 		}
 
 		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {

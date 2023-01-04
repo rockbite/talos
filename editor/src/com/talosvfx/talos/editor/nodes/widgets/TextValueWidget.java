@@ -248,12 +248,18 @@ public class TextValueWidget extends AbstractWidget<String> {
     }
 
     public void setValue(String text) {
+        setValue(text, isChanged(text));
+    }
+
+    public void setValue(String text, boolean notify) {
         valueLabel.setText(text);
         textField.setText(text);
 
         value = text;
 
-        fireChangedEvent();
+        if (notify) {
+            fireChangedEvent();
+        }
     }
 
 
@@ -274,7 +280,7 @@ public class TextValueWidget extends AbstractWidget<String> {
 
     @Override
     public void read (Json json, JsonValue jsonValue) {
-        setValue(jsonValue.asString());
+        setValue(jsonValue.asString(), false);
     }
 
     @Override
