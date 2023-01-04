@@ -21,6 +21,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
     private boolean isYoyo = false;
     private Interpolation interpolation = Interpolation.linear;
+    private Object targets;
 
     // override fetching of variables, so that before fetching it sets "fetch payload",
     // so when fetching it uses that payload to provide proper data, which for example will be used by stagger node or other
@@ -49,6 +50,16 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
     @Override
     public void receiveSignal(String portName) {
         U signalPayload = (U)routineInstanceRef.getSignalPayload();
+
+        if(!supportsConcurrent()) {
+            for (int i = states.size - 1; i >= 0; i--) {
+                if (states.get(i).getTarget() == signalPayload) {
+                    //states.get(i).alpha = 0;
+                    return;
+                }
+            }
+        }
+
         T state = obtainState();
         state.setTarget(signalPayload);
         state.alpha = 0;
@@ -67,6 +78,12 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         } else {
             Pools.free(state);
         }
+
+        targets = routineInstanceRef.fetchGlobal("executedTargets");
+    }
+
+    protected boolean supportsConcurrent() {
+        return false;
     }
 
 
@@ -114,6 +131,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         for(U target: tmpArr) {
             // this now needs to send signal to next guy
             routineInstanceRef.setSignalPayload(target);
+            routineInstanceRef.storeGlobal("executedTargets", targets);
             sendSignal("onComplete");
         }
         tmpArr.clear();

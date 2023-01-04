@@ -35,6 +35,15 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "MoveTowardsNode" title = "Move Towards" keywords = "movement" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <value port="input" name="x" type="float" min="-1000" max="1000">X: </value>
+                <value port="input" name="y" type="float" min="-1000" max="1000">Y: </value>
+            </group>
+            <dynamicValue port="input" name="speed" type="float" default="1">speed</dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "ColorToNode" title = "Color To" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <color port="input" name="color" type="color">Color: </color>
@@ -60,6 +69,7 @@
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
                 <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
             </group>
+            <checkbox name="additive" default = "false">Additive</checkbox>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
@@ -87,6 +97,7 @@
                 <value port="input" name="stopSignal" type="signal">stop</value>
                 <value port="input" name="flag" type="boolean">flag</value>
             </group>
+            <dynamicValue name="count" type="float" default="10" step="1" min="0" max="1000">count</dynamicValue>
             <dynamicValue name="interval" type="float" default="1">interval</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
@@ -95,6 +106,11 @@
         <module name = "RemoveEntityNode" title = "Remove Entity" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name="GetTransformNode" title="Get Transform" keywords="" class="RoutineNodeWidget">
+            <inputText name="target" type="string">target</inputText>
+            <value port="output" name="x" type="float">x</value>
+            <value port="output" name="y" type="float">y</value>
         </module>
         <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="addSignal" type="signal">add</value>
@@ -120,6 +136,7 @@
         </module>
         <module name = "SpawnSpineNode" title = "Spawn Spine" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
             <asset port="input" name="spine" type="SKELETON">spine</asset>
             <color port="input" name="color" type="color">Color: </color>
             <value port="input" name="layerOrder" type="int">Layer order</value>
@@ -306,6 +323,7 @@
                 <dynamicValue port="input" name="min" type="float" default="0" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
                 <dynamicValue port="input" name="max" type="float" default="1" min = "-1000" max = "1000" step="0.01">max: </dynamicValue>
             </group>
+            <checkbox name="random" default = "false">New Everytime</checkbox>
             <value port="output" name="output" type="float">output</value>
         </module>
         <module name = "AssetSelectNode" title = "Asset Select" keywords = "" class = "RoutineNodeWidget">

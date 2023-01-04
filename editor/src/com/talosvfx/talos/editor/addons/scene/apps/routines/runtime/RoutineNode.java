@@ -259,8 +259,10 @@ public abstract class RoutineNode {
                     String targetName = connection.toPort.name;
 
                     Object payload = routineInstanceRef.getSignalPayload();
+                    Object targets = routineInstanceRef.fetchGlobal("executedTargets");
                     targetNode.receiveSignal(targetName);
                     routineInstanceRef.setSignalPayload(payload);
+                    routineInstanceRef.storeGlobal("executedTargets", targets);
                 }
             }
         }
@@ -308,6 +310,18 @@ public abstract class RoutineNode {
         if(port == null) return "";
 
         return (String) port.valueOverride;
+    }
+
+    protected boolean isPortConnected(String key) {
+        Port port = inputs.get(key);
+        if(port == null) return false;
+        if(port.connectionType == ConnectionType.DATA) {
+            if (!port.connections.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected float fetchFloatValue(String key) {
