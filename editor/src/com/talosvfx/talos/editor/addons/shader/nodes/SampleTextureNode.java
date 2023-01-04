@@ -8,7 +8,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 
 import java.io.File;
 
@@ -149,7 +149,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
 
                     updatePreview();
 
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(SampleTextureNode.this));
+                    Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), SampleTextureNode.this));
                 } catch (Exception e) {
 
                 }

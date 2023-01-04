@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.notifications;
 
-import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -9,10 +8,7 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
-import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
-import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
-import com.talosvfx.talos.editor.notifications.events.*;
+import lombok.Getter;
 
 public class Notifications {
 
@@ -26,8 +22,15 @@ public class Notifications {
 
 	}
 
-	public interface EventRunner {
-		public void runEvent (TalosEvent event);
+	public abstract class EventRunner {
+
+		@Getter
+		private final Observer observer;
+
+		public EventRunner (Observer observer) {
+			this.observer = observer;
+		}
+		public abstract void runEvent (TalosEvent event);
 	}
 
 	private static Notifications getInstance () {
@@ -83,7 +86,7 @@ public class Notifications {
 
 				method.setAccessible(true);
 
-				EventRunner eventRunner = new EventRunner() {
+				EventRunner eventRunner = new EventRunner(observer) {
 					@Override
 					public void runEvent (TalosEvent event) {
 						try {
@@ -112,15 +115,7 @@ public class Notifications {
 	public void fireEventInner (TalosEvent event) {
 		if (invocationMap.containsKey(event.getClass())) {
 			for (EventRunner eventRunner : invocationMap.get(event.getClass())) {
-				if (event instanceof TalosContextBasedEvent) {
-					Object context = ((TalosContextBasedEvent) event).getContext();
-					Observer observerForEventRunner = getObserverForEventRunner(eventRunner);
-					if (context != observerForEventRunner) {
-						continue;
-					}
-				}
-
-				eventRunner.runEvent(event);
+				testAndFireEvent(eventRunner, event);
 			}
 		}
 
@@ -131,16 +126,24 @@ public class Notifications {
 		eventPoolMap.get(event.getClass()).free(event);
 	}
 
-	private Observer getObserverForEventRunner (EventRunner eventRunner) {
-		for (ObjectMap.Entry<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerObjectMapEntry : observerInvocationMap) {
-			for (ObjectMap.Entry<Class<? extends TalosEvent>, EventRunner> classEventRunnerEntry : observerObjectMapEntry.value) {
-				if (classEventRunnerEntry.value == eventRunner) {
-					return observerObjectMapEntry.key;
-				}
+	private void testAndFireEvent (EventRunner eventRunner, TalosEvent event) {
+		if (event instanceof ContextRequiredEvent) {
+			if (!(eventRunner.getObserver() instanceof EventContextProvider)) {
+				throw new GdxRuntimeException("Invalid event handler. Events that extend ContextRequiredEvent must have their " +
+						"owner class implement ContextProvider");
 			}
-		}
 
-		return null;
+			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
+
+			if (eventContextObject == null) {
+				throw new GdxRuntimeException("Invalid event, context must be provided");
+			}
+			if (!(eventContextObject == eventRunner.getObserver())) {
+				return;
+			}
+
+		}
+		eventRunner.runEvent(event);
 	}
 
 	public void notifyObserversInner (Array<Observer> observers, TalosEvent event) {
@@ -148,7 +151,7 @@ public class Notifications {
 			ObjectMap<Class<? extends TalosEvent>, EventRunner> eventMap = observerInvocationMap.get(observer);
 			EventRunner eventRunner = eventMap.get(event.getClass());
 
-			eventRunner.runEvent(event);
+			testAndFireEvent(eventRunner, event);
 
 			eventPoolMap.get(event.getClass()).free(event);
 		}

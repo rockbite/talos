@@ -1147,7 +1147,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
 		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
 		for (RoutineRendererComponent updatedComponent : updatedComponents) {
-			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
+			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent, true); //We set rapid to true so it doesn't save
+		}
+
+
+		//Check if any got updateed and we need to save
+		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+			if (updatedComponent.isRequiresWrite()) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, false); //Don't use global state because it came from routine
+				return;
+			}
 		}
 	}
 

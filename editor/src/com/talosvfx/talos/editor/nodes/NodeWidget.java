@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.nodes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,10 +15,9 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
@@ -171,8 +169,12 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
             Vector2 tmp = new Vector2();
             Vector2 prev = new Vector2();
 
+            Vector2 start = new Vector2();
+            boolean hasMoved = false;
+
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 prev.set(x, y);
+                start.set(getX(), getY());
                 NodeWidget.this.localToStageCoordinates(prev);
                 if(nodeBoard != null) {
                     nodeBoard.nodeClicked(NodeWidget.this);
@@ -189,6 +191,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                     nodeBoard.wrapperMovedBy(NodeWidget.this, tmp.x - prev.x, tmp.y - prev.y);
                 }
 
+                if (!(start.epsilonEquals(getX(), getY()))) {
+                    hasMoved = true;
+                }
+
                 prev.set(tmp);
             }
 
@@ -196,9 +202,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
                 if(nodeBoard != null) {
-                    nodeBoard.nodeClickedUp(NodeWidget.this);
+                    nodeBoard.nodeClickedUp(NodeWidget.this, hasMoved);
                 }
                 event.cancel();
+                hasMoved = false;
             }
         });
     }
@@ -546,7 +553,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     protected void reportNodeDataModified() {
-        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(NodeWidget.this));
+        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this));
     }
 
     public void constructNode(XmlReader.Element module) {
