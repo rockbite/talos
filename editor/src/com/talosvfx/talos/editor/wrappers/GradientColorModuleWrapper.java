@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.values.ColorPoint;
 import com.talosvfx.talos.editor.widgets.GradientWidget;
@@ -55,7 +56,8 @@ public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModul
                 picker.setListener(null);
                 picker.setColor(point.color);
 
-                TalosMain.Instance().UIStage().getStage().addActor(picker.fadeIn());
+                SharedResources.stage.addActor(picker.fadeIn());
+                picker.toFront();
 
                 picker.setListener(new ColorPickerAdapter() {
                     @Override

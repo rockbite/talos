@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -31,8 +30,6 @@ import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.assets.AssetProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,31 +191,8 @@ public class SceneUtils {
 				}
 				AssetRepository.getInstance().copySampleParticleToProject(vfx);
 				sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
-				AssetRepository.getInstance().createPForTLSIfNotExist(sample.getRootRawAsset(), true);
 			}
-			// TODO: this shit needs to be refactored and delegated :(
 			ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
-			VFXProjectData vfxProjectData = sample.getResource();
-			ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-			GameAsset pAsset = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX_OUTPUT);
-			descriptor.setAssetProvider(new AssetProvider() {
-				@Override
-				public <T> T findAsset (String assetName, Class<T> clazz) {
-
-					if (Sprite.class.isAssignableFrom(clazz)) {
-						GameAsset<Texture> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-						if(gameAsset.getResource() == null) {
-							gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
-						}
-						return (T)new Sprite(gameAsset.getResource());
-					}
-
-					throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
-				}
-			});
-			descriptor.load(pAsset.getRootRawAsset().handle);
-			vfxProjectData.setDescriptor(descriptor);
-
 			particleComponent.setGameAsset(sample);
 		}
 	}

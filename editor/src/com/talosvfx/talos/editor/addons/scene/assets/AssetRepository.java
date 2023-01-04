@@ -42,12 +42,14 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
@@ -835,6 +837,10 @@ public class AssetRepository implements Observer {
 
 				VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
 				((GameAsset<VFXProjectData>)gameAssetOut).setResourcePayload(projectData);
+
+				//This is mega hack. Only because we will be making it into DynamicNodeStage later
+				ParticleNodeEditorApp app = new ParticleNodeEditorApp();
+				app.loadProject(projectData);
 
 
 				break;

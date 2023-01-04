@@ -102,7 +102,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		projectData.setFrom(moduleBoardWidget);
 	}
 
-	private void loadProject (VFXProjectData projectData) {
+	public void loadProject (VFXProjectData projectData) {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
 
