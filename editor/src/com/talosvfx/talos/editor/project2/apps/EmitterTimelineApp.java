@@ -29,7 +29,7 @@ public class EmitterTimelineApp extends AppManager.BaseApp<VFXProjectData> imple
 
         emitterList = new EmitterList(SharedResources.skin);
 
-        this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        this.gridAppReference = new DummyLayoutApp<VFXProjectData>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent () {
                 return emitterList;

@@ -71,7 +71,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
 
-		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		this.gridAppReference = new DummyLayoutApp<VFXProjectData>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return moduleGraphUIWrapper;
@@ -272,7 +272,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	public void dataModified() {
 		saveProjectToData(gameAsset.getResource());
-		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+		AssetRepository.getInstance().assetChanged(gameAsset);
 		gameAsset.setUpdated();
 	}
 

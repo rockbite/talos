@@ -22,7 +22,7 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> impl
 		this.singleton = true;
 
 		propertyPanel = new SEPropertyPanel();
-		DummyLayoutApp propertyPanelApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		DummyLayoutApp<IPropertyHolder> propertyPanelApp = new DummyLayoutApp<IPropertyHolder>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return propertyPanel;

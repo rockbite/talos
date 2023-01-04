@@ -56,8 +56,8 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
         });
     }
 
-    public void saveGameAsset () {
-        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+    public void markAssetChanged () {
+        AssetRepository.getInstance().assetChanged(gameAsset);
     }
 
     @Override

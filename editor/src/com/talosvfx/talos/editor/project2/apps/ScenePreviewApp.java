@@ -25,7 +25,7 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
         workspaceWidget = new ScenePreviewStage();
         workspaceWidget.disableListeners();
 
-        DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        DummyLayoutApp<Scene> sceneEditorWorkspaceApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent () {
                 return workspaceWidget;

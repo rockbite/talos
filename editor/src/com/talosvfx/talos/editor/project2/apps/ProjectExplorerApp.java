@@ -21,7 +21,7 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 		super.updateForGameAsset(gameAsset);
 
 		projectExplorerWidget = new ProjectExplorerWidget();
-		DummyLayoutApp assetDirectoryApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		DummyLayoutApp<Object> assetDirectoryApp = new DummyLayoutApp<Object>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return projectExplorerWidget;

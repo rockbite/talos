@@ -119,7 +119,7 @@ public class SceneUtils {
 		selectGameObjectExternallyEvent.setGameObject(gameObject);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
 
-		saveContainer(gameObjectContainer);
+		markContainerChanged(gameObjectContainer);
 
 	}
 
@@ -251,7 +251,7 @@ public class SceneUtils {
 		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
 
-		saveContainer(currentContainer);
+		markContainerChanged(currentContainer);
 
 	}
 
@@ -265,7 +265,7 @@ public class SceneUtils {
 		gameObjectDeleted.setTarget(gameObject);
 		Notifications.fireEvent(gameObjectDeleted);
 
-		saveContainer(gameObjectContainer);
+		markContainerChanged(gameObjectContainer);
 
 	}
 
@@ -291,7 +291,7 @@ public class SceneUtils {
 		componentAdded.setComponent(component);
 		Notifications.fireEvent(componentAdded);
 
-		saveContainer(currentHolder);
+		markContainerChanged(currentHolder);
 	}
 
 	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component) {
@@ -307,14 +307,14 @@ public class SceneUtils {
 		Notifications.fireEvent(componentUpdated);
 
 		if (!isRapid) {
-			saveContainer(gameObjectContainer);
+			markContainerChanged(gameObjectContainer);
 		}
 	}
-	private static void saveContainer (GameObjectContainer currentHolder) {
+	private static void markContainerChanged (GameObjectContainer currentHolder) {
 		if (currentHolder instanceof Scene) {
 			GameAsset<Scene> sceneGameAsset = AssetRepository.getInstance().getAssetForResource((Scene)currentHolder);
 			if (sceneGameAsset != null) {
-				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(sceneGameAsset, true);
+				AssetRepository.getInstance().assetChanged(sceneGameAsset);
 			} else {
 				logger.error("Couldn't find game asset for resource {}", currentHolder);
 				Toasts.getInstance().showErrorToast("Couldn't save scene");
@@ -322,7 +322,7 @@ public class SceneUtils {
 		} else if (currentHolder instanceof Prefab) {
 			GameAsset<Prefab> prefabGameAsset = AssetRepository.getInstance().getAssetForResource((Prefab)currentHolder);
 			if (prefabGameAsset != null) {
-				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(prefabGameAsset, true);
+				AssetRepository.getInstance().assetChanged(prefabGameAsset);
 			} else {
 				logger.error("Couldn't find game asset for resource {}", currentHolder);
 				Toasts.getInstance().showErrorToast("Couldn't save prefab");
@@ -331,7 +331,7 @@ public class SceneUtils {
 			//We need to find the scene that this game object belongs to, and get the game asset for that and save it
 
 			GameObjectContainer gameObjectContainerRoot = ((GameObject)currentHolder).getGameObjectContainerRoot();
-			saveContainer(gameObjectContainerRoot);
+			markContainerChanged(gameObjectContainerRoot);
 		} else {
 			logger.info("Not something we can save");
 		}
