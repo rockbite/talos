@@ -991,6 +991,8 @@ public class AssetRepository implements Observer {
 	}
 
 	public void assetChanged (GameAsset<?> gameAsset) {
+		Toasts.getInstance().showInfoToast("Marked changes " + gameAsset.nameIdentifier);
+
 		GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
 		SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
 	}

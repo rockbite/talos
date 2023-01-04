@@ -58,7 +58,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     }
 
     public void markAssetChanged () {
-        Toasts.getInstance().showInfoToast("Marked node stage changes");
         AssetRepository.getInstance().assetChanged(gameAsset);
     }
 

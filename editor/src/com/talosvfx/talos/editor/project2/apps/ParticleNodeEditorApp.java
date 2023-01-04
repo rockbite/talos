@@ -274,9 +274,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	}
 
 	public void dataModified() {
-		saveProjectToData(gameAsset.getResource());
-		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
-		gameAsset.setUpdated();
+		AssetRepository.getInstance().assetChanged(gameAsset);
+
+//		saveProjectToData(gameAsset.getResource());
+//		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+//		gameAsset.setUpdated();
 	}
 
 	public void resetToNew() {
