@@ -149,7 +149,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         if(!currAnimation.isEmpty()) {
             Animation animation = skeleton.getData().findAnimation(currAnimation);
-            animationState.setAnimation(0, animation, true);
+            if(animation != null) {
+                animationState.setAnimation(0, animation, true);
+            }
         }
 
         super.read(json, jsonData);
