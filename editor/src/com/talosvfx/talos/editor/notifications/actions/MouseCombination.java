@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.notifications.actions;
 
 import com.badlogic.gdx.Input;
 
-public class MouseCombination extends CombinationWithModifier {
+public class MouseCombination extends AbstractCombinationWithModifier {
     private MouseAction mouseAction;
     private boolean isMouseActionDone = false;
 
@@ -66,7 +66,7 @@ public class MouseCombination extends CombinationWithModifier {
 
     @Override
     public void actionIsRun() {
-
+        isMouseActionDone = false;
     }
 
     @Override

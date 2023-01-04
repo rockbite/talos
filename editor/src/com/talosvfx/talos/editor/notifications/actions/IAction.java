@@ -7,8 +7,6 @@ public interface IAction {
 
     String getFullName();
 
-    void setFullName(String fullName);
-
     String getUniqueName();
 
     Combination getActiveCombination();

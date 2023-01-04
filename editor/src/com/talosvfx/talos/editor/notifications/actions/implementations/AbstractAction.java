@@ -11,7 +11,7 @@ public abstract class AbstractAction implements IAction {
     private final String name;
     @Getter
     private final String description;
-    @Getter @Setter
+    @Getter
     private String fullName;
 
     @Getter

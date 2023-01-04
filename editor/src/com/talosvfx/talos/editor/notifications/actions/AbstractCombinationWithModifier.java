@@ -3,12 +3,15 @@ package com.talosvfx.talos.editor.notifications.actions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 
-public abstract class CombinationWithModifier implements Combination {
+public abstract class AbstractCombinationWithModifier implements Combination {
     protected Array<ModifierKey> modifierKeys = new Array<>();
+
+    protected boolean isAnyModifier;
 
     protected ObjectSet<ModifierKey> pressedModifierKeys = new ObjectSet<>();
 
-    public CombinationWithModifier(ModifierKey... modifierKeys) {
+    public AbstractCombinationWithModifier(ModifierKey... modifierKeys) {
+        this.isAnyModifier = modifierKeys.length == 0;
         for (ModifierKey modifierKey : modifierKeys) {
             this.modifierKeys.add(modifierKey);
         }
@@ -25,6 +28,10 @@ public abstract class CombinationWithModifier implements Combination {
 
     @Override
     public boolean shouldExecute() {
+        if (isAnyModifier) {
+            return !pressedModifierKeys.isEmpty();
+        }
+
         for (ModifierKey modifierKey : modifierKeys) {
             if (!pressedModifierKeys.contains(modifierKey)) {
                 return false;

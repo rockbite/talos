@@ -1,8 +1,7 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-public class KeyboardCombination extends CombinationWithModifier {
+public class KeyboardCombination extends AbstractCombinationWithModifier {
     private int regularKey;
-
     private boolean repeat;
 
     private float repeatStartTime = 0.5f;

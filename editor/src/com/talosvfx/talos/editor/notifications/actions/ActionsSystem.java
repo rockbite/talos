@@ -28,7 +28,7 @@ public class ActionsSystem extends InputAdapter {
         MouseCombination copyActionCombination = new MouseCombination(MouseAction.WHEEL_IN, ModifierKey.CTRL);
         allActions.add(new CopyAction(copyActionCombination, null));
 
-        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
+        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S,false, ModifierKey.CTRL);
         allActions.add(new SaveAction(keyboardKeyCombination, null));
     }
 
