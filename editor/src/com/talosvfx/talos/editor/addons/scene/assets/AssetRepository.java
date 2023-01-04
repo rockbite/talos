@@ -163,6 +163,8 @@ public class AssetRepository implements Observer {
 	}
 
 
+
+
 	static class DataMaps {
 		private ObjectMap<FileHandle, GameAsset> fileHandleGameAssetObjectMap = new ObjectMap<>();
 		private ObjectMap<UUID, RawAsset> uuidRawAssetMap = new ObjectMap<>();
@@ -362,6 +364,29 @@ public class AssetRepository implements Observer {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void reloadGameAssetFromString (GameAsset gameAssetReference, String asSTring) {
+		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
+		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
+
+		FileHandle temp = Gdx.files.local("temp");
+		temp.writeString(asSTring, false);
+
+		RawAsset rawAsset = new RawAsset(temp);
+
+		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
+			GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rawAsset, false, gameAssetReference);
+			gameAssetReference.setResourcePayload(gameAsset.getResource());
+			gameAssetReference.setUpdated();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		temp.delete();
 	}
 
 	static class TypeIdentifierPair {
@@ -1011,24 +1036,41 @@ public class AssetRepository implements Observer {
 		return asString;
 	}
 
-	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
-		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
+	public <T> String saveGameAssetCurrentStateToJsonString (GameAsset<T> gameAsset) {
 		GameResourceSaveStrategy<T> gameResourceSaveStrategy = saveStrategyObjectMap.get(gameAsset.type);
 		if (gameResourceSaveStrategy != null) {
-			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
 
 			String jsonString = gameResourceSaveStrategy.serializeToJson(gameAsset, json);
+
 			if (jsonString == null) {
 				Toasts.getInstance().showErrorToast("Error saving asset " + gameAsset);
 				logger.error("Error saving asset");
-				return;
+				return null;
 			}
-			rootRawAsset.handle.writeString(jsonString, false);
-			SharedResources.globalSaveStateSystem.markSaved(gameAsset);
+
+			return jsonString;
 
 		} else {
+			Toasts.getInstance().showErrorToast("Trying to save an asset that doesn't have a save strategy " + gameAsset);
 			logger.error("Trying to save an asset that doesn't have a save strategy");
 		}
+
+		return null;
+	}
+
+	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+		Toasts.getInstance().showInfoToast("Saved to file " + gameAsset.nameIdentifier);
+		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+
+		String jsonString = saveGameAssetCurrentStateToJsonString(gameAsset);
+
+		if (jsonString == null) {
+			logger.error("Error saving to file");
+			return;
+		}
+
+		rootRawAsset.handle.writeString(jsonString, false);
+		SharedResources.globalSaveStateSystem.markSaved(gameAsset);
 
 	}
 

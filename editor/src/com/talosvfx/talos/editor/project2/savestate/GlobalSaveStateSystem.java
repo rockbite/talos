@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,18 +71,19 @@ public class GlobalSaveStateSystem implements Observer {
 		public GameAssetUpdateStateObject (GameAsset<?> gameAsset) {
 			super();
 			this.gameAsset = gameAsset;
-
-			RawAsset rootRawAsset = this.gameAsset.getRootRawAsset();
-			asSTring = rootRawAsset.handle.readString();
+			asSTring = SharedResources.globalSaveStateSystem.getAndIncrementLatestGameAssetAsString(gameAsset);
+			if (asSTring == null) {
+				System.out.println();
+			}
 		}
+
+
 
 		@Override
 		void restore () {
-			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+			SharedResources.globalSaveStateSystem.rawStringHistoryMap.put(gameAsset, asSTring);
 
-			rootRawAsset.handle.writeString(asSTring, false);
-
-			AssetRepository.getInstance().reloadGameAsset(gameAsset);
+			AssetRepository.getInstance().reloadGameAssetFromString(gameAsset, asSTring);
 
 			Toasts.getInstance().showInfoToast("Undone " + gameAsset.getResource().getClass().getSimpleName() + " [" + gameAsset.type + "] state");
 		}
@@ -90,6 +92,7 @@ public class GlobalSaveStateSystem implements Observer {
 
 	private Stack<StateObject> stateObjects = new Stack<>();
 	private ObjectSet<GameAsset<?>> hasChanges = new ObjectSet<>();
+	private ObjectMap<GameAsset<?>, String> rawStringHistoryMap = new ObjectMap<>();
 
 	public GlobalSaveStateSystem () {
 		Notifications.registerObserver(this);
@@ -97,6 +100,26 @@ public class GlobalSaveStateSystem implements Observer {
 
 	public <T> boolean isItemChangedAndUnsaved (GameAsset<T> gameAsset) {
 		return hasChanges.contains(gameAsset);
+	}
+
+	private String getAndIncrementLatestGameAssetAsString (GameAsset<?> gameAsset) {
+		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+
+		String returnString;
+
+		if (rawStringHistoryMap.containsKey(gameAsset)) {
+			//We use this latest one, return it, and then put in the current state as the string in cache
+			returnString = rawStringHistoryMap.get(gameAsset);
+		} else {
+			//Use from file
+			returnString = rootRawAsset.handle.readString();
+		}
+
+		//Put the current in memory representation for the next time
+		String memoryRepresentation = AssetRepository.getInstance().saveGameAssetCurrentStateToJsonString(gameAsset);
+		rawStringHistoryMap.put(gameAsset, memoryRepresentation);
+
+		return returnString;
 	}
 
 	public void pushItem (StateObject assetUpdateStateObject) {

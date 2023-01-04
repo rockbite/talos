@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,7 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     }
 
     public void markAssetChanged () {
+        Toasts.getInstance().showInfoToast("Marked node stage changes");
         AssetRepository.getInstance().assetChanged(gameAsset);
     }
 
