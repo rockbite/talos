@@ -21,6 +21,7 @@ public abstract class RoutineNode {
     protected JsonValue propertiesJson;
     @Getter
     protected boolean configured = false;
+    private int configureDepth = 0;
 
     public enum DataType {
         NUMBER,
@@ -96,17 +97,24 @@ public abstract class RoutineNode {
 
         //todo: fix later?
         this.propertiesJson = nodeData.get("properties");
+        scheduleConfiguring();
+
+        uniqueId = nodeData.getInt("id");
+    }
+
+    private void scheduleConfiguring() {
+        configureDepth++;
         configureNode(propertiesJson);
         if(!configured) {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    configureNode(propertiesJson); // try again next time
+                    if(configureDepth < 5) {
+                        scheduleConfiguring(); // try again next time
+                    }
                 }
             });
         }
-
-        uniqueId = nodeData.getInt("id");
     }
 
     protected void constructNode(XmlReader.Element config) {
@@ -160,6 +168,10 @@ public abstract class RoutineNode {
             if(name.equals("asset")) {
                 port.dataType = DataType.ASSET;
             }
+
+            if(name.equals("checkbox")) {
+                port.valueOverride = row.getBooleanAttribute("default", false);
+            }
         }
 
         if(portType.equals("input")) {
@@ -178,6 +190,10 @@ public abstract class RoutineNode {
             String name = item.name;
 
             Port port = inputs.get(name);
+            if(port == null) {
+                configured = false;
+                return;
+            }
             JsonValue jsonValue = properties.get(name);
             if(port.dataType == DataType.COLOR) {
                 Json json = new Json();
@@ -206,7 +222,12 @@ public abstract class RoutineNode {
                 }
             } else {
                 try {
-                    port.setValueFromString(properties.getString(name));
+                    String str = properties.getString(name);
+                    if(str == null || str.isEmpty()) {
+                        // we keep value override
+                    } else {
+                        port.setValueFromString(str);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

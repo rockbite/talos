@@ -10,6 +10,8 @@ import lombok.Getter;
 
 public class ColorToNode extends AsyncRoutineNode<GameObject, ColorToNode.ColorState> {
 
+    private boolean alphaOnly;
+
     public static class ColorState extends AsyncRoutineNodeState<GameObject> {
         @Getter
         private Color originalColor = new Color();
@@ -39,6 +41,8 @@ public class ColorToNode extends AsyncRoutineNode<GameObject, ColorToNode.ColorS
         Color color = fetchColorValue("color");
         state.targetColor.set(color);
 
+        alphaOnly = fetchBooleanValue("alphaOnly");
+
         return true;
     }
 
@@ -48,16 +52,20 @@ public class ColorToNode extends AsyncRoutineNode<GameObject, ColorToNode.ColorS
 
         if(target.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent component = target.getComponent(SpriteRendererComponent.class);
-            component.color.r = state.originalColor.r + (state.targetColor.r - state.originalColor.r) * state.interpolatedAlpha;
-            component.color.g = state.originalColor.g + (state.targetColor.g - state.originalColor.g) * state.interpolatedAlpha;
-            component.color.b = state.originalColor.b + (state.targetColor.b - state.originalColor.b) * state.interpolatedAlpha;
+            if(!alphaOnly) {
+                component.color.r = state.originalColor.r + (state.targetColor.r - state.originalColor.r) * state.interpolatedAlpha;
+                component.color.g = state.originalColor.g + (state.targetColor.g - state.originalColor.g) * state.interpolatedAlpha;
+                component.color.b = state.originalColor.b + (state.targetColor.b - state.originalColor.b) * state.interpolatedAlpha;
+            }
             component.color.a = state.originalColor.a + (state.targetColor.a - state.originalColor.a) * state.interpolatedAlpha;
         }
         if(target.hasComponent(SpineRendererComponent.class)) {
             SpineRendererComponent component = target.getComponent(SpineRendererComponent.class);
-            component.color.r = state.originalColor.r + (state.targetColor.r - state.originalColor.r) * state.interpolatedAlpha;
-            component.color.g = state.originalColor.g + (state.targetColor.g - state.originalColor.g) * state.interpolatedAlpha;
-            component.color.b = state.originalColor.b + (state.targetColor.b - state.originalColor.b) * state.interpolatedAlpha;
+            if(!alphaOnly) {
+                component.color.r = state.originalColor.r + (state.targetColor.r - state.originalColor.r) * state.interpolatedAlpha;
+                component.color.g = state.originalColor.g + (state.targetColor.g - state.originalColor.g) * state.interpolatedAlpha;
+                component.color.b = state.originalColor.b + (state.targetColor.b - state.originalColor.b) * state.interpolatedAlpha;
+            }
             component.color.a = state.originalColor.a + (state.targetColor.a - state.originalColor.a) * state.interpolatedAlpha;
         }
     }

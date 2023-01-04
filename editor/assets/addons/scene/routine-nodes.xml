@@ -48,6 +48,7 @@
             <value port="input" name="startSignal" type="signal">start</value>
             <color port="input" name="color" type="color">Color: </color>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <checkbox name="alphaOnly" default = "true">Transparency Only</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
