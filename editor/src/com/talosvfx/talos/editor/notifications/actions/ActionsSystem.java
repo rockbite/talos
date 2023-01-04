@@ -1,10 +1,12 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+import com.talosvfx.talos.editor.notifications.actions.implementations.GeneralAction;
 import com.talosvfx.talos.editor.notifications.events.actions.ActionContextEvent;
 import com.talosvfx.talos.editor.notifications.events.actions.ActionEvent;
 import com.talosvfx.talos.editor.notifications.events.actions.IActionEvent;
@@ -32,6 +34,17 @@ public class ActionsSystem extends InputAdapter {
 
     public ActionsSystem() {
 
+        KeyboardCombination copyCombination = new KeyboardCombination(Input.Keys.C, false, ModifierKey.CTRL);
+        GeneralAction copyAction = new GeneralAction(Actions.ActionType.COPY, ActionContextType.FOCUSED_APP, copyCombination, null);
+        allActions.add(copyAction);
+
+        KeyboardCombination saveCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
+        GeneralAction saveAction = new GeneralAction(Actions.ActionType.SAVE, ActionContextType.GLOBAL, saveCombination, null);
+        allActions.add(saveAction);
+
+        KeyboardCombination openCombination = new KeyboardCombination(Input.Keys.O, false, ModifierKey.CTRL);
+        GeneralAction openAction = new GeneralAction(Actions.ActionType.OPEN, ActionContextType.FOCUSED_APP, openCombination, null);
+        allActions.add(openAction);
     }
 
     private boolean checkActionState() {
@@ -59,7 +72,7 @@ public class ActionsSystem extends InputAdapter {
 
     public void runAction(IAction action) {
         Notifications.fireEvent(getEventForAction(action));
-        logger.info("ACTION IS RUN - " + action.getFullName());
+        logger.info("ACTION IS RUN - " + action.getActionType().name);
     }
 
     public void clearAfterRunning() {
@@ -72,13 +85,14 @@ public class ActionsSystem extends InputAdapter {
         IActionEvent actionEvent = Notifications.obtainEvent(getActionEventTypeForContextType(action.getContextType()));
         actionEvent.setActionType(action.getActionType());
         ActionContextType contextType = action.getContextType();
+
         if (contextType == ActionContextType.FOCUSED_APP) {
             ActionContextEvent contextEvent = (ActionContextEvent) actionEvent;
             AppManager appManager = SharedResources.appManager;
-            appManager.get
-            contextEvent.setContext(appManager);
-            // TODO: 1/4/2023 RESOLVE CONTEXT
+            AppManager.BaseApp focusedApp = appManager.getFocusedApp();
+            contextEvent.setContext(focusedApp);
         }
+
         return actionEvent;
     }
 

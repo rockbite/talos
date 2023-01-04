@@ -102,8 +102,8 @@ public class PrefWidgetFactory {
             return null;
         }
 
-        public void configure(Actions.ActionEnumInterface action) {
-            keymapBox.setKey(action.toString());
+        public void configure(Actions.ActionType actionType) {
+            keymapBox.setKey(actionType.toString());
         }
     }
 

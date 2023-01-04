@@ -3,18 +3,10 @@ package com.talosvfx.talos.editor.notifications.actions.implementations;
 import com.talosvfx.talos.editor.notifications.actions.ActionContextType;
 import com.talosvfx.talos.editor.notifications.actions.Combination;
 import com.talosvfx.talos.editor.notifications.actions.IAction;
+import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
 import lombok.Getter;
 
-public abstract class AbstractAction implements IAction {
-    @Getter
-    private final String name;
-    @Getter
-    private final String description;
-    @Getter
-    private String fullName;
-
-    @Getter
-    private final String uniqueName;
+public class GeneralAction implements IAction {
 
     @Getter
     private Combination activeCombination;
@@ -26,11 +18,11 @@ public abstract class AbstractAction implements IAction {
 
     private boolean isDefaultActionOverridden;
 
-    public AbstractAction(String name, String fullName, String description, String uniqueName, ActionContextType context, Combination defaultCombination, Combination overriddenKeyCombination) {
-        this.name = name;
-        this.fullName = fullName;
-        this.description = description;
-        this.uniqueName = uniqueName;
+    @Getter
+    private Actions.ActionType actionType;
+
+    public GeneralAction(Actions.ActionType actionType, ActionContextType context, Combination defaultCombination, Combination overriddenKeyCombination) {
+        this.actionType = actionType;
         this.defaultCombination = defaultCombination;
         this.contextType = context;
         this.isDefaultActionOverridden = overriddenKeyCombination != null;

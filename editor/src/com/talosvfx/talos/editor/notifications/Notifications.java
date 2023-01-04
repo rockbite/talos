@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+import com.talosvfx.talos.editor.notifications.events.actions.IActionEvent;
 import lombok.Getter;
 
 public class Notifications {
@@ -31,6 +33,15 @@ public class Notifications {
 			this.observer = observer;
 		}
 		public abstract void runEvent (TalosEvent event);
+	}
+
+	public abstract class ActionEventRunner extends EventRunner {
+		private Actions.ActionType actionType;
+
+		public ActionEventRunner(Observer observer, Actions.ActionType actionType) {
+			super(observer);
+			this.actionType = actionType;
+		}
 	}
 
 	private static Notifications getInstance () {
@@ -72,13 +83,23 @@ public class Notifications {
 
 		for (Method method : declaredMethods) {
 			final Annotation declaredAnnotation = method.getDeclaredAnnotation(EventHandler.class);
-			if (declaredAnnotation == null)
+			final Annotation declaredActionAnnotation = method.getDeclaredAnnotation(ActionEventHandler.class);
+			if (declaredAnnotation == null && declaredActionAnnotation == null)
 				continue;
 
-			EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
+			boolean isActionEvent = declaredActionAnnotation != null;
 
-			if (eventHandler == null)
-				continue;
+			if (!isActionEvent) {
+				EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
+				if (eventHandler == null) {
+					continue;
+				}
+			} else {
+				ActionEventHandler eventHandler = declaredActionAnnotation.getAnnotation(ActionEventHandler.class);
+				if (eventHandler == null) {
+					continue;
+				}
+			}
 
 			//Events should only have one param, and that param should be of instance Event
 			if (method.getParameterTypes().length == 1 && ClassReflection.isAssignableFrom(TalosEvent.class, method.getParameterTypes()[0])) {
@@ -86,16 +107,31 @@ public class Notifications {
 
 				method.setAccessible(true);
 
-				EventRunner eventRunner = new EventRunner(observer) {
-					@Override
-					public void runEvent (TalosEvent event) {
-						try {
-							method.invoke(observer, event);
-						} catch (ReflectionException e) {
-							e.printStackTrace();
+				EventRunner eventRunner;
+				if (isActionEvent) {
+					ActionEventHandler actionAnnotation = declaredActionAnnotation.getAnnotation(ActionEventHandler.class);
+					eventRunner = new ActionEventRunner(observer, actionAnnotation.actionType()) {
+						@Override
+						public void runEvent(TalosEvent event) {
+							try {
+								method.invoke(observer, event);
+							} catch (ReflectionException e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				};
+					};
+				} else {
+					eventRunner = new EventRunner(observer) {
+						@Override
+						public void runEvent (TalosEvent event) {
+							try {
+								method.invoke(observer, event);
+							} catch (ReflectionException e) {
+								e.printStackTrace();
+							}
+						}
+					};
+				}
 
 				if (!invocationMap.containsKey(event)) {
 					invocationMap.put(event, new Array<>());
@@ -127,6 +163,17 @@ public class Notifications {
 	}
 
 	private void testAndFireEvent (EventRunner eventRunner, TalosEvent event) {
+		if (event instanceof IActionEvent) {
+			if (!(eventRunner instanceof ActionEventRunner)) {
+				return;
+			}
+
+			ActionEventRunner actionEventRunner = (ActionEventRunner) eventRunner;
+			if (actionEventRunner.actionType != ((IActionEvent) event).getActionType()) {
+				return;
+			}
+		}
+
 		if (event instanceof ContextRequiredEvent) {
 			if (!(eventRunner.getObserver() instanceof EventContextProvider)) {
 				throw new GdxRuntimeException("Invalid event handler. Events that extend ContextRequiredEvent must have their " +

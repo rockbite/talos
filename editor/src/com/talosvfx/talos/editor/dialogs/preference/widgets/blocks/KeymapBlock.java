@@ -15,7 +15,7 @@ public class KeymapBlock extends BlockWidget {
         widgetArray = new Array<>();
         getWidgetLabel().setText("Keymap");
 
-        Actions.ActionEnumInterface[] values = Actions.ALL_ACTIONS;
+        Actions.ActionType[] values = Actions.ActionType.values();
 
         for(int i = 0; i  < values.length; i++) {
             String name = values[i].toString();

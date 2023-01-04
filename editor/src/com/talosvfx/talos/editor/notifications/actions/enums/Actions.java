@@ -8,18 +8,25 @@ import java.lang.String;
  *  The XML file is located in editor/assets/actions.xml
  */
 public class Actions {
-  public interface ActionEnumInterface {
+  public enum ActionGroup {
+    GENERAL
   }
 
-  enum GeneralAction implements ActionEnumInterface {
-    Copy("copy_action");
+  public enum ActionType {
+    COPY(ActionGroup.GENERAL, "copy_action", "Copy", ""),
+    SAVE(ActionGroup.GENERAL, "save_action", "Save", ""),
+    OPEN(ActionGroup.GENERAL, "open_action", "Open", "");
 
+    public final ActionGroup actionGroup;
     public final String uniqueName;
+    public final String name;
+    public final String description;
 
-    GeneralAction(String uniqueName) {
+    ActionType (ActionGroup actionGroup, String uniqueName, String name, String description) {
+      this.actionGroup = actionGroup;
       this.uniqueName = uniqueName;;
+      this.name = name;
+      this.description = description;
     }
   }
-
-  public static ActionEnumInterface[] ALL_ACTIONS = new ActionEnumInterface[]{GeneralAction.Copy};
 }

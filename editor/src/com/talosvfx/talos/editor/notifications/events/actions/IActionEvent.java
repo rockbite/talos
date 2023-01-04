@@ -4,6 +4,6 @@ import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
 
 public interface IActionEvent extends TalosEvent {
-    Actions.ActionEnumInterface getActionType();
-    void setActionType(Actions.ActionEnumInterface type);
+    Actions.ActionType getActionType();
+    void setActionType(Actions.ActionType type);
 }

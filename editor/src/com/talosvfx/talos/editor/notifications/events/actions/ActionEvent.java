@@ -8,7 +8,7 @@ public class ActionEvent implements IActionEvent {
 
     @Getter
     @Setter
-    Actions.ActionEnumInterface actionType;
+    Actions.ActionType actionType;
 
     @Override
     public void reset() {

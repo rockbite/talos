@@ -522,6 +522,18 @@ public class AppManager implements Observer {
 		// todo: close all floating windows
 	}
 
+	public BaseApp getFocusedApp () {
+		Array<BaseApp> appInstances = getAppInstances();
+		for (BaseApp appInstance : appInstances) {
+			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+			if (isFocused) {
+				return appInstance;
+			}
+		}
+
+		return null;
+	}
+
 	@EventHandler
 	public void onSave (SaveRequest event) {
 		// set preferences for all assets
@@ -539,21 +551,15 @@ public class AppManager implements Observer {
 
 		//Save the selected app if it needs it
 
-		for (BaseApp appInstance : appInstances) {
-			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+		BaseApp focusedApp = getFocusedApp();
+		GameAsset<?> gameAsset = focusedApp.gameAsset;
+		if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+			return;
+		}
 
-			if (isFocused) {
-				GameAsset<?> gameAsset = appInstance.gameAsset;
-				if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) continue;
-
-				boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
-				if (itemChangedAndUnsaved) {
-					AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
-					return;
-				}
-
-			}
-
+		boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		if (itemChangedAndUnsaved) {
+			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
 		}
 	}
 }

@@ -8,8 +8,8 @@ import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
 
 
 public class ActionParser {
-    public static ObjectMap<Actions.ActionEnumInterface, IAction> defaultConfiguration = new ObjectMap<>();
-    public static ObjectMap<Actions.ActionEnumInterface, IAction> overriddenConfiguration = new ObjectMap<>();
+    public static ObjectMap<Actions.ActionType, IAction> defaultConfiguration = new ObjectMap<>();
+    public static ObjectMap<Actions.ActionType, IAction> overriddenConfiguration = new ObjectMap<>();
 
     public void parseDefaultActions(FileHandle file) {
         XmlReader xmlReader = new XmlReader();
