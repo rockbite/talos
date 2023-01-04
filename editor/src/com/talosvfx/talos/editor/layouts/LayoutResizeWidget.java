@@ -18,6 +18,7 @@ public class LayoutResizeWidget extends Table {
 
 	private LayoutItem responder;
 	private boolean entered;
+	private boolean touchDragging;
 
 	private Drawable noFocus;
 	private Drawable focus;
@@ -58,7 +59,16 @@ public class LayoutResizeWidget extends Table {
 			}
 
 			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				touchDragging = false;
+				
+				super.touchUp(event, x, y, pointer, button);
+			}
+
+			@Override
 			public void touchDragged (InputEvent event, float x, float y, int pointer) {
+				touchDragging = true;
+
 				responder.draggedResizeWidget(LayoutResizeWidget.this, event, x, y, pointer);
 				super.touchDragged(event, x, y, pointer);
 			}
@@ -72,7 +82,7 @@ public class LayoutResizeWidget extends Table {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if (entered) {
+		if (entered || touchDragging) {
 			if (responder instanceof LayoutColumn) {
 				CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_VERTICALLY);
 			} else if (responder instanceof LayoutRow) {
