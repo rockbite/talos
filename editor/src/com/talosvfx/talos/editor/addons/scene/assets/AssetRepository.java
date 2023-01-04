@@ -959,8 +959,12 @@ public class AssetRepository implements Observer {
 		metadataHandleFor.writeString(json.prettyPrint(metadata), false);
 	}
 
+	public void assetChanged (GameAsset<?> gameAsset) {
+		GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
+		SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
+	}
+
 	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {
-		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
 		if (useGlobalState) {
 			GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
 			SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
@@ -1008,6 +1012,7 @@ public class AssetRepository implements Observer {
 	}
 
 	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
 		GameResourceSaveStrategy<T> gameResourceSaveStrategy = saveStrategyObjectMap.get(gameAsset.type);
 		if (gameResourceSaveStrategy != null) {
 			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
@@ -1019,6 +1024,7 @@ public class AssetRepository implements Observer {
 				return;
 			}
 			rootRawAsset.handle.writeString(jsonString, false);
+			SharedResources.globalSaveStateSystem.markSaved(gameAsset);
 
 		} else {
 			logger.error("Trying to save an asset that doesn't have a save strategy");

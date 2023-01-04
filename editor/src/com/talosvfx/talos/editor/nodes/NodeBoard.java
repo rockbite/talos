@@ -834,7 +834,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	private void updateSaveState () {
-		nodeStage.saveGameAsset();
+		nodeStage.markAssetChanged();
 	}
 
 	@EventHandler

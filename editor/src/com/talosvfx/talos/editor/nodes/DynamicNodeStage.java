@@ -22,7 +22,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>> {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>>, GameAsset.GameAssetUpdateListener {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
 
@@ -36,6 +36,7 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
     public GameAsset<T> gameAsset;
     public T data;
+    private GameAsset.GameAssetUpdateListener gameAssetUpdateListener;
 
     public DynamicNodeStage (Skin skin) {
         super();
@@ -48,16 +49,15 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     public void setFromData (GameAsset<T> data) {
         this.gameAsset = data;
         this.data = data.getResource();
-        gameAsset.listeners.add(new GameAsset.GameAssetUpdateListener() {
-            @Override
-            public void onUpdate () {
-                logger.warn("on game asset update todo");
-            }
-        });
+
+
+        if (!gameAsset.listeners.contains(this, true)) {
+            gameAsset.listeners.add(this);
+        }
     }
 
-    public void saveGameAsset () {
-        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
+    public void markAssetChanged () {
+        AssetRepository.getInstance().assetChanged(gameAsset);
     }
 
     @Override

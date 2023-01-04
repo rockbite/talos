@@ -30,7 +30,7 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
                 AssetRepository.getInstance().saveMetaDataToFile(metaData);
             }
         });
-        DummyLayoutApp spriteEditorApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        DummyLayoutApp<Texture> spriteEditorApp = new DummyLayoutApp<Texture>(SharedResources.skin, this, getAppName()) {
             @Override
             public void onInputProcessorAdded() {
                 super.onInputProcessorAdded();

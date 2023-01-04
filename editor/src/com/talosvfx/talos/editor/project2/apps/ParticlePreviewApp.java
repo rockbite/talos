@@ -24,7 +24,7 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> {
 
 		preview3D = new Preview3D();
 
-		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		this.gridAppReference = new DummyLayoutApp<VFXProjectData>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return preview3D;

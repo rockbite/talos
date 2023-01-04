@@ -55,7 +55,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
         routineStage.sendInStage(routineStageWrapper.getStage());
 
-        DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        DummyLayoutApp<RoutineStageData> app = new DummyLayoutApp<RoutineStageData>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent() {
                 return content;

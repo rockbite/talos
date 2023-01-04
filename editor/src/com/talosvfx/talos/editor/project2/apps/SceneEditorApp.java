@@ -27,7 +27,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 		workspaceWidget = new SceneEditorWorkspace(this);
 		workspaceWidget.disableListeners();
 
-		DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		DummyLayoutApp<Scene> sceneEditorWorkspaceApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return workspaceWidget;

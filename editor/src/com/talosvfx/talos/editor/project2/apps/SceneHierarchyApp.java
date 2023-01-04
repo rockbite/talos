@@ -18,7 +18,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 
 		hierarchyWidget = new HierarchyWidget();
-		DummyLayoutApp hierarchyApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		DummyLayoutApp<Scene> hierarchyApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return hierarchyWidget;

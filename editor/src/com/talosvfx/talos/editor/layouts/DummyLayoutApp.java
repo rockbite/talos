@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
@@ -17,7 +19,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-public class DummyLayoutApp implements LayoutApp {
+public class DummyLayoutApp<T> implements LayoutApp {
 
     private String tabName;
 
@@ -33,14 +35,20 @@ public class DummyLayoutApp implements LayoutApp {
     private LayoutContent layoutContent;
     private boolean currentFocusState;
 
-    private static class TabWidget extends Table {
+    private AppManager.BaseApp<T> baseApp;
+
+    private class TabWidget extends Table {
 
         private Table highlight = new Table();
+        private Table changes = new Table();
 
 
         public TabWidget () {
             highlight.setFillParent(true);
             addActor(highlight);
+
+            changes.setFillParent(true);
+            addActor(changes);
 
             Table highlightPixel = new Table();
             highlightPixel.setBackground(SharedResources.skin.newDrawable("white", ColorLibrary.BORDER_BLUE));
@@ -50,16 +58,36 @@ public class DummyLayoutApp implements LayoutApp {
             highlight.add(highlightPixel).growX().height(4).bottom();
 
             highlight.setVisible(false);
+
+            VisLabel changesLabel = new VisLabel("*");
+            changesLabel.setColor(ColorLibrary.ORANGE);
+
+            changes.top().left();
+            changes.defaults().top().left();
+            changes.add(changesLabel).top();
+            changes.setVisible(false);
         }
 
         public void setFocused (boolean focused) {
             highlight.setVisible(focused);
             highlight.toFront();
         }
+
+        public void setChanges (boolean hasChangesToShow) {
+            changes.setVisible(hasChangesToShow);
+        }
+
+        @Override
+        public void act (float delta) {
+            super.act(delta);
+            setChanges(DummyLayoutApp.this.baseApp.hasChangesToSave());
+        }
     }
 
-    public DummyLayoutApp (Skin skin, String tabName) {
+    public DummyLayoutApp (Skin skin, AppManager.BaseApp<T> baseApp, String tabName) {
         this.tabName = tabName;
+        this.baseApp = baseApp;
+
         build(skin);
         uuid = UUID.randomUUID().toString();
     }
@@ -151,6 +179,11 @@ public class DummyLayoutApp implements LayoutApp {
         }
 
         currentFocusState = shouldFocus;
+    }
+
+    @Override
+    public boolean isTabFocused () {
+        return currentFocusState;
     }
 
     protected void onTouchFocused () {

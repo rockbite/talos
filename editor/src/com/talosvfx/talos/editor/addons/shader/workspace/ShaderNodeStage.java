@@ -32,6 +32,8 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     PolygonBatch spriteBatch;
     Viewport viewport;
 
+
+
     class ExportSequencePayload {
         public int width;
         public int height;
@@ -64,6 +66,11 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         XmlReader.Element root = xmlReader.parse(list);
 
         return root;
+    }
+
+    @Override
+    public void onUpdate () {
+
     }
 
     @Override

@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
@@ -72,9 +71,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     @Override
-    public void saveGameAsset() {
+    public void onUpdate () {
+        loadFrom(gameAsset);
+    }
+
+    @Override
+    public void markAssetChanged () {
         if(!loading) {
-            super.saveGameAsset();
+            super.markAssetChanged();
         }
     }
 
@@ -153,7 +157,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void routineUpdated () {
         if(!loading) {
             //todo: this isn't right
-            saveGameAsset();
+            markAssetChanged();
             gameAsset.setUpdated();
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));

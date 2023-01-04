@@ -1154,7 +1154,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		//Check if any got updateed and we need to save
 		for (RoutineRendererComponent updatedComponent : updatedComponents) {
 			if (updatedComponent.isRequiresWrite()) {
-				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, false); //Don't use global state because it came from routine
+				AssetRepository.getInstance().assetChanged(gameAsset);
 				return;
 			}
 		}

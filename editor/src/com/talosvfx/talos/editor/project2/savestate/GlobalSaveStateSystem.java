@@ -1,6 +1,10 @@
 package com.talosvfx.talos.editor.project2.savestate;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
@@ -18,7 +22,18 @@ public class GlobalSaveStateSystem implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(GlobalSaveStateSystem.class);
 
-	public static abstract class StateObject {
+
+
+    public static abstract class StateObject {
+
+		private long counter = 0;
+		private static long globalCounter = 1;
+
+		private boolean persisted;
+
+		StateObject () {
+			counter = globalCounter++;
+		}
 		abstract void restore ();
 	}
 
@@ -28,6 +43,7 @@ public class GlobalSaveStateSystem implements Observer {
 		private String asString;
 
 		public MetaDataUpdateStateObject (AMetadata metadata) {
+			super();
 			this.metadata = metadata;
 
 			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
@@ -52,6 +68,7 @@ public class GlobalSaveStateSystem implements Observer {
 		private String asSTring;
 
 		public GameAssetUpdateStateObject (GameAsset<?> gameAsset) {
+			super();
 			this.gameAsset = gameAsset;
 
 			RawAsset rootRawAsset = this.gameAsset.getRootRawAsset();
@@ -66,20 +83,40 @@ public class GlobalSaveStateSystem implements Observer {
 
 			AssetRepository.getInstance().reloadGameAsset(gameAsset);
 
-			Toasts.getInstance().showInfoToast("Undone " + gameAsset.getResource() + " [" + gameAsset.type + "] state");
+			Toasts.getInstance().showInfoToast("Undone " + gameAsset.getResource().getClass().getSimpleName() + " [" + gameAsset.type + "] state");
 		}
 	}
 
 
 	private Stack<StateObject> stateObjects = new Stack<>();
+	private ObjectSet<GameAsset<?>> hasChanges = new ObjectSet<>();
 
 	public GlobalSaveStateSystem () {
 		Notifications.registerObserver(this);
 	}
 
+	public <T> boolean isItemChangedAndUnsaved (GameAsset<T> gameAsset) {
+		return hasChanges.contains(gameAsset);
+	}
+
 	public void pushItem (StateObject assetUpdateStateObject) {
 		stateObjects.push(assetUpdateStateObject);
+		if (assetUpdateStateObject instanceof GameAssetUpdateStateObject) {
+			addToGameAssetStates((GameAssetUpdateStateObject) assetUpdateStateObject);
+		}
 	}
+
+	private void addToGameAssetStates (GameAssetUpdateStateObject gameAssetUpdateStateObject) {
+		hasChanges.add(gameAssetUpdateStateObject.gameAsset);
+	}
+	private void removeFromGameAssetStates (GameAssetUpdateStateObject gameAssetUpdateStateObject) {
+		hasChanges.remove(gameAssetUpdateStateObject.gameAsset);
+	}
+
+	public void markSaved (GameAsset<?> gameAsset) {
+		hasChanges.remove(gameAsset);
+	}
+
 	public void onUndoRequest () {
 		if (stateObjects.isEmpty()) {
 			Toasts.getInstance().showErrorToast("Nothing left to undo");
@@ -88,5 +125,7 @@ public class GlobalSaveStateSystem implements Observer {
 			pop.restore();
 		}
 	}
+
+
 
 }
