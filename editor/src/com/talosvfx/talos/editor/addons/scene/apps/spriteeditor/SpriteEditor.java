@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Scaling;
@@ -20,8 +21,8 @@ public class SpriteEditor extends Table {
     public SpriteEditor() {
         editorMenu = new VerticalIconMenu<>();
 
-        final SpriteEditorWindowMenuTab propertiesTab = new SpriteEditorWindowMenuTab("arrow-icon");
-        final SpriteEditorWindowMenuTab ninePatchTab = new SpriteEditorWindowMenuTab("arrow-icon");
+        final SpriteEditorWindowMenuTab propertiesTab = new SpriteEditorWindowMenuTab("ic-menu-image-settings");
+        final SpriteEditorWindowMenuTab ninePatchTab = new SpriteEditorWindowMenuTab("ic-menu-ninepatch");
 
         editorMenu.addListener(new ChangeListener() {
             @Override
@@ -33,6 +34,7 @@ public class SpriteEditor extends Table {
         });
 
         container = new Table();
+        container.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUARE, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
         contentCell = container.add().grow();
 
         add(editorMenu).width(35).padTop(5).growY();
@@ -70,13 +72,16 @@ public class SpriteEditor extends Table {
 
             final Button.ButtonStyle buttonStyle = new Button.ButtonStyle(SharedResources.skin.get(Button.ButtonStyle.class));
             buttonStyle.up = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
-            buttonStyle.over = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT_2, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY);
-            buttonStyle.checked = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT_2, ColorLibrary.BackgroundColor.DARK_GRAY);
+            buttonStyle.over = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT_2, ColorLibrary.BackgroundColor.DARK_GRAY);
+            buttonStyle.checked = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_LEFT_2, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY);
+
             spriteEditorTab.setStyle(buttonStyle);
 
+            final Table iconWrapper = new Table();
             final Image icon = new Image(SharedResources.skin.getDrawable(iconName), Scaling.fit);
-
-            stack(spriteEditorTab, icon).grow().padLeft(10);
+            iconWrapper.add(icon).grow().pad(4);
+            iconWrapper.setTouchable(Touchable.disabled);
+            stack(spriteEditorTab, iconWrapper).grow().padLeft(10);
         }
     }
 }

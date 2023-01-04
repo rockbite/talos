@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.editor.widgets.ui.common.CollapsableWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
     // property widgets
@@ -56,7 +57,9 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         }
 
         // init save button
-        final TextButton saveButton = new TextButton("Save", SharedResources.skin);
+        final Label buttonLabel = new Label("Save", SharedResources.skin);
+        final SquareButton saveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
+        saveButton.getStyle().checked = saveButton.getStyle().up;
         saveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
