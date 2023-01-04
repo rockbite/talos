@@ -7,21 +7,34 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.commands.CommandContextType;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener, Observer {
 
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
     public GenericStageWrappedViewportWidget routineStageWrapper;
 
+    private static final Logger logger = LoggerFactory.getLogger(RoutineEditorApp.class);
+
     public RoutineEditorApp() {
+        Notifications.registerObserver(this);
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
 
@@ -88,6 +101,16 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         };
 
         this.gridAppReference = app;
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.OPEN)
+    public void onOpenCommand (CommandContextEvent event) {
+        logger.info("ROUTINE CALLED OPEN");
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.COPY)
+    public void onCopyCommand (CommandContextEvent event) {
+        logger.info("ROUTINE CALLED COPY");
     }
 
     @Override

@@ -18,6 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -167,7 +168,7 @@ public class AppManager implements Observer {
 
 	//Grid layout needs to be able to be setup with layout specific in mind
 
-	public abstract static class BaseApp<T> {
+	public abstract static class BaseApp<T> implements EventContextProvider<BaseApp<T>> {
 		protected boolean singleton;
 
 		@Getter
@@ -178,7 +179,6 @@ public class AppManager implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
-
 		}
 
 		public abstract String getAppName ();
@@ -199,6 +199,11 @@ public class AppManager implements Observer {
 
 		public boolean hasChangesToSave () {
 			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		}
+
+		@Override
+		public BaseApp<T> getContext() {
+			return this;
 		}
 	}
 

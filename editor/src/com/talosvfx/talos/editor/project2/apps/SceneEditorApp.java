@@ -2,24 +2,32 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SingletonApp
 public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
 	private final SceneEditorWorkspace workspaceWidget;
+
+	private static final Logger logger = LoggerFactory.getLogger(SceneEditorApp.class);
 
 	public SceneEditorApp () {
 		this.singleton = true;
@@ -93,6 +101,16 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@EventHandler
 	public void GONameChangeCommand(GONameChangeCommand command) {
 		workspaceWidget.changeGOName(command.getGo(), command.getSuggestedName());
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.OPEN)
+	public void onOpenCommand (CommandContextEvent event) {
+		logger.info("SCENE CALLED OPEN");
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.COPY)
+	public void onCopyCommand (CommandContextEvent event) {
+		logger.info("SCENE CALLED COPY");
 	}
 
 	@Override

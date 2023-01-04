@@ -27,18 +27,6 @@ public class SaveSystem implements Observer {
 		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
 	}
 
-	@CommandEventHandler(commandType = Commands.CommandType.SAVE)
-	public void onSave2Action (CommandEvent actionEvent) {
-		logger.info("SAVE REACHED HERE2");
-		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
-	}
-
-	@CommandEventHandler(commandType = Commands.CommandType.COPY)
-	public void onCopyAction (CommandEvent actionEvent) {
-		logger.info("COPY REACHED HERE");
-		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
-	}
-
 	@EventHandler
 	public void onSave (SaveRequest event) {
 

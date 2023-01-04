@@ -33,7 +33,6 @@ public class CommandsSystem extends InputAdapter {
     }
 
     public CommandsSystem() {
-
         KeyboardCombination copyCombination = new KeyboardCombination(Input.Keys.C, false, ModifierKey.CTRL);
         GeneralCommand copyAction = new GeneralCommand(Commands.CommandType.COPY, CommandContextType.FOCUSED_APP, copyCombination, null);
         allCommands.add(copyAction);
