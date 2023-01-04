@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
+import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+
 public interface IAction {
     String getName();
 
@@ -18,4 +20,8 @@ public interface IAction {
     void clearAfterRunning();
 
     void runAction();
+
+    ActionContextType getContextType();
+
+    Actions.ActionEnumInterface getActionType();
 }

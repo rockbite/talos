@@ -112,6 +112,14 @@ public class Notifications {
 	public void fireEventInner (TalosEvent event) {
 		if (invocationMap.containsKey(event.getClass())) {
 			for (EventRunner eventRunner : invocationMap.get(event.getClass())) {
+				if (event instanceof TalosContextBasedEvent) {
+					Object context = ((TalosContextBasedEvent) event).getContext();
+					Observer observerForEventRunner = getObserverForEventRunner(eventRunner);
+					if (context != observerForEventRunner) {
+						continue;
+					}
+				}
+
 				eventRunner.runEvent(event);
 			}
 		}
@@ -121,6 +129,18 @@ public class Notifications {
 		}
 
 		eventPoolMap.get(event.getClass()).free(event);
+	}
+
+	private Observer getObserverForEventRunner (EventRunner eventRunner) {
+		for (ObjectMap.Entry<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerObjectMapEntry : observerInvocationMap) {
+			for (ObjectMap.Entry<Class<? extends TalosEvent>, EventRunner> classEventRunnerEntry : observerObjectMapEntry.value) {
+				if (classEventRunnerEntry.value == eventRunner) {
+					return observerObjectMapEntry.key;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public void notifyObserversInner (Array<Observer> observers, TalosEvent event) {

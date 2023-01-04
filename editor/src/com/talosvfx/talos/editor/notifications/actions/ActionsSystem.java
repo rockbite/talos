@@ -3,10 +3,17 @@ package com.talosvfx.talos.editor.notifications.actions;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.notifications.actions.implementations.CopyAction;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+import com.talosvfx.talos.editor.notifications.actions.implementations.AbstractAction;
+import com.talosvfx.talos.editor.notifications.actions.implementations.UndoAction;
 import com.talosvfx.talos.editor.notifications.actions.implementations.SaveAction;
+import com.talosvfx.talos.editor.notifications.events.actions.ActionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class ActionsSystem extends InputAdapter {
 
@@ -24,11 +31,13 @@ public class ActionsSystem extends InputAdapter {
         injectedAdapters.removeValue(inputAdapter, true);
     }
 
+    private ObjectMap<Actions.ActionEnumInterface, Class<? extends ActionEvent>> eventObjectMap = new ObjectMap<>();
+
     public ActionsSystem() {
         MouseCombination copyActionCombination = new MouseCombination(MouseAction.WHEEL_IN, ModifierKey.CTRL);
-        allActions.add(new CopyAction(copyActionCombination, null));
+        allActions.add(new UndoAction(copyActionCombination, null));
 
-        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S,false, ModifierKey.CTRL);
+        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
         allActions.add(new SaveAction(keyboardKeyCombination, null));
     }
 
@@ -48,22 +57,32 @@ public class ActionsSystem extends InputAdapter {
         return isRun;
     }
 
-    public void act (float delta) {
+    public void act(float delta) {
         for (IAction action : allActions) {
             action.getActiveCombination().act(delta);
         }
         checkActionState();
     }
 
-    public void runAction(IAction IAction) {
-        IAction.runAction();
-        logger.info("ACTION IS RUN - " + IAction.getFullName());
+    public void runAction(IAction action) {
+        Notifications.fireEvent(getEventForAction(action));
+        logger.info("ACTION IS RUN - " + action.getFullName());
     }
 
     public void clearAfterRunning() {
         for (IAction action : allActions) {
             action.clearAfterRunning();
         }
+    }
+
+    private TalosEvent getEventForAction(IAction action) {
+        Actions.ActionEnumInterface actionType = action.getActionType();
+        ActionContextType contextType = action.getContextType();
+        ActionEvent actionEvent = Notifications.obtainEvent(eventObjectMap.get(actionType));
+        if (contextType == ActionContextType.FOCUSED_APP) {
+            // TODO: 1/4/2023 RESOLVE CONTEXT
+        }
+        return actionEvent;
     }
 
 

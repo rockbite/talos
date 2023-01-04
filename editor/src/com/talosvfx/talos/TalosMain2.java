@@ -105,7 +105,6 @@ public class TalosMain2 extends ApplicationAdapter {
 		layoutGridContainer.clearChildren();
 		layoutGridContainer.add(projectData.getLayoutGrid()).grow();
 
-
 		ProjectLoadedEvent projectLoadedEvent = Notifications.obtainEvent(ProjectLoadedEvent.class);
 		projectLoadedEvent.setProjectData(projectData);
 		Notifications.fireEvent(projectLoadedEvent);

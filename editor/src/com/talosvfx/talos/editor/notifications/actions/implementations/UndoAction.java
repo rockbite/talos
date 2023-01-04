@@ -3,10 +3,10 @@ package com.talosvfx.talos.editor.notifications.actions.implementations;
 import com.talosvfx.talos.editor.notifications.actions.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class CopyAction extends AbstractAction {
+public class UndoAction extends AbstractAction {
 
-    public CopyAction(Combination defaultKeyCombination, Combination overriddenKeyCombination) {
-        super("Copy", "generic.copy",  "", "copy_action", defaultKeyCombination, overriddenKeyCombination);
+    public UndoAction(Combination defaultKeyCombination, Combination overriddenKeyCombination) {
+        super("Undo", "generic.undo",  "", "undo_action", ActionContextType.GENERAL, defaultKeyCombination, overriddenKeyCombination);
     }
 
     @Override
