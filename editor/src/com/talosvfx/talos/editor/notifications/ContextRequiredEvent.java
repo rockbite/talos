@@ -11,6 +11,6 @@ public class ContextRequiredEvent<T> implements TalosEvent {
 
     @Override
     public void reset () {
-
+        context = null;
     }
 }

@@ -1,16 +1,15 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
-import com.talosvfx.talos.editor.notifications.actions.implementations.AbstractAction;
-import com.talosvfx.talos.editor.notifications.actions.implementations.UndoAction;
-import com.talosvfx.talos.editor.notifications.actions.implementations.SaveAction;
+import com.talosvfx.talos.editor.notifications.events.actions.ActionContextEvent;
 import com.talosvfx.talos.editor.notifications.events.actions.ActionEvent;
+import com.talosvfx.talos.editor.notifications.events.actions.IActionEvent;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +30,8 @@ public class ActionsSystem extends InputAdapter {
         injectedAdapters.removeValue(inputAdapter, true);
     }
 
-    private ObjectMap<Actions.ActionEnumInterface, Class<? extends ActionEvent>> eventObjectMap = new ObjectMap<>();
-
     public ActionsSystem() {
-        MouseCombination copyActionCombination = new MouseCombination(MouseAction.WHEEL_IN, ModifierKey.CTRL);
-        allActions.add(new UndoAction(copyActionCombination, null));
 
-        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
-        allActions.add(new SaveAction(keyboardKeyCombination, null));
     }
 
     private boolean checkActionState() {
@@ -76,13 +69,28 @@ public class ActionsSystem extends InputAdapter {
     }
 
     private TalosEvent getEventForAction(IAction action) {
-        Actions.ActionEnumInterface actionType = action.getActionType();
+        IActionEvent actionEvent = Notifications.obtainEvent(getActionEventTypeForContextType(action.getContextType()));
+        actionEvent.setActionType(action.getActionType());
         ActionContextType contextType = action.getContextType();
-        ActionEvent actionEvent = Notifications.obtainEvent(eventObjectMap.get(actionType));
         if (contextType == ActionContextType.FOCUSED_APP) {
+            ActionContextEvent contextEvent = (ActionContextEvent) actionEvent;
+            AppManager appManager = SharedResources.appManager;
+            appManager.get
+            contextEvent.setContext(appManager);
             // TODO: 1/4/2023 RESOLVE CONTEXT
         }
         return actionEvent;
+    }
+
+    Class<? extends IActionEvent> getActionEventTypeForContextType (ActionContextType type) {
+        switch (type) {
+            case GLOBAL:
+                return ActionEvent.class;
+            case FOCUSED_APP:
+                return ActionContextEvent.class;
+        }
+
+        return null;
     }
 
 

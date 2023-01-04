@@ -31,6 +31,8 @@ public class TalosLocalPrefs {
 		@Getter
 		private ObjectMap<String, String> globalPrefs = new ObjectMap<>();
 
+		// TODO: 1/4/2023 overridden combinations in composition way
+
 		public void updateProject (String absolutePathToProjectFile) {
 			for (RecentProject recentProject : recentProjects) {
 				if (recentProject.getProjectPath().equals(absolutePathToProjectFile)) {
