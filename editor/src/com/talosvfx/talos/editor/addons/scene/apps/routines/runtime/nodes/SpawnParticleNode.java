@@ -28,10 +28,12 @@ public class SpawnParticleNode extends RoutineNode {
             String name = NamingUtils.getNewName("dynamicParticleGo", target.getAllGONames());
             go.setName(name);
             TransformComponent transformComponent = new TransformComponent();
+            transformComponent.position.set(fetchFloatValue("x"), fetchFloatValue("y"));
             ParticleComponent particleComponent = new ParticleComponent();
             go.addComponent(transformComponent);
             go.addComponent(particleComponent);
             particleComponent.setGameAsset(asset);
+            particleComponent.orderingInLayer = fetchIntValue("layerOrder");
 
             target.addGameObject(go);
 
