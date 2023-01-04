@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.dialogs.preference.widgets.blocks;
 import com.badlogic.gdx.utils.Array;
 
 import com.talosvfx.talos.editor.dialogs.preference.widgets.PrefWidgetFactory;
-import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 
 public class KeymapBlock extends BlockWidget {
 
@@ -15,7 +15,7 @@ public class KeymapBlock extends BlockWidget {
         widgetArray = new Array<>();
         getWidgetLabel().setText("Keymap");
 
-        Actions.ActionType[] values = Actions.ActionType.values();
+        Commands.CommandType[] values = Commands.CommandType.values();
 
         for(int i = 0; i  < values.length; i++) {
             String name = values[i].toString();

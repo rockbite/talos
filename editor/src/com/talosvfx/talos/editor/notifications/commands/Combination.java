@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.notifications.actions;
+package com.talosvfx.talos.editor.notifications.commands;
 
 public interface Combination {
     boolean shouldExecute();
@@ -19,7 +19,7 @@ public interface Combination {
 
     void act(float delta);
 
-    void actionIsRun();
+    void commandIsRun();
 
     CombinationType getCombinationType();
 }

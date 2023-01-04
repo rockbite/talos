@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
-import com.talosvfx.talos.editor.notifications.events.actions.IActionEvent;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
 import lombok.Getter;
 
 public class Notifications {
@@ -35,12 +35,12 @@ public class Notifications {
 		public abstract void runEvent (TalosEvent event);
 	}
 
-	public abstract class ActionEventRunner extends EventRunner {
-		private Actions.ActionType actionType;
+	public abstract class CommandEventRunner extends EventRunner {
+		private Commands.CommandType commandType;
 
-		public ActionEventRunner(Observer observer, Actions.ActionType actionType) {
+		public CommandEventRunner(Observer observer, Commands.CommandType commandType) {
 			super(observer);
-			this.actionType = actionType;
+			this.commandType = commandType;
 		}
 	}
 
@@ -83,19 +83,19 @@ public class Notifications {
 
 		for (Method method : declaredMethods) {
 			final Annotation declaredAnnotation = method.getDeclaredAnnotation(EventHandler.class);
-			final Annotation declaredActionAnnotation = method.getDeclaredAnnotation(ActionEventHandler.class);
-			if (declaredAnnotation == null && declaredActionAnnotation == null)
+			final Annotation declaredCommandAnnotation = method.getDeclaredAnnotation(CommandEventHandler.class);
+			if (declaredAnnotation == null && declaredCommandAnnotation == null)
 				continue;
 
-			boolean isActionEvent = declaredActionAnnotation != null;
+			boolean isCommandEvent = declaredCommandAnnotation != null;
 
-			if (!isActionEvent) {
+			if (!isCommandEvent) {
 				EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
 				if (eventHandler == null) {
 					continue;
 				}
 			} else {
-				ActionEventHandler eventHandler = declaredActionAnnotation.getAnnotation(ActionEventHandler.class);
+				CommandEventHandler eventHandler = declaredCommandAnnotation.getAnnotation(CommandEventHandler.class);
 				if (eventHandler == null) {
 					continue;
 				}
@@ -108,9 +108,9 @@ public class Notifications {
 				method.setAccessible(true);
 
 				EventRunner eventRunner;
-				if (isActionEvent) {
-					ActionEventHandler actionAnnotation = declaredActionAnnotation.getAnnotation(ActionEventHandler.class);
-					eventRunner = new ActionEventRunner(observer, actionAnnotation.actionType()) {
+				if (isCommandEvent) {
+					CommandEventHandler commandAnnotation = declaredCommandAnnotation.getAnnotation(CommandEventHandler.class);
+					eventRunner = new CommandEventRunner(observer, commandAnnotation.commandType()) {
 						@Override
 						public void runEvent(TalosEvent event) {
 							try {
@@ -163,13 +163,13 @@ public class Notifications {
 	}
 
 	private void testAndFireEvent (EventRunner eventRunner, TalosEvent event) {
-		if (event instanceof IActionEvent) {
-			if (!(eventRunner instanceof ActionEventRunner)) {
+		if (event instanceof ICommandEvent) {
+			if (!(eventRunner instanceof CommandEventRunner)) {
 				return;
 			}
 
-			ActionEventRunner actionEventRunner = (ActionEventRunner) eventRunner;
-			if (actionEventRunner.actionType != ((IActionEvent) event).getActionType()) {
+			CommandEventRunner commandEventRunner = (CommandEventRunner) eventRunner;
+			if (commandEventRunner.commandType != ((ICommandEvent) event).getCommandType()) {
 				return;
 			}
 		}

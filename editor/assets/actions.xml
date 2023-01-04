@@ -1,9 +1,0 @@
-<actions>
-    <actionGroup package = "GeneralAction">
-        <action name = "Copy" uniqueName = "copy_action" description = "HERE IS A FULL DESCRIPTION OF COPY">
-            <combination type = "keyboard">
-                "CTRL C"
-            </combination>
-        </action>
-    </actionGroup>
-</actions>

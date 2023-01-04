@@ -1,0 +1,9 @@
+<actions>
+    <commandGroup package = "General">
+        <action name = "Copy" uniqueName = "copy_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
+            <combination type = "keyboard">
+                "CTRL C"
+            </combination>
+        </action>
+    </commandGroup>
+</actions>

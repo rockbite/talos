@@ -1,13 +1,12 @@
 package com.talosvfx.talos.editor.project2.savestate;
 
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
-import com.talosvfx.talos.editor.notifications.ActionEventHandler;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
-import com.talosvfx.talos.editor.notifications.events.actions.ActionEvent;
-import com.talosvfx.talos.editor.notifications.events.actions.IActionEvent;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.utils.Toasts;
@@ -22,20 +21,20 @@ public class SaveSystem implements Observer {
 		Notifications.registerObserver(this);
 	}
 
-	@ActionEventHandler(actionType = Actions.ActionType.SAVE)
-	public void onSaveAction (ActionEvent actionEvent) {
+	@CommandEventHandler(commandType = Commands.CommandType.SAVE)
+	public void onSaveAction (CommandEvent actionEvent) {
 		logger.info("SAVE REACHED HERE");
 		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
 	}
 
-	@ActionEventHandler(actionType = Actions.ActionType.SAVE)
-	public void onSave2Action (ActionEvent actionEvent) {
+	@CommandEventHandler(commandType = Commands.CommandType.SAVE)
+	public void onSave2Action (CommandEvent actionEvent) {
 		logger.info("SAVE REACHED HERE2");
 		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
 	}
 
-	@ActionEventHandler(actionType = Actions.ActionType.COPY)
-	public void onCopyAction (ActionEvent actionEvent) {
+	@CommandEventHandler(commandType = Commands.CommandType.COPY)
+	public void onCopyAction (CommandEvent actionEvent) {
 		logger.info("COPY REACHED HERE");
 		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
 	}

@@ -14,7 +14,7 @@ import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.actions.ActionsSystem;
+import com.talosvfx.talos.editor.notifications.commands.CommandsSystem;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.*;
@@ -33,7 +33,7 @@ public class TalosMain2 extends ApplicationAdapter {
 	private Skin skin;
 	private Stage stage;
 	private Table layoutGridContainer;
-	private ActionsSystem actionsSystem;
+	private CommandsSystem commandsSystem;
 
 	public TalosMain2(ILauncher launcher) {
 		this.launcher = launcher;
@@ -85,8 +85,8 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
-		actionsSystem = new ActionsSystem();
-		SharedResources.inputHandling.addPermanentInputProcessor(actionsSystem);
+		commandsSystem = new CommandsSystem();
+		SharedResources.inputHandling.addPermanentInputProcessor(commandsSystem);
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
@@ -126,7 +126,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.13f, 0.13f, 0.13f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		actionsSystem.act(Gdx.graphics.getDeltaTime());
+		commandsSystem.act(Gdx.graphics.getDeltaTime());
 		stage.act();
 		stage.draw();
 	}

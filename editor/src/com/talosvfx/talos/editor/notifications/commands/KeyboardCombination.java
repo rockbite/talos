@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.notifications.actions;
+package com.talosvfx.talos.editor.notifications.commands;
 
 public class KeyboardCombination extends AbstractCombinationWithModifier {
     private int regularKey;
@@ -23,7 +23,7 @@ public class KeyboardCombination extends AbstractCombinationWithModifier {
     }
 
     @Override
-    public void actionIsRun() {
+    public void commandIsRun() {
         firstTimeDone = true;
     }
 

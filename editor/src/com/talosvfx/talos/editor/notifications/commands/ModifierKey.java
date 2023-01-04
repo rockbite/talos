@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.notifications.actions;
+package com.talosvfx.talos.editor.notifications.commands;
 
 import com.badlogic.gdx.Input;
 

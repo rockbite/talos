@@ -1,15 +1,15 @@
-package com.talosvfx.talos.editor.notifications.actions;
+package com.talosvfx.talos.editor.notifications.commands;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.notifications.actions.enums.Actions;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 
 
-public class ActionParser {
-    public static ObjectMap<Actions.ActionType, IAction> defaultConfiguration = new ObjectMap<>();
-    public static ObjectMap<Actions.ActionType, IAction> overriddenConfiguration = new ObjectMap<>();
+public class CommandParser {
+    public static ObjectMap<Commands.CommandType, ICommand> defaultConfiguration = new ObjectMap<>();
+    public static ObjectMap<Commands.CommandType, ICommand> overriddenConfiguration = new ObjectMap<>();
 
     public void parseDefaultActions(FileHandle file) {
         XmlReader xmlReader = new XmlReader();
@@ -23,7 +23,7 @@ public class ActionParser {
 //                .addJavadoc("This is a generated class. It shouldn't be modified by hand, as the changes would be " +
 //                        "overridden.\n")
 //                .addJavadoc("To regenerate this class, call generateActionsEnum task from Gradle.\n " +
-//                        "The XML file is located in editor/assets/actions.xml");
+//                        "The XML file is located in editor/assets/commands.xml");
 //
 //        TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder("ActionEnumInterface");
 //        TypeSpec interfaceBuilt = interfaceBuilder.build();

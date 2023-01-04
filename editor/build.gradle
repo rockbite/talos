@@ -77,42 +77,33 @@ task createProperties () {
     }
 }
 
-task generateActionsEnum () {
+task generateCommandsEnum () {
     doFirst {
-        TypeSpec.Builder builder = TypeSpec.classBuilder("Actions").addModifiers(Modifier.PUBLIC)
+        TypeSpec.Builder builder = TypeSpec.classBuilder("Commands").addModifiers(Modifier.PUBLIC)
                 .addJavadoc("This is a generated class. It shouldn't be modified by hand, as the changes would be " +
                 "overridden.\n")
-                .addJavadoc("To regenerate this class, call generateActionsEnum task from Gradle.\n " +
-                        "The XML file is located in editor/assets/actions.xml")
-        def file = rootProject.file("editor/assets/actions.xml")
+                .addJavadoc("To regenerate this class, call generateCommandsEnum task from Gradle.\n " +
+                        "The XML file is located in editor/assets/commands.xml")
+        def file = rootProject.file("editor/assets/commands.xml")
         XmlReader xmlReader = new XmlReader()
         XmlReader.Element root = xmlReader.parse(new FileHandle(file))
 
-        TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder("ActionEnumInterface").addModifiers(Modifier.PUBLIC)
-        TypeSpec interfaceBuilt = interfaceBuilder.build()
-        builder.addType(interfaceBuilt)
-
-        def interfacePackageName = "com.talosvfx.talos.editor.notifications.actions.enums.Actions"
-        def interfaceJavaFile = JavaFile.builder(interfacePackageName, interfaceBuilt).build()
-
-        def className = ClassName.get(interfaceJavaFile.packageName, interfaceJavaFile.typeSpec.name)
-
-        for (XmlReader.Element actionGroup : root.getChildrenByName("actionGroup")) {
-            String packageName = actionGroup.getAttribute("package")
-            TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(packageName).addSuperinterface(className)
+        for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
+            String packageName = commandGroup.getAttribute("package")
+            TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(packageName)
             enumBuilder.addField(FieldSpec.builder(String.class, "uniqueName", Modifier.PUBLIC, Modifier.FINAL).build())
             MethodSpec uniqueName = MethodSpec.constructorBuilder().addParameter(String.class, "uniqueName").addStatement("this.uniqueName = uniqueName;").build()
             enumBuilder.addMethod(uniqueName)
-            for (XmlReader.Element action : actionGroup.getChildrenByName("action")) {
-                enumBuilder.addEnumConstant(action.getAttribute("name").toUpperCase(),
-                        TypeSpec.anonymousClassBuilder("\$S", action.getAttribute("uniqueName")).build())
+            for (XmlReader.Element command : commandGroup.getChildrenByName("command")) {
+                enumBuilder.addEnumConstant(command.getAttribute("name").toUpperCase(),
+                        TypeSpec.anonymousClassBuilder("\$S", command.getAttribute("uniqueName")).build())
             }
             TypeSpec enumType = enumBuilder.build();
             builder.addType(enumType);
         }
 
         TypeSpec clazzBuild = builder.build();
-        final JavaFile.Builder fileBuilder = JavaFile.builder("com.talosvfx.talos.editor.notifications.actions.enums", clazzBuild);
+        final JavaFile.Builder fileBuilder = JavaFile.builder("com.talosvfx.talos.editor.notifications.commands.enums", clazzBuild);
         JavaFile javaFile = fileBuilder.build()
         def destination = new File("$projectDir/src/")
         javaFile.writeTo(destination)
