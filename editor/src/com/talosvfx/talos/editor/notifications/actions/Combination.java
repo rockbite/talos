@@ -20,4 +20,6 @@ public interface Combination {
     void act(float delta);
 
     void actionIsRun();
+
+    CombinationType getCombinationType();
 }

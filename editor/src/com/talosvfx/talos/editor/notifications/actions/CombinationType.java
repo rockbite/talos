@@ -1,5 +1,5 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-public enum InputSource {
+public enum CombinationType {
     MOUSE, KEYBOARD;
 }

@@ -68,4 +68,9 @@ public class MouseCombination extends CombinationWithModifier {
     public void actionIsRun() {
 
     }
+
+    @Override
+    public CombinationType getCombinationType() {
+        return CombinationType.MOUSE;
+    }
 }

@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.notifications.actions.implementations;
 
+import com.talosvfx.talos.editor.notifications.actions.Combination;
 import com.talosvfx.talos.editor.notifications.actions.IAction;
-import com.talosvfx.talos.editor.notifications.actions.ActionCombinationWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,36 +18,35 @@ public abstract class AbstractAction implements IAction {
     private final String uniqueName;
 
     @Getter
-    private ActionCombinationWrapper actionCombinationWrapper;
+    private Combination activeCombination;
 
     @Getter
-    private final ActionCombinationWrapper defaultKeyCombination;
+    private final Combination defaultCombination;
 
     private boolean isDefaultActionOverridden;
 
-    public AbstractAction(String name, String fullName, String description, String uniqueName, ActionCombinationWrapper defaultKeyCombination, ActionCombinationWrapper overriddenKeyCombination) {
+    public AbstractAction(String name, String fullName, String description, String uniqueName, Combination defaultCombination, Combination overriddenKeyCombination) {
         this.name = name;
         this.fullName = fullName;
         this.description = description;
         this.uniqueName = uniqueName;
-        this.defaultKeyCombination = defaultKeyCombination;
+        this.defaultCombination = defaultCombination;
         this.isDefaultActionOverridden = overriddenKeyCombination != null;
-        this.actionCombinationWrapper = isDefaultActionOverridden ? overriddenKeyCombination : defaultKeyCombination;
+        this.activeCombination = isDefaultActionOverridden ? overriddenKeyCombination : defaultCombination;
     }
-
 
     @Override
     public boolean isReadyToRun() {
-        return actionCombinationWrapper.combination.shouldExecute();
+        return activeCombination.shouldExecute();
     }
 
     @Override
     public void runAction() {
-        actionCombinationWrapper.combination.actionIsRun();
+        activeCombination.actionIsRun();
     }
 
     @Override
     public void clearAfterRunning() {
-        actionCombinationWrapper.combination.resetState();
+        activeCombination.resetState();
     }
 }

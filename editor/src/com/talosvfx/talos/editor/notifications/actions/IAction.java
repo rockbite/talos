@@ -11,9 +11,9 @@ public interface IAction {
 
     String getUniqueName();
 
-    ActionCombinationWrapper getActionKeyCombination();
+    Combination getActiveCombination();
 
-    ActionCombinationWrapper getDefaultKeyCombination();
+    Combination getDefaultCombination();
 
     boolean isReadyToRun();
 

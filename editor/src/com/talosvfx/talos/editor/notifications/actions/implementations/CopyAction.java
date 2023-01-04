@@ -5,7 +5,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class CopyAction extends AbstractAction {
 
-    public CopyAction(ActionCombinationWrapper defaultKeyCombination, ActionCombinationWrapper overriddenKeyCombination) {
+    public CopyAction(Combination defaultKeyCombination, Combination overriddenKeyCombination) {
         super("Copy", "generic.copy",  "", "copy_action", defaultKeyCombination, overriddenKeyCombination);
     }
 

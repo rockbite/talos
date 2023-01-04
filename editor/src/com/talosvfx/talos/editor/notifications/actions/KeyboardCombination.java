@@ -29,6 +29,11 @@ public class KeyboardCombination extends CombinationWithModifier {
     }
 
     @Override
+    public CombinationType getCombinationType() {
+        return CombinationType.KEYBOARD;
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
         if (repeat) {
