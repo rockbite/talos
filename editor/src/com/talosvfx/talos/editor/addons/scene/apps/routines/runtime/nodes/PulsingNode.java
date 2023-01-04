@@ -31,6 +31,11 @@ public class PulsingNode extends RoutineNode implements TickableNode {
         routineInstanceRef.setDepthValue(iteration++);
         routineInstanceRef.setSignalPayload(payload);
         sendSignal("onComplete");
+
+        if(iteration >= fetchIntValue("count")) {
+            running = false;
+            routineInstanceRef.endDepth();
+        }
     }
 
 
@@ -50,5 +55,6 @@ public class PulsingNode extends RoutineNode implements TickableNode {
     public void reset() {
         super.reset();
         running = false;
+        iteration = 0;
     }
 }

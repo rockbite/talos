@@ -99,7 +99,7 @@ public class RoutineRenderer {
                 reset = true;
             }*/
 
-            renderRoutineNode.position.set(transform.position);
+            renderRoutineNode.position.set(transform.worldPosition);
             renderRoutineNode.size.set(routineRendererComponent.viewportSize);
             renderRoutineNode.viewportPosition.set(camera.position.x, camera.position.y);
             renderRoutineNode.viewportSize.set(cameraViewportRect.width, cameraViewportRect.height);

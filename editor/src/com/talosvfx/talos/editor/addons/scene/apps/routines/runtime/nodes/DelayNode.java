@@ -14,4 +14,9 @@ public class DelayNode extends AsyncRoutineNode<GameObject, AsyncRoutineNodeStat
     protected boolean targetAdded(AsyncRoutineNodeState<GameObject> state) {
         return true;
     }
+
+    @Override
+    protected boolean supportsConcurrent() {
+        return true;
+    }
 }

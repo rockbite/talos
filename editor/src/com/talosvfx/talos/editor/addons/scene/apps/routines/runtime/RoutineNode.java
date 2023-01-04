@@ -309,6 +309,18 @@ public abstract class RoutineNode {
         return (String) port.valueOverride;
     }
 
+    protected boolean isPortConnected(String key) {
+        Port port = inputs.get(key);
+        if(port == null) return false;
+        if(port.connectionType == ConnectionType.DATA) {
+            if (!port.connections.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected float fetchFloatValue(String key) {
         Object object = fetchValue(key);
 

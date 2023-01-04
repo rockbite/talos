@@ -50,6 +50,16 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
     @Override
     public void receiveSignal(String portName) {
         U signalPayload = (U)routineInstanceRef.getSignalPayload();
+
+        if(!supportsConcurrent()) {
+            for (int i = states.size - 1; i >= 0; i--) {
+                if (states.get(i).getTarget() == signalPayload) {
+                    //states.get(i).alpha = 0;
+                    return;
+                }
+            }
+        }
+
         T state = obtainState();
         state.setTarget(signalPayload);
         state.alpha = 0;
@@ -70,6 +80,10 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
         }
 
         targets = routineInstanceRef.fetchGlobal("executedTargets");
+    }
+
+    protected boolean supportsConcurrent() {
+        return false;
     }
 
 
