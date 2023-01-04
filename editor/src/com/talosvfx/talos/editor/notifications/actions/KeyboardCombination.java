@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-public class KeyboardKeyCombination extends KeyCombinationWithModifier {
+public class KeyboardCombination extends CombinationWithModifier {
     private int regularKey;
 
     private boolean repeat;
@@ -13,7 +13,7 @@ public class KeyboardKeyCombination extends KeyCombinationWithModifier {
 
     private boolean isRegularKeyPressed = false;
 
-    public KeyboardKeyCombination (int regularKey, boolean repeat, ModifierKey... modifierKeys) {
+    public KeyboardCombination(int regularKey, boolean repeat, ModifierKey... modifierKeys) {
         super(modifierKeys);
         this.regularKey = regularKey;
         this.repeat = repeat;

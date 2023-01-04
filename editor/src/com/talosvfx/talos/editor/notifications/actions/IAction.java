@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-public interface Action {
+public interface IAction {
     String getName();
 
     String getDescription();
@@ -11,9 +11,9 @@ public interface Action {
 
     String getUniqueName();
 
-    ActionKeyCombination getActionKeyCombination();
+    ActionCombinationWrapper getActionKeyCombination();
 
-    ActionKeyCombination getDefaultKeyCombination();
+    ActionCombinationWrapper getDefaultKeyCombination();
 
     boolean isReadyToRun();
 

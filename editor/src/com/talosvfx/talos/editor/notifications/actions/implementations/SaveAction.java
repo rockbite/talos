@@ -2,10 +2,10 @@ package com.talosvfx.talos.editor.notifications.actions.implementations;
 
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.actions.ActionKeyCombination;
+import com.talosvfx.talos.editor.notifications.actions.ActionCombinationWrapper;
 
 public class SaveAction extends AbstractAction {
-    public SaveAction(ActionKeyCombination defaultKeyCombination, ActionKeyCombination overriddenKeyCombination) {
+    public SaveAction(ActionCombinationWrapper defaultKeyCombination, ActionCombinationWrapper overriddenKeyCombination) {
         super("Save", "generic.save",  "", "save_action", defaultKeyCombination, overriddenKeyCombination);
     }
     @Override

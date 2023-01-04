@@ -3,12 +3,12 @@ package com.talosvfx.talos.editor.notifications.actions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 
-public abstract class KeyCombinationWithModifier implements KeyCombination {
+public abstract class CombinationWithModifier implements Combination {
     protected Array<ModifierKey> modifierKeys = new Array<>();
 
     protected ObjectSet<ModifierKey> pressedModifierKeys = new ObjectSet<>();
 
-    public KeyCombinationWithModifier(ModifierKey... modifierKeys) {
+    public CombinationWithModifier(ModifierKey... modifierKeys) {
         for (ModifierKey modifierKey : modifierKeys) {
             this.modifierKeys.add(modifierKey);
         }

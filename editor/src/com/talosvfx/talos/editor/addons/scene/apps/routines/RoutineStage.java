@@ -54,27 +54,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         nodeBoard.setTouchable(Touchable.enabled);
     }
 
-//    private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {
-//        if (gameObject.hasComponent(RoutineRendererComponent.class)) {
-//            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-//            if (component.routineInstance != null) {
-//                logger.error("todo don't do this with uuid do it with instance of the game asset");
-////                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
-////                    component.updatePropertyWrappers(true);
-////                    updatedComponents.add(component);
-////                }
-//            }
-//        }
-//
-//        Array<GameObject> children = gameObject.getGameObjects();
-//        if (children != null) {
-//            for (int i = 0; i < children.size; i++) {
-//                GameObject child = children.get(i);
-//                updatePropertiesForGOs(child, updatedComponents);
-//            }
-//        }
-//    }
-
     public void writeData (FileHandle target) {
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);

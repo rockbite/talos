@@ -1,11 +1,11 @@
 package com.talosvfx.talos.editor.notifications.actions.implementations;
 
-import com.talosvfx.talos.editor.notifications.actions.Action;
-import com.talosvfx.talos.editor.notifications.actions.ActionKeyCombination;
+import com.talosvfx.talos.editor.notifications.actions.IAction;
+import com.talosvfx.talos.editor.notifications.actions.ActionCombinationWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class AbstractAction implements Action {
+public abstract class AbstractAction implements IAction {
 
     @Getter
     private final String name;
@@ -18,36 +18,36 @@ public abstract class AbstractAction implements Action {
     private final String uniqueName;
 
     @Getter
-    private ActionKeyCombination actionKeyCombination;
+    private ActionCombinationWrapper actionCombinationWrapper;
 
     @Getter
-    private final ActionKeyCombination defaultKeyCombination;
+    private final ActionCombinationWrapper defaultKeyCombination;
 
     private boolean isDefaultActionOverridden;
 
-    public AbstractAction(String name, String fullName, String description, String uniqueName, ActionKeyCombination defaultKeyCombination, ActionKeyCombination overriddenKeyCombination) {
+    public AbstractAction(String name, String fullName, String description, String uniqueName, ActionCombinationWrapper defaultKeyCombination, ActionCombinationWrapper overriddenKeyCombination) {
         this.name = name;
         this.fullName = fullName;
         this.description = description;
         this.uniqueName = uniqueName;
         this.defaultKeyCombination = defaultKeyCombination;
         this.isDefaultActionOverridden = overriddenKeyCombination != null;
-        this.actionKeyCombination = isDefaultActionOverridden ? overriddenKeyCombination : defaultKeyCombination;
+        this.actionCombinationWrapper = isDefaultActionOverridden ? overriddenKeyCombination : defaultKeyCombination;
     }
 
 
     @Override
     public boolean isReadyToRun() {
-        return actionKeyCombination.keyCombination.shouldExecute();
+        return actionCombinationWrapper.combination.shouldExecute();
     }
 
     @Override
     public void runAction() {
-        actionKeyCombination.keyCombination.actionIsRun();
+        actionCombinationWrapper.combination.actionIsRun();
     }
 
     @Override
     public void clearAfterRunning() {
-        actionKeyCombination.keyCombination.resetState();
+        actionCombinationWrapper.combination.resetState();
     }
 }

@@ -12,7 +12,7 @@ public class ActionsSystem extends InputAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionsSystem.class);
 
-    private Array<Action> allActions = new Array<>();
+    private Array<IAction> allActions = new Array<>();
 
     private Array<InputAdapter> injectedAdapters = new Array<>();
 
@@ -25,18 +25,18 @@ public class ActionsSystem extends InputAdapter {
     }
 
     public ActionsSystem() {
-        KeyboardKeyCombination copyActionCombination = new KeyboardKeyCombination(Input.Keys.C, true, ModifierKey.CTRL);
-        ActionKeyCombination copyActionKeyCombination = new ActionKeyCombination(InputSource.KEYBOARD, copyActionCombination);
-        allActions.add(new CopyAction(copyActionKeyCombination, null));
+        MouseCombination copyActionCombination = new MouseCombination(MouseAction.WHEEL_IN, ModifierKey.CTRL);
+        ActionCombinationWrapper copyActionCombinationWrapper = new ActionCombinationWrapper(copyActionCombination);
+        allActions.add(new CopyAction(copyActionCombinationWrapper, null));
 
-        KeyboardKeyCombination keyboardKeyCombination = new KeyboardKeyCombination(Input.Keys.S, false, ModifierKey.CTRL);
-        ActionKeyCombination actionKeyCombination = new ActionKeyCombination(InputSource.KEYBOARD, keyboardKeyCombination);
-        allActions.add(new SaveAction(actionKeyCombination, null));
+        KeyboardCombination keyboardKeyCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
+        ActionCombinationWrapper actionCombinationWrapper = new ActionCombinationWrapper(keyboardKeyCombination);
+        allActions.add(new SaveAction(actionCombinationWrapper, null));
     }
 
     private boolean checkActionState() {
         boolean isRun = false;
-        for (Action action : allActions) {
+        for (IAction action : allActions) {
             if (action.isReadyToRun()) {
                 runAction(action);
                 isRun = true;
@@ -51,19 +51,19 @@ public class ActionsSystem extends InputAdapter {
     }
 
     public void act (float delta) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.act(delta);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.act(delta);
         }
         checkActionState();
     }
 
-    public void runAction(Action action) {
-        action.runAction();
-        logger.info("ACTION IS RUN - " + action.getFullName());
+    public void runAction(IAction IAction) {
+        IAction.runAction();
+        logger.info("ACTION IS RUN - " + IAction.getFullName());
     }
 
     public void clearAfterRunning() {
-        for (Action action : allActions) {
+        for (IAction action : allActions) {
             action.clearAfterRunning();
         }
     }
@@ -71,8 +71,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.mouseMoved();
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.mouseMoved();
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {
@@ -84,8 +84,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.touchDown(button);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.touchDown(button);
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {
@@ -97,8 +97,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.scrolled(amountY);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.scrolled(amountY);
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {
@@ -110,8 +110,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.touchUp(button);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.touchUp(button);
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {
@@ -123,8 +123,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean keyDown(int keycode) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.keyDown(keycode);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.keyDown(keycode);
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {
@@ -136,8 +136,8 @@ public class ActionsSystem extends InputAdapter {
 
     @Override
     public boolean keyUp(int keycode) {
-        for (Action action : allActions) {
-            action.getActionKeyCombination().keyCombination.keyUp(keycode);
+        for (IAction action : allActions) {
+            action.getActionKeyCombination().combination.keyUp(keycode);
         }
 
         for (InputAdapter inputAdapter : injectedAdapters) {

@@ -47,6 +47,7 @@ dependencyResolutionManagement {
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
 
             library("spark", "com.sparkjava", "spark-core").versionRef("spark")
+            library("javapoet", "com.squareup", "javapoet").version("1.13.0")
 
             plugin("lombok", "io.freefair.lombok").version("6.4.1")
         }

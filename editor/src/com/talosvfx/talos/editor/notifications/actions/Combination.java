@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.notifications.actions;
 
-public interface KeyCombination {
+public interface Combination {
     boolean shouldExecute();
 
     void resetState();
