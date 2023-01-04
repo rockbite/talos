@@ -867,7 +867,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void wrapperClickedUp (ModuleWrapper wrapper) {
 
         if (wasWrapperDragged != null) {
-              app.dataModified();
+              //app.dataModified();
         } else {
             // on mouse up when no drag happens this wrapper should be selected unless shift was pressed
             if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
