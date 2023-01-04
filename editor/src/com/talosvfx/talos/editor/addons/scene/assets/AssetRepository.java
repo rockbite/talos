@@ -960,6 +960,7 @@ public class AssetRepository implements Observer {
 	}
 
 	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {
+		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
 		if (useGlobalState) {
 			GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
 			SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
