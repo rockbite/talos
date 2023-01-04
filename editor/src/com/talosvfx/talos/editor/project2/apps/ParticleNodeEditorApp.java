@@ -256,20 +256,6 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	}
 
-	@Override
-	public void applyFromPreferences(ViewportPreferences prefs) {
-		moduleGraphUIWrapper.setCameraPos(prefs.cameraPos);
-		moduleGraphUIWrapper.setCameraZoom(prefs.cameraZoom);
-	}
-
-	@Override
-	public ViewportPreferences getPrefs() {
-		ViewportPreferences prefs = new ViewportPreferences();
-		prefs.cameraPos = moduleGraphUIWrapper.getCameraPos();
-		prefs.cameraZoom = moduleGraphUIWrapper.getCameraZoom();
-		return prefs;
-	}
-
 	public void dataModified() {
 		saveProjectToData(gameAsset.getResource());
 		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
@@ -278,6 +264,16 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	public void resetToNew() {
 		// ?
+	}
+
+	@Override
+	public ViewportPreferences getPreferences() {
+		return moduleGraphUIWrapper.get();
+	}
+
+	@Override
+	public void applyPreferences(ViewportPreferences preferences) {
+		moduleGraphUIWrapper.accept(preferences);
 	}
 }
 
