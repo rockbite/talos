@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 
 public class LayoutResizeWidget extends Table {
@@ -18,12 +19,18 @@ public class LayoutResizeWidget extends Table {
 	private LayoutItem responder;
 	private boolean entered;
 
+	private Drawable noFocus;
+	private Drawable focus;
+
 	public LayoutResizeWidget (Skin skin, LayoutGrid layoutGrid, LayoutItem responder) {
 		this.skin = skin;
 		this.layoutGrid = layoutGrid;
 		this.responder = responder;
 
-		setBackground(skin.newDrawable("white", Color.valueOf("333333ff")));
+		noFocus = skin.newDrawable("white", Color.valueOf("333333ff"));
+		focus = skin.newDrawable("white", Color.valueOf("666666ff"));
+
+		setBackground(noFocus);
 
 		ClickListener listener = new ClickListener() {
 
@@ -31,7 +38,7 @@ public class LayoutResizeWidget extends Table {
 			public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
 				entered = true;
 
-				setBackground(skin.newDrawable("white", Color.valueOf("666666ff")));
+				setBackground(focus);
 				super.enter(event, x, y, pointer, fromActor);
 			}
 
@@ -39,7 +46,7 @@ public class LayoutResizeWidget extends Table {
 			public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
 				entered = false;
 
-				setBackground(skin.newDrawable("white", Color.valueOf("333333ff")));
+				setBackground(noFocus);
 				super.exit(event, x, y, pointer, toActor);
 			}
 
