@@ -249,6 +249,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 		if (this.descriptor != vfxProjectData.getDescriptorSupplier().get()) {
 			this.descriptor = vfxProjectData.getDescriptorSupplier().get();
 			this.effectInstance = this.descriptor.createEffectInstance();
+			effectInstance.loopable = true;
 		}
 
 		long timeBefore = TimeUtils.nanoTime();
