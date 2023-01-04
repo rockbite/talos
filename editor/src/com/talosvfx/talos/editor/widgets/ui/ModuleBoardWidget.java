@@ -288,6 +288,13 @@ public class ModuleBoardWidget extends WidgetGroup {
                     TalosVFXUtils.getModuleListPopup().remove();
                 }
 
+                super.touchDown(event, x, y, pointer, button);
+
+                if (!event.isHandled()) {
+                    clearSelection();
+                    return false;
+                }
+
                 return false;
             }
 
