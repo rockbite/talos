@@ -24,7 +24,9 @@ public class SpawnSpineNode extends RoutineNode {
         if(asset != null) {
             tmp.setZero();
             GameObject go = new GameObject();
-            String name = NamingUtils.getNewName("dynamicSpineGo", target.getAllGONames());
+            String nm = fetchStringValue("name");
+            if(nm == null || nm.isEmpty()) nm = "dynamicSpineGo";
+            String name = NamingUtils.getNewName(nm, target.getAllGONames());
             go.setName(name);
             TransformComponent transformComponent = new TransformComponent();
             SpineRendererComponent spineRendererComponent = new SpineRendererComponent();
