@@ -72,9 +72,6 @@ public class GlobalSaveStateSystem implements Observer {
 			super();
 			this.gameAsset = gameAsset;
 			asSTring = SharedResources.globalSaveStateSystem.getAndIncrementLatestGameAssetAsString(gameAsset);
-			if (asSTring == null) {
-				System.out.println();
-			}
 		}
 
 

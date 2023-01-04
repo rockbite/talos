@@ -40,7 +40,7 @@ import lombok.Getter;
 
 import java.util.Comparator;
 
-public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences> {
+public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
 
 	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
@@ -101,7 +101,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		};
 	}
 
-	private void saveProjectToData(VFXProjectData projectData) {
+	private void saveProjectToData (VFXProjectData projectData) {
 		projectData.setFrom(moduleBoardWidget);
 	}
 
@@ -130,6 +130,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		//Set it up every time we load it
 		editorState.reset();
+		moduleBoardWidget.clearAll();
 
 		projectData.setDescriptor(particleEffectDescriptor);
 
@@ -231,6 +232,15 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
+		if (this.gameAsset != null) {
+			this.gameAsset.listeners.removeValue(this, true);
+		}
+
+		if (!gameAsset.listeners.contains(this, true)) {
+			gameAsset.listeners.add(this);
+		}
+
+
 		super.updateForGameAsset(gameAsset);
 
 		loadProject(gameAsset.getResource());
@@ -274,15 +284,17 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	}
 
 	public void dataModified() {
+		saveProjectToData(gameAsset.getResource());
 		AssetRepository.getInstance().assetChanged(gameAsset);
-
-//		saveProjectToData(gameAsset.getResource());
-//		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
-//		gameAsset.setUpdated();
 	}
 
 	public void resetToNew() {
 		// ?
+	}
+
+	@Override
+	public void onUpdate () {
+		loadProject(gameAsset.getResource());
 	}
 }
 
