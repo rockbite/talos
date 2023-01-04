@@ -714,14 +714,11 @@ public class DirectoryViewWidget extends Table {
 		@Override
 		public boolean accept (File pathname) {
 
-			if (pathname.getName().endsWith(".tse"))
-				return false;
-			if (pathname.getName().equals(".DS_Store"))
-				return false;
-			if (pathname.getName().endsWith(".meta"))
-				return false;
-			if (pathname.getName().endsWith(".p"))
-				return false;
+			if(pathname.getAbsolutePath().endsWith(".tse")) return false;
+			if(pathname.getName().equals(".DS_Store")) return false;
+			if(pathname.getAbsolutePath().endsWith(".meta")) return false;
+			if(pathname.getAbsolutePath().endsWith(".p")) return false;
+			if (pathname.getName().endsWith(".tlsprj")) return false;
 
 			return true;
 		}
