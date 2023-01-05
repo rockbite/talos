@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -28,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExter
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -36,12 +38,11 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HierarchyWidget extends Table implements Observer {
+public class HierarchyWidget extends Table implements Observer, EventContextProvider<GameObjectContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
 
@@ -626,6 +627,11 @@ public class HierarchyWidget extends Table implements Observer {
 
     public ScrollPane getScrollPane () {
         return scrollPane;
+    }
+
+    @Override
+    public GameObjectContainer getContext() {
+        return currentContainer;
     }
 
     private static class HierarchyWrapper extends Table {

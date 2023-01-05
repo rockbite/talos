@@ -50,7 +50,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private transient Gizmo.TransformSettings transformSettings = new Gizmo.TransformSettings();
     public transient boolean isPlacing = false;
 
-    @Getter
     private GameObjectContainer rootGameObjectContainer;
 
     public GameObject () {

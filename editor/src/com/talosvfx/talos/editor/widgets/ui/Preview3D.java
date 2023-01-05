@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
+import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import lombok.Getter;
 
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
 
 import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
 
-public class Preview3D extends PreviewWidget {
+public class Preview3D extends PreviewWidget<Preview3D> {
 
     private final TinyGizmoRenderer tinyGizmoRenderer;
 
@@ -126,6 +127,11 @@ public class Preview3D extends PreviewWidget {
 
         if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
         }
+    }
+
+    @Override
+    protected Preview3D getEventContext() {
+        return this;
     }
 
     @Override

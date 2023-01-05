@@ -1,10 +1,9 @@
 package com.talosvfx.talos.editor.notifications;
 
-import com.talosvfx.talos.editor.notifications.TalosEvent;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ContextRequiredEvent<T> implements TalosEvent {
+public class ContextRequiredEvent<T extends ContextRequiredEvent.Context> implements TalosEvent {
 
     @Getter@Setter
     private T context;
@@ -12,5 +11,9 @@ public class ContextRequiredEvent<T> implements TalosEvent {
     @Override
     public void reset () {
 
+    }
+
+    /** Tag interface */
+    public interface Context {
     }
 }

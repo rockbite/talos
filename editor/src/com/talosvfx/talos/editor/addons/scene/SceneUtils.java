@@ -111,7 +111,7 @@ public class SceneUtils {
 	}
 
 	private static void onObjectCreated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(gameObjectContainer, gameObject));
 		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
 		selectGameObjectExternallyEvent.setGameObject(gameObject);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
@@ -236,7 +236,7 @@ public class SceneUtils {
 		Notifications.fireEvent(deSelectGameObjectExternallyEvent);
 
 		GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
-		gameObjectDeleted.setTarget(gameObject);
+		gameObjectDeleted.set(gameObjectContainer, gameObject);
 		Notifications.fireEvent(gameObjectDeleted);
 
 		markContainerChanged(gameObjectContainer);

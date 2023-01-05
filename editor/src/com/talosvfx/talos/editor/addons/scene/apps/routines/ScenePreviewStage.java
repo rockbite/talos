@@ -10,6 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class ScenePreviewStage extends ViewportWidget implements Observer {
+public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
@@ -83,6 +84,11 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 	@Override
 	protected boolean canMoveAround () {
 		return true;
+	}
+
+	@Override
+	protected Scene getEventContext() {
+		return currentScene;
 	}
 
 	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
