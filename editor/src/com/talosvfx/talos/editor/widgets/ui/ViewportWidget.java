@@ -49,8 +49,6 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
-import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -83,7 +81,7 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public abstract class ViewportWidget<T extends ContextRequiredEvent.Context> extends Table implements ContextRequiredEvent.Context  {
+public abstract class ViewportWidget extends Table {
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
@@ -1287,7 +1285,7 @@ public abstract class ViewportWidget<T extends ContextRequiredEvent.Context> ext
 		return false;
 	}
 
-	protected abstract T getEventContext();
+	protected abstract <T> T getEventContext();
 
 	public void selectGameObjectExternally (GameObject gameObject) {
 		if (fromDirectoryView)

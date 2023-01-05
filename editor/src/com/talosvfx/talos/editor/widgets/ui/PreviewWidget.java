@@ -36,7 +36,6 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-public abstract class PreviewWidget<T extends ContextRequiredEvent.Context> extends ViewportWidget<T> {
+public abstract class PreviewWidget extends ViewportWidget {
 
 	private static final Logger logger = LoggerFactory.getLogger(PreviewWidget.class);
 

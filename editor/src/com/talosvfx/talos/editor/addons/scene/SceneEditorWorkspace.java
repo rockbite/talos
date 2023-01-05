@@ -71,7 +71,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public class SceneEditorWorkspace extends ViewportWidget<SavableContainer> implements Json.Serializable, Observer, EventContextProvider<GameObjectContainer> {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer, EventContextProvider<GameObjectContainer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;

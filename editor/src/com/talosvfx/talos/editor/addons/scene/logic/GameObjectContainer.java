@@ -7,7 +7,7 @@ import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public interface GameObjectContainer extends ContextRequiredEvent.Context {
+public interface GameObjectContainer {
 
     String getName();
     void setName(String name);

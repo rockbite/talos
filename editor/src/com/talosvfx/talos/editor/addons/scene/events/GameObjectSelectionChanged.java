@@ -4,11 +4,11 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 
-public class GameObjectSelectionChanged extends ContextRequiredEvent {
+public class GameObjectSelectionChanged<T> extends ContextRequiredEvent<T> {
 
     private ObjectSet<GameObject> objectArray = new ObjectSet<>();
 
-    public GameObjectSelectionChanged set(Context context, ObjectSet<GameObject> arr) {
+    public GameObjectSelectionChanged set(T context, ObjectSet<GameObject> arr) {
         setContext(context);
 
         objectArray.clear();

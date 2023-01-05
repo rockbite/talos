@@ -49,7 +49,7 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 
-public class PaletteEditorWorkspace extends ViewportWidget<PaletteEditorWorkspace> implements Observer, EventContextProvider<PaletteEditorWorkspace> {
+public class PaletteEditorWorkspace extends ViewportWidget implements Observer, EventContextProvider<PaletteEditorWorkspace> {
 
     private static final Logger logger = LoggerFactory.getLogger(PaletteEditorWorkspace.class);
     private PaletteEditor paletteEditor;

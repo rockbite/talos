@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import lombok.Getter;
 
-public abstract class WorkplaceStage implements ContextRequiredEvent.Context {
+public abstract class WorkplaceStage {
 
 
     @Getter

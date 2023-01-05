@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer {
+public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
