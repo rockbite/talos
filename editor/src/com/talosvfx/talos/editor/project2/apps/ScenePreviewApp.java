@@ -84,4 +84,12 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
         prefs.cameraZoom = workspaceWidget.getCameraZoom();
         return prefs;
     }
+
+    public void setPaused(boolean paused) {
+        this.workspaceWidget.setPaused(paused);
+    }
+
+    public void setSpeed(float timeScale) {
+        workspaceWidget.setSpeed(timeScale);
+    }
 }

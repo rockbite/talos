@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
@@ -25,6 +26,8 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.editor.utils.Toasts;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +39,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     private Vector2 tmp = new Vector2();
 
+    @Getter@Setter
     private float timeScale = 1f;
     private boolean loading = false;
+
+    @Getter
+    private boolean paused = false;
+    @Getter
+    private boolean playing;
+    private ScenePreviewApp scenePreviewApp;
 
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
@@ -297,15 +307,60 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void act() {
         if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
+        if(scenePreviewApp != null) {
+            if (data.getRoutineInstance() != null) {
+                scenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
+            } else {
+                scenePreviewApp.setSpeed(timeScale);
+            }
+        }
     }
 
     public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
-        ScenePreviewApp scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+        scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
 
         return scenePreviewApp;
     }
 
     public void resetNodes() {
         nodeBoard.resetNodes();
+    }
+
+    public void play(String executorName) {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        RoutineExecutorNode node = (RoutineExecutorNode) routineInstance.getCustomLookup().get(executorName);
+        if(node != null) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(node.uniqueId);
+            boolean result = executorWidget.startPlay();
+
+            if(result) {
+                playing = true;
+            }
+        }
+    }
+
+    public void stop() {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        routineInstance.stop();
+        scenePreviewApp.reload();
+        playing = false;
+        timeScale = 1f;
+    }
+
+    public void resume() {
+        paused = false;
+        data.getRoutineInstance().setPaused(paused);
+        scenePreviewApp.setPaused(paused);
+    }
+
+    public void pause() {
+        paused = true;
+        data.getRoutineInstance().setPaused(paused);
+        scenePreviewApp.setPaused(paused);
+    }
+
+    public void setTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+        scenePreviewApp.setSpeed(timeScale);
     }
 }

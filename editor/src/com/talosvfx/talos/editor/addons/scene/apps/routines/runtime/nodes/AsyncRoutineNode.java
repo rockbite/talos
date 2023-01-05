@@ -103,6 +103,7 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         // when it's finished call the end signal
 
+        delta = processDelta(delta);
 
         tmpArr.clear();
 
@@ -135,6 +136,10 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
             sendSignal("onComplete");
         }
         tmpArr.clear();
+    }
+
+    protected float processDelta(float delta) {
+        return delta;
     }
 
     private void freeState(int i) {

@@ -48,6 +48,9 @@ public class RoutineInstance {
     @Getter
     private transient boolean isDirty = true;
 
+    @Getter@Setter
+    private float timeScale = 1f;
+
     public boolean configured = false;
 
     @Getter
@@ -62,11 +65,13 @@ public class RoutineInstance {
     @Getter@Setter
     private SavableContainer container;
     private GameObject cameraGO;
+    private boolean paused = false;
 
     public void reset() {
         clearMemory();
         globalMap.clear();
         scopeNumbers.clear();
+        timeScale = 1f;
 
         signalPayload = null;
 
@@ -109,6 +114,10 @@ public class RoutineInstance {
 
     public void setCameraGO(GameObject cameraGO) {
         this.cameraGO = cameraGO;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public static class RoutineListenerAdapter implements RoutineListener {
@@ -300,8 +309,10 @@ public class RoutineInstance {
 
     public void tick(float delta) {
         if(checkConfigured()) {
-            for (TickableNode node : tickableNodes) {
-                node.tick(delta);
+            if(!paused) {
+                for (TickableNode node : tickableNodes) {
+                    node.tick(delta * timeScale);
+                }
             }
         }
     }
@@ -337,5 +348,9 @@ public class RoutineInstance {
         for (DrawableQuad drawableQuad : drawableQuads) {
             drawableQuad.position.add(diff);
         }
+    }
+
+    public void stop() {
+        reset();
     }
 }
