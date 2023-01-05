@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.notifications.commands.implementations;
 
+import com.badlogic.gdx.Input;
 import com.talosvfx.talos.editor.notifications.commands.CommandContextType;
 import com.talosvfx.talos.editor.notifications.commands.Combination;
 import com.talosvfx.talos.editor.notifications.commands.ICommand;
@@ -20,12 +21,17 @@ public class GeneralCommand implements ICommand {
     @Getter
     private Commands.CommandType commandType;
 
-    public GeneralCommand(Commands.CommandType commandType, CommandContextType context, Combination defaultCombination, Combination overriddenKeyCombination) {
+    public GeneralCommand(Commands.CommandType commandType, CommandContextType context, Combination defaultCombination) {
         this.commandType = commandType;
         this.defaultCombination = defaultCombination;
         this.contextType = context;
-        this.isDefaultCombinationOverridden = overriddenKeyCombination != null;
-        this.activeCombination = isDefaultCombinationOverridden ? overriddenKeyCombination : defaultCombination;
+        this.isDefaultCombinationOverridden = false;
+        this.activeCombination = defaultCombination;
+    }
+
+    public void overrideCombination (Combination combination) {
+        this.isDefaultCombinationOverridden = true;
+        this.activeCombination = combination;
     }
 
     @Override

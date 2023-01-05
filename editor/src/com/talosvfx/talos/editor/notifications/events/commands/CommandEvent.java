@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CommandEvent implements ICommandEvent {
-
     @Getter
     @Setter
     Commands.CommandType commandType;

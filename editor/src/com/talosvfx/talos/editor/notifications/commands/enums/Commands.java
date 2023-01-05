@@ -13,17 +13,25 @@ public class Commands {
   }
 
   public enum CommandType {
-    COPY("copy_command", "Copy", "HERE IS A FULL DESCRIPTION OF COPY", "GENERAL"),
+    COPY("copy_command", "Copy", "", "GENERAL"),
 
-    PASTE("paste_command", "Paste", "HERE IS A FULL DESCRIPTION OF PASTE", "GENERAL"),
+    CUT("cut_command", "Cut", "", "GENERAL"),
 
-    SAVE("save_command", "Save", "HERE IS A FULL DESCRIPTION OF SAVE", "GENERAL"),
+    PASTE("paste_command", "Paste", "", "GENERAL"),
 
-    OPEN("open_command", "Open", "HERE IS A FULL DESCRIPTION OF OPEN", "GENERAL"),
+    SAVE("save_command", "Save", "", "GENERAL"),
 
-    UNDO("undo_command", "Undo", "HERE IS A FULL DESCRIPTION OF UNDO", "GENERAL"),
+    OPEN("open_command", "Open", "", "GENERAL"),
 
-    REDO("redo_command", "Redo", "HERE IS A FULL DESCRIPTION OF REDO", "GENERAL");
+    UNDO("undo_command", "Undo", "", "GENERAL"),
+
+    REDO("redo_command", "Redo", "", "GENERAL"),
+
+    SELECT_ALL("select_all_command", "Select All", "", "GENERAL"),
+
+    DELETE("delete_command", "Delete", "", "GENERAL"),
+
+    RENAME("rename_command", "Rename", "", "GENERAL");
 
     public final String uniqueName;
 

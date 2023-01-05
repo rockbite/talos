@@ -12,9 +12,16 @@ public abstract class AbstractCombinationWithModifier implements Combination {
     protected ObjectSet<ModifierKey> pressedModifierKeys = new ObjectSet<>();
 
     public AbstractCombinationWithModifier(ModifierKey... modifierKeys) {
-        this.isAnyModifier = modifierKeys.length == 0;
         for (ModifierKey modifierKey : modifierKeys) {
             this.modifierKeys.add(modifierKey);
+        }
+
+        isAnyModifier = true;
+        for (ModifierKey value : ModifierKey.values()) {
+            if (!this.modifierKeys.contains(value, false)) {
+                isAnyModifier = false;
+                break;
+            }
         }
     }
 

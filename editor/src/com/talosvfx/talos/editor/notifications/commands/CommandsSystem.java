@@ -1,14 +1,12 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
-import com.talosvfx.talos.editor.notifications.commands.implementations.GeneralCommand;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
@@ -22,18 +20,17 @@ public class CommandsSystem extends InputAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandsSystem.class);
 
-    private CommandRepository commandRepository;
+    private CommandParser commandParser;
 
     private Array<ICommand> allCommands = new Array<>();
 
     public CommandsSystem() {
-        commandRepository = new CommandRepository();
-        commandRepository.parseCommands(Gdx.files.local("commands.xml"));
-        for (ObjectMap.Entry<Commands.CommandType, ICommand> entry : CommandRepository.commandConfiguration) {
-            allCommands.add(entry.value);
+        commandParser = new CommandParser();
+        commandParser.parseCommands(Gdx.files.local("commands.xml"));
+        for (ObjectMap.Entry<Commands.CommandType, Array<ICommand>> entry : CommandParser.commandConfiguration) {
+            allCommands.addAll(entry.value);
         }
     }
-
     private boolean checkCommandState() {
         boolean isRun = false;
         for (ICommand command : allCommands) {

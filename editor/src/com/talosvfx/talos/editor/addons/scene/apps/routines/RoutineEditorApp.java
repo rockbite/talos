@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.commands.CommandContextType;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;

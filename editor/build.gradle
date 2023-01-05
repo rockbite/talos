@@ -118,7 +118,7 @@ task generateCommandsEnum () {
         for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
             String packageName = commandGroup.getAttribute("package")
             for (XmlReader.Element command : commandGroup.getChildrenByName("command")) {
-                enumBuilder.addEnumConstant(command.getAttribute("name").toUpperCase(),
+                enumBuilder.addEnumConstant(command.getAttribute("name").replaceAll(" ", "_").toUpperCase(),
                         TypeSpec.anonymousClassBuilder("\$S, \$S, \$S, \$S", command.getAttribute("uniqueName"),
                                 command.getAttribute("name"), command.getAttribute("description"), packageName.toUpperCase()).build())
             }

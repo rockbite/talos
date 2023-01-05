@@ -4,13 +4,10 @@ import com.talosvfx.talos.editor.notifications.TalosEvent;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ContextRequiredEvent<T> implements TalosEvent {
+public interface ContextRequiredEvent<T> extends TalosEvent {
 
-    @Getter@Setter
-    private T context;
+    T getContext();
 
-    @Override
-    public void reset () {
-        context = null;
-    }
+    void setContext(T context);
+
 }

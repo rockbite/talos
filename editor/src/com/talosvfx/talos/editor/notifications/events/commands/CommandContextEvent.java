@@ -6,14 +6,13 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import lombok.Getter;
 import lombok.Setter;
 
-public class CommandContextEvent extends ContextRequiredEvent<AppManager.BaseApp> implements ICommandEvent {
-
+public class CommandContextEvent extends CommandEvent implements ContextRequiredEvent<AppManager.BaseApp> {
     @Getter@Setter
-    Commands.CommandType commandType;
+    AppManager.BaseApp context;
 
     @Override
     public void reset() {
         super.reset();
-        commandType = null;
+        context = null;
     }
 }

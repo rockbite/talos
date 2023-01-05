@@ -1,39 +1,66 @@
 <actions>
     <commandGroup package = "General">
-        <command name = "Copy" uniqueName = "copy_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
+        <command name = "Copy" uniqueName = "copy_command" description = "">
             <context>FOCUSED</context>>
             <combination type = "keyboard" repeat = "false">
                 CTRL C
             </combination>
         </command>
-        <command name = "Paste" uniqueName = "paste_command" description = "HERE IS A FULL DESCRIPTION OF PASTE">
+        <command name = "Cut" uniqueName = "cut_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL X
+            </combination>
+        </command>
+        <command name = "Paste" uniqueName = "paste_command" description = "">
             <context>FOCUSED</context>>
             <combination type = "keyboard" repeat = "false">
                 CTRL V
             </combination>
         </command>
-        <command name = "Save" uniqueName = "save_command" description = "HERE IS A FULL DESCRIPTION OF SAVE">
+        <command name = "Save" uniqueName = "save_command" description = "">
             <context>GLOBAL</context>>
             <combination type = "keyboard" repeat = "false">
                 CTRL S
             </combination>
         </command>
-        <command name = "Open" uniqueName = "open_command" description = "HERE IS A FULL DESCRIPTION OF OPEN">
+        <command name = "Open" uniqueName = "open_command" description = "">
             <context>FOCUSED</context>>
             <combination type = "keyboard" repeat = "false">
                 CTRL O
             </combination>
         </command>
-        <command name = "Undo" uniqueName = "undo_command" description = "HERE IS A FULL DESCRIPTION OF UNDO">
+        <command name = "Undo" uniqueName = "undo_command" description = "">
             <context>GLOBAL</context>>
             <combination type = "keyboard" repeat = "true">
                 CTRL Z
             </combination>
         </command>
-        <command name = "Redo" uniqueName = "redo_command" description = "HERE IS A FULL DESCRIPTION OF REDO">
+        <command name = "Redo" uniqueName = "redo_command" description = "">
             <context>GLOBAL</context>>
             <combination type = "keyboard" repeat = "true">
                 CTRL SHIFT Z
+            </combination>
+        </command>
+        <command name = "Select All" uniqueName = "select_all_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL A
+            </combination>
+        </command>
+        <command name = "Delete" uniqueName = "delete_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                DEL
+            </combination>
+            <combination type = "keyboard" repeat = "false">
+                FORWARD_DEL
+            </combination>
+        </command>
+        <command name = "Rename" uniqueName = "rename_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                F2
             </combination>
         </command>
     </commandGroup>

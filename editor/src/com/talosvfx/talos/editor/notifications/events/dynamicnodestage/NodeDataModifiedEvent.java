@@ -4,8 +4,9 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 
-public class NodeDataModifiedEvent extends ContextRequiredEvent<DynamicNodeStage<?>> {
+public class NodeDataModifiedEvent extends AbstractContextRequiredEvent<DynamicNodeStage<?>> {
     private NodeWidget node;
 
     @Override

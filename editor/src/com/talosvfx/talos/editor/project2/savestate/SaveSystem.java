@@ -23,8 +23,7 @@ public class SaveSystem implements Observer {
 
 	@CommandEventHandler(commandType = Commands.CommandType.SAVE)
 	public void onSaveAction (CommandEvent actionEvent) {
-		logger.info("SAVE REACHED HERE");
-		// TODO: 1/4/2023 FIRE SAVE REQUEST EVENT
+
 	}
 
 	@EventHandler

@@ -12,10 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class CommandRepository {
+public class CommandParser {
     private static final Logger logger = LoggerFactory.getLogger(CommandsSystem.class);
-    public static ObjectMap<Commands.CommandType, ICommand> commandConfiguration = new ObjectMap<>();
+    public static ObjectMap<Commands.CommandType, Array<ICommand>> commandConfiguration = new ObjectMap<>();
     public static ObjectMap<Commands.CommandGroup, Array<Commands.CommandType>> commandGroupConfiguration = new ObjectMap<>();
+
+    private ObjectMap<String, Integer> customKeyNames = new ObjectMap<>();
+
+    public CommandParser() {
+        customKeyNames.put("DEL", Input.Keys.DEL);
+        customKeyNames.put("FORWARD_DEL", Input.Keys.FORWARD_DEL);
+    }
 
     public void parseCommands(FileHandle file) {
         XmlReader xmlReader = new XmlReader();
@@ -33,8 +40,15 @@ public class CommandRepository {
             for (XmlReader.Element command : commands) {
                 Commands.CommandType commandType = getCommandTypeByUniqueName(command.getAttribute("uniqueName"));
                 commandGroupTypes.add(commandType);
-                GeneralCommand generalCommand = new GeneralCommand(commandType, getContextType(command.getChildByName("context").getText()), parseCombination(command.getChildByName("combination")), null);
-                commandConfiguration.put(commandType, generalCommand);
+                Array<XmlReader.Element> combinationObjects = command.getChildrenByName("combination");
+                Array<ICommand> commandArray = new Array<>();
+                for (XmlReader.Element combinationObject : combinationObjects) {
+                    Combination combination = parseCombination(combinationObject);
+                    CommandContextType context = getContextType(command.getChildByName("context").getText());
+                    GeneralCommand generalCommand = new GeneralCommand(commandType, context, combination);
+                    commandArray.add(generalCommand);
+                }
+                commandConfiguration.put(commandType, commandArray);
             }
         }
     }
@@ -77,7 +91,11 @@ public class CommandRepository {
 
         if (type.equalsIgnoreCase("keyboard")) {
             String primaryKeyString = keyStrings[keyStrings.length - 1];
-            int primaryKey = Input.Keys.valueOf(primaryKeyString);
+            int primaryKey = customKeyNames.containsKey(primaryKeyString) ? customKeyNames.get(primaryKeyString) : Input.Keys.valueOf(primaryKeyString);
+            if (primaryKey == -1) {
+                logger.error("WRONG CONFIGURATION FOR COMMAND");
+                throw new GdxRuntimeException("NO GDX KEY FOUND FOR - " + primaryKeyString);
+            }
             boolean repeat = combinationElement.getBooleanAttribute("repeat");
             combination = new KeyboardCombination(primaryKey, repeat, modifierKeys);
         } else {
