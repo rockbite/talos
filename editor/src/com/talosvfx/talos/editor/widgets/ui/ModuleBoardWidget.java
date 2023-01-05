@@ -292,6 +292,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
                 if (!event.isHandled()) {
                     clearSelection();
+                    stage.unfocusAll();
                     return false;
                 }
 
