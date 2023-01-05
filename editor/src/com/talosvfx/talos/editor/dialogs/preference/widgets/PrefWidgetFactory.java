@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.Styles;
 import com.talosvfx.talos.editor.widgets.ui.common.*;
+import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 
 public class PrefWidgetFactory {
 
@@ -117,6 +118,16 @@ public class PrefWidgetFactory {
                     // only showing visual combination (cant be changed directly)
                     finalCombination.setTouchable(Touchable.disabled);
 
+                    final ImageButton resetToDefaultsButton = new ImageButton(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2,  ColorLibrary.BackgroundColor.LIGHT_GRAY), SharedResources.skin.getDrawable("icon-arrow-left"));
+                    resetToDefaultsButton.getIconCell().pad(1);
+                    resetToDefaultsButton.addListener(new ClickListener(){
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            super.clicked(event, x, y);
+                            // TODO: 05.01.23 reset default settings
+                        }
+                    });
+
                     // assemble top segment
                     final Table topSegment = new Table();
                     topSegment.defaults().space(6);
@@ -124,6 +135,7 @@ public class PrefWidgetFactory {
                     topSegment.add(configurationNameLabel).expand().left().top();
                     topSegment.add(inputCombinationTypeSelectionBox).minWidth(90);
                     topSegment.add(finalCombination).width(90);
+                    topSegment.add(resetToDefaultsButton).size(inputCombinationTypeSelectionBox.getHeight());
                     return topSegment;
                 }
 
