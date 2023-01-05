@@ -602,9 +602,12 @@ public class MainRenderer implements Observer {
         ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
 
         if(particleCache.containsKey(component)) {
-            return particleCache.get(component);
+            ParticleEffectInstance particleEffectInstance = particleCache.get(component);
+            component.setEffectRef(particleEffectInstance);
+            return particleEffectInstance;
         } else {
             ParticleEffectInstance instance = descriptor.createEffectInstance();
+            component.setEffectRef(instance);
             particleCache.put(component, instance);
             return instance;
         }
