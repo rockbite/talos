@@ -8,13 +8,18 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Notifications {
 
 	private static Notifications instance;
+
+	private static final Logger logger = LoggerFactory.getLogger(Notifications.class);
 
 	private ObjectMap<Class<? extends TalosEvent>, Array<EventRunner>> invocationMap = new ObjectMap<>();
 	private ObjectMap<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerInvocationMap = new ObjectMap<>();
@@ -174,6 +179,7 @@ public class Notifications {
 			}
 		}
 
+
 		if (event instanceof ContextRequiredEvent) {
 			if (!(eventRunner.getObserver() instanceof EventContextProvider)) {
 				throw new GdxRuntimeException("Invalid event handler. Events that extend ContextRequiredEvent must have their " +
@@ -184,6 +190,10 @@ public class Notifications {
 
 			if (!(eventContextObject == eventRunner.getObserver())) {
 				return;
+			}
+
+			if (eventContextObject == null) {
+				logger.warn("firing event with no context provided");
 			}
 		}
 		eventRunner.runEvent(event);
