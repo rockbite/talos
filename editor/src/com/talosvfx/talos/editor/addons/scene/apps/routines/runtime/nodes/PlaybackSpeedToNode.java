@@ -21,8 +21,7 @@ public class PlaybackSpeedToNode extends AsyncRoutineNode<GameObject, AsyncRouti
     @Override
     protected void stateTick(AsyncRoutineNodeState<GameObject> state, float delta) {
         RoutineInstance target = routineInstanceRef;
-        float currTimeScale = routineInstanceRef.getTimeScale();
-        float newTimeScale = (timeScaleTo - currTimeScale) * state.alpha + startValue;
+        float newTimeScale = (timeScaleTo - startValue) * state.alpha + startValue;
         target.setTimeScale(newTimeScale);
     }
 

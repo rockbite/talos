@@ -2,6 +2,7 @@
 package com.talosvfx.talos.editor.addons.scene.assets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -723,6 +724,21 @@ public class AssetRepository implements Observer {
 
 				break;
 			case SOUND:
+
+				if (gameAssetOut == null) {
+					GameAsset<Music> musicGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = musicGameAsset;
+
+					if (createLinks) {
+						value.gameAssetReferences.add(musicGameAsset);
+						musicGameAsset.dependentRawAssets.add(value);
+					}
+				}
+
+				Music music = Gdx.audio.newMusic(value.handle);
+
+				((GameAsset<Music>)gameAssetOut).setResourcePayload(music);
+
 				break;
 			case VFX_OUTPUT:
 

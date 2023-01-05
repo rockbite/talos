@@ -35,6 +35,11 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "PlayMusicNode" title = "Play Sound" keywords = "movement" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="asset" type="SOUND">asset</asset>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "MoveTowardsNode" title = "Move Towards" keywords = "movement" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
