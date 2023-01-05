@@ -1,8 +1,10 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
@@ -20,30 +22,16 @@ public class CommandsSystem extends InputAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandsSystem.class);
 
+    private CommandRepository commandRepository;
+
     private Array<ICommand> allCommands = new Array<>();
 
-    private Array<InputAdapter> injectedAdapters = new Array<>();
-
-    public void injectAdapter(InputAdapter inputAdapter) {
-        injectedAdapters.add(inputAdapter);
-    }
-
-    public void removeAdapter(InputAdapter inputAdapter) {
-        injectedAdapters.removeValue(inputAdapter, true);
-    }
-
     public CommandsSystem() {
-        KeyboardCombination copyCombination = new KeyboardCombination(Input.Keys.C, false, ModifierKey.CTRL);
-        GeneralCommand copyAction = new GeneralCommand(Commands.CommandType.COPY, CommandContextType.FOCUSED_APP, copyCombination, null);
-        allCommands.add(copyAction);
-
-        KeyboardCombination saveCombination = new KeyboardCombination(Input.Keys.S, false, ModifierKey.CTRL);
-        GeneralCommand saveAction = new GeneralCommand(Commands.CommandType.SAVE, CommandContextType.GLOBAL, saveCombination, null);
-        allCommands.add(saveAction);
-
-        KeyboardCombination openCombination = new KeyboardCombination(Input.Keys.O, false, ModifierKey.CTRL);
-        GeneralCommand openAction = new GeneralCommand(Commands.CommandType.OPEN, CommandContextType.FOCUSED_APP, openCombination, null);
-        allCommands.add(openAction);
+        commandRepository = new CommandRepository();
+        commandRepository.parseCommands(Gdx.files.local("commands.xml"));
+        for (ObjectMap.Entry<Commands.CommandType, ICommand> entry : CommandRepository.commandConfiguration) {
+            allCommands.add(entry.value);
+        }
     }
 
     private boolean checkCommandState() {
@@ -114,10 +102,6 @@ public class CommandsSystem extends InputAdapter {
             command.getActiveCombination().mouseMoved();
         }
 
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.mouseMoved(screenX, screenY);
-        }
-
         return checkCommandState();
     }
 
@@ -125,10 +109,6 @@ public class CommandsSystem extends InputAdapter {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         for (ICommand command : allCommands) {
             command.getActiveCombination().touchDown(button);
-        }
-
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.touchDown(screenX, screenY, pointer, button);
         }
 
         return checkCommandState();
@@ -140,10 +120,6 @@ public class CommandsSystem extends InputAdapter {
             command.getActiveCombination().scrolled(amountY);
         }
 
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.scrolled(amountX, amountY);
-        }
-
         return checkCommandState();
     }
 
@@ -151,10 +127,6 @@ public class CommandsSystem extends InputAdapter {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         for (ICommand command : allCommands) {
             command.getActiveCombination().touchUp(button);
-        }
-
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.touchUp(screenX, screenY, pointer, button);
         }
 
         return checkCommandState();
@@ -166,10 +138,6 @@ public class CommandsSystem extends InputAdapter {
             command.getActiveCombination().keyDown(keycode);
         }
 
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.keyDown(keycode);
-        }
-
         return checkCommandState();
     }
 
@@ -177,10 +145,6 @@ public class CommandsSystem extends InputAdapter {
     public boolean keyUp(int keycode) {
         for (ICommand command : allCommands) {
             command.getActiveCombination().keyUp(keycode);
-        }
-
-        for (InputAdapter inputAdapter : injectedAdapters) {
-            inputAdapter.keyUp(keycode);
         }
 
         return checkCommandState();

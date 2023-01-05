@@ -70,6 +70,10 @@ public class KeyboardCombination extends AbstractCombinationWithModifier {
     @Override
     public void keyDown(int keycode) {
         super.keyDown(keycode);
+        if (ModifierKey.getModifierFromKey(keycode) == null) {
+            isRegularKeyPressed = false;
+        }
+
         if (keycode == regularKey) {
             isRegularKeyPressed = true;
         }

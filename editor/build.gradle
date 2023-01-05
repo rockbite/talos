@@ -82,7 +82,7 @@ task generateCommandsEnum () {
         TypeSpec.Builder builder = TypeSpec.classBuilder("Commands").addModifiers(Modifier.PUBLIC)
                 .addJavadoc("This is a generated class. It shouldn't be modified by hand, as the changes would be " +
                 "overridden.\n")
-                .addJavadoc("To regenerate this class, call generateCommandsEnum task from Gradle.\n " +
+                .addJavadoc("To regenerate this class, call generateCommandsEnum task from Gradle.\n" +
                         "The XML file is located in editor/assets/commands.xml")
         def file = rootProject.file("editor/assets/commands.xml")
         XmlReader xmlReader = new XmlReader()

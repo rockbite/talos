@@ -1,18 +1,39 @@
 <actions>
     <commandGroup package = "General">
         <command name = "Copy" uniqueName = "copy_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
-            <combination type = "keyboard">
-                "CTRL C"
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL C
             </combination>
         </command>
-        <command name = "Save" uniqueName = "save_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
-            <combination type = "keyboard">
-                "CTRL C"
+        <command name = "Paste" uniqueName = "paste_command" description = "HERE IS A FULL DESCRIPTION OF PASTE">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL V
             </combination>
         </command>
-        <command name = "Open" uniqueName = "open_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
-            <combination type = "keyboard">
-                "CTRL C"
+        <command name = "Save" uniqueName = "save_command" description = "HERE IS A FULL DESCRIPTION OF SAVE">
+            <context>GLOBAL</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL S
+            </combination>
+        </command>
+        <command name = "Open" uniqueName = "open_command" description = "HERE IS A FULL DESCRIPTION OF OPEN">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL O
+            </combination>
+        </command>
+        <command name = "Undo" uniqueName = "undo_command" description = "HERE IS A FULL DESCRIPTION OF UNDO">
+            <context>GLOBAL</context>>
+            <combination type = "keyboard" repeat = "true">
+                CTRL Z
+            </combination>
+        </command>
+        <command name = "Redo" uniqueName = "redo_command" description = "HERE IS A FULL DESCRIPTION OF REDO">
+            <context>GLOBAL</context>>
+            <combination type = "keyboard" repeat = "true">
+                CTRL SHIFT Z
             </combination>
         </command>
     </commandGroup>

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 
@@ -34,6 +35,12 @@ public abstract class AbstractCombinationWithModifier implements Combination {
 
         for (ModifierKey modifierKey : modifierKeys) {
             if (!pressedModifierKeys.contains(modifierKey)) {
+                return false;
+            }
+        }
+
+        for (ModifierKey modifierKey : pressedModifierKeys) {
+            if (!modifierKeys.contains(modifierKey, false)) {
                 return false;
             }
         }

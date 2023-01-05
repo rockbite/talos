@@ -5,7 +5,7 @@ import java.lang.String;
 /**
  * This is a generated class. It shouldn't be modified by hand, as the changes would be overridden.
  * To regenerate this class, call generateCommandsEnum task from Gradle.
- *  The XML file is located in editor/assets/commands.xml
+ * The XML file is located in editor/assets/commands.xml
  */
 public class Commands {
   public enum CommandGroup {
@@ -15,9 +15,15 @@ public class Commands {
   public enum CommandType {
     COPY("copy_command", "Copy", "HERE IS A FULL DESCRIPTION OF COPY", "GENERAL"),
 
-    SAVE("save_command", "Save", "HERE IS A FULL DESCRIPTION OF COPY", "GENERAL"),
+    PASTE("paste_command", "Paste", "HERE IS A FULL DESCRIPTION OF PASTE", "GENERAL"),
 
-    OPEN("open_command", "Open", "HERE IS A FULL DESCRIPTION OF COPY", "GENERAL");
+    SAVE("save_command", "Save", "HERE IS A FULL DESCRIPTION OF SAVE", "GENERAL"),
+
+    OPEN("open_command", "Open", "HERE IS A FULL DESCRIPTION OF OPEN", "GENERAL"),
+
+    UNDO("undo_command", "Undo", "HERE IS A FULL DESCRIPTION OF UNDO", "GENERAL"),
+
+    REDO("redo_command", "Redo", "HERE IS A FULL DESCRIPTION OF REDO", "GENERAL");
 
     public final String uniqueName;
 
