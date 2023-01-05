@@ -18,7 +18,7 @@ import lombok.Getter;
 
 import java.util.function.Supplier;
 
-public class GenericStageWrappedViewportWidget extends ViewportWidget {
+public class GenericStageWrappedViewportWidget extends ViewportWidget<Stage> {
 
 	@Getter
 	private final Stage stage;
@@ -65,8 +65,8 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 	}
 
 	@Override
-	protected GenericStageWrappedViewportWidget getEventContext() {
-		return this;
+	protected Stage getEventContext() {
+		return stage;
 	}
 
 	@Override

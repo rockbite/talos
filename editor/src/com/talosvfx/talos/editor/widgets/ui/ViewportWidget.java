@@ -22,6 +22,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -81,7 +82,10 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public abstract class ViewportWidget extends Table {
+/**
+ * @param <T> Type of the context ( asset ) the viewport is operating on.
+ */
+public abstract class ViewportWidget<T> extends Table {
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
@@ -1191,7 +1195,9 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
+		GameObjectSelectionChanged<T> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 	protected void clearSelection () {
@@ -1226,14 +1232,18 @@ public abstract class ViewportWidget extends Table {
 
 	public void removeFromSelection (GameObject gameObject) {
 		selection.remove(gameObject);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
+		GameObjectSelectionChanged<T> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 	public void addToSelection (GameObject gameObject) {
 		if (!hierarchicallyContains(gameObject)) {
 			selection.add(gameObject);
 		}
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
+		GameObjectSelectionChanged<T> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 	// Checks if gameObject or its ancestors are already in the selection or not
@@ -1256,7 +1266,9 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
+		GameObjectSelectionChanged<T> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 
@@ -1277,7 +1289,9 @@ public abstract class ViewportWidget extends Table {
 		if (selection.size > 1 && selection.contains(exceptThis)) {
 			selection.clear();
 			selection.add(exceptThis);
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
+			GameObjectSelectionChanged<T> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+			gameObjectSelectionChanged.set(getEventContext(), selection);
+			Notifications.fireEvent(gameObjectSelectionChanged);
 
 			return true;
 		}
@@ -1285,7 +1299,7 @@ public abstract class ViewportWidget extends Table {
 		return false;
 	}
 
-	protected abstract <T> T getEventContext();
+	protected abstract T getEventContext();
 
 	public void selectGameObjectExternally (GameObject gameObject) {
 		if (fromDirectoryView)

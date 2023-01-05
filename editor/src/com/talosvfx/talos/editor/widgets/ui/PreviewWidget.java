@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-public abstract class PreviewWidget extends ViewportWidget {
+public abstract class PreviewWidget extends ViewportWidget<VFXProjectData> {
 
 	private static final Logger logger = LoggerFactory.getLogger(PreviewWidget.class);
 
@@ -408,5 +408,10 @@ public abstract class PreviewWidget extends ViewportWidget {
 	public void setParticleEffect (VFXProjectData vfxProjectData) {
 		this.vfxProjectData = vfxProjectData;
 
+	}
+
+	@Override
+	protected VFXProjectData getEventContext() {
+		return vfxProjectData;
 	}
 }

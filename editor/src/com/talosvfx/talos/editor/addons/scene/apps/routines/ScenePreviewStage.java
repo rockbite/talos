@@ -7,16 +7,12 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
-import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
 import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -29,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class ScenePreviewStage extends ViewportWidget implements Observer {
+public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 

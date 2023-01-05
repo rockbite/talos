@@ -120,11 +120,6 @@ public class Preview3D extends PreviewWidget {
     }
 
     @Override
-    protected Preview3D getEventContext() {
-        return this;
-    }
-
-    @Override
     public void drawContent(PolygonBatch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
 
