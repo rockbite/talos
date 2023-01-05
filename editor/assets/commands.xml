@@ -1,9 +1,19 @@
 <actions>
     <commandGroup package = "General">
-        <action name = "Copy" uniqueName = "copy_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
+        <command name = "Copy" uniqueName = "copy_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
             <combination type = "keyboard">
                 "CTRL C"
             </combination>
-        </action>
+        </command>
+        <command name = "Save" uniqueName = "save_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
+            <combination type = "keyboard">
+                "CTRL C"
+            </combination>
+        </command>
+        <command name = "Open" uniqueName = "open_command" description = "HERE IS A FULL DESCRIPTION OF COPY">
+            <combination type = "keyboard">
+                "CTRL C"
+            </combination>
+        </command>
     </commandGroup>
 </actions>

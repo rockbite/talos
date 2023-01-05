@@ -31,7 +31,6 @@ public class SaveSystem implements Observer {
 	public void onSave (SaveRequest event) {
 
 		if (SharedResources.currentProject != null) {
-
 			TalosProjectData currentProject = SharedResources.currentProject;
 
 			try {

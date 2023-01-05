@@ -88,19 +88,43 @@ task generateCommandsEnum () {
         XmlReader xmlReader = new XmlReader()
         XmlReader.Element root = xmlReader.parse(new FileHandle(file))
 
+        TypeSpec.Builder packageEnumBuilder = TypeSpec.enumBuilder("CommandGroup").addModifiers(Modifier.PUBLIC)
+
         for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
             String packageName = commandGroup.getAttribute("package")
-            TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(packageName)
-            enumBuilder.addField(FieldSpec.builder(String.class, "uniqueName", Modifier.PUBLIC, Modifier.FINAL).build())
-            MethodSpec uniqueName = MethodSpec.constructorBuilder().addParameter(String.class, "uniqueName").addStatement("this.uniqueName = uniqueName;").build()
-            enumBuilder.addMethod(uniqueName)
+            packageEnumBuilder.addEnumConstant(packageName.toUpperCase())
+        }
+
+        TypeSpec builtEnum = packageEnumBuilder.build()
+
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder("CommandType").addModifiers(Modifier.PUBLIC)
+        enumBuilder.addField(FieldSpec.builder(String.class, "uniqueName", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(String.class, "name", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(String.class, "description", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(ClassName.bestGuess("com.talosvfx.talos.editor.notifications.commands.enums.Commands.CommandGroup"), "commandType", Modifier.PUBLIC, Modifier.FINAL).build())
+
+
+        MethodSpec uniqueName = MethodSpec.constructorBuilder()
+                .addParameter(String.class, "uniqueName")
+        .addParameter(String.class, "name")
+        .addParameter(String.class, "description")
+        .addParameter(String.class, "commandType")
+        .addStatement("this.uniqueName = uniqueName;\n" +
+                "this.name = name;\n" +
+                "this.description = description;\n" +
+                "this.commandType = CommandGroup.valueOf(commandType);").build()
+        enumBuilder.addMethod(uniqueName)
+
+        for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
+            String packageName = commandGroup.getAttribute("package")
             for (XmlReader.Element command : commandGroup.getChildrenByName("command")) {
                 enumBuilder.addEnumConstant(command.getAttribute("name").toUpperCase(),
-                        TypeSpec.anonymousClassBuilder("\$S", command.getAttribute("uniqueName")).build())
+                        TypeSpec.anonymousClassBuilder("\$S, \$S, \$S, \$S", command.getAttribute("uniqueName"),
+                                command.getAttribute("name"), command.getAttribute("description"), packageName.toUpperCase()).build())
             }
-            TypeSpec enumType = enumBuilder.build();
-            builder.addType(enumType);
         }
+
+        builder.addType(builtEnum).addType(enumBuilder.build())
 
         TypeSpec clazzBuild = builder.build();
         final JavaFile.Builder fileBuilder = JavaFile.builder("com.talosvfx.talos.editor.notifications.commands.enums", clazzBuild);
