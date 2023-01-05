@@ -219,7 +219,7 @@ public abstract class RoutineNode {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             } else {
                 try {
