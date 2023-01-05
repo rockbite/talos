@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor;
 
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+
 import lombok.Getter;
 
 public abstract class WorkplaceStage {
