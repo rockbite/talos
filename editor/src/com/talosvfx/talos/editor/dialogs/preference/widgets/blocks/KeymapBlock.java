@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.dialogs.preference.widgets.blocks;
 
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 
 import com.talosvfx.talos.editor.dialogs.preference.widgets.PrefWidgetFactory;
@@ -13,6 +14,9 @@ public class KeymapBlock extends BlockWidget {
     @Override
     public void build() {
         widgetArray = new Array<>();
+        setBackground((Drawable) null);
+        content.padLeft(10).defaults().space(4);
+
         getWidgetLabel().setText("Keymap");
 
         Commands.CommandType[] values = Commands.CommandType.values();
@@ -27,6 +31,5 @@ public class KeymapBlock extends BlockWidget {
             content.add(widget).growX();
             content.row();
         }
-
     }
 }

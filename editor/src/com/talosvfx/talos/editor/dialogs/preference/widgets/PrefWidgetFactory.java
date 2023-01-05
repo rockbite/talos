@@ -2,17 +2,25 @@ package com.talosvfx.talos.editor.dialogs.preference.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.dialogs.preference.widgets.blocks.KeyboardCombinationTypeWidget;
+import com.talosvfx.talos.editor.dialogs.preference.widgets.blocks.MouseCombinationTypeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.notifications.commands.CombinationType;
+import com.talosvfx.talos.editor.notifications.commands.ModifierKey;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.editor.widgets.ui.common.FileOpenField;
+import com.talosvfx.talos.editor.widgets.ui.Styles;
+import com.talosvfx.talos.editor.widgets.ui.common.*;
 
 public class PrefWidgetFactory {
 
@@ -50,10 +58,18 @@ public class PrefWidgetFactory {
         return null;
     }
 
+
     public static class KeyInputWidget extends APrefWidget {
-        private CheckBox checkBox;
-        private SelectBox selectBox;
-        private KeymapBox keymapBox;
+        // buttons
+        private ObjectMap<ModifierKey, Button> buttonLabelsMap;
+        private SquareButton anyButton;
+
+        private CollapsableWidget collapsableWidget;
+        private Cell combinationTypeCell;
+        private Label configurationNameLabel;
+        private SelectBox inputCombinationTypeSelectionBox;
+        private Label finalCombination;
+
         public KeyInputWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
         }
@@ -61,35 +77,140 @@ public class PrefWidgetFactory {
         public KeyInputWidget(String parentPath) {
             super(parentPath, null);
 
-            build();
+            collapsableWidget = new CollapsableWidget() {
+                @Override
+                protected Table constructContent() {
+                    pad(0);
 
-            // TODO: 27.12.22 remove later, added for testing
-            selectBox.setItems("selection 1", "selection 2", "selection 3", "selection 4");
+                    // remove background
+                    setBackground((Drawable) null);
+
+                    // construct rows
+                    final Table modifierButtonsRow = constructModifierButtonsRow();
+
+                    // assemble content
+                    content = new Table();
+                    content.padLeft(5).padRight(8).defaults().space(6);
+                    combinationTypeCell = content.add().growX();
+                    content.row();
+                    content.add(modifierButtonsRow).growX();
+                    return content;
+                }
+
+                @Override
+                public Table constructTopSegment() {
+                    // init components
+                    arrowButton = new ArrowButton(false);
+                    arrowButton.getCell(arrowButton.getArrowIcon()).pad(0);
+
+                    widgetLabel = new Label("", SharedResources.skin, "small");
+
+                    configurationNameLabel = new Label("", SharedResources.skin, "small");
+
+                    inputCombinationTypeSelectionBox = new SelectBox<>(Styles.keyInputWidgetSelectBoxStyle);
+
+                    finalCombination = new Label("", SharedResources.skin, "small");
+                    final Label.LabelStyle labelStyle = new Label.LabelStyle(finalCombination.getStyle());
+                    labelStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.LIGHT_GRAY);
+                    finalCombination.setStyle(labelStyle);
+                    finalCombination.setAlignment(Align.center);
+                    // only showing visual combination (cant be changed directly)
+                    finalCombination.setTouchable(Touchable.disabled);
+
+                    // assemble top segment
+                    final Table topSegment = new Table();
+                    topSegment.defaults().space(6);
+                    topSegment.add(arrowButton).expandY().top();
+                    topSegment.add(configurationNameLabel).expand().left().top();
+                    topSegment.add(inputCombinationTypeSelectionBox).minWidth(90);
+                    topSegment.add(finalCombination).width(90);
+                    return topSegment;
+                }
+
+                @Override
+                protected void addListeners() {
+                    arrowButton.addListener(initClickListener());
+                    arrowButton.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            super.clicked(event, x, y);
+                            if (arrowButton.isCollapsed()) {
+                                collapsableWidget.setBackground((Drawable) null);
+                                getCell(topSegment).pad(0);
+                            } else {
+                                collapsableWidget.setBackground(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.DARK_GRAY));
+                                getCell(topSegment).pad(5).padBottom(3);
+                            }
+                        }
+                    });
+                }
+            };
+            add(collapsableWidget).growX();
+
+            inputCombinationTypeSelectionBox.setItems(CombinationType.values());
+            // update combination type when type selected
+            inputCombinationTypeSelectionBox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    setInputCombinationType((CombinationType) inputCombinationTypeSelectionBox.getSelection().first());
+                }
+            });
+            setInputCombinationType((CombinationType) inputCombinationTypeSelectionBox.getSelection().first());
         }
 
-        private void build() {
-            this.checkBox = new CheckBox("checkboxtext", SharedResources.skin);
+        private void setInputCombinationType (CombinationType combinationType) {
+            if (combinationType == CombinationType.MOUSE) combinationTypeCell.setActor(new MouseCombinationTypeWidget());
+            if (combinationType == CombinationType.KEYBOARD) combinationTypeCell.setActor(new KeyboardCombinationTypeWidget());
+        }
 
-            final SelectBox.SelectBoxStyle keyInputWidgetSelectBoxStyle = new SelectBox.SelectBoxStyle(SharedResources.skin.get(SelectBox.SelectBoxStyle.class));
-            keyInputWidgetSelectBoxStyle.font = SharedResources.skin.getFont("small-font");
-            keyInputWidgetSelectBoxStyle.listStyle.font = SharedResources.skin.getFont("small-font");
-            keyInputWidgetSelectBoxStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
-            keyInputWidgetSelectBoxStyle.backgroundOver = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY);
-            keyInputWidgetSelectBoxStyle.backgroundOpen = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_TOP_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
-            keyInputWidgetSelectBoxStyle.listStyle.selection = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.LIGHT_BLUE);
-            keyInputWidgetSelectBoxStyle.listStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
-            keyInputWidgetSelectBoxStyle.scrollStyle.background =ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
+        private Table constructModifierButtonsRow () {
+            buttonLabelsMap = new ObjectMap<>();
 
-            this.selectBox = new SelectBox<>(keyInputWidgetSelectBoxStyle);
-            this.keymapBox = new KeymapBox();
+            final Table modifierButtonsRow = new Table();
+            modifierButtonsRow.defaults().space(10);
 
-            // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
-            pad(5, 10, 5, 8).defaults().space(8);
+            // init button labels
+            // adding "any button" for activating all other buttons but the empty one
+            final Label anyButtonLabel = new Label("Any", SharedResources.skin, "small");
+            anyButton = new SquareButton(SharedResources.skin, anyButtonLabel, "");
+            anyButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    anyPressed();
+                }
+            });
+            modifierButtonsRow.add(anyButton);
 
-            // assemble top segment
-            add(checkBox).expandX().left();
-            add(selectBox).minWidth(90);
-            add(keymapBox).width(90);
+            // adding modifier key buttons
+            for (ModifierKey modifierKey : ModifierKey.values()) {
+                final Label buttonLabel = new Label(modifierKey.name(), SharedResources.skin, "small");
+                final SquareButton button = new SquareButton(SharedResources.skin, buttonLabel, "");
+                button.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        buttonPressed(modifierKey);
+                    }
+                });
+                buttonLabelsMap.put(modifierKey, button);
+                modifierButtonsRow.add(button);
+            }
+
+            modifierButtonsRow.add().expandX();
+            return modifierButtonsRow;
+        }
+
+        // button
+        private void anyPressed () {
+            for (ObjectMap.Entry<ModifierKey, Button> modifierKeySquareButtonEntry : buttonLabelsMap) {
+                modifierKeySquareButtonEntry.value.setChecked(anyButton.isChecked());
+                buttonPressed(modifierKeySquareButtonEntry.key);
+            }
+        }
+
+        private void buttonPressed (ModifierKey modifierKey) {
+
         }
 
         @Override
@@ -103,7 +224,9 @@ public class PrefWidgetFactory {
         }
 
         public void configure(Commands.CommandType commandType) {
-            keymapBox.setKey(commandType.toString());
+            configurationNameLabel.setText(commandType.name);
+            // TODO: 05.01.23 get command combination
+            finalCombination.setText(commandType.toString());
         }
     }
 
