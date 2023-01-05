@@ -25,6 +25,17 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
     public void receiveSignal (String portName) {
 
         GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
+        String parent = fetchStringValue("parent");
+        if(parent != null && !parent.isEmpty()) {
+            if(parent.equals("root")) {
+                target = routineInstanceRef.getContainer().root;
+            } else {
+                Array<GameObject> gameObjects = routineInstanceRef.getContainer().findGameObjects(parent);
+                if (!gameObjects.isEmpty()) {
+                    target = gameObjects.first();
+                }
+            }
+        }
 
         GameAsset<VFXProjectData> asset = fetchAssetValue("particle");
 

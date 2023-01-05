@@ -145,12 +145,13 @@
         </module>
         <module name = "SpawnParticleNode" title = "Spawn Particle" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="parent" type="string">parent</inputText>
             <asset port="input" name="particle" type="VFX">spine</asset>
             <group>
                 <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">x: </dynamicValue>
                 <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">y: </dynamicValue>
             </group>
-            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <dynamicValue port="input" name="layerOrder" type="int" step="1" max="50">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetSpineAnimationNode" title = "Set Spine Animation" keywords = "" class = "SetSpineAnimationNodeWidget">
