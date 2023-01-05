@@ -130,7 +130,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 			Vector3 forward = new Vector3();
 			Vector3 temp = new Vector3();
 
-			float width = 1;
+			float width = thickness.getFloat();
 			Vector3 left = new Vector3();
 			for (int j = 0; j < pointData.size; j++) {
 				float progression = j / (float)(pointData.size - 1);

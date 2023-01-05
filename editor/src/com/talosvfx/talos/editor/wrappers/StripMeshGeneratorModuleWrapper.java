@@ -45,6 +45,7 @@ public class StripMeshGeneratorModuleWrapper extends ModuleWrapper<StripMeshGene
         addInputSlot("uvs", StripMeshGeneratorModule.UVS);
         addInputSlot("offset", StripMeshGeneratorModule.OFFSET);
         addInputSlot("colour", StripMeshGeneratorModule.COLOUR);
+        addInputSlot("thickness", StripMeshGeneratorModule.THICKNESS);
         addInputSlot("transparency", StripMeshGeneratorModule.TRANSPARENCY);
 
         addOutputSlot("strip", StripMeshGeneratorModule.MODULE);
@@ -56,6 +57,7 @@ public class StripMeshGeneratorModuleWrapper extends ModuleWrapper<StripMeshGene
         if (slot.getIndex() == StripMeshGeneratorModule.OFFSET) return Vector2Module.class;
         if (slot.getIndex() == StripMeshGeneratorModule.COLOUR) return ColorModule.class;
         if (slot.getIndex() == StripMeshGeneratorModule.TRANSPARENCY) return StaticValueModule.class;
+        if (slot.getIndex() == StripMeshGeneratorModule.THICKNESS) return StaticValueModule.class;
 
         return null;
     }
