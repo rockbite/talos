@@ -2,6 +2,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,8 +27,15 @@ import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class TalosMain2 extends ApplicationAdapter {
+
+	private static final Logger logger = LoggerFactory.getLogger(TalosMain2.class);
 	private final ILauncher launcher;
 	@Getter
 	private Skin skin;
@@ -129,6 +137,32 @@ public class TalosMain2 extends ApplicationAdapter {
 		stage.draw();
 
 
+
+		de();
+	}
+
+	private void de () {
+		Field[] declaredFields = Input.Keys.class.getDeclaredFields();
+		for (Field declaredField : declaredFields) {
+			declaredField.setAccessible(true);
+			if (Modifier.isStatic(declaredField.getModifiers())) {
+				try {
+					Object o = declaredField.get(null);
+
+					if (o instanceof Integer) {
+						if (Gdx.input.isKeyPressed((Integer) o)) {
+							logger.info("Key down {}", declaredField.getName());
+						}
+					} else {
+					}
+
+
+
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 
 	@Override
