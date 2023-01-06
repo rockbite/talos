@@ -147,7 +147,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 
 				fetchAllInputSlotValues();
-				
+
 				float width = thickness.getFloat();
 
 				float scaleU = uvs.get(0);
