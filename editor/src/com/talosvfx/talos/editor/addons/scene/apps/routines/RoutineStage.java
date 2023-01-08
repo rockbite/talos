@@ -39,7 +39,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     private Vector2 tmp = new Vector2();
 
-    @Getter@Setter
+    @Getter
     private float timeScale = 1f;
     private boolean loading = false;
 
@@ -344,7 +344,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         routineInstance.stop();
         scenePreviewApp.reload();
         playing = false;
-        timeScale = 1f;
+        //timeScale = 1f;
     }
 
     public void resume() {
@@ -361,6 +361,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     public void setTimeScale(float timeScale) {
         this.timeScale = timeScale;
-        scenePreviewApp.setSpeed(timeScale);
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setSpeed(timeScale);
+        }
+    }
+
+    public void lockCamera(boolean checked) {
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setLockCamera(checked);
+        }
     }
 }
