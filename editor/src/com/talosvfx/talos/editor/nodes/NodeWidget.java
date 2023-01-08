@@ -202,7 +202,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
                 if(nodeBoard != null) {
-                    nodeBoard.nodeClickedUp(NodeWidget.this, hasMoved);
+                    // if we clicked up but not anymore on top of that node then don't bother
+                    if(NodeWidget.this.hit(x, y, true) != null) {
+                        nodeBoard.nodeClickedUp(NodeWidget.this, hasMoved);
+                    }
                 }
                 event.cancel();
                 hasMoved = false;
