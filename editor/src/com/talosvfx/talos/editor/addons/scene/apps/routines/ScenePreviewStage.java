@@ -92,8 +92,13 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if(cameraGO != null) {
 			CameraComponent component = cameraGO.getComponent(CameraComponent.class);
 			TransformComponent transform = cameraGO.getComponent(TransformComponent.class);
-			renderer.getCamera().position.set(transform.position.x, transform.position.y, 0);
-			// todo: apply zoom later
+			Camera camera = renderer.getCamera();
+			if(camera instanceof OrthographicCamera) {
+				OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+				orthographicCamera.position.set(transform.position.x, transform.position.y, 0);
+				orthographicCamera.zoom = component.zoom;
+				viewportViewSettings.setZoom(component.zoom);
+			}
 		}
 
 		float currSpeed = speed;
