@@ -69,6 +69,7 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
             if(component.getEffectRef() != null) {
                 ParticleEffectInstance effectRef = component.getEffectRef();
                 if(effectRef.getParticleCount() == 0) {
+                    //todo put back in
                     trackingVFX.removeIndex(i);
                     gameObject.getParent().removeObject(gameObject);
                 }

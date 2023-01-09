@@ -41,6 +41,7 @@ public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer
 
 	@Setter@Getter
 	private boolean paused =false;
+	private boolean lockCamera = false;
 
 	public ScenePreviewStage () {
 		setSkin(SharedResources.skin);
@@ -94,8 +95,13 @@ public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer
 		if(cameraGO != null) {
 			CameraComponent component = cameraGO.getComponent(CameraComponent.class);
 			TransformComponent transform = cameraGO.getComponent(TransformComponent.class);
-			renderer.getCamera().position.set(transform.position.x, transform.position.y, 0);
-			// todo: apply zoom later
+			Camera camera = renderer.getCamera();
+			if(camera instanceof OrthographicCamera && lockCamera) {
+				OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+				orthographicCamera.position.set(transform.position.x, transform.position.y, 0);
+				orthographicCamera.zoom = component.zoom;
+				viewportViewSettings.setZoom(component.zoom);
+			}
 		}
 
 		float currSpeed = speed;
@@ -126,5 +132,9 @@ public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer
 
 	public void setCameraGO(GameObject cameraGO) {
 		this.cameraGO = cameraGO;
+	}
+
+	public void setLockCamera(boolean checked) {
+		this.lockCamera = checked;
 	}
 }

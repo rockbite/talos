@@ -92,4 +92,8 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
     public void setSpeed(float timeScale) {
         workspaceWidget.setSpeed(timeScale);
     }
+
+    public void setLockCamera(boolean checked) {
+        workspaceWidget.setLockCamera(checked);
+    }
 }

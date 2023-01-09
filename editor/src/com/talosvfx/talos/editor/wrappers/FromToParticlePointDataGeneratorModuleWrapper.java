@@ -20,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
 import com.talosvfx.talos.runtime.Slot;
@@ -79,8 +82,8 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
     @Override
     public Class<? extends AbstractModule> getSlotsPreferredModule (Slot slot) {
 
-        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
-        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+//        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+//        if (slot.getIndex() == FromToParticlePointDataGeneratorModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
         if (slot.getIndex() == FromToParticlePointDataGeneratorModule.POINTS_COUNT) return StaticValueModule.class;
 
         return null;
@@ -88,14 +91,16 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
 
     @Override
     protected void wrapperSelected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.registerForDragPoints(this);
+        RegisterDragPoints registerDragPoints = Notifications.obtainEvent(RegisterDragPoints.class);
+        registerDragPoints.setRegisterForDragPoints(this);
+        Notifications.fireEvent(registerDragPoints);
     }
 
     @Override
     protected void wrapperDeselected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.unregisterDragPoints(this);
+        UnRegisterDragPoints unregisterDragPoints = Notifications.obtainEvent(UnRegisterDragPoints.class);
+        unregisterDragPoints.setUnRegisterForDragPoints(this);
+        Notifications.fireEvent(unregisterDragPoints);
     }
 
     @Override

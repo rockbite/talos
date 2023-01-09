@@ -47,8 +47,13 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
             public void changed(Color newColor) {
                 super.changed(newColor);
                 box.setColor(newColor);
-                callValueChanged(newColor);
+                callValueChanged(newColor, true);
+            }
 
+            @Override
+            public void finished (Color newColor) {
+                super.finished(newColor);
+                callValueChanged(newColor, false);
             }
         });
 
@@ -88,4 +93,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
             box.setColor(value);
         }
     }
+
+
+
 }

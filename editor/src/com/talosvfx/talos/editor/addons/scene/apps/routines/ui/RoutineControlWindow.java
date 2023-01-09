@@ -27,6 +27,7 @@ public class RoutineControlWindow extends Table {
     private final RoundedFlatButton playButton;
     private final ValueWidget speedValueWidget;
     private final RoundedFlatButton pauseButton;
+    private final RoundedFlatButton cameraLockBtn;
 
     public RoutineControlWindow(RoutineStage routineStage) {
         setTouchable(Touchable.enabled);
@@ -96,6 +97,19 @@ public class RoutineControlWindow extends Table {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 routineStage.setTimeScale(speedValueWidget.getValue());
+            }
+        });
+
+        cameraLockBtn = new RoundedFlatButton();
+        cameraLockBtn.make("Camera Lock");
+        cameraLockBtn.getStyle().checked = ColorLibrary.createClippedPatch(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.LIGHT_BLUE);
+        content.add(cameraLockBtn).padLeft(5);
+        cameraLockBtn.setChecked(false);
+
+        cameraLockBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                routineStage.lockCamera(cameraLockBtn.isChecked());
             }
         });
     }

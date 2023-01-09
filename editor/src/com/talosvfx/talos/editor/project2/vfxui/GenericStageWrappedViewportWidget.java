@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.project2.vfxui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -30,6 +31,12 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget<Stage> {
 		Camera camera = currentCameraSupplier.get();
 
 		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND());
+
+		camera.position.set(0, 0, 0);
+		if (camera instanceof OrthographicCamera) {
+			((OrthographicCamera) camera).zoom = 2f;
+		}
+		camera.update();
 
 		stage.addActor(actor);
 		stage.setKeyboardFocus(actor);
