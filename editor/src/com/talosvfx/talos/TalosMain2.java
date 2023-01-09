@@ -137,33 +137,8 @@ public class TalosMain2 extends ApplicationAdapter {
 		stage.draw();
 
 
-
-		de();
 	}
 
-	private void de () {
-		Field[] declaredFields = Input.Keys.class.getDeclaredFields();
-		for (Field declaredField : declaredFields) {
-			declaredField.setAccessible(true);
-			if (Modifier.isStatic(declaredField.getModifiers())) {
-				try {
-					Object o = declaredField.get(null);
-
-					if (o instanceof Integer) {
-						if (Gdx.input.isKeyPressed((Integer) o)) {
-							logger.info("Key down {}", declaredField.getName());
-						}
-					} else {
-					}
-
-
-
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-	}
 
 	@Override
 	public void resize (int width, int height) {
