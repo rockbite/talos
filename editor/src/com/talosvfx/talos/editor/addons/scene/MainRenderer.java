@@ -44,6 +44,8 @@ public class MainRenderer implements Observer {
 
     public final Comparator<GameObject> layerAndDrawOrderComparator;
 
+    public float timeScale = 1f;
+
     private  Comparator<GameObject> activeSorter;
 
     private TransformComponent tempTransform = new TransformComponent();
@@ -357,7 +359,7 @@ public class MainRenderer implements Observer {
         spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
 
         if (!skipUpdates) {
-            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime() * timeScale);
             spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         }
         spineRendererComponent.skeleton.updateWorldTransform();
@@ -381,7 +383,7 @@ public class MainRenderer implements Observer {
         instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 
         if (!skipUpdates) {
-            instance.update(Gdx.graphics.getDeltaTime());
+            instance.update(Gdx.graphics.getDeltaTime() * timeScale);
         }
         talosRenderer.setBatch(batch);
         talosRenderer.render(instance);
@@ -602,9 +604,12 @@ public class MainRenderer implements Observer {
         ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
 
         if(particleCache.containsKey(component)) {
-            return particleCache.get(component);
+            ParticleEffectInstance particleEffectInstance = particleCache.get(component);
+            component.setEffectRef(particleEffectInstance);
+            return particleEffectInstance;
         } else {
             ParticleEffectInstance instance = descriptor.createEffectInstance();
+            component.setEffectRef(instance);
             particleCache.put(component, instance);
             return instance;
         }

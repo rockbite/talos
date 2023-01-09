@@ -18,6 +18,8 @@ import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.Supplier;
 
@@ -39,6 +41,9 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
     public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
+    @Setter@Getter
+    private boolean requiresWrite;
+
     public RoutineRendererComponent() {
         updateListener = new GameAsset.GameAssetUpdateListener() {
             @Override
@@ -57,6 +62,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
         json.writeValue("size", viewportSize, Vector2.class);
         json.writeValue("cache", cacheCoolDown);
         json.writeValue("properties", propertyWrappers);
+
+        requiresWrite = false;
     }
 
     @Override
@@ -87,6 +94,11 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
 
         propertyWrappers.clear();
         if (routineInstance != null) {
+            boolean needsToUpdate = needsToUpdate(copyWrappers, routineInstance.getParentPropertyWrappers());
+            if (needsToUpdate) {
+                requiresWrite = true;
+            }
+
             for (PropertyWrapper<?> propertyWrapper : routineInstance.getParentPropertyWrappers()) {
                 if (tryToMerge) {
                     boolean foundCopy = false;
@@ -112,6 +124,38 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
                 }
             }
         }
+    }
+
+    private boolean needsToUpdate (Array<PropertyWrapper<?>> existingWrappers, Array<PropertyWrapper<?>> truthWrappers) {
+        for (int i = 0; i < truthWrappers.size; i++) {
+            PropertyWrapper<?> truthWrapper = truthWrappers.get(i);
+            int indexToFind = truthWrapper.index;
+
+            PropertyWrapper<?> wrapperForIndex = getWrapperForIndex(indexToFind, existingWrappers);
+            if (wrapperForIndex == null) {
+                return true;
+            }
+            if (wrapperForIndex.getType() != truthWrapper.getType()) {
+                return true;
+            }
+            if (!(wrapperForIndex.propertyName.equals(truthWrapper.propertyName))) {
+                return true;
+            }
+            if (!(wrapperForIndex.defaultValue.equals(truthWrapper.defaultValue))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private PropertyWrapper<?> getWrapperForIndex (int index, Array<PropertyWrapper<?>> wrappers) {
+        for (int i = 0; i < wrappers.size; i++) {
+            PropertyWrapper<?> propertyWrapper = wrappers.get(i);
+            if (propertyWrapper.index == index) {
+                return propertyWrapper;
+            }
+        }
+        return null;
     }
 
     @Override

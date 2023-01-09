@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -31,8 +30,6 @@ import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.assets.AssetProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +116,7 @@ public class SceneUtils {
 		selectGameObjectExternallyEvent.setGameObject(gameObject);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
 
-		saveContainer(gameObjectContainer);
+		markContainerChanged(gameObjectContainer);
 
 	}
 
@@ -194,31 +191,8 @@ public class SceneUtils {
 				}
 				AssetRepository.getInstance().copySampleParticleToProject(vfx);
 				sample = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX);
-				AssetRepository.getInstance().createPForTLSIfNotExist(sample.getRootRawAsset(), true);
 			}
-			// TODO: this shit needs to be refactored and delegated :(
 			ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
-			VFXProjectData vfxProjectData = sample.getResource();
-			ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor();
-			GameAsset pAsset = AssetRepository.getInstance().getAssetForIdentifier("sample", GameAssetType.VFX_OUTPUT);
-			descriptor.setAssetProvider(new AssetProvider() {
-				@Override
-				public <T> T findAsset (String assetName, Class<T> clazz) {
-
-					if (Sprite.class.isAssignableFrom(clazz)) {
-						GameAsset<Texture> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-						if(gameAsset.getResource() == null) {
-							gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
-						}
-						return (T)new Sprite(gameAsset.getResource());
-					}
-
-					throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
-				}
-			});
-			descriptor.load(pAsset.getRootRawAsset().handle);
-			vfxProjectData.setDescriptor(descriptor);
-
 			particleComponent.setGameAsset(sample);
 		}
 	}
@@ -251,7 +225,7 @@ public class SceneUtils {
 		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
 		Notifications.fireEvent(selectGameObjectExternallyEvent);
 
-		saveContainer(currentContainer);
+		markContainerChanged(currentContainer);
 
 	}
 
@@ -265,7 +239,7 @@ public class SceneUtils {
 		gameObjectDeleted.setTarget(gameObject);
 		Notifications.fireEvent(gameObjectDeleted);
 
-		saveContainer(gameObjectContainer);
+		markContainerChanged(gameObjectContainer);
 
 	}
 
@@ -291,7 +265,7 @@ public class SceneUtils {
 		componentAdded.setComponent(component);
 		Notifications.fireEvent(componentAdded);
 
-		saveContainer(currentHolder);
+		markContainerChanged(currentHolder);
 	}
 
 	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component) {
@@ -307,14 +281,14 @@ public class SceneUtils {
 		Notifications.fireEvent(componentUpdated);
 
 		if (!isRapid) {
-			saveContainer(gameObjectContainer);
+			markContainerChanged(gameObjectContainer);
 		}
 	}
-	private static void saveContainer (GameObjectContainer currentHolder) {
+	private static void markContainerChanged (GameObjectContainer currentHolder) {
 		if (currentHolder instanceof Scene) {
 			GameAsset<Scene> sceneGameAsset = AssetRepository.getInstance().getAssetForResource((Scene)currentHolder);
 			if (sceneGameAsset != null) {
-				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(sceneGameAsset, true);
+				AssetRepository.getInstance().assetChanged(sceneGameAsset);
 			} else {
 				logger.error("Couldn't find game asset for resource {}", currentHolder);
 				Toasts.getInstance().showErrorToast("Couldn't save scene");
@@ -322,7 +296,7 @@ public class SceneUtils {
 		} else if (currentHolder instanceof Prefab) {
 			GameAsset<Prefab> prefabGameAsset = AssetRepository.getInstance().getAssetForResource((Prefab)currentHolder);
 			if (prefabGameAsset != null) {
-				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(prefabGameAsset, true);
+				AssetRepository.getInstance().assetChanged(prefabGameAsset);
 			} else {
 				logger.error("Couldn't find game asset for resource {}", currentHolder);
 				Toasts.getInstance().showErrorToast("Couldn't save prefab");
@@ -331,7 +305,7 @@ public class SceneUtils {
 			//We need to find the scene that this game object belongs to, and get the game asset for that and save it
 
 			GameObjectContainer gameObjectContainerRoot = ((GameObject)currentHolder).getGameObjectContainerRoot();
-			saveContainer(gameObjectContainerRoot);
+			markContainerChanged(gameObjectContainerRoot);
 		} else {
 			logger.info("Not something we can save");
 		}

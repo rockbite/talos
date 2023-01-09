@@ -13,10 +13,13 @@ import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
@@ -37,7 +40,7 @@ import lombok.Getter;
 
 import java.util.Comparator;
 
-public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences> {
+public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
 
 	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
@@ -71,7 +74,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
 
-		this.gridAppReference = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+		this.gridAppReference = new DummyLayoutApp<VFXProjectData>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return moduleGraphUIWrapper;
@@ -98,11 +101,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		};
 	}
 
-	private void saveProjectToData(VFXProjectData projectData) {
+	private void saveProjectToData (VFXProjectData projectData) {
 		projectData.setFrom(moduleBoardWidget);
 	}
 
-	private void loadProject (VFXProjectData projectData) {
+	public void loadProject (VFXProjectData projectData) {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
 
@@ -127,6 +130,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		//Set it up every time we load it
 		editorState.reset();
+		moduleBoardWidget.clearAll();
 
 		projectData.setDescriptor(particleEffectDescriptor);
 
@@ -228,6 +232,15 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
+		if (this.gameAsset != null) {
+			this.gameAsset.listeners.removeValue(this, true);
+		}
+
+		if (!gameAsset.listeners.contains(this, true)) {
+			gameAsset.listeners.add(this);
+		}
+
+
 		super.updateForGameAsset(gameAsset);
 
 		loadProject(gameAsset.getResource());
@@ -272,12 +285,16 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	public void dataModified() {
 		saveProjectToData(gameAsset.getResource());
-		AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
-		gameAsset.setUpdated();
+		AssetRepository.getInstance().assetChanged(gameAsset);
 	}
 
 	public void resetToNew() {
 		// ?
+	}
+
+	@Override
+	public void onUpdate () {
+		loadProject(gameAsset.getResource());
 	}
 }
 

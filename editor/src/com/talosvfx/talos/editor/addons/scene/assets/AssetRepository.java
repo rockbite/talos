@@ -2,6 +2,7 @@
 package com.talosvfx.talos.editor.addons.scene.assets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
@@ -42,15 +43,14 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
-import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
-import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +161,8 @@ public class AssetRepository implements Observer {
 		gameAsset.setDummy(true);
 		return gameAsset;
 	}
+
+
 
 
 	static class DataMaps {
@@ -362,6 +364,29 @@ public class AssetRepository implements Observer {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void reloadGameAssetFromString (GameAsset gameAssetReference, String asSTring) {
+		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
+		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
+
+		FileHandle temp = Gdx.files.local("temp");
+		temp.writeString(asSTring, false);
+
+		RawAsset rawAsset = new RawAsset(temp);
+
+		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
+			GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rawAsset, false, gameAssetReference);
+			gameAssetReference.setResourcePayload(gameAsset.getResource());
+			gameAssetReference.setUpdated();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		temp.delete();
 	}
 
 	static class TypeIdentifierPair {
@@ -699,6 +724,21 @@ public class AssetRepository implements Observer {
 
 				break;
 			case SOUND:
+
+				if (gameAssetOut == null) {
+					GameAsset<Music> musicGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = musicGameAsset;
+
+					if (createLinks) {
+						value.gameAssetReferences.add(musicGameAsset);
+						musicGameAsset.dependentRawAssets.add(value);
+					}
+				}
+
+				Music music = Gdx.audio.newMusic(value.handle);
+
+				((GameAsset<Music>)gameAssetOut).setResourcePayload(music);
+
 				break;
 			case VFX_OUTPUT:
 
@@ -810,6 +850,10 @@ public class AssetRepository implements Observer {
 
 				VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
 				((GameAsset<VFXProjectData>)gameAssetOut).setResourcePayload(projectData);
+
+				//This is mega hack. Only because we will be making it into DynamicNodeStage later
+				ParticleNodeEditorApp app = new ParticleNodeEditorApp();
+				app.loadProject(projectData);
 
 
 				break;
@@ -959,6 +1003,13 @@ public class AssetRepository implements Observer {
 		metadataHandleFor.writeString(json.prettyPrint(metadata), false);
 	}
 
+	public void assetChanged (GameAsset<?> gameAsset) {
+		Toasts.getInstance().showInfoToast("Marked changes " + gameAsset.nameIdentifier);
+
+		GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
+		SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
+	}
+
 	public void saveGameAssetResourceJsonToFile (GameAsset<?> gameAsset, boolean useGlobalState) {
 		if (useGlobalState) {
 			GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
@@ -1006,22 +1057,41 @@ public class AssetRepository implements Observer {
 		return asString;
 	}
 
-	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+	public <T> String saveGameAssetCurrentStateToJsonString (GameAsset<T> gameAsset) {
 		GameResourceSaveStrategy<T> gameResourceSaveStrategy = saveStrategyObjectMap.get(gameAsset.type);
 		if (gameResourceSaveStrategy != null) {
-			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
 
 			String jsonString = gameResourceSaveStrategy.serializeToJson(gameAsset, json);
+
 			if (jsonString == null) {
 				Toasts.getInstance().showErrorToast("Error saving asset " + gameAsset);
 				logger.error("Error saving asset");
-				return;
+				return null;
 			}
-			rootRawAsset.handle.writeString(jsonString, false);
+
+			return jsonString;
 
 		} else {
+			Toasts.getInstance().showErrorToast("Trying to save an asset that doesn't have a save strategy " + gameAsset);
 			logger.error("Trying to save an asset that doesn't have a save strategy");
 		}
+
+		return null;
+	}
+
+	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+		Toasts.getInstance().showInfoToast("Saved to file " + gameAsset.nameIdentifier);
+		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+
+		String jsonString = saveGameAssetCurrentStateToJsonString(gameAsset);
+
+		if (jsonString == null) {
+			logger.error("Error saving to file");
+			return;
+		}
+
+		rootRawAsset.handle.writeString(jsonString, false);
+		SharedResources.globalSaveStateSystem.markSaved(gameAsset);
 
 	}
 

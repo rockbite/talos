@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.RoutineControlWindow;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
@@ -16,6 +17,7 @@ import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidge
 
 public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
 
+    private final RoutineControlWindow controlWindow;
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 
@@ -48,14 +50,14 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         routineStage.init();
 
         variableCreationWindow = new VariableCreationWindow(routineStage);
+        routineStageWrapper.add(variableCreationWindow).pad(10).width(240).left().top().expand();
 
-
-        routineStageWrapper.left().top();
-        routineStageWrapper.add(variableCreationWindow).pad(10).width(240);
+        controlWindow = new RoutineControlWindow(routineStage);
+        routineStageWrapper.add(controlWindow).pad(10).right().top().expand();
 
         routineStage.sendInStage(routineStageWrapper.getStage());
 
-        DummyLayoutApp app = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        DummyLayoutApp<RoutineStageData> app = new DummyLayoutApp<RoutineStageData>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent() {
                 return content;
@@ -106,6 +108,8 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         routineStage.loadFrom(gameAsset);
         variableCreationWindow.reloadWidgets();
         variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
+
+        controlWindow.update();
     }
 
     @Override

@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
@@ -22,12 +21,10 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
-import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
@@ -219,7 +216,7 @@ public class VariableCreationWindow extends Table {
                 if (exposedVariable != null) {
                     NodeListPopup nodeListPopup = routineStage.getNodeListPopup();
                     exposedVariable.constructNode(nodeListPopup.getModuleByName("ExposedVariableNode"));
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(exposedVariable));
+                    Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(routineStage, exposedVariable));
                     exposedVariable.update(propertyWrapper);
                 }
                 RoutineInstance routineInstance = routineStage.data.getRoutineInstance();

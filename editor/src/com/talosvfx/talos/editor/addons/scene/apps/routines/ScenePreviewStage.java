@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,14 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	private MainRenderer renderer;
 
-	private boolean isPlaying = false;
 	private GameObject cameraGO;
+
+	@Setter
+	private float speed = 1;
+
+	@Setter@Getter
+	private boolean paused =false;
+	private boolean lockCamera = false;
 
 	public ScenePreviewStage () {
 		setSkin(SharedResources.skin);
@@ -86,9 +93,19 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if(cameraGO != null) {
 			CameraComponent component = cameraGO.getComponent(CameraComponent.class);
 			TransformComponent transform = cameraGO.getComponent(TransformComponent.class);
-			renderer.getCamera().position.set(transform.position.x, transform.position.y, 0);
-			// todo: apply zoom later
+			Camera camera = renderer.getCamera();
+			if(camera instanceof OrthographicCamera && lockCamera) {
+				OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+				orthographicCamera.position.set(transform.position.x, transform.position.y, 0);
+				orthographicCamera.zoom = component.zoom;
+				viewportViewSettings.setZoom(component.zoom);
+			}
 		}
+
+		float currSpeed = speed;
+
+		if(paused) currSpeed = 0;
+		renderer.timeScale = currSpeed;
 
 		renderer.setLayers(SharedResources.currentProject.getSceneData().getRenderLayers());
 		renderer.update(currentScene.getSelfObject());
@@ -113,5 +130,9 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	public void setCameraGO(GameObject cameraGO) {
 		this.cameraGO = cameraGO;
+	}
+
+	public void setLockCamera(boolean checked) {
+		this.lockCamera = checked;
 	}
 }

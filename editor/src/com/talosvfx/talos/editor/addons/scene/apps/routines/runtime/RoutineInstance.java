@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -47,6 +48,9 @@ public class RoutineInstance {
     @Getter
     private transient boolean isDirty = true;
 
+    @Getter@Setter
+    private float timeScale = 1f;
+
     public boolean configured = false;
 
     @Getter
@@ -61,11 +65,13 @@ public class RoutineInstance {
     @Getter@Setter
     private SavableContainer container;
     private GameObject cameraGO;
+    private boolean paused = false;
 
     public void reset() {
         clearMemory();
         globalMap.clear();
         scopeNumbers.clear();
+        timeScale = 1f;
 
         signalPayload = null;
 
@@ -108,6 +114,10 @@ public class RoutineInstance {
 
     public void setCameraGO(GameObject cameraGO) {
         this.cameraGO = cameraGO;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public static class RoutineListenerAdapter implements RoutineListener {
@@ -192,20 +202,33 @@ public class RoutineInstance {
             }
         }
 
+        configureConnections(connections, idMap);
+    }
 
-        for(JsonValue connectionJson: connections) {
-            int fromId = connectionJson.getInt("fromNode");
-            int toId = connectionJson.getInt("toNode");
+    private void configureConnections(JsonValue connections, IntMap<RoutineNode> idMap) {
+        boolean configured = checkConfigured();
+        if(configured) {
+            for (JsonValue connectionJson : connections) {
+                int fromId = connectionJson.getInt("fromNode");
+                int toId = connectionJson.getInt("toNode");
 
-            if(idMap.containsKey(fromId) && idMap.containsKey(toId)) {
-                RoutineNode fromNode = idMap.get(fromId);
-                RoutineNode toNode = idMap.get(toId);
+                if (idMap.containsKey(fromId) && idMap.containsKey(toId)) {
+                    RoutineNode fromNode = idMap.get(fromId);
+                    RoutineNode toNode = idMap.get(toId);
 
-                String fromSlot = connectionJson.getString("fromSlot");
-                String toSlot = connectionJson.getString("toSlot");
+                    String fromSlot = connectionJson.getString("fromSlot");
+                    String toSlot = connectionJson.getString("toSlot");
 
-                fromNode.addConnection(toNode, fromSlot, toSlot);
+                    fromNode.addConnection(toNode, fromSlot, toSlot);
+                }
             }
+        } else {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    configureConnections(connections, idMap);
+                }
+            });
         }
     }
 
@@ -286,8 +309,10 @@ public class RoutineInstance {
 
     public void tick(float delta) {
         if(checkConfigured()) {
-            for (TickableNode node : tickableNodes) {
-                node.tick(delta);
+            if(!paused) {
+                for (TickableNode node : tickableNodes) {
+                    node.tick(delta * timeScale);
+                }
             }
         }
     }
@@ -323,5 +348,9 @@ public class RoutineInstance {
         for (DrawableQuad drawableQuad : drawableQuads) {
             drawableQuad.position.add(diff);
         }
+    }
+
+    public void stop() {
+        reset();
     }
 }

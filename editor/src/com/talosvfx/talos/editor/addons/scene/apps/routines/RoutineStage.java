@@ -9,12 +9,10 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
-import com.talosvfx.talos.editor.addons.scene.events.TweenPlayedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
@@ -24,9 +22,12 @@ import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.editor.notifications.events.*;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
+import com.talosvfx.talos.editor.utils.Toasts;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +39,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     private Vector2 tmp = new Vector2();
 
+    @Getter
     private float timeScale = 1f;
     private boolean loading = false;
+
+    @Getter
+    private boolean paused = false;
+    @Getter
+    private boolean playing;
+    private ScenePreviewApp scenePreviewApp;
 
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
@@ -95,9 +103,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     @Override
-    public void saveGameAsset() {
+    public void onUpdate () {
+        loadFrom(gameAsset);
+    }
+
+    @Override
+    public void markAssetChanged () {
         if(!loading) {
-            super.saveGameAsset();
+            super.markAssetChanged();
         }
     }
 
@@ -176,8 +189,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void routineUpdated () {
         if(!loading) {
             //todo: this isn't right
-            AssetRepository.getInstance().saveGameAssetResourceJsonToFile(this.routineEditorApp.getGameAsset(), true);
-            gameAsset.setUpdated();
+            markAssetChanged();
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
@@ -223,7 +235,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             String key = stringAbstractWidgetEntry.key;
             AbstractWidget value = stringAbstractWidgetEntry.value;
 
-            if (value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
+            if (value instanceof TextValueWidget || value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
                 logicNode.setProperty(key, value.getValue());
                 setRoutineDirty = true;
             }
@@ -295,15 +307,68 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void act() {
         if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
+        if(scenePreviewApp != null) {
+            if (data.getRoutineInstance() != null) {
+                scenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
+            } else {
+                scenePreviewApp.setSpeed(timeScale);
+            }
+        }
     }
 
     public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
-        ScenePreviewApp scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+        scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
 
         return scenePreviewApp;
     }
 
     public void resetNodes() {
         nodeBoard.resetNodes();
+    }
+
+    public void play(String executorName) {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        RoutineExecutorNode node = (RoutineExecutorNode) routineInstance.getCustomLookup().get(executorName);
+        if(node != null) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(node.uniqueId);
+            boolean result = executorWidget.startPlay();
+
+            if(result) {
+                playing = true;
+            }
+        }
+    }
+
+    public void stop() {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        routineInstance.stop();
+        scenePreviewApp.reload();
+        playing = false;
+        //timeScale = 1f;
+    }
+
+    public void resume() {
+        paused = false;
+        data.getRoutineInstance().setPaused(paused);
+        scenePreviewApp.setPaused(paused);
+    }
+
+    public void pause() {
+        paused = true;
+        data.getRoutineInstance().setPaused(paused);
+        scenePreviewApp.setPaused(paused);
+    }
+
+    public void setTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setSpeed(timeScale);
+        }
+    }
+
+    public void lockCamera(boolean checked) {
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setLockCamera(checked);
+        }
     }
 }

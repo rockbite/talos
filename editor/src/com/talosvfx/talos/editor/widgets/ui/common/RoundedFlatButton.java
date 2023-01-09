@@ -10,6 +10,7 @@ public class RoundedFlatButton extends Button {
 
     private Image icon;
     private Cell iconCell;
+    private Label label;
 
     public RoundedFlatButton() {
 
@@ -24,7 +25,7 @@ public class RoundedFlatButton extends Button {
         style.disabled = ColorLibrary.createClippedPatch(getSkin(), ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.BRIGHT_GRAY);
         setStyle(style);
 
-        Label label = new Label(text, getSkin());
+        label = new Label(text, getSkin());
         label.setAlignment(Align.center);
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
     }
@@ -96,5 +97,9 @@ public class RoundedFlatButton extends Button {
 
     public Cell getIconCell() {
         return iconCell;
+    }
+
+    public void setText(String text) {
+        label.setText(text);
     }
 }

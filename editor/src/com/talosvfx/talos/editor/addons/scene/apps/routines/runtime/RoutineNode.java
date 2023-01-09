@@ -21,6 +21,7 @@ public abstract class RoutineNode {
     protected JsonValue propertiesJson;
     @Getter
     protected boolean configured = false;
+    private int configureDepth = 0;
 
     public enum DataType {
         NUMBER,
@@ -96,17 +97,24 @@ public abstract class RoutineNode {
 
         //todo: fix later?
         this.propertiesJson = nodeData.get("properties");
+        scheduleConfiguring();
+
+        uniqueId = nodeData.getInt("id");
+    }
+
+    private void scheduleConfiguring() {
+        configureDepth++;
         configureNode(propertiesJson);
         if(!configured) {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    configureNode(propertiesJson); // try again next time
+                    if(configureDepth < 5) {
+                        scheduleConfiguring(); // try again next time
+                    }
                 }
             });
         }
-
-        uniqueId = nodeData.getInt("id");
     }
 
     protected void constructNode(XmlReader.Element config) {
@@ -151,13 +159,19 @@ public abstract class RoutineNode {
             if(type.equals("asset")) port.dataType = DataType.ASSET;
             if(type.equals("SKELETON")) port.dataType = DataType.ASSET;
             if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
+            if(type.equals("SOUND")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("VFX")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
 
             if(name.equals("asset")) {
                 port.dataType = DataType.ASSET;
+            }
+
+            if(name.equals("checkbox")) {
+                port.valueOverride = row.getBooleanAttribute("default", false);
             }
         }
 
@@ -177,6 +191,10 @@ public abstract class RoutineNode {
             String name = item.name;
 
             Port port = inputs.get(name);
+            if(port == null) {
+                configured = false;
+                return;
+            }
             JsonValue jsonValue = properties.get(name);
             if(port.dataType == DataType.COLOR) {
                 Json json = new Json();
@@ -200,12 +218,19 @@ public abstract class RoutineNode {
                         return;
                     }
 
-                } catch (Exception e) {}
-            }else {
-                try {
-                    port.setValueFromString(properties.getString(name));
                 } catch (Exception e) {
-                    System.out.println(e);
+                    //e.printStackTrace();
+                }
+            } else {
+                try {
+                    String str = properties.getString(name);
+                    if(str == null || str.isEmpty()) {
+                        // we keep value override
+                    } else {
+                        port.setValueFromString(str);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -256,8 +281,10 @@ public abstract class RoutineNode {
                     String targetName = connection.toPort.name;
 
                     Object payload = routineInstanceRef.getSignalPayload();
+                    Object targets = routineInstanceRef.fetchGlobal("executedTargets");
                     targetNode.receiveSignal(targetName);
                     routineInstanceRef.setSignalPayload(payload);
+                    routineInstanceRef.storeGlobal("executedTargets", targets);
                 }
             }
         }
@@ -305,6 +332,18 @@ public abstract class RoutineNode {
         if(port == null) return "";
 
         return (String) port.valueOverride;
+    }
+
+    protected boolean isPortConnected(String key) {
+        Port port = inputs.get(key);
+        if(port == null) return false;
+        if(port.connectionType == ConnectionType.DATA) {
+            if (!port.connections.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected float fetchFloatValue(String key) {

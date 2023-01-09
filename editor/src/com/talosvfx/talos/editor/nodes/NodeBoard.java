@@ -20,13 +20,11 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.data.DynamicNodeStageData;
-import com.talosvfx.talos.editor.notifications.EventHandler;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.notifications.*;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.Slot;
@@ -35,7 +33,7 @@ import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup implements Observer {
+public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup implements Observer, EventContextProvider<DynamicNodeStage<?>> {
 
 	private static final Logger logger = LoggerFactory.getLogger(NodeBoard.class);
 
@@ -93,6 +91,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		for (ObjectMap.Entry<Integer, NodeWidget> entry : nodeMap) {
 			entry.value.resetNode();
 		}
+	}
+
+	@Override
+	public DynamicNodeStage<?> getContext () {
+		return getNodeStage();
 	}
 
 	public static class NodeConnection {
@@ -344,7 +347,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 			}
 		}
 
-		Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(node));
+		Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(getNodeStage(), node));
 
 		mainContainer.removeActor(node);
 
@@ -415,7 +418,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		connection.fromNode.setSlotConnectionInactive(connection, false);
 		connection.toNode.setSlotConnectionInactive(connection, true);
 
-		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(connection));
+		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(getNodeStage(), connection));
 
 		updateSaveState();
 
@@ -535,7 +538,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 //        TalosMain.Instance().ProjectController().setDirty();
 
-		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionCreatedEvent.class).set(connection));
+		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionCreatedEvent.class).set(getNodeStage(), connection));
 	}
 
 	/**
@@ -810,9 +813,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		}
 	}
 
-	public void nodeClickedUp (NodeWidget node) {
+	public void nodeClickedUp (NodeWidget node, boolean hasMoved) {
 
-		if (wasNodeDragged != null) {
+		if (wasNodeDragged != null && hasMoved) {
 			updateSaveState();
 
 //            TalosMain.Instance().ProjectController().setDirty();
@@ -831,7 +834,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	private void updateSaveState () {
-		nodeStage.saveGameAsset();
+		nodeStage.markAssetChanged();
 	}
 
 	@EventHandler
@@ -985,6 +988,10 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	public NodeWidget getNodeById(int nodeId) {
 		return nodeMap.get(nodeId);
+	}
+
+	public NodeWidget findNode(int uniqueId) {
+		return nodeMap.get(uniqueId);
 	}
 
 }

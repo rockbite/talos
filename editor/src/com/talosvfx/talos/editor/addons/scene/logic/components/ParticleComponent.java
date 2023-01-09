@@ -18,11 +18,17 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.Supplier;
 
 public class ParticleComponent extends RendererComponent implements GameResourceOwner<VFXProjectData> {
     private transient GameAsset<VFXProjectData> defaultGameAsset;
+
+    @Getter@Setter
+    private transient ParticleEffectInstance effectRef;
 
     public GameAsset<VFXProjectData> gameAsset;
     @Override

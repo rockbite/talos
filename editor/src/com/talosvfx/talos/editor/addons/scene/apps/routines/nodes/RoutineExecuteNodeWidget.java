@@ -38,37 +38,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
-                nodeStage.resetNodes();
-
-                GameAssetWidget assetWidget = (GameAssetWidget)getWidget("scene");
-                GameAsset sceneAsset = assetWidget.getValue();
-
-                GameObject cameraGO = null;
-
-                SavableContainer container = null;
-                if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
-                    ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
-                    scenePreviewApp.reload();
-                    container = scenePreviewApp.getWorkspaceWidget().currentScene;
-                    Array<GameObject> cameraGoList = container.root.getChildrenByComponent(CameraComponent.class, new Array<>());
-                    if(cameraGoList != null && !cameraGoList.isEmpty()) {
-                        cameraGO = cameraGoList.first();
-                    } else {
-                        cameraGO = null;
-                    }
-                    scenePreviewApp.getWorkspaceWidget().setCameraGO(cameraGO);
-                } else {
-                    return;
-                }
-
-                RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
-                routineInstance.reset();
-                int uniqueId = getUniqueId();
-                RoutineExecutorNode node = (RoutineExecutorNode)routineInstance.getNodeById(uniqueId);
-                routineInstance.setContainer(container);
-                routineInstance.setCameraGO(cameraGO);
-                node.receiveSignal("startSignal");
+               startPlay();
             }
         });
 
@@ -77,5 +47,41 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
     public String getTweenTitle() {
         TextValueWidget titleText = (TextValueWidget) getWidget("title");
         return titleText.getValue();
+    }
+
+    public boolean startPlay() {
+        RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
+        nodeStage.resetNodes();
+
+        GameAssetWidget assetWidget = (GameAssetWidget)getWidget("scene");
+        GameAsset sceneAsset = assetWidget.getValue();
+
+        GameObject cameraGO = null;
+
+        SavableContainer container = null;
+        if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
+            ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
+            scenePreviewApp.reload();
+            container = scenePreviewApp.getWorkspaceWidget().currentScene;
+            Array<GameObject> cameraGoList = container.root.getChildrenByComponent(CameraComponent.class, new Array<>());
+            if(cameraGoList != null && !cameraGoList.isEmpty()) {
+                cameraGO = cameraGoList.first();
+            } else {
+                cameraGO = null;
+            }
+            scenePreviewApp.getWorkspaceWidget().setCameraGO(cameraGO);
+        } else {
+            return false;
+        }
+
+        RoutineInstance routineInstance = nodeStage.data.getRoutineInstance();
+        routineInstance.reset();
+        int uniqueId = getUniqueId();
+        RoutineExecutorNode node = (RoutineExecutorNode)routineInstance.getNodeById(uniqueId);
+        routineInstance.setContainer(container);
+        routineInstance.setCameraGO(cameraGO);
+        node.receiveSignal("startSignal");
+
+        return true;
     }
 }

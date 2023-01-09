@@ -51,6 +51,7 @@ import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -265,6 +266,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						vec.set(touchToWorld.x, touchToWorld.y);
 
 						SceneUtils.createSpineObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+
+						//forcefully make active if we aren't active
+						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.VFX) {
+						GameAsset<VFXProjectData> gameAsset = (GameAsset<VFXProjectData>)gameAssetPayload.getGameAsset();
+
+						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
+						vec.set(touchToWorld.x, touchToWorld.y);
+
+						SceneUtils.createParticle(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
@@ -1150,7 +1164,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		GameAsset<RoutineStageData> routineStageData = event.routineAsset;
 		updateRoutinePropertiesForGOs(rootGO, routineStageData, updatedComponents);
 		for (RoutineRendererComponent updatedComponent : updatedComponents) {
-			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent);
+			SceneUtils.componentUpdated(rootGO, updatedComponent.getGameObject(), updatedComponent, true); //We set rapid to true so it doesn't save
+		}
+
+
+		//Check if any got updateed and we need to save
+		for (RoutineRendererComponent updatedComponent : updatedComponents) {
+			if (updatedComponent.isRequiresWrite()) {
+				AssetRepository.getInstance().assetChanged(gameAsset);
+				return;
+			}
 		}
 	}
 

@@ -196,6 +196,10 @@ public class AppManager implements Observer {
 		}
 
 		public abstract void onRemove ();
+
+		public boolean hasChangesToSave () {
+			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		}
 	}
 
 	private static class AppRegistry {
@@ -532,5 +536,24 @@ public class AppManager implements Observer {
 
 		// save preferences
 		TalosLocalPrefs.savePrefs();
+
+		//Save the selected app if it needs it
+
+		for (BaseApp appInstance : appInstances) {
+			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+
+			if (isFocused) {
+				GameAsset<?> gameAsset = appInstance.gameAsset;
+				if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) continue;
+
+				boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+				if (itemChangedAndUnsaved) {
+					AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+					return;
+				}
+
+			}
+
+		}
 	}
 }

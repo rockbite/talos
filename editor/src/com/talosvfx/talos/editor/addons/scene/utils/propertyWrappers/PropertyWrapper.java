@@ -75,4 +75,5 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
     public void setDefault () {
         this.value = defaultValue;
     }
+
 }

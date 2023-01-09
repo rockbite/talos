@@ -11,6 +11,10 @@ public abstract class ARndNode extends RoutineNode {
     Random random = new Random();
 
     protected void setSeed() {
+        if(fetchBooleanValue("random")) {
+            random.setSeed((long) (Math.random() * 1000000));
+            return;
+        }
         float seed1 = 0;
         if(inputs.containsKey("seed")) {
             seed1 = fetchFloatValue("seed"); // provided seed

@@ -8,9 +8,11 @@ public interface LayoutApp {
 
 	void setTabActive (boolean active);
 
+	boolean isTabActive ();
+
 	void setTabFocused (boolean focused);
 
-	boolean isTabActive ();
+	boolean isTabFocused ();
 
 	String getUniqueIdentifier ();
 

@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
-import com.talosvfx.talos.editor.addons.shader.nodes.SampleTextureNode;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
@@ -19,7 +18,7 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +31,8 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     FrameBuffer frameBuffer;
     PolygonBatch spriteBatch;
     Viewport viewport;
+
+
 
     class ExportSequencePayload {
         public int width;
@@ -65,6 +66,11 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         XmlReader.Element root = xmlReader.parse(list);
 
         return root;
+    }
+
+    @Override
+    public void onUpdate () {
+
     }
 
     @Override

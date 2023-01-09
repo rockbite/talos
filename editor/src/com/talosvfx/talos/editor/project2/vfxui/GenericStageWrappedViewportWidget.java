@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.project2.vfxui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import lombok.Getter;
@@ -29,7 +31,13 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
 		Camera camera = currentCameraSupplier.get();
 
-		stage = new Stage(new ScreenViewport(camera));
+		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND());
+
+		camera.position.set(0, 0, 0);
+		if (camera instanceof OrthographicCamera) {
+			((OrthographicCamera) camera).zoom = 2f;
+		}
+		camera.update();
 
 		stage.addActor(actor);
 		stage.setKeyboardFocus(actor);

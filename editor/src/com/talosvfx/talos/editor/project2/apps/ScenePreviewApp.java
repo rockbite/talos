@@ -25,7 +25,7 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
         workspaceWidget = new ScenePreviewStage();
         workspaceWidget.disableListeners();
 
-        DummyLayoutApp sceneEditorWorkspaceApp = new DummyLayoutApp(SharedResources.skin, getAppName()) {
+        DummyLayoutApp<Scene> sceneEditorWorkspaceApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent () {
                 return workspaceWidget;
@@ -83,5 +83,17 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
         prefs.cameraPos = workspaceWidget.getCameraPos();
         prefs.cameraZoom = workspaceWidget.getCameraZoom();
         return prefs;
+    }
+
+    public void setPaused(boolean paused) {
+        this.workspaceWidget.setPaused(paused);
+    }
+
+    public void setSpeed(float timeScale) {
+        workspaceWidget.setSpeed(timeScale);
+    }
+
+    public void setLockCamera(boolean checked) {
+        workspaceWidget.setLockCamera(checked);
     }
 }

@@ -130,7 +130,6 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 			Vector3 forward = new Vector3();
 			Vector3 temp = new Vector3();
 
-			float width = 1;
 			Vector3 left = new Vector3();
 			for (int j = 0; j < pointData.size; j++) {
 				float progression = j / (float)(pointData.size - 1);
@@ -146,7 +145,10 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				getScope().set(ScopePayload.PARTICLE_ALPHA, fromReference.alpha);
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
+
 				fetchAllInputSlotValues();
+
+				float width = thickness.getFloat();
 
 				float scaleU = uvs.get(0);
 				float scaleV = uvs.get(1);
