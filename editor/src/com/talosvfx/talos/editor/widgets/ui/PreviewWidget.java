@@ -409,4 +409,9 @@ public abstract class PreviewWidget extends ViewportWidget {
 		this.vfxProjectData = vfxProjectData;
 
 	}
+
+	@Override
+	protected VFXProjectData getEventContext() {
+		return vfxProjectData;
+	}
 }

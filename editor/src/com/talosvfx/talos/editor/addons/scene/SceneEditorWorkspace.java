@@ -45,6 +45,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
@@ -70,7 +71,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer, EventContextProvider<SavableContainer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;
@@ -761,6 +762,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		//TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
+	@Override
+	public SavableContainer getContext() {
+		return currentContainer;
+	}
+
 	public static class ClipboardPayload {
 		public Array<GameObject> objects = new Array<>();
 		public Array<Vector2> objectWorldPositions = new Array<>();
@@ -824,7 +830,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					component.position.add(offset);
 				}
 				initGizmos(gameObject, this);
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(getEventContext(), gameObject));
 				addToSelection(gameObject);
 			}
 
@@ -1211,35 +1217,31 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
-		//If this didn't come from scene editor ignore it
-		if (event.getContext() == this) {
+		ObjectSet<GameObject> gameObjects = event.get();
 
-			ObjectSet<GameObject> gameObjects = event.get();
+		if (event.get().size == 1) { //Only select gizmos if one is selected
+			selectGizmos(gameObjects);
+		} else {
+			unselectGizmos();
+			groupSelectionGizmo.setSelected(true);
+		}
 
-			if (event.get().size == 1) { //Only select gizmos if one is selected
-				selectGizmos(gameObjects);
-			} else {
-				unselectGizmos();
-				groupSelectionGizmo.setSelected(true);
+		// now for properties
+
+		if (gameObjects.size == 0) {
+			// we select the main container then
+			if (currentContainer instanceof Scene) {
+				Scene scene = (Scene) currentContainer;
+				selectPropertyHolder(scene);
+			} else if (currentContainer instanceof Prefab) {
+				Prefab prefab = (Prefab) currentContainer;
+				selectPropertyHolder(prefab);
 			}
-
-			// now for properties
-
-			if (gameObjects.size == 0) {
-				// we select the main container then
-				if (currentContainer instanceof Scene) {
-					Scene scene = (Scene) currentContainer;
-					selectPropertyHolder(scene);
-				} else if (currentContainer instanceof Prefab) {
-					Prefab prefab = (Prefab) currentContainer;
-					selectPropertyHolder(prefab);
-				}
+		} else {
+			if (gameObjects.size == 1) {
+				selectPropertyHolder(gameObjects.first());
 			} else {
-				if (gameObjects.size == 1) {
-					selectPropertyHolder(gameObjects.first());
-				} else {
-					selectPropertyHolder(new MultiPropertyHolder(gameObjects));
-				}
+				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
 			}
 		}
 
@@ -1544,6 +1546,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		performSelectionClear();
 	}
 
+	@Override
+	protected GameObjectContainer getEventContext() {
+		return currentContainer;
+	}
+
 	public void performSelectionClear() {
 		for (GameObject gameObject : selection) {
 			if (gizmos.gizmoMap.containsKey(gameObject)) {
@@ -1554,7 +1561,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		GameObjectSelectionChanged<GameObjectContainer> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 	@EventHandler

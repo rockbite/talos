@@ -10,6 +10,8 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
@@ -74,10 +76,10 @@ public class MapEditorState implements Observer {
 		hideDrawingObject();
 	}
 
-	public void update (GameObjectSelectionChanged event) {
+	public void update (GameObjectSelectionChanged<?> event) {
 		ObjectSet<GameObject> gameObjects = event.get();
 
-		if (event.getContext() instanceof SceneEditorWorkspace) {
+		if (event.getContext() instanceof SavableContainer) { // SceneEditorWorkspace
 			//Changed selection in main window
 
 			if (gameObjects.size == 0) {
@@ -91,7 +93,7 @@ public class MapEditorState implements Observer {
 				}
 			}
 
-		} else if (event.getContext() instanceof PaletteEditorWorkspace) {
+		} else if (event.getContext() instanceof TilePaletteData) { // PaletteEditorWorkspace
 			//Changed what we want to paint
 			if (gameObjects.size == 1 && !(gameObjects.first() instanceof TileGameObjectProxy)) {
 				//We have something new to paint, make a new instance of the game object

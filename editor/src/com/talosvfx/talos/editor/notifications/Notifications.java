@@ -135,12 +135,14 @@ public class Notifications {
 						"owner class implement ContextProvider");
 			}
 
+			EventContextProvider<?> eventContextProvider  = (EventContextProvider<?>) eventRunner.getObserver();
+
 			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
 
 			if (eventContextObject == null) {
 				throw new GdxRuntimeException("Invalid event, context must be provided");
 			}
-			if (!(eventContextObject == eventRunner.getObserver())) {
+			if (!(eventContextObject == eventContextProvider.getContext())) {
 				return;
 			}
 

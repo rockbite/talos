@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.project2.vfxui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +19,6 @@ import lombok.Getter;
 import java.util.function.Supplier;
 
 public class GenericStageWrappedViewportWidget extends ViewportWidget {
-
 
 	@Getter
 	private final Stage stage;
@@ -70,6 +68,11 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		stage.getViewport().setScreenBounds((int)x1, (int)y1, screenWidth, screenHeight);
  		stage.act();
 
+	}
+
+	@Override
+	protected Stage getEventContext() {
+		return stage;
 	}
 
 	@Override

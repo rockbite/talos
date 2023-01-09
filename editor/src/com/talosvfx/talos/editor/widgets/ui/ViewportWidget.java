@@ -22,6 +22,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -82,7 +83,6 @@ import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImport
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public abstract class ViewportWidget extends Table {
-
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewportWidget.class);
 
@@ -1192,7 +1192,7 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
 
 	protected void clearSelection () {
@@ -1227,14 +1227,14 @@ public abstract class ViewportWidget extends Table {
 
 	public void removeFromSelection (GameObject gameObject) {
 		selection.remove(gameObject);
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
 
 	public void addToSelection (GameObject gameObject) {
 		if (!hierarchicallyContains(gameObject)) {
 			selection.add(gameObject);
 		}
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
 
 	// Checks if gameObject or its ancestors are already in the selection or not
@@ -1257,7 +1257,7 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
 
 
@@ -1278,13 +1278,14 @@ public abstract class ViewportWidget extends Table {
 		if (selection.size > 1 && selection.contains(exceptThis)) {
 			selection.clear();
 			selection.add(exceptThis);
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
-
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 			return true;
 		}
 
 		return false;
 	}
+
+	protected abstract Object getEventContext();
 
 	public void selectGameObjectExternally (GameObject gameObject) {
 		if (fromDirectoryView)
