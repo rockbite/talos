@@ -71,7 +71,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public class SceneEditorWorkspace extends ViewportWidget<SavableContainer> implements Json.Serializable, Observer, EventContextProvider<SavableContainer> {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer, EventContextProvider<SavableContainer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;
@@ -1547,7 +1547,7 @@ public class SceneEditorWorkspace extends ViewportWidget<SavableContainer> imple
 	}
 
 	@Override
-	protected SavableContainer getEventContext() {
+	protected GameObjectContainer getEventContext() {
 		return currentContainer;
 	}
 
@@ -1561,7 +1561,7 @@ public class SceneEditorWorkspace extends ViewportWidget<SavableContainer> imple
 			}
 		}
 		clearSelection();
-		GameObjectSelectionChanged<SavableContainer> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		GameObjectSelectionChanged<GameObjectContainer> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
 		gameObjectSelectionChanged.set(getEventContext(), selection);
 		Notifications.fireEvent(gameObjectSelectionChanged);
 	}

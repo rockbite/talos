@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer {
+public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ScenePreviewStage.class);
 
@@ -84,7 +85,7 @@ public class ScenePreviewStage extends ViewportWidget<Scene> implements Observer
 	}
 
 	@Override
-	protected Scene getEventContext() {
+	protected GameObjectContainer getEventContext() {
 		return currentScene;
 	}
 

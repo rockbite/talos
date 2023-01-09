@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 public class GroupSelectionGizmo extends Gizmo {
 
-	private final ViewportWidget<?> viewportWidget;
+	private final ViewportWidget viewportWidget;
 
 	private BoundingBox selectionBounds = new BoundingBox();
 

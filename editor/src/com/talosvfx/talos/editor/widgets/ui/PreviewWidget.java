@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-public abstract class PreviewWidget extends ViewportWidget<VFXProjectData> {
+public abstract class PreviewWidget extends ViewportWidget {
 
 	private static final Logger logger = LoggerFactory.getLogger(PreviewWidget.class);
 
