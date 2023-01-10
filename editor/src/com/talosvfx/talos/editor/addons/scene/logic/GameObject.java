@@ -286,7 +286,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
-                GONameChangeCommand command = Notifications.obtainEvent(GONameChangeCommand.class).set(GameObject.this, value);
+                GONameChangeCommand command = Notifications.obtainEvent(GONameChangeCommand.class).set(GameObject.this.getGameObjectContainerRoot(), GameObject.this, value);
                 Notifications.fireEvent(command);
             }
         });

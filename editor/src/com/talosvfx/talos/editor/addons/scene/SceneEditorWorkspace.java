@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
+import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
@@ -1244,6 +1245,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		mapEditorState.update(event);
+	}
+
+	@EventHandler
+	public void GONameChangeCommand(GONameChangeCommand command) {
+		changeGOName(command.getGo(), command.getSuggestedName());
 	}
 
 	public void changeGOName (GameObject gameObject, String suggestedName) {
