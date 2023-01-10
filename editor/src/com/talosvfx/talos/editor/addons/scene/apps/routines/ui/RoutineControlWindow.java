@@ -66,8 +66,11 @@ public class RoutineControlWindow extends Table {
                     routineStage.stop();
                     updatePlayState();
                 } else {
-                    routineStage.play(selectBox.getSelected().toString());
-                    updatePlayState();
+                    Object selected = selectBox.getSelected();
+                    if (selected != null) {
+                        routineStage.play(selected.toString());
+                        updatePlayState();
+                    }
                 }
             }
         });

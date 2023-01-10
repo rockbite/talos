@@ -17,7 +17,7 @@ import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidge
 
 public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
 
-    private final RoutineControlWindow controlWindow;
+    public final RoutineControlWindow controlWindow;
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
 

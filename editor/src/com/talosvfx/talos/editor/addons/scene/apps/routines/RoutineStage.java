@@ -200,11 +200,13 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     @EventHandler
     public void onNodeCreatedEvent (NodeCreatedEvent event) {
         routineUpdated();
+        routineEditorApp.controlWindow.update();
     }
 
     @EventHandler
     public void onNodeRemovedEvent (NodeRemovedEvent event) {
         routineUpdated();
+        routineEditorApp.controlWindow.update();
     }
 
     @EventHandler
@@ -221,6 +223,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
         updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node);
+        routineEditorApp.controlWindow.update();
     }
 
     private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {
