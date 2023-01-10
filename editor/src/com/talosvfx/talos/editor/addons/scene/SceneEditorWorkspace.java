@@ -1469,21 +1469,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	@EventHandler
-	public void onAssetPathChanged (AssetPathChanged event) {
-		Array<AComponent> list = new Array<>();
-
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-				for (AComponent component : list) {
-					//Dont think we need this
-//					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
-				}
-			}
-		});
-	}
-
 
 
 	public void dispose () {

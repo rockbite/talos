@@ -24,6 +24,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -373,6 +374,62 @@ public class DirectoryViewWidget extends Table {
 				}
 			});
 		}
+
+
+		for (ObjectMap.Entry<String, FilteredTree.Node<String>> node : projectExplorerWidget.getNodes()) {
+			SharedResources.globalDragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
+				@Override
+				public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+					return true;
+				}
+
+				@Override
+				public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+					GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+
+					boolean isSomethingWeWant = object instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload || object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload || object instanceof GlobalDragAndDrop.ArrayDragAndDropPayload;
+
+					if (!isSomethingWeWant)
+						return;
+
+					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+					if (object instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
+						GlobalDragAndDrop.ArrayDragAndDropPayload payloadObject = (GlobalDragAndDrop.ArrayDragAndDropPayload) object;
+						for (GlobalDragAndDrop.BaseDragAndDropPayload item : payloadObject.getItems()) {
+							if (item instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+								handlePayloadObject((GlobalDragAndDrop.GameAssetDragAndDropPayload) item);
+							} else if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+								handlePayloadObject((GlobalDragAndDrop.FileHandleDragAndDropPayload) item);
+							}
+						}
+						navigateTo(destination);
+					} else if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+						handlePayloadObject((GlobalDragAndDrop.GameAssetDragAndDropPayload) object);
+						navigateTo(destination);
+					} else if (object instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+						handlePayloadObject((GlobalDragAndDrop.FileHandleDragAndDropPayload) object);
+						navigateTo(destination);
+					}
+				}
+
+				private void handlePayloadObject(GlobalDragAndDrop.GameAssetDragAndDropPayload payload) {
+					GameAsset<?> sourceItem = payload.getGameAsset();
+					FileHandle handle = sourceItem.getRootRawAsset().handle;
+					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+					if (!handle.parent().path().equals(destination.path())) {
+						AssetRepository.getInstance().moveFile(handle, destination, true, false);
+					}
+				}
+
+				private void handlePayloadObject(GlobalDragAndDrop.FileHandleDragAndDropPayload payload) {
+					FileHandle handle = payload.getHandle();
+					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+					if (!handle.parent().path().equals(destination.path())) {
+						AssetRepository.getInstance().moveFile(handle, destination, true, false);
+					}
+				}
+			});
+		}
 	}
 
 	private GlobalDragAndDrop.BaseDragAndDropPayload getPayloadForItem (Item item) {
@@ -471,10 +528,7 @@ public class DirectoryViewWidget extends Table {
 
 				if (lastCopiedFile != null) {
 					// open current directory
-					String projectPath = SharedResources.currentProject.rootProjectDir().path();
-					projectExplorerWidget.loadDirectoryTree(projectPath);
-					projectExplorerWidget.expand(lastCopiedFile.parent().path());
-					projectExplorerWidget.select(lastCopiedFile.parent().path());
+					navigateTo(lastCopiedFile.parent());
 				}
 			}
 
@@ -482,10 +536,7 @@ public class DirectoryViewWidget extends Table {
 				FileHandle copiedFile = handle(payloadObject);
 				if (copiedFile != null) {
 					// open current directory
-					String projectPath = SharedResources.currentProject.rootProjectDir().path();
-					projectExplorerWidget.loadDirectoryTree(projectPath);
-					projectExplorerWidget.expand(copiedFile.parent().path());
-					projectExplorerWidget.select(copiedFile.parent().path());
+					navigateTo(copiedFile.parent().parent());
 				}
 			}
 
@@ -726,6 +777,13 @@ public class DirectoryViewWidget extends Table {
 
 	public FileHandle getCurrentFolder () {
 		return fileHandle;
+	}
+
+	private void navigateTo (FileHandle destination) {
+		String projectPath = SharedResources.currentProject.rootProjectDir().path();
+		projectExplorerWidget.loadDirectoryTree(projectPath);
+		projectExplorerWidget.expand(destination.path());
+		projectExplorerWidget.select(destination.path());
 	}
 
 }

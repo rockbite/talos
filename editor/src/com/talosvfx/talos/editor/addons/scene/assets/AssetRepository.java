@@ -1472,7 +1472,6 @@ public class AssetRepository implements Observer {
 	}
 	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets, boolean rename) {
 
-
 		if (file.isDirectory()) {
 			//Moving a folder
 			if (destination.exists() && !destination.isDirectory()) {
@@ -1527,11 +1526,6 @@ public class AssetRepository implements Observer {
 
 
 				FileHandle newHandle = destination.child(file.name());
-
-				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-				assetPathChanged.oldRelativePath = relative(file);
-				assetPathChanged.newRelativePath = relative(newHandle);
-				Notifications.fireEvent(assetPathChanged);
 
 				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
