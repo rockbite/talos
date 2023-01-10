@@ -69,7 +69,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		TalosVFXUtils.init();
 
-		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
 
 		SharedResources.stage = stage;
 		SharedResources.ui = new UIController();

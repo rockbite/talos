@@ -29,7 +29,7 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
 		Camera camera = currentCameraSupplier.get();
 
-		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND());
+		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
 
 		camera.position.set(0, 0, 0);
 		if (camera instanceof OrthographicCamera) {
