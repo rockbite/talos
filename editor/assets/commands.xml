@@ -63,5 +63,20 @@
                 F2
             </combination>
         </command>
+        <command name = "Group" uniqueName = "group_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL G
+            </combination>
+        </command>
+        <command name = "Escape" uniqueName = "escape_command" description = "">
+            <context>FOCUSED</context>>
+            <combination type = "keyboard" repeat = "false">
+                ESCAPE
+            </combination>
+            <combination type = "keyboard" repeat = "false">
+                BACK
+            </combination>
+        </command>
     </commandGroup>
 </actions>

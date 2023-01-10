@@ -111,6 +111,37 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@CommandEventHandler(commandType = Commands.CommandType.COPY)
 	public void onCopyCommand (CommandContextEvent event) {
 		logger.info("SCENE CALLED COPY");
+		workspaceWidget.copySelected();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
+	public void onPasteCommand (CommandContextEvent commandContextEvent) {
+		logger.info("SCENE CALLED PASTE");
+		workspaceWidget.pasteFromClipboard();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.SELECT_ALL)
+	public void onSelectAllCommand (CommandContextEvent commandContextEvent) {
+		logger.info("SCENE CALLED SELECT ALL");
+		workspaceWidget.selectAll();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.GROUP)
+	public void onGroupCommand (CommandContextEvent commandContextEvent) {
+		logger.info("SCENE CALLED GROUP");
+		workspaceWidget.convertSelectedIntoGroup();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.DELETE)
+	public void onDeleteCommand (CommandContextEvent commandContextEvent) {
+		logger.info("SCENE CALLED DELETE");
+		workspaceWidget.deleteSelected();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.ESCAPE)
+	public void onEscapeCommand (CommandContextEvent commandContextEvent) {
+		logger.info("SCENE CALLED ESCAPE");
+		workspaceWidget.escapePressed();
 	}
 
 	@Override
