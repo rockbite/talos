@@ -54,7 +54,7 @@ public class SceneUtils {
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
 		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
 		}
 		component.setGameAsset(spriteAsset);
 
@@ -66,7 +66,7 @@ public class SceneUtils {
 		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
 
 		if (!fromDirectoryView) {
-			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
+			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, rendererComponent.sortingLayer);
 		}
 		rendererComponent.setGameAsset(asset);
 
@@ -78,7 +78,7 @@ public class SceneUtils {
 		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
 
 		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
 		}
 		component.setGameAsset(asset);
 
