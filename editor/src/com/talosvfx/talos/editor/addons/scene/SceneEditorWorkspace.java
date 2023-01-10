@@ -433,6 +433,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				// set focus to scene
+				SharedResources.stage.setKeyboardFocus(SceneEditorWorkspace.this);
+
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);

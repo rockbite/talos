@@ -4,6 +4,8 @@ package com.talosvfx.talos.editor.addons.scene.assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -23,12 +25,10 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.events.AssetResolutionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
-import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
@@ -1616,6 +1616,24 @@ public class AssetRepository implements Observer {
 		if (checkGameAssets) {
 			checkAllGameAssetCreation();
 		}
+	}
+
+	public void resizeAsset (GameAsset<Texture> gameAsset, int width, int height)  {
+		final FileHandle fileHandle = gameAsset.getRootRawAsset().handle;
+		final Pixmap oldPixmap = new Pixmap(fileHandle);
+		final Pixmap newPixmap = new Pixmap(width, height, oldPixmap.getFormat());
+		newPixmap.drawPixmap(oldPixmap, 0, 0);
+
+		PixmapIO.writePNG(fileHandle, newPixmap);
+
+		gameAsset.setResourcePayload(new Texture(newPixmap));
+		gameAsset.setUpdated();
+
+		oldPixmap.dispose();
+		newPixmap.dispose();
+
+		// fire asset resolution changed event
+		Notifications.fireEvent(Notifications.obtainEvent(AssetResolutionChanged.class));
 	}
 
 	public static String relative(String fullPath) {

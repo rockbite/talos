@@ -2,9 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -18,23 +16,11 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
         this.singleton = true;
 
         spriteEditor = new SpriteEditor();
-        spriteEditor.setListener(new SpriteEditor.SpriteMetadataListener() {
-            @Override
-            public void changed(int left, int right, int top, int bottom) {
-                SpriteMetadata metaData = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
-                metaData.borderData[0] = left;
-                metaData.borderData[1] = right;
-                metaData.borderData[2] = top;
-                metaData.borderData[3] = bottom;
-
-                AssetRepository.getInstance().saveMetaDataToFile(metaData);
-            }
-        });
         DummyLayoutApp<Texture> spriteEditorApp = new DummyLayoutApp<Texture>(SharedResources.skin, this, getAppName()) {
             @Override
             public void onInputProcessorAdded() {
                 super.onInputProcessorAdded();
-                SharedResources.stage.setScrollFocus(spriteEditor.editPanel);
+                spriteEditor.setScrollFocus();
             }
 
             @Override
@@ -54,7 +40,7 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
     @Override
     public void updateForGameAsset (GameAsset<Texture> gameAsset) {
         super.updateForGameAsset(gameAsset);
-        spriteEditor.show(gameAsset);
+        spriteEditor.updateForGameAsset(gameAsset);
     }
 
     @Override
