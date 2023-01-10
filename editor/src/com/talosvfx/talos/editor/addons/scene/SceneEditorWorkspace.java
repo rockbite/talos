@@ -559,9 +559,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				SceneUtils.repositionGameObject(rootGO, dummyParent, gameObject);
 			}
 
-			GameObjectsRestructured gameObjectsRestructured = Notifications.obtainEvent(GameObjectsRestructured.class);
-			gameObjectsRestructured.targets.addAll(selectedObjects);
-			Notifications.fireEvent(gameObjectsRestructured);
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), selectedObjects));
 
 			selectGameObjectExternally(dummyParent);
 		});
