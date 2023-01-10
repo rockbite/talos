@@ -24,6 +24,10 @@ public class Shortcuts extends InputAdapter {
 			SharedResources.globalSaveStateSystem.onUndoRequest();
 		}
 
+		if (keycode == Input.Keys.E && (InputUtils.ctrlPressed() || InputUtils.macCmdPressed())) {
+			//todo: delegate this to export action
+		}
+
 		return false;
 
 	}
