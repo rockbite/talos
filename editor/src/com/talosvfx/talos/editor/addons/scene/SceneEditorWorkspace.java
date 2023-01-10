@@ -1401,8 +1401,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		for (GameObject gameObject : list) {
 			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
-			SceneLayer sortingLayer = component.getSortingLayer();
-			if (!layerList.contains(sortingLayer, false)) {
+
+			boolean foundLayer = false;
+			for (SceneLayer sceneLayer : layerList) {
+				if (sceneLayer.getIndex() == component.sortingLayer.getIndex()) {
+					component.setSortingLayer(sceneLayer);
+					foundLayer = true;
+					break;
+				}
+			}
+
+			if (!foundLayer) {
 				component.setSortingLayer(MainRenderer.DEFAULT_SCENE_LAYER);
 			}
 		}

@@ -108,7 +108,7 @@ public class MainRenderer implements Observer {
             @Override
             public int compare (GameObject o1, GameObject o2) {
                 SceneLayer o1Layer = MainRenderer.getLayerSafe(o1);
-                SceneLayer o2Layer = MainRenderer.getLayerSafe(o1);
+                SceneLayer o2Layer = MainRenderer.getLayerSafe(o2);
 
                 if (o1Layer.equals(o2Layer)) {
                     float aSort = MainRenderer.getDrawOrderSafe(o1);

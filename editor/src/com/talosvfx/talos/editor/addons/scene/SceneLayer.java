@@ -14,4 +14,8 @@ public class SceneLayer {
         this.name = name;
         this.index = index;
     }
+
+    public SceneLayer() {
+
+    }
 }

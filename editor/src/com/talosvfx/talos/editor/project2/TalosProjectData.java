@@ -94,6 +94,7 @@ public class TalosProjectData implements Json.Serializable {
 	@Override
 	public void write (Json json) {
 		json.writeValue("projectName", projectFile.nameWithoutExtension());
+		json.writeValue("sceneData", sceneData);
 		json.writeValue("currentLayout", layoutGrid);
 	}
 
@@ -103,6 +104,7 @@ public class TalosProjectData implements Json.Serializable {
 		if (jsonData.has("currentLayout")) {
 			jsonLayoutRepresentation = jsonData.getChild("currentLayout");
 		}
+		sceneData = json.readValue("sceneData", SceneData.class, new SceneData(), jsonData);
 	}
 
 	@Getter
