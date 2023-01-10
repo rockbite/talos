@@ -1624,10 +1624,6 @@ public class AssetRepository implements Observer {
 		final Pixmap newPixmap = new Pixmap(width, height, oldPixmap.getFormat());
 		newPixmap.drawPixmap(oldPixmap, 0, 0);
 
-		final Texture texture = gameAsset.getResource();
-		if (!texture.getTextureData().isPrepared()) {
-			texture.getTextureData().prepare();
-		}
 		PixmapIO.writePNG(fileHandle, newPixmap);
 
 		gameAsset.setResourcePayload(new Texture(newPixmap));
