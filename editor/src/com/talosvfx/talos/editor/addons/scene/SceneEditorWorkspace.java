@@ -1005,41 +1005,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (exportType.equals("Default")) {
 			// default behaviour
 		} else if (exportType.equals("Custom Script")) {
-			String sceneEditorExportScriptPath = TalosMain.Instance().Prefs().getString("sceneEditorExportScriptPath", null);
-			if (sceneEditorExportScriptPath != null) {
-				FileHandle handle = Gdx.files.absolute(sceneEditorExportScriptPath);
 
-				if (!handle.exists()) {
-					handle = Gdx.files.absolute(projectPath + File.separator + sceneEditorExportScriptPath);
-				}
-
-				if (handle.exists() && !handle.isDirectory()) {
-					Runtime rt = Runtime.getRuntime();
-
-					try {
-						String nodeCommand = "node";
-						String buildScriptPath = handle.path();
-						String projectDirectoryPath = "\"" + projectPath  + "\"";
-						String projectFilePath = "\"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
-
-						if (TalosMain.Instance().isOsX()) {
-							File nodeBinary = new File(nodeCommand);
-							if(!nodeBinary.exists()) {
-								nodeCommand = "/opt/homebrew/bin/node";
-							}
-							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePath);
-							pb.inheritIO();
-							pb.start();
-						} else {
-							ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePath);
-							pb.inheritIO();
-							pb.start();
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
 		}
 		exporting = false;
 

@@ -126,6 +126,17 @@ public class TalosLocalPrefs {
 		return localPrefData.globalPrefs.get(key, "");
 	}
 
+	public int getGlobalInteger(String key, int defaultVal) {
+		String str = localPrefData.globalPrefs.get(key, "");
+		int val = defaultVal;
+		try {
+			val = Integer.parseInt(str);
+		} catch (Exception e){};
+
+
+		return val;
+	}
+
 	public void updateProject (TalosProjectData talosProjectData) {
 		//Let's update the recents with our latest one
 		String absolutePathToProjectFile = talosProjectData.getAbsolutePathToProjectFile();
@@ -140,6 +151,19 @@ public class TalosLocalPrefs {
 		Preferences prefs = Gdx.app.getPreferences(LOCAL_PREFS);
 		prefs.putString("localData", stringData);
 		prefs.flush();
+	}
+
+	public Preferences getProjectPrefs() {
+		String prefName = getCurrentProjectPrefName();
+		Preferences preferences = Gdx.app.getPreferences(prefName);
+
+		return preferences;
+	}
+
+	public void setProjectPrefs(String key, String value) {
+		String prefName = getCurrentProjectPrefName();
+		Preferences preferences = Gdx.app.getPreferences(prefName);
+		preferences.putString(key, value);
 	}
 
 	/**

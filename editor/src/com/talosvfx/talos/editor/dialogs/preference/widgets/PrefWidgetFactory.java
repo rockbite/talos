@@ -120,6 +120,7 @@ public class PrefWidgetFactory {
                 leftContent.add(label).right().expandX();
             }
             checkBoxWidget = new CheckBox(xml.getText(), SharedResources.skin, "rounded-checkbox");
+            checkBoxWidget.setProgrammaticChangeEvents(false);
             rightContent.add(checkBoxWidget).left().expandX();
         }
 
@@ -159,7 +160,7 @@ public class PrefWidgetFactory {
             }
             if(xml.hasAttribute("min") || xml.hasAttribute("max")) {
                 valueWidget.setRange(min, max);
-                valueWidget.setShowProgress(true);
+                valueWidget.setShowProgress(xml.getBooleanAttribute("progress", true));
             }
         }
 
@@ -188,7 +189,7 @@ public class PrefWidgetFactory {
 
         @Override
         protected void fromString(String str) {
-            widget.setValue(str);
+            widget.setValue(str, false);
         }
 
         @Override
