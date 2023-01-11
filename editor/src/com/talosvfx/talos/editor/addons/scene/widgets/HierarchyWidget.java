@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Select;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
@@ -236,6 +234,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 event.stop();
                 gameObject.setEditorVisible(!gameObject.isEditorVisible());
+                SceneUtils.visibilityUpdated(currentContainer, gameObject);
 
                 return true;
             }
@@ -248,6 +247,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 event.stop();
                 gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
+                SceneUtils.lockUpdated(currentContainer, gameObject);
 
                 Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
                 for (FilteredTree.Node<GameObject> gameObjectNode : selection) {

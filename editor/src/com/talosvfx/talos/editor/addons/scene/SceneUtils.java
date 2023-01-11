@@ -352,4 +352,14 @@ public class SceneUtils {
 		Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(prefabs.path()));
 	}
 
+	public static void visibilityUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectVisibilityChanged.class).set(gameObjectContainer, gameObject));
+		markContainerChanged(gameObjectContainer);
+	}
+
+	public static void lockUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectLockChanged.class).set(gameObjectContainer, gameObject));
+		markContainerChanged(gameObjectContainer);
+	}
+
 }
