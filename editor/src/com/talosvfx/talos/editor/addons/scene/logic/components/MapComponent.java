@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -53,8 +54,7 @@ public class MapComponent extends RendererComponent {
                 for (TalosLayer item : value) {
                     layers.add(item);
                 }
-
-                Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
+                SceneUtils.layersUpdated();
             }
         }, new DynamicItemListWidget.DynamicItemListInteraction<TalosLayer>() {
             @Override

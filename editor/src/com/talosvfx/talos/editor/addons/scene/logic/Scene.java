@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.SceneLayer;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -116,8 +117,7 @@ public class Scene extends SavableContainer implements IPropertyProvider {
                     SceneLayer sceneLayer = new SceneLayer(item.text, i++);
                     renderLayers.add(sceneLayer);
                 }
-
-                Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
+                SceneUtils.layersUpdated();
             }
         }, new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
             @Override
@@ -136,7 +136,12 @@ public class Scene extends SavableContainer implements IPropertyProvider {
                 itemData.updateName(newText);
                 return newText;
             }
-        });
+        }) {
+            @Override
+            public boolean canDelete(ItemData itemData) {
+                return itemData.canDelete;
+            }
+        };
 
         itemListWidget.setDraggableInLayerOnly(true);
 

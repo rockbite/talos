@@ -20,24 +20,17 @@ public class SaveSystem implements Observer {
 
 	@EventHandler
 	public void onSave (SaveRequest event) {
-
 		if (SharedResources.currentProject != null) {
-
 			TalosProjectData currentProject = SharedResources.currentProject;
-
 			try {
 				currentProject.save();
 				Toasts.getInstance().showInfoToast("Project saved");
-
 			} catch (Exception e) {
 				logger.error("Failure to save", e);
 				Toasts.getInstance().showErrorToast("Failure to save " + e.getMessage());
 			}
-
 		} else {
 			Toasts.getInstance().showInfoToast("No project to save");
-
 		}
-
 	}
 }
