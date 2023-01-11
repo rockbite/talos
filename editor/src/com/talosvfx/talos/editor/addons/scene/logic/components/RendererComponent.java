@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.MainRenderer;
+import com.talosvfx.talos.editor.addons.scene.SceneLayer;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
@@ -15,17 +17,17 @@ import java.util.function.Supplier;
 
 public abstract class RendererComponent extends AComponent implements Json.Serializable {
 
-    public String sortingLayer = "Default";
+    public SceneLayer sortingLayer = MainRenderer.DEFAULT_SCENE_LAYER;
     public int orderingInLayer;
 
     public boolean visible = true;
     public boolean childrenVisible = true;
 
-    public String getSortingLayer () {
+    public SceneLayer getSortingLayer () {
         return sortingLayer;
     }
 
-    public void setSortingLayer (String name) {
+    public void setSortingLayer (SceneLayer name) {
         sortingLayer = name;
     }
 
@@ -40,18 +42,23 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer", new Supplier<String>() {
             @Override
             public String get() {
-                return sortingLayer;
+                return sortingLayer.getName();
             }
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
-                sortingLayer = value;
+                RendererComponent.this.sortingLayer = SharedResources.currentProject.getSceneData().getSceneLayerByName(value);
             }
         }, new Supplier<Array<String>>() {
             @Override
             public Array<String> get() {
+                Array<String> layerNames = new Array<>();
                 SceneData sceneData = SharedResources.currentProject.getSceneData();
-                return sceneData.getRenderLayers();
+                Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+                for (SceneLayer renderLayer : renderLayers) {
+                    layerNames.add(renderLayer.getName());
+                }
+                return layerNames;
             }
         });
 
@@ -65,7 +72,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void write (Json json) {
-        json.writeValue("sortingLayer", sortingLayer);
+        json.writeValue("sortingSceneLayer", sortingLayer);
         json.writeValue("orderingInLayer", orderingInLayer);
         json.writeValue("visible", visible);
         json.writeValue("childrenVisible", childrenVisible);
@@ -74,7 +81,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        sortingLayer = jsonData.getString("sortingLayer", "Default");
+        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class, MainRenderer.DEFAULT_SCENE_LAYER, jsonData);
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
         visible = jsonData.getBoolean("visible", true);
         childrenVisible = jsonData.getBoolean("childrenVisible", true);
@@ -85,7 +92,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     @Override
     public void reset() {
         super.reset();
-        sortingLayer = "Default";
+        sortingLayer = MainRenderer.DEFAULT_SCENE_LAYER;
         orderingInLayer = 0;
         visible = true;
         childrenVisible = true;

@@ -42,6 +42,8 @@ import java.util.Comparator;
 
 public class MainRenderer implements Observer {
 
+    public static SceneLayer DEFAULT_SCENE_LAYER = new SceneLayer("Default", 0);
+
     public final Comparator<GameObject> layerAndDrawOrderComparator;
 
     public float timeScale = 1f;
@@ -53,8 +55,6 @@ public class MainRenderer implements Observer {
     private Vector2 vector2 = new Vector2();
 
     private Vector2[] points = new Vector2[4];
-
-    private ObjectMap<String, Integer> layerOrderLookup = new ObjectMap<>();
 
     private static final int LB = 0;
     private static final int LT = 1;
@@ -81,9 +81,9 @@ public class MainRenderer implements Observer {
     public boolean skipUpdates = false;
 
     private Texture white;
-    private Array<String> layerList;
+    private Array<SceneLayer> layerList;
 
-    public void setLayers (Array<String> layerList) {
+    public void setLayers (Array<SceneLayer> layerList) {
         this.layerList = layerList;
     }
 
@@ -107,16 +107,29 @@ public class MainRenderer implements Observer {
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
             public int compare (GameObject o1, GameObject o2) {
+                SceneLayer o1Layer = MainRenderer.getLayerSafe(o1);
+                SceneLayer o2Layer = MainRenderer.getLayerSafe(o2);
 
-                float aSort = MainRenderer.getDrawOrderSafe(o1);
-                float bSort = MainRenderer.getDrawOrderSafe(o2);
-
-                return Float.compare(aSort, bSort);
+                if (o1Layer.equals(o2Layer)) {
+                    float aSort = MainRenderer.getDrawOrderSafe(o1);
+                    float bSort = MainRenderer.getDrawOrderSafe(o2);
+                    return Float.compare(aSort, bSort);
+                } else {
+                    return Integer.compare(o1Layer.getIndex(), o2Layer.getIndex());
+                }
             }
         };
 
         activeSorter = layerAndDrawOrderComparator;
         white = new Texture(Gdx.files.internal("white.png"));
+    }
+
+    private static SceneLayer getLayerSafe(GameObject gameObject) {
+        if (gameObject.hasComponentType(RendererComponent.class)) {
+            RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+            return rendererComponent.sortingLayer;
+        }
+        return DEFAULT_SCENE_LAYER;
     }
 
     public static float getDrawOrderSafe (GameObject gameObject) {
@@ -194,8 +207,6 @@ public class MainRenderer implements Observer {
     }
     public void render (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
         mapRenderer.setCamera(this.camera);
-
-        updateLayerOrderLookup();
 
         //fill entities
         state.list.clear();
@@ -612,14 +623,6 @@ public class MainRenderer implements Observer {
             component.setEffectRef(instance);
             particleCache.put(component, instance);
             return instance;
-        }
-    }
-
-    private void updateLayerOrderLookup () {
-        layerOrderLookup.clear();
-        int i = 0;
-        for(String layer: layerList) {
-            layerOrderLookup.put(layer, i++);
         }
     }
 
