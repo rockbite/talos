@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -765,6 +766,11 @@ public class ProjectExplorerWidget extends Table implements Observer {
     @EventHandler
     public void onDirectoryChange (AssetChangeDirectoryEvent assetChangeDirectoryEvent) {
         select(assetChangeDirectoryEvent.getPath().path());
+    }
+
+    @EventHandler
+    public void onAssetColorFillEvent (AssetColorFillEvent event) {
+        directoryViewWidget.changeAssetPreview(event.getFileHandle());
     }
 
     public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {

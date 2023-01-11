@@ -232,7 +232,6 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                event.stop();
                 gameObject.setEditorVisible(!gameObject.isEditorVisible());
                 SceneUtils.visibilityUpdated(currentContainer, gameObject);
 
@@ -245,7 +244,6 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         handButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                event.stop();
                 gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
                 SceneUtils.lockUpdated(currentContainer, gameObject);
 

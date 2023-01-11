@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.editor.addons.scene.SceneLayer;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -47,7 +49,10 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
             public void report(String value) {
-                RendererComponent.this.sortingLayer = SharedResources.currentProject.getSceneData().getSceneLayerByName(value);
+                RendererComponent rendererComponent = RendererComponent.this;
+                rendererComponent.sortingLayer = SharedResources.currentProject.getSceneData().getSceneLayerByName(value);
+                GameObject gameObject = rendererComponent.getGameObject();
+                SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, rendererComponent, false);
             }
         }, new Supplier<Array<String>>() {
             @Override
