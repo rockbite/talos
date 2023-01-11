@@ -451,39 +451,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				selectionRect.setVisible(false);
 			}
-
-			@Override
-			public boolean keyDown (InputEvent event, int keycode) {
-
-				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-					ObjectSet<GameObject> deleteList = new ObjectSet<>();
-					deleteList.addAll(selection);
-					requestSelectionClear();
-					deleteGameObjects(deleteList);
-				}
-
-				if (keycode == Input.Keys.C && ctrlPressed()) {
-					copySelected();
-				}
-
-				if (keycode == Input.Keys.V && ctrlPressed()) {
-					pasteFromClipboard();
-				}
-
-				if (keycode == Input.Keys.A && ctrlPressed()) {
-					selectAll();
-				}
-
-				if (keycode == Input.Keys.G && ctrlPressed()) {
-					convertSelectedIntoGroup();
-				}
-
-				if (keycode == Input.Keys.ESCAPE) {
-					escapePressed();
-				}
-
-				return super.keyDown(event, keycode);
-			}
 		};
 
 		addListener(inputListener);
@@ -519,12 +486,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		removeFromSelection(removeFromSelectionEvent.getGameObject());
 	}
 
-	private void escapePressed() {
+	public void deleteSelected () {
+		ObjectSet<GameObject> deleteList = new ObjectSet<>();
+		deleteList.addAll(selection);
+		requestSelectionClear();
+		deleteGameObjects(deleteList);
+	}
+
+	public void escapePressed() {
 		performSelectionClear();
 		mapEditorState.escapePressed();
 	}
 
-	private void convertSelectedIntoGroup () {
+	public void convertSelectedIntoGroup () {
 		if (selection.isEmpty() || selection.size == 1) {
 			return;
 		}
@@ -1068,7 +1042,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
 	}
 
-	private void selectAll () {
+	public void selectAll () {
 		selection.clear();
 		Array<GameObject> gameObjects = currentContainer.getGameObjects();
 		if (gameObjects != null) {

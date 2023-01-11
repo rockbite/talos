@@ -31,7 +31,11 @@ public class Commands {
 
     DELETE("delete_command", "Delete", "", "GENERAL"),
 
-    RENAME("rename_command", "Rename", "", "GENERAL");
+    RENAME("rename_command", "Rename", "", "GENERAL"),
+
+    GROUP("group_command", "Group", "", "GENERAL"),
+
+    ESCAPE("escape_command", "Escape", "", "GENERAL");
 
     public final String uniqueName;
 
