@@ -56,6 +56,8 @@ class Item extends Widget implements ActorCloneable<Item> {
 	}
 
 	public void setFile (FileHandle fileHandle) {
+		this.fileHandle = fileHandle;
+
 		String name = fileHandle.name();
 		label.setText(name);
 		label.getLabel().setWrap(true);
@@ -72,14 +74,9 @@ class Item extends Widget implements ActorCloneable<Item> {
 			icon.setDrawable(SharedResources.skin.getDrawable("ic-file-big"));
 			String extension = fileHandle.extension();
 			if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
-				Texture texture = new Texture(fileHandle);
-				TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-				icon.setDrawable(drawable);
-				icon.setScaling(Scaling.fit);
+				updatePreview();
 			}
 		}
-
-		this.fileHandle = fileHandle;
 
 		GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
 		if (assetForPath != null) {
@@ -209,5 +206,12 @@ class Item extends Widget implements ActorCloneable<Item> {
 
 	public GameAsset<?> getGameAsset () {
 		return gameAsset;
+	}
+
+	public void updatePreview () {
+		final Texture texture = new Texture(fileHandle);
+		final TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+		icon.setDrawable(drawable);
+		icon.setScaling(Scaling.fit);
 	}
 }

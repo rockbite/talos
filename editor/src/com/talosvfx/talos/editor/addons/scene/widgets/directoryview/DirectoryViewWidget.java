@@ -786,4 +786,12 @@ public class DirectoryViewWidget extends Table {
 		projectExplorerWidget.select(destination.path());
 	}
 
+	public void changeAssetPreview (FileHandle assetFileHande) {
+		for (Actor child : items.getChildren()) {
+			final Item item = (Item) child;
+			if (item.fileHandle.equals(assetFileHande)) {
+				item.updatePreview();
+			}
+		}
+	}
 }
