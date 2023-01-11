@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.SceneLayer;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
@@ -409,69 +410,72 @@ public class SmartTransformGizmo extends Gizmo {
 
     }
 
-    public static int getLatestFreeOrderingIndex (String sortingLayer) {
-        logger.info("todo find game objects and get free order index");
-//        Array<GameObject> list = SceneEditorAddon.get().workspace.getRootGO().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
-//        return list.size;
+    public static int getLatestFreeOrderingIndex (GameObjectContainer gameObjectContainer, SceneLayer sortingLayer) {
+        Array<GameObject> list = gameObjectContainer.getSelfObject().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
+        int i = 0;
+        for (GameObject gameObject : list) {
+            SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+            if (spriteRendererComponent.sortingLayer.equals(sortingLayer)) {
+                i++;
+            }
+        }
 
-        return 0;
+        return i;
     }
 
     protected void moveInLayerOrder (GameObject gameObject, int direction) {
         // direction -1 for down, 1 for up
         if(gameObject.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
-            String sortingLayer = component.sortingLayer;
+            SceneLayer sortingLayer = component.sortingLayer;
 
-            logger.info("Redo move in layer order");
-//            Array<GameObject> list = SceneEditorAddon.get().workspace.getRootGO().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
-//            for(int i = list.size - 1; i >= 0; i--) {
-//                if(!list.get(i).getComponent(SpriteRendererComponent.class).sortingLayer.equals(sortingLayer)) {
-//                    list.removeIndex(i);
-//                }
-//                if (list.get(i) == gameObject) {
-//                    list.removeIndex(i);
-//                }
-//            }
+            Array<GameObject> list = gameObjectContainer.getSelfObject().getChildrenByComponent(SpriteRendererComponent.class, new Array<>());
+            for(int i = list.size - 1; i >= 0; i--) {
+                if(!list.get(i).getComponent(SpriteRendererComponent.class).sortingLayer.equals(sortingLayer)) {
+                    list.removeIndex(i);
+                }
+            }
 
-//            list.sort(new Comparator<GameObject>() {
-//                @Override
-//                public int compare (GameObject o1, GameObject o2) {
-//                    SpriteRendererComponent o1SpriteRender = o1.getComponent(SpriteRendererComponent.class);
-//                    SpriteRendererComponent o2SpriteRender = o2.getComponent(SpriteRendererComponent.class);
-//                    return Integer.compare(o1SpriteRender.orderingInLayer, o2SpriteRender.orderingInLayer);
-//                }
-//            });
+            list.removeValue(gameObject, false);
+            list.sort(new Comparator<GameObject>() {
+                @Override
+                public int compare (GameObject o1, GameObject o2) {
+                    SpriteRendererComponent o1SpriteRender = o1.getComponent(SpriteRendererComponent.class);
+                    SpriteRendererComponent o2SpriteRender = o2.getComponent(SpriteRendererComponent.class);
+                    return Integer.compare(o1SpriteRender.orderingInLayer, o2SpriteRender.orderingInLayer);
+                }
+            });
 
-//            if (list.size > 0) {
-//                int currentOrderInLayer = component.orderingInLayer;
-//
-//                GameObject objectToSwap = null;
-//                for (int i = 0; i < list.size; i++) {
-//                    GameObject gameObjectToTest = list.get(i);
-//                    int otherOrderInLayer = gameObjectToTest.getComponent(SpriteRendererComponent.class).orderingInLayer;
-//                    if ((currentOrderInLayer + direction) == otherOrderInLayer) {
-//                        objectToSwap = gameObjectToTest;
-//                        break;
-//                    }
-//                }
-//                if (objectToSwap != null) {
-//                    int otherOrder = objectToSwap.getComponent(SpriteRendererComponent.class).orderingInLayer;
-//                    int tempSwap = currentOrderInLayer;
-//
-//                    gameObject.getComponent(SpriteRendererComponent.class).orderingInLayer = otherOrder;
-//                    objectToSwap.getComponent(SpriteRendererComponent.class).orderingInLayer = tempSwap;
-//
-//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
-//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(objectToSwap.getComponent(SpriteRendererComponent.class), false));
-//                } else {
-//                    //Nothing found, so we can just set it
-//                    component.orderingInLayer = MathUtils.clamp(currentOrderInLayer + direction, 0, list.size);
-//                    Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(gameObject.getComponent(SpriteRendererComponent.class), false));
-//                }
-//
-//
-//            }
+            if (list.size > 0) {
+                int currentOrderInLayer = component.orderingInLayer;
+
+                GameObject objectToSwap = null;
+                for (int i = 0; i < list.size; i++) {
+                    GameObject gameObjectToTest = list.get(i);
+                    int otherOrderInLayer = gameObjectToTest.getComponent(SpriteRendererComponent.class).orderingInLayer;
+                    if ((currentOrderInLayer + direction) == otherOrderInLayer) {
+                        objectToSwap = gameObjectToTest;
+                        break;
+                    }
+                }
+                SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+                if (objectToSwap != null) {
+                    SpriteRendererComponent objectToSwapComponent = objectToSwap.getComponent(SpriteRendererComponent.class);
+                    int otherOrder = objectToSwapComponent.orderingInLayer;
+                    int tempSwap = currentOrderInLayer;
+
+                    spriteRendererComponent.orderingInLayer = otherOrder;
+                    objectToSwapComponent.orderingInLayer = tempSwap;
+                    SceneUtils.componentUpdated(gameObjectContainer, gameObject, spriteRendererComponent);
+                    SceneUtils.componentUpdated(gameObjectContainer, objectToSwap, objectToSwapComponent);
+                } else {
+                    //Nothing found, so we can just set it
+                    component.orderingInLayer = MathUtils.clamp(currentOrderInLayer + direction, 0, list.size);
+                    SceneUtils.componentUpdated(gameObjectContainer, gameObject, spriteRendererComponent);
+                }
+
+
+            }
 
         }
     }
