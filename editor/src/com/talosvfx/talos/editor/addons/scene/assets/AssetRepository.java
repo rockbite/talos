@@ -1361,20 +1361,20 @@ public class AssetRepository implements Observer {
 	}
 
 	/**
-	 * In the first synopsis form, the copyRawAsset utility copies the contents of the source_file to the target_file.
-	 * In the second synopsis form, the contents of each named source_file is copied to the target_file target_directory.
+	 * In the first synopsis form, the copyRawAsset utility copies the contents of the sourceFile to the targetFile.
+	 * In the second synopsis form, the contents of each named sourceFile is copied to the targetFile target_directory.
 	 * The names of the files themselves are changed in case of collision, while replace flag is false.
-	 * @param source_file
-	 * @param target_file
+	 * @param sourceFile
+	 * @param targetFile
 	 * @param replace
 	 * @return FileHandle of newly copied file.
 	 */
-	public FileHandle copyRawAsset (FileHandle source_file, FileHandle target_file, boolean replace) {
-		String fileName = target_file.isDirectory() ? source_file.name() : target_file.name();
-		final FileHandle destinationDirectory = target_file.isDirectory() ? target_file : target_file.parent();
+	public FileHandle copyRawAsset (FileHandle sourceFile, FileHandle targetFile, boolean replace) {
+		String fileName = targetFile.isDirectory() ? sourceFile.name() : targetFile.name();
+		final FileHandle destinationDirectory = targetFile.isDirectory() ? targetFile : targetFile.parent();
 
 		if (destinationDirectory.child(fileName).exists() && !replace) {
-			String baseName = target_file.isDirectory() ? source_file.nameWithoutExtension() : target_file.nameWithoutExtension();
+			String baseName = targetFile.isDirectory() ? sourceFile.nameWithoutExtension() : targetFile.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
 				@Override
@@ -1385,7 +1385,7 @@ public class AssetRepository implements Observer {
 					}
 					return fileNames;
 				}
-			}) + "." + source_file.extension();
+			}) + "." + sourceFile.extension();
 
 		}
 		// do not allow stupid characters
@@ -1393,8 +1393,8 @@ public class AssetRepository implements Observer {
 		Matcher matcher = pattern.matcher(fileName);
 		fileName = matcher.replaceAll("_");
 		FileHandle dest = destinationDirectory.child(fileName);
-		if (source_file.isDirectory()) { // recursively copy directory and its contents
-			FileHandle[] list = source_file.list();
+		if (sourceFile.isDirectory()) { // recursively copy directory and its contents
+			FileHandle[] list = sourceFile.list();
 			//Change the destination and copy all its children into the new destination
 			dest.mkdirs();
 			for (FileHandle fileHandle : list) {
@@ -1403,7 +1403,7 @@ public class AssetRepository implements Observer {
 				copyRawAsset(fileHandle, dest);
 			}
 		} else { // single file
-			source_file.copyTo(dest);
+			sourceFile.copyTo(dest);
 		}
 
 		collectRawResourceFromDirectory(dest, true);
