@@ -223,21 +223,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
                 selectionRect.setVisible(false);
             }
-
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                if (stageSentIn != event.getStage()) {
-                    event.cancel();
-                    return super.keyDown(event, keycode);
-                }
-//
-//                if(keycode == Input.Keys.F5) {
-//                    stage.getCamera().position.set(0, 0, 0);
-//                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
-//                }
-
-                return super.keyDown(event, keycode);
-            }
         });
 
     }
