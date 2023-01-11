@@ -1360,6 +1360,46 @@ public class AssetRepository implements Observer {
 		return copyRawAsset(file, destination, false);
 	}
 
+	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
+		String fileName = file.name();
+		if (directory.child(fileName).exists() && !replace) {
+			String baseName = file.nameWithoutExtension();
+
+			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
+				@Override
+				public Collection<String> get () {
+					ArrayList<String> fileNames = new ArrayList<>();
+					for (FileHandle fileHandle : directory.list()) {
+						fileNames.add(fileHandle.nameWithoutExtension());
+					}
+					return fileNames;
+				}
+			}) + "." + file.extension();
+
+		}
+		// do not allow stupid characters
+		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
+		Matcher matcher = pattern.matcher(fileName);
+		fileName = matcher.replaceAll("_");
+		FileHandle dest = directory.child(fileName);
+		if (file.isDirectory()) { // recursively copy directory and its contents
+			FileHandle[] list = file.list();
+			//Change the destination and copy all its children into the new destination
+			dest.mkdirs();
+			for (FileHandle fileHandle : list) {
+				if (fileHandle.extension().equals("meta")) continue; //Don't copy meta
+
+				copyRawAsset(fileHandle, dest);
+			}
+		} else { // single file
+			file.copyTo(dest);
+		}
+
+		collectRawResourceFromDirectory(dest, true);
+
+		return dest;
+	}
+
 	/**
 	 * In the first synopsis form, the copyRawAsset utility copies the contents of the sourceFile to the targetFile.
 	 * In the second synopsis form, the contents of each named sourceFile is copied to the targetFile target_directory.
@@ -1369,7 +1409,7 @@ public class AssetRepository implements Observer {
 	 * @param replace
 	 * @return FileHandle of newly copied file.
 	 */
-	public FileHandle copyRawAsset (FileHandle sourceFile, FileHandle targetFile, boolean replace) {
+	public FileHandle copyRawAssetSmart (FileHandle sourceFile, FileHandle targetFile, boolean replace) {
 		String fileName = targetFile.isDirectory() ? sourceFile.name() : targetFile.name();
 		final FileHandle destinationDirectory = targetFile.isDirectory() ? targetFile : targetFile.parent();
 
