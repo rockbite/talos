@@ -68,9 +68,13 @@ public class VariableCreationWindow extends Table {
         plusButton.addListener(new ClickListener() {
             private BasicPopup<PropertyType> popup;
 
+            private Vector2 temp = new Vector2();
+
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(popup!=null)popup.hide();
+                temp.set(x, y);
+                plusButton.localToScreenCoordinates(temp);
                 popup = BasicPopup.build(PropertyType.class)
                         .addItem("Float", PropertyType.FLOAT)
                         .addItem("Vector2", PropertyType.VECTOR2)
@@ -87,7 +91,7 @@ public class VariableCreationWindow extends Table {
                                 reloadWidgets();
                             }
                         })
-                        .show(plusButton, x, y);
+                        .show(plusButton, temp.x, temp.y);
             }
         });
 
@@ -199,10 +203,7 @@ public class VariableCreationWindow extends Table {
             });
         }
 
-        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.routineEditorApp.routineStageWrapper) {
-
-            private Vector2 temp = new Vector2();
-
+        dragAndDrop.addTarget(new DragAndDrop.Target(routineStage.routineEditorApp.uiContent) {
             @Override
             public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 return true;

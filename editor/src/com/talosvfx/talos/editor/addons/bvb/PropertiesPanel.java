@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -56,9 +57,15 @@ public class PropertiesPanel extends Table {
                     .row();
 
             settingButton.addListener( new ClickListener(){
+
+                private Vector2 temp = new Vector2();
+
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
+
+                    temp.set(x, y);
+                    settingButton.localToScreenCoordinates(temp);
 
                     BasicPopup.build(String.class)
                             .addItem("Reset", "reset")
@@ -86,7 +93,7 @@ public class PropertiesPanel extends Table {
                                     }
                                 }
                             })
-                            .show(settingButton, x, y);
+                            .show(settingButton, temp.x, temp.y);
                 }
             });
 
