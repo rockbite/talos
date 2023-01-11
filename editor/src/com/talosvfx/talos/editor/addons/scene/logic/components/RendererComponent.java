@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 public abstract class RendererComponent extends AComponent implements Json.Serializable {
 
-    public SceneLayer sortingLayer;
+    public SceneLayer sortingLayer = MainRenderer.DEFAULT_SCENE_LAYER;
     public int orderingInLayer;
 
     public boolean visible = true;
