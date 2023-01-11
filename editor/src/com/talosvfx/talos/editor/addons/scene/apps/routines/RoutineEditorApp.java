@@ -104,38 +104,28 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         this.gridAppReference = app;
     }
 
-    @CommandEventHandler(commandType = Commands.CommandType.OPEN)
-    public void onOpenCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED OPEN");
-    }
-
     @CommandEventHandler(commandType = Commands.CommandType.COPY)
     public void onCopyCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED COPY");
         routineStage.getNodeBoard().copySelectedModules();
     }
 
     @CommandEventHandler(commandType = Commands.CommandType.PASTE)
     public void onPasteCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED PASTE");
         routineStage.getNodeBoard().pasteFromClipboard();
     }
 
     @CommandEventHandler(commandType = Commands.CommandType.SELECT_ALL)
     public void onSelectAllCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED SELECT ALL");
         routineStage.getNodeBoard().selectAllNodes();
     }
 
     @CommandEventHandler(commandType = Commands.CommandType.GROUP)
     public void onGroupCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED GROUP");
         routineStage.getNodeBoard().createGroupFromSelectedNodes();
     }
 
     @CommandEventHandler(commandType = Commands.CommandType.UNGROUP)
     public void onUngroupCommand (CommandContextEvent event) {
-        logger.info("ROUTINE CALLED UNGROUP");
         routineStage.getNodeBoard().ungroupSelectedNodes();
     }
 
