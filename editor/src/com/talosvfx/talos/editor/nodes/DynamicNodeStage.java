@@ -223,41 +223,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
                 selectionRect.setVisible(false);
             }
-
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                if (stageSentIn != event.getStage()) {
-                    event.cancel();
-                    return super.keyDown(event, keycode);
-                }
-//
-//                if(keycode == Input.Keys.F5) {
-//                    stage.getCamera().position.set(0, 0, 0);
-//                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
-//                }
-
-                if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    nodeBoard.createGroupFromSelectedNodes();
-                }
-
-                if(keycode == Input.Keys.U && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    nodeBoard.ungroupSelectedNodes();
-                }
-
-                if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    nodeBoard.copySelectedModules();
-                }
-
-                if(keycode == Input.Keys.V && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    nodeBoard.pasteFromClipboard();
-                }
-
-                if(keycode == Input.Keys.A && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    nodeBoard.selectAllNodes();
-                }
-
-                return super.keyDown(event, keycode);
-            }
         });
 
     }
