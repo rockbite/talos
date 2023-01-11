@@ -20,6 +20,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
@@ -61,7 +62,7 @@ public class MainRenderer implements Observer {
     private static final int RT = 2;
     private static final int RB = 3;
 
-    private ObjectMap<Texture, NinePatch> patchCache = new ObjectMap<>();
+    private ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
@@ -412,8 +413,7 @@ public class MainRenderer implements Observer {
                 final float height = spriteRenderer.size.y;
 
                 if(metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    Texture texture = textureRegion.getTexture(); // todo: pelase fix me, i am such a shit
-                    NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
+                    NinePatch patch = obtainNinePatch(gameResource);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
                     float xSign = width < 0 ? -1 : 1;
                     float ySign = height < 0 ? -1 : 1;
@@ -589,13 +589,14 @@ public class MainRenderer implements Observer {
         }
     }
 
-    private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
-        if(patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
-            return patchCache.get(texture);
+    private NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+        if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
+            return patchCache.get(gameAsset);
         } else {
-            NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
-            patch.scale(1/metadata.pixelsPerUnit, 1/metadata.pixelsPerUnit); // fix this later
-            patchCache.put(texture, patch);
+            final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
+            final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+            patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
+            patchCache.put(gameAsset, patch);
             return patch;
         }
     }
@@ -697,5 +698,20 @@ public class MainRenderer implements Observer {
 
     public Camera getCamera() {
         return camera;
+    }
+
+
+    @EventHandler
+    public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
+        final SpriteMetadata metadata = event.getSpriteMetadata();
+        for (ObjectMap.Entry<GameAsset<Texture>, NinePatch> gameAssetNinePatchEntry : patchCache) {
+            if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
+                final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+                final float scale = 1 / metadata.pixelsPerUnit;
+                patch.scale(scale, scale);
+                patchCache.put(gameAssetNinePatchEntry.key, patch);
+                break;
+            }
+        }
     }
 }
