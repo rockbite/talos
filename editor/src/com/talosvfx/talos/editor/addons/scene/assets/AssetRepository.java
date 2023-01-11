@@ -1356,8 +1356,8 @@ public class AssetRepository implements Observer {
 
 	}
 
-	public FileHandle copyRawAsset (FileHandle file, FileHandle destination) {
-		return copyRawAsset(file, destination, false);
+	public FileHandle copyRawAsset (FileHandle file, FileHandle directory) {
+		return copyRawAsset(file, directory, false);
 	}
 
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
