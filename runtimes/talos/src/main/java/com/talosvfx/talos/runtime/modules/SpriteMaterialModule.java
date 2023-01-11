@@ -29,7 +29,7 @@ public class SpriteMaterialModule extends MaterialModule {
 
 	private DrawableValue userDrawable;
 
-	public String regionName;
+	public String assetIdentifier = "white";
 
 	private ModuleValue<SpriteMaterialModule> moduleOutput;
 
@@ -52,31 +52,31 @@ public class SpriteMaterialModule extends MaterialModule {
 	public void processCustomValues () {
 	}
 
-	public void setRegion (String regionName, Sprite region) {
-		this.regionName = regionName;
-
-		if (region != null) {
-			userDrawable.setDrawable(new TextureRegionDrawable(region));
-		}
+	public void setAsset (String identifier) {
+		this.assetIdentifier = identifier;
+		final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+		Sprite asset = assetProvider.findAsset(assetIdentifier, Sprite.class);
+		userDrawable.setDrawable(new TextureRegionDrawable(asset));
 	}
 
 	@Override
 	public void setModuleGraph(ParticleEmitterDescriptor graph) {
 		super.setModuleGraph(graph);
-		final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-		setRegion(regionName, assetProvider.findAsset(regionName, Sprite.class));
+		setAsset(assetIdentifier);
 	}
 
 	@Override
 	public void write (Json json) {
 		super.write(json);
-		json.writeValue("regionName", regionName);
+		json.writeValue("asset", assetIdentifier);
 	}
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		regionName = jsonData.getString("regionName");
+		assetIdentifier = jsonData.getString("asset", "white");
+
+
 	}
 
 

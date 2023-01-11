@@ -4,15 +4,21 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
-public abstract class CheckboxWidget extends PropertyWidget<Boolean> {
+import java.util.function.Supplier;
+
+public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	private CheckBox checkBox;
 
-	public CheckboxWidget(String name) {
-		super(name);
+	public CheckboxWidget() {
+		super();
 	}
 
+	public CheckboxWidget(String name, Supplier<Boolean> supplier, ValueChanged<Boolean> valueChanged) {
+		super(name, supplier, valueChanged);
+	}
 
 	@Override
 	protected void addToContainer(Actor actor) {
@@ -22,12 +28,12 @@ public abstract class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	@Override
 	public Actor getSubWidget() {
-		checkBox = new CheckBox("", TalosMain.Instance().getSkin(), "panel-checkbox");
+		checkBox = new CheckBox("", SharedResources.skin, "panel-checkbox");
 
 		listener = new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				valueChanged(checkBox.isChecked());
+				callValueChanged(checkBox.isChecked());
 			}
 		};
 		checkBox.addListener(listener);
@@ -37,6 +43,7 @@ public abstract class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	@Override
 	public void updateWidget(Boolean value) {
+		if(value == null) return;
 		checkBox.removeListener(listener);
 		checkBox.setChecked(value);
 		checkBox.addListener(listener);

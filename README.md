@@ -1,7 +1,7 @@
 # Talos VFX
 
 Website: [https://talosvfx.com/](https://talosvfx.com/)
-Discord Server: [https://discord.gg/zjEGT5zEzM](https://discord.gg/zjEGT5zEzM)
+Discord Server: [https://discord.gg/EQqYGcyMfr](https://discord.gg/EQqYGcyMfr)
 
 Prebuilt binaries:
 [Snapshot download 1.4.2-SNAPSHOT](https://editor.talosvfx.com/editor-binaries/editor-desktop-1.4.2-SNAPSHOT.jar)
@@ -11,7 +11,7 @@ Prebuilt binaries:
 
 Node based, open source VFX Editor with powerful interface and a ready to use libGDX runtime.
 
-### Screenshot
+### Screenshot 
 
 ![screenshot](https://i.imgur.com/KYpynzB.png)
 

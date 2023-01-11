@@ -5,15 +5,38 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
-public abstract class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoint>> {
+import java.util.function.Supplier;
+
+public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoint>> {
 
     GlobalValueListContainer listContainer;
 
+    public Supplier<Array<Bone>> boneListSuppler;
+
+    public GlobalValuePointsWidget() {
+        super();
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        GlobalValuePointsWidget clone = (GlobalValuePointsWidget) super.clone();
+        clone.boneListSuppler = this.boneListSuppler;
+
+        return clone;
+    }
+
+
+    public GlobalValuePointsWidget(Supplier<Array<AttachmentPoint>> supplier, Supplier<Array<Bone>> boneListSuppler) {
+        super(supplier, null);
+        this.boneListSuppler = boneListSuppler;
+    }
+
     @Override
     public Actor getSubWidget() {
-        listContainer = new GlobalValueListContainer(TalosMain.Instance().getSkin());
-        listContainer.setBoneList(getBoneList());
+        listContainer = new GlobalValueListContainer(SharedResources.skin);
+        listContainer.setBoneList(boneListSuppler.get());
         return listContainer;
     }
 
@@ -21,6 +44,4 @@ public abstract class GlobalValuePointsWidget extends PropertyWidget<Array<Attac
     public void updateWidget(Array<AttachmentPoint> value) {
         listContainer.setData(value);
     }
-
-    public abstract Array<Bone> getBoneList();
 }

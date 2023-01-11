@@ -51,21 +51,21 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
 
     private Table buildHeader() {
         Skin skin = getSkin();
-        SquareButton ffBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"));
+        SquareButton ffBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"), "ff back");
         ffBack.flipHorizontal();
-        playBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true);
+        playBack = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true, "play back");
         playBack.flipHorizontal();
-        play = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true);
-        SquareButton ffForward = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"));
-        repeatBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-repeat"), true);
+        play = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), true, "play");
+        SquareButton ffForward = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-ff"), "ff forward");
+        repeatBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-repeat"), true, "repeat");
 
-        newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"));
+        newBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-new"), "New emitter");
         newBtn.getIconCell().padTop(2).padLeft(1);
-        SquareButton deleteBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-delete"));
+        SquareButton deleteBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-delete"), "Delete emitter");
 
-        upBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        upBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), "Move up");
         upBtn.flipVertical();
-        downBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"));
+        downBtn = new SquareButton(skin, skin.getDrawable("timeline-btn-icon-play"), "Move down");
         downBtn.flipVertical(); downBtn.flipHorizontal();
 
         Table header = new Table();

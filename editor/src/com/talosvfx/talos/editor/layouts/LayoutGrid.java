@@ -1,7 +1,9 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,797 +12,1067 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class LayoutGrid extends WidgetGroup {
-	private final DragAndDrop dragAndDrop;
+public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
-	LayoutItem root;
+    private static final Logger logger = LoggerFactory.getLogger(LayoutGrid.class);
 
-	LayoutContent overItem;
-	LayoutContent startItem;
-	private Skin skin;
+    private DragAndDrop dragAndDrop;
 
-	private DragHitResult dragHitResult = new DragHitResult();
+    LayoutItem root;
 
-	private ObjectMap<LayoutContentApp, DragAndDrop.Source> sources = new ObjectMap<>();
-	private ObjectMap<LayoutContent, DragAndDrop.Target> targets = new ObjectMap<>();
-
-	float horizontalPercent = 0.3f;
-	float verticalPercent = 0.3f;
+    LayoutContent overItem;
+    LayoutContent startItem;
+    private Skin skin;
 
-	float rootHorizontalPercent = 0.03f;
-	float rootVerticalPercent = 0.03f;
-
-	public LayoutGrid (Skin skin) {
-		this.skin = skin;
-
-		dragAndDrop = new DragAndDrop();
-		dragAndDrop.setKeepWithinStage(false);
-	}
-
-	public void removeContent (LayoutContent content) {
-		removeContent(content, true);
-	}
-
-	public void removeContent (LayoutContent content, boolean removeEmptyParent) {
-		removeDragTarget(content);
-
-		if (content == root) {
-			root = null;
-			removeActor(content);
-		} else {
-			removeRecursive(content, removeEmptyParent);
-		}
-	}
-
-	private void removeRecursive (LayoutItem content, boolean removeEmpty) {
-		LayoutItem parent = (LayoutItem)content.getParent(); //Its always going to be a LayoutItem
-
-		parent.removeItem(content);
-
-		if (removeEmpty && parent.isEmpty()) {
-			removeRecursive(parent, removeEmpty);
-		}
-
-	}
-
-
-
-	public enum LayoutDirection {
-		UP,
-		RIGHT,
-		DOWN,
-		LEFT,
-		TAB
-	}
+    private DragHitResult dragHitResult = new DragHitResult();
 
-	public void addContent (LayoutItem content) {
-		if (root == null) {
-			root = content;
-			addActor(root);
-		} else {
-			if (root instanceof LayoutRow) {
-				((LayoutRow)root).addColumnContainer(content, false);
-			} else {
-				//Exchange root
-				LayoutItem oldRoot = root;
-				removeActor(oldRoot);
+    private ObjectMap<LayoutContentAppPair, DragAndDrop.Source> sources = new ObjectMap<>();
+    private ObjectMap<LayoutContent, DragAndDrop.Target> targets = new ObjectMap<>();
 
-				LayoutRow newRow = new LayoutRow(skin, this);
-				newRow.addColumnContainer(oldRoot, false);
-				newRow.addColumnContainer(content, false);
+    float horizontalPercent = 0.3f;
+    float verticalPercent = 0.3f;
 
-				root = newRow;
-				addActor(root);
-			}
-		}
+    float rootHorizontalPercent = 0.03f;
+    float rootVerticalPercent = 0.03f;
+
+    public LayoutGrid (Skin skin) {
+        this.skin = skin;
+
+        dragAndDrop = new DragAndDrop();
+        dragAndDrop.setKeepWithinStage(false);
+    }
+
+    public void removeContent (LayoutContent content) {
+        removeContent(content, true);
+    }
+
+
+    public void removeApp (LayoutContent layoutContent, LayoutApp layoutApp) {
+        //Find the content that has it and remove it
+        layoutContent.removeContent(layoutApp);
+        SharedResources.appManager.onAppRemoved(layoutApp);
+
+        if (layoutContent.isEmpty()) {
+            removeContent(layoutContent);
+        }
+
+    }
+
+    public void removeContent (LayoutContent content, boolean removeEmptyParent) {
+        removeDragTarget(content);
+
+        if (content == root) {
+            root = null;
+            removeActor(content);
+        } else {
+            removeRecursive(content, removeEmptyParent);
+        }
+    }
+
+    private void removeRecursive (LayoutItem content, boolean removeEmpty) {
+        if (content.getParent() instanceof LayoutGrid) {
+            reset();
+            return;
+        }
+
+        LayoutItem parent = (LayoutItem) content.getParent(); //Its always going to be a LayoutItem
+
+        parent.removeItem(content);
+
+        if (removeEmpty && parent.isEmpty()) {
+            removeRecursive(parent, removeEmpty);
+        }
+
+    }
+
+    public void reset () {
+        if (this.root != null) {
+            this.root.remove();
+            this.root = null;
+        }
+        overItem = null;
+        startItem = null;
+        sources.clear();
+        targets.clear();
+        dragAndDrop = new DragAndDrop();
+    }
+
+    @Override
+    public void draw (Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+    }
+
+    @Override
+    public void write (Json json) {
+        LayoutJsonStructure layoutJsonStructure = buildJsonFromObject(root);
+        json.writeValue("structure", layoutJsonStructure);
+    }
+
+    @Override
+    public void read (Json json, JsonValue jsonData) {
+        LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonData.get("structure"));
+        System.out.println("got structure");
+    }
+
+    public void setLayoutActive (LayoutContent layoutContent) {
+        Array<LayoutContent> out = new Array<>();
+        getAllLayoutContentsFlat(root, out);
+
+        for (LayoutContent content : out) {
+            content.setLayoutFocused(false);
+        }
+        layoutContent.setLayoutFocused(true);
+    }
+
+    public void getAllLayoutContentsFlat (Array<LayoutContent> out) {
+        getAllLayoutContentsFlat(root, out);
+    }
+
+    private void getAllLayoutContentsFlat (LayoutItem root, Array<LayoutContent> out) {
+        if (root == null) return;
+        if (root instanceof LayoutContent) {
+            out.add((LayoutContent) root);
+        } else if (root instanceof LayoutRow) {
+            Array<LayoutItem> columns = ((LayoutRow) root).getColumns();
+            for (int i = 0; i < columns.size; i++) {
+                LayoutItem layoutItem = columns.get(i);
+                getAllLayoutContentsFlat(layoutItem, out);
+            }
+        } else if (root instanceof LayoutColumn) {
+            Array<LayoutItem> rows = ((LayoutColumn) root).getRows();
+            for (int i = 0; i < rows.size; i++) {
+                LayoutItem layoutItem = rows.get(i);
+                getAllLayoutContentsFlat(layoutItem, out);
+            }
+        }
+    }
+
+
+    public enum LayoutDirection {
+        UP,
+        RIGHT,
+        DOWN,
+        LEFT,
+        TAB,
+        POP
+    }
+
+    public void addContent (LayoutItem content) {
+        if (root == null) {
+            root = content;
+            addActor(root);
+        } else {
+            if (root instanceof LayoutRow) {
+                ((LayoutRow) root).addColumnContainer(content, false);
+            } else {
+                //Exchange root
+                LayoutItem oldRoot = root;
+                removeActor(oldRoot);
+
+                LayoutRow newRow = new LayoutRow(skin, this);
+                newRow.addColumnContainer(oldRoot, false);
+                newRow.addColumnContainer(content, false);
+
+                root = newRow;
+                addActor(root);
+            }
+        }
+
+        registerDragTargetRecursive(content);
+
+
+    }
+
+    public void registerDragTargetRecursive (LayoutItem item) {
+        if (item instanceof LayoutContent) {
+            registerDragTarget((LayoutContent) item);
+        } else if (item instanceof LayoutRow) {
+            Array<LayoutItem> columns = ((LayoutRow) item).getColumns();
+            for (int i = 0; i < columns.size; i++) {
+                LayoutItem layoutItem = columns.get(i);
+                registerDragTargetRecursive(layoutItem);
+            }
+        } else if (item instanceof LayoutColumn) {
+            Array<LayoutItem> rows = ((LayoutColumn) item).getRows();
+            for (int i = 0; i < rows.size; i++) {
+                LayoutItem layoutItem = rows.get(i);
+                registerDragTargetRecursive(layoutItem);
+            }
+        }
+    }
+
+    void registerDragTarget (LayoutContent layoutContent) {
+        if (targets.containsKey(layoutContent)) return; //Don't register twice
+        DragAndDrop.Target target = new DragAndDrop.Target(layoutContent) {
+            @Override
+            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                //should just always be true
+
+                return true;
+            }
+
+            @Override
+            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                DragHitResult hitResult = dragHitResult;
+
+                Object payloadObject = payload.getObject();
+                LayoutContentAppPair layoutContentAppPair = (LayoutContentAppPair) payloadObject;
+
+                if (dragHitResult.direction == LayoutDirection.POP) {
+
+                    if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+                        removeApp(layoutContentAppPair.layoutContent, layoutContentAppPair.app);
+                        SharedResources.windowUtils.openWindow(layoutContentAppPair.app);
+                    }
+
+                    return;
+                }
+
+                if (hitResult.hit == null)
+                    return;
+                if (hitResult.hit == startItem)
+                    return;
+
+
+                if (hitResult.root) {
+                    dropContainer(layoutContentAppPair, null, dragHitResult.direction);
+                } else {
+                    dropContainer(layoutContentAppPair, dragHitResult.hit, dragHitResult.direction);
+                }
+
+            }
+        };
+        dragAndDrop.addTarget(target);
+        targets.put(layoutContent, target);
+    }
+
+    public void removeDragTarget (LayoutContent content) {
+        DragAndDrop.Target remove = targets.remove(content);
+        dragAndDrop.removeTarget(remove);
+    }
+
+    /*
+    target is null when root should be used
+     */
+    private void dropContainer (LayoutContentAppPair source, @Null LayoutContent target, LayoutDirection direction) {
+        //Here comes the logic
+
+        LayoutContent parent = source.layoutContent;
+        LayoutApp app = source.app;
+
+        //Source
+        //Remove drag and drop
+        DragAndDrop.Source dragAndDropSource = sources.remove(source);
+        dragAndDrop.removeSource(dragAndDropSource);
+
+        //Potentially removes all the shit from hierarchy if its last one
+        parent.removeContent(app);
+
+        if (parent.isEmpty()) {
+            removeRecursive(parent, true);
+        }
+
+        if (dragHitResult.root) {
+            placeContentInRoot(direction, app);
+        } else {
+            placeContentRelative(target, direction, app);
+        }
+
+    }
+
+    public void placeContentRelative (LayoutContent target, LayoutDirection direction, LayoutApp app) {
+        //Target
+        switch (direction) {
+
+            //If its up or down we get the parent of the target and wrap it in a row, then add our content to the top or bottom
+            case UP:
+            case DOWN: {
+                LayoutItem parentItem = (LayoutItem) target.getParent();
+
+                //Check the parent item for the target. If its already a layout row, we can just add at top or bottom
+
+                LayoutColumn colTarget;
+
+                boolean isExistingColumn = false;
+                if (parentItem instanceof LayoutColumn) {
+                    colTarget = (LayoutColumn) parentItem;
+                    isExistingColumn = true;
+                } else {
+                    //Its TIME TO WRAP
+
+                    LayoutColumn newColumn = new LayoutColumn(skin, this);
+
+                    //Remove the target
+                    exchangeAndWrapToColumn(newColumn, target);
+
+                    colTarget = newColumn;
+
+                }
+
+                LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                registerDragTarget(newLayoutContent);
+                newLayoutContent.addContent(app);
+                colTarget.addRowContainer(newLayoutContent, direction == LayoutDirection.UP, isExistingColumn ? target : null);
+            }
+            break;
+
+            case RIGHT:
+            case LEFT: {
 
-		if (content instanceof LayoutContent) {
-			registerDragTarget((LayoutContent)content);
-		}
+                LayoutItem parentItem = (LayoutItem) target.getParent();
+
+                //Check the parent item for the target. If its already a layout row, we can just add at top or bottom
 
-	}
+                LayoutRow rowTarget;
 
-	void registerDragTarget (LayoutContent layoutContent) {
-		DragAndDrop.Target target = new DragAndDrop.Target(layoutContent) {
-			@Override
-			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                boolean isExistingRow = false;
+                if (parentItem instanceof LayoutRow) {
+                    rowTarget = (LayoutRow) parentItem;
+                    isExistingRow = true;
+                } else {
+                    //Its TIME TO WRAP
 
-				//should just always be true
+                    LayoutRow newRow = new LayoutRow(skin, this);
 
-				return true;
-			}
+                    //Remove the target
+                    exchangeAndWrapToRow(newRow, target);
 
-			@Override
-			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-				DragHitResult hitResult = dragHitResult;
-				if (hitResult.hit == null)
-					return;
-				if (hitResult.hit == startItem)
-					return;
+                    rowTarget = newRow;
 
-				if (hitResult.root) {
-					dropContainer((LayoutContentApp)payload.getObject(), null, dragHitResult.direction);
-				} else {
-					dropContainer((LayoutContentApp)payload.getObject(), dragHitResult.hit, dragHitResult.direction);
-				}
+                }
 
-			}
-		};
-		dragAndDrop.addTarget(target);
-		targets.put(layoutContent, target);
-	}
+                LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                registerDragTarget(newLayoutContent);
+                newLayoutContent.addContent(app);
+                rowTarget.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT, isExistingRow ? target : null);
+            }
 
-	public void removeDragTarget (LayoutContent content) {
-		DragAndDrop.Target remove = targets.remove(content);
-		dragAndDrop.removeTarget(remove);
-	}
+            break;
 
-	/*
-	target is null when root should be used
-	 */
-	private void dropContainer (LayoutContentApp source, @Null LayoutContent target, LayoutDirection direction) {
-		//Here comes the logic
+            case TAB:
 
-		LayoutContent parent = source.layoutContent;
-		LayoutApp app = source.app;
+                //If its a tab, we add it to the target
+                target.addContent(app);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + direction);
+        }
+    }
 
-		//Source
-		//Remove drag and drop
-		DragAndDrop.Source dragAndDropSource = sources.remove(source);
-		dragAndDrop.removeSource(dragAndDropSource);
+    public void placeContentInRoot (LayoutDirection direction, LayoutApp app) {
+        //Target
+        switch (direction) {
 
-		//Potentially removes all the shit from hierarchy if its last one
-		parent.removeContent(app);
+            case UP:
+            case DOWN: {
 
-		if (parent.isEmpty()) {
-			removeRecursive(parent, true);
-		}
+                //Check if root is row, if its not wrap
+                if (root instanceof LayoutColumn) {
+                    //Just add it to the column
 
-		if (dragHitResult.root) {
-			//Target
-			switch (direction) {
+                    LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                    newLayoutContent.addContent(app);
 
-			case UP:
-			case DOWN: {
+                    ((LayoutColumn) root).addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
 
-				//Check if root is row, if its not wrap
-				if (root instanceof LayoutColumn) {
-					//Just add it to the column
+                } else {
+                    LayoutItem oldRoot = root;
+                    removeActor(oldRoot);
 
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-					newLayoutContent.addContent(app);
+                    LayoutColumn newColumn = new LayoutColumn(skin, this);
 
-					((LayoutColumn)root).addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
+                    newColumn.setRelativeWidth(1f);
+                    newColumn.setRelativeHeight(1f);
 
-				} else {
-					LayoutItem oldRoot = root;
-					removeActor(oldRoot);
+                    oldRoot.setRelativeWidth(1f);
+                    oldRoot.setRelativeHeight(1f);
 
-					LayoutColumn newColumn = new LayoutColumn(skin, this);
+                    newColumn.addRowContainer(oldRoot, true);
 
-					newColumn.setRelativeWidth(1f);
-					newColumn.setRelativeHeight(1f);
+                    LayoutContent newLayoutContent = new LayoutContent(skin, this);
 
-					oldRoot.setRelativeWidth(1f);
-					oldRoot.setRelativeHeight(1f);
+                    registerDragTarget(newLayoutContent);
 
-					newColumn.addRowContainer(oldRoot, true);
+                    newLayoutContent.addContent(app);
+                    newLayoutContent.setRelativeWidth(1f);
+                    newLayoutContent.setRelativeHeight(1f);
 
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                    newColumn.addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
+                    addActor(newColumn);
 
-					registerDragTarget(newLayoutContent);
+                    root = newColumn;
+                }
 
-					newLayoutContent.setRandomColour(parent.getRandomColour());
-					newLayoutContent.addContent(app);
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+            }
+            break;
 
-					newColumn.addRowContainer(newLayoutContent, direction == LayoutDirection.UP);
-					addActor(newColumn);
+            case RIGHT:
+            case LEFT: {
 
-					root = newColumn;
-				}
+                //Check if root is row, if its not wrap
+                if (root instanceof LayoutRow) {
+                    //Just add it to the column
 
-			}
-			break;
+                    LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                    newLayoutContent.addContent(app);
 
-			case RIGHT:
-			case LEFT: {
+                    ((LayoutRow) root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
 
-				//Check if root is row, if its not wrap
-				if (root instanceof LayoutRow) {
-					//Just add it to the column
+                } else {
+                    LayoutItem oldRoot = root;
+                    removeActor(oldRoot);
 
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
-					newLayoutContent.addContent(app);
+                    LayoutRow newLayoutRow = new LayoutRow(skin, this);
 
-					((LayoutRow)root).addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
+                    newLayoutRow.setRelativeWidth(1f);
+                    newLayoutRow.setRelativeHeight(1f);
 
-				} else {
-					LayoutItem oldRoot = root;
-					removeActor(oldRoot);
+                    oldRoot.setRelativeWidth(1f);
+                    oldRoot.setRelativeHeight(1f);
 
-					LayoutRow newLayoutRow = new LayoutRow(skin, this);
+                    newLayoutRow.addColumnContainer(oldRoot, true);
 
-					newLayoutRow.setRelativeWidth(1f);
-					newLayoutRow.setRelativeHeight(1f);
+                    LayoutContent newLayoutContent = new LayoutContent(skin, this);
 
-					oldRoot.setRelativeWidth(1f);
-					oldRoot.setRelativeHeight(1f);
+                    registerDragTarget(newLayoutContent);
 
-					newLayoutRow.addColumnContainer(oldRoot, true);
+                    newLayoutContent.addContent(app);
+                    newLayoutContent.setRelativeWidth(1f);
+                    newLayoutContent.setRelativeHeight(1f);
 
-					LayoutContent newLayoutContent = new LayoutContent(skin, this);
+                    newLayoutRow.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
+                    addActor(newLayoutRow);
 
-					registerDragTarget(newLayoutContent);
+                    root = newLayoutRow;
+                }
+            }
 
-					newLayoutContent.setRandomColour(parent.getRandomColour());
-					newLayoutContent.addContent(app);
-					newLayoutContent.setRelativeWidth(1f);
-					newLayoutContent.setRelativeHeight(1f);
+            break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + direction);
+        }
+    }
 
-					newLayoutRow.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT);
-					addActor(newLayoutRow);
+    private void exchangeAndWrapToColumn (LayoutColumn newColumn, LayoutContent target) {
 
-					root = newLayoutRow;
-				}
-			}
+        //We need to swap this column with the parent
+        LayoutItem parent = (LayoutItem) target.getParent();
+        parent.exchangeItem(target, newColumn);
+        newColumn.setRelativeWidth(target.getRelativeWidth());
+        newColumn.setRelativeHeight(target.getRelativeHeight());
 
-			break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + direction);
-			}
+        target.setRelativeWidth(1f);
+        target.setRelativeHeight(1f);
 
-			return;
-		}
+        newColumn.addRowContainer(target, false);
+    }
 
-		//Target
-		switch (direction) {
+    private void exchangeAndWrapToRow (LayoutRow newRow, LayoutContent target) {
 
-		//If its up or down we get the parent of the target and wrap it in a row, then add our content to the top or bottom
-		case UP:
-		case DOWN: {
-			LayoutItem parentItem = (LayoutItem)target.getParent();
+        //We need to swap this column with the parent
+        LayoutItem parent = (LayoutItem) target.getParent();
+        parent.exchangeItem(target, newRow);
 
-			//Check the parent item for the target. If its already a layout row, we can just add at top or bottom
+        newRow.setRelativeWidth(target.getRelativeWidth());
+        newRow.setRelativeHeight(target.getRelativeHeight());
 
-			LayoutColumn colTarget;
+        target.setRelativeWidth(1f);
+        target.setRelativeHeight(1f);
 
-			boolean isExistingColumn = false;
-			if (parentItem instanceof LayoutColumn) {
-				colTarget = (LayoutColumn)parentItem;
-				isExistingColumn = true;
-			} else {
-				//Its TIME TO WRAP
+        newRow.addColumnContainer(target, false);
+    }
 
-				LayoutColumn newColumn = new LayoutColumn(skin, this);
+    //Add each LayoutContent for drag and drop as a source
+    //Add each LayoutContent for drag and drop as a target
+    void registerDragSource (LayoutContent parent, LayoutApp layoutApp, Actor actorToDrag) {
 
-				//Remove the target
-				exchangeAndWrapToColumn(newColumn, target);
+        LayoutContentAppPair layoutContentAppObject = new LayoutContentAppPair(parent, layoutApp);
 
-				colTarget = newColumn;
+        DragAndDrop.Source source = new DragAndDrop.Source(actorToDrag) {
+            @Override
+            public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-			}
+                LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
+                dummy.setSize(200, 200);
 
-			LayoutContent newLayoutContent = new LayoutContent(skin, this);
-			newLayoutContent.setRandomColour(parent.getRandomColour());
-			registerDragTarget(newLayoutContent);
-			newLayoutContent.addContent(app);
-			colTarget.addRowContainer(newLayoutContent, direction == LayoutDirection.UP, isExistingColumn ? target : null);
-		}
-		break;
+                dummy.addContent(layoutApp, true);
 
-		case RIGHT:
-		case LEFT: {
+                payload.setDragActor(dummy);
 
-			LayoutItem parentItem = (LayoutItem)target.getParent();
+                payload.setObject(layoutContentAppObject);
 
-			//Check the parent item for the target. If its already a layout row, we can just add at top or bottom
+                startItem = parent;
 
-			LayoutRow rowTarget;
+                return payload;
+            }
 
-			boolean isExistingRow = false;
-			if (parentItem instanceof LayoutRow) {
-				rowTarget = (LayoutRow)parentItem;
-				isExistingRow = true;
-			} else {
-				//Its TIME TO WRAP
+            @Override
+            public void drag (InputEvent event, float x, float y, int pointer) {
+                super.drag(event, x, y, pointer);
 
-				LayoutRow newRow = new LayoutRow(skin, this);
+                float unhitSize = 200;
 
-				//Remove the target
-				exchangeAndWrapToRow(newRow, target);
+                Actor dragActor = dragAndDrop.getDragActor();
+                if (dragActor != null) {
 
-				rowTarget = newRow;
+                    //Find out if we hit something, and if so what side
 
-			}
+                    getDragHit(dragHitResult);
 
-			LayoutContent newLayoutContent = new LayoutContent(skin, this);
-			newLayoutContent.setRandomColour(parent.getRandomColour());
-			registerDragTarget(newLayoutContent);
-			newLayoutContent.addContent(app);
-			rowTarget.addColumnContainer(newLayoutContent, direction == LayoutDirection.LEFT, isExistingRow ? target : null);
-		}
 
-		break;
+                    Vector2 vector2 = new Vector2();
+                    float hitInStageX = vector2.x;
+                    float hitInStageY = vector2.y;
 
-		case TAB:
+                    LayoutContent hitResult = dragHitResult.hit;
+                    if (hitResult != null) {
+                        if (hitResult == startItem) {
+                            return;
+                        }
 
-			//If its a tab, we add it to the target
-			target.addContent(app);
-			break;
-		default:
-			throw new IllegalStateException("Unexpected value: " + direction);
-		}
+                        float horizontalPercentToUse = dragHitResult.root ? rootHorizontalPercent : horizontalPercent;
+                        float vertPercentToUse = dragHitResult.root ? rootVerticalPercent : verticalPercent;
 
-	}
+                        Actor targetActor = dragHitResult.root ? LayoutGrid.this : dragHitResult.hit;
 
-	private void exchangeAndWrapToColumn (LayoutColumn newColumn, LayoutContent target) {
+                        switch (dragHitResult.direction) {
+                            case UP:
 
-		//We need to swap this column with the parent
-		LayoutItem parent = (LayoutItem)target.getParent();
-		parent.exchangeItem(target, newColumn);
-		newColumn.setRelativeWidth(target.getRelativeWidth());
-		newColumn.setRelativeHeight(target.getRelativeHeight());
+                                dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
 
-		target.setRelativeWidth(1f);
-		target.setRelativeHeight(1f);
+                                //The offset needs to be the difference between the drag x and y and the target x and y
+                                vector2.setZero();
+                                targetActor.localToStageCoordinates(vector2);
+                                vector2.sub(x, y);
 
-		newColumn.addRowContainer(target, false);
-	}
+                                hitInStageX = vector2.x;
+                                hitInStageY = vector2.y;
 
-	private void exchangeAndWrapToRow (LayoutRow newRow, LayoutContent target) {
+                                vector2.set(Gdx.input.getX(), Gdx.input.getY());
+                                screenToLocalCoordinates(vector2);
 
-		//We need to swap this column with the parent
-		LayoutItem parent = (LayoutItem)target.getParent();
-		parent.exchangeItem(target, newRow);
+                                dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
 
-		newRow.setRelativeWidth(target.getRelativeWidth());
-		newRow.setRelativeHeight(target.getRelativeHeight());
+                                break;
 
-		target.setRelativeWidth(1f);
-		target.setRelativeHeight(1f);
+                            case DOWN:
+                                dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
 
-		newRow.addColumnContainer(target, false);
-	}
+                                //The offset needs to be the difference between the drag x and y and the target x and y
+                                vector2.setZero();
+                                targetActor.localToStageCoordinates(vector2);
+                                vector2.sub(x, y);
 
-	//Add each LayoutContent for drag and drop as a source
-	//Add each LayoutContent for drag and drop as a target
-	void registerDragSource (LayoutContent parent, LayoutApp layoutApp, Actor actorToDrag) {
+                                hitInStageX = vector2.x;
+                                hitInStageY = vector2.y;
 
-		LayoutContentApp layoutContentAppObject = new LayoutContentApp(parent, layoutApp);
+                                vector2.set(Gdx.input.getX(), Gdx.input.getY());
+                                screenToLocalCoordinates(vector2);
 
-		DragAndDrop.Source source = new DragAndDrop.Source(actorToDrag) {
-			@Override
-			public DragAndDrop.Payload dragStart (InputEvent event, float x, float y, int pointer) {
-				DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                                dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
+                                break;
 
-				LayoutContent dummy = new LayoutContent(skin, LayoutGrid.this);
-				dummy.setRandomColour(parent.getRandomColour());
-				dummy.setSize(200, 200);
+                            case RIGHT:
+                                dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
 
-				dummy.addContent(layoutApp, true);
+                                //The offset needs to be the difference between the drag x and y and the target x and y
+                                vector2.setZero();
+                                targetActor.localToStageCoordinates(vector2);
+                                vector2.sub(x, y);
 
-				payload.setDragActor(dummy);
+                                hitInStageX = vector2.x;
+                                hitInStageY = vector2.y;
 
-				payload.setObject(layoutContentAppObject);
+                                vector2.set(Gdx.input.getX(), Gdx.input.getY());
+                                screenToLocalCoordinates(vector2);
 
-				startItem = parent;
+                                dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
+                                break;
 
-				return payload;
-			}
+                            case LEFT:
+                                dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
 
-			@Override
-			public void drag (InputEvent event, float x, float y, int pointer) {
-				super.drag(event, x, y, pointer);
+                                //The offset needs to be the difference between the drag x and y and the target x and y
+                                vector2.setZero();
+                                targetActor.localToStageCoordinates(vector2);
+                                vector2.sub(x, y);
 
-				float unhitSize = 200;
+                                hitInStageX = vector2.x;
+                                hitInStageY = vector2.y;
 
-				Actor dragActor = dragAndDrop.getDragActor();
-				if (dragActor != null) {
+                                vector2.set(Gdx.input.getX(), Gdx.input.getY());
+                                screenToLocalCoordinates(vector2);
 
-					//Find out if we hit something, and if so what side
+                                dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + dragActor.getWidth(), y - (vector2.y - hitInStageY));
+                                break;
 
-					getDragHit(dragHitResult);
+                            case TAB:
+                                Table tabTable = hitResult.getTabTable();
+                                dragActor.setSize(200, tabTable.getHeight());
 
-					Vector2 vector2 = new Vector2();
-					float hitInStageX = vector2.x;
-					float hitInStageY = vector2.y;
+                                vector2.setZero();
+                                targetActor.localToStageCoordinates(vector2);
+                                vector2.sub(x, y);
 
-					LayoutContent hitResult = dragHitResult.hit;
-					if (hitResult != null) {
-						if (hitResult == startItem) {
-							return;
-						}
+                                hitInStageX = vector2.x;
+                                hitInStageY = vector2.y;
 
-						float horizontalPercentToUse = dragHitResult.root ? rootHorizontalPercent : horizontalPercent;
-						float vertPercentToUse = dragHitResult.root ? rootVerticalPercent : verticalPercent;
+                                vector2.set(Gdx.input.getX(), Gdx.input.getY());
+                                screenToLocalCoordinates(vector2);
 
-						Actor targetActor = dragHitResult.root ? LayoutGrid.this : dragHitResult.hit;
+                                dragAndDrop.setDragActorPosition(+dragActor.getWidth() / 2f, y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
 
-						switch (dragHitResult.direction) {
-						case UP:
+                                break;
+                        }
+                    } else {
+                        dragActor.setSize(unhitSize, unhitSize);
+                        dragAndDrop.setDragActorPosition(dragActor.getWidth() / 2f, -dragActor.getHeight() / 2f);
+                    }
 
-							dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
+                }
 
-							//The offset needs to be the difference between the drag x and y and the target x and y
-							vector2.setZero();
-							targetActor.localToStageCoordinates(vector2);
-							vector2.sub(x, y);
+            }
 
-							hitInStageX = vector2.x;
-							hitInStageY = vector2.y;
+            @Override
+            public void dragStop (InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                super.dragStop(event, x, y, pointer, payload, target);
+                startItem = null;
+                dragHitResult.reset();
+            }
+        };
+        dragAndDrop.addSource(source);
 
-							vector2.set(Gdx.input.getX(), Gdx.input.getY());
-							screenToLocalCoordinates(vector2);
+        sources.put(layoutContentAppObject, source);
+    }
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
+    private void getDragHit (DragHitResult dragHitResult) {
+        dragHitResult.reset();
 
-							break;
+        int x = Gdx.input.getX();
+        int y = Gdx.input.getY();
+        Vector2 universalCoords = new Vector2(x, y);
 
-						case DOWN:
-							dragActor.setSize(targetActor.getWidth(), targetActor.getHeight() * verticalPercent);
+        if (overItem != null) {
 
-							//The offset needs to be the difference between the drag x and y and the target x and y
-							vector2.setZero();
-							targetActor.localToStageCoordinates(vector2);
-							vector2.sub(x, y);
+            overItem.screenToLocalCoordinates(universalCoords);
+            Vector2 copyOfLocalCoords = new Vector2(universalCoords.x, universalCoords.y);
+            universalCoords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
 
-							hitInStageX = vector2.x;
-							hitInStageY = vector2.y;
+            //Prioritize tab
+            Actor hit = null;
+            if ((hit = overItem.hitTabTable(copyOfLocalCoords)) != null) {
+                dragHitResult.hit = overItem;
+                dragHitResult.direction = LayoutDirection.TAB;
+                return;
+            }
+        }
 
-							vector2.set(Gdx.input.getX(), Gdx.input.getY());
-							screenToLocalCoordinates(vector2);
+        //Check for root
+        if (root != null) {
+            //Check edges of root
+            Vector2 vecForMainGrid = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+            screenToLocalCoordinates(vecForMainGrid);
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
-							break;
+            vecForMainGrid.scl(1f / getWidth(), 1f / getHeight());
 
-						case RIGHT:
-							dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
+            float distanceFromMiddleX = Math.abs(0.5f - vecForMainGrid.x);
+            float distanceFromMiddleY = Math.abs(0.5f - vecForMainGrid.y);
 
-							//The offset needs to be the difference between the drag x and y and the target x and y
-							vector2.setZero();
-							targetActor.localToStageCoordinates(vector2);
-							vector2.sub(x, y);
+            if (distanceFromMiddleX >= distanceFromMiddleY) {
+                //Its going to be an X if it exists
 
-							hitInStageX = vector2.x;
-							hitInStageY = vector2.y;
+                if (vecForMainGrid.x < rootHorizontalPercent) {
+                    //Left edge
+                    dragHitResult.root = true;
+                    dragHitResult.hit = overItem;
+                    dragHitResult.direction = LayoutDirection.LEFT;
+                    return;
+                } else if (vecForMainGrid.x > (1 - rootHorizontalPercent)) {
+                    //Right edge
+                    dragHitResult.root = true;
+                    dragHitResult.hit = overItem;
+                    dragHitResult.direction = LayoutDirection.RIGHT;
+                    return;
+                }
 
-							vector2.set(Gdx.input.getX(), Gdx.input.getY());
-							screenToLocalCoordinates(vector2);
+            } else {
+                //its going to be Y if it exists
+                if (vecForMainGrid.y < rootVerticalPercent) {
+                    dragHitResult.root = true;
+                    dragHitResult.hit = overItem;
+                    dragHitResult.direction = LayoutDirection.DOWN;
+                    return;
+                } else if (vecForMainGrid.y > (1 - rootVerticalPercent)) {
+                    //top edge
+                    dragHitResult.root = true;
+                    dragHitResult.hit = overItem;
+                    dragHitResult.direction = LayoutDirection.UP;
+                    return;
+                }
+            }
+        }
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + targetActor.getWidth(), y - (vector2.y - hitInStageY));
-							break;
+        if (overItem == null) {
+            return;
+        }
 
-						case LEFT:
-							dragActor.setSize(horizontalPercent * targetActor.getWidth(), targetActor.getHeight());
+        //UNiversal coordinates
 
-							//The offset needs to be the difference between the drag x and y and the target x and y
-							vector2.setZero();
-							targetActor.localToStageCoordinates(vector2);
-							vector2.sub(x, y);
+        float distanceFromMiddleX = Math.abs(0.5f - universalCoords.x);
+        float distanceFromMiddleY = Math.abs(0.5f - universalCoords.y);
 
-							hitInStageX = vector2.x;
-							hitInStageY = vector2.y;
+        if (distanceFromMiddleX >= distanceFromMiddleY) {
+            //Its going to be an X if it exists
 
-							vector2.set(Gdx.input.getX(), Gdx.input.getY());
-							screenToLocalCoordinates(vector2);
+            if (universalCoords.x < horizontalPercent) {
+                //Left edge
+                dragHitResult.hit = overItem;
+                dragHitResult.direction = LayoutDirection.LEFT;
+            } else if (universalCoords.x > (1 - horizontalPercent)) {
+                //Right edge
+                dragHitResult.hit = overItem;
+                dragHitResult.direction = LayoutDirection.RIGHT;
+            }
 
-							dragAndDrop.setDragActorPosition(x - (vector2.x - hitInStageX) + dragActor.getWidth(), y - (vector2.y - hitInStageY));
-							break;
+        } else {
 
-						case TAB:
-							Table tabTable = hitResult.getTabTable();
-							dragActor.setSize(200, tabTable.getHeight());
+            //its going to be Y if it exists
+            if (universalCoords.y < verticalPercent) {
 
-							vector2.setZero();
-							targetActor.localToStageCoordinates(vector2);
-							vector2.sub(x, y);
+                dragHitResult.hit = overItem;
+                dragHitResult.direction = LayoutDirection.DOWN;
+            } else if (universalCoords.y > (1 - verticalPercent)) {
+                //top edge
 
-							hitInStageX = vector2.x;
-							hitInStageY = vector2.y;
+                dragHitResult.hit = overItem;
+                dragHitResult.direction = LayoutDirection.UP;
+            }
+        }
 
-							vector2.set(Gdx.input.getX(), Gdx.input.getY());
-							screenToLocalCoordinates(vector2);
 
-							dragAndDrop.setDragActorPosition(+dragActor.getWidth() / 2f, y - (vector2.y - hitInStageY) + targetActor.getHeight() - dragActor.getHeight());
+        if (dragHitResult.direction == null) { //Disable pop, not ready
+//			dragHitResult.direction = LayoutDirection.POP;
+        }
 
-							break;
-						}
-					} else {
-						dragActor.setSize(unhitSize, unhitSize);
-						dragAndDrop.setDragActorPosition(dragActor.getWidth() / 2f, -dragActor.getHeight() / 2f);
-					}
+    }
 
-				}
+    static class LayoutContentAppPair {
+        public LayoutContent layoutContent;
+        public LayoutApp app;
 
-			}
+        public LayoutContentAppPair (LayoutContent parent, LayoutApp app) {
+            this.layoutContent = parent;
+            this.app = app;
+        }
 
-			@Override
-			public void dragStop (InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-				super.dragStop(event, x, y, pointer, payload, target);
-				startItem = null;
-				dragHitResult.reset();
-			}
-		};
-		dragAndDrop.addSource(source);
+        @Override
+        public boolean equals (Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            LayoutContentAppPair that = (LayoutContentAppPair) o;
+            return Objects.equals(layoutContent, that.layoutContent) && Objects.equals(app, that.app);
+        }
 
-		sources.put(layoutContentAppObject, source);
-	}
+        @Override
+        public int hashCode () {
+            return Objects.hash(layoutContent, app);
+        }
+    }
 
-	private void getDragHit (DragHitResult dragHitResult) {
-		dragHitResult.reset();
+    static class DragHitResult {
+        public LayoutContent hit;
+        public boolean root;
+        public LayoutDirection direction;
 
-		int x = Gdx.input.getX();
-		int y = Gdx.input.getY();
-		Vector2 universalCoords = new Vector2(x, y);
+        void reset () {
+            hit = null;
+            root = false;
+            direction = null;
+        }
 
-		if (overItem != null) {
+        @Override
+        public String toString () {
+            String hitName = hit != null ? hit.getClass().getSimpleName() : "null";
+            return "DragHitResult{" + "hit=" + hitName + ", root=" + root + ", direction=" + direction + '}';
+        }
+    }
 
-			overItem.screenToLocalCoordinates(universalCoords);
-			Vector2 copyOfLocalCoords = new Vector2(universalCoords.x, universalCoords.y);
-			universalCoords.scl(1f / overItem.getWidth(), 1f / overItem.getHeight());
+    @Override
+    public void layout () {
+        super.layout();
+        if (root == null)
+            return;
 
+        root.setBounds(0, 0, getWidth(), getHeight());
+    }
 
+    @Override
+    public void act (float delta) {
+        super.act(delta);
+        if (root == null) {
+            return;
+        }
 
-			//Prioritize tab
-			Actor hit = null;
-			if ((hit = overItem.hitTabTable(copyOfLocalCoords)) != null) {
-				dragHitResult.hit = overItem;
-				dragHitResult.direction = LayoutDirection.TAB;
-				return;
-			}
-		}
+        int x = Gdx.input.getX();
+        int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+        Vector2 screenCoords = new Vector2(x, y);
+        screenToLocalCoordinates(screenCoords);
 
-		//Check for root
-		if (root != null) {
-			//Check edges of root
-			Vector2 vecForMainGrid = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-			screenToLocalCoordinates(vecForMainGrid);
+        Actor hit = hit(x, y, true);
 
-			vecForMainGrid.scl(1f / getWidth(), 1f / getHeight());
+        hit = getLayoutFromHit(hit);
 
-			float distanceFromMiddleX = Math.abs(0.5f - vecForMainGrid.x);
-			float distanceFromMiddleY = Math.abs(0.5f - vecForMainGrid.y);
 
-			if (distanceFromMiddleX >= distanceFromMiddleY) {
-				//Its going to be an X if it exists
+        if (hit instanceof LayoutContent) {
+            overItem = (LayoutContent) hit;
+        } else if (hit != null) {
+            if (hit.getParent() instanceof LayoutContent) {
+                overItem = (LayoutContent) hit.getParent();
+            } else if (hit.getParent() != null) {
+                if (hit.getParent().getParent() instanceof LayoutContent) {
+                    overItem = (LayoutContent) hit.getParent().getParent();
+                }
+            }
+        } else {
+            overItem = null;
+        }
+    }
 
-				if (vecForMainGrid.x < rootHorizontalPercent) {
-					//Left edge
-					dragHitResult.root = true;
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.LEFT;
-					return;
-				} else if (vecForMainGrid.x > (1 - rootHorizontalPercent)) {
-					//Right edge
-					dragHitResult.root = true;
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.RIGHT;
-					return;
-				}
+    private Actor getLayoutFromHit (Actor hit) {
+        if (hit == null) return null;
 
-			} else {
-				//its going to be Y if it exists
-				if (vecForMainGrid.y < rootVerticalPercent) {
-					dragHitResult.root = true;
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.DOWN;
-					return;
-				} else if (vecForMainGrid.y > (1 - rootVerticalPercent)) {
-					//top edge
-					dragHitResult.root = true;
-					dragHitResult.hit = overItem;
-					dragHitResult.direction = LayoutDirection.UP;
-					return;
-				}
-			}
-		}
+        if (hit instanceof LayoutContent) return hit;
 
-		if (overItem == null) {
-			return;
-		}
 
+        LayoutItem layoutItem = hit.firstAscendant(LayoutContent.class);
 
-		//UNiversal coordinates
+        if (layoutItem != null) {
+            return layoutItem;
+        }
 
-		float distanceFromMiddleX = Math.abs(0.5f - universalCoords.x);
-		float distanceFromMiddleY = Math.abs(0.5f - universalCoords.y);
+        return hit;
+    }
 
-		if (distanceFromMiddleX >= distanceFromMiddleY) {
-			//Its going to be an X if it exists
+    enum LayoutType {
+        ROW,
+        COLUMN,
+        CONTENT,
+        APP
+    }
 
-			if (universalCoords.x < horizontalPercent) {
-				//Left edge
-				dragHitResult.hit = overItem;
-				dragHitResult.direction = LayoutDirection.LEFT;
-			} else if (universalCoords.x > (1 - horizontalPercent)) {
-				//Right edge
-				dragHitResult.hit = overItem;
-				dragHitResult.direction = LayoutDirection.RIGHT;
-			}
+    public static class LayoutJsonStructure {
+        LayoutType type;
+        String appID;
 
-		} else {
+        boolean tabActive;
 
-			//its going to be Y if it exists
-			if (universalCoords.y < verticalPercent) {
+        String baseAppClazz;
+        String gameAssetIdentifier;
+        String gameAssetUniqueIdentifier;
+        GameAssetType gameAssetType;
 
-				dragHitResult.hit = overItem;
-				dragHitResult.direction = LayoutDirection.DOWN;
-			} else if (universalCoords.y > (1 - verticalPercent)) {
-				//top edge
+        float relativeWidth;
+        float relativeHeight;
+        Array<LayoutJsonStructure> children = new Array<>();
+    }
 
-				dragHitResult.hit = overItem;
-				dragHitResult.direction = LayoutDirection.UP;
-			}
-		}
+    public String writeToJsonString () {
+        Json json = new Json();
+        LayoutJsonStructure layoutJsonStructure = buildJsonFromObject(root);
+        return json.prettyPrint(layoutJsonStructure);
+    }
 
-	}
 
-	static class LayoutContentApp {
-		public LayoutContent layoutContent;
-		public LayoutApp app;
+    public void writeToJson (FileHandle handle) {
+        Json json = new Json();
 
-		public LayoutContentApp (LayoutContent parent, LayoutApp app) {
-			this.layoutContent = parent;
-			this.app = app;
-		}
+        LayoutJsonStructure rootJson = buildJsonFromObject(root);
 
-		@Override
-		public boolean equals (Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
-			LayoutContentApp that = (LayoutContentApp)o;
-			return Objects.equals(layoutContent, that.layoutContent) && Objects.equals(app, that.app);
-		}
+        String result = json.prettyPrint(rootJson);
+        handle.writeString(result, false);
 
-		@Override
-		public int hashCode () {
-			return Objects.hash(layoutContent, app);
-		}
-	}
+    }
 
-	static class DragHitResult {
-		public LayoutContent hit;
-		public boolean root;
-		public LayoutDirection direction;
+    public void readFromJsonStructure (LayoutJsonStructure layoutJsonStructure) {
+        LayoutItem parent = null;
 
-		void reset () {
-			hit = null;
-			root = false;
-			direction = null;
-		}
-	}
+        if (layoutJsonStructure.type == LayoutType.COLUMN) {
+            LayoutColumn layoutColumn = new LayoutColumn(skin, this);
+            parent = layoutColumn;
+        } else if (layoutJsonStructure.type == LayoutType.ROW) {
+            LayoutRow layoutRow = new LayoutRow(skin, this);
+            parent = layoutRow;
+        } else if (layoutJsonStructure.type == LayoutType.CONTENT) {
+            LayoutContent layoutContent = new LayoutContent(skin, this);
+            parent = layoutContent;
+        } else if (layoutJsonStructure.type == LayoutType.APP) {
+            throw new GdxRuntimeException("Root can't be an APP");
+        }
 
-	@Override
-	public void layout () {
-		super.layout();
-		if (root == null)
-			return;
+        //Load the children and this is recursive
+        loadChildren(parent, layoutJsonStructure);
 
-		root.setBounds(0, 0, getWidth(), getHeight());
-	}
 
-	@Override
-	public void act (float delta) {
-		super.act(delta);
-		if (root == null) {
-			return;
-		}
+        addContent(parent);
+    }
 
-		int x = Gdx.input.getX();
-		int y = Gdx.graphics.getHeight() - Gdx.input.getY();
-		Vector2 screenCoords = new Vector2(x, y);
-		screenToLocalCoordinates(screenCoords);
+    public void readFromJson (JsonValue jsonLayoutRepresentation) {
+        Json json = new Json();
+        LayoutJsonStructure layoutJsonStructure = json.readValue(LayoutJsonStructure.class, jsonLayoutRepresentation);
+        readFromJsonStructure(layoutJsonStructure);
+    }
 
-		Actor hit = hit(x, y, true);
-		if (hit instanceof LayoutContent) {
-			overItem = (LayoutContent)hit;
-		} else if (hit != null) {
-			if (hit.getParent() instanceof LayoutContent) {
-				overItem = (LayoutContent)hit.getParent();
-			} else if (hit.getParent() != null) {
-				if (hit.getParent().getParent() instanceof LayoutContent) {
-					overItem = (LayoutContent)hit.getParent().getParent();
-				}
-			}
-		} else {
-			overItem = null;
-		}
-	}
+    private void loadChildren (LayoutItem parent, LayoutJsonStructure layoutJsonStructure) {
+        Array<LayoutJsonStructure> children = layoutJsonStructure.children;
 
-	enum LayoutType {
-		ROW,
-		COLUMN,
-		CONTENT,
-		APP
-	}
+        if (children != null && !children.isEmpty()) {
+            for (int i = 0; i < children.size; i++) {
+                LayoutJsonStructure child = children.get(i);
 
-	static class LayoutJsonStructure {
-		LayoutType type;
-		String appID;
-		float relativeWidth;
-		float relativeHeight;
-		Array<LayoutJsonStructure> children = new Array<>();
-	}
+                LayoutItem layoutItem = null;
 
-	public void writeToJson (FileHandle handle) {
-		Json json = new Json();
+                if (child.type == LayoutType.COLUMN) {
+                    LayoutColumn layoutColumn = new LayoutColumn(skin, this);
+                    layoutColumn.setRelativeWidth(child.relativeWidth);
+                    layoutColumn.setRelativeHeight(child.relativeHeight);
 
-		LayoutJsonStructure rootJson = buildJsonFromObject(root);
+                    layoutItem = layoutColumn;
 
-		String result = json.prettyPrint(rootJson);
-		handle.writeString(result, false);
+                } else if (child.type == LayoutType.ROW) {
+                    LayoutRow layoutRow = new LayoutRow(skin, this);
+                    layoutRow.setRelativeWidth(child.relativeWidth);
+                    layoutRow.setRelativeHeight(child.relativeHeight);
 
-	}
+                    layoutItem = layoutRow;
+                } else if (child.type == LayoutType.CONTENT) {
+                    LayoutContent layoutContent = new LayoutContent(skin, this);
+                    layoutContent.setRelativeWidth(child.relativeWidth);
+                    layoutContent.setRelativeHeight(child.relativeHeight);
 
-	public void readFromJson (FileHandle handle) {
-		Json json = new Json();
-		LayoutJsonStructure layoutJsonStructure = json.fromJson(LayoutJsonStructure.class, handle);
-//
-//		LayoutItem parent = null;
-//
-//		if (layoutJsonStructure.type == LayoutType.COLUMN) {
-//			LayoutColumn layoutColumn = new LayoutColumn(skin, parent);
-//		} else if (layoutJsonStructure.type == LayoutType.ROW) {
-//			LayoutRow layoutRow = new LayoutRow();
-//		} else if (layoutJsonStructure.type == LayoutType.CONTENT) {
-//			LayoutContent layoutContent =  new LayoutContent();
-//		} else if (layoutJsonStructure.type == LayoutType.APP) {
-//			//Register the app uuid for injection
-//		}
+                    layoutItem = layoutContent;
 
-		System.out.println("");
+                } else if (child.type == LayoutType.APP) {
 
+                    String appID = child.appID;
+                    boolean tabActive = child.tabActive;
+                    String baseAppClazz = child.baseAppClazz;
+                    String gameAssetIdentifier = child.gameAssetIdentifier;
+                    GameAssetType gameAssetType = child.gameAssetType;
+                    String gameAssetUniqueIdentifier = child.gameAssetUniqueIdentifier;
 
-	}
+                    //We need to make the app
 
-	private LayoutJsonStructure buildJsonFromObject (LayoutItem root) {
-		LayoutJsonStructure jsonStructure = new LayoutJsonStructure();
+                    try {
+                        AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier, gameAssetUniqueIdentifier);
 
-		if (root instanceof LayoutColumn) {
-			jsonStructure.type = LayoutType.COLUMN;
-			jsonStructure.relativeWidth = root.getRelativeWidth();
-			jsonStructure.relativeHeight = root.getRelativeHeight();
-			Array<LayoutItem> rows = ((LayoutColumn)root).getRows();
-			for (LayoutItem row : rows) {
-				LayoutJsonStructure child = buildJsonFromObject(row);
-				jsonStructure.children.add(child);
-			}
-		} else if (root instanceof LayoutRow) {
-			jsonStructure.type = LayoutType.ROW;
-			jsonStructure.relativeWidth = root.getRelativeWidth();
-			jsonStructure.relativeHeight = root.getRelativeHeight();
-			Array<LayoutItem> columns = ((LayoutRow)root).getColumns();
-			for (LayoutItem column : columns) {
-				LayoutJsonStructure child = buildJsonFromObject(column);
-				jsonStructure.children.add(child);
-			}
-		} else if (root instanceof LayoutContent) {
-			jsonStructure.type = LayoutType.CONTENT;
-			jsonStructure.relativeWidth = root.getRelativeWidth();
-			jsonStructure.relativeHeight = root.getRelativeHeight();
-			ObjectMap<String, LayoutApp> apps = ((LayoutContent)root).getApps();
+                        //We skip and just add it to the parent
+                        if (!(parent instanceof LayoutContent)) {
+                            logger.error("Parent is not layout content, invalid layout, ignoring");
+                        }
 
-			for (ObjectMap.Entry<String, LayoutApp> app : apps) {
-				LayoutJsonStructure child = new LayoutJsonStructure();
-				child.type = LayoutType.APP;
-				child.appID = app.key;
-				jsonStructure.children.add(child);
-			}
-		}
+                        LayoutApp gridAppReference = baseApp.getGridAppReference();
 
-		return jsonStructure;
-	}
+                        gridAppReference.setTabActive(tabActive);
 
+                        LayoutContent parent1 = (LayoutContent) parent;
+                        parent1.addContent(gridAppReference, false, false);
 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("Error creating app from layout", e);
+                        Toasts.getInstance().showErrorToast("Error creating app from layout " + e.getMessage());
+                    }
+                }
+
+                if (layoutItem != null) {
+
+                    //Add this item to the parent if parent is rows or layout
+                    if (parent instanceof LayoutRow) {
+                        ((LayoutRow) parent).addColumnContainer(layoutItem, false, false);
+                    } else if (parent instanceof LayoutColumn) {
+                        ((LayoutColumn) parent).addRowContainer(layoutItem, true, false);
+                    }
+
+                    //Load the children
+
+                    loadChildren(layoutItem, child);
+
+                }
+            }
+        }
+
+        if (parent instanceof LayoutContent)
+            ((LayoutContent) parent).sortToActiveTab();
+    }
+
+
+    private LayoutJsonStructure buildJsonFromObject (LayoutItem root) {
+        LayoutJsonStructure jsonStructure = new LayoutJsonStructure();
+
+        if (root instanceof LayoutColumn) {
+            jsonStructure.type = LayoutType.COLUMN;
+            jsonStructure.relativeWidth = root.getRelativeWidth();
+            jsonStructure.relativeHeight = root.getRelativeHeight();
+            Array<LayoutItem> rows = ((LayoutColumn) root).getRows();
+            for (LayoutItem row : rows) {
+                LayoutJsonStructure child = buildJsonFromObject(row);
+                jsonStructure.children.add(child);
+            }
+        } else if (root instanceof LayoutRow) {
+            jsonStructure.type = LayoutType.ROW;
+            jsonStructure.relativeWidth = root.getRelativeWidth();
+            jsonStructure.relativeHeight = root.getRelativeHeight();
+            Array<LayoutItem> columns = ((LayoutRow) root).getColumns();
+            for (LayoutItem column : columns) {
+                LayoutJsonStructure child = buildJsonFromObject(column);
+                jsonStructure.children.add(child);
+            }
+        } else if (root instanceof LayoutContent) {
+            jsonStructure.type = LayoutType.CONTENT;
+            jsonStructure.relativeWidth = root.getRelativeWidth();
+            jsonStructure.relativeHeight = root.getRelativeHeight();
+            ObjectMap<String, LayoutApp> apps = ((LayoutContent) root).getApps();
+
+            for (ObjectMap.Entry<String, LayoutApp> app : apps) {
+                LayoutJsonStructure child = new LayoutJsonStructure();
+                child.type = LayoutType.APP;
+                child.appID = app.key;
+                child.tabActive = app.value.isTabActive();
+                AppManager.BaseApp<?> appy = SharedResources.appManager.getAppForLayoutApp(app.value);
+                if (appy != null) {
+                    child.baseAppClazz = appy.getClass().getSimpleName();
+                    child.gameAssetIdentifier = appy.getAssetIdentifier();
+
+                    RawAsset first = appy.getGameAsset().getRootRawAsset();
+                    String uuid = first.metaData.uuid.toString();
+                    child.gameAssetUniqueIdentifier = uuid;
+                    child.gameAssetType = appy.getGameAssetType();
+                }
+                jsonStructure.children.add(child);
+            }
+        }
+
+        return jsonStructure;
+    }
 
 }

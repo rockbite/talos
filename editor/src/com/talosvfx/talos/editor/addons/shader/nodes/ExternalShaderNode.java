@@ -4,20 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.addons.shader.ShaderProject;
 import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeCreatedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
-import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
 
 public class ExternalShaderNode extends AbstractShaderNode {
 
@@ -69,7 +64,7 @@ public class ExternalShaderNode extends AbstractShaderNode {
                 codeArea.setText(data);
 
                 updatePreview();
-                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(ExternalShaderNode.this));
+                Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), ExternalShaderNode.this));
             }
         });
 
@@ -127,7 +122,7 @@ public class ExternalShaderNode extends AbstractShaderNode {
         NodeWidget node = nodeStage.createNode(moduleName, this.getX() - 200, this.getY());
         UniformNode uniformNode = (UniformNode) node;
         node.constructNode(nodeStage.getNodeListPopup().getModuleByName(moduleName));
-        Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(node));
+        Notifications.fireEvent(Notifications.obtainEvent(NodeCreatedEvent.class).set(nodeBoard.getNodeStage(), node));
         nodeStage.getNodeBoard().makeConnection(node, this, "out", uniformName);
         ((UniformNode) node).setValue(0.5f);
         uniformNode.setUniformName(uniformName);

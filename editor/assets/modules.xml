@@ -19,6 +19,7 @@
         <module name = "Global Values" wrapper = "GlobalScopeModuleWrapper">GlobalScopeModule</module>
         <module name = "Mixer" wrapper = "MixModuleWrapper">MixModule</module>
         <module name = "Shape Range" wrapper = "OffsetModuleWrapper">OffsetModule</module>
+<!--        <module name = "Shape Coordinate" wrapper = "ShapeModuleWrapper">ShapeModule</module>-->
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>

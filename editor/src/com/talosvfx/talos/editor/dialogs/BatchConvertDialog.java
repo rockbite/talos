@@ -180,10 +180,10 @@ public class BatchConvertDialog extends VisWindow {
 
         String result = "ok";
         try {
-            TalosMain.Instance().TalosProject().importFromLegacyFormat(fileHandle);
-            // now that it's done save TLS file
-            TalosMain.Instance().ProjectController().saveProject(projectDestination);
-            TalosMain.Instance().TalosProject().exportProject(exportDestination);
+//            TalosMain.Instance().TalosProject().importFromLegacyFormat(fileHandle);
+//             now that it's done save TLS file
+//            TalosMain.Instance().ProjectController().saveProject(projectDestination);
+//            TalosMain.Instance().TalosProject().exportProject(exportDestination);
 
         } catch (Exception e) {
             result = "nok";

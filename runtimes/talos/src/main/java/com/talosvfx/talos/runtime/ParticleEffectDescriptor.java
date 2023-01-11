@@ -170,4 +170,12 @@ public class ParticleEffectDescriptor {
 	public ParticleEffectInstance getInstanceReference() {
 		return processsingEffectReference;
 	}
+
+
+	public boolean different (ParticleEffectDescriptor descriptor) {
+		if (this != descriptor) return true;
+		if (this.emitterModuleGraphs.size != descriptor.emitterModuleGraphs.size) return true;
+
+		return false;
+	}
 }

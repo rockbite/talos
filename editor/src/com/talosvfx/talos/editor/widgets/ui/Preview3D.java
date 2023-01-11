@@ -2,37 +2,21 @@ package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
-import com.talosvfx.talos.runtime.IEmitter;
-import com.talosvfx.talos.runtime.Particle;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.Particle3DRenderer;
-import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
 import lombok.Getter;
 
-import static com.rockbite.bongo.engine.systems.RenderPassSystem.glViewport;
+import java.util.function.Supplier;
 
 public class Preview3D extends PreviewWidget {
 
@@ -40,11 +24,8 @@ public class Preview3D extends PreviewWidget {
 
     @Getter
     private final BongoPreview bongoPreview;
-    //Controls
-    private InputAdapter cameraInputController;
 
     //Render
-    public Camera worldCamera;
     private boolean isDrawXYZ, isDrawXZPlane, isDrawXYPlane;
     private Array<Model> models;
     private ModelInstance xyzInstance, xzPlaneInstance, xyPlaneInstance;
@@ -53,10 +34,13 @@ public class Preview3D extends PreviewWidget {
     private IDragPointProvider dragPointProvider;
     private Array<DragPoint> dragPoints = new Array<>();
 
-
-    public Preview3D(PreviewImageControllerWidget previewImageControllerWidget) {
-        super(previewImageControllerWidget);
-        cameraController.scrollOnly = true;
+    public Preview3D() {
+        super();
+        if (MathUtils.isEqual(viewportViewSettings.getNear(), 0.0f)) {
+            viewportViewSettings.setNear(0.01f);
+        }
+//        cameraController.scrollOnly = true;
+        setWorldSize(10);
 
         environment = new Environment();
         environment.add(new DirectionalLight().set(Color.WHITE, 0,0,-1));
@@ -79,87 +63,10 @@ public class Preview3D extends PreviewWidget {
         tinyGizmoRenderer = new TinyGizmoRenderer();
 
         bongoPreview = new BongoPreview();
-        worldCamera = bongoPreview.getWorldCamera();
-        worldCamera.position.set(8, 5, 8);
-        worldCamera.lookAt(0, 2, 0);
-        worldCamera.near = 0.1f;
-        worldCamera.far = 100f;
-        worldCamera.update();
 
-        cameraInputController = new BongoCameraController(worldCamera);
-        if (cameraInputController instanceof BongoCameraController) {
-            ((BongoCameraController)cameraInputController).translateTarget = false;
-        }
-
-        bongoPreview.setCameraController(cameraInputController);
+        bongoPreview.setCameraController(viewportViewSettings.getCurrentCameraController());
 
 
-    }
-
-    @Override
-    protected void addPanListener() {
-        addListener(new InputListener() {
-            @Override
-            public boolean keyDown (InputEvent event, int keycode) {
-                tinyGizmoRenderer.getInputAdapter().keyDown(keycode);
-
-                return super.keyDown(event, keycode);
-            }
-
-            @Override
-            public boolean keyUp (InputEvent event, int keycode) {
-                tinyGizmoRenderer.getInputAdapter().keyUp(keycode);
-                return super.keyUp(event, keycode);
-            }
-
-            @Override
-            public boolean scrolled (InputEvent event, float x, float y, float amountX, float amountY) {
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return true;
-                if (cameraInputController.scrolled(amountX, amountY)) return true;
-                return super.scrolled(event, x, y, amountX, amountY);
-            }
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tinyGizmoRenderer.getInputAdapter().touchDown((int)x, (int)y, pointer, button);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return true;
-                cameraInputController.touchDown((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
-                return !event.isHandled();
-            }
-
-            @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                tinyGizmoRenderer.getInputAdapter().touchUp((int)x, (int)y, pointer, button);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return;
-                cameraInputController.touchUp((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
-            }
-
-            @Override
-            public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                tinyGizmoRenderer.getInputAdapter().touchDragged((int)x, (int)y, pointer);
-                final boolean interacted = tinyGizmoRenderer.getInteracted();
-                if (interacted) return;
-                cameraInputController.touchDragged((int)x, Gdx.graphics.getHeight() - (int)y, pointer);
-            }
-
-            @Override
-            public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(Preview3D.this);
-                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(Preview3D.this);
-            }
-
-            @Override
-            public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                if (pointer != -1) return; //Only care about exit/enter from mouse move
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
-                TalosMain.Instance().UIStage().getStage().setKeyboardFocus(null);
-            }
-        });
     }
 
     @Override
@@ -202,14 +109,13 @@ public class Preview3D extends PreviewWidget {
     public void act(float delta) {
         super.act(delta);
 
+        bongoPreview.setCamera(viewportViewSettings.getCurrentCamera());
+
 //        worldCamera.viewportWidth = getWidth();
 //        worldCamera.viewportHeight = getHeight();
 //        worldCamera.update();
 
-
-
         if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
-            ((BongoCameraController)cameraInputController).update();
         }
     }
 
@@ -218,17 +124,22 @@ public class Preview3D extends PreviewWidget {
         super.drawContent(batch, parentAlpha);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            switchCamera();
+//            switchCamera();
         }
 
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        if (particleEffect != null) {
-            bongoPreview.updateParticleInstance(particleEffect);
+        if (effectInstance != null) {
+            bongoPreview.updateParticleInstance(effectInstance);
         }
 
         batch.end();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+
+
+        if (viewportViewSettings.isShowAxis()) {
+            drawAxis();
+        }
+
+//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+//        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 
 //        modelBatch.begin(worldCamera);
 //        //if(isDrawXYZ) modelBatch.render(xyzInstance);
@@ -291,18 +202,21 @@ public class Preview3D extends PreviewWidget {
             RenderPassSystem.glViewport.height
         );
 
-        if (worldCamera instanceof PerspectiveCamera) {
-            worldCamera.viewportWidth = glViewport.width;
-            worldCamera.viewportHeight = glViewport.height;
-            worldCamera.update();
-        }
+//        if (worldCamera instanceof PerspectiveCamera) {
+//            worldCamera.viewportWidth = glViewport.width;
+//            worldCamera.viewportHeight = glViewport.height;
+//            worldCamera.update();
+//        }
 
 
         bongoPreview.render();
 
         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
-        tinyGizmoRenderer.render(worldCamera, this, dragPoints);
+        Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+        Camera camera = currentCameraSupplier.get();
+
+        tinyGizmoRenderer.render(camera, this, dragPoints);
         for (DragPoint dragPoint : dragPoints) {
             if (dragPoint.changed) {
                 dragPointProvider.dragPointChanged(dragPoint);
@@ -316,32 +230,32 @@ public class Preview3D extends PreviewWidget {
 
     boolean isPerspective = true;
     private void switchCamera () {
-        final Vector3 position = worldCamera.position;
-        final Vector3 direction = worldCamera.direction;
-
-        if (isPerspective) {
-            float aspect = (float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
-            float width = 10f;
-            float height = width * aspect;
-            OrthographicCamera orthographicCamera = new OrthographicCamera(width, height);
-            bongoPreview.setCamera(orthographicCamera);
-        } else {
-            PerspectiveCamera perspectiveCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            bongoPreview.setCamera(perspectiveCamera);
-        }
-
-        isPerspective = !isPerspective;
-
-        worldCamera = bongoPreview.getWorldCamera();
-        worldCamera.near = 0.1f;
-        worldCamera.far = 100f;
-        worldCamera.position.set(position);
-        worldCamera.direction.set(direction);
-        worldCamera.update();
-
-        if (cameraInputController instanceof CameraInputController) {
-            ((CameraInputController)cameraInputController).camera = worldCamera;
-        }
+//        final Vector3 position = worldCamera.position;
+//        final Vector3 direction = worldCamera.direction;
+//
+//        if (isPerspective) {
+//            float aspect = (float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
+//            float width = 10f;
+//            float height = width * aspect;
+//            OrthographicCamera orthographicCamera = new OrthographicCamera(width, height);
+//            bongoPreview.setCamera(orthographicCamera);
+//        } else {
+//            PerspectiveCamera perspectiveCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            bongoPreview.setCamera(perspectiveCamera);
+//        }
+//
+//        isPerspective = !isPerspective;
+//
+//        worldCamera = bongoPreview.getWorldCamera();
+//        worldCamera.near = 0.1f;
+//        worldCamera.far = 100f;
+//        worldCamera.position.set(position);
+//        worldCamera.direction.set(direction);
+//        worldCamera.update();
+//
+////        if (cameraInputController instanceof CameraInputController) {
+////            ((CameraInputController)cameraInputController).camera = worldCamera;
+////        }
 
 
     }
@@ -372,55 +286,6 @@ public class Preview3D extends PreviewWidget {
         }
     }
 
-    @Override
-    public String getBackgroundImagePath() {
-        return null;
-    }
-
-    @Override
-    public boolean isGridVisible() {
-        return false;
-    }
-
-    @Override
-    public boolean isBackgroundImageInBack() {
-        return false;
-    }
-
-    @Override
-    public float getBgImageSize() {
-        return 0;
-    }
-
-    @Override
-    public float getGridSize() {
-        return 0;
-    }
-
-    @Override
-    public void setBackgroundImage(String bgImagePath) {
-
-    }
-
-    @Override
-    public void setGridVisible(boolean isGridVisible) {
-
-    }
-
-    @Override
-    public void setImageIsBackground(boolean bgImageIsInBack) {
-
-    }
-
-    @Override
-    public void setBgImageSize(float bgImageSize) {
-
-    }
-
-    @Override
-    public void setGridSize(float gridSize) {
-
-    }
 
     @Override
     public void removePreviewImage() {

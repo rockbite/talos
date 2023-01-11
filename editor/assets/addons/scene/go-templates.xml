@@ -1,0 +1,89 @@
+<entityTemplates componentClassPath="com.talosvfx.talos.editor.addons.scene.logic.components" gizmoClassPath="com.talosvfx.talos.editor.addons.scene.widgets.gizmos">
+    <templates>
+        <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+            </components>
+        </template>
+        <template name = "sprite" title = "Sprite Object" nameTemplate = "sprite" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="SpriteRendererComponent"></component>
+            </components>
+        </template>
+        <template name = "particle" title = "Particle Effect" nameTemplate = "Particle_Effect" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="ParticleComponent"></component>
+            </components>
+        </template>
+        <template name = "camera" title = "Camera" nameTemplate = "Main_Camera" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="CameraComponent"></component>
+            </components>
+        </template>
+        <template name = "map" title = "Map" nameTemplate = "Map" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="MapComponent"></component>
+            </components>
+        </template>
+            <template name = "spine" title = "Spine" nameTemplate = "Spine_Animation" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="SpineRendererComponent"></component>
+            </components>
+        </template>
+        <template name = "curve" title = "Curve" nameTemplate = "Curve" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="CurveComponent"></component>
+            </components>
+        </template>
+        <template name = "psurface" title = "Paintable Surface" nameTemplate = "Surface" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="PaintSurfaceComponent"></component>
+            </components>
+        </template>
+    </templates>
+    <components>
+        <component className="TransformComponent">
+            <gizmos>
+                <gizmo className="TransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="CameraComponent">
+            <gizmos>
+                <gizmo className="CameraTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="SpriteRendererComponent">
+            <gizmos>
+                <gizmo className="SpriteTransformGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="MapComponent">
+            <gizmos>
+                <gizmo className="MapGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="ParticleComponent">
+        </component>
+        <component className="SpineRendererComponent">
+        </component>
+        <component className="ScriptComponent">
+        </component>
+        <component className="CurveComponent">
+            <gizmos>
+                <gizmo className="CurveGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="PaintSurfaceComponent">
+            <gizmos>
+                <gizmo className="PaintSurfaceGizmo"></gizmo>
+            </gizmos>
+        </component>
+    </components>
+</entityTemplates>

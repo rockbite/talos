@@ -15,10 +15,10 @@ import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ColorWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
-import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionCreatedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
 public abstract class AbstractShaderNode extends NodeWidget implements Observer {
@@ -108,13 +108,14 @@ public abstract class AbstractShaderNode extends NodeWidget implements Observer 
     public void resetProcessingTree() {
         isProcessed = false;
 
-        ObjectMap<String, NodeWidget.Connection> inputs = getInputs();
+        ObjectMap<String, Array<Connection>> inputs = getInputs();
 
         for(String id : inputs.keys()) {
-            NodeWidget.Connection connection = inputs.get(id);
-            AbstractShaderNode node = (AbstractShaderNode)connection.targetNode;
+            for(Connection connection: inputs.get(id)) {
+                AbstractShaderNode node = (AbstractShaderNode) connection.targetNode;
 
-            node.resetProcessingTree();
+                node.resetProcessingTree();
+            }
         }
     }
 
@@ -125,7 +126,7 @@ public abstract class AbstractShaderNode extends NodeWidget implements Observer 
 
         inputStrings.clear();
 
-        ObjectMap<String, NodeWidget.Connection> inputs = getInputs();
+        ObjectMap<String, Array<Connection>> inputs = getInputs();
 
         if(isInputDynamic != inputs.size > 0) {
             isInputDynamic = inputs.size > 0;
@@ -133,13 +134,14 @@ public abstract class AbstractShaderNode extends NodeWidget implements Observer 
         }
 
         for(String id : inputs.keys()) {
-            NodeWidget.Connection connection = inputs.get(id);
-            AbstractShaderNode node = (AbstractShaderNode)connection.targetNode;
+            for(Connection connection: inputs.get(id)) {
+                AbstractShaderNode node = (AbstractShaderNode) connection.targetNode;
 
-            node.processTree(shaderBuilder);
+                node.processTree(shaderBuilder);
 
-            String returnStatement = node.writeOutputCode(connection.targetSlot);
-            inputStrings.put(id, returnStatement);
+                String returnStatement = node.writeOutputCode(connection.targetSlot);
+                inputStrings.put(id, returnStatement);
+            }
         }
 
         prepareDeclarations(shaderBuilder);
@@ -370,9 +372,14 @@ public abstract class AbstractShaderNode extends NodeWidget implements Observer 
     }
 
     protected ShaderBuilder.Type getTargetVarType(String name, ShaderBuilder.Type defaultType) {
-        if(inputs.get(name) != null && inputs.get(name).targetNode != null) {
-            String removeVarName = inputs.get(name).targetSlot;
-            return ((AbstractShaderNode)inputs.get(name).targetNode).getVarType(removeVarName);
+
+        if(inputs.get(name) == null || inputs.get(name).isEmpty()) return defaultType;
+
+        Connection connection = inputs.get(name).first();
+
+        if(inputs.get(name) != null && connection.targetNode != null) {
+            String removeVarName = connection.targetSlot;
+            return ((AbstractShaderNode)connection.targetNode).getVarType(removeVarName);
         } else {
             return defaultType;
         }

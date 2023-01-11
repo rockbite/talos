@@ -51,7 +51,7 @@
 		orange: {down: button-orange-down, up: button-orange }
 		toggle: {checked: button-down, down: button-down, up: button }
 		dragndrop: {down: dragndrop-area-down, over: dragndrop-area-down, up: dragndrop-area-up }
-		square: {checked: timeline-btn-solid-special, down: timeline-btn-solid-pressed, up: timeline-btn-solid-normal, over: timeline-btn-solid-normal},
+		square: {checked: timeline-btn-solid-special, down: timeline-btn-solid-pressed, up: timeline-btn-solid-normal, over: timeline-btn-solid-normal, disabled: timeline-btn-solid-normal},
 		flat: {down: timeline-btn-flat-pressed, up: timeline-btn-flat-normal, over: timeline-btn-flat-normal},
 		miniSelector: {checked: timeline-checkbox-mini-checked, down: timeline-checkbox-mini, up: timeline-checkbox-mini}
 	},
@@ -156,7 +156,8 @@
 		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
 	},
 	com.talosvfx.talos.editor.widgets.ui.FilteredTree$TreeStyle: {
-		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over }
+		default: {minus: tree-minus, plus: tree-plus, selection: tree-selection, over: tree-over, companionBackground: packingItemBg },
+		modern: {minus: tree-minus, plus: tree-plus, selection: timeline-top-bar-bg, over: tree-over, underline: vis-check-down, companionBackground: packingItemBg }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 		default: {background: tooltip-pane, label: {font: default-font, fontColor: white} }

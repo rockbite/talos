@@ -55,7 +55,7 @@ public class PropertyPanelContainer extends Table {
         panelList.clear();
 
         for(IPropertyProvider provider: list) {
-            PropertiesPanel panel = new PropertiesPanel(provider, getSkin());
+            PropertiesPanel panel = new PropertiesPanel(provider, getSkin(), null);
 
             container.add(panel).growX().top().padBottom(5);
             container.row();

@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -9,21 +11,27 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
-    private final Table editing;
-    private final Table main;
-    private final Table progressContainer;
-    private final Table progress;
-
+    private Table editing;
+    private Table main;
+    private Table progressContainer;
+    private Table progress;
     private Label label;
     private Label valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
-    private Stage stageRef;
+    private ColorLibrary.BackgroundColor mainBgColor = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+
+    public void setMainColor(ColorLibrary.BackgroundColor color) {
+        mainBgColor = color;
+        setBackgrounds();
+    }
 
     public enum Type {
         NORMAL, TOP, MID, BOTTOM
@@ -33,25 +41,30 @@ public class ValueWidget extends AbstractWidget<Float> {
     private boolean isSelected;
     private boolean isHover;
 
-    private float minValue;
-    private float maxValue;
+    private float minValue = -9999;
+    private float maxValue = 9999;
     private float step = 0.01f;
 
     private float value;
 
     private boolean showProgress;
 
-    private EventListener stageListener;
     private Vector2 tmpVec = new Vector2();
 
     private boolean isDragging = false;
+
+    private boolean isDisabled;
 
     public ValueWidget() {
         editing = new Table();
         main = new Table();
         progressContainer = new Table();
         progress = new Table();
+    }
 
+    public ValueWidget(Skin skin) {
+        this();
+        init(skin);
     }
 
     @Override
@@ -118,9 +131,16 @@ public class ValueWidget extends AbstractWidget<Float> {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getTarget() == portBorder) return false;
+
+                if(isDisabled) return false;
                 dragged = false;
                 lastPos = x;
-                return super.touchDown(event, x, y, pointer, button);
+
+                event.stop();
+
+                super.touchDown(event, x, y, pointer, button);
+                return true;
             }
 
             @Override
@@ -139,15 +159,19 @@ public class ValueWidget extends AbstractWidget<Float> {
 
                 float change = diff * localStep;
 
-                setValue(value + change);
+                setValue(value + change, true);
 
                 lastPos = x;
+
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                isDragging = false;
+                if (isDragging) {
+                    isDragging = false;
+                    setValue(value, true);
+                }
                 setBackgrounds();
             }
 
@@ -163,7 +187,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
+                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 
@@ -180,36 +204,10 @@ public class ValueWidget extends AbstractWidget<Float> {
                 }
             }
         });
-
-        stageListener = new InputListener() {
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tmpVec.set(x, y);
-                ValueWidget.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = ValueWidget.this.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null) {
-                        getStage().setKeyboardFocus(null);
-                }
-
-                return false;
-            }
-        };
-    }
-
-    @Override
-    protected void setStage(Stage stage) {
-        super.setStage(stage);
-        if (stage != null) {
-            getStage().getRoot().addCaptureListener(stageListener);
-            stageRef = getStage();
-        } else {
-            if(stageRef != null) {
-                stageRef.getRoot().removeCaptureListener(stageListener);
-                stageRef = null;
-            }
-        }
     }
 
     private void showEditMode() {
+        if(isDisabled) return;
         if(editing.isVisible()) return;
 
         getStage().setKeyboardFocus(textField);
@@ -225,7 +223,7 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     private void hideEditMode() {
         try {
-            setValue(Float.parseFloat(textField.getText()));
+            setValue(Float.parseFloat(textField.getText()), true);
         } catch (NumberFormatException exception) {
             // keep prev value
         }
@@ -258,7 +256,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     private void setBackgrounds () {
         String shape = getShape();
 
-        ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
+        ColorLibrary.BackgroundColor color = mainBgColor;
 
         if(isSelected) {
             color = ColorLibrary.BackgroundColor.MID_GRAY;
@@ -279,16 +277,21 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public void setValue(float value) {
+        setValue(value, false);
+    }
+
+    public void setValue(float value, boolean notify) {
         if(value > maxValue) value = maxValue;
         if(value < minValue) value = minValue;
 
+        float precision = 1 / step;
+        value = MathUtils.round((value) * precision) / precision;
+
+        String text = value + "";
         this.value = value;
 
-        String text = "";
-        if (step < 1) {
-            text = value + ""; //todo format in gwt friendly way
-        } else if (step == 1) {
-            text = Math.round(value) + "";
+        if (MathUtils.round(step) == step) {
+            text = MathUtils.round(value) + "";
         }
 
         valueLabel.setText(text);
@@ -296,7 +299,9 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         updateProgress();
 
-        fireChangedEvent();
+        if (notify) {
+            fireChangedEvent();
+        }
     }
 
     private void updateProgress() {
@@ -333,9 +338,13 @@ public class ValueWidget extends AbstractWidget<Float> {
         setStep(step);
         setShowProgress(progress);
 
-        setValue(defaultValue);
+        setValue(defaultValue, false);
 
         setLabel(text);
+    }
+
+    public boolean isFastChange () {
+        return isDragging;
     }
 
     @Override
@@ -343,10 +352,9 @@ public class ValueWidget extends AbstractWidget<Float> {
         return value;
     }
 
-
     @Override
     public void read (Json json, JsonValue jsonValue) {
-        setValue(jsonValue.asFloat());
+        setValue(jsonValue.asFloat(), false);
     }
 
     @Override
@@ -357,5 +365,17 @@ public class ValueWidget extends AbstractWidget<Float> {
     public void setType(Type type) {
         this.type = type;
         setBackgrounds();
+    }
+
+    public void setNone() {
+        valueLabel.setText("-");
+    }
+
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
     }
 }

@@ -17,27 +17,29 @@
 package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.addons.AddonController;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
-import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.render.Render;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 public class TalosMain extends ApplicationAdapter {
 
@@ -45,7 +47,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private UIStage uiStage;
 
-	private NodeStage nodeStage;
 
 	private WorkplaceStage currentWorkplaceStage;
 
@@ -55,9 +56,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private static TalosMain instance;
 
-	private AddonController addonController;
 
-	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
+//	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
 	public static TalosMain Instance () {
 		return instance;
@@ -71,19 +71,11 @@ public class TalosMain extends ApplicationAdapter {
 
 	public ErrorReporting errorReporting;
 
-	public NodeStage NodeStage () {
-		return nodeStage;
-	}
-
 	private Preferences preferences;
 
 	private FileTracker fileTracker = new FileTracker();
 
 	private InputMultiplexer inputMultiplexer;
-
-	public TalosProject TalosProject() {
-		return ProjectController.TLS;
-	}
 
 	public IProject Project() {
 		return projectController.getProject();
@@ -103,14 +95,17 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
-	public Cursor pickerCursor;
-	private Cursor currentCursor;
-
 	private Array<InputProcessor> inputProcessors = new Array<>();
 	private Array<InputProcessor> customInputProcessors = new Array<>();
 
 	public TalosMain () {
 
+	}
+
+	public static boolean isOsX() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		boolean isMacOs = osName.startsWith("mac os x");
+		return isMacOs;
 	}
 
 	@Override
@@ -120,7 +115,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		screenshotService = new ScreenshotService();
 
-		addonController = new AddonController();
 
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
@@ -130,32 +124,25 @@ public class TalosMain extends ApplicationAdapter {
 
 		VisUI.load(skin);
 
-		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
-
 		uiStage = new UIStage(skin);
 
 		errorReporting = new ErrorReporting();
 
-		nodeStage = new NodeStage(skin);
-		currentWorkplaceStage = nodeStage;
 
 		projectController = new ProjectController();
 
 
-		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
+//		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		inputMultiplexer = new InputMultiplexer();
 		setInputProcessors();
 
 		uiStage.init();
-		nodeStage.init();
 
-		addonController.initAll();
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
 		// final init after all is done
-		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
 	}
 
 	private void setInputProcessors() {
@@ -173,50 +160,76 @@ public class TalosMain extends ApplicationAdapter {
 		setInputProcessors();
 	}
 
-	public void setCursor(Cursor cursor) {
-		if(currentCursor != cursor) {
-			if(cursor != null) {
-				Gdx.graphics.setCursor(cursor);
-			} else {
-				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+	private void loadFromProperties () {
+		FileHandle properties = Gdx.files.internal("talos-version.properties");
+		if (properties.exists()) {
+			Properties props = new Properties();
+			try {
+				props.load(properties.read());
+
+				String title = "Talos";
+				//buildHash=cac0e98
+				//buildTime=1660634881583
+				//version=1.4.2-SNAPSHOT
+
+				if (props.containsKey("version")) {
+					title = props.getProperty("version");
+				}
+				if (props.containsKey("buildTime")) {
+					String buildTime = props.getProperty("buildTime");
+					Date date = new Date(Long.parseLong(buildTime));
+
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
+					title += " " + sdf.format(date);
+				}
+				if (props.containsKey("buildHash")) {
+					title += " " + props.getProperty("buildHash");
+				}
+				Gdx.graphics.setTitle(title);
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			currentCursor = cursor;
 		}
+	}
+
+	public void setPerFrameCursorTypeEnabled () {
+
 	}
 
 	public void disableNodeStage() {
 		currentWorkplaceStage = null;
-		inputProcessors.removeValue(nodeStage.getStage(), true);
 	}
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
 	public void enableNodeStage() {
-		currentWorkplaceStage = nodeStage;
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
 	@Override
 	public void render () {
-		if (!focused) {
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		CursorUtil.checkAndReset();
+
+
+		try {
+			Thread.sleep(16);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		if (currentWorkplaceStage != null) {
-			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
+//			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {
 			Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
 		}
@@ -224,8 +237,8 @@ public class TalosMain extends ApplicationAdapter {
 
 		if (currentWorkplaceStage != null) {
 			currentWorkplaceStage.act();
-			currentWorkplaceStage.getStage().act();
-			currentWorkplaceStage.getStage().draw();
+//			currentWorkplaceStage.getStage().act();
+//			currentWorkplaceStage.getStage().draw();
 		}
 
 		fileTracker.update();
@@ -249,12 +262,12 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
-		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
-			currentWorkplaceStage.getStage().dispose();
-		}
-		pickerCursor.dispose();
+//		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
+//			currentWorkplaceStage.getStage().dispose();
+//		}
 		uiStage.getStage().dispose();
 		Render.instance().dispose();
+		SocketServer.dispose();
 	}
 
 	public Skin getSkin() {
@@ -262,11 +275,10 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public CameraController getCameraController() {
-		return currentWorkplaceStage.getCameraController();
-	}
+		if(currentWorkplaceStage == null) return null;
 
-	public AddonController Addons() {
-		return addonController;
+		return null;
+//		return currentWorkplaceStage.getCameraController();
 	}
 
 	public FileTracker FileTracker() {

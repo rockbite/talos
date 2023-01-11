@@ -149,4 +149,8 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 
 	}
+
+	public void setCamera(Camera camera) {
+		this.camera = camera;
+	}
 }

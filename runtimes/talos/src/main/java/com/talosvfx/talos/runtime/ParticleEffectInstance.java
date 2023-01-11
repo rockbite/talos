@@ -60,7 +60,7 @@ public class ParticleEffectInstance {
 		return paused;
 	}
 
-	public class EmitterComparator implements Comparator<IEmitter> {
+	public static class EmitterComparator implements Comparator<IEmitter> {
 
 		@Override
 		public int compare(IEmitter o1, IEmitter o2) {
@@ -150,6 +150,19 @@ public class ParticleEffectInstance {
 
 	public boolean isComplete() {
     	if(loopable) return false;
+
+		boolean allEmittersContinuous = true;
+		for (int i = 0; i < emitters.size; i++) {
+			if (!emitters.get(i).isContinuous()) {
+				allEmittersContinuous = false;
+				break;
+			}
+		}
+		
+		if (allEmittersContinuous) {
+			return false;
+		}
+
 
 		for (int i = 0; i < emitters.size; i++) {
 			if (!emitters.get(i).isComplete()) {

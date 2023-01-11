@@ -64,6 +64,8 @@ public class BongoPreview {
 		world.getSystem(EngineDebugSystem.class).setDrawUnitSquare(false);
 		world.getSystem(EngineDebugSystem.class).setDrawAxis(false);
 
+		world.getSystem(CameraControllerSystem.class).setEnabled(false);
+
 
 		//Particle
 		particleEntityID = world.create();

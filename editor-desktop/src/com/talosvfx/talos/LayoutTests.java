@@ -57,8 +57,6 @@ public class LayoutTests extends ApplicationAdapter {
 
 					stage.clear();
 					layoutGrid = new LayoutGrid(skin);
-
-					layoutGrid.readFromJson(Gdx.files.local("bananas.json"));
 				}
 
 				return super.keyDown(keycode);
@@ -84,7 +82,7 @@ public class LayoutTests extends ApplicationAdapter {
 
 		String uuid = UUID.randomUUID().toString();
 
-		return new DummyLayoutApp(skin, uuid);
+		return new DummyLayoutApp(skin, null, uuid);
 	}
 
 	private void newItem () {

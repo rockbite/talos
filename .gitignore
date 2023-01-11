@@ -92,3 +92,4 @@ editor/deploy/*.zip
 
 editor-desktop/out
 editor-web/war
+editor/assets/talos-version.properties

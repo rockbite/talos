@@ -27,12 +27,17 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.modules.EmitterModule;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModuleListPopup extends VisWindow {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ModuleListPopup.class);
 
     private InputListener stageListener;
     FilteredTree<String> tree;
@@ -41,6 +46,7 @@ public class ModuleListPopup extends VisWindow {
     Vector2 createLocation = new Vector2();
 
     private ObjectMap<String, String> nameToModuleClass = new ObjectMap<>();
+    private ModuleBoardWidget moduleBoardWidget;
 
     public ModuleListPopup(XmlReader.Element root) {
         super("Add Module", "module-list");
@@ -56,8 +62,6 @@ public class ModuleListPopup extends VisWindow {
 
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
-
-        TalosMain.Instance().moduleNames.clear();
 
         parseCategory(tree, null, root);
 
@@ -91,14 +95,14 @@ public class ModuleListPopup extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void chosen(FilteredTree.Node node) {
+            public void selected(FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     try {
                         Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
                         if(WrapperRegistry.map.containsKey(clazz)) {
-                            TalosMain.Instance().NodeStage().moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
+                            moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
@@ -107,8 +111,8 @@ public class ModuleListPopup extends VisWindow {
             }
 
             @Override
-            public void selected(FilteredTree.Node node) {
-
+            public void addedIntoSelection (FilteredTree.Node node) {
+                super.addedIntoSelection(node);
             }
         });
     }
@@ -140,9 +144,9 @@ public class ModuleListPopup extends VisWindow {
     private void registerModule(XmlReader.Element module) {
         try {
             Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + module.getText());
-            Class wrapperClazz =ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
+            Class wrapperClazz = ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
-            TalosMain.Instance().moduleNames.put(wrapperClazz, module.getAttribute("name"));
+            TalosVFXUtils.moduleNames.put(wrapperClazz, module.getAttribute("name"));
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
@@ -150,7 +154,9 @@ public class ModuleListPopup extends VisWindow {
         WrapperRegistry.reg(EmitterModule.class, EmitterModuleWrapper.class);
     }
 
-    public void showPopup(Stage stage, Vector2 location) {
+    public void showPopup(Stage stage, Vector2 location, ModuleBoardWidget moduleBoardWidget) {
+        this.moduleBoardWidget = moduleBoardWidget;
+
         setPosition(location.x, location.y - getHeight());
         if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
         ActorUtils.keepWithinStage(stage, this);
@@ -166,7 +172,6 @@ public class ModuleListPopup extends VisWindow {
 
     @Override
     public boolean remove () {
-        TalosMain.Instance().NodeStage().moduleBoardWidget.clearCC();
         if (getStage() != null) getStage().removeListener(stageListener);
         return super.remove();
     }

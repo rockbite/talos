@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.ui.DynamicTable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
@@ -446,7 +447,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             return override;
         }
 
-        String moduleName = TalosMain.Instance().moduleNames.get(this.getClass());
+        String moduleName = TalosVFXUtils.moduleNames.get(this.getClass());
 
         if(!titleOverride.equals("")) {
             if (appendModule) {
@@ -681,9 +682,6 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         setModule(module);
     }
 
-    protected void setDirty() {
-        TalosMain.Instance().ProjectController().setDirty();
-    }
 }
 
 

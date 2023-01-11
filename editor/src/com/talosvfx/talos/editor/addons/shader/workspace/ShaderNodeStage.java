@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
-import com.talosvfx.talos.editor.addons.shader.nodes.SampleTextureNode;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
@@ -19,7 +18,7 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +31,8 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     FrameBuffer frameBuffer;
     PolygonBatch spriteBatch;
     Viewport viewport;
+
+
 
     class ExportSequencePayload {
         public int width;
@@ -68,13 +69,18 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    public NodeWidget createNode (String nodeName, float x, float y) {
+    public void onUpdate () {
+
+    }
+
+    @Override
+    public NodeWidget createNode (String nodeName, float screenX, float y) {
 
         if(!nodeName.equals("ColorOutput")) {
-            return super.createNode(nodeName, x, y);
+            return super.createNode(nodeName, screenX, y);
         } else {
             if(colorOutput == null) {
-                NodeWidget node = super.createNode(nodeName, x, y);
+                NodeWidget node = super.createNode(nodeName, screenX, y);
                 colorOutput = (ColorOutput) node;
                 return node;
             }
@@ -163,21 +169,21 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         Vector2 tmp = new Vector2();
         Vector2 targetSize = new Vector2(64, 64);
 
-        for(NodeWidget nodeWidget : nodeBoard.nodes) {
-            if(nodeWidget instanceof SampleTextureNode) {
-                SampleTextureNode node = (SampleTextureNode) nodeWidget;
-                Texture texture = node.getValue();
-
-                if(texture.getWidth() > targetSize.x) {
-                    targetSize.x = texture.getWidth();
-                }
-
-                if(texture.getHeight() > targetSize.y) {
-                    targetSize.y = texture.getHeight();
-                }
-            }
-
-        }
+//        for(NodeWidget nodeWidget : nodeBoard.nodes) {
+//            if(nodeWidget instanceof SampleTextureNode) {
+//                SampleTextureNode node = (SampleTextureNode) nodeWidget;
+//                Texture texture = node.getValue();
+//
+//                if(texture.getWidth() > targetSize.x) {
+//                    targetSize.x = texture.getWidth();
+//                }
+//
+//                if(texture.getHeight() > targetSize.y) {
+//                    targetSize.y = texture.getHeight();
+//                }
+//            }
+//
+//        }
 
         viewport.update((int)targetSize.x, (int)targetSize.y);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);

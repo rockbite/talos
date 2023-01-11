@@ -12,7 +12,6 @@ import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentTypeToggle;
-import com.talosvfx.talos.editor.addons.bvb.BvBAddon;
 import com.talosvfx.talos.editor.widgets.ui.BackgroundButton;
 import com.talosvfx.talos.editor.widgets.ui.NumericalValueField;
 
@@ -73,11 +72,11 @@ public class AttachmentPointBox extends Table {
                     // change the bone
                     if(point == null) return;
                     Vector2 pos = new Vector2();
-                    Bone bone = ((BvBAddon) TalosMain.Instance().Addons().getAddon(BvBAddon.class)).getWorkspace().getSkeletonContainer().getBoneByName(boneList.getSelected());
-                    pos.sub(bone.getWorldX(), bone.getWorldY());
-                    float boneWorldScale = bone.getWorldScaleX();
-                    point.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
-                    point.setBone(bone.getData().getName());
+//                    Bone bone = ((BvBAddon) TalosMain.Instance().Addons().getAddon(BvBAddon.class)).getWorkspace().getSkeletonContainer().getBoneByName(boneList.getSelected());
+//                    pos.sub(bone.getWorldX(), bone.getWorldY());
+//                    float boneWorldScale = bone.getWorldScaleX();
+//                    point.setOffset(pos.x / boneWorldScale, pos.y / boneWorldScale);
+//                    point.setBone(bone.getData().getName());
                 }
             });
         }

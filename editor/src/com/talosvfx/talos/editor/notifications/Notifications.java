@@ -8,168 +8,205 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.notifications.events.*;
-
+import lombok.Getter;
 
 public class Notifications {
 
-    private static Notifications instance;
+	private static Notifications instance;
 
-    private ObjectMap<Class<? extends TalosEvent>, Array<EventRunner>> invocationMap = new ObjectMap<>();
-    private ObjectMap<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerInvocationMap = new ObjectMap<>();
-    private ObjectMap<Class, Pool<TalosEvent>> eventPoolMap = new ObjectMap<>();
+	private ObjectMap<Class<? extends TalosEvent>, Array<EventRunner>> invocationMap = new ObjectMap<>();
+	private ObjectMap<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerInvocationMap = new ObjectMap<>();
+	private ObjectMap<Class, Pool<TalosEvent>> eventPoolMap = new ObjectMap<>();
 
-    private Notifications() {
+	private Notifications () {
 
-    }
+	}
 
-    public interface EventRunner {
-        public void runEvent(TalosEvent event);
-    }
+	public abstract class EventRunner {
 
-    private static Notifications getInstance() {
-        if(instance == null) {
-            instance = new Notifications();
-            instance.registerEvents();
-        }
+		@Getter
+		private final Observer observer;
 
-        return instance;
-    }
+		public EventRunner (Observer observer) {
+			this.observer = observer;
+		}
+		public abstract void runEvent (TalosEvent event);
+	}
 
-    private void registerEvents() {
-        addPool(ProjectSavedEvent.class);
-        addPool(NodeCreatedEvent.class);
-        addPool(NodeConnectionCreatedEvent.class);
-        addPool(NodeConnectionRemovedEvent.class);
-        addPool(NodeDataModifiedEvent.class);
-        addPool(NodeRemovedEvent.class);
-        addPool(AssetFileDroppedEvent.class);
-    }
+	private static Notifications getInstance () {
+		if (instance == null) {
+			instance = new Notifications();
+			instance.registerEvents();
+		}
 
-    private void addPool(Class clazz) {
-        if(ClassReflection.isAssignableFrom(TalosEvent.class, clazz)) {
-            Pool<TalosEvent> pool = new Pool<TalosEvent>() {
-                @Override
-                protected TalosEvent newObject () {
-                    try {
-                        return (TalosEvent) ClassReflection.newInstance(clazz);
-                    } catch (ReflectionException e) {
-                        throw new GdxRuntimeException(e);
-                    }
-                }
-            };
-            eventPoolMap.put(clazz, pool);
-        } else {
-            throw new GdxRuntimeException("pool must implement Event interface");
-        }
-    }
+		return instance;
+	}
 
-    public void registerObserverInner(Observer observer) {
-        final Method[] declaredMethods = ClassReflection.getMethods(observer.getClass());
+	private void registerEvents () {
+	}
 
-        for (Method method : declaredMethods) {
-            final Annotation declaredAnnotation = method.getDeclaredAnnotation(EventHandler.class);
-            if (declaredAnnotation == null) continue;
+	public static void addEventToPool (Class<? extends TalosEvent> clazz) {
+		getInstance().addPool(clazz);
+	}
 
-            EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
+	private void addPool (Class clazz) {
+		if (ClassReflection.isAssignableFrom(TalosEvent.class, clazz)) {
+			Pool<TalosEvent> pool = new Pool<TalosEvent>() {
+				@Override
+				protected TalosEvent newObject () {
+					try {
+						return (TalosEvent)ClassReflection.newInstance(clazz);
+					} catch (ReflectionException e) {
+						throw new GdxRuntimeException(e);
+					}
+				}
+			};
+			eventPoolMap.put(clazz, pool);
+		} else {
+			throw new GdxRuntimeException("pool must implement Event interface");
+		}
+	}
 
-            if (eventHandler == null) continue;
+	public void registerObserverInner (Observer observer) {
+		final Method[] declaredMethods = ClassReflection.getMethods(observer.getClass());
 
-            //Events should only have one param, and that param should be of instance Event
-            if (method.getParameterTypes().length == 1 && ClassReflection.isAssignableFrom(TalosEvent.class, method.getParameterTypes()[0])) {
-                Class<? extends TalosEvent> event = method.getParameterTypes()[0];
+		for (Method method : declaredMethods) {
+			final Annotation declaredAnnotation = method.getDeclaredAnnotation(EventHandler.class);
+			if (declaredAnnotation == null)
+				continue;
 
-                method.setAccessible(true);
+			EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
 
-                EventRunner eventRunner = new EventRunner() {
-                    @Override
-                    public void runEvent (TalosEvent event) {
-                        try {
-                            method.invoke(observer, event);
-                        } catch (ReflectionException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
+			if (eventHandler == null)
+				continue;
 
-                if(!invocationMap.containsKey(event)) {
-                    invocationMap.put(event, new Array<>());
-                }
-                if(!observerInvocationMap.containsKey(observer)) {
-                    observerInvocationMap.put(observer, new ObjectMap<>());
-                }
+			//Events should only have one param, and that param should be of instance Event
+			if (method.getParameterTypes().length == 1 && ClassReflection.isAssignableFrom(TalosEvent.class, method.getParameterTypes()[0])) {
+				Class<? extends TalosEvent> event = method.getParameterTypes()[0];
 
-                Array<EventRunner> observerMethods = invocationMap.get(event);
-                observerMethods.add(eventRunner);
+				method.setAccessible(true);
 
-                observerInvocationMap.get(observer).put(event, eventRunner);
-            }
-        }
-    }
+				EventRunner eventRunner = new EventRunner(observer) {
+					@Override
+					public void runEvent (TalosEvent event) {
+						try {
+							method.invoke(observer, event);
+						} catch (ReflectionException e) {
+							e.printStackTrace();
+						}
+					}
+				};
 
-    public void fireEventInner(TalosEvent event) {
-        if(invocationMap.containsKey(event.getClass())) {
-            for(EventRunner eventRunner: invocationMap.get(event.getClass())) {
-                eventRunner.runEvent(event);
-            }
-        }
+				if (!invocationMap.containsKey(event)) {
+					invocationMap.put(event, new Array<>());
+				}
+				if (!observerInvocationMap.containsKey(observer)) {
+					observerInvocationMap.put(observer, new ObjectMap<>());
+				}
 
-        eventPoolMap.get(event.getClass()).free(event);
-    }
+				Array<EventRunner> observerMethods = invocationMap.get(event);
+				observerMethods.add(eventRunner);
 
-    public void notifyObserversInner(Array<Observer> observers, TalosEvent event) {
-        for(Observer observer: observers) {
-            ObjectMap<Class<? extends TalosEvent>, EventRunner> eventMap = observerInvocationMap.get(observer);
-            EventRunner eventRunner = eventMap.get(event.getClass());
+				observerInvocationMap.get(observer).put(event, eventRunner);
+			}
+		}
+	}
 
-            eventRunner.runEvent(event);
+	public void fireEventInner (TalosEvent event) {
+		if (invocationMap.containsKey(event.getClass())) {
+			Array<EventRunner> eventRunners = invocationMap.get(event.getClass());
+			for (int i = 0; i < eventRunners.size; i++) {
+				EventRunner eventRunner = eventRunners.get(i);
+				testAndFireEvent(eventRunner, event);
+			}
+		}
 
-            eventPoolMap.get(event.getClass()).free(event);
-        }
-    }
+		if (event.notifyThroughSocket()) {
+			NotificationMessageHandler.sendEventToSocket(event);
+		}
 
-    public <T extends TalosEvent> T obtainEventInner(Class<T> clazz) {
-        if(!eventPoolMap.containsKey(clazz)) {
-            throw new GdxRuntimeException("Event is not registered for pooling: " + clazz.getSimpleName());
-        }
+		eventPoolMap.get(event.getClass()).free(event);
+	}
 
-        T eventObject = (T) eventPoolMap.get(clazz).obtain();
+	private void testAndFireEvent (EventRunner eventRunner, TalosEvent event) {
+		if (event instanceof ContextRequiredEvent) {
+			if (!(eventRunner.getObserver() instanceof EventContextProvider)) {
+				throw new GdxRuntimeException("Invalid event handler. Events that extend ContextRequiredEvent must have their " +
+						"owner class implement ContextProvider");
+			}
 
-        return eventObject;
-    }
+			EventContextProvider<?> eventContextProvider  = (EventContextProvider<?>) eventRunner.getObserver();
 
-    public void unregisterObserverInner(Observer observer) {
-        if(!observerInvocationMap.containsKey(observer)) {
-            return;
-        }
+			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
 
-        for(Class<? extends TalosEvent> eventClass: observerInvocationMap.get(observer).keys()) {
-            EventRunner runner = observerInvocationMap.get(observer).get(eventClass);
+			if (eventContextObject == null) {
+				throw new GdxRuntimeException("Invalid event, context must be provided");
+			}
+			if (!(eventContextObject == eventContextProvider.getContext())) {
+				return;
+			}
 
-            Array<EventRunner> eventRunners = invocationMap.get(eventClass);
-            eventRunners.removeValue(runner, true);
-        }
+		}
+		eventRunner.runEvent(event);
+	}
 
-        observerInvocationMap.remove(observer);
-    }
+	public void notifyObserversInner (Array<Observer> observers, TalosEvent event) {
+		for (Observer observer : observers) {
+			ObjectMap<Class<? extends TalosEvent>, EventRunner> eventMap = observerInvocationMap.get(observer);
+			EventRunner eventRunner = eventMap.get(event.getClass());
 
-    public static void registerObserver(Observer observer) {
-        getInstance().registerObserverInner(observer);
-    }
+			testAndFireEvent(eventRunner, event);
 
-    public static void fireEvent(TalosEvent event) {
-        getInstance().fireEventInner(event);
-    }
+			eventPoolMap.get(event.getClass()).free(event);
+		}
+	}
 
-    public static void notifyObservers(Array<Observer> observers, TalosEvent event) {
-        getInstance().notifyObserversInner(observers, event);
-    }
+	public <T extends TalosEvent> T obtainEventInner (Class<T> clazz) {
+		if (!eventPoolMap.containsKey(clazz)) {
+			addEventToPool(clazz);
+		}
 
-    public static <T extends TalosEvent> T obtainEvent(Class<T> clazz) {
-        return getInstance().obtainEventInner(clazz);
-    }
+		T eventObject = (T)eventPoolMap.get(clazz).obtain();
 
-    public static void unregisterObserver(Observer observer) {
-        getInstance().unregisterObserverInner(observer);
-    }
+		return eventObject;
+	}
+
+	public void unregisterObserverInner (Observer observer) {
+		if (!observerInvocationMap.containsKey(observer)) {
+			return;
+		}
+
+		for (Class<? extends TalosEvent> eventClass : observerInvocationMap.get(observer).keys()) {
+			EventRunner runner = observerInvocationMap.get(observer).get(eventClass);
+
+			Array<EventRunner> eventRunners = invocationMap.get(eventClass);
+			eventRunners.removeValue(runner, true);
+		}
+
+		observerInvocationMap.remove(observer);
+	}
+
+	public static void registerObserver (Observer observer) {
+		getInstance().registerObserverInner(observer);
+	}
+
+	public static void quickFire (Class clazz) {
+		getInstance().fireEventInner(obtainEvent(clazz));
+	}
+
+	public static void fireEvent (TalosEvent event) {
+		getInstance().fireEventInner(event);
+	}
+
+	public static void notifyObservers (Array<Observer> observers, TalosEvent event) {
+		getInstance().notifyObserversInner(observers, event);
+	}
+
+	public static <T extends TalosEvent> T obtainEvent (Class<T> clazz) {
+		return getInstance().obtainEventInner(clazz);
+	}
+
+	public static void unregisterObserver (Observer observer) {
+		getInstance().unregisterObserverInner(observer);
+	}
 }

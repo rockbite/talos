@@ -16,7 +16,6 @@
 
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -25,12 +24,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
-public class EditableLabel extends Table {
+public class EditableLabel extends Table implements ActorCloneable {
 
     private Table labelTable;
     private Table inputTable;
@@ -42,7 +40,15 @@ public class EditableLabel extends Table {
 
     private Vector2 tmpVec = new Vector2();
 
-    private final InputListener stageListener;
+    private boolean editMode = false;
+    private boolean editable = true;
+
+    private Cell<Label> labelCell;
+    private Actor keyboardFocus;
+
+    public void setEditable (boolean editable) {
+        this.editable = editable;
+    }
 
     public interface EditableLabelChangeListener {
         void editModeStarted ();
@@ -66,12 +72,12 @@ public class EditableLabel extends Table {
 
         label = new Label(text, getSkin(), "default");
         label.setEllipsis(true);
-        labelTable.add(label).growX().width(0);
+        labelCell = labelTable.add(label).width(0).growX();
 
-
-        textField = new TextField(text, getSkin(), "no-bg");
-        inputTable.add(textField);
-        inputTable.add().expandX();
+		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
+		TextField.TextFieldStyle style = new TextField.TextFieldStyle(textFieldStyle);
+		textField = new TextField(text, style);
+        inputTable.add(textField).width(0).growX();
 
         addListener(new ClickListener() {
 
@@ -81,7 +87,7 @@ public class EditableLabel extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 long time = TimeUtils.millis();
 
-                if(time - clickTime < 200) {
+                if(time - clickTime < 200 && editable) {
                     setEditMode();
                 }
 
@@ -94,46 +100,24 @@ public class EditableLabel extends Table {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if(keycode == Input.Keys.ENTER) {
-                    setStaticMode();
-                    if(listener != null) {
-                        listener.changed(label.getText().toString());
-                    }
+                if(SceneEditorWorkspace.isEnterPressed(keycode)) {
+                    finishTextEdit();
                 }
 
                 return super.keyDown(event, keycode);
             }
         });
 
-        textField.addListener(new FocusListener() {
-            @Override
-            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-                super.keyboardFocusChanged(event, actor, focused);
-                if(!focused) {
-                    setStaticMode();
-                    if(listener != null) {
-                        listener.changed(label.getText().toString());
-                    }
-                }
-            }
-        });
-
-        stageListener = new InputListener() {
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                tmpVec.set(x, y);
-                EditableLabel.this.stageToLocalCoordinates(tmpVec);
-                Actor touchTarget = EditableLabel.this.hit(tmpVec.x, tmpVec.y, false);
-                if (touchTarget == null && getStage() != null) {
-                    getStage().setKeyboardFocus(null);
-                }
-
-                return false;
-            }
-        };
-
         pack();
 
         setStaticMode();
+    }
+
+    public void finishTextEdit () {
+        setStaticMode();
+        if(listener != null) {
+            listener.changed(label.getText().toString());
+        }
     }
 
     public void setListener(EditableLabelChangeListener listener) {
@@ -141,40 +125,56 @@ public class EditableLabel extends Table {
     }
 
     @Override
-    protected void setStage(Stage stage) {
+    public void setStage(Stage stage) {
         super.setStage(stage);
-        if (stage != null) {
-            getStage().getRoot().addCaptureListener(stageListener);
-        }
     }
 
     public void setEditMode() {
-        if (listener != null) {
-            listener.editModeStarted();
+        if (getStage() != null) {
+            keyboardFocus = getStage().getKeyboardFocus();
+            getStage().setKeyboardFocus(textField);
         }
+
+        editMode = true;
         labelTable.setVisible(false);
         inputTable.setVisible(true);
-        textField.setWidth(label.getPrefWidth() + 10);
+
         textField.setText(label.getText().toString());
-        if( TalosMain.Instance() != null) {
-            TalosMain.Instance().NodeStage().getStage().unfocusAll();
-        }
-        getStage().setKeyboardFocus(textField);
+
         textField.selectAll();
     }
 
     public void setStaticMode() {
+        editMode = false;
         labelTable.setVisible(true);
         inputTable.setVisible(false);
 
         label.setText(textField.getText());
         textField.clearSelection();
+
+        if (getStage() != null) {
+            if (getStage().getKeyboardFocus() == this) {
+                getStage().setKeyboardFocus(keyboardFocus);
+            }
+        }
     }
 
     @Override
     public void setColor (Color color) {
+        super.setColor(color);
+        textField.setColor(color);
         label.setColor(color);
+		textField.getStyle().fontColor.set(color);
     }
+
+    @Override
+    public void setColor (float r, float g, float b, float a) {
+        super.setColor(r, g, b, a);
+        textField.setColor(r, g, b, a);
+        label.setColor(r, g, b, a);
+		textField.getStyle().fontColor.set(r, g, b, a);
+
+	}
 
     public String getText() {
         return label.getText().toString();
@@ -184,7 +184,32 @@ public class EditableLabel extends Table {
         label.setText(text);
     }
 
-    public Label getLabel () {
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setAlignment (int alignment) {
+        label.setAlignment(alignment);
+        textField.setAlignment(alignment);
+    }
+
+    @Override
+    public Actor copyActor (Actor copyFrom) {
+        Label label = new Label(this.label.getText(), getSkin());
         return label;
+    }
+    public Label getLabel() {
+        return label;
+    }
+
+    public TextField getTextField() { return textField; }
+
+    public Cell<Label> getLabelCell() {
+        return labelCell;
+    }
+
+    @Override
+    public float getPrefWidth () {
+        return Math.max(getTextField().getPrefWidth(), getLabelCell().getPrefWidth());
     }
 }

@@ -98,7 +98,7 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 
 		simple3DBatch.begin(cameras.getGameCamera(), shaderProgram.getShaderProgram());
 
-		float deltaTime = Gdx.graphics.getDeltaTime();
+		float deltaTime = Math.min(1/30f, Gdx.graphics.getDeltaTime());
 
 		IntBag entities = renderObjectsSubscription.getEntities();
 		int size = entities.size();

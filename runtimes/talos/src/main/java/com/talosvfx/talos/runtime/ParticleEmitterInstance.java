@@ -98,6 +98,9 @@ public class ParticleEmitterInstance implements IEmitter {
 	}
 
 	public void update (float delta) {
+		final DrawableModule drawableModule = getDrawableModule();
+		if (drawableModule == null) return;
+
 		emitterModule = emitterGraph.getEmitterModule();
 		if (emitterModule == null)
 			return;

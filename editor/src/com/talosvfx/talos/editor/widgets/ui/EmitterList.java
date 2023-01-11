@@ -4,14 +4,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
+import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.widgets.ui.timeline.ActionRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.BasicRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
+
+    private Preview3D preview;
+    private ParticleNodeEditorApp editorApp;
 
     public EmitterList(Skin skin) {
         super(skin);
@@ -39,7 +48,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onToggleLoop (boolean loopEnabled) {
-                TalosMain.Instance().TalosProject().getParticleEffect().loopable = loopEnabled;
+                preview.getEffectInstance().loopable = loopEnabled;
             }
 
             @Override
@@ -56,15 +65,16 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             protected void onItemVisibilityChange (Object identifier, boolean isVisible) {
                 ParticleEmitterWrapper wrapper = (ParticleEmitterWrapper) identifier;
                 wrapper.isMuted = !isVisible;
-                TalosMain.Instance().TalosProject().getParticleEffect().getEmitter(wrapper.getEmitter()).setVisible(isVisible);
+                preview.getEffectInstance().getEmitter(wrapper.getEmitter()).setVisible(isVisible);
             }
 
             @Override
             protected void onItemSelect(Object identifier) {
                 ParticleEmitterWrapper selected = (ParticleEmitterWrapper) identifier;
 
-                TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(selected);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(selected);
+
+                editorApp.getModuleBoardWidget().currentEmitterWrapper = selected;
+                editorApp.getModuleBoardWidget().setCurrentEmitter(selected);
             }
 
             @Override
@@ -76,7 +86,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onSkipToStartClicked () {
-                TalosMain.Instance().TalosProject().getParticleEffect().restart();
+                preview.getEffectInstance().restart();
                 getActionWidget().getPlayButton().setChecked(true);
             }
 
@@ -85,9 +95,9 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 boolean play = getActionWidget().getPlayButton().isChecked();
 
                 if(play) {
-                    TalosMain.Instance().TalosProject().getParticleEffect().resume();
+                    preview.getEffectInstance().resume();
                 } else {
-                    TalosMain.Instance().TalosProject().getParticleEffect().pause();
+                    preview.getEffectInstance().pause();
                 }
 
             }
@@ -103,16 +113,18 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 }
 
                 for(ParticleEmitterWrapper wrapper: selector) {
-                    TalosMain.Instance().TalosProject().removeEmitter(wrapper);
+                    removeEmitter(wrapper);
                 }
                 
                 removeItems(selector);
 
-                Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
+                Array<ParticleEmitterWrapper> activeWrappers = editorApp.getEditorState().activeWrappers;
+
                 if(activeWrappers.size == 0) {
                     // we need to create default one
-                    TalosMain.Instance().TalosProject().resetToNew();
+                    editorApp.resetToNew();
                 }
+                AssetRepository.getInstance().assetChanged(editorApp.getGameAsset());
             }
         });
     }
@@ -123,10 +135,9 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         if(selectedItem != null) {
             float sortPosition = selectedItem.getEmitter().getSortPosition() + moveBy;
             selectedItem.setPosition(sortPosition);
-            TalosMain.Instance().TalosProject().sortEmitters();
-
-            Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-            //activeWrappers.reverse();
+            editorApp.sortEmitters();
+            Array<ParticleEmitterWrapper> activeWrappers = editorApp.getEditorState().activeWrappers;
+            activeWrappers.reverse();
             setData(activeWrappers);
             setSelected(selectedItem);
         }
@@ -140,14 +151,13 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             sortPosition = selectedItem.getEmitter().getSortPosition() + 0.5f;
         }
 
-        final ParticleEmitterWrapper emitter = TalosMain.Instance().TalosProject().createNewEmitter("emitter", sortPosition);
-        Array<ParticleEmitterWrapper> activeWrappers = TalosMain.Instance().TalosProject().getActiveWrappers();
-
-        // update all items
-        //activeWrappers.reverse();
+        ParticleEmitterWrapper emitter = createNewEmitter("emitter", sortPosition);
+        Array<ParticleEmitterWrapper> activeWrappers = editorApp.getEditorState().activeWrappers;
+        activeWrappers.reverse();
         setData(activeWrappers);
-
         setSelected(emitter);
+
+        editorApp.getModuleBoardWidget().loadEmitterToBoard(emitter, new EmitterData());
     }
 
     @Override
@@ -159,9 +169,6 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         if(emitterWrappers.size > 0) {
             setData(emitterWrappers);
             setSelected(emitterWrappers.first());
-
-            TalosMain.Instance().TalosProject().setCurrentEmitterWrapper(emitterWrappers.first());
-            TalosMain.Instance().NodeStage().moduleBoardWidget.setCurrentEmitter(emitterWrappers.first());
         }
     }
 
@@ -169,15 +176,105 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public void act (float delta) {
         super.act(delta);
 
-        float totalTime = TalosMain.Instance().TalosProject().getParticleEffect().getTotalTime();
-        float duration = TalosMain.Instance().TalosProject().estimateTotalEffectDuration();
-
-        float time = totalTime % duration;
-
-        setTimeCursor(time);
+        if(preview != null && preview.getEffectInstance() != null) {
+            float totalTime = preview.getEffectInstance().getTotalTime();
+            float duration = estimateTotalEffectDuration();
+            float time = totalTime % duration;
+            setTimeCursor(time);
+        }
     }
 
     public void setPaused (boolean paused) {
         getActionWidget().getPlayButton().setChecked(paused);
+    }
+
+    public void setPreview(Preview3D preview3D) {
+        this.preview = preview3D;
+    }
+
+
+    public float estimateTotalEffectDuration() {
+        if(preview == null) return 0;
+
+        Array<ParticleEmitterDescriptor> emitterDescriptors = preview.getDescriptor().emitterModuleGraphs;
+
+        if (preview.getDescriptor().isContinuous()) {
+            float maxWindow = 0;
+            for(ParticleEmitterDescriptor emitter: emitterDescriptors) {
+                if(emitter.getEmitterModule() != null) {
+                    float duration = emitter.getEmitterModule().getDuration();
+
+                    float totalWaitTime = duration;
+
+                    if (maxWindow < totalWaitTime) {
+                        maxWindow = totalWaitTime;
+                    }
+                }
+            }
+            return maxWindow;
+        } else {
+            float furthestPoint = 0;
+            for(ParticleEmitterDescriptor emitter: emitterDescriptors) {
+                if(emitter.getEmitterModule() != null && emitter.getParticleModule() != null) {
+                    float delay = emitter.getEmitterModule().getDelay();
+                    float duration = emitter.getEmitterModule().getDuration();
+                    float life = emitter.getParticleModule().getLife();
+
+                    float point = delay + duration + life;
+
+                    if (furthestPoint < point) {
+                        furthestPoint = point;
+                    }
+                }
+            }
+
+            return furthestPoint;
+        }
+    }
+
+    private ParticleEmitterWrapper createNewEmitter (String emitterName, float sortPosition) {
+        ParticleEmitterWrapper emitterWrapper = editorApp.initEmitter(emitterName);
+        Supplier<ParticleEffectDescriptor> descriptorSupplier = editorApp.getGameAsset().getResource().getDescriptorSupplier();
+        ParticleEffectDescriptor particleEffectDescriptor = descriptorSupplier.get();
+        particleEffectDescriptor.addEmitter(emitterWrapper.getEmitter());
+
+        editorApp.getEditorState().activeWrappers.add(emitterWrapper);
+
+        editorApp.getModuleBoardWidget().currentEmitterWrapper = emitterWrapper;
+
+        emitterWrapper.setPosition(sortPosition);
+        editorApp.sortEmitters();
+
+        //todo: mark as modified to save
+
+        editorApp.getModuleBoardWidget().setCurrentEmitter(emitterWrapper);
+
+        AssetRepository.getInstance().assetChanged(editorApp.getGameAsset());
+
+        return emitterWrapper;
+    }
+
+    public void setEditorApp(ParticleNodeEditorApp app) {
+        this.editorApp = app;
+    }
+
+    public void removeEmitter (ParticleEmitterWrapper wrapper) {
+        editorApp.getModuleBoardWidget().removeEmitter(wrapper);
+        preview.getEffectInstance().removeEmitterForEmitterDescriptor(wrapper.getEmitter());
+        preview.getDescriptor().removeEmitter(wrapper.getEmitter());
+        Array<ParticleEmitterWrapper> activeWrappers = editorApp.getEditorState().activeWrappers;
+
+
+        activeWrappers.removeValue(wrapper, true);
+        if (activeWrappers.size > 0) {
+            editorApp.getModuleBoardWidget().currentEmitterWrapper = activeWrappers.peek();
+        } else {
+            editorApp.getModuleBoardWidget().currentEmitterWrapper = null;
+        }
+
+        //todo : node stage onEmitterRemoved call needed?
+
+        setEmitters(activeWrappers);
+
     }
 }
