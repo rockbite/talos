@@ -211,7 +211,7 @@ public class PrefWidgetFactory {
 
             fileOpener = new FileOpenField();
             fileOpener.getInputContainer().setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
-            rightContent.add(fileOpener).left().expand().growX().padLeft(5).padRight(5);
+            rightContent.add(fileOpener).left().expand().growX().padLeft(5).padRight(5).padBottom(5);
         }
 
         @Override
