@@ -369,15 +369,13 @@ public class SEPropertyPanel extends PropertyPanel {
                                     //Sugggest to put it in scripts
                                     FileHandle suggestedScriptsFolder = SceneUtils.getContextualFolderToCreateFile();
 
-                                    FileHandle newScriptDestination = suggestedScriptsFolder.child(newFileName + ".ts");
                                     FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
-                                    AssetRepository.getInstance().copyRawAsset(templateScript, newScriptDestination);
+                                    FileHandle newScript = AssetRepository.getInstance().copyRawAsset(templateScript, suggestedScriptsFolder.child(newFileName + ".ts"));
 
-                                    String templateString = templateScript.readString();
-                                    templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
-                                    newScriptDestination.writeString(templateString, false);
+                                    String processed = newScript.readString().replaceAll("%TEMPLATE_NAME%", newFileName);
+                                    newScript.writeString(processed, false);
 
-                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScriptDestination, false);
+                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScript, false);
 
                                     if (assetForPath != null) {
 
