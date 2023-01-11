@@ -56,6 +56,8 @@ public class SceneUtils {
 		}
 		component.setGameAsset(spriteAsset);
 
+		onObjectCreated(gameObjectContainer, spriteObject);
+
 		return spriteObject;
 	}
 
@@ -68,6 +70,8 @@ public class SceneUtils {
 		}
 		rendererComponent.setGameAsset(asset);
 
+		onObjectCreated(gameObjectContainer, spineObject);
+
 		return spineObject;
 	}
 
@@ -79,6 +83,8 @@ public class SceneUtils {
 			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
 		}
 		component.setGameAsset(asset);
+
+		onObjectCreated(gameObjectContainer, particleObject);
 
 		return particleObject;
 	}
@@ -136,9 +142,6 @@ public class SceneUtils {
 		} else {
 			parent.addGameObject(gameObject);
 		}
-
-
-		onObjectCreated(gameObjectContainer, gameObject);
 
 		return gameObject;
 	}
