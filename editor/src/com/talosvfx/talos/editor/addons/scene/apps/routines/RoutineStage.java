@@ -345,7 +345,9 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void stop() {
         RoutineInstance routineInstance = data.getRoutineInstance();
         routineInstance.stop();
-        scenePreviewApp.reload();
+        if (scenePreviewApp != null) {
+            scenePreviewApp.reload();
+        }
         playing = false;
         //timeScale = 1f;
     }
@@ -353,13 +355,17 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void resume() {
         paused = false;
         data.getRoutineInstance().setPaused(paused);
-        scenePreviewApp.setPaused(paused);
+        if (scenePreviewApp != null) {
+            scenePreviewApp.setPaused(paused);
+        }
     }
 
     public void pause() {
         paused = true;
         data.getRoutineInstance().setPaused(paused);
-        scenePreviewApp.setPaused(paused);
+        if (scenePreviewApp != null) {
+            scenePreviewApp.setPaused(paused);
+        }
     }
 
     public void setTimeScale(float timeScale) {
