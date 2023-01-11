@@ -1362,16 +1362,28 @@ public class AssetRepository implements Observer {
 		return copyRawAsset(file, directory, false);
 	}
 
+	/**
+	 * In the first synopsis form, the copyRawAsset utility copies the contents of the file to the directory.
+	 * In the second synopsis form, the contents of each named file is copied to the directory target_directory.
+	 * The names of the files themselves are changed in case of collision, while replace flag is false.
+	 * @param file
+	 * @param directory
+	 * @param replace
+	 * @return FileHandle of newly copied file.
+	 */
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
-		String fileName = file.name();
-		if (directory.child(fileName).exists() && !replace) {
-			String baseName = file.nameWithoutExtension();
+		// TODO: 11.01.23 rename arguments
+		String fileName = directory.isDirectory() ? file.name() : directory.name();
+		final FileHandle destinationDirectory = directory.isDirectory() ? directory : directory.parent();
+
+		if (destinationDirectory.child(fileName).exists() && !replace) {
+			String baseName = directory.isDirectory() ? file.nameWithoutExtension() : directory.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
 				@Override
 				public Collection<String> get () {
 					ArrayList<String> fileNames = new ArrayList<>();
-					for (FileHandle fileHandle : directory.list()) {
+					for (FileHandle fileHandle : destinationDirectory.list()) {
 						fileNames.add(fileHandle.nameWithoutExtension());
 					}
 					return fileNames;
@@ -1383,7 +1395,7 @@ public class AssetRepository implements Observer {
 		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
 		Matcher matcher = pattern.matcher(fileName);
 		fileName = matcher.replaceAll("_");
-		FileHandle dest = directory.child(fileName);
+		FileHandle dest = destinationDirectory.child(fileName);
 		if (file.isDirectory()) { // recursively copy directory and its contents
 			FileHandle[] list = file.list();
 			//Change the destination and copy all its children into the new destination
