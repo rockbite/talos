@@ -35,6 +35,8 @@ public class Commands {
 
     GROUP("group_command", "Group", "", "GENERAL"),
 
+    UNGROUP("ungroup_command", "Ungroup", "", "GENERAL"),
+
     ESCAPE("escape_command", "Escape", "", "GENERAL");
 
     public final String uniqueName;
