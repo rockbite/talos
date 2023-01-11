@@ -1370,6 +1370,7 @@ public class AssetRepository implements Observer {
 	 * @return FileHandle of newly copied file.
 	 */
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
+		// TODO: 11.01.23 rename arguments
 		String fileName = directory.isDirectory() ? file.name() : directory.name();
 		final FileHandle destinationDirectory = directory.isDirectory() ? directory : directory.parent();
 
