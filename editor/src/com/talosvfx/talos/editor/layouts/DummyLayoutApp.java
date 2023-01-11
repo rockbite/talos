@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -125,9 +126,13 @@ public class DummyLayoutApp<T> implements LayoutApp {
 
         ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
         actor.addListener(new ClickListener() {
+            private Vector2 temp = new Vector2();
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+
+                temp.set(x, y);
+                actor.localToScreenCoordinates(temp);
 
                 BasicPopup<String> popup = BasicPopup.build(String.class)
                         .addItem("Maximize", "maximize")
@@ -147,7 +152,7 @@ public class DummyLayoutApp<T> implements LayoutApp {
 
                         popupButtonClicked(payload);
                     }
-                }).show(actor, x, y);
+                }).show(actor, temp.x, temp.y);
 
             }
         });
