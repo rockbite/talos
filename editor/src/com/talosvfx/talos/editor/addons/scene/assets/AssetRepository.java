@@ -1360,16 +1360,27 @@ public class AssetRepository implements Observer {
 		return copyRawAsset(file, directory, false);
 	}
 
+	/**
+	 * In the first synopsis form, the copyRawAsset utility copies the contents of the file to the directory.
+	 * In the second synopsis form, the contents of each named file is copied to the directory target_directory.
+	 * The names of the files themselves are changed in case of collision, while replace flag is false.
+	 * @param file
+	 * @param directory
+	 * @param replace
+	 * @return FileHandle of newly copied file.
+	 */
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
-		String fileName = file.name();
-		if (directory.child(fileName).exists() && !replace) {
-			String baseName = file.nameWithoutExtension();
+		String fileName = directory.isDirectory() ? file.name() : directory.name();
+		final FileHandle destinationDirectory = directory.isDirectory() ? directory : directory.parent();
+
+		if (destinationDirectory.child(fileName).exists() && !replace) {
+			String baseName = directory.isDirectory() ? file.nameWithoutExtension() : directory.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
 				@Override
 				public Collection<String> get () {
 					ArrayList<String> fileNames = new ArrayList<>();
-					for (FileHandle fileHandle : directory.list()) {
+					for (FileHandle fileHandle : destinationDirectory.list()) {
 						fileNames.add(fileHandle.nameWithoutExtension());
 					}
 					return fileNames;
@@ -1381,7 +1392,7 @@ public class AssetRepository implements Observer {
 		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
 		Matcher matcher = pattern.matcher(fileName);
 		fileName = matcher.replaceAll("_");
-		FileHandle dest = directory.child(fileName);
+		FileHandle dest = destinationDirectory.child(fileName);
 		if (file.isDirectory()) { // recursively copy directory and its contents
 			FileHandle[] list = file.list();
 			//Change the destination and copy all its children into the new destination
@@ -1393,57 +1404,6 @@ public class AssetRepository implements Observer {
 			}
 		} else { // single file
 			file.copyTo(dest);
-		}
-
-		collectRawResourceFromDirectory(dest, true);
-
-		return dest;
-	}
-
-	/**
-	 * In the first synopsis form, the copyRawAsset utility copies the contents of the sourceFile to the targetFile.
-	 * In the second synopsis form, the contents of each named sourceFile is copied to the targetFile target_directory.
-	 * The names of the files themselves are changed in case of collision, while replace flag is false.
-	 * @param sourceFile
-	 * @param targetFile
-	 * @param replace
-	 * @return FileHandle of newly copied file.
-	 */
-	public FileHandle copyRawAssetSmart (FileHandle sourceFile, FileHandle targetFile, boolean replace) {
-		String fileName = targetFile.isDirectory() ? sourceFile.name() : targetFile.name();
-		final FileHandle destinationDirectory = targetFile.isDirectory() ? targetFile : targetFile.parent();
-
-		if (destinationDirectory.child(fileName).exists() && !replace) {
-			String baseName = targetFile.isDirectory() ? sourceFile.nameWithoutExtension() : targetFile.nameWithoutExtension();
-
-			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
-				@Override
-				public Collection<String> get () {
-					ArrayList<String> fileNames = new ArrayList<>();
-					for (FileHandle fileHandle : destinationDirectory.list()) {
-						fileNames.add(fileHandle.nameWithoutExtension());
-					}
-					return fileNames;
-				}
-			}) + "." + sourceFile.extension();
-
-		}
-		// do not allow stupid characters
-		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
-		Matcher matcher = pattern.matcher(fileName);
-		fileName = matcher.replaceAll("_");
-		FileHandle dest = destinationDirectory.child(fileName);
-		if (sourceFile.isDirectory()) { // recursively copy directory and its contents
-			FileHandle[] list = sourceFile.list();
-			//Change the destination and copy all its children into the new destination
-			dest.mkdirs();
-			for (FileHandle fileHandle : list) {
-				if (fileHandle.extension().equals("meta")) continue; //Don't copy meta
-
-				copyRawAsset(fileHandle, dest);
-			}
-		} else { // single file
-			sourceFile.copyTo(dest);
 		}
 
 		collectRawResourceFromDirectory(dest, true);
