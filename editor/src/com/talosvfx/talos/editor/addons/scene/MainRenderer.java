@@ -462,7 +462,7 @@ public class MainRenderer implements Observer {
                     float endY = startY + totalHeight;
 
                     xCoord = startX;
-                    yCoord = startX;
+                    yCoord = startY;
 
                     for (xCoord = startX; xCoord < endX - tileWidth; xCoord += tileWidth){
                         for (yCoord = startY; yCoord < endY - tileHeight; yCoord += tileHeight) {
@@ -479,9 +479,12 @@ public class MainRenderer implements Observer {
                         }
                     }
 
-                    float remainderX = endX - xCoord;
-                    float remainderY = endY - yCoord;
-
+                    // clip remainder if a tile is bigger than the sprite
+                    final float remainderX, remainderY;
+                    if (totalWidth < tileWidth) remainderX = totalWidth;
+                    else remainderX = endX - xCoord;
+                    if (totalHeight < tileHeight) remainderY = totalHeight;
+                    else remainderY = endY - yCoord;
 
                     //Draw the remainders in x
                     for (float yCoordRemainder = startY; yCoordRemainder < endY - tileHeight; yCoordRemainder += tileHeight) {
