@@ -49,6 +49,13 @@
             <dynamicValue port="input" name="speed" type="float" default="1">speed</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "MoveOnPath" title = "Path Move" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="target" type="string">path</inputText>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "ColorToNode" title = "Color To" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <color port="input" name="color" type="color">Color: </color>
