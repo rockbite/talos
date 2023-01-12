@@ -41,6 +41,22 @@ public class ShaderBuilder {
         resourceCounter = 0;
     }
 
+
+//    uniform sampler2D u_textures[MAX_TEXTURE_UNITS];
+//
+//    varying LOWP vec4 v_color;
+//    varying vec2 v_texCoords;
+//
+//
+//
+//    vec4 sampleTextureArray (int index, vec2 texCoords) {
+//    %SAMPLE_TEXTURE_ARRAY_CODE%
+//    }
+//
+//    void main () {
+//        gl_FragColor = v_color * sampleTextureArray(int(v_texture_index), v_texCoords);
+//    }
+
     public static String DEFAULT_TEMPLATE() {
         String template =
                 "#ifdef GL_ES\n" +
@@ -50,10 +66,12 @@ public class ShaderBuilder {
                 "   #define LOWP\n" +
                 "#endif\n\n";
 
+        template += "#define MAX_TEXTURE_UNITS " + 16 + "\n";
         template +=
-                "uniform sampler2D u_texture;\n" + //this is baddy
+                "uniform sampler2D u_textures[MAX_TEXTURE_UNITS];\n" + //this is baddy
                 "varying LOWP vec4 v_color;\n" +
-                "varying vec2 v_texCoords;\n\n";
+                "varying vec2 v_texCoords;\n"+
+                "varying float v_texture_index;\n\n";
 
         template += "\n\n{CUSTOM_UNIFORMS}\n";
         template += "\n{CUSTOM_METHODS}\n";
@@ -126,17 +144,21 @@ public class ShaderBuilder {
                 "attribute vec3 a_position;\n" +
                         "attribute vec4 a_color;\n" +
                         "attribute vec2 a_texCoord0;\n" +
+                        "attribute float texture_index;\n" +
+                        "attribute float custom_info;\n" +
                         "\n" +
                         "uniform mat4 u_projTrans;\n" +
                         "\n" +
                         "varying vec4 v_color;\n" +
                         "varying vec2 v_texCoords;\n" +
+                        "varying float v_texture_index;\n" +
                         "\n" +
                         "void main()\n" +
                         "{\n" +
                         "    v_color = a_color;\n" +
                         "    v_color.a = v_color.a * (256.0/255.0);\n" +
                         "    v_texCoords = a_texCoord0;\n" +
+                        "    v_texture_index = texture_index;\n" +
                         "    gl_Position =  u_projTrans * vec4(a_position, 1.0);\n" +
                         "}\n";
 

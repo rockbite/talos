@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
@@ -58,7 +59,7 @@ public class SceneUtils {
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
 		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
 		}
 		component.setGameAsset(spriteAsset);
 
@@ -72,7 +73,7 @@ public class SceneUtils {
 		SpineRendererComponent rendererComponent = spineObject.getComponent(SpineRendererComponent.class);
 
 		if (!fromDirectoryView) {
-			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(rendererComponent.sortingLayer);
+			rendererComponent.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, rendererComponent.sortingLayer);
 		}
 		rendererComponent.setGameAsset(asset);
 
@@ -86,7 +87,7 @@ public class SceneUtils {
 		ParticleComponent component = particleObject.getComponent(ParticleComponent.class);
 
 		if (!fromDirectoryView) {
-			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
+			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
 		}
 		component.setGameAsset(asset);
 
@@ -146,9 +147,7 @@ public class SceneUtils {
 			parent.addGameObject(gameObject);
 		}
 
-
 		onObjectCreated(gameObjectContainer, gameObject);
-
 		return gameObject;
 	}
 
@@ -288,6 +287,13 @@ public class SceneUtils {
 			markContainerChanged(gameObjectContainer);
 		}
 	}
+
+	public static void layersUpdated () {
+		TalosProjectData currentProject = SharedResources.currentProject;
+		currentProject.save();
+		Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
+	}
+
 	private static void markContainerChanged (GameObjectContainer currentHolder) {
 		if (currentHolder instanceof Scene) {
 			GameAsset<Scene> sceneGameAsset = AssetRepository.getInstance().getAssetForResource((Scene)currentHolder);
@@ -349,6 +355,16 @@ public class SceneUtils {
 		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);
 
 		Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(prefabs.path()));
+	}
+
+	public static void visibilityUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectVisibilityChanged.class).set(gameObjectContainer, gameObject));
+		markContainerChanged(gameObjectContainer);
+	}
+
+	public static void lockUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
+		Notifications.fireEvent(Notifications.obtainEvent(GameObjectLockChanged.class).set(gameObjectContainer, gameObject));
+		markContainerChanged(gameObjectContainer);
 	}
 
 }

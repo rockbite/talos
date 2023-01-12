@@ -1,13 +1,17 @@
 package com.talosvfx.talos.editor.addons.scene.utils.metadata;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
 import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -34,7 +38,14 @@ public class SpriteMetadata extends AMetadata {
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> propertyWidgets = new Array<>();
 
-        propertyWidgets.add(WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld"));
+        final PropertyWidget pixelToWorldPropertyWidget = WidgetFactory.generate(this, "pixelsPerUnit", "pxToWorld");
+        pixelToWorldPropertyWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                Notifications.fireEvent(Notifications.obtainEvent(SpritePixelPerUnitUpdateEvent.class).setSpriteMetadata(SpriteMetadata.this));
+            }
+        });
+        propertyWidgets.add(pixelToWorldPropertyWidget);
         propertyWidgets.add(WidgetFactory.generate(this, "minFilter", "MinFilter"));
         propertyWidgets.add(WidgetFactory.generate(this, "magFilter", "MagFilter"));
 

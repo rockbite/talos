@@ -1101,15 +1101,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
 		makeGizmosFor(getRootSceneObject(), gameObject, this);
-
-
-		// call set dirty method on the next frame so that the game asset is already set
-		// TODO: refactor the order of the event and setting data
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-			}
-		});
 	}
 
 	@EventHandler
@@ -1356,7 +1347,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 
 
-	public Array<String> getLayerList () {
+	public Array<SceneLayer> getLayerList () {
 		SceneData sceneData = SharedResources.currentProject.getSceneData();
 
 		return sceneData.getRenderLayers();
@@ -1370,16 +1361,25 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onLayerListUpdated (LayerListUpdated event) {
-		Array<String> layerList = getLayerList();
+		Array<SceneLayer> layerList = getLayerList();
 		// find all game objects and if any of them is on layer that does not exist, change its layer to default
 		Array<GameObject> list = new Array<>();
 		list = currentContainer.getSelfObject().getChildrenByComponent(RendererComponent.class, list);
 
 		for (GameObject gameObject : list) {
 			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
-			String sortingLayer = component.getSortingLayer();
-			if (!layerList.contains(sortingLayer, false)) {
-				component.setSortingLayer("Default");
+
+			boolean foundLayer = false;
+			for (SceneLayer sceneLayer : layerList) {
+				if (sceneLayer.getIndex() == component.sortingLayer.getIndex()) {
+					component.setSortingLayer(sceneLayer);
+					foundLayer = true;
+					break;
+				}
+			}
+
+			if (!foundLayer) {
+				component.setSortingLayer(MainRenderer.DEFAULT_SCENE_LAYER);
 			}
 		}
 	}
