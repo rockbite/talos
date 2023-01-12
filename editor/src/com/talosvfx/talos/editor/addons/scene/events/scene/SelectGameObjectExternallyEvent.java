@@ -13,4 +13,9 @@ public class SelectGameObjectExternallyEvent implements TalosEvent {
 	public void reset () {
 		gameObject = null;
 	}
+
+	public SelectGameObjectExternallyEvent setGameObject (GameObject gameObject) {
+		this.gameObject = gameObject;
+		return this;
+	}
 }

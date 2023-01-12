@@ -355,8 +355,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             item.addListener(new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
-                    SceneUtils.createObjectByTypeName(currentContainer, name, new Vector2(), gameObject, name);
-
+                    final GameObject newObjectInstance = SceneUtils.createObjectByTypeName(currentContainer, name, new Vector2(), gameObject, name);
+                    Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(newObjectInstance));
                 }
             });
             popupMenu.addItem(item);

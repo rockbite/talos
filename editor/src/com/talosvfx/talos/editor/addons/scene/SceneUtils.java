@@ -46,7 +46,11 @@ public class SceneUtils {
 	private static final Logger logger = LoggerFactory.getLogger(SceneUtils.class);
 
 	public static GameObject createEmpty (GameObjectContainer gameObjectContainer, Vector2 position, GameObject parent) {
-		return createObjectByTypeName(gameObjectContainer, "empty", position, parent, "empty");
+		GameObject emptyObject =  createObjectByTypeName(gameObjectContainer, "empty", position, parent, "empty");
+
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(emptyObject));
+
+		return emptyObject;
 	}
 
 	public static GameObject createSpriteObject (GameObjectContainer gameObjectContainer, GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
@@ -57,6 +61,8 @@ public class SceneUtils {
 			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
 		}
 		component.setGameAsset(spriteAsset);
+
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(spriteObject));
 
 		return spriteObject;
 	}
@@ -70,6 +76,8 @@ public class SceneUtils {
 		}
 		rendererComponent.setGameAsset(asset);
 
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(spineObject));
+
 		return spineObject;
 	}
 
@@ -81,6 +89,8 @@ public class SceneUtils {
 			component.orderingInLayer = getLatestFreeOrderingIndex(component.sortingLayer);
 		}
 		component.setGameAsset(asset);
+
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(particleObject));
 
 		return particleObject;
 	}
@@ -107,17 +117,14 @@ public class SceneUtils {
 
 		onObjectCreated(gameObjectContainer, gameObject);
 
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(gameObject));
+
 		return gameObject;
 	}
 
 	private static void onObjectCreated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(gameObjectContainer, gameObject));
-		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
-		selectGameObjectExternallyEvent.setGameObject(gameObject);
-		Notifications.fireEvent(selectGameObjectExternallyEvent);
-
 		markContainerChanged(gameObjectContainer);
-
 	}
 
 	public static GameObject createObjectByTypeName (GameObjectContainer gameObjectContainer, String idName, Vector2 position, GameObject parent, String nameHint) {
@@ -220,10 +227,7 @@ public class SceneUtils {
 		GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
 		//for updating left panel values
 
-
-		SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
-		selectGameObjectExternallyEvent.setGameObject(childThatHasMoved);
-		Notifications.fireEvent(selectGameObjectExternallyEvent);
+		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(childThatHasMoved));
 
 		markContainerChanged(currentContainer);
 

@@ -192,7 +192,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			public void chosen (XmlReader.Element template, float x, float y) {
 				Vector2 pos = new Vector2(x, y);
 				String templateName = template.getAttribute("name");
-				SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
+				final GameObject newObjectInstance = SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
+				Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(newObjectInstance));
 			}
 		});
 
