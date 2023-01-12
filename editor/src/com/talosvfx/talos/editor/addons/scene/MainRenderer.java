@@ -600,7 +600,7 @@ public class MainRenderer implements Observer {
         }
     }
 
-    private NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+    public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
         if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
             return patchCache.get(gameAsset);
         } else {
