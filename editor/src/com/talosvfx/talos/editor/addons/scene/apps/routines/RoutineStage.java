@@ -62,34 +62,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         nodeBoard.setTouchable(Touchable.enabled);
     }
 
-//    private void updatePropertiesForGOs (GameObject gameObject, Array<RoutineRendererComponent> updatedComponents) {
-//        if (gameObject.hasComponent(RoutineRendererComponent.class)) {
-//            RoutineRendererComponent component = gameObject.getComponent(RoutineRendererComponent.class);
-//            if (component.routineInstance != null) {
-//                logger.error("todo don't do this with uuid do it with instance of the game asset");
-////                if (routineInstance.uuid.equals(component.routineInstance.uuid)) {
-////                    component.updatePropertyWrappers(true);
-////                    updatedComponents.add(component);
-////                }
-//            }
-//        }
-//
-//        Array<GameObject> children = gameObject.getGameObjects();
-//        if (children != null) {
-//            for (int i = 0; i < children.size; i++) {
-//                GameObject child = children.get(i);
-//                updatePropertiesForGOs(child, updatedComponents);
-//            }
-//        }
-//    }
-
-    public void writeData (FileHandle target) {
-        Json json = new Json();
-        json.setOutputType(JsonWriter.OutputType.json);
-        String data = json.prettyPrint(this);
-        target.writeString(data, false);
-    }
-
     public void loadFrom (GameAsset<RoutineStageData> asset) {
         loading = true;
         if (asset == null || asset.getResource() == null) return;
@@ -190,6 +162,10 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         if(!loading) {
             //todo: this isn't right
             markAssetChanged();
+            // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
+            gameAsset.listeners.removeValue(this, true);
+            gameAsset.setUpdated();
+            gameAsset.listeners.add(this);
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
