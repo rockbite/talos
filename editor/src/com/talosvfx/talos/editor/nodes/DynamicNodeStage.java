@@ -37,7 +37,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
     public GameAsset<T> gameAsset;
     public T data;
-    private GameAsset.GameAssetUpdateListener gameAssetUpdateListener;
 
     public DynamicNodeStage (Skin skin) {
         super();
