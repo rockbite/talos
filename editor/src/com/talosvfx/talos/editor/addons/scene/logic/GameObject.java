@@ -37,7 +37,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     private boolean editorTransformLocked = false;
     private boolean editorVisible = true;
 
-    private Array<GameObject> children;
+    private Array<GameObject> children = new Array<>();
     private ObjectMap<String, GameObject> childrenMap = new ObjectMap<>();
     private ObjectSet<AComponent> components = new ObjectSet<>();
     private ObjectMap<Class, AComponent> componentClasses = new ObjectMap<>();
@@ -86,18 +86,16 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         json.writeValue("locked", editorTransformLocked);
 
         json.writeArrayStart("components");
-        for(AComponent component: components) {
+        for (AComponent component : components) {
             json.writeValue(component, AComponent.class);
         }
         json.writeArrayEnd();
 
-        if(children != null) {
-            json.writeArrayStart("children");
-            for(GameObject child: children) {
-                json.writeValue(child, GameObject.class);
-            }
-            json.writeArrayEnd();
+        json.writeArrayStart("children");
+        for (GameObject child : children) {
+            json.writeValue(child, GameObject.class);
         }
+        json.writeArrayEnd();
     }
 
     @Override
@@ -130,10 +128,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     @Override
     public void addGameObject (GameObject gameObject) {
-        if(children == null) {
-            children = new Array<>();
-        }
-
         children.add(gameObject);
         childrenMap.put(gameObject.name, gameObject);
 
@@ -143,9 +137,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     @Override
     public  Array<GameObject> deleteGameObject (GameObject gameObject) {
         tmp.clear();
-        if(children == null) {
-            return tmp;
-        }
 
         String name = gameObject.getName();
         if(childrenMap.containsKey(name)) {
@@ -157,33 +148,24 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             objectToRemove.clearChildren(tmp);
         }
 
-        if(children.isEmpty()) children = null;
-
         return tmp;
     }
 
     @Override
     public void removeObject (GameObject gameObject) {
-        if(children == null) {
-            return;
-        }
-
         String name = gameObject.getName();
         if(childrenMap.containsKey(name)) {
             GameObject objectToRemove = childrenMap.get(name);
             childrenMap.remove(name);
             children.removeValue(objectToRemove, true);
         }
-
-        if(children.isEmpty()) children = null;
     }
 
     @Override
     public void clearChildren (Array<GameObject> tmp) {
-        if(children == null) return;
         tmp.addAll(children);
 
-        children = null;
+        children.clear();
         childrenMap.clear();
     }
 
@@ -242,8 +224,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
 
     @Override
     public boolean hasGOWithName (String name) {
-        if(children == null) return false;
-
         if(childrenMap.containsKey(name)) return true;
         for(GameObject child: children) {
             if(child.hasGOWithName(name)) {
@@ -387,7 +367,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         if (hasComponentType(clazz)) { //Check self in case of prefab
             list.add(this);
         }
-        if(children == null) return list;
         for(GameObject gameObject: children) {
             if(gameObject.hasComponentType(clazz)) {
                 list.add(gameObject);
@@ -420,13 +399,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         Iterable<AComponent> components = gameObject.getComponents();
         for (AComponent component : components) {
             if (component instanceof RendererComponent) {
-                ((RendererComponent)component).minMaxBounds(gameObject, minMax);
+                ((RendererComponent) component).minMaxBounds(gameObject, minMax);
             }
         }
-        if (gameObject.children != null) {
-            for (GameObject child : gameObject.children) {
-                estimateSizeForGameObject(child, minMax);
-            }
+        for (GameObject child : gameObject.children) {
+            estimateSizeForGameObject(child, minMax);
         }
     }
     public BoundingBox estimateSizeFromRoot () {
@@ -490,10 +467,6 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
     }
 
     public GameObject getChildByUUID (String uuid) {
-        if (children == null) {
-            return null;
-        }
-
         for (int i = 0; i < children.size; i++) {
             GameObject child = children.get(i);
             if (child.uuid.toString().equals(uuid)) {
@@ -511,12 +484,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return null;
     }
 
-    public void setEditorVisible (boolean editorVisible){
+    public void setEditorVisible(boolean editorVisible) {
         this.editorVisible = editorVisible;
-        if(children !=null) {
-            for (GameObject child : children) {
-                child.setEditorVisible(editorVisible);
-            }
+        for (GameObject child : children) {
+            child.setEditorVisible(editorVisible);
         }
     }
 
@@ -524,12 +495,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
         return editorVisible;
     }
 
-    public void setEditorTransformLocked (boolean editorTransformLocked){
+    public void setEditorTransformLocked(boolean editorTransformLocked) {
         this.editorTransformLocked = editorTransformLocked;
-        if(children !=null) {
-            for (GameObject child : children) {
-                child.setEditorTransformLocked(editorTransformLocked);
-            }
+        for (GameObject child : children) {
+            child.setEditorTransformLocked(editorTransformLocked);
         }
     }
 
@@ -555,10 +524,8 @@ public class GameObject implements GameObjectContainer, Json.Serializable, IProp
             return result;
         }
 
-        if(children != null) {
-            for (GameObject child : children) {
-                child.findGOsWithComponents(result, clazz);
-            }
+        for (GameObject child : children) {
+            child.findGOsWithComponents(result, clazz);
         }
 
         return result;
