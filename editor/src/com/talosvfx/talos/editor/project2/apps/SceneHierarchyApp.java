@@ -91,6 +91,13 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	@Override
 	public void applyFromPreferences(HierarchyPreference prefs) {
 		hierarchyWidget.getTree().collapseAll();
+
+		// stupid hack
+		// TODO: 12.01.23 fix so root is not generated everytime
+		if (prefs.isRootOpen()) {
+			hierarchyWidget.getTree().getRootNodes().first().setExpanded(true);
+		}
+
 		Array<String> expandedUUIDs = prefs.getUUUIDsOfExpandedObjects();
 		Array<GameObject> expandedGameObjects = new Array<>();
 		GameObjectContainer container = gameAsset.getResource();
@@ -122,6 +129,11 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 		}
 		HierarchyPreference preference = new HierarchyPreference();
 		preference.setUUUIDsOfExpandedObjects(expandedUUIDS);
+
+		// stupid hack
+		// TODO: 12.01.23 fix so root is not generated everytime
+		preference.setRootOpen(hierarchyWidget.getTree().getRootNodes().first().isExpanded());
+
 		return preference;
 	}
 }
