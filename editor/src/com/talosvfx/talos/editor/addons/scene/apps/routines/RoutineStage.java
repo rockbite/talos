@@ -76,7 +76,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     public void onUpdate () {
-        loadFrom(gameAsset);
+
     }
 
     @Override
