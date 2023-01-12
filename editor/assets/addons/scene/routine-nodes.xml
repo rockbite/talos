@@ -51,6 +51,7 @@
         </module>
         <module name = "MoveOnPath" title = "Path Move" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue name="jitter" type="float" default="0" min = "0" max = "2" progress="true">Jitter</dynamicValue>
             <inputText name="target" type="string">path</inputText>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
