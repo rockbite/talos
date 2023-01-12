@@ -23,6 +23,8 @@ import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
 public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>>, GameAsset.GameAssetUpdateListener {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
@@ -236,23 +238,23 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 //                    ((OrthographicCamera)stage.getCamera()).zoom = 1.0f;
 //                }
 
-                if(keycode == Input.Keys.G && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(keycode == Input.Keys.G && ctrlPressed()) {
                     nodeBoard.createGroupFromSelectedNodes();
                 }
 
-                if(keycode == Input.Keys.U && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(keycode == Input.Keys.U && ctrlPressed()) {
                     nodeBoard.ungroupSelectedNodes();
                 }
 
-                if(keycode == Input.Keys.C && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(keycode == Input.Keys.C && ctrlPressed()) {
                     nodeBoard.copySelectedModules();
                 }
 
-                if(keycode == Input.Keys.V && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(keycode == Input.Keys.V && ctrlPressed()) {
                     nodeBoard.pasteFromClipboard();
                 }
 
-                if(keycode == Input.Keys.A && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                if(keycode == Input.Keys.A && ctrlPressed()) {
                     nodeBoard.selectAllNodes();
                 }
 
