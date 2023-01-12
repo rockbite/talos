@@ -48,7 +48,7 @@ public class RenderQuadNode extends RoutineNode {
         if (resource == null) {
             return;
         }
-        drawableQuad.texture = resource;
+        drawableQuad.gameAsset = asset;
 
         drawableQuad.rotation = fetchFloatValue("rotation");
         drawableQuad.color.set(fetchColorValue("color"));
