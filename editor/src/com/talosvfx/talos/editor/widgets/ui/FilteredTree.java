@@ -259,11 +259,14 @@ public class FilteredTree<T> extends WidgetGroup {
                 }
 
                 // Toggle expanded.
+                // peak of programming evolution btw.
                 if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
                     float rowX = node.actor.getX();
+                    Drawable plus = style.plus, minus = style.minus;
+                    Drawable expandIcon = node.expanded ? minus : plus;
                     if (node.icon != null)
                         rowX -= iconSpacingRight + node.icon.getMinWidth();
-                    if (x < rowX) {
+                    if (x > rowX - expandIcon.getMinWidth() - iconSpacingLeft - 4.0 && x < rowX) {
                         node.setExpanded(!node.expanded);
                         return;
                     }
