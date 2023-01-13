@@ -158,10 +158,16 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
     }
 
-    public void routineUpdated () {
+    public void routineUpdated() {
+        routineUpdated(false);
+    }
+
+    public void routineUpdated (boolean isFastChange) {
         if(!loading) {
             //todo: this isn't right
-            markAssetChanged();
+            if (!isFastChange) {
+                markAssetChanged();
+            }
             // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
             gameAsset.listeners.removeValue(this, true);
             gameAsset.setUpdated();
@@ -198,11 +204,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     @EventHandler
     public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
-        updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node);
+        updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node, event.isFastChange);
         routineEditorApp.controlWindow.update();
     }
 
-    private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {
+    private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget, boolean isFastChange) {
         RoutineNode logicNode = routineInstance.getNodeById(nodeWidget.getUniqueId());
 
         if (logicNode == null) return;
@@ -222,7 +228,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
         if (setRoutineDirty) {
             routineInstance.setDirty();
-            routineUpdated();
+            routineUpdated(isFastChange);
         }
     }
 

@@ -6,10 +6,12 @@ import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 
 public class NodeDataModifiedEvent extends ContextRequiredEvent<DynamicNodeStage<?>> {
     private NodeWidget node;
+    public boolean isFastChange = false;
 
     @Override
-    public void reset () {
-
+    public void reset() {
+        node = null;
+        isFastChange = false;
     }
 
     public NodeDataModifiedEvent set (DynamicNodeStage<?> context, NodeWidget node) {

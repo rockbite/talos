@@ -87,6 +87,10 @@ public abstract class AbstractWidget<T> extends Table {
         return var2;
     }
 
+    public boolean isFastChange() {
+        return false;
+    }
+
     public abstract T getValue();
 
     public boolean isChanged (T newValue) {

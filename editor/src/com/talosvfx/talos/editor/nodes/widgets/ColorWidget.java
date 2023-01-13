@@ -20,6 +20,8 @@ public class ColorWidget extends AbstractWidget<Color> {
     private Color color = new Color();
     private Table colorButton;
 
+    private boolean isBeingEdited = false;
+
     public void init(Skin skin, String text) {
         super.init(skin);
 
@@ -47,14 +49,41 @@ public class ColorWidget extends AbstractWidget<Color> {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);
+                        isBeingEdited = true;
                         color.set(newColor);
                         colorButton.setColor(newColor);
 
                         fireChangedEvent();
                     }
+
+                    @Override
+                    public void canceled(Color oldColor) {
+                        super.canceled(oldColor);
+                        isBeingEdited = false;
+                        fireChangedEvent();
+                    }
+
+                    @Override
+                    public void reset(Color previousColor, Color newColor) {
+                        super.reset(previousColor, newColor);
+                        isBeingEdited = false;
+                        fireChangedEvent();
+                    }
+
+                    @Override
+                    public void finished(Color newColor) {
+                        super.finished(newColor);
+                        isBeingEdited = false;
+                        fireChangedEvent();
+                    }
                 });
             }
         });
+    }
+
+    @Override
+    public boolean isFastChange() {
+        return isBeingEdited;
     }
 
     @Override
