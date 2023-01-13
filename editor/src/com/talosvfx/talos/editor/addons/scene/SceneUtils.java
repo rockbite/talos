@@ -1,8 +1,11 @@
 package com.talosvfx.talos.editor.addons.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
@@ -25,6 +28,7 @@ import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
+import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
@@ -34,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter.fromDirectoryView;
@@ -243,19 +248,115 @@ public class SceneUtils {
 
 	}
 
-	private static ObjectMap<GameObjectContainer, Array<GameObject>> copyPasteBuffer = new ObjectMap<>();
+	private static ObjectMap<GameObjectContainer, OrderedSet<GameObject>> copyPasteBuffer = new ObjectMap<>();
 
-	public static void copy (GameObjectContainer currentContainer, Array<GameObject> arraySelection) {
-		copyPasteBuffer.put(currentContainer, arraySelection);
-	}
+	public static void copy (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
+		final GameObjectContainer currentContainer = gameAsset.getResource();
 
-	public static void paste (GameObjectContainer currentContainer) {
-		logger.info("Needs a rethink");
-		if (copyPasteBuffer.containsKey(currentContainer)) {
-			if (copyPasteBuffer.get(currentContainer).isEmpty()) {
+		copyPasteBuffer.put(currentContainer, selection);
 
+		final Vector3 camPos = getCameraPosForScene(gameAsset);
+
+		SceneEditorWorkspace.ClipboardPayload payload = new SceneEditorWorkspace.ClipboardPayload();
+		Array<GameObject> gameObjects = selection.orderedItems();
+		for (int i = 0; i < selection.size; i++) {
+			GameObject value = gameObjects.get(i);
+			payload.objects.add(value);
+			if (value.hasComponentType(TransformComponent.class)) {
+				payload.objectWorldPositions.add(value.getComponent(TransformComponent.class).worldPosition);
+			} else {
+				payload.objectWorldPositions.add(new Vector2());
 			}
 		}
+
+		payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+
+		Json json = new Json();
+		String clipboard = json.toJson(payload);
+		Gdx.app.getClipboard().setContents(clipboard);
+	}
+
+	public static void paste (GameAsset<Scene> gameAsset) {
+		final SavableContainer currentContainer = gameAsset.getResource();
+
+		if (!copyPasteBuffer.containsKey(currentContainer)) return;
+		if (copyPasteBuffer.get(currentContainer).isEmpty()) return;
+
+		final Vector3 camPosAtPaste = getCameraPosForScene(gameAsset);
+
+		final OrderedSet<GameObject> selection = copyPasteBuffer.get(currentContainer);
+
+		final String clipboard = Gdx.app.getClipboard().getContents();
+		final Json json = new Json();
+
+		try {
+			final SceneEditorWorkspace.ClipboardPayload payload = json.fromJson(SceneEditorWorkspace.ClipboardPayload.class, clipboard);
+
+			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
+			offset.sub(payload.cameraPositionAtCopy);
+
+			GameObject parent = currentContainer.root;
+			if (selection.size == 1 && selection.first() != currentContainer.root) {
+				parent = selection.first().parent;
+			}
+
+			clearSelection(currentContainer);
+
+			for (int i = 0; i < payload.objects.size; i++) {
+				GameObject gameObject = payload.objects.get(i);
+
+				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
+
+				gameObject.setName(name);
+				randomizeChildrenUUID(gameObject);
+				parent.addGameObject(gameObject);
+				if (gameObject.hasComponentType(TransformComponent.class)) {
+					TransformComponent component = gameObject.getComponent(TransformComponent.class);
+					component.worldPosition.set(payload.objectWorldPositions.get(i));
+					GameObject.projectInParentSpace(parent, gameObject);
+					component.position.add(offset);
+				}
+
+				if (!hierarchicallyContains(selection, gameObject)) {
+					selection.add(gameObject);
+				}
+
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(currentContainer, gameObject));
+			}
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(currentContainer, selection));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param gameAsset scene game asset
+	 * @return scene camera position if scene open else a zero vector
+	 */
+	private static Vector3 getCameraPosForScene (GameAsset<Scene> gameAsset) {
+		final SceneEditorApp currentApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, gameAsset);
+		Vector3 camPos = new Vector3();
+		if (currentApp != null) {
+			final Supplier<Camera> currentCameraSupplier = currentApp.getWorkspaceWidget().getViewportViewSettings().getCurrentCameraSupplier();
+			final Camera camera = currentCameraSupplier.get();
+			camPos = camera.position;
+		}
+		return camPos;
+	}
+
+	public static void clearSelection (GameObjectContainer container) {
+		copyPasteBuffer.get(container).clear();
+	}
+
+	// checks if gameObject or its ancestors are already in the selection or not
+	public static boolean hierarchicallyContains (ObjectSet<GameObject> selection, GameObject gameObject) {
+		GameObject temp = gameObject;
+		while (temp != null) {
+			if (selection.contains(temp)) return true;
+			temp = temp.parent;
+		}
+		return false;
 	}
 
 	public static void componentAdded (GameObjectContainer currentHolder, GameObject gameObject, AComponent component) {

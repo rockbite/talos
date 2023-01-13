@@ -777,74 +777,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void copySelected () {
-		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
-		Camera camera = currentCameraSupplier.get();
-
-		ClipboardPayload payload = new ClipboardPayload();
-		Array<GameObject> gameObjects = selection.orderedItems();
-		for (int i = 0; i < selection.size; i++) {
-			GameObject value = gameObjects.get(i);
-			payload.objects.add(value);
-			if (value.hasComponentType(TransformComponent.class)) {
-				payload.objectWorldPositions.add(value.getComponent(TransformComponent.class).worldPosition);
-			} else {
-				payload.objectWorldPositions.add(new Vector2());
-			}
-		}
-		Vector3 camPos = camera.position;
-		payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
-
-		Json json = new Json();
-		String clipboard = json.toJson(payload);
-		Gdx.app.getClipboard().setContents(clipboard);
+		SceneUtils.copy(gameAsset, selection);
 	}
 
 	public void pasteFromClipboard () {
-		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
-		Camera camera = currentCameraSupplier.get();
-
-		String clipboard = Gdx.app.getClipboard().getContents();
-
-		Json json = new Json();
-
-		try {
-			ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
-			Vector3 camPosAtPaste = camera.position;
-			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
-			offset.sub(payload.cameraPositionAtCopy);
-			GameObject parent = currentContainer.root;
-			if (selection.size == 1 && selection.first() != currentContainer.root) {
-				parent = selection.first().parent;
-			}
-
-			clearSelection();
-			for (int i = 0; i < payload.objects.size; i++) {
-				GameObject gameObject = payload.objects.get(i);
-
-				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
-
-				gameObject.setName(name);
-				SceneUtils.randomizeChildrenUUID(gameObject);
-				parent.addGameObject(gameObject);
-				if (gameObject.hasComponentType(TransformComponent.class)) {
-					TransformComponent component = gameObject.getComponent(TransformComponent.class);
-					component.worldPosition.set(payload.objectWorldPositions.get(i));
-					GameObject.projectInParentSpace(parent, gameObject);
-					component.position.add(offset);
-				}
-				initGizmos(gameObject, this);
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(getEventContext(), gameObject));
-				addToSelection(gameObject);
-			}
-
-			//todo: mm, why? i don't think it should trigger save
-			logger.info("Paste shuld trigger a save too, pasted event that goes through SceneUtils is the way to do this");
-
-//			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		SceneUtils.paste(gameAsset);
 	}
 
 	@Override
@@ -1100,7 +1037,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
-		makeGizmosFor(getRootSceneObject(), gameObject, this);
+		initGizmos(getRootSceneObject(), gameObject, this);
 	}
 
 	@EventHandler
@@ -1529,7 +1466,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameAssetOpened (GameAssetOpenEvent gameAssetOpenEvent) {
 		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
 		if (gameAsset.type == GameAssetType.SCENE) {
-
+			this.gameAsset = (GameAsset<Scene>) gameAsset;
 		}
 	}
 }

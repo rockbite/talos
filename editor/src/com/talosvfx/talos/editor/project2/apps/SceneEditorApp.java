@@ -10,11 +10,13 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import lombok.Getter;
 
 
 @SingletonApp
 public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<ViewportPreferences> {
 
+	@Getter
 	private final SceneEditorWorkspace workspaceWidget;
 
 	public SceneEditorApp () {

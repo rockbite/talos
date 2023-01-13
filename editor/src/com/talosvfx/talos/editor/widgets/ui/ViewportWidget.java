@@ -127,6 +127,7 @@ public abstract class ViewportWidget extends Table {
 	protected GroupSelectionGizmo groupSelectionGizmo;
 	private boolean panRequiresSpace = false;
 
+	@Getter
 	protected ViewportViewSettings viewportViewSettings;
 
     public ViewportWidget() {
