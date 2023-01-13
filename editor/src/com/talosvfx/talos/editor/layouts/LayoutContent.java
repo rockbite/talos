@@ -98,11 +98,6 @@ public class LayoutContent extends LayoutItem {
 				}
 			}
 
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				grid.setLayoutActive(LayoutContent.this);
-				return super.touchDown(event, x, y, pointer, button);
-			}
 		});
 	}
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class InputHandling {
 
@@ -41,6 +42,8 @@ public class InputHandling {
 	}
 	public void setGDXMultiPlexer () {
 		inputMultiplexer.clear();
+
+		inputMultiplexer.addProcessor(SharedResources.appManager);
 
 		for (InputProcessor priorityInputProcessor : priorityInputProcessors) {
 			inputMultiplexer.addProcessor(priorityInputProcessor);
