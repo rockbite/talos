@@ -10,6 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.RoutineControlWin
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
@@ -136,6 +137,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
     @Override
     public void onRemove() {
         // remove listeners and stuff somehow
+        routineStageWrapper.disableListeners();
+        SharedResources.inputHandling.removePriorityInputProcessor(routineUIStageWrapper.getStage());
+        SharedResources.inputHandling.removePriorityInputProcessor(routineStageWrapper.getStage());
+        SharedResources.inputHandling.setGDXMultiPlexer();
+
+        Notifications.unregisterObserver(routineStage);
+
     }
 
     @Override
