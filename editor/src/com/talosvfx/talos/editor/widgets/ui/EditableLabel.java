@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
@@ -70,7 +71,7 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         add(stack).expand().grow();
 
-        label = new Label(text, getSkin(), "default");
+        label = new LabelWithZoom(text, getSkin(), "default");
         label.setEllipsis(true);
         labelCell = labelTable.add(label).width(0).growX();
 

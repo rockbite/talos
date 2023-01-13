@@ -14,6 +14,7 @@ import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class NodeListPopup extends VisWindow {
 
@@ -155,7 +156,7 @@ public class NodeListPopup extends VisWindow {
         // get modules
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
-            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("title"), new Label(module.getAttribute("title"), getSkin()));
+            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("title"), new LabelWithZoom(module.getAttribute("title"), getSkin()));
 
             titleToNodeName.put(module.getAttribute("title"),module.getAttribute("name"));
 
