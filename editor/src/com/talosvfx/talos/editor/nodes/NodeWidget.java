@@ -534,7 +534,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                     widget.addListener(new ChangeListener() {
                         @Override
                         public void changed (ChangeEvent changeEvent, Actor actor) {
-                            reportNodeDataModified();
+                            boolean fastChange = widget.isFastChange();
+                            reportNodeDataModified(fastChange);
                         }
                     });
                 }
@@ -556,7 +557,13 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     protected void reportNodeDataModified() {
-        Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this));
+        reportNodeDataModified(false);
+    }
+
+    protected void reportNodeDataModified(boolean isFastChange) {
+        NodeDataModifiedEvent nodeDataModifiedEvent = Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this);
+        nodeDataModifiedEvent.isFastChange = isFastChange;
+        Notifications.fireEvent(nodeDataModifiedEvent);
     }
 
     public void constructNode(XmlReader.Element module) {

@@ -47,6 +47,11 @@ public class Vector2Widget extends AbstractWidget<Vector2> {
     }
 
     @Override
+    public boolean isFastChange() {
+        return xWidget.isFastChange() || yWidget.isFastChange();
+    }
+
+    @Override
     public void loadFromXML(XmlReader.Element element) {
             // todo: impl later
     }

@@ -203,6 +203,11 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
             add(widget).right();
         }
 
+        @Override
+        public boolean isFastChange() {
+            return widget.isFastChange();
+        }
+
         public void setValue(float val) {
             widget.setValue(val);
         }
