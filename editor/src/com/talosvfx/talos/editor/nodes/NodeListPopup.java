@@ -21,7 +21,7 @@ public class NodeListPopup extends VisWindow {
     FilteredTree<String> tree;
     SearchFilteredTree<String> searchFilteredTree;
 
-    Vector2 createLocation = new Vector2();
+    Vector2 createLocationScreenCoords = new Vector2();
 
     private ObjectMap<String, String> titleToNodeName = new ObjectMap<>();
     private ObjectMap<Class, XmlReader.Element> registry = new ObjectMap<>();
@@ -57,7 +57,7 @@ public class NodeListPopup extends VisWindow {
     }
 
     interface NodeListListener {
-        void chosen(Class clazz, XmlReader.Element module, float x, float y);
+        void chosen(Class clazz, XmlReader.Element module, float screenX, float screenY);
     }
 
     private NodeListListener nodeListListener;
@@ -115,9 +115,9 @@ public class NodeListPopup extends VisWindow {
             }
         };
 
-        tree.setItemListener(new FilteredTree.ItemListener() {
+        tree.addItemListener(new FilteredTree.ItemListener() {
             @Override
-            public void chosen(FilteredTree.Node node) {
+            public void selected (FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     String nodeName = titleToNodeName.get(node.name);
                     String className = getClassNameFromModuleName(nodeName);
@@ -125,7 +125,7 @@ public class NodeListPopup extends VisWindow {
                     if(nodeListListener != null) {
                         try {
                             Class clazz = ClassReflection.forName(classPath + "." + className);
-                            nodeListListener.chosen(clazz, getConfigFor(nodeName), createLocation.x, createLocation.y);
+                            nodeListListener.chosen(clazz, getConfigFor(nodeName), createLocationScreenCoords.x, createLocationScreenCoords.y);
                         } catch (ReflectionException e) {
                             e.printStackTrace();
                         }
@@ -134,10 +134,9 @@ public class NodeListPopup extends VisWindow {
                     remove();
                 }
             }
-
             @Override
-            public void selected(FilteredTree.Node node) {
-
+            public void addedIntoSelection (FilteredTree.Node node) {
+                super.addedIntoSelection(node);
             }
         });
     }
@@ -208,7 +207,7 @@ public class NodeListPopup extends VisWindow {
             setHeight(200);
         }
 
-        this.createLocation.set(createLocation);
+        this.createLocationScreenCoords.set(createLocation);
     }
 
     @Override

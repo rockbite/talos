@@ -28,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.render.Render;
 
 import static com.talosvfx.talos.runtime.modules.OffsetModule.*;
 
@@ -57,7 +58,8 @@ public class ShapeWidget extends Actor {
     public ShapeWidget(Skin skin) {
         this.skin = skin;
         tmpColor = new Color();
-        shapeRenderer = new ShapeRenderer();
+
+        shapeRenderer = Render.instance().shapeRenderer();
 
         shapePos.set(0, 0);
         shapeSize.set(30, 30);

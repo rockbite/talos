@@ -1,0 +1,69 @@
+dependencies {
+
+    implementation project(":editor")
+
+    implementation libs.bongo.desktop
+
+    implementation libs.logback.core
+    implementation libs.logback.classic
+
+    implementation variantOf(libs.tiny.gizmo) { classifier("natives-desktop") }
+
+}
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["assets"]
+
+project.ext.mainClassName = "com.talosvfx.talos.TalosLauncher"
+project.ext.assetsDir = new File("assets")
+
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+
+    if (System.properties['os.name'].toLowerCase().contains('mac')) {
+        jvmArgs = ["-XstartOnFirstThread"]
+    }
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+    debug = true
+
+    if (System.properties['os.name'].toLowerCase().contains('mac')) {
+        jvmArgs = ["-XstartOnFirstThread"]
+    }
+}
+
+task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task distLegacyTest(type: Jar) {
+    manifest {
+        attributes 'Main-Class': "com.talosvfx.talos.test.LegacyCompareTest"
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+dist.dependsOn classes

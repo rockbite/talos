@@ -1,115 +1,77 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
-    }
+
+plugins {
+    id 'java-library'
+    alias(libs.plugins.lombok)
 }
-
-apply plugin: 'maven'
-apply plugin: 'nexus'
-
 
 dependencies {
-    api project(":runtimes:talos-libgdx")
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
-    implementation "info.debatty:java-string-similarity:1.2.1"
-    implementation "com.github.Tom-Ski:spine-runtimes:3.9-8e40258"
-    implementation "org.yaml:snakeyaml:1.21"
+
+    api libs.bongo.engine
+    api project(":runtimes:talos-bongo")
+
+    api libs.visui
+
+    implementation libs.string.similarity
+
+    implementation libs.spine.libgdx
+
+    implementation libs.snakeyaml
+
+    implementation libs.tiny.gizmo
+    implementation libs.spark
+
 }
 
-sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
 
+sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["assets"]
 
-project.ext.mainClassName = "com.talosvfx.talos.TalosLauncher"
-project.ext.assetsDir = new File("assets")
 
 
-task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
 
-    if (System.properties['os.name'].toLowerCase().contains('mac')) {
-        jvmArgs = ["-XstartOnFirstThread"]
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
     }
+    return stdout.toString().trim()
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
-    debug = true
+task createProperties () {
+    doFirst {
 
-    if (System.properties['os.name'].toLowerCase().contains('mac')) {
-        jvmArgs = ["-XstartOnFirstThread"]
-    }
-}
-
-task dist(type: Jar) {
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
-    from {
-        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar
-}
-
-task distLegacyTest(type: Jar) {
-    manifest {
-        attributes 'Main-Class': "com.talosvfx.talos.test.LegacyCompareTest"
-    }
-    from {
-        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar
-}
-
-dist.dependsOn classes
-
-
-
-modifyPom {
-    project {
-        name "Talos Editor"
-        description "Talos Editor"
-        url "https://github.com/rockbite/talos"
-        inceptionYear "2019"
-
-        scm {
-            url "https://github.com/rockbite/talos"
-            connection "scm:https://rockbite@github.com/rockbite/talos.git"
-            developerConnection "scm:git://github.com/rockbite/talos.git"
+        def file = rootProject.file("editor/assets/talos-version.properties");
+        Properties properties = new Properties();
+        if (file.exists()) {
+            properties.load(file.newReader());
         }
+        properties.setProperty("version", project.version);
+        properties.setProperty("buildHash", getGitHash());
+        properties.setProperty("buildTime", System.currentTimeMillis() + "");
 
-        licenses {
-            license {
-                name "The Apache Software License, Version 2.0"
-                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                distribution "repo"
-            }
-        }
-
-        developers {
-            developer {
-                id "Tom-Ski"
-                name "Tom Wojciechowsk"
-            }
-            developer {
-                id "azakhary"
-                name "Avetis Zakharyan"
-            }
-        }
+        properties.store(file.newPrintWriter(), "");
     }
+}
+
+classes {
+    dependsOn createProperties
+}
+
+task packageSources(type: Jar, dependsOn: classes) {
+    from delombok
+    from sourceSets.main.resources.srcDirs
+    archiveClassifier = 'web'
+}
+
+configurations {
+    web {
+        canBeConsumed true
+        canBeResolved false
+        extendsFrom implementation, runtimeOnly
+    }
+}
+
+artifacts {
+    web(packageSources)
 }

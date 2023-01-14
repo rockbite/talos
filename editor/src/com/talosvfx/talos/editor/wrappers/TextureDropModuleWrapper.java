@@ -27,26 +27,29 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
+import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 
 import java.io.File;
+import java.util.Locale;
 
 public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends ModuleWrapper<T> {
 
     protected TextureDropWidget<AbstractModule> dropWidget;
     protected TextureRegion defaultRegion;
 
-    protected String regionName = "fire";
+    protected String regionName = "white";
     protected String filePath = null;
 
     @Override
     protected void configureSlots() {
-        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-        defaultRegion = projectAssetProvider.findAsset("fire", TextureRegion.class);
+        final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
+        defaultRegion = projectAssetProvider.findAsset("white", TextureRegion.class);
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
     }
 
@@ -61,24 +64,25 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
 
             final String extension = fileHandle.extension();
 
-            if (extension.endsWith("png") || extension.endsWith("jpg")) {
+            if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
                 final Texture texture = new Texture(fileHandle);
                 final Sprite region = new Sprite(texture);
-                TalosMain.Instance().TalosProject().getProjectAssetProvider().addToAtlas(fileHandle.nameWithoutExtension(), region);
+                final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+                assetProvider.addToAtlas(fileHandle.nameWithoutExtension(), region);
                 setModuleRegion(fileHandle.nameWithoutExtension(), region);
                 dropWidget.setDrawable(new TextureRegionDrawable(region));
 
                 regionName = fileHandle.nameWithoutExtension();
                 filePath = fileHandle.path();
 
-                TalosMain.Instance().ProjectController().setDirty();
+//                TalosMain.Instance().ProjectController().setDirty();
 
                 TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
                     @Override
                     public void updated(FileHandle handle) {
 
-                        final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-                        Sprite region = projectAssetProvider.replaceRegion(handle);
+                        final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+                        Sprite region = assetProvider.replaceRegion(handle);
 
                         setModuleRegion(handle.nameWithoutExtension(), region);
                         dropWidget.setDrawable(new TextureRegionDrawable(region));
@@ -105,16 +109,17 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
                 filePath = filePath + ".png";
             }
         }
-    
-        final TalosAssetProvider assetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
+
+        /*
+        final TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
         final Sprite textureRegion = assetProvider.findAsset(regionName, Sprite.class);
 
         if (textureRegion != null) {
             setModuleRegion(regionName, textureRegion);
             dropWidget.setDrawable(new TextureRegionDrawable(textureRegion));
         } else {
-            TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
-        }
+            //TalosMain.Instance().errorReporting.reportException(new GdxRuntimeException("Texture is missing on loading in all paths: " + regionName));
+        }*/
     }
 
     @Override

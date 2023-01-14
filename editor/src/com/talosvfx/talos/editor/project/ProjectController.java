@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.widgets.ui.FileTab;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class ProjectController {
     public FileTab currentTab;
     private ObjectMap<String, String> fileCache = new ObjectMap<>();
     private ObjectMap<String, String> pathCache = new ObjectMap<>();
+    private ObjectMap<String, FileTab> tabCache = new ObjectMap<>();
     private ObjectMap<String, String> exporthPathCache = new ObjectMap<>();
     private boolean loading = false;
 
@@ -24,11 +26,9 @@ public class ProjectController {
 
     private SnapshotTracker snapshotTracker;
 
-    public static TalosProject TLS = new TalosProject();
     private boolean lastDirTracking = true;
 
     public ProjectController() {
-        currentProject = TLS;
 
         snapshotTracker = new SnapshotTracker();
     }
@@ -53,9 +53,9 @@ public class ProjectController {
                 currentProjectPath = projectFileHandle.path();
                 projectFileName = projectFileHandle.name();
                 loading = true;
-                currentTab = new FileTab(projectFileName, currentProject); // trackers need to know what current tab is
+                currentTab = new FileTab(projectFileHandle, currentProject); // trackers need to know what current tab is
                 String string = projectFileHandle.readString();
-                currentProject.loadProject(string);
+                currentProject.loadProject(projectFileHandle, string, false);
                 snapshotTracker.reset(string);
                 reportProjectFileInterraction(projectFileHandle);
                 loading = false;
@@ -83,39 +83,27 @@ public class ProjectController {
 
     private void saveProjectToCache(String projectFileName) {
         try {
-            fileCache.put(projectFileName, currentProject.getProjectString());
+            fileCache.put(projectFileName, currentProject.getProjectString(true));
             pathCache.put(projectFileName, currentProjectPath);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         }
     }
 
-    private void getProjectFromCache(String projectFileName) {
+    private void getProjectFromString(String string, boolean fromMemory) {
         try {
             loading = true;
-            currentProjectPath = pathCache.get(projectFileName);
-            String string = fileCache.get(projectFileName);
-            currentProject.loadProject(string);
-            snapshotTracker.reset(string);
-            loading = false;
+            currentProject.loadProject(null, string, fromMemory);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
-        }
-    }
-
-    private void getProjectFromString(String string) {
-        try {
-            loading = true;
-            currentProject.loadProject(string);
+        } finally {
             loading = false;
-        } catch (Exception e) {
-            TalosMain.Instance().reportException(e);
         }
     }
 
     public void saveProject (FileHandle destination) {
         try {
-            String data = currentProject.getProjectString();
+            String data = currentProject.getProjectString(false);
             destination.writeString(data, false);
 
             reportProjectFileInterraction(destination);
@@ -130,7 +118,7 @@ public class ProjectController {
 
             if (!currentTab.getFileName().equals(projectFileName)) {
                 clearCache(currentTab.getFileName());
-                currentTab.setFileName(projectFileName);
+                currentTab.setProjectFileHandle(destination);
                 TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
                 fileCache.put(projectFileName, data);
             }
@@ -147,6 +135,23 @@ public class ProjectController {
     }
 
     public void newProject (IProject project) {
+        if(project.requiresWorkspaceLocation()) {
+            String fileName = getNewFilename(project);
+            String projectName = fileName.substring(0, fileName.indexOf("."));
+            NewProjectDialog.show(project.getProjectTypeName(), projectName, new NewProjectDialog.NewProjectListener() {
+                @Override
+                public void create (String path, String name) {
+                    createNewProjectTab(project, fileName);
+                    project.createWorkspaceEnvironment(path, name);
+                }
+            });
+        } else {
+            String fileName = getNewFilename(project);
+            createNewProjectTab(project, fileName);
+        }
+    }
+
+    public void createNewProjectTab(IProject project, String fileName) {
         FileTab prevTab = currentTab;
 
         boolean removingUnworthy = false;
@@ -160,15 +165,15 @@ public class ProjectController {
             }
         }
 
-        String newName = getNewFilename(project);
-        FileTab tab = new FileTab(newName, project);
+        final FileTab tab = new FileTab(Gdx.files.local(fileName), project);
+
         tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
         TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
         TalosMain.Instance().FileTracker().addTab(tab);
 
         currentProject.resetToNew();
-        snapshotTracker.reset(currentProject.getProjectString());
+        snapshotTracker.reset(currentProject.getProjectString(true));
         currentProjectPath = null;
 
         if(removingUnworthy) {
@@ -215,34 +220,32 @@ public class ProjectController {
             currentTab.setWorthy();
 
             // also add this as snapshot
-            snapshotTracker.addSnapshot(getProjectString());
+            snapshotTracker.addSnapshot(getProjectString(true));
         }
     }
 
-    private String getProjectString() {
-        return currentProject.getProjectString();
+    private String getProjectString(boolean toMemory) {
+        return currentProject.getProjectString(toMemory);
     }
 
     public void loadFromTab(FileTab tab) {
         String fileName = tab.getFileName();
 
-        if(currentTab != null && currentTab != tab) {
+        if (currentTab != null && currentTab != tab) {
             saveProjectToCache(projectFileName);
         }
-        if(fileCache.containsKey(fileName)) {
+
+        if (fileCache.containsKey(fileName)) {
             currentProject = tab.getProjectType();
-            currentTab =  tab;
-            getProjectFromCache(fileName);
+            currentTab = tab;
+            final FileHandle projectFileHandle = tab.getProjectFileHandle();
+            final String fileData = fileCache.get(tab.getFileName());
+            currentProject.loadProject(projectFileHandle, fileData, true);
         }
 
         projectFileName = fileName;
         currentTab = tab;
         currentProject = currentTab.getProjectType();
-        if(tab.getProjectType() == TLS) {
-            TalosMain.Instance().UIStage().swapToTalosContent();
-        } else {
-            currentProject.initUIContent();
-        }
     }
 
     public void removeTab(FileTab tab) {
@@ -260,9 +263,6 @@ public class ProjectController {
 
     public void setProject(IProject project) {
         currentProject = project;
-        if(project.equals(TLS)) {
-            TalosMain.Instance().UIStage().swapToTalosContent();
-        }
     }
 
     public IProject getProject() {
@@ -346,39 +346,20 @@ public class ProjectController {
 
     public void undo() {
         boolean changed = snapshotTracker.moveBack();
-        if(changed) {
-            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+        if (changed) {
+            getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }
 
     public void redo() {
         boolean changed = snapshotTracker.moveForward();
-        if(changed) {
-            getProjectFromString(snapshotTracker.getCurrentSnapshot());
+        if (changed) {
+            getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
         }
     }
 
     public void closeCurrentTab() {
         safeRemoveTab(currentTab);
-    }
-
-    public static class RecentsEntry {
-        String path;
-        long time;
-
-        public RecentsEntry() {
-
-        }
-
-        public RecentsEntry(String path, long time) {
-            this.path = path;
-            this.time = time;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return path.equals(((RecentsEntry)obj).path);
-        }
     }
 
     Comparator<RecentsEntry> recentsEntryComparator = new Comparator<RecentsEntry>() {
@@ -391,23 +372,25 @@ public class ProjectController {
     public void reportProjectFileInterraction(FileHandle handle) {
         Preferences prefs = TalosMain.Instance().Prefs();
         String data = prefs.getString("recents");
-        Array<RecentsEntry> list = new Array<>();
+
+        Recents recents = new Recents();
+
         //read
         Json json = new Json();
         try {
             if (data != null && !data.isEmpty()) {
-                list = json.fromJson(list.getClass(), data);
+                recents = json.fromJson(Recents.class, data);
             }
         } catch( Exception e) {
-
+            e.printStackTrace();
         }
-        RecentsEntry newEntry = new RecentsEntry(handle.path(), TimeUtils.millis());
-        list.removeValue(newEntry, false);
-        list.add(newEntry);
+        RecentsEntry newEntry = new RecentsEntry(handle.path(), (int)TimeUtils.millis());
+        recents.getRecents().removeValue(newEntry, false);
+        recents.getRecents().add(newEntry);
         //sort
-        list.sort(recentsEntryComparator);
+        recents.getRecents().sort(recentsEntryComparator);
         //write
-        String result = json.toJson(list);
+        String result = json.toJson(recents);
         prefs.putString("recents", result);
         prefs.flush();
         updateRecentsList();
@@ -416,22 +399,22 @@ public class ProjectController {
     public Array<String> updateRecentsList() {
         Preferences prefs = TalosMain.Instance().Prefs();
         String data = prefs.getString("recents");
+
         Array<String> list = new Array<>();
         //read
 
         try {
             Json json = new Json();
             if (data != null && !data.isEmpty()) {
-                Array<RecentsEntry> rList = new Array<>();
-                rList = json.fromJson(rList.getClass(), data);
-                for (RecentsEntry entry : rList) {
-                    list.add(entry.path);
+                Recents recents = json.fromJson(Recents.class, data);
+                for (RecentsEntry recent : recents.getRecents()) {
+                    list.add(recent.path);
                 }
             }
 
             TalosMain.Instance().UIStage().Menu().updateRecentsList(list);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         return list;

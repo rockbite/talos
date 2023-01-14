@@ -17,37 +17,29 @@
 package com.talosvfx.talos;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.kotcrab.vis.ui.VisUI;
-import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.WorkplaceStage;
-import com.talosvfx.talos.editor.addons.AddonController;
 import com.talosvfx.talos.editor.dialogs.ErrorReporting;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
-import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
+import com.talosvfx.talos.editor.render.Render;
+import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CameraController;
+import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.ScopePayload;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWDropCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
-import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
-import static org.lwjgl.system.MemoryUtil.*;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 public class TalosMain extends ApplicationAdapter {
 
@@ -55,7 +47,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private UIStage uiStage;
 
-	private NodeStage nodeStage;
 
 	private WorkplaceStage currentWorkplaceStage;
 
@@ -65,9 +56,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	private static TalosMain instance;
 
-	private AddonController addonController;
 
-	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
+//	public ObjectMap<Class, String> moduleNames = new ObjectMap<>();
 
 	public static TalosMain Instance () {
 		return instance;
@@ -81,19 +71,11 @@ public class TalosMain extends ApplicationAdapter {
 
 	public ErrorReporting errorReporting;
 
-	public NodeStage NodeStage () {
-		return nodeStage;
-	}
-
 	private Preferences preferences;
 
 	private FileTracker fileTracker = new FileTracker();
 
 	private InputMultiplexer inputMultiplexer;
-
-	public TalosProject TalosProject() {
-		return ProjectController.TLS;
-	}
 
 	public IProject Project() {
 		return projectController.getProject();
@@ -113,9 +95,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	private ScreenshotService screenshotService;
 
-	public Cursor pickerCursor;
-	private Cursor currentCursor;
-
 	private Array<InputProcessor> inputProcessors = new Array<>();
 	private Array<InputProcessor> customInputProcessors = new Array<>();
 
@@ -123,43 +102,19 @@ public class TalosMain extends ApplicationAdapter {
 
 	}
 
+	public static boolean isOsX() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		boolean isMacOs = osName.startsWith("mac os x");
+		return isMacOs;
+	}
+
 	@Override
 	public void create () {
-		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
-		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
-			@Override
-			public void invoke (long window, int count, long names) {
-
-				PointerBuffer namebuffer = memPointerBuffer(names, count);
-				final String[] filesPaths = new String[count];
-				for (int i = 0; i < count; i++) {
-					String pathToObject = memUTF8(memByteBufferNT1(namebuffer.get(i)));
-					filesPaths[i] = pathToObject;
-				}
-
-				Gdx.app.postRunnable(new Runnable() {
-					@Override
-					public void run () {
-						final int x = Gdx.input.getX();
-						final int y = Gdx.input.getY();
-
-						try {
-							nodeStage.fileDrop(filesPaths, x, y);
-							uiStage.fileDrop(filesPaths, x, y);
-						}  catch (Exception e) {
-							TalosMain.Instance().reportException(e);
-						}
-					}
-				});
-			}
-		});
-
 
 		TalosMain.instance = this;
 
 		screenshotService = new ScreenshotService();
 
-		addonController = new AddonController();
 
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
@@ -169,47 +124,25 @@ public class TalosMain extends ApplicationAdapter {
 
 		VisUI.load(skin);
 
-		pickerCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("cursors/picker.png")), 0, 0);
-
 		uiStage = new UIStage(skin);
 
 		errorReporting = new ErrorReporting();
 
-		nodeStage = new NodeStage(skin);
-		currentWorkplaceStage = nodeStage;
 
 		projectController = new ProjectController();
 
 
-		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
+//		inputProcessors.add(uiStage.getStage(), currentWorkplaceStage.getStage());
 
 		inputMultiplexer = new InputMultiplexer();
 		setInputProcessors();
 
 		uiStage.init();
-		nodeStage.init();
 
-		addonController.initAll();
 
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
 		// final init after all is done
-		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
-
-
-		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
-			@Override
-			public void invoke (long window, boolean focused) {
-				Gdx.app.postRunnable(new Runnable() {
-					@Override
-					public void run () {
-						TalosMain.focused = focused;
-					}
-				});
-			}
-		});
-		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
-
 	}
 
 	private void setInputProcessors() {
@@ -227,58 +160,85 @@ public class TalosMain extends ApplicationAdapter {
 		setInputProcessors();
 	}
 
-	public void setCursor(Cursor cursor) {
-		if(currentCursor != cursor) {
-			if(cursor != null) {
-				Gdx.graphics.setCursor(cursor);
-			} else {
-				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+	private void loadFromProperties () {
+		FileHandle properties = Gdx.files.internal("talos-version.properties");
+		if (properties.exists()) {
+			Properties props = new Properties();
+			try {
+				props.load(properties.read());
+
+				String title = "Talos";
+				//buildHash=cac0e98
+				//buildTime=1660634881583
+				//version=1.4.2-SNAPSHOT
+
+				if (props.containsKey("version")) {
+					title = props.getProperty("version");
+				}
+				if (props.containsKey("buildTime")) {
+					String buildTime = props.getProperty("buildTime");
+					Date date = new Date(Long.parseLong(buildTime));
+
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
+					title += " " + sdf.format(date);
+				}
+				if (props.containsKey("buildHash")) {
+					title += " " + props.getProperty("buildHash");
+				}
+				Gdx.graphics.setTitle(title);
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			currentCursor = cursor;
 		}
+	}
+
+	public void setPerFrameCursorTypeEnabled () {
+
 	}
 
 	public void disableNodeStage() {
 		currentWorkplaceStage = null;
-		inputProcessors.removeValue(nodeStage.getStage(), true);
 	}
 
 	public void setThirdPartyStage(WorkplaceStage stage) {
 		currentWorkplaceStage = stage;
 		inputProcessors.clear();
-		inputProcessors.add(nodeStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+		inputProcessors.add(uiStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
 	public void enableNodeStage() {
-		currentWorkplaceStage = nodeStage;
 		inputProcessors.clear();
 		inputProcessors.add(uiStage.getStage());
-		inputProcessors.add(currentWorkplaceStage.getStage());
+//		inputProcessors.add(currentWorkplaceStage.getStage());
 		setInputProcessors();
 	}
 
 	@Override
 	public void render () {
-		if (!focused) {
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		CursorUtil.checkAndReset();
+
+
+		try {
+			Thread.sleep(16);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		if (currentWorkplaceStage != null) {
-			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
+//			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {
 			Gdx.gl.glClearColor(0.15f, 0.15f, 0.15f, 1);
 		}
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		if (currentWorkplaceStage != null) {
-			currentWorkplaceStage.getStage().act();
-			currentWorkplaceStage.getStage().draw();
+			currentWorkplaceStage.act();
+//			currentWorkplaceStage.getStage().act();
+//			currentWorkplaceStage.getStage().draw();
 		}
 
 		fileTracker.update();
@@ -302,11 +262,12 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void dispose () {
-		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
-			currentWorkplaceStage.getStage().dispose();
-		}
-		pickerCursor.dispose();
+//		if(currentWorkplaceStage != null && currentWorkplaceStage.getStage() != null) {
+//			currentWorkplaceStage.getStage().dispose();
+//		}
 		uiStage.getStage().dispose();
+		Render.instance().dispose();
+		SocketServer.dispose();
 	}
 
 	public Skin getSkin() {
@@ -314,14 +275,17 @@ public class TalosMain extends ApplicationAdapter {
 	}
 
 	public CameraController getCameraController() {
-		return currentWorkplaceStage.getCameraController();
-	}
+		if(currentWorkplaceStage == null) return null;
 
-	public AddonController Addons() {
-		return addonController;
+		return null;
+//		return currentWorkplaceStage.getCameraController();
 	}
 
 	public FileTracker FileTracker() {
 		return fileTracker;
+	}
+
+	public WorkplaceStage getNodeStage () {
+		return currentWorkplaceStage;
 	}
 }

@@ -1,63 +1,50 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
-import com.badlogic.gdx.graphics.g3d.particles.batches.ModelInstanceParticleBatch;
-import com.badlogic.gdx.graphics.g3d.particles.batches.PointSpriteParticleBatch;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
-import com.talosvfx.talos.TalosMain;
+import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.ModelBatchParticleRenderer;
+import lombok.Getter;
+
+import java.util.function.Supplier;
 
 public class Preview3D extends PreviewWidget {
 
-    //Controls
-    private CameraInputController cameraInputController;
+    private final TinyGizmoRenderer tinyGizmoRenderer;
 
-    private ModelBatchParticleRenderer particleRenderer;
+    @Getter
+    private final BongoPreview bongoPreview;
 
     //Render
-    public PerspectiveCamera worldCamera;
     private boolean isDrawXYZ, isDrawXZPlane, isDrawXYPlane;
     private Array<Model> models;
     private ModelInstance xyzInstance, xzPlaneInstance, xyPlaneInstance;
     private Environment environment;
-    private ModelBatch modelBatch;
+
+    private IDragPointProvider dragPointProvider;
+    private Array<DragPoint> dragPoints = new Array<>();
 
     public Preview3D() {
         super();
-        cameraController.scrollOnly = true;
+        if (MathUtils.isEqual(viewportViewSettings.getNear(), 0.0f)) {
+            viewportViewSettings.setNear(0.01f);
+        }
+//        cameraController.scrollOnly = true;
+        setWorldSize(10);
 
-        int w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-        modelBatch = new ModelBatch();
         environment = new Environment();
         environment.add(new DirectionalLight().set(Color.WHITE, 0,0,-1));
 
-        worldCamera = new PerspectiveCamera(67, w, h);
-        worldCamera.position.set(10, 10, 10);
-        worldCamera.lookAt(0,0,0);
-        worldCamera.near = 0.1f;
-        worldCamera.far = 300f;
-        worldCamera.update();
-
-        cameraInputController = new CameraInputController(worldCamera);
-        cameraInputController.translateTarget = false;
 
         models = new Array<Model>();
         ModelBuilder builder = new ModelBuilder();
@@ -73,57 +60,13 @@ public class Preview3D extends PreviewWidget {
         setDrawXYZ(true);
         setDrawXZPlane(true);
 
-        particleRenderer = new ModelBatchParticleRenderer();
-        particleRenderer.setWorld(worldCamera, environment);
+        tinyGizmoRenderer = new TinyGizmoRenderer();
 
-        TalosMain.Instance().addCustomInputProcessor(cameraInputController);
-    }
+        bongoPreview = new BongoPreview();
 
-    @Override
-    protected void addPanListener() {
-        addListener(new InputListener() {
-            @Override
-            public boolean scrolled(InputEvent event, float x, float y, int amount) {
+        bongoPreview.setCameraController(viewportViewSettings.getCurrentCameraController());
 
-                cameraInputController.scrolled(amount);
 
-                return true;
-            }
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                cameraInputController.touchDown((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
-                return !event.isHandled();
-            }
-
-            @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                cameraInputController.touchUp((int)x, Gdx.graphics.getHeight() - (int)y, pointer, button);
-            }
-
-            @Override
-            public void touchDragged (InputEvent event, float x, float y, int pointer) {
-                cameraInputController.touchDragged((int)x, Gdx.graphics.getHeight() - (int)y, pointer);
-            }
-
-            @Override
-            public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(Preview3D.this);
-            }
-
-            @Override
-            public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                if (pointer != -1) return; //Only care about exit/enter from mouse move
-                TalosMain.Instance().UIStage().getStage().setScrollFocus(null);
-            }
-        });
-    }
-
-    @Override
-    protected Table buildPreviewController() {
-        return new Table();
     }
 
     @Override
@@ -166,33 +109,155 @@ public class Preview3D extends PreviewWidget {
     public void act(float delta) {
         super.act(delta);
 
-        worldCamera.viewportWidth = getWidth();
-        worldCamera.viewportHeight = getHeight();
-        worldCamera.update();
-        cameraInputController.update();
+        bongoPreview.setCamera(viewportViewSettings.getCurrentCamera());
+
+//        worldCamera.viewportWidth = getWidth();
+//        worldCamera.viewportHeight = getHeight();
+//        worldCamera.update();
+
+        if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
+        }
     }
 
     @Override
-    public void drawContent(Batch batch, float parentAlpha) {
+    public void drawContent(PolygonBatch batch, float parentAlpha) {
         super.drawContent(batch, parentAlpha);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+//            switchCamera();
+        }
+
+        if (effectInstance != null) {
+            bongoPreview.updateParticleInstance(effectInstance);
+        }
+
         batch.end();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 
-        modelBatch.begin(worldCamera);
-        if(isDrawXYZ) modelBatch.render(xyzInstance);
-        if(isDrawXZPlane) modelBatch.render(xzPlaneInstance);
-        if(isDrawXYPlane) modelBatch.render(xyPlaneInstance);
 
-        //Draw
-        particleRenderer.setBatch(modelBatch);
-        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-        particleEffect.render(particleRenderer);
+        if (viewportViewSettings.isShowAxis()) {
+            drawAxis();
+        }
 
-        modelBatch.end();
+//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+//        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+
+//        modelBatch.begin(worldCamera);
+//        //if(isDrawXYZ) modelBatch.render(xyzInstance);
+//        if(isDrawXZPlane) modelBatch.render(xzPlaneInstance);
+//        if(isDrawXYPlane) modelBatch.render(xyPlaneInstance);
+//
+//        //Draw
+//        modelBatch.end();
+
+
+//        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+//        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+
+//        Gdx.gl.glEnable(GL20.GL_BLEND);
+//        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+//        final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
+//        simple3DBatch.begin(worldCamera, shaderProgram);
+//        particleRenderer.setBatch(simple3DBatch);
+//        particleEffect.render(particleRenderer);
+//        simple3DBatch.end();
+
+//        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+
+
+
+
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+
+        Vector2 temp = new Vector2();
+        Vector2 temp2 = new Vector2();
+
+        temp.set(0, 0);
+        temp2.set(getWidth(), getHeight());
+
+        localToScreenCoordinates(temp);
+        localToScreenCoordinates(temp2);
+
+        temp.y = Gdx.graphics.getHeight() - temp.y;
+        temp2.y = Gdx.graphics.getHeight() - temp2.y;
+
+        int width = (int)(temp2.x - temp.x);
+        int height = (int)(temp2.y - temp.y);
+        int x = (int)temp.x;
+        int y = (int)temp.y;
+
+        x = HdpiUtils.toBackBufferX(x);
+        y = HdpiUtils.toBackBufferY(y);
+        width = HdpiUtils.toBackBufferX(width);
+        height = HdpiUtils.toBackBufferY(height);
+
+        RenderPassSystem.glViewport.x = x;
+        RenderPassSystem.glViewport.y = y;
+        RenderPassSystem.glViewport.width = width;
+        RenderPassSystem.glViewport.height = height;
+        HdpiUtils.glViewport(
+            RenderPassSystem.glViewport.x,
+            RenderPassSystem.glViewport.y,
+            RenderPassSystem.glViewport.width,
+            RenderPassSystem.glViewport.height
+        );
+
+//        if (worldCamera instanceof PerspectiveCamera) {
+//            worldCamera.viewportWidth = glViewport.width;
+//            worldCamera.viewportHeight = glViewport.height;
+//            worldCamera.update();
+//        }
+
+
+        bongoPreview.render();
+
+        Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
+
+        Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
+        Camera camera = currentCameraSupplier.get();
+
+        tinyGizmoRenderer.render(camera, this, dragPoints);
+        for (DragPoint dragPoint : dragPoints) {
+            if (dragPoint.changed) {
+                dragPointProvider.dragPointChanged(dragPoint);
+                dragPoint.changed = false;
+            }
+        }
 
         batch.begin();
+
+    }
+
+    boolean isPerspective = true;
+    private void switchCamera () {
+//        final Vector3 position = worldCamera.position;
+//        final Vector3 direction = worldCamera.direction;
+//
+//        if (isPerspective) {
+//            float aspect = (float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
+//            float width = 10f;
+//            float height = width * aspect;
+//            OrthographicCamera orthographicCamera = new OrthographicCamera(width, height);
+//            bongoPreview.setCamera(orthographicCamera);
+//        } else {
+//            PerspectiveCamera perspectiveCamera = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            bongoPreview.setCamera(perspectiveCamera);
+//        }
+//
+//        isPerspective = !isPerspective;
+//
+//        worldCamera = bongoPreview.getWorldCamera();
+//        worldCamera.near = 0.1f;
+//        worldCamera.far = 100f;
+//        worldCamera.position.set(position);
+//        worldCamera.direction.set(direction);
+//        worldCamera.update();
+//
+////        if (cameraInputController instanceof CameraInputController) {
+////            ((CameraInputController)cameraInputController).camera = worldCamera;
+////        }
+
+
     }
 
     @Override
@@ -200,68 +265,35 @@ public class Preview3D extends PreviewWidget {
 
     }
 
-    @Override
-    public void unregisterDragPoints() {
-
-    }
-
-    @Override
     public void registerForDragPoints(IDragPointProvider dragPointProvider) {
-
+        this.dragPointProvider = dragPointProvider;
+        DragPoint[] arr = dragPointProvider.fetchDragPoints();
+        dragPoints.clear();
+        for(int i = 0; i < arr.length; i++) {
+            dragPoints.add(arr[i]);
+        }
     }
 
-    @Override
+    public void unregisterDragPoints() {
+        this.dragPointProvider = null;
+        dragPoints.clear();
+    }
+
     public void unregisterDragPoints(IDragPointProvider dragPointProvider) {
+        if(this.dragPointProvider == dragPointProvider) {
+            this.dragPointProvider = null;
+            dragPoints.clear();
+        }
+    }
+
+
+    @Override
+    public void removePreviewImage() {
 
     }
 
     @Override
-    public String getBackgroundImagePath() {
-        return null;
-    }
-
-    @Override
-    public boolean isGridVisible() {
-        return false;
-    }
-
-    @Override
-    public boolean isBackgroundImageInBack() {
-        return false;
-    }
-
-    @Override
-    public float getBgImageSize() {
-        return 0;
-    }
-
-    @Override
-    public float getGridSize() {
-        return 0;
-    }
-
-    @Override
-    public void setBackgroundImage(String bgImagePath) {
-
-    }
-
-    @Override
-    public void setGridVisible(boolean isGridVisible) {
-
-    }
-
-    @Override
-    public void setImageIsBackground(boolean bgImageIsInBack) {
-
-    }
-
-    @Override
-    public void setBgImageSize(float bgImageSize) {
-
-    }
-
-    @Override
-    public void setGridSize(float gridSize) {
+    public void gridSizeChanged(float size) {
 
     }
 }

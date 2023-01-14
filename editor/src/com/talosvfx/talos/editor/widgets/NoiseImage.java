@@ -24,6 +24,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.rockbite.bongo.engine.render.ShaderFlags;
+import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
 import com.talosvfx.talos.runtime.utils.SimplexNoise;
 
 public class NoiseImage extends Actor {
@@ -39,7 +41,8 @@ public class NoiseImage extends Actor {
     public NoiseImage(Skin skin) {
         this.skin = skin;
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
-        shaderProgram = new ShaderProgram(Gdx.files.internal("shaders/ui/default.vert"), Gdx.files.internal("shaders/ui/noise.frag"));
+
+        shaderProgram = SpriteShaderCompiler.getOrCreateShader("ui/noise", Gdx.files.internal("shaders/gl2/ui/default.vert.glsl"), Gdx.files.internal("shaders/gl2/ui/noise.frag.glsl"), new ShaderFlags());
 
         pixmap = new Pixmap(165, 100, Pixmap.Format.RGB888);
     }

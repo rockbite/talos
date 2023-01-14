@@ -36,6 +36,7 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
 import com.talosvfx.talos.runtime.modules.ColorModule;
 
@@ -43,8 +44,6 @@ import com.talosvfx.talos.runtime.modules.ColorModule;
 public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
     private Image colorBtn;
-
-    private ColorPicker picker;
 
     VisTextField rField;
     VisTextField gField;
@@ -96,22 +95,6 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
         addOutputSlot("position", 0);
 
-        picker = new ColorPicker(new ColorPickerAdapter() {
-            @Override
-            public void changed (Color newColor) {
-                if(colorBtn != null) {
-                    colorBtn.setColor(newColor);
-                    rField.setText(""+(int)(newColor.r * 255f));
-                    gField.setText(""+(int)(newColor.g * 255f));
-                    bField.setText(""+(int)(newColor.b * 255f));
-
-                    module.setR(newColor.r);
-                    module.setG(newColor.g);
-                    module.setB(newColor.b);
-                }
-            }
-        });
-
         // create color picker Btn
         colorBtn = new Image(getSkin().getDrawable("white"));
         contentWrapper.add(colorBtn).width(50).height(50).right().padLeft(26);
@@ -122,15 +105,24 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                TalosMain.Instance().UIStage().getStage().addActor(picker.fadeIn());
+                SharedResources.ui.showColorPicker(new ColorPickerAdapter() {
+                    @Override
+                    public void changed(Color newColor) {
+                        super.changed(newColor);
+                        if(colorBtn != null) {
+                            colorBtn.setColor(newColor);
+                            rField.setText(""+(int)(newColor.r * 255f));
+                            gField.setText(""+(int)(newColor.g * 255f));
+                            bField.setText(""+(int)(newColor.b * 255f));
+
+                            module.setR(newColor.r);
+                            module.setG(newColor.g);
+                            module.setB(newColor.b);
+                        }
+                    }
+                });
             }
         });
-
-        picker.padTop(32);
-        picker.padLeft(16);
-        picker.setHeight(330);
-        picker.setWidth(430);
-        picker.padRight(26);
     }
 
     private void update() {
@@ -159,7 +151,5 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
     @Override
     public void act (float delta) {
         super.act(delta);
-
-        ScreenshotService.testForPicker(picker);
     }
 }

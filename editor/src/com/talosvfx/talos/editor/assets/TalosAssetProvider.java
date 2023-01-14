@@ -25,6 +25,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
 import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
 import com.talosvfx.talos.runtime.utils.VectorField;
@@ -95,6 +98,8 @@ public class TalosAssetProvider extends BaseAssetProvider {
 
 	private void addDefaultAssets () {
 		addTexture(Gdx.files.internal("fire.png"));
+		addTexture(Gdx.files.internal("spot.png"));
+		addTexture(Gdx.files.internal("smoke.png"));
 	}
 
 	private void addTexture (FileHandle path) {
@@ -156,6 +161,11 @@ public class TalosAssetProvider extends BaseAssetProvider {
 	}
 
 	private Sprite findSpriteOrLoad (String assetName) {
+
+		GameAsset<Texture> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+		if (assetForIdentifier != null) {
+			return new Sprite(assetForIdentifier.getResource());
+		}
 		final Sprite region = atlas.createSprite(assetName);
 		if (region == null) {
 			//Look in all paths, and hopefully load the requested asset, or fail (crash)

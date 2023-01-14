@@ -46,6 +46,14 @@
                 <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
             </group>
         </module>
+        <module name = "Vector3Node" title = "XYZ to Vector" keywords = "vector3,position">
+            <value port="output" name="outputValue" type="vec3">Output</value>
+            <group>
+                <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X: </dynamicValue>
+                <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y: </dynamicValue>
+                <dynamicValue port="input" name="Z" type="float" min="-1000" max="1000">Z: </dynamicValue>
+            </group>
+        </module>
         <module name = "ColorNode" title = "Color" keywords = "color">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
@@ -59,6 +67,7 @@
         <module name = "SampleTextureNode" title = "Texture Sample" keywords = "texture,sample">
             <group>
                 <value port="output" name="outputRGBA" type="vec4">RGBA</value>
+                <value port="input" name="overrideUV" type="vec2">UV</value>
                 <value port="input" name="offsetUV" type="vec2">UV Offset</value>
                 <value port="input" name="mulUV" type="vec2">UV Mul</value>
             </group>
@@ -74,10 +83,21 @@
     <category name="master" title="Master">
         <module name = "ColorOutput" title = "Pixel Shader" keywords = "main">
             <value port="input" name="inputColor" type="vec4">Input Color</value>
+            <value port="output" name="outputShader" type="text">Output Shader</value>
             <select name="blending">
                 <option value = "NORMAL">Normal Blending</option>
                 <option value = "ADDITIVE">Additive Blending</option>
                 <option value = "BLEND-ADD">Blend Add (Alpha)</option>
+            </select>
+        </module>
+        <module name = "ExternalShaderNode" title = "External Shader" keywords = "custom">
+            <value port="output" name="outputShader" type="text">Output Shader</value>
+        </module>
+        <module name = "MaterialEndpoint" title = "Material" keywords = "main">
+            <value port="input" name="inputShader" type="text">Pixel Shader</value>
+            <select name="preview">
+                <option value = "3D">3D Preview</option>
+                <option value = "2D">2D Preview</option>
             </select>
         </module>
     </category>
@@ -123,6 +143,25 @@
                 <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.1">Value A</dynamicValue>
                 <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.1">Value B</dynamicValue>
             </group>
+        </module>
+        <module name = "CrossProduct" title = "Cross Product" keywords = "math" class="GenericMethodNode">
+            <value port="output" name="outputValue" type="vec3">Output Value</value>
+            <value port="input" name="vec1" type="vec3">Vec 1</value>
+            <value port="input" name="vec2" type="vec3">Vec 2</value>
+            <shader-body>
+                <![CDATA[
+                    return cross(vec1, vec2);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "NormalizeNode" title = "Normalize Vector" keywords = "math" class="GenericMethodNode">
+            <value port="output" name="outputValue" type="vec4">Output Value</value>
+            <value port="input" name="var" type="vec4">Normalized Input</value>
+            <shader-body>
+                <![CDATA[
+                    return normalize(var);
+                ]]>
+            </shader-body>
         </module>
         <module name = "NormalizedSin" title = "Normalized Sinus" keywords = "math" class="GenericMethodNode">
             <value port="output" name="outputValue" type="vec4">Output Value</value>
@@ -302,6 +341,10 @@
                 ]]>
             </shader-body>
         </module>
+        <module name = "FloatUniform" title = "Float Uniform" keywords = "uniform" class="UniformNode">
+            <dynamicValue port="input" name="val" type="float" min="0" max="1" progress="true">Val: </dynamicValue>
+            <value port="output" name="out" type="float">out</value>
+        </module>
     </category>
     <category name="uv" title="UV">
         <module name = "RadialShearNode" title = "Radial Shear" keywords = "math" class="GenericMethodNode">
@@ -371,6 +414,33 @@
             <shader-body>
                 <![CDATA[
                     return fract(uv * tiling + offset);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "PosterizeNode" title = "Posterize" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+                <value port="input" name="steps" type="vec4" default="4">Steps</value>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return floor(inValue / (1.0 / steps)) * (1.0 / steps);
+                ]]>
+            </shader-body>
+        </module>
+        <module name = "ClampNode" title = "Clamp" keywords = "math" class="GenericMethodNode">
+            <group>
+                <value port="output" name="outputValue" type="vec4">Output</value>
+                <value port="input" name="inValue" type="vec4">In</value>
+            </group>
+            <group>
+                <dynamicValue port="input" name="min" type="float" max="1" step="0.001" progress="true">Min</dynamicValue>
+                <dynamicValue port="input" name="max" type="float" max="1" step="0.001" progress="true" default="1">Max</dynamicValue>
+            </group>
+            <shader-body>
+                <![CDATA[
+                    return clamp(inValue, min, max);
                 ]]>
             </shader-body>
         </module>

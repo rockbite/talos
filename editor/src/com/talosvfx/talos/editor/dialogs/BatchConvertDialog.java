@@ -23,15 +23,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.filesystem.FileChooserListener;
+import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 
 import java.io.File;
 
 public class BatchConvertDialog extends VisWindow {
 
-    FileChooser fileChooser;
     TextField inputPathField;
     TextField outputPathField;
     TextField inputFilterField;
@@ -60,9 +59,6 @@ public class BatchConvertDialog extends VisWindow {
         centerWindow();
 
         initContent();
-
-        fileChooser = new FileChooser(FileChooser.Mode.OPEN);
-        fileChooser.setBackground(getSkin().getDrawable("window-noborder"));
 
     }
 
@@ -128,18 +124,12 @@ public class BatchConvertDialog extends VisWindow {
     }
 
     private void showFolderSelect(final TextField pathField) {
-        fileChooser.setMode(FileChooser.Mode.OPEN);
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setSelectionMode(FileChooser.SelectionMode.DIRECTORIES);
-
-        fileChooser.setListener(new FileChooserAdapter() {
+        FileSystemInteraction.instance().showFolderChooser(new FileChooserListener() {
             @Override
-            public void selected (Array<FileHandle> file) {
-                pathField.setText(file.get(0).path());
+            public void selected (Array<FileHandle> files) {
+                pathField.setText(files.get(0).path());
             }
         });
-
-        getStage().addActor(fileChooser.fadeIn());
     }
 
     private void startConversion() {
@@ -190,10 +180,10 @@ public class BatchConvertDialog extends VisWindow {
 
         String result = "ok";
         try {
-            TalosMain.Instance().TalosProject().importFromLegacyFormat(fileHandle);
-            // now that it's done save TLS file
-            TalosMain.Instance().ProjectController().saveProject(projectDestination);
-            TalosMain.Instance().TalosProject().exportProject(exportDestination);
+//            TalosMain.Instance().TalosProject().importFromLegacyFormat(fileHandle);
+//             now that it's done save TLS file
+//            TalosMain.Instance().ProjectController().saveProject(projectDestination);
+//            TalosMain.Instance().TalosProject().exportProject(exportDestination);
 
         } catch (Exception e) {
             result = "nok";

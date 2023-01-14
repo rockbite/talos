@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.wrappers;
 
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.*;
 
@@ -22,7 +23,7 @@ public class AttractorModuleWrapper extends ModuleWrapper<AttractorModule> {
 
         if(slot.getIndex() == AttractorModule.INITIAL_ANGLE) return RandomRangeModule.class;
         if(slot.getIndex() == AttractorModule.INITIAL_VELOCITY) return RandomRangeModule.class;
-        if(slot.getIndex() == AttractorModule.ATTRACTOR_POSITION) return Vector2Module.class;
+        if(slot.getIndex() == AttractorModule.ATTRACTOR_POSITION) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
         if(slot.getIndex() == AttractorModule.ALPHA) return InterpolationModule.class;
         return null;
     }

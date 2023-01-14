@@ -1,17 +1,17 @@
-# talos vfx
-![Build Status](http://jenkins.svc.rockbitegames.com:8080/buildStatus/icon?job=Talos)[![Github All Releases](https://img.shields.io/github/downloads/rockbite/talos/total.svg)]()
-
-Travis
-[![Build Status](https://travis-ci.com/rockbite/talos.svg?branch=master)](https://travis-ci.com/rockbite/talos)
+# Talos VFX
 
 Website: [https://talosvfx.com/](https://talosvfx.com/)
-Discord Server: [https://discord.gg/zjEGT5zEzM](https://discord.gg/zjEGT5zEzM)
+Discord Server: [https://discord.gg/EQqYGcyMfr](https://discord.gg/EQqYGcyMfr)
+
+Prebuilt binaries:
+[Snapshot download 1.4.2-SNAPSHOT](https://editor.talosvfx.com/editor-binaries/editor-desktop-1.4.2-SNAPSHOT.jar)
+
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
 
-Node based, open source VFX Editor with powerfull interface and a ready to use libGDX runtime.
+Node based, open source VFX Editor with powerful interface and a ready to use libGDX runtime.
 
-### Screenshot
+### Screenshot 
 
 ![screenshot](https://i.imgur.com/KYpynzB.png)
 
@@ -22,7 +22,7 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Beam Renderer
   * Visual manipulation of shapes, sizes and positions
   * Custom pre-compiled java scriptwriting for value manipulation
-  * Custom widget flaours allowing for same widget to look differently if it's just number or if number is angle
+  * Custom widget flavours allowing for same widget to look differently if it's just number or if number is angle
   
 ### List of modules (nodes)
 
@@ -45,8 +45,8 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Multi Input - has dynamic amount of inputs, chooses one randomly and set's it to output
   * Curve - Allows for user made curve with provided points, outputs single value
   * Interpolation - Same as Curve but instead of custom points it is procedural meaning it's a formula
-  * Math Operations - Add, substract, multiply, devide, sin, cos functions to be used with A and B values
-  * Beam Position - Converts From and To positoin values into Rotation, Position & Size values that are used by Beam Renderer
+  * Math Operations - Add, subtract, multiply, divide, sin, cos functions to be used with A and B values
+  * Beam Position - Converts From and To position values into Rotation, Position & Size values that are used by Beam Renderer
   * Emitter Config - Wraps emitter configuration checkboxes into one UI. 
   * Script (Java) - Modules with 5 inputs and 5 outputs that can take a Java code as string to act open this values.
   

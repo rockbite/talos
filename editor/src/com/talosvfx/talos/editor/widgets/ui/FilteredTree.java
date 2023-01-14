@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -35,9 +37,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Predicate;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
+
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 /**
  * A tree widget where each node has an icon, actor, and child nodes.
@@ -54,6 +59,7 @@ public class FilteredTree<T> extends WidgetGroup {
     TreeStyle style;
     final Array<Node<T>> rootNodes = new Array();
     final Selection<Node<T>> selection;
+
     float ySpacing = 4, iconSpacingLeft = 2, iconSpacingRight = 2, padding = 0, indentSpacing;
     private float leftColumnWidth, prefWidth, prefHeight;
     private boolean sizeInvalid = true;
@@ -65,7 +71,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private Skin skin;
 
-    private boolean draggable;
+    public boolean draggable;
     private int autoSelectionIndex = 0;
 
     public FilteredTree (Skin skin) {
@@ -73,19 +79,54 @@ public class FilteredTree<T> extends WidgetGroup {
         this.skin = skin;
     }
 
-    private ItemListener itemListener;
+    private Array<ItemListener<T>> itemListeners = new Array<>();
 
-    public interface ItemListener {
-        void chosen(Node node);
-        void selected(Node node);
+    public void addItemListener (ItemListener<T> itemListener) {
+        itemListeners.add(itemListener);
     }
 
-    public void setItemListener(ItemListener itemListener) {
-        this.itemListener = itemListener;
+    public void removeItemListener (ItemListener<T> filterTreeListener) {
+        boolean b = itemListeners.removeValue(filterTreeListener, true);
     }
+
+    public static abstract class ItemListener<T> {
+        public void selected(Node<T> node) {
+
+        }
+
+        public void addedIntoSelection(Node<T> node) {
+
+        }
+
+        public void removedFromSelection (Node<T> node) {
+
+        }
+
+        public void rightClick (Node<T> node) {
+
+        }
+
+        public void mouseMoved (Node<T> node) {
+
+        }
+
+        public void delete (Array<FilteredTree.Node<T>> nodes) {
+
+        }
+
+        public void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+
+        }
+
+        public void clearSelection () {
+
+        }
+    }
+
 
     public FilteredTree (Skin skin, String styleName) {
         this(skin.get(styleName, TreeStyle.class));
+        this.skin = skin;
     }
 
     public FilteredTree (TreeStyle style) {
@@ -102,7 +143,7 @@ public class FilteredTree<T> extends WidgetGroup {
             }
         };
         selection.setActor(this);
-        selection.setMultiple(false);
+        selection.setMultiple(true);
         selection.setToggle(true);
         setStyle(style);
         initialize();
@@ -114,61 +155,194 @@ public class FilteredTree<T> extends WidgetGroup {
 
         if(result.size == 0) return;
 
-        if(itemListener != null) {
-            itemListener.chosen(result.get(autoSelectionIndex));
+        for (ItemListener<T> itemListener : itemListeners) {
+            itemListener.selected(result.get(autoSelectionIndex));
+        }
+
+    }
+
+    // Discards all selected nodes
+    public void clearSelection (boolean notifyListeners) {
+        if (selection.isEmpty()) {
+            return;
+        }
+
+        if (notifyListeners) {
+            for (int i = 0; i < itemListeners.size; i++) {
+                ItemListener<T> tItemListener = itemListeners.get(i);
+                tItemListener.clearSelection();
+            }
+        }
+        selection.clear();
+        selection.fireChangeEvent();
+    }
+
+    // Adds multiple nodes to already selected ones
+    public void addNodesToSelection (Array<Node<T>> nodes, boolean notify) {
+        for (Node<T> node : nodes) {
+            selection.add(node);
+            if (notify) {
+                for (int i = 0; i < itemListeners.size; i++) {
+                    ItemListener<T> tItemListener = itemListeners.get(i);
+                    tItemListener.selected(node);
+                }
+            }
+        }
+        selection.fireChangeEvent();
+    }
+
+    // Adds a single node to the selection
+    public void addNodeToSelection (Node<T> node) {
+        selection.add(node);
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.addedIntoSelection(node);
+        }
+
+        selection.fireChangeEvent();
+    }
+
+    // Removes a single node from selection
+    public void removeNodeFromSelection (Node<T> node) {
+        if (!selection.contains(node)) {
+            return;
+        }
+        for (int i = 0; i < itemListeners.size; i++) {
+            ItemListener<T> tItemListener = itemListeners.get(i);
+            tItemListener.removedFromSelection(node);
+        }
+        selection.remove(node);
+        selection.fireChangeEvent();
+    }
+
+
+    private void selectSingleNode (Node<T> node, boolean notifyListeners) {
+        clearSelection(notifyListeners);
+        addNodeToSelection(node);
+        if (notifyListeners) {
+            for (int i = 0; i < itemListeners.size; i++) {
+                ItemListener<T> tItemListener = itemListeners.get(i);
+                tItemListener.selected(node);
+            }
         }
     }
 
     private void initialize () {
         addListener(clickListener = new ClickListener() {
+            @Override
             public void clicked (InputEvent event, float x, float y) {
-                Node node = getNodeAt(y);
-                if (node == null)
+                super.clicked(event, x, y);
+
+                // No node found, bye bye
+                Node<T> node = getNodeAt(y);
+                if (node == null) {
+                    clearSelection(true);
                     return;
-                if (node != getNodeAt(getTouchDownY()))
-                    return;
-                if (selection.getMultiple() && selection.hasItems() && UIUtils.shift()) {
-                    // Select range (shift).
-                    if (rangeStart == null)
+                }
+
+                // Range selection with shift
+                if (selection.getMultiple() && selection.notEmpty() && UIUtils.shift()) {
+                    if (rangeStart == null) {
                         rangeStart = node;
-                    Node rangeStart = FilteredTree.this.rangeStart;
-                    if (!UIUtils.ctrl())
-                        selection.clear();
+                    }
+                    Node<T> rangeStart = FilteredTree.this.rangeStart;
+                    selection.clear();
                     float start = rangeStart.actor.getY(), end = node.actor.getY();
                     if (start > end)
-                        selectNodes(rootNodes, end, start);
+                        findAndSelectNodes(rootNodes, end, start);
                     else {
-                        selectNodes(rootNodes, start, end);
+                        findAndSelectNodes(rootNodes, start, end);
                         selection.items().orderedItems().reverse();
                     }
 
-                    selection.fireChangeEvent();
-                    FilteredTree.this.rangeStart = rangeStart;
                     return;
                 }
+
+                // Toggle expanded.
+                // peak of programming evolution btw.
                 if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
-                    // Toggle expanded.
                     float rowX = node.actor.getX();
+                    Drawable plus = style.plus, minus = style.minus;
+                    Drawable expandIcon = node.expanded ? minus : plus;
                     if (node.icon != null)
                         rowX -= iconSpacingRight + node.icon.getMinWidth();
-                    if (x < rowX) {
+                    if (x > rowX - expandIcon.getMinWidth() - iconSpacingLeft - 4.0 && x < rowX) {
                         node.setExpanded(!node.expanded);
                         return;
                     }
                 }
+
+                // Non selectable node
                 if (!node.isSelectable())
                     return;
-                selection.choose(node);
-                if(itemListener != null) {
-                    itemListener.chosen(node);
+
+                // Add node to the already selected ones
+                if (!selection.contains(node) && ctrlPressed()) {
+                    addNodeToSelection(node);
+                    return;
                 }
+
+                // Deselect node from already selected ones but keep others
+                if (selection.contains(node) && ctrlPressed()){
+                    removeNodeFromSelection(node);
+                    return;
+                }
+
+                // Just handle this node
+                if (selection.contains(node)) {
+                    clearSelection(true);
+                } else {
+                    selectSingleNode(node, true);
+                }
+
                 if (!selection.isEmpty())
                     rangeStart = node;
+
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                Node<T> node = getNodeAt(y);
+                if (itemListeners.size > 0) {
+                    if (button == 1) {
+                        for (ItemListener<T> itemListener : itemListeners) {
+                            itemListener.rightClick(node);
+                        }
+                        event.cancel();
+                        return true;
+                    }
+                }
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public boolean keyDown (InputEvent event, int keycode) {
+
+                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
+                    if(!selection.isEmpty()) {
+                        Array<FilteredTree.Node<T>> nodes = new Array<>();
+                        for(Object nodeObject: selection) {
+                            FilteredTree.Node<T> node = (FilteredTree.Node<T>) nodeObject;
+                            if (node.canDelete) {
+                                nodes.add(node);
+                            }
+                        }
+                        for (ItemListener<T> itemListener : itemListeners) {
+                            itemListener.delete(nodes);
+                        }
+                        selection.removeAll(nodes);
+                    }
+                }
+                return super.keyDown(event, keycode);
             }
 
             public boolean mouseMoved (InputEvent event, float x, float y) {
                 setOverNode(getNodeAt(y));
-                return false;
+                for (ItemListener<T> itemListener : itemListeners) {
+                    itemListener.mouseMoved(getNodeAt(y));
+                }
+
+                return true;
             }
 
             public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
@@ -187,181 +361,249 @@ public class FilteredTree<T> extends WidgetGroup {
     public void add (Node<T> node) {
         insert(rootNodes.size, node);
 
-        if (draggable && node.draggable) {
+        if (draggable) {
             addSource(node);
         }
     }
 
     private Node<T> previousSelected;
 
-    private void addSource (final Node<T> node) {
-        node.actor.setUserObject(node);
+    public void addSource (final Node<T> node) {
+        if(node.draggable) {
 
-        DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
-            @Override
-            public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
-                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+            node.actor.setUserObject(node);
 
-                Actor dragging;
+            DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
+                @Override
+                public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
 
-                if (node.actor instanceof ActorCloneable) {
-                    dragging = ((ActorCloneable)node.actor).copyActor(node.actor);
-                } else {
-                    dragging = new Label("Dragging label", skin);
+                    if (!selection.contains(node)) {
+                        if (!ctrlPressed()) {
+                            clearSelection(true);
+                        }
+                        addNodeToSelection(node);
+                    }
+
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+
+                    Actor dragging;
+                    if (selection.size() > 0) {
+                        dragging = createPayloadFor(selection);
+                    } else if (node.actor instanceof ActorCloneable) {
+                        dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
+                    } else {
+                        dragging = new Label("Dragging label", skin);
+                    }
+
+                    payload.setDragActor(dragging);
+                    payload.setObject(node);
+
+                    return payload;
                 }
+            };
+            rootDrag.addSource(dragSource);
+            DragAndDrop.Target targetSource = new DragAndDrop.Target(node.actor) {
+                @Override
+                public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 
-                payload.setDragActor(dragging);
-                payload.setObject(node);
+                    Actor actor = getActor();
 
-                return payload;
-            }
-        };
-        rootDrag.addSource(dragSource);
-        DragAndDrop.Target targetSource = new DragAndDrop.Target(node.actor) {
-            @Override
-            public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                Actor actor = getActor();
-
-                if (actor == source.getActor()) {
-                    return false;
-                }
-
-                Node<T> payloadNode = (Node<T>)payload.getObject();
-                if (payloadNode.draggableInLayerOnly) {
-                    if (payloadNode.getParent() != ((Node<T>)actor.getUserObject()).getParent()) {
+                    if (actor == source.getActor()) {
                         return false;
                     }
 
-
-                    float yAlpha = y/getActor().getHeight();
-
-                    if (yAlpha > 0.3f && yAlpha < 0.7f) {
-                        //We are adding as a child, if we are not draggable, we ignore
-                        if (previousSelected != null) {
-                            previousSelected.underline = false;
-                            previousSelected = ((Node<T>)actor.getUserObject());
+                    Node<T> payloadNode = (Node<T>) payload.getObject();
+                    if (payloadNode.draggableInLayerOnly) {
+                        if (payloadNode.getParent() != ((Node<T>) actor.getUserObject()).getParent()) {
+                            return false;
                         }
-                        return false;
+
+
+                        float yAlpha = y / getActor().getHeight();
+
+                        if (yAlpha > 0.3f && yAlpha < 0.7f) {
+                            if(payloadNode.draggableInLayerOnly) {
+                               return false;
+                            }
+                            //We are adding as a child, if we are not draggable, we ignore
+                            if (previousSelected != null) {
+                                previousSelected.underline = false;
+                                previousSelected = ((Node<T>) actor.getUserObject());
+                            }
+                            return false;
+                        }
                     }
+
+                    if (previousSelected == null) {
+                        previousSelected = ((Node<T>) actor.getUserObject());
+                    } else if (previousSelected != actor.getUserObject()) {
+                        previousSelected.underline = false;
+                        previousSelected = ((Node<T>) actor.getUserObject());
+                    }
+
+                    if (previousSelected != null) {
+                        float yAlpha = y / getActor().getHeight();
+                        previousSelected.yAlpha = yAlpha;
+                        previousSelected.underline = true;
+                    }
+
+                    return true;
                 }
 
-                if (previousSelected == null) {
-                    previousSelected = ((Node<T>)actor.getUserObject());
-                } else if (previousSelected != actor.getUserObject()) {
-                    previousSelected.underline = false;
-                    previousSelected = ((Node<T>)actor.getUserObject());
-                }
+                @Override
+                public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                    Actor targetActor = getActor();
+                    Object userObject = targetActor.getUserObject();
 
-                if (previousSelected != null) {
-                    float yAlpha = y/getActor().getHeight();
-                    previousSelected.yAlpha = yAlpha;
-                    previousSelected.underline = true;
-                }
+                    Node<T> node = ((Node) userObject);
+                    Node<T> parent = node.getParent();
 
-                return true;
-            }
+                    if(selection.contains(node)){
+                        return;
+                    }
 
-            @Override
-            public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor targetActor = getActor();
-                Object userObject = targetActor.getUserObject();
+                    Array<Node<T>> selectedNodesCopy = new Array<>();
+                    selectedNodesCopy.addAll(selection.items().orderedItems());
+                    for (int i = 0; i < selectedNodesCopy.size; i++) {
+                        Node<T> item = selectedNodesCopy.get(i);
+                        Node<T> targetNodeToDrop = item;
 
-                Node<T> node = ((Node)userObject);
-                Node<T> parent = node.getParent();
-                Node<T> targetNodeToDrop = (Node)payload.getObject();
+                        int indexInParent = -1;
 
-                int indexInParent = -1;
+                        indexInParent = getIndexInParent(node, parent);
 
-                indexInParent = getIndexInParent(node, parent);
+                        Node<T> payloadParent = targetNodeToDrop.getParent();
+                        Node<T> payloadNode = targetNodeToDrop;
 
-                Node<T> payloadParent = targetNodeToDrop.getParent();
-                Node<T> payloadNode = targetNodeToDrop;
+                        boolean isChild = false;
+                        Node<T> parentNode = node;
+                        while (parentNode.parent != null) {
+                            if (parentNode.parent == payloadNode) {
+                                isChild = true;
+                                break;
+                            }
+                            parentNode = parentNode.parent;
+                        }
 
-                boolean sameLayer = payloadParent == node.getParent();
+                        if(isChild){
+                            continue;
+                        }
+
+                        boolean sameLayer = payloadParent == node.getParent();
 
 
-                //Lets check if its valid first before continuing
+                        //Lets check if its valid first before continuing
 
-                float yAlpha = y/getActor().getHeight();
+                        float yAlpha = y / getActor().getHeight();
 
-                int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
+                        int indexOfPayloadInParent = getIndexInParent(payloadNode, payloadParent);
 
-                payloadNode.remove();
+                        payloadNode.remove();
 
-                if (yAlpha < 0.3f) {
-                    //Always put it below current
+                        if (yAlpha < 0.3f) {
+                            //Always put it below current
 
-                    if (sameLayer) {
-                        if (indexOfPayloadInParent > indexInParent) {
-                            //We are below it, doesnt change the index of the target
+                            if (sameLayer) {
+                                if (indexOfPayloadInParent > indexInParent) {
+                                    //We are below it, doesnt change the index of the target
+                                } else {
+                                    //We are above it, removing this node will pop the index of the child back
+                                    indexInParent -= 1;
+                                }
+                            } else {
+                                //Always going to be the index of the component
+                            }
+
+                            if (parent != null) {
+                                indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
+                                parent.insert(indexInParent, payloadNode);
+                                onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
+                            } else {
+                                indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
+                                insert(indexInParent, payloadNode);
+                                onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
+                            }
+                        } else if (yAlpha > 0.7f) {
+                            //Always put it above
+
+                            if (sameLayer) {
+                                if (indexOfPayloadInParent > indexInParent) {
+                                    //We are below it, doesnt change the index of the target
+                                } else {
+                                    //We are above it, removing this node will pop the index of the child back
+                                    indexInParent -= 1;
+                                }
+                            } else {
+                                //Always going to be the index of the component
+                            }
+
+                            if (parent != null) {
+                                indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
+                                parent.insert(indexInParent, payloadNode);
+                                onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
+                            } else {
+                                indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
+                                insert(indexInParent, payloadNode);
+                                onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
+                            }
                         } else {
-                            //We are above it, removing this node will pop the index of the child back
-                            indexInParent -= 1;
+                            //Always put it as a child
+                            if(!node.draggableInLayerOnly) {
+                                node.insert(0, payloadNode);
+                                node.setExpanded(true);
+
+                                onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
+                            }
                         }
-                    } else {
-                        //Always going to be the index of the component
                     }
-
-                    if (parent != null) {
-                        indexInParent = MathUtils.clamp(indexInParent + 1, 0, parent.children.size);
-                        parent.insert(indexInParent, payloadNode);
-                        onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                    } else {
-                        indexInParent = MathUtils.clamp(indexInParent + 1, 0, rootNodes.size);
-                        insert(indexInParent, payloadNode);
-                        onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
-                    }
-                } else if (yAlpha > 0.7f) {
-                    //Always put it above
-
-                    if (sameLayer) {
-                        if (indexOfPayloadInParent > indexInParent) {
-                            //We are below it, doesnt change the index of the target
-                        } else {
-                            //We are above it, removing this node will pop the index of the child back
-                            indexInParent -= 1;
-                        }
-                    } else {
-                        //Always going to be the index of the component
-                    }
-
-                    if (parent != null) {
-                        indexInParent = MathUtils.clamp(indexInParent, 0, parent.children.size);
-                        parent.insert(indexInParent, payloadNode);
-                        onNodeMove(parent, payloadNode, indexInParent, indexOfPayloadInParent);
-                    } else {
-                        indexInParent = MathUtils.clamp(indexInParent, 0, rootNodes.size);
-                        insert(indexInParent, payloadNode);
-                        onNodeMove(null, payloadNode, indexInParent, indexOfPayloadInParent);
-                    }
-                } else {
-                    //Always put it as a child
-                    node.insert(0, payloadNode);
-                    node.setExpanded(true);
-
-                    onNodeMove(node, payloadNode, 0, indexOfPayloadInParent);
                 }
-            }
 
-            @Override
-            public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                if (previousSelected != null) {
-                    previousSelected.underline = false;
-                    previousSelected = null;
+                @Override
+                public void reset (DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                    if (previousSelected != null) {
+                        previousSelected.underline = false;
+                        previousSelected = null;
+                    }
                 }
-            }
-        };
-        rootDrag.addTarget(targetSource);
+            };
+            rootDrag.addTarget(targetSource);
+        }
         for (Node child : node.children) {
             addSource(child);
         }
     }
 
-    protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+    private Actor createPayloadFor (Selection<Node<T>> selection) {
+        Table mainTable = new Table();
+        mainTable.defaults().left().pad(1);
 
+        int i = 0;
+        for (Node<T> item : selection.items()) {
+            if (i > 6) {
+                break;
+            }
+            Table nameTable = new Table(skin);
+            nameTable.defaults().padLeft(4).padRight(4);
+            nameTable.setBackground("panel_button_bg");
+            Label name = new Label(item.getName(), skin);
+            if (i > 3) {
+                nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-3) / 3f);
+            }
+            nameTable.add(name).grow();
+
+            mainTable.add(nameTable);
+            mainTable.row();
+            i++;
+        }
+
+        return mainTable;
     }
 
+    protected void onNodeMove (Node<T> parentToMoveTo, Node<T> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
+        for (ItemListener<T> itemListener : itemListeners) {
+            itemListener.onNodeMove(parentToMoveTo, childThatHasMoved, indexInParent, indexOfPayloadInPayloadBefore);
+        }
+    }
 
 
     private int getIndexInParent (Node<T> node, Node<T> parent) {
@@ -433,16 +675,21 @@ public class FilteredTree<T> extends WidgetGroup {
         sizeInvalid = true;
     }
 
+    @Override
+    protected void sizeChanged () {
+        super.sizeChanged();
+    }
+
     private void computeSize () {
         sizeInvalid = false;
         prefWidth = style.plus.getMinWidth();
         prefWidth = Math.max(prefWidth, style.minus.getMinWidth());
-        prefHeight = getHeight();
+
         leftColumnWidth = 0;
+        prefHeight = 0;
         computeSize(rootNodes, indentSpacing);
         leftColumnWidth += iconSpacingLeft + padding;
         prefWidth += leftColumnWidth + padding;
-        prefHeight = getHeight() - prefHeight;
     }
 
     private void computeSize (Array<Node<T>> nodes, float indent) {
@@ -470,7 +717,7 @@ public class FilteredTree<T> extends WidgetGroup {
                 node.height = Math.max(node.height, node.icon.getMinHeight());
             }
             prefWidth = Math.max(prefWidth, rowWidth);
-            prefHeight -= node.height + ySpacing;
+            prefHeight += node.height + ySpacing;
             if (node.expanded)
                 computeSize(node.children, indent + indentSpacing);
         }
@@ -483,7 +730,11 @@ public class FilteredTree<T> extends WidgetGroup {
     }
 
     public void filter (String filter) {
-        filter(rootNodes, filter.toLowerCase());
+        filter(filter, false);
+    }
+
+    public void filter (String filter, boolean endsWithLogic) {
+        filter(rootNodes, filter.toLowerCase(), endsWithLogic);
         expandAll();
 
         autoSelectionIndex = 0;
@@ -509,14 +760,9 @@ public class FilteredTree<T> extends WidgetGroup {
         if(autoSelectionIndex < 0) autoSelectionIndex = result.size - 1;
         if(autoSelectionIndex > result.size - 1) autoSelectionIndex = 0;
 
-        selection.clear();
         Node node = result.get(autoSelectionIndex);
-        selection.add(node);
+        selectSingleNode(node, false);
         if(node.parent != null) node.parent.setExpanded(true);
-
-        if(itemListener != null) {
-            itemListener.selected(node);
-        }
     }
 
     public void collectFilteredNodes(Array<Node<T>> nodes, Array<Node<T>> result) {
@@ -601,39 +847,67 @@ public class FilteredTree<T> extends WidgetGroup {
         for (int i = 0; i < nodes.size; i++) {
             if (nodes.get(i).filterPositive()) {
                 nodes.get(i).node.filtered = false;
-                nodes.get(i).node.actor.setVisible(true);
+                nodes.get(i).node.setVisible(true);
                 setAllParentsNotFiltered(nodes.get(i).node);
                 setAllChildrenNotFiltered(nodes.get(i).node);
             } else {
                 nodes.get(i).node.filtered = true;
-                nodes.get(i).node.actor.setVisible(false);
+                nodes.get(i).node.setVisible(false);
             }
         }
     }
 
     public void filter (Array<Node<T>> nodes, String filter) {
+        filter(nodes, filter, false);
+    }
+
+
+    public void filterAll (Predicate<Node<T>> predicate) {
+        this.filter(this.rootNodes, predicate);
+    }
+    public void filter (Array<Node<T>> nodes, Predicate<Node<T>> predicate) {
         for (int i = 0; i < nodes.size; i++) {
-            if (nodes.get(i).name.toLowerCase().contains(filter)) {
-                filter(nodes.get(i).children, filter);
+            Node<T> testNode = nodes.get(i);
+
+            if (predicate.evaluate(testNode)) {
+                filter(testNode.children, predicate);
+                testNode.filtered = false;
+                testNode.setVisible(true);
+                setAllParentsNotFiltered(nodes.get(i));
+                setAllChildrenNotFiltered(nodes.get(i));
+            } else {
+                testNode.filtered = true;
+                testNode.setVisible(false);
+                filter(testNode.children, predicate);
+            }
+        }
+    }
+    public void filter (Array<Node<T>> nodes, String filter, boolean endsWithLogic) {
+        for (int i = 0; i < nodes.size; i++) {
+            boolean statement = nodes.get(i).name.toLowerCase().contains(filter);
+            if(endsWithLogic) {
+                statement = nodes.get(i).name.toLowerCase().endsWith(filter);
+            }
+            if (statement) {
+                filter(nodes.get(i).children, filter, endsWithLogic);
 
                 nodes.get(i).filtered = false;
-                nodes.get(i).actor.setVisible(true);
+                nodes.get(i).setVisible(true);
                 setAllParentsNotFiltered(nodes.get(i));
                 setAllChildrenNotFiltered(nodes.get(i));
             } else {
                 nodes.get(i).filtered = true;
-                nodes.get(i).actor.setVisible(false);
-                filter(nodes.get(i).children, filter);
+                nodes.get(i).setVisible(false);
+                filter(nodes.get(i).children, filter, endsWithLogic);
             }
 
         }
-
     }
 
     private void setAllChildrenNotFiltered (Node<T> node) {
         for (int i = 0; i < node.children.size; i++) {
             node.children.get(i).filtered = false;
-            node.children.get(i).actor.setVisible(true);
+            node.children.get(i).setVisible(true);
             setAllChildrenNotFiltered(node.children.get(i));
         }
     }
@@ -642,7 +916,7 @@ public class FilteredTree<T> extends WidgetGroup {
         Node parent;
         while ((parent = node.parent) != null) {
             parent.filtered = false;
-            parent.actor.setVisible(true);
+            parent.setVisible(true);
             node = parent;
         }
     }
@@ -654,13 +928,20 @@ public class FilteredTree<T> extends WidgetGroup {
             if (node.filtered)
                 continue;
             float x = indent;
-            if (node.icon != null)
+            if (node.icon != null) {
                 x += node.icon.getMinWidth();
+            }
             y -= node.height;
+
+            if (node.companionActor != null) {
+                node.companionActor.setPosition(0, y); //Always left aligned
+                x += node.companionActor.getWidth();
+            }
             node.actor.setPosition(x, y);
             y -= ySpacing;
-            if (node.expanded)
+            if (node.expanded) {
                 y = layout(node.children, indent + indentSpacing, y);
+            }
         }
         return y;
     }
@@ -668,8 +949,21 @@ public class FilteredTree<T> extends WidgetGroup {
     public void draw (Batch batch, float parentAlpha) {
         Color color = getColor();
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
-        if (style.background != null)
+        if (style.background != null) {
             style.background.draw(batch, getX(), getY(), getWidth(), getHeight());
+        }
+        //If we got a companion, lets draw its background
+        if (!rootNodes.isEmpty()) {
+            if (rootNodes.first().companionActor != null) {
+                float companionWidth = rootNodes.first().companionActor.getWidth();
+
+                if (style.companionBackground != null) {
+                    style.companionBackground.draw(batch, getX(), getY(), companionWidth, getHeight());
+                }
+
+            }
+        }
+
         draw(batch, rootNodes, leftColumnWidth);
         super.draw(batch, parentAlpha); // Draw actors.
     }
@@ -717,7 +1011,11 @@ public class FilteredTree<T> extends WidgetGroup {
 
             Drawable expandIcon = node.expanded ? minus : plus;
             float iconY = actor.getY() + Math.round((node.height - expandIcon.getMinHeight()) / 2);
-            expandIcon.draw(batch, x + indent - iconSpacingLeft, y + iconY, expandIcon.getMinWidth(), expandIcon.getMinHeight());
+            float offsetDueToCompanion = 0;
+            if (node.companionActor != null) {
+                offsetDueToCompanion += node.companionActor.getWidth();
+            }
+            expandIcon.draw(batch, x + indent - iconSpacingLeft + offsetDueToCompanion, y + iconY, expandIcon.getMinWidth(), expandIcon.getMinHeight());
             if (node.expanded)
                 draw(batch, node.children, indent + indentSpacing);
         }
@@ -752,19 +1050,21 @@ public class FilteredTree<T> extends WidgetGroup {
         return rowY;
     }
 
-    void selectNodes (Array<Node<T>> nodes, float low, float high) {
+    void findAndSelectNodes (Array<Node<T>> nodes, float low, float high) {
         for (int i = 0, n = nodes.size; i < n; i++) {
             Node<T> node = nodes.get(i);
             if (node.actor.getY() < low)
                 break;
+            if (node.expanded)
+                findAndSelectNodes(node.children, low, high);
             if (!node.isSelectable())
                 continue;
             if (node.actor.getY() <= high)
-                selection.add(node);
-            if (node.expanded)
-                selectNodes(node.children, low, high);
+                addNodeToSelection(node);
+
         }
     }
+
 
     public Selection<Node<T>> getSelection () {
         return selection;
@@ -798,7 +1098,13 @@ public class FilteredTree<T> extends WidgetGroup {
      * @param overNode May be null.
      */
     public void setOverNode (Node overNode) {
+        if (this.overNode != null) {
+            this.overNode.over = false;
+        }
         this.overNode = overNode;
+        if (this.overNode != null) {
+            this.overNode.over = true;
+        }
     }
 
     /**
@@ -949,6 +1255,7 @@ public class FilteredTree<T> extends WidgetGroup {
 
     static public class Node<T> {
         final Actor actor;
+        Actor companionActor;
         Node<T> parent;
         public final Array<Node<T>> children = new Array<>(0);
         boolean selectable = true;
@@ -963,11 +1270,18 @@ public class FilteredTree<T> extends WidgetGroup {
         public boolean draggable;
         public boolean draggableInLayerOnly;
 
+        public boolean canDelete = true;
+        public boolean over;
+
         public Node (String name, Actor actor) {
             if (actor == null)
                 throw new IllegalArgumentException("actor cannot be null.");
             this.name = name;
             this.actor = actor;
+        }
+
+        public void setCompanionActor (Actor companionActor) {
+            this.companionActor = companionActor;
         }
 
         public void setExpanded (boolean expanded) {
@@ -994,6 +1308,9 @@ public class FilteredTree<T> extends WidgetGroup {
          */
         protected void addToTree (FilteredTree tree) {
             tree.addActor(actor);
+            if (companionActor != null) {
+                tree.addActor(companionActor);
+            }
             if (!expanded)
                 return;
             for (int i = 0, n = children.size; i < n; i++)
@@ -1005,6 +1322,9 @@ public class FilteredTree<T> extends WidgetGroup {
          */
         protected void removeFromTree (FilteredTree tree) {
             tree.removeActor(actor);
+            if (companionActor != null) {
+                tree.removeActor(companionActor);
+            }
             if (!expanded)
                 return;
             Object[] children = this.children.items;
@@ -1195,6 +1515,13 @@ public class FilteredTree<T> extends WidgetGroup {
         public String getName () {
             return name;
         }
+
+        public void setVisible (boolean visible) {
+            this.actor.setVisible(visible);
+            if (this.companionActor != null) {
+                this.companionActor.setVisible(visible);
+            }
+        }
     }
 
     /**
@@ -1207,7 +1534,7 @@ public class FilteredTree<T> extends WidgetGroup {
         /**
          * Optional.
          */
-        public Drawable over, selection, background, underline;
+        public Drawable over, selection, background, companionBackground, underline;
 
         public TreeStyle () {
         }

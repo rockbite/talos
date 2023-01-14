@@ -2,17 +2,31 @@
     <category name = "Main Modules">
         <module name = "Particle" wrapper = "ParticleModuleWrapper">ParticleModule</module>
         <module name = "Emitter" wrapper = "EmitterModuleWrapper">EmitterModule</module>
+        <module name = "Render" wrapper = "DrawableModuleWrapper">DrawableModule</module>
+    </category>
+    <category name = "PointGenerators">
+        <module name = "Single Point" wrapper = "SingleParticlePointDataGeneratorModuleWrapper">SingleParticlePointDataGeneratorModule</module>
+        <module name = "FromTo Point" wrapper = "FromToParticlePointDataGeneratorModuleWrapper">FromToParticlePointDataGeneratorModule</module>
+        <module name = "History Point" wrapper = "HistoryParticlePointDataGeneratorModuleWrapper">HistoryParticlePointDataGeneratorModule</module>
+    </category>
+    <category name = "MeshGenerators">
+        <module name = "Quad" wrapper = "QuadMeshGeneratorModuleWrapper">QuadMeshGeneratorModule</module>
+        <module name = "Strip" wrapper = "StripMeshGeneratorModuleWrapper">StripMeshGeneratorModule</module>
+        <module name = "Marched" wrapper = "MarchedMeshGeneratorModuleWrapper">MarchedMeshGeneratorModule</module>
     </category>
     <category name = "General Use">
         <module name = "System Input" wrapper = "InputModuleWrapper">InputModule</module>
         <module name = "Global Values" wrapper = "GlobalScopeModuleWrapper">GlobalScopeModule</module>
         <module name = "Mixer" wrapper = "MixModuleWrapper">MixModule</module>
         <module name = "Shape Range" wrapper = "OffsetModuleWrapper">OffsetModule</module>
+<!--        <module name = "Shape Coordinate" wrapper = "ShapeModuleWrapper">ShapeModule</module>-->
     </category>
     <category name = "Static Values">
         <module name = "Number" wrapper = "StaticValueModuleWrapper">StaticValueModule</module>
-        <module name = "Position (Vector)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Position (Vector2)" wrapper = "Vector2ModuleWrapper">Vector2Module</module>
+        <module name = "Position (Vector3)" wrapper = "Vector3ModuleWrapper">Vector3Module</module>
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
+        <module name = "Position Split (Vector)" wrapper = "VectorSplitModuleWrapper">VectorSplitModule</module>
     </category>
     <category name = "Color">
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
@@ -25,6 +39,9 @@
         <module name = "Nine Patch Renderer" wrapper = "NinePatchModuleWrapper">NinePatchModule</module>
         <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
         <module name = "Shaded Sprite" wrapper = "ShadedSpriteModuleWrapper">ShadedSpriteModule</module>
+    </category>
+    <category name = "Materials">
+        <module name = "SpriteMaterial" wrapper = "SpriteMaterialModuleWrapper">SpriteMaterialModule</module>
     </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>
@@ -42,6 +59,7 @@
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
         <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
         <module name = "Math Operations" wrapper = "MathModuleWrapper">MathModule</module>
+        <module name = "Target Movement" wrapper = "TargetModuleWrapper">TargetModule</module>
     </category>
     <category name = "Adapters">
         <module name = "Beam Position" wrapper = "FromToModuleWrapper">FromToModule</module>

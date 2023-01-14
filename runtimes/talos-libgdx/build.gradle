@@ -1,68 +1,60 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
-    }
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    alias(libs.plugins.lombok)
 }
-
-apply plugin: 'maven'
-apply plugin: 'nexus'
-
 
 dependencies {
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    implementation 'com.github.jitpack:gradle-simple:1.0'
+    api project(":runtimes:talos")
+    api libs.slf4j.api
 
-    testImplementation "com.kotcrab.vis:vis-ui:$visuiVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    testImplementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    testImplementation libs.bongo.desktop
+    testImplementation  libs.visui
+
 }
 
-sourceCompatibility = 1.7
-sourceSets.main.java.srcDirs = ["src/"]
-sourceSets.test.java.srcDirs = ["test/"]
-
-
-nexus {
-    sign = true
-    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+task packageSources(type: Jar, dependsOn: [classes, jar]) {
+    from delombok
+    from sourceSets.main.resources.srcDirs
+    archiveClassifier = 'web'
 }
 
-modifyPom {
-    project {
-        name "Talos Libgdx Runtime"
-        description "Talos runtime for use in LibGDX projects"
-        url "https://github.com/rockbite/talos"
-        inceptionYear "2019"
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
-        scm {
-            url "https://github.com/rockbite/talos"
-            connection "scm:https://rockbite@github.com/rockbite/talos.git"
-            developerConnection "scm:git://github.com/rockbite/talos.git"
-        }
+artifacts {
+    api(jar, packageSources)
+}
 
-        licenses {
-            license {
-                name "The Apache Software License, Version 2.0"
-                url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                distribution "repo"
+configurations {
+    web {
+        canBeConsumed true
+        canBeResolved false
+        extendsFrom implementation, runtimeOnly
+    }
+}
+
+
+
+publishing {
+    repositories {
+        repositories {
+            maven {
+                name = "snapshot"
+                url = getSnapshotRepositoryUrl()
+                credentials(org.gradle.api.credentials.PasswordCredentials)
             }
         }
-
-        developers {
-            developer {
-                id "Tom-Ski"
-                name "Tom Wojciechowsk"
-            }
-            developer {
-                id "azakhary"
-                name "Avetis Zakharyan"
-            }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact packageSources
+            groupId project.group
+            artifactId project.name
+            version project.version
         }
     }
 }

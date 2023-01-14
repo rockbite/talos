@@ -1,0 +1,14 @@
+{
+    "name": "main_scene",
+    "gameObjects":
+    [],
+    "properties":
+    {
+        "layers":
+        [
+            "Default",
+            "UI",
+            "Misc"
+        ]
+    }
+}

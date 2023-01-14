@@ -12,12 +12,19 @@
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ]
 	],
-	"previewCamPos": {},
-	"previewCamZoom": 1.4285715,
+	"previewCamPos": {
+		"x": 4.3623466,
+		"y": 1.6035454
+	},
+	"previewCamZoom": 0.891,
 	"bgImagePath": "",
-	"bgImageIsInBack": true,
-	"bgImageSize": 10,
-	"gridSize": 1
+	"isGridVisible": false,
+	"bgImageIsInBack": false,
+	"bgImageSize": 0,
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0,
+	"resourcePaths": []
 },
 "emitters": [
 	{
@@ -26,8 +33,8 @@
 			{
 				"class": "ParticleModuleWrapper",
 				"id": 0,
-				"x": -39,
-				"y": -130,
+				"x": 165,
+				"y": -74,
 				"module": {
 					"data": {
 						"class": "ParticleModule",
@@ -38,47 +45,15 @@
 			{
 				"class": "EmitterModuleWrapper",
 				"id": 1,
-				"x": -58,
-				"y": 170,
+				"x": 308,
+				"y": 322,
 				"module": {
 					"data": {
 						"class": "EmitterModule",
 						"index": 1,
 						"delay": 0,
 						"duration": 1,
-						"rate": 5
-					}
-				}
-			},
-			{
-				"class": "PolylineModuleWrapper",
-				"id": 2,
-				"titleOverride": "Beam Renderer",
-				"x": -449,
-				"y": 163,
-				"module": {
-					"data": {
-						"class": "PolylineModule",
-						"index": 2,
-						"points": 50,
-						"regionName": "fire"
-					}
-				},
-				"fileName": fire,
-			},
-			{
-				"class": "FromToModuleWrapper",
-				"id": 3,
-				"x": -206,
-				"y": -130,
-				"module": {
-					"data": {
-						"class": "FromToModule",
-						"index": 3,
-						"fromX": 4.7086997,
-						"fromY": -0.03990548,
-						"toX": -5.1077404,
-						"toY": -0.039903656
+						"rate": 4
 					}
 				}
 			},
@@ -86,21 +61,21 @@
 				"class": "NoiseModuleWrapper",
 				"id": 4,
 				"titleOverride": "Simplex Noise",
-				"x": -1049,
-				"y": 501,
+				"x": -1523.7019,
+				"y": 513.4176,
 				"module": {
 					"data": {
 						"class": "NoiseModule",
 						"index": 4,
-						"frequency": 4
+						"frequency": 4.3999996
 					}
 				}
 			},
 			{
 				"class": "CurveModuleWrapper",
 				"id": 5,
-				"x": -897,
-				"y": 76,
+				"x": -1019,
+				"y": 1,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -115,8 +90,8 @@
 								"y": 0.14581299
 							},
 							{
-								"x": 0.49383017,
-								"y": 0.29164633
+								"x": 0.4463767,
+								"y": 0.5602068
 							},
 							{
 								"x": 0.8395089,
@@ -134,8 +109,8 @@
 				"class": "InputModuleWrapper",
 				"id": 6,
 				"titleOverride": "System Input",
-				"x": -1560,
-				"y": 645,
+				"x": -2034.7019,
+				"y": 657.4176,
 				"module": {
 					"data": {
 						"class": "InputModule",
@@ -148,37 +123,39 @@
 				"class": "InputModuleWrapper",
 				"id": 7,
 				"titleOverride": "Tells Module Point Index",
-				"x": -1435,
-				"y": 225,
+				"x": -1454,
+				"y": 156,
 				"module": {
 					"data": {
 						"class": "InputModule",
 						"index": 7,
-						"scopeKey": 6
+						"scopeKey": 9
 					}
 				}
 			},
 			{
 				"class": "EmConfigModuleWrapper",
 				"id": 8,
-				"x": 141,
-				"y": 171,
+				"x": 68,
+				"y": 288,
 				"module": {
 					"data": {
 						"class": "EmConfigModule",
 						"index": 8,
 						"additive": true,
+						"isBlendAdd": false,
 						"attached": false,
 						"continuous": true,
-						"aligned": false
+						"aligned": false,
+						"immortal": false
 					}
 				}
 			},
 			{
 				"class": "StaticValueModuleWrapper",
 				"id": 9,
-				"x": -223,
-				"y": 171,
+				"x": -173,
+				"y": 169,
 				"module": {
 					"data": {
 						"class": "StaticValueModule",
@@ -190,13 +167,13 @@
 			{
 				"class": "MathModuleWrapper",
 				"id": 10,
-				"x": -569,
-				"y": 575,
+				"x": -1043.7012,
+				"y": 587.4176,
 				"module": {
 					"data": {
 						"class": "MathModule",
 						"index": 10,
-						"a": 0,
+						"a": 3,
 						"b": 0,
 						"mathExpression": "multiply"
 					}
@@ -206,8 +183,8 @@
 				"class": "CurveModuleWrapper",
 				"id": 11,
 				"titleOverride": "Noise Scale",
-				"x": -852,
-				"y": 544,
+				"x": -1334.1362,
+				"y": 502.07886,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -218,12 +195,12 @@
 								"y": 0
 							},
 							{
-								"x": 0.5020596,
-								"y": 0.6874809
+								"x": 0.5660777,
+								"y": 0.4977824
 							},
 							{
 								"x": 1,
-								"y": 0
+								"y": 1
 							}
 						]
 					}
@@ -232,8 +209,8 @@
 			{
 				"class": "GradientColorModuleWrapper",
 				"id": 12,
-				"x": -944,
-				"y": 250,
+				"x": -893,
+				"y": 229,
 				"module": {
 					"data": {
 						"class": "GradientColorModule",
@@ -249,7 +226,7 @@
 								"r": 0.101960786,
 								"g": 0.43137255,
 								"b": 1,
-								"pos": 0.4984715
+								"pos": 0.48271528
 							},
 							{
 								"r": 1,
@@ -264,8 +241,8 @@
 			{
 				"class": "MathModuleWrapper",
 				"id": 13,
-				"x": -1254,
-				"y": 578,
+				"x": -1728.7019,
+				"y": 590.4176,
 				"module": {
 					"data": {
 						"class": "MathModule",
@@ -279,8 +256,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 14,
-				"x": -483,
-				"y": -142,
+				"x": -455,
+				"y": 191,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -291,16 +268,16 @@
 								"y": 0
 							},
 							{
-								"x": 0.135807,
-								"y": 0.8645662
+								"x": 0.16850588,
+								"y": 0.76490974
 							},
 							{
 								"x": 0.48971418,
 								"y": 1
 							},
 							{
-								"x": 0.864202,
-								"y": 0.84373283
+								"x": 0.80850357,
+								"y": 0.7533449
 							},
 							{
 								"x": 1,
@@ -311,39 +288,234 @@
 				}
 			},
 			{
+				"class": "DrawableModuleWrapper",
+				"id": 16,
+				"x": 72,
+				"y": 619,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 16
+					}
+				}
+			},
+			{
+				"class": "SpriteMaterialModuleWrapper",
+				"id": 17,
+				"x": -177,
+				"y": 800,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 17,
+						"regionName": "smoke"
+					}
+				},
+				"filePath": "smoke.png",
+				"regionName": "smoke"
+			},
+			{
+				"class": "StripMeshGeneratorModuleWrapper",
+				"id": 23,
+				"x": -140,
+				"y": 516,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.StripMeshGeneratorModule",
+						"index": 23
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 24,
+				"x": -706,
+				"y": 104,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 24,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
 				"class": "Vector2ModuleWrapper",
-				"id": 15,
-				"x": -495,
-				"y": 418,
+				"id": 25,
+				"x": -509,
+				"y": 410,
 				"module": {
 					"data": {
 						"class": "Vector2Module",
-						"index": 15,
+						"index": 25,
+						"x": 0.09263563,
+						"y": -0.7912918
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 33,
+				"x": -206,
+				"y": -20,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 33,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.121906795,
+								"y": 1
+							},
+							{
+								"x": 0.8935991,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 34,
+				"x": -693,
+				"y": 0,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 34,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 35,
+				"x": -1274,
+				"y": 389,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 35,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 36,
+				"x": -795,
+				"y": 388,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 36,
+						"a": 0,
+						"b": 1,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 37,
+				"x": -754,
+				"y": 545,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 37,
+						"x": 0,
+						"y": 0,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "FromToParticlePointDataGeneratorModuleWrapper",
+				"id": 38,
+				"x": -251,
+				"y": 660,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.FromToParticlePointDataGeneratorModule",
+						"index": 38,
+						"pointCount": 30,
+						"fromX": 0,
+						"fromY": 0,
+						"fromZ": 0,
+						"toX": 0,
+						"toY": 0,
+						"toZ": 0
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 39,
+				"x": -532,
+				"y": 747,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 39,
 						"x": 0,
 						"y": 0
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 40,
+				"x": -520,
+				"y": 644,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 40,
+						"x": 8.463687,
+						"y": 0.19553053
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 41,
+				"x": -1649,
+				"y": 292,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 41,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 42,
+				"x": -1222,
+				"y": 248,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 42,
+						"a": 0,
+						"b": 5,
+						"mathExpression": "multiply"
 					}
 				}
 			}
 		],
 		"connections": [
-			{
-				"moduleFrom": 3,
-				"slotFrom": 1,
-				"slotTo": 7
-			},
-			{
-				"moduleFrom": 3,
-				"slotFrom": 2,
-				"slotTo": 13
-			},
-			{
-				"moduleFrom": 3,
-				"slotTo": 14
-			},
-			{
-				"moduleFrom": 2,
-				"slotTo": 2
-			},
 			{
 				"moduleFrom": 7,
 				"moduleTo": 4,
@@ -363,30 +535,12 @@
 				"slotTo": 4
 			},
 			{
-				"moduleFrom": 5,
-				"moduleTo": 2,
-				"slotTo": 1
-			},
-			{
-				"moduleFrom": 12,
-				"moduleTo": 2,
-				"slotTo": 2
-			},
-			{
 				"moduleFrom": 7,
 				"moduleTo": 11
 			},
 			{
-				"moduleFrom": 4,
-				"moduleTo": 10
-			},
-			{
 				"moduleFrom": 13,
 				"moduleTo": 4
-			},
-			{
-				"moduleFrom": 14,
-				"slotTo": 10
 			},
 			{
 				"moduleFrom": 11,
@@ -402,19 +556,97 @@
 				"moduleTo": 13
 			},
 			{
-				"moduleFrom": 15,
-				"moduleTo": 2
+				"moduleFrom": 17,
+				"moduleTo": 16
+			},
+			{
+				"moduleFrom": 23,
+				"moduleTo": 16,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 23,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 23,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 24,
+				"moduleTo": 14
+			},
+			{
+				"moduleFrom": 25,
+				"moduleTo": 23,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 33,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 34,
+				"moduleTo": 33
+			},
+			{
+				"moduleFrom": 35,
+				"moduleTo": 36
+			},
+			{
+				"moduleFrom": 36,
+				"moduleTo": 25
+			},
+			{
+				"moduleFrom": 4,
+				"moduleTo": 10
 			},
 			{
 				"moduleFrom": 10,
-				"moduleTo": 15,
+				"moduleTo": 37,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 37,
+				"moduleTo": 23,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 37,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 38,
+				"moduleTo": 16,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 39,
+				"moduleTo": 38,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 40,
+				"moduleTo": 38,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 41,
+				"moduleTo": 42
+			},
+			{
+				"moduleFrom": 42,
+				"moduleTo": 36,
 				"slotTo": 1
 			}
 		],
 		"groups": [
 			{
 				"text": "BEAM NOISE",
-				"modules": [ 10, 13, 11, 6, 4 ],
+				"modules": [ 6, 4, 13, 11, 10 ],
 				"color": -1.3926823E38
 			}
 		]

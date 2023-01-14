@@ -1,0 +1,670 @@
+{
+"metaData": {
+	"scopeDefaults": [
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	"previewCamPos": {
+		"x": 0.8659215,
+		"y": -0.5586592
+	},
+	"previewCamZoom": 1,
+	"bgImagePath": "",
+	"isGridVisible": false,
+	"bgImageIsInBack": false,
+	"bgImageSize": 0,
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0,
+	"resourcePaths": [
+	]
+},
+"emitters": [
+	{
+		"name": "default_emitter",
+		"modules": [
+			{
+				"class": "ParticleModuleWrapper",
+				"id": 0,
+				"x": 165,
+				"y": -74,
+				"module": {
+					"data": {
+						"class": "ParticleModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "EmitterModuleWrapper",
+				"id": 1,
+				"x": 308,
+				"y": 322,
+				"module": {
+					"data": {
+						"class": "EmitterModule",
+						"index": 1,
+						"delay": 0,
+						"duration": 1,
+						"rate": 4
+					}
+				}
+			},
+			{
+				"class": "NoiseModuleWrapper",
+				"id": 4,
+				"titleOverride": "Simplex Noise",
+				"x": -1523.7019,
+				"y": 513.4176,
+				"module": {
+					"data": {
+						"class": "NoiseModule",
+						"index": 4,
+						"frequency": 4.3999996
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 5,
+				"x": -1025,
+				"y": 75,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 5,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.16049683,
+								"y": 0.14581299
+							},
+							{
+								"x": 0.4463767,
+								"y": 0.5602068
+							},
+							{
+								"x": 0.8395089,
+								"y": 0.15622966
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 6,
+				"titleOverride": "System Input",
+				"x": -2034.7019,
+				"y": 657.4176,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 6,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 7,
+				"titleOverride": "Tells Module Point Index",
+				"x": -1435,
+				"y": 225,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 7,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
+				"class": "EmConfigModuleWrapper",
+				"id": 8,
+				"x": 68,
+				"y": 288,
+				"module": {
+					"data": {
+						"class": "EmConfigModule",
+						"index": 8,
+						"additive": true,
+						"isBlendAdd": false,
+						"attached": false,
+						"continuous": true,
+						"aligned": false,
+						"immortal": false
+					}
+				}
+			},
+			{
+				"class": "StaticValueModuleWrapper",
+				"id": 9,
+				"x": -173,
+				"y": 169,
+				"module": {
+					"data": {
+						"class": "StaticValueModule",
+						"index": 9,
+						"value": 2
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 10,
+				"x": -1043.7012,
+				"y": 587.4176,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 10,
+						"a": 3,
+						"b": 0,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 11,
+				"titleOverride": "Noise Scale",
+				"x": -1334.1362,
+				"y": 502.07886,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 11,
+						"points": [
+							{
+								"x": 0,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "GradientColorModuleWrapper",
+				"id": 12,
+				"x": -922,
+				"y": 259,
+				"module": {
+					"data": {
+						"class": "GradientColorModule",
+						"index": 12,
+						"points": [
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 0
+							},
+							{
+								"r": 0.101960786,
+								"g": 0.43137255,
+								"b": 1,
+								"pos": 0.48271528
+							},
+							{
+								"r": 1,
+								"g": 0.26666668,
+								"b": 0.101960786,
+								"pos": 1
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 13,
+				"x": -1728.7019,
+				"y": 590.4176,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 13,
+						"a": 0,
+						"b": 0.2,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 14,
+				"x": -455,
+				"y": 191,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 14,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.16850588,
+								"y": 0.76490974
+							},
+							{
+								"x": 0.48971418,
+								"y": 1
+							},
+							{
+								"x": 0.80850357,
+								"y": 0.7533449
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "DrawableModuleWrapper",
+				"id": 16,
+				"x": 72,
+				"y": 619,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 16
+					}
+				}
+			},
+			{
+				"class": "SpriteMaterialModuleWrapper",
+				"id": 17,
+				"x": -200,
+				"y": 765,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 17,
+						"regionName": "smoke"
+					}
+				},
+				"filePath": "smoke.png",
+				"regionName": "smoke"
+			},
+			{
+				"class": "StripMeshGeneratorModuleWrapper",
+				"id": 23,
+				"x": -140,
+				"y": 516,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.StripMeshGeneratorModule",
+						"index": 23
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 24,
+				"x": -706,
+				"y": 104,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 24,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 25,
+				"x": -509,
+				"y": 410,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 25,
+						"x": 0.09263563,
+						"y": -0.7912918
+					}
+				}
+			},
+			{
+				"class": "HistoryParticlePointDataGeneratorModuleWrapper",
+				"id": 28,
+				"x": -287,
+				"y": 663,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.HistoryParticlePointDataGeneratorModule",
+						"index": 28,
+						"maxPoints": 60,
+						"minDistance": 0.1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 29,
+				"x": -995,
+				"y": -132,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 29,
+						"scopeKey": 7
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 30,
+				"x": -423,
+				"y": -187,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 30,
+						"a": 2,
+						"b": 4,
+						"mathExpression": "sin"
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 31,
+				"x": -673,
+				"y": -192,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 31,
+						"a": 1,
+						"b": 100,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 32,
+				"x": -423,
+				"y": -335,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 32,
+						"a": 2,
+						"b": 4,
+						"mathExpression": "cos"
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 33,
+				"x": -206,
+				"y": -20,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 33,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.121906795,
+								"y": 1
+							},
+							{
+								"x": 0.8935991,
+								"y": 1
+							},
+							{
+								"x": 1,
+								"y": 0
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 34,
+				"x": -693,
+				"y": 0,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 34,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 35,
+				"x": -1300,
+				"y": 383,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 35,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 36,
+				"x": -772,
+				"y": 390,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 36,
+						"a": 0,
+						"b": 2,
+						"mathExpression": "multiply"
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 37,
+				"x": -720,
+				"y": 551,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 37,
+						"x": 0,
+						"y": 0,
+						"z": 0
+					}
+				}
+			},
+			{
+				"class": "Vector3ModuleWrapper",
+				"id": 38,
+				"x": -129,
+				"y": -249,
+				"module": {
+					"data": {
+						"class": "Vector3Module",
+						"index": 38,
+						"x": 0,
+						"y": 0,
+						"z": 0
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 7,
+				"moduleTo": 4,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 5
+			},
+			{
+				"moduleFrom": 8,
+				"moduleTo": 1,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 9,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 11
+			},
+			{
+				"moduleFrom": 13,
+				"moduleTo": 4
+			},
+			{
+				"moduleFrom": 11,
+				"moduleTo": 10,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 12
+			},
+			{
+				"moduleFrom": 6,
+				"moduleTo": 13
+			},
+			{
+				"moduleFrom": 17,
+				"moduleTo": 16
+			},
+			{
+				"moduleFrom": 23,
+				"moduleTo": 16,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 23,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 23,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 24,
+				"moduleTo": 14
+			},
+			{
+				"moduleFrom": 25,
+				"moduleTo": 23,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 28,
+				"moduleTo": 16,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 29,
+				"moduleTo": 31
+			},
+			{
+				"moduleFrom": 31,
+				"moduleTo": 30
+			},
+			{
+				"moduleFrom": 31,
+				"moduleTo": 32
+			},
+			{
+				"moduleFrom": 33,
+				"slotTo": 10
+			},
+			{
+				"moduleFrom": 34,
+				"moduleTo": 33
+			},
+			{
+				"moduleFrom": 35,
+				"moduleTo": 36
+			},
+			{
+				"moduleFrom": 36,
+				"moduleTo": 25
+			},
+			{
+				"moduleFrom": 4,
+				"moduleTo": 10
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 37,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 37,
+				"moduleTo": 23,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 38,
+				"slotTo": 27
+			},
+			{
+				"moduleFrom": 30,
+				"moduleTo": 38
+			},
+			{
+				"moduleFrom": 32,
+				"moduleTo": 38,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 10,
+				"moduleTo": 37,
+				"slotTo": 2
+			}
+		],
+		"groups": [
+			{
+				"text": "BEAM NOISE",
+				"modules": [ 10, 6, 4, 13, 11 ],
+				"color": -1.3926823E38
+			}
+		]
+	}
+]
+}

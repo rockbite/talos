@@ -1,0 +1,131 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+    dependencies {
+        classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
+        classpath 'org.gretty:gretty:3.0.7'
+    }
+}
+
+apply plugin: "gwt"
+apply plugin: "war"
+apply plugin: "org.gretty"
+
+
+dependencies {
+
+    implementation project(path: ":editor")
+    implementation project(path: ":editor", configuration: "web")
+
+    api project(path: ":runtimes:talos-libgdx")
+    api project(path: ":runtimes:talos-libgdx", configuration: "web")
+    api project(path: ":runtimes:talos")
+    api project(path: ":runtimes:talos", configuration: "web")
+
+    api libs.bongo.web
+    api variantOf(libs.bongo.web) { classifier("web") }
+    api variantOf(libs.bongo.engine) { classifier("web") }
+
+    implementation variantOf(libs.spine.libgdx) { classifier("sources") }
+    implementation variantOf(libs.snakeyaml) { classifier("sources") }
+    implementation variantOf(libs.visui) { classifier("sources") }
+    implementation variantOf(libs.string.similarity) { classifier("sources") }
+    implementation variantOf(libs.tiny.gizmo) { classifier("sources") }
+}
+
+gwt {
+    gwtVersion='2.8.2' // Should match the gwt version used for building the gwt backend
+    maxHeapSize="2G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
+    minHeapSize="1G"
+
+    src = files(file("src/")) // Needs to be in front of "modules" below.
+    modules 'com.talosvfx.talos.GdxDefinition'
+    devModules 'com.talosvfx.talos.GdxDefinitionSuperdev'
+    project.webAppDirName = 'webapp'
+
+    compiler {
+        strict = false;
+        disableCastChecking = true;
+    }
+}
+
+import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
+import org.akhikhl.gretty.AppBeforeIntegrationTestTask
+
+gretty.httpPort = 8080
+gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
+gretty.contextPath = "/"
+gretty.portPropertiesFileName = "TEMP_PORTS.properties"
+
+task startHttpServer () {
+    dependsOn draftCompileGwt
+
+    doFirst {
+        copy {
+            from "webapp"
+            into gretty.resourceBase
+        }
+
+        copy {
+            from "war"
+            into gretty.resourceBase
+        }
+    }
+}
+
+task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+    // The next line allows ports to be reused instead of
+    // needing a process to be manually terminated.
+    file("build/TEMP_PORTS.properties").delete()
+    // Somewhat of a hack; uses Gretty's support for wrapping a task in
+    // a start and then stop of a Jetty server that serves files while
+    // also running the SuperDev code server.
+    integrationTestTask 'superDev'
+
+    interactive false
+}
+
+task superDev (type: GwtSuperDev) {
+    dependsOn startHttpServer
+    doFirst {
+        gwt.modules = gwt.devModules
+    }
+}
+
+task dist(dependsOn: [clean, compileGwt]) {
+    doLast {
+        file("build/dist").mkdirs()
+        copy {
+            from "build/gwt/out"
+            into "build/dist"
+        }
+        copy {
+            from "webapp"
+            into "build/dist"
+        }
+        copy {
+            from "war"
+            into "build/dist"
+        }
+    }
+}
+
+task addSource {
+    doLast {
+        sourceSets.main.compileClasspath += files(project(':editor').sourceSets.main.allJava.srcDirs)
+    }
+}
+
+tasks.compileGwt.dependsOn(addSource)
+tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+

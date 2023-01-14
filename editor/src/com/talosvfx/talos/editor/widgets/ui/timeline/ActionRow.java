@@ -50,6 +50,10 @@ public class ActionRow<U> extends BasicRow<U> {
 
         label.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
+            public void editModeStarted () {
+            }
+
+            @Override
             public void changed(String newText) {
                 onItemNameChange(newText);
             }
@@ -102,7 +106,7 @@ public class ActionRow<U> extends BasicRow<U> {
 
         label.setText(dataProvider.getItemName());
         boolean isVisible = dataProvider.isItemVisible();
-        if (isItemVisible) {
+        if (isVisible) {
             eye.getColor().a = 1f;
         } else {
             eye.getColor().a = 0.3f;

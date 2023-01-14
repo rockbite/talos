@@ -1,8 +1,8 @@
 package com.talosvfx.talos.editor.notifications.events;
 
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class ProjectSavedEvent implements Notifications.Event {
+public class ProjectSavedEvent implements TalosEvent {
 
     String projectName;
 

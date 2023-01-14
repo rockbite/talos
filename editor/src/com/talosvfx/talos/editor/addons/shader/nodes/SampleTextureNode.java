@@ -8,7 +8,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
 import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 
 import java.io.File;
 
@@ -19,6 +19,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
     private String regionName;
     private String uniformName;
 
+    public final String INPUT_UV_OVERRIDE = "overrideUV";
     public final String INPUT_UV_OFFSET = "offsetUV";
     public final String INPUT_UV_MUL = "mulUV";
 
@@ -81,12 +82,13 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
             return "vec4(1.0)";
         }
 
+        String uvSample = getExpression(INPUT_UV_OVERRIDE, "v_texCoords");
         String uvOffset = getExpression(INPUT_UV_OFFSET, "vec2(0.0, 0.0)");
         String uvMul = getExpression(INPUT_UV_MUL, "vec2(1.0, 1.0)");
 
         boolean wrap = (boolean) widgetMap.get(WRAP).getValue();
 
-        String sample = "(v_texCoords - 0.5)/(" + uvMul + ") + 0.5 + " + uvOffset;
+        String sample = "(" + uvSample + " - 0.5)/(" + uvMul + ") + 0.5 + " + uvOffset;
 
         if(wrap) {
             sample = "fract(" + sample + ")";
@@ -147,7 +149,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
 
                     updatePreview();
 
-                    Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(SampleTextureNode.this));
+                    Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), SampleTextureNode.this));
                 } catch (Exception e) {
 
                 }

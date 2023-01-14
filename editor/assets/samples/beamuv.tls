@@ -1,0 +1,391 @@
+{
+"metaData": {
+	"scopeDefaults": [
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	"previewCamPos": {
+		"x": 4.7310534,
+		"y": 1.6340619
+	},
+	"previewCamZoom": 0.96027327,
+	"bgImagePath": "",
+	"isGridVisible": false,
+	"bgImageIsInBack": false,
+	"bgImageSize": 0,
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0
+},
+"emitters": [
+	{
+		"name": "default_emitter",
+		"modules": [
+			{
+				"class": "ParticleModuleWrapper",
+				"id": 0,
+				"x": 206.04092,
+				"y": -84.260284,
+				"module": {
+					"data": {
+						"class": "ParticleModule",
+						"index": 0
+					}
+				}
+			},
+			{
+				"class": "EmitterModuleWrapper",
+				"id": 1,
+				"x": 349.04092,
+				"y": 311.73972,
+				"module": {
+					"data": {
+						"class": "EmitterModule",
+						"index": 1,
+						"delay": 0,
+						"duration": 1,
+						"rate": 3
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 7,
+				"titleOverride": "Tells Module Point Index",
+				"x": -1332.96,
+				"y": 288.73972,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 7,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
+				"class": "EmConfigModuleWrapper",
+				"id": 8,
+				"x": 109.040924,
+				"y": 277.73972,
+				"module": {
+					"data": {
+						"class": "EmConfigModule",
+						"index": 8,
+						"additive": true,
+						"isBlendAdd": false,
+						"attached": false,
+						"continuous": false,
+						"aligned": false,
+						"immortal": true
+					}
+				}
+			},
+			{
+				"class": "StaticValueModuleWrapper",
+				"id": 9,
+				"x": -83.959045,
+				"y": 152.73972,
+				"module": {
+					"data": {
+						"class": "StaticValueModule",
+						"index": 9,
+						"value": 2
+					}
+				}
+			},
+			{
+				"class": "GradientColorModuleWrapper",
+				"id": 12,
+				"x": -530.9592,
+				"y": 374.73972,
+				"module": {
+					"data": {
+						"class": "GradientColorModule",
+						"index": 12,
+						"points": [
+							{
+								"r": 0,
+								"g": 0.14901961,
+								"b": 0.9882353,
+								"pos": 0
+							},
+							{
+								"r": 0.101960786,
+								"g": 0.43137255,
+								"b": 1,
+								"pos": 0.11153008
+							},
+							{
+								"r": 0,
+								"g": 0.8156863,
+								"b": 1,
+								"pos": 0.92812973
+							},
+							{
+								"r": 0.11764706,
+								"g": 0,
+								"b": 1,
+								"pos": 0.99345756
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "CurveModuleWrapper",
+				"id": 14,
+				"x": -413.95914,
+				"y": 180.73972,
+				"module": {
+					"data": {
+						"class": "CurveModule",
+						"index": 14,
+						"points": [
+							{
+								"x": 0,
+								"y": 0
+							},
+							{
+								"x": 0.70537347,
+								"y": 0.7251568
+							},
+							{
+								"x": 1,
+								"y": 1
+							}
+						]
+					}
+				}
+			},
+			{
+				"class": "DrawableModuleWrapper",
+				"id": 16,
+				"x": 113.040924,
+				"y": 608.7396,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.DrawableModule",
+						"index": 16
+					}
+				}
+			},
+			{
+				"class": "SpriteMaterialModuleWrapper",
+				"id": 17,
+				"x": -120.95886,
+				"y": 789.7396,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.SpriteMaterialModule",
+						"index": 17,
+						"regionName": "smoke"
+					}
+				},
+				"filePath": "smoke.png",
+				"regionName": "smoke"
+			},
+			{
+				"class": "StripMeshGeneratorModuleWrapper",
+				"id": 23,
+				"x": -98.95911,
+				"y": 505.73975,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.StripMeshGeneratorModule",
+						"index": 23
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 25,
+				"x": -442.95923,
+				"y": 527.7396,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 25,
+						"x": 0.6547821,
+						"y": 0.59387344
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 35,
+				"x": -1288.96,
+				"y": 563.7396,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 35,
+						"scopeKey": 9
+					}
+				}
+			},
+			{
+				"class": "FromToParticlePointDataGeneratorModuleWrapper",
+				"id": 38,
+				"x": -209.95898,
+				"y": 649.7396,
+				"module": {
+					"data": {
+						"class": "com.talosvfx.talos.runtime.modules.FromToParticlePointDataGeneratorModule",
+						"index": 38
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 39,
+				"x": -467.95923,
+				"y": 739.7396,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 39,
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			{
+				"class": "Vector2ModuleWrapper",
+				"id": 40,
+				"x": -478.95923,
+				"y": 633.7396,
+				"module": {
+					"data": {
+						"class": "Vector2Module",
+						"index": 40,
+						"x": 8.463687,
+						"y": 0.19553053
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 41,
+				"x": -736.9591,
+				"y": 489.73975,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 41,
+						"a": 0,
+						"b": 0,
+						"mathExpression": "sum"
+					}
+				}
+			},
+			{
+				"class": "InputModuleWrapper",
+				"id": 43,
+				"x": -1293.96,
+				"y": 469.73972,
+				"module": {
+					"data": {
+						"class": "InputModule",
+						"index": 43,
+						"scopeKey": 1
+					}
+				}
+			},
+			{
+				"class": "MathModuleWrapper",
+				"id": 44,
+				"x": -967.9595,
+				"y": 399.73972,
+				"module": {
+					"data": {
+						"class": "MathModule",
+						"index": 44,
+						"a": 0,
+						"b": 2,
+						"mathExpression": "multiply"
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"moduleFrom": 8,
+				"moduleTo": 1,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 9,
+				"slotTo": 4
+			},
+			{
+				"moduleFrom": 17,
+				"moduleTo": 16
+			},
+			{
+				"moduleFrom": 23,
+				"moduleTo": 16,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 12,
+				"moduleTo": 23,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 14,
+				"moduleTo": 23,
+				"slotTo": 3
+			},
+			{
+				"moduleFrom": 25,
+				"moduleTo": 23,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 38,
+				"moduleTo": 16,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 39,
+				"moduleTo": 38,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 40,
+				"moduleTo": 38,
+				"slotTo": 2
+			},
+			{
+				"moduleFrom": 41,
+				"moduleTo": 25
+			},
+			{
+				"moduleFrom": 43,
+				"moduleTo": 44
+			},
+			{
+				"moduleFrom": 35,
+				"moduleTo": 41
+			},
+			{
+				"moduleFrom": 44,
+				"moduleTo": 41,
+				"slotTo": 1
+			},
+			{
+				"moduleFrom": 7,
+				"moduleTo": 12
+			}
+		]
+	}
+]
+}

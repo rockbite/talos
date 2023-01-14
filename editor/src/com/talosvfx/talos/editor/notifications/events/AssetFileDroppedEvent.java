@@ -2,9 +2,9 @@ package com.talosvfx.talos.editor.notifications.events;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class AssetFileDroppedEvent implements Notifications.Event {
+public class AssetFileDroppedEvent implements TalosEvent {
 
     private Vector2 screenPos = new Vector2();
     private FileHandle fileHandle;

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public abstract class EmptyWindow extends Table {
 
@@ -32,7 +33,7 @@ public abstract class EmptyWindow extends Table {
         this.resizeBorder = 8;
 
         this.setTouchable(Touchable.enabled);
-        this.setClip(true);
+        this.setClip(false);
 
         this.addCaptureListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -218,7 +219,7 @@ public abstract class EmptyWindow extends Table {
 
     public void draw(Batch batch, float parentAlpha) {
         Stage stage = this.getStage();
-        if (stage != null && stage.getKeyboardFocus() == null) {
+        if (stage != null && stage.getKeyboardFocus() == null && SharedResources.stage.getKeyboardFocus() == null) {
             stage.setKeyboardFocus(this);
         }
 

@@ -34,7 +34,9 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
+import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 
 public class ModuleWrapperGroup extends Group implements Json.Serializable{
@@ -59,6 +61,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
     Actor topHit;
 
     PopupMenu settingsPopup;
+    private ModuleBoardWidget moduleBoardWidget;
 
     public ModuleWrapperGroup() {
 
@@ -103,7 +106,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
         changeColorMenuItem.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                TalosMain.Instance().UIStage().showColorPicker(new ColorPickerAdapter() {
+                SharedResources.ui.showColorPicker(new ColorPickerAdapter() {
                     @Override
                     public void changed(Color newColor) {
                         super.changed(newColor);
@@ -116,7 +119,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(ModuleWrapperGroup.this);
+                moduleBoardWidget.removeGroup(ModuleWrapperGroup.this);
             }
         });
 
@@ -130,8 +133,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 pos.set(x, y);
                 topHit.localToStageCoordinates(pos);
-                TalosMain.Instance().NodeStage().moduleBoardWidget.setSelectedWrappers(wrappers);
-                return true;
+                moduleBoardWidget.setSelectedWrappers(wrappers); return true;
             }
 
             @Override
@@ -212,7 +214,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
         }
 
         if(wrappers.size == 0) {
-            TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(this);
+            moduleBoardWidget.removeGroup(this);
         }
     }
 
@@ -236,7 +238,7 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
     public void removeWrapper(ModuleWrapper wrapper) {
         wrappers.remove(wrapper);
         if(wrappers.size == 0) {
-            TalosMain.Instance().NodeStage().moduleBoardWidget.removeGroup(this);
+            moduleBoardWidget.removeGroup(this);
         }
     }
 
@@ -269,5 +271,9 @@ public class ModuleWrapperGroup extends Group implements Json.Serializable{
         wrappers = json.readValue(ObjectSet.class, jsonData.get("modules"));
         setText(text);
         setColor(color);
+    }
+
+    public void setModuleBoardReference (ModuleBoardWidget moduleBoardWidget) {
+        this.moduleBoardWidget = moduleBoardWidget;
     }
 }

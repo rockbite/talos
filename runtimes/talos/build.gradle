@@ -1,0 +1,48 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    alias(libs.plugins.lombok)
+}
+
+dependencies {
+    api libs.libgdx
+    implementation libs.slf4j.api
+}
+
+task packageSources(type: Jar, dependsOn: [classes, jar]) {
+    from delombok
+    from sourceSets.main.resources.srcDirs
+    archiveClassifier = 'web'
+}
+
+artifacts {
+    api(jar, packageSources)
+}
+
+configurations {
+    web {
+        canBeConsumed true
+        canBeResolved false
+        extendsFrom implementation, runtimeOnly
+    }
+}
+
+
+publishing {
+    repositories {
+        maven {
+            name = "snapshot"
+            url = getSnapshotRepositoryUrl()
+            credentials(org.gradle.api.credentials.PasswordCredentials)
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact packageSources
+            groupId project.group
+            artifactId project.name
+            version project.version
+        }
+    }
+}

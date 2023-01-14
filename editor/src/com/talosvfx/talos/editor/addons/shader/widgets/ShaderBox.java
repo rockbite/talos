@@ -13,12 +13,12 @@ import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
 
 public class ShaderBox extends Actor {
 
-    ShaderProgram shaderProgram;
-    ShaderBuilder shaderBuilder;
+    protected ShaderProgram shaderProgram;
+    protected ShaderBuilder shaderBuilder;
 
-    Skin skin;
+    protected Skin skin;
 
-    Texture white;
+    protected Texture white;
 
     private Blending blending = Blending.NORMAL;
 
@@ -92,16 +92,20 @@ public class ShaderBox extends Actor {
                 }
             }
 
-            batch.draw(white, getX(), getY(), getWidth(), getHeight());
+            drawCall(batch);
         } else {
             Color prevColor = batch.getColor();
             batch.setColor(Color.BLACK);
-            batch.draw(white, getX(), getY(), getWidth(), getHeight());
+            drawCall(batch);
             batch.setColor(prevColor);
         }
 
         batch.setShader(prevShader);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    protected void drawCall (Batch batch) {
+        batch.draw(white, getX(), getY(), getWidth(), getHeight());
     }
 }
