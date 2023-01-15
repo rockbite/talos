@@ -369,6 +369,7 @@ public class MainRenderer implements Observer {
 
         spineRendererComponent.skeleton.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
         spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
+        spineRendererComponent.skeleton.getRootBone().setRotation(transformComponent.rotation);
 
         if (!skipUpdates) {
             spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime() * timeScale);

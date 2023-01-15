@@ -161,23 +161,25 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
         String toId = nodeConnection.toId;
         super.setSlotConnectionInactive(nodeConnection, isInput);
 
-        ProbabilityWidget probabilityChoiceWidget = map.get(toId);
+        if(isInput) {
+            ProbabilityWidget probabilityChoiceWidget = map.get(toId);
 
-        probabilityChoiceWidget.remove();
-        Cell<ProbabilityWidget> probabilityWidgetCell = cellMap.get(probabilityChoiceWidget);
-        probabilityWidgetCell.height(0).pad(0);
-        probabilityWidgetCell.getTable().invalidateHierarchy();
-        //container.getCells().removeValue(probabilityWidgetCell, true);
-        setY(getY() + 42);
+            probabilityChoiceWidget.remove();
+            Cell<ProbabilityWidget> probabilityWidgetCell = cellMap.get(probabilityChoiceWidget);
+            probabilityWidgetCell.height(0).pad(0);
+            probabilityWidgetCell.getTable().invalidateHierarchy();
+            //container.getCells().removeValue(probabilityWidgetCell, true);
+            setY(getY() + 42);
 
-        widgetMap.remove(toId);
-        typeMap.remove(toId);
-        defaultsMap.remove(toId);
-        map.remove(toId);
-        cellMap.remove(probabilityChoiceWidget);
-        inputs.remove(toId);
+            widgetMap.remove(toId);
+            typeMap.remove(toId);
+            defaultsMap.remove(toId);
+            map.remove(toId);
+            cellMap.remove(probabilityChoiceWidget);
+            inputs.remove(toId);
 
-        adjustOthersExcept(null);
+            adjustOthersExcept(null);
+        }
     }
 
     public static class ProbabilityWidget extends AbstractWidget<Float>  {

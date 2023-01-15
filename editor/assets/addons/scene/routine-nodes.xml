@@ -53,6 +53,7 @@
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue name="jitter" type="float" default="0" min = "0" max = "2" progress="true">Jitter</dynamicValue>
             <inputText name="target" type="string">path</inputText>
+            <checkbox name="reverse" default = "false">reverse</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
@@ -128,7 +129,7 @@
                 <value port="input" name="flag" type="boolean">flag</value>
             </group>
             <dynamicValue name="count" type="float" default="10" step="1" min="0" max="1000">count</dynamicValue>
-            <dynamicValue name="interval" type="float" default="1">interval</dynamicValue>
+            <dynamicValue name="interval" type="float" default="1" step="0.0001">interval</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
     </category>
@@ -161,7 +162,7 @@
                 <option value = "sliced">Sliced</option>
                 <option value = "tiled">Tiled</option>
             </select>
-            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SpawnSpineNode" title = "Spawn Spine" keywords = "" class = "RoutineNodeWidget">
@@ -169,7 +170,7 @@
             <inputText name="name" type="string">name</inputText>
             <asset port="input" name="spine" type="SKELETON">spine</asset>
             <color port="input" name="color" type="color">Color: </color>
-            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SpawnParticleNode" title = "Spawn Particle" keywords = "" class = "RoutineNodeWidget">
@@ -180,7 +181,7 @@
                 <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">x: </dynamicValue>
                 <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">y: </dynamicValue>
             </group>
-            <dynamicValue port="input" name="layerOrder" type="int" step="1" max="50">Layer order</dynamicValue>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetSpineAnimationNode" title = "Set Spine Animation" keywords = "" class = "SetSpineAnimationNodeWidget">
@@ -188,6 +189,8 @@
             <asset port="input" name="reference" type="SKELETON">reference</asset>
             <container name="animation_list"></container>
             <checkbox name="repeat" default = "true">repeat</checkbox>
+            <checkbox name="add" default = "false">add it</checkbox>
+            <dynamicValue port="input" name="track" type="int" min="0" max="10" step="1" progress="true">track</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetTransformNode" title = "Set Transform" keywords = "" class = "RoutineNodeWidget">
@@ -205,8 +208,8 @@
                 <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
             </group>
             <group>
-                <dynamicValue port="input" name="width" type="float" step="0.1">Width: </dynamicValue>
-                <dynamicValue port="input" name="height" type="float" step="0.1">Height: </dynamicValue>
+                <dynamicValue port="input" name="width" type="float" step="0.01">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" step="0.01">Height: </dynamicValue>
             </group>
             <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step = "1" progress="true">Rotation: </dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>

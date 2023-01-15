@@ -120,6 +120,12 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
                         }
 
                         widget.init(SharedResources.skin);
+
+
+                        if(widget instanceof ValueWidget) {
+                            ((ValueWidget) widget).setLabel(wrapper.propertyName);
+                        }
+
                         widgetMap.put(wrapper.propertyName, widget);
                         typeMap.put(wrapper.propertyName, type.toString().toLowerCase(Locale.ROOT));
                         defaultsMap.put(wrapper.propertyName, "");

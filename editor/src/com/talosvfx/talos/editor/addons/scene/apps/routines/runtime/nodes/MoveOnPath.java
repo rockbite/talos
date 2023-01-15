@@ -18,6 +18,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
     private Bezier<Vector2> bezier = new Bezier<>();
     private Vector2 tmp = new Vector2();
     public transient Vector2[] tmpArr;
+    private boolean reverse = false;
 
     public MoveOnPath() {
         tmpArr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
@@ -46,6 +47,8 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
     @Override
     protected boolean targetAdded(State state) {
         gameObjects.clear();
+
+        reverse = fetchBooleanValue("reverse");
 
         SavableContainer container = routineInstanceRef.getContainer();
 
@@ -104,6 +107,11 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
     protected void stateTick(State state, float delta) {
         createEvenlySpacedPoints(state);
 
+        float alpha = state.alpha;
+        if(reverse) {
+            alpha = 1f - alpha;
+        }
+
         float currLen = 0;
 
         for(int i = 0; i < getNumSegments(state.points); i++) {
@@ -114,8 +122,8 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
             currLen += length;
             float currA = currLen/state.sumLength;
             float prevA = prevLen/state.sumLength;
-            if(state.alpha < currA) {
-                float localAlpha = (state.alpha-prevA)/(currA-prevA);
+            if(alpha < currA) {
+                float localAlpha = (alpha-prevA)/(currA-prevA);
                 Vector2 point = bezier.valueAt(tmp, localAlpha);
                 TransformComponent transform = state.getTarget().getComponent(TransformComponent.class);
                 transform.position.set(point);
