@@ -11,19 +11,16 @@ import lombok.Getter;
 
 public final class TALOS_BUILD {
   @Getter
-  private static final String versionString = "2.0.0-SNAPSHOT";
+  private static final String version = "2.0.0";
 
   @Getter
-  private static final String buildHash = "63ffeefa";
-
-  @Getter
-  private static final String commit = "f2ac6f4";
+  private static final String commit = "833645c";
 
   @Getter
   private static final String branch = "snapshot-version";
 
   @Getter
-  private static final Date buildDate = new Date(1673866001987l);
+  private static final Date buildDate = new Date(1673883324447l);
 
   private static void printHeader() {
     System.out.println("      ___           ___           ___       ___           ___     \n"
@@ -45,7 +42,7 @@ public final class TALOS_BUILD {
   }
 
   private static void printVersion() {
-    System.out.println("Runtime Version: " + versionString);
+    System.out.println("Runtime Version: " + version);
     System.out.println("Runtime commit: " + commit);
     System.out.println("Runtime branch: " + branch);
   }

@@ -1,10 +1,14 @@
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } // snapshots
     }
     dependencies {
+        classpath 'com.squareup:javapoet:1.13.0'
+        classpath "org.projectlombok:lombok:1.18.22"
+        classpath "com.badlogicgames.gdx:gdx:$project.gdxVersion"
+        classpath "com.badlogicgames.gdx:gdx-tools:$project.gdxVersion"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
     }
 }
@@ -32,6 +36,10 @@ dependencies {
     implementation libs.tiny.gizmo
     implementation libs.spark
 
+    implementation libs.javapoet
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 
@@ -48,26 +56,6 @@ def getGitHash = { ->
         standardOutput = stdout
     }
     return stdout.toString().trim()
-}
-
-task createProperties () {
-    doFirst {
-
-        def file = rootProject.file("editor/assets/talos-version.properties");
-        Properties properties = new Properties();
-        if (file.exists()) {
-            properties.load(file.newReader());
-        }
-        properties.setProperty("version", project.version);
-        properties.setProperty("buildHash", getGitHash());
-        properties.setProperty("buildTime", System.currentTimeMillis() + "");
-
-        properties.store(file.newPrintWriter(), "");
-    }
-}
-
-classes {
-    dependsOn createProperties
 }
 
 task packageSources(type: Jar, dependsOn: classes) {
@@ -89,14 +77,13 @@ artifacts {
 }
 
 class TalosBuildInfo {
-    def versionString
-    def buildHash
+    def version
     def branch
     def commit
     def date
 
     TalosBuildInfo (def project, def grgit) {
-        def versionPropsFile = project.file('assets/talos-version.properties')
+        def versionPropsFile = project.file('../gradle.properties')
 
         def Properties versionProps = new Properties()
 
@@ -104,12 +91,10 @@ class TalosBuildInfo {
         versionProps.load(inputStream)
         inputStream.close()
 
-        this.versionString = versionProps['version']
-        this.buildHash = versionProps['buildHash']
-
+        this.version = versionProps['version']
         this.commit = grgit.head().abbreviatedId
         this.branch = grgit.branch.current().getName()
-        this.date = Long.valueOf(versionProps['buildTime'])
+        this.date = System.currentTimeMillis()
     }
 
     def print () {
@@ -120,4 +105,146 @@ class TalosBuildInfo {
 def getBuildInfo () {
     def buildInfo = new TalosBuildInfo(project, grgit)
     return buildInfo
+}
+
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeSpec
+import javax.lang.model.element.Modifier
+import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.SharedLibraryLoader
+import lombok.Getter
+
+def addStringField (TypeSpec.Builder builder, String fieldName, String fieldValue) {
+    FieldSpec fieldSpec = FieldSpec.builder(String.class, fieldName)
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+            .addAnnotation(Getter.class)
+            .initializer('$S', fieldValue)
+            .build()
+
+    builder.addField(fieldSpec)
+}
+
+def addIntField (TypeSpec.Builder builder, String fieldName, int fieldValue) {
+    FieldSpec fieldSpec = FieldSpec.builder(int.class, fieldName)
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+            .addAnnotation(Getter.class)
+            .initializer('$L', fieldValue)
+            .build()
+
+    builder.addField(fieldSpec)
+}
+
+def addDateField (TypeSpec.Builder builder, String fieldName, long fieldValue) {
+    FieldSpec fieldSpec = FieldSpec.builder(Date.class, fieldName)
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+            .addAnnotation(Getter.class)
+            .initializer('new Date($Ll)', fieldValue)
+            .build()
+
+    builder.addField(fieldSpec)
+}
+
+task generateBuildConfig {
+
+    description 'Generate build config java file'
+
+    outputs.upToDateWhen { false }
+
+    doFirst {
+
+        MethodSpec printHeader = MethodSpec.methodBuilder("printHeader")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .returns(void.class)
+                .addStatement('$T.out.println($S)', System.class, "      ___           ___           ___       ___           ___     \n" +
+                        "     /\\  \\         /\\  \\         /\\__\\     /\\  \\         /\\  \\    \n" +
+                        "     \\:\\  \\       /::\\  \\       /:/  /    /::\\  \\       /::\\  \\   \n" +
+                        "      \\:\\  \\     /:/\\:\\  \\     /:/  /    /:/\\:\\  \\     /:/\\ \\  \\  \n" +
+                        "      /::\\  \\   /::\\~\\:\\  \\   /:/  /    /:/  \\:\\  \\   _\\:\\~\\ \\  \\ \n" +
+                        "     /:/\\:\\__\\ /:/\\:\\ \\:\\__\\ /:/__/    /:/__/ \\:\\__\\ /\\ \\:\\ \\ \\__\n" +
+                        "    /:/  \\/__/ \\/__\\:\\/:/  / \\:\\  \\    \\:\\  \\ /:/  / \\:\\ \\:\\ \\/__/\n" +
+                        "   /:/  /           \\::/  /   \\:\\  \\    \\:\\  /:/  /   \\:\\ \\:\\__\\  \n" +
+                        "   \\/__/            /:/  /     \\:\\  \\    \\:\\/:/  /     \\:\\/:/  /  \n" +
+                        "                   /:/  /       \\:\\__\\    \\::/  /       \\::/  /   \n" +
+                        "                   \\/__/         \\/__/     \\/__/         \\/__/    \n")
+                .build()
+
+
+        MethodSpec printDate = MethodSpec.methodBuilder("printDate")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .returns(void.class)
+                .addStatement('$T cal = $T.getInstance()', Calendar.class, Calendar.class)
+                .addStatement('$T.out.println($S + cal.getTime().toString())', System.class, "Current Date: ")
+                .build()
+
+
+        MethodSpec printVersion = MethodSpec.methodBuilder("printVersion")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .returns(void.class)
+                .addStatement('$T.out.println($S + version)', System.class, "Runtime Version: ")
+                .addStatement('$T.out.println($S + commit)', System.class, "Runtime commit: ")
+                .addStatement('$T.out.println($S + branch)', System.class, "Runtime branch: ")
+                .build()
+
+        MethodSpec printSystemInfo = MethodSpec.methodBuilder("printSystemInfo")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .returns(void.class)
+                .addStatement('$T is64Bit = $T.is64Bit', boolean.class, SharedLibraryLoader.class)
+                .addStatement('$T applicationType = $T.app.getType()', Application.ApplicationType.class, Gdx.class)
+                .addStatement('$T.out.println($S + applicationType.name())', System.class, "Platform: ")
+                .addStatement('$T.out.println($S + is64Bit)', System.class, "Is 64 Bit: ")
+
+                .addStatement('$T glVersion = $T.graphics.getGLVersion().getDebugVersionString()', String.class, Gdx.class)
+                .addStatement('$T.out.println(glVersion)', System.class)
+                .build()
+
+        MethodSpec printAll = MethodSpec.methodBuilder("printAll")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(void.class)
+                .addStatement('printHeader()')
+                .addStatement('printDate()')
+                .addStatement('printVersion()')
+                .addStatement('printSystemInfo()')
+                .build()
+
+
+        TypeSpec.Builder classSpecBuilder = TypeSpec.classBuilder("TALOS_BUILD")
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+
+
+        //Meta
+
+        def buildInfo = project(":editor").getBuildInfo()
+        /*
+
+            def versionString
+            def commit
+            def branch
+            def date
+
+         */
+
+        addStringField(classSpecBuilder, "version", buildInfo.version as String)
+        addStringField(classSpecBuilder, "commit", buildInfo.commit as String)
+        addStringField(classSpecBuilder, "branch", buildInfo.branch as String)
+        addDateField(classSpecBuilder, "buildDate", buildInfo.date as Long)
+
+        classSpecBuilder
+                .addMethod(printHeader)
+                .addMethod(printDate)
+                .addMethod(printVersion)
+                .addMethod(printSystemInfo)
+                .addMethod(printAll)
+
+        TypeSpec classSpec = classSpecBuilder.build()
+
+        JavaFile javaFile = JavaFile.builder("com.talosvfx.talos", classSpec).build()
+        javaFile.writeTo(System.out)
+
+        def file = new File("$projectDir/src/")
+        javaFile.writeTo(file)
+    }
+
 }
