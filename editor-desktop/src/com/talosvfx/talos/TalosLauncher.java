@@ -73,6 +73,7 @@ public class TalosLauncher implements ILauncher {
 				super.create();
 				afterCreated();
 				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TALOS_BUILD.getVersion() + " " + misc);
+				TALOS_BUILD.printAll();
 			}
 		};
 
