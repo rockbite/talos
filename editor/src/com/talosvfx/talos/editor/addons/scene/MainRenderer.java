@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
@@ -166,6 +167,36 @@ public class MainRenderer implements Observer {
 
                     transform.worldRotation += parentTransform.worldRotation;
                     transform.worldScale.scl(parentTransform.worldScale);
+                }
+            }
+        }
+
+        // if root has render component try mixing colors if they exist
+        if (root.hasComponentType(RendererComponent.class)) {
+            final RendererComponent rendererComponent = root.getComponentAssignableFrom(RendererComponent.class);
+
+            // check if render component has color value
+            if (rendererComponent instanceof IColorHolder) {
+                final IColorHolder colorHolder = (IColorHolder) rendererComponent;
+
+                // update final color by Renderer color
+                final Color finalColor = (colorHolder.getFinalColor());
+                finalColor.set(colorHolder.getColor());
+
+                // should inherit parent color update final color by parent color
+                if (colorHolder.shouldInheritParentColor()) {
+                    if (root.parent != null) {
+                        // check if parent contains render component
+                        if (root.parent.hasComponentType(RendererComponent.class)) {
+                            final RendererComponent parentRendererComponent = root.parent.getComponentAssignableFrom(RendererComponent.class);
+
+                            // check if parent render component has color value
+                            if (parentRendererComponent instanceof IColorHolder) {
+                                // combine colors
+                                finalColor.mul(((IColorHolder) parentRendererComponent).getFinalColor());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -377,7 +408,7 @@ public class MainRenderer implements Observer {
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
-        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.color);
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -419,7 +450,7 @@ public class MainRenderer implements Observer {
             }
             textureRegion.setRegion(resource);
             if(textureRegion != null) {
-                batch.setColor(spriteRenderer.color);
+                batch.setColor(spriteRenderer.finalColor);
 
                 final float width = spriteRenderer.size.x;
                 final float height = spriteRenderer.size.y;
