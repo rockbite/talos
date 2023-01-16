@@ -5,20 +5,21 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } // snapshots
     }
     dependencies {
-        classpath 'com.squareup:javapoet:1.13.0'
-        classpath "org.projectlombok:lombok:$project.lombokVersion"
-        classpath "com.badlogicgames.gdx:gdx:$project.gdxVersion"
-        classpath "com.badlogicgames.gdx:gdx-tools:$project.gdxVersion"
-        classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
+
+        classpath libs.javapoet
+        classpath libs.libgdx
+        classpath libs.libgdx.tools
+        classpath libs.lombok
+        classpath libs.grgit
     }
 }
 
 plugins {
     id 'java-library'
     alias(libs.plugins.lombok)
+    alias(libs.plugins.grgit)
 }
 
-apply plugin: "org.ajoberstar.grgit"
 
 dependencies {
 
@@ -38,14 +39,13 @@ dependencies {
 
     implementation libs.javapoet
 
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 }
 
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["assets"]
-
 
 
 
@@ -83,15 +83,7 @@ class TalosBuildInfo {
     def date
 
     TalosBuildInfo (def project, def grgit) {
-        def versionPropsFile = project.file('../gradle.properties')
-
-        def Properties versionProps = new Properties()
-
-        def inputStream = new FileInputStream(versionPropsFile)
-        versionProps.load(inputStream)
-        inputStream.close()
-
-        this.version = versionProps['version']
+        this.version = project.version
         this.commit = grgit.head().abbreviatedId
         this.branch = grgit.branch.current().getName()
         this.date = System.currentTimeMillis()

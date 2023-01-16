@@ -11,16 +11,16 @@ import lombok.Getter;
 
 public final class TALOS_BUILD {
   @Getter
-  private static final String version = "2.0.0";
+  private static final String version = "2.0.0-SNAPSHOT";
 
   @Getter
-  private static final String commit = "833645c";
+  private static final String commit = "4fcb37a";
 
   @Getter
   private static final String branch = "snapshot-version";
 
   @Getter
-  private static final Date buildDate = new Date(1673883324447l);
+  private static final Date buildDate = new Date(1673899027931l);
 
   private static void printHeader() {
     System.out.println("      ___           ___           ___       ___           ___     \n"

@@ -5,11 +5,6 @@ allprojects {
 
     ext {
         appName = "talos"
-        gdxVersion = '1.10.1-SNAPSHOT'
-        freetypeGwtVersion = '1.11.1-SNAPSHOT'
-        lwjgl3Version = '3.3.0-SNAPSHOT'
-        visuiVersion = '1.5.0'
-        lombokVersion = '1.18.22'
 
         isReleaseBuild = {
             return project.hasProperty("RELEASE")
