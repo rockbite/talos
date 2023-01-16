@@ -43,7 +43,7 @@ task debug(dependsOn: classes, type: JavaExec) {
     }
 }
 
-task dist(type: Jar) {
+task dist(dependsOn: 'editor:generateBuildConfig', type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }

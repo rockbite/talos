@@ -24,8 +24,13 @@ dependencyResolutionManagement {
             version("logback", "1.2.3")
             version("slf4j", "1.7.25")
             version("spark", "2.9.4")
+            version("javapoet", "1.13.0")
+            version("lombokPlugin", "6.4.1")
+            version("grgit", "3.1.1")
+
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
+            library("libgdx-tools", "com.badlogicgames.gdx", "gdx-tools").versionRef("libgdx")
             library("bongo-engine", "com.rockbite.bongo", "engine").versionRef("bongo")
             library("bongo-desktop", "com.rockbite.bongo", "desktop").versionRef("bongo")
             library("bongo-web", "com.rockbite.bongo", "web").versionRef("bongo")
@@ -48,7 +53,12 @@ dependencyResolutionManagement {
 
             library("spark", "com.sparkjava", "spark-core").versionRef("spark")
 
-            plugin("lombok", "io.freefair.lombok").version("6.4.1")
+            library("javapoet", "com.squareup", "javapoet").versionRef("javapoet")
+
+            library("grgit", "org.ajoberstar.grgit", "grgit-gradle").versionRef("grgit")
+
+            plugin("grgit", "org.ajoberstar.grgit").versionRef("grgit")
+            plugin("lombok", "io.freefair.lombok").versionRef("lombokPlugin")
         }
     }
 }
