@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.squareup:javapoet:1.13.0'
-        classpath "org.projectlombok:lombok:1.18.22"
+        classpath "org.projectlombok:lombok:$project.lombokVersion"
         classpath "com.badlogicgames.gdx:gdx:$project.gdxVersion"
         classpath "com.badlogicgames.gdx:gdx-tools:$project.gdxVersion"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
