@@ -28,7 +28,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public GameAsset<Texture> gameAsset;
 
     public Color color = new Color(Color.WHITE);
-    public Color worldColor = new Color();
+    public transient Color finalColor = new Color();
+    public boolean shouldInheritParentColor = true;
     public boolean flipX;
     public boolean flipY;
     public boolean fixAspectRatio = true;
@@ -103,6 +104,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         });
 
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
+        PropertyWidget inheritParentColorWidget = WidgetFactory.generate(this, "shouldInheritParentColor", "Inherit Parent Color");
         PropertyWidget flipXWidget = WidgetFactory.generate(this, "flipX", "Flip X");
         PropertyWidget flipYWidget = WidgetFactory.generate(this, "flipY", "Flip Y");
         PropertyWidget fixAspectRatioWidget = WidgetFactory.generate(this, "fixAspectRatio", "Fix Aspect Ratio");
@@ -171,6 +173,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
         properties.add(textureWidget);
         properties.add(colorWidget);
+        properties.add(inheritParentColorWidget);
         properties.add(fixAspectRatioWidget);
         properties.add(flipXWidget);
         properties.add(flipYWidget);
@@ -213,6 +216,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         GameResourceOwner.writeGameAsset(json, this);
 
         json.writeValue("color", color);
+        json.writeValue("shouldInheritParentColor", shouldInheritParentColor);
         json.writeValue("flipX", flipX);
         json.writeValue("flipY", flipY);
         json.writeValue("fixAspectRatio", fixAspectRatio);
@@ -231,6 +235,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         loadTextureFromIdentifier(gameResourceIdentifier);
 
         color = json.readValue(Color.class, jsonData.get("color"));
+        shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);
         if(color == null) color = new Color(Color.WHITE);
 
         flipX = jsonData.getBoolean("flipX", false);
@@ -307,7 +312,12 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     }
 
     @Override
-    public Color getWorldColor() {
-        return worldColor;
+    public Color getFinalColor() {
+        return finalColor;
+    }
+
+    @Override
+    public boolean shouldInheritParentColor() {
+        return shouldInheritParentColor;
     }
 }

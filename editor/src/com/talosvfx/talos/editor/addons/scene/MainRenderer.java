@@ -177,18 +177,24 @@ public class MainRenderer implements Observer {
 
             // check if render component has color value
             if (rendererComponent instanceof IColorHolder) {
-                final Color worldColor = ((IColorHolder) rendererComponent).getWorldColor();
-                worldColor.set(((IColorHolder) rendererComponent).getColor());
+                final IColorHolder colorHolder = (IColorHolder) rendererComponent;
 
-                if (root.parent != null) {
-                    // check if parent contains render component
-                    if (root.parent.hasComponentType(RendererComponent.class)) {
-                        final RendererComponent parentRendererComponent = root.parent.getComponentAssignableFrom(RendererComponent.class);
+                // update final color by Renderer color
+                final Color finalColor = (colorHolder.getFinalColor());
+                finalColor.set(colorHolder.getColor());
 
-                        // check if parent render component has color value
-                        if (parentRendererComponent instanceof IColorHolder) {
-                            // combine colors
-                            worldColor.mul(((IColorHolder) parentRendererComponent).getWorldColor());
+                // should inherit parent color update final color by parent color
+                if (colorHolder.shouldInheritParentColor()) {
+                    if (root.parent != null) {
+                        // check if parent contains render component
+                        if (root.parent.hasComponentType(RendererComponent.class)) {
+                            final RendererComponent parentRendererComponent = root.parent.getComponentAssignableFrom(RendererComponent.class);
+
+                            // check if parent render component has color value
+                            if (parentRendererComponent instanceof IColorHolder) {
+                                // combine colors
+                                finalColor.mul(((IColorHolder) parentRendererComponent).getFinalColor());
+                            }
                         }
                     }
                 }
@@ -402,7 +408,7 @@ public class MainRenderer implements Observer {
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
-        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.worldColor);
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -444,7 +450,7 @@ public class MainRenderer implements Observer {
             }
             textureRegion.setRegion(resource);
             if(textureRegion != null) {
-                batch.setColor(spriteRenderer.worldColor);
+                batch.setColor(spriteRenderer.finalColor);
 
                 final float width = spriteRenderer.size.x;
                 final float height = spriteRenderer.size.y;
