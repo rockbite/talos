@@ -267,14 +267,20 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     private void showContextMenu (GameObject gameObject) {
         contextualMenu.clearItems();
-        contextualMenu.addItem("Convert to Prefab", new ClickListener() {
+
+        // if multiple objects are selected disable convert to prefab functionality
+        final boolean multipleObjectSelected = tree.getSelection().size() != 1;
+        final MenuItem convertToPrefab = contextualMenu.addItem("Convert to Prefab", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
+                if (multipleObjectSelected) return;
                 FilteredTree.Node<GameObject> item = tree.getSelection().first();
                 GameObject gameObject = objectMap.get(item.getObject().uuid.toString());
                 SceneUtils.convertToPrefab(gameObject);
             }
         });
+        convertToPrefab.setDisabled(multipleObjectSelected);
+
         contextualMenu.addSeparator();
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
