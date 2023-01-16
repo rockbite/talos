@@ -6,23 +6,24 @@ import com.badlogic.gdx.utils.SharedLibraryLoader;
 import java.lang.String;
 import java.lang.System;
 import java.util.Calendar;
+import java.util.Date;
 import lombok.Getter;
 
 public final class TALOS_BUILD {
   @Getter
-  private static final String version = "0.00.0";
+  private static final String versionString = "2.0.0-SNAPSHOT";
 
   @Getter
-  private static final int versionCode = 0;
+  private static final String buildHash = "63ffeefa";
 
   @Getter
-  private static final String commit = "63ffeef";
+  private static final String commit = "f2ac6f4";
 
   @Getter
-  private static final String branch = "talos-3d";
+  private static final String branch = "snapshot-version";
 
   @Getter
-  private static final String buildDate = "Jan 16, 2023 2:46:42 PM";
+  private static final Date buildDate = new Date(1673866001987l);
 
   private static void printHeader() {
     System.out.println("      ___           ___           ___       ___           ___     \n"
@@ -44,7 +45,7 @@ public final class TALOS_BUILD {
   }
 
   private static void printVersion() {
-    System.out.println("Runtime Version: " + version);
+    System.out.println("Runtime Version: " + versionString);
     System.out.println("Runtime commit: " + commit);
     System.out.println("Runtime branch: " + branch);
   }

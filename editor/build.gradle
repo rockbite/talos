@@ -1,8 +1,20 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
+    }
+}
 
 plugins {
     id 'java-library'
     alias(libs.plugins.lombok)
 }
+
+apply plugin: "org.ajoberstar.grgit"
 
 dependencies {
 
@@ -74,4 +86,38 @@ configurations {
 
 artifacts {
     web(packageSources)
+}
+
+class TalosBuildInfo {
+    def versionString
+    def buildHash
+    def branch
+    def commit
+    def date
+
+    TalosBuildInfo (def project, def grgit) {
+        def versionPropsFile = project.file('assets/talos-version.properties')
+
+        def Properties versionProps = new Properties()
+
+        def inputStream = new FileInputStream(versionPropsFile)
+        versionProps.load(inputStream)
+        inputStream.close()
+
+        this.versionString = versionProps['version']
+        this.buildHash = versionProps['buildHash']
+
+        this.commit = grgit.head().abbreviatedId
+        this.branch = grgit.branch.current().getName()
+        this.date = Long.valueOf(versionProps['buildTime'])
+    }
+
+    def print () {
+        println "${this.versionString} ${this.commit} ${this.branch} ${this.date}"
+    }
+}
+
+def getBuildInfo () {
+    def buildInfo = new TalosBuildInfo(project, grgit)
+    return buildInfo
 }

@@ -117,6 +117,16 @@ def addIntField (TypeSpec.Builder builder, String fieldName, int fieldValue) {
     builder.addField(fieldSpec)
 }
 
+def addDateField (TypeSpec.Builder builder, String fieldName, long fieldValue) {
+    FieldSpec fieldSpec = FieldSpec.builder(Date.class, fieldName)
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+            .addAnnotation(Getter.class)
+            .initializer('new Date($Ll)', fieldValue)
+            .build()
+
+    builder.addField(fieldSpec)
+}
+
 task generateBuildConfig {
 
     description 'Generate build config java file'
@@ -124,8 +134,6 @@ task generateBuildConfig {
     outputs.upToDateWhen { false }
 
     doFirst {
-        String version = project.versionString
-        int versionCode = project.versionCode
 
         MethodSpec printHeader = MethodSpec.methodBuilder("printHeader")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
@@ -155,7 +163,7 @@ task generateBuildConfig {
         MethodSpec printVersion = MethodSpec.methodBuilder("printVersion")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
                 .returns(void.class)
-                .addStatement('$T.out.println($S + version)', System.class, "Runtime Version: ")
+                .addStatement('$T.out.println($S + versionString)', System.class, "Runtime Version: ")
                 .addStatement('$T.out.println($S + commit)', System.class, "Runtime commit: ")
                 .addStatement('$T.out.println($S + branch)', System.class, "Runtime branch: ")
                 .build()
@@ -185,33 +193,25 @@ task generateBuildConfig {
         TypeSpec.Builder classSpecBuilder = TypeSpec.classBuilder("TALOS_BUILD")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 
-        addStringField(classSpecBuilder, "version", version)
-        addIntField(classSpecBuilder, "versionCode", versionCode)
-//        addBooleanField(classSpecBuilder, "debugMode", !releaseMode)
-//        addBooleanField(classSpecBuilder, "resetUserOnLogin", resetUserOnLogin)
-//        addStringsField(classSpecBuilder, "serverUrls", serverUrlArray)
-//        addStringField(classSpecBuilder, "guildChatServiceUrl", guildChatMicroserviceURL)
-//        addBooleanField(classSpecBuilder, "isBetaVersion", isBetaVersion)
-//        addBooleanField(classSpecBuilder, "isPrServer", isPrServer)
-//        addStringField(classSpecBuilder, "SERVER_CONTEXT", serverContext)
 
         //Meta
 
-        def buildInfo = rootProject.getBuildInfo()
+        def buildInfo = project(":editor").getBuildInfo()
         /*
 
             def versionString
+            def buildHash
             def commit
             def branch
             def date
 
          */
 
+        addStringField(classSpecBuilder, "versionString", buildInfo.versionString as String)
+        addStringField(classSpecBuilder, "buildHash", buildInfo.buildHash as String)
         addStringField(classSpecBuilder, "commit", buildInfo.commit as String)
         addStringField(classSpecBuilder, "branch", buildInfo.branch as String)
-        addStringField(classSpecBuilder, "buildDate", buildInfo.date as String)
-
-
+        addDateField(classSpecBuilder, "buildDate", buildInfo.date as Long)
 
         classSpecBuilder
                 .addMethod(printHeader)
