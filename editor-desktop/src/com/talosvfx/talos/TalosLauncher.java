@@ -58,6 +58,10 @@ public class TalosLauncher implements ILauncher {
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
+		// TODO: 16.01.23 use actual build version
+//		String misc = "Version: [" + TALOS_BUILD.getVersion() + "] Branch: [" + TALOS_BUILD.getBranch() + "] Commit:[" + TALOS_BUILD.getCommit() + "]";
+		String misc = "Branch: [" + TALOS_BUILD.getBranch() + "] Commit:[" + TALOS_BUILD.getCommit() + "]";
+
 		TalosLauncher launcher = new TalosLauncher();
 
 		TalosMain2 talos = new TalosMain2(launcher) {
@@ -65,7 +69,7 @@ public class TalosLauncher implements ILauncher {
 			public void create () {
 				super.create();
 				afterCreated();
-				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TalosVersion.getVersion());
+				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TalosVersion.getVersion() + " " + misc);
 			}
 		};
 
@@ -77,7 +81,7 @@ public class TalosLauncher implements ILauncher {
 			ShaderProgram.prependVertexCode = "#version 330 core\n";
 			ShaderProgram.prependFragmentCode = "#version 330 core\n";
 		}
-		
+
 
 
 

@@ -43,3 +43,71 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 }
+
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
+    }
+}
+
+apply plugin: "org.ajoberstar.grgit"
+
+ext {
+
+    def versionPropsFile = file('version.properties')
+
+    if (versionPropsFile.canRead()) {
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        versionCode = Integer.valueOf(versionProps['VERSION_BUILD_CODE'])
+        versionString = versionProps['VERSION_BUILD_STRING'].toString()
+    } else {
+        throw new FileNotFoundException("Could not read version.properties!")
+    }
+}
+
+class TalosBuildInfo {
+    def versionString
+    def versionCode
+    def commit
+    def branch
+    def date
+
+    TalosBuildInfo (def project, def grgit) {
+        def versionPropsFile = project.file('version.properties')
+
+        def Properties versionProps = new Properties()
+
+        def inputStream = new FileInputStream(versionPropsFile)
+        versionProps.load(inputStream)
+        inputStream.close()
+
+        this.versionString = versionProps['VERSION_BUILD_STRING']
+        this.versionCode = versionProps['VERSION_BUILD_CODE']
+
+        this.commit = grgit.head().abbreviatedId
+        this.branch = grgit.branch.current().getName()
+        this.date = new Date().toLocaleString()
+    }
+
+    String getIOSVersion () {
+        def string = this.versionString
+        String[] split = string.split("\\.")
+        return "${Integer.parseInt(split[0]) + 2}.${split[1]}.${split[2]}"
+    }
+
+    def print () {
+        println "${this.versionString} ${this.commit} ${this.branch} ${this.date}"
+    }
+}
+
+def getBuildInfo () {
+    def buildInfo = new TalosBuildInfo(project, grgit)
+    return buildInfo
+}
