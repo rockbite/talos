@@ -15,18 +15,20 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture>, ISizableComponent {
+public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture>, ISizableComponent, IColorHolder {
 
     public transient GameAsset<Texture> defaultGameAsset;
     public GameAsset<Texture> gameAsset;
 
     public Color color = new Color(Color.WHITE);
+    public Color worldColor = new Color();
     public boolean flipX;
     public boolean flipY;
     public boolean fixAspectRatio = true;
@@ -297,5 +299,15 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     @Override
     public void setHeight(float height) {
         size.y = height;
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public Color getWorldColor() {
+        return worldColor;
     }
 }

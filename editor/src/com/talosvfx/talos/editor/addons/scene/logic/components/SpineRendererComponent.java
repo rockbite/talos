@@ -18,13 +18,14 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData> {
+public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
     private transient GameAsset<SkeletonData> defaultGameAsset;
     private GameAsset<SkeletonData> gameAsset;
@@ -33,6 +34,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public AnimationState animationState;
 
     public Color color = new Color(Color.WHITE);
+    public Color worldColor = new Color();
 
     private transient String currAnimation;
 
@@ -234,4 +236,13 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         }
     }
 
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public Color getWorldColor() {
+        return worldColor;
+    }
 }
