@@ -342,11 +342,9 @@ public class SceneUtils {
 		String newName = NamingUtils.getNewName(name, names);
 		FileHandle prefabHandle = prefabs.child(newName);
 
-		GameObject gamePrefab = new GameObject();
-		gamePrefab.setName("Prefab");
-		gamePrefab.addGameObject(gameObject);
+		gameObject.setName("Prefab_" + gameObject.getName());
 
-		Prefab prefab = new Prefab(gamePrefab);
+		Prefab prefab = new Prefab(gameObject);
 
 		prefabHandle.writeString(prefab.getAsString(), false);
 		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);
