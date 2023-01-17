@@ -113,6 +113,10 @@ public class UIUtils {
         orderedFontMap.put(6, skin.getFont("generated-font-6"));
         orderedFontMap.put(5, skin.getFont("generated-font-5"));
         orderedFontMap.put(4, skin.getFont("generated-font-4"));
+
+        for (BitmapFont value : orderedFontMap.values()) {
+            value.setUseIntegerPositions(true);
+        }
     }
 
 

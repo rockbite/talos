@@ -3,9 +3,9 @@
   minHeight: 16,
   maxWidth: 2048,
   maxHeight: 2048,
-  combineSubdirectories:true
-  stripWhitespaceX:true
-  stripWhitespaceY:true
+  combineSubdirectories:true,
+  stripWhitespaceX:true,
+  stripWhitespaceY:true,
   filterMin: MipMapLinearLinear,
-	filterMag: Linear,
+  filterMag: Linear,
 }

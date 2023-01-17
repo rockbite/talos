@@ -1,12 +1,7 @@
 package com.talosvfx.talos.editor.widgets.ui.common;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -62,35 +57,54 @@ public class LabelWithZoom extends Label {
         }
         this.registeredFont = fontByName;
         this.setStyle(providedStyle);
+        setDebug(true);
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+    public void act(float delta) {
+        super.act(delta);
         Stage stage = getStage();
         if (stage != null) {
-            Camera camera = stage.getCamera();
-            if (camera instanceof OrthographicCamera) {
-                OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
-                float preferredFontSize = worldToPixel(orthographicCamera, registeredFont.defaultSize);
-                int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
-                BitmapFont bitmapFont = UIUtils.orderedFontMap.get(fontSize);
-                getStyle().font = bitmapFont;
-                setStyle(getStyle());
-                setFontScale(registeredFont.defaultSize / preferredFontSize);
+            float preferredFontSize = stageToScreen(registeredFont.defaultSize);
+            if (preferredFontSize == 0) {
+                // not ready yet
+                return;
             }
+            int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
+            if (fontSize == registeredFont.defaultSize) {
+                setFontScale(1);
+                return;
+            }
+            getStyle().font = UIUtils.orderedFontMap.get(fontSize);
+            setStyle(getStyle());
+            float fontScale = preferredFontSize / fontSize;
+            setFontScale(fontScale);
+            float v = screenToStage(fontSize * fontScale);
+            System.out.println();
         }
     }
 
     private Vector2 tmp = new Vector2();
 
-    private float worldToPixel(Camera camera, int pixelSize) {
+    private float stageToScreen(float stageSize) {
         tmp.set(0, 0);
         getStage().stageToScreenCoordinates(tmp);
         float baseline = tmp.x;
 
-        tmp.set(pixelSize, 0);
+        tmp.set(stageSize, 0);
         getStage().stageToScreenCoordinates(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline);
+    }
+
+    private float screenToStage (float screenSize) {
+        tmp.set(0, 0);
+        getStage().screenToStageCoordinates(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(screenSize, 0);
+        getStage().screenToStageCoordinates(tmp);
         float pos = tmp.x;
 
         return Math.abs(pos - baseline);
