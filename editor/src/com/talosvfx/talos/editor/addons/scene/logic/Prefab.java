@@ -16,7 +16,6 @@ public class Prefab extends SavableContainer {
         path = fileHandle.path();
         name = fileHandle.nameWithoutExtension();
         loadFromHandle(fileHandle);
-        root.addComponent(new TransformComponent());
     }
 
     public Prefab(GameObject root) {
