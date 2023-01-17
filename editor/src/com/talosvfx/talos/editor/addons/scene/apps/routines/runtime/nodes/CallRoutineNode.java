@@ -13,13 +13,13 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.data.RoutineStageData;
-import com.talosvfx.talos.editor.project2.SharedResources;
 
-public class CallRoutineNode extends RoutineNode implements TickableNode {
-
+public class CallRoutineNode extends RoutineNode implements TickableNode, GameAsset.GameAssetUpdateListener {
 
     RoutineInstance targetInstance;
     private RoutineInstance.RoutineListenerAdapter listener;
+
+    GameAsset<RoutineStageData> currentSelectedAsset;
 
     @Override
     protected void constructNode(XmlReader.Element config) {
@@ -52,6 +52,10 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
     public void customConstruction(GameAsset<RoutineStageData> asset) {
         //todo: ths should be done in a runtime friendly way
+
+        if (currentSelectedAsset != null) {
+            currentSelectedAsset.listeners.removeValue(this, true);
+        }
         RoutineStageData resource = asset.getResource();
         if(resource == null) {
             configured = false;
@@ -81,6 +85,8 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
         // now create that routine
         targetInstance = asset.getResource().createInstance(false);
+        currentSelectedAsset = asset;
+        currentSelectedAsset.listeners.add(this);
     }
 
     private DataType makeDataType(PropertyType type) {
@@ -147,6 +153,13 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
             targetInstance.removeListener();
 
             targetInstance.reset();
+        }
+    }
+
+    @Override
+    public void onUpdate() {
+        if (!currentSelectedAsset.isBroken()) {
+            targetInstance = currentSelectedAsset.getResource().createInstance(false);
         }
     }
 }
