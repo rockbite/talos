@@ -28,6 +28,9 @@ dependencies {
 
     api libs.visui
 
+    api libs.libgdx.freetype
+
+
     implementation libs.string.similarity
 
     implementation libs.spine.libgdx
