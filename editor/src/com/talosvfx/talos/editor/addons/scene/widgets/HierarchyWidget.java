@@ -52,7 +52,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     private FilteredTree<GameObject> tree;
 
     private ObjectMap<String, GameObject> objectMap = new ObjectMap<>();
-    private SavableContainer currentContainer;
+    private GameObjectContainer currentContainer;
     private ObjectMap<GameObject, FilteredTree.Node<GameObject>> nodeMap = new ObjectMap<>();
 
     private ContextualMenu contextualMenu;
