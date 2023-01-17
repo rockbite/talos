@@ -284,6 +284,10 @@ public class ProjectExplorerWidget extends Table implements Observer {
         boolean canDelete = true;
         for (FileHandle file : files) {
             FilteredTree.Node<String> node = nodes.get(file.path());
+            if (node == null) {
+                // not interested
+                continue;
+            }
             if (!node.canDelete) {
                 canDelete = false;
             }
