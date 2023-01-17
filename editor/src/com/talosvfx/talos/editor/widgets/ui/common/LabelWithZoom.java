@@ -67,31 +67,30 @@ public class LabelWithZoom extends Label {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-//        getStyle().font.getData().
-//        Stage stage = getStage();
-//        if (stage != null) {
-//            Camera camera = stage.getCamera();
-//            if (camera instanceof OrthographicCamera) {
-//                OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
-//                float preferredFontSize = worldToPixel(orthographicCamera, registeredFont.defaultSize);
-//                int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
-//                BitmapFont bitmapFont = UIUtils.orderedFontMap.get(fontSize);
-//                getStyle().font = bitmapFont;
-//                setStyle(getStyle());
-//                setFontScale(registeredFont.defaultSize / preferredFontSize);
-//            }
-//        }
+        Stage stage = getStage();
+        if (stage != null) {
+            Camera camera = stage.getCamera();
+            if (camera instanceof OrthographicCamera) {
+                OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+                float preferredFontSize = worldToPixel(orthographicCamera, registeredFont.defaultSize);
+                int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
+                BitmapFont bitmapFont = UIUtils.orderedFontMap.get(fontSize);
+                getStyle().font = bitmapFont;
+                setStyle(getStyle());
+                setFontScale(registeredFont.defaultSize / preferredFontSize);
+            }
+        }
     }
 
-    private Vector3 tmp = new Vector3();
+    private Vector2 tmp = new Vector2();
 
     private float worldToPixel(Camera camera, int pixelSize) {
-        tmp.set(0, 0, 0);
-        camera.project(tmp);
+        tmp.set(0, 0);
+        getStage().stageToScreenCoordinates(tmp);
         float baseline = tmp.x;
 
-        tmp.set(pixelSize, 0, 0);
-        camera.project(tmp);
+        tmp.set(pixelSize, 0);
+        getStage().stageToScreenCoordinates(tmp);
         float pos = tmp.x;
 
         return Math.abs(pos - baseline);
