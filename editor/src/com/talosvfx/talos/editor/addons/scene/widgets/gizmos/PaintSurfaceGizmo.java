@@ -173,6 +173,10 @@ public class PaintSurfaceGizmo extends Gizmo {
     }
 
     private FrameBuffer createFrameBuffer() {
+        if (frameBuffer != null) {
+            frameBuffer.dispose();
+        }
+
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
         GameAsset<Texture> gameResource = surface.getGameResource();
         if (gameResource.isBroken()) {
