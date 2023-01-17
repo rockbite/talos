@@ -271,11 +271,11 @@
                 <option value = "DIV">Divide</option>
                 <option value = "POW">Power</option>
                 <option value = "SIN">Sinus</option>
-                <option value = "COS">Cosinus</option>
+                <option value = "COS">Cosines</option>
             </select>
             <group>
-                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.01">Value A</dynamicValue>
-                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.01">Value B</dynamicValue>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" min = "-999" step="0.01">Value A</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" min = "-999" step="0.01">Value B</dynamicValue>
             </group>
         </module>
         <module name = "LoopNode" title = "Loop" keywords = "" class = "RoutineNodeWidget">
