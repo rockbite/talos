@@ -154,7 +154,7 @@ public class AppManager extends InputAdapter implements Observer {
 		return null;
 	}
 
-	public <T extends BaseApp> T  getAppForAsset(Class<T> appClass, GameAsset<VFXProjectData> gameAsset) {
+	public <T extends BaseApp> T  getAppForAsset(Class<T> appClass, GameAsset<?> gameAsset) {
 		Array<BaseApp> appInstances = getAppInstances();
 		for(BaseApp app: appInstances) {
 			if(appClass.isAssignableFrom(app.getClass()) && app.gameAsset != null && app.gameAsset == gameAsset) {

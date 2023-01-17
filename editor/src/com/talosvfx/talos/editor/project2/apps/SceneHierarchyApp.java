@@ -62,7 +62,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 				gameAsset.listeners.add(this);
 			}
 
-			hierarchyWidget.loadEntityContainer(gameAsset.getResource());
+			hierarchyWidget.loadEntityContainer(gameAsset);
 		}
 
 		// apply after the three is loaded
@@ -85,7 +85,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 	@Override
 	public void onUpdate () {
-		hierarchyWidget.loadEntityContainer(gameAsset.getResource());
+		hierarchyWidget.loadEntityContainer(gameAsset);
 	}
 
 	@Override
