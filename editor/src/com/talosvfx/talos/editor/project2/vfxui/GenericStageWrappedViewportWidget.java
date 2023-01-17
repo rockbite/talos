@@ -76,6 +76,21 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 	}
 
 	@Override
+	public Vector2 localToAscendantCoordinates(Actor ascendant, Vector2 localCoords) {
+		return super.localToAscendantCoordinates(ascendant, localCoords);
+	}
+
+	@Override
+	public Vector2 localToScreenCoordinates(Vector2 localCoords) {
+		return super.localToScreenCoordinates(localCoords);
+	}
+
+	@Override
+	public Vector2 localToStageCoordinates(Vector2 localCoords) {
+		return super.localToStageCoordinates(localCoords);
+	}
+
+	@Override
 	public void drawContent (PolygonBatch batch, float parentAlpha) {
 
 		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();

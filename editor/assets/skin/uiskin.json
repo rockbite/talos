@@ -1,7 +1,18 @@
 {
 	com.badlogic.gdx.graphics.g2d.BitmapFont: {
-		default-font: { file: skin/default-font.fnt },
-		small-font: { file: skin/small-font.fnt }
+		default-font: { file: skin/generated-font-15.fnt },
+		small-font: { file: skin/generated-font-12.fnt }
+		generated-font-14: { file: skin/generated-font-14.fnt },
+		generated-font-13: { file: skin/generated-font-13.fnt },
+		generated-font-11: { file: skin/generated-font-11.fnt },
+		generated-font-10: { file: skin/generated-font-10.fnt },
+		generated-font-9: { file: skin/generated-font-9.fnt },
+		generated-font-8: { file: skin/generated-font-8.fnt },
+		generated-font-7: { file: skin/generated-font-7.fnt },
+		generated-font-6: { file: skin/generated-font-6.fnt },
+		generated-font-5: { file: skin/generated-font-5.fnt },
+		generated-font-4: { file: skin/generated-font-4.fnt },
+
 	},
 	com.badlogic.gdx.graphics.Color: {
 		black: {a: 1, b: 0, g: 0, r: 0 }

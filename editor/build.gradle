@@ -75,3 +75,4 @@ configurations {
 artifacts {
     web(packageSources)
 }
+

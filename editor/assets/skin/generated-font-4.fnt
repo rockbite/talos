@@ -1,24 +1,24 @@
 info face="Vis Open Sans" size=4 bold=0 italic=0 charset="" unicode=0 stretchH=100 smooth=1 aa=1 padding=1,1,1,1 spacing=-2,-2
 common lineHeight=7 base=5 scaleW=512 scaleH=512 pages=1 packed=0
-page id=0 file="small-font-2.png"
+page id=0 file="generated-font-4.png"
 chars count=97
-char id=0       x=388  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
+char id=0       x=429  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=10      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=0    page=0    chnl=0 
 char id=32      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=1    page=0    chnl=0 
 char id=33      x=154  y=0    width=3    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
-char id=34      x=393  y=0    width=4    height=4    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
+char id=34      x=388  y=0    width=4    height=4    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=35      x=378  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=3    page=0    chnl=0 
 char id=36      x=14   y=0    width=5    height=7    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
 char id=37      x=196  y=0    width=6    height=6    xoffset=-1   yoffset=1    xadvance=3    page=0    chnl=0 
 char id=38      x=202  y=0    width=5    height=6    xoffset=-1   yoffset=1    xadvance=3    page=0    chnl=0 
-char id=39      x=401  y=0    width=3    height=4    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
+char id=39      x=396  y=0    width=3    height=4    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=40      x=167  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=41      x=171  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=42      x=383  y=0    width=5    height=5    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
 char id=43      x=373  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
-char id=44      x=407  y=0    width=3    height=4    xoffset=-1   yoffset=3    xadvance=1    page=0    chnl=0 
-char id=45      x=415  y=0    width=4    height=4    xoffset=-1   yoffset=2    xadvance=1    page=0    chnl=0 
-char id=46      x=404  y=0    width=3    height=4    xoffset=-1   yoffset=3    xadvance=1    page=0    chnl=0 
+char id=44      x=402  y=0    width=3    height=4    xoffset=-1   yoffset=3    xadvance=1    page=0    chnl=0 
+char id=45      x=410  y=0    width=4    height=4    xoffset=-1   yoffset=2    xadvance=1    page=0    chnl=0 
+char id=46      x=399  y=0    width=3    height=4    xoffset=-1   yoffset=3    xadvance=1    page=0    chnl=0 
 char id=47      x=365  y=0    width=4    height=5    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=48      x=149  y=0    width=5    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=49      x=336  y=0    width=4    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
@@ -33,7 +33,7 @@ char id=57      x=144  y=0    width=5    height=6    xoffset=-1   yoffset=1    x
 char id=58      x=164  y=0    width=3    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=59      x=161  y=0    width=3    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=60      x=355  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
-char id=61      x=419  y=0    width=5    height=4    xoffset=-1   yoffset=2    xadvance=2    page=0    chnl=0 
+char id=61      x=414  y=0    width=5    height=4    xoffset=-1   yoffset=2    xadvance=2    page=0    chnl=0 
 char id=62      x=360  y=0    width=5    height=5    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=63      x=157  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=64      x=190  y=0    width=6    height=6    xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
@@ -66,9 +66,9 @@ char id=90      x=294  y=0    width=5    height=5    xoffset=-1   yoffset=1    x
 char id=91      x=175  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=92      x=369  y=0    width=4    height=5    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
 char id=93      x=179  y=0    width=3    height=6    xoffset=-1   yoffset=1    xadvance=1    page=0    chnl=0 
-char id=94      x=410  y=0    width=5    height=4    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
-char id=95      x=424  y=0    width=5    height=3    xoffset=-2   yoffset=4    xadvance=2    page=0    chnl=0 
-char id=96      x=397  y=0    width=4    height=4    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
+char id=94      x=405  y=0    width=5    height=4    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
+char id=95      x=419  y=0    width=5    height=3    xoffset=-2   yoffset=4    xadvance=2    page=0    chnl=0 
+char id=96      x=392  y=0    width=4    height=4    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
 char id=97      x=52   y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=98      x=0    y=0    width=5    height=7    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
 char id=99      x=56   y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
@@ -98,7 +98,7 @@ char id=122     x=332  y=0    width=4    height=5    xoffset=-1   yoffset=1    x
 char id=123     x=182  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
 char id=124     x=10   y=0    width=4    height=7    xoffset=-1   yoffset=0    xadvance=2    page=0    chnl=0 
 char id=125     x=186  y=0    width=4    height=6    xoffset=-1   yoffset=1    xadvance=2    page=0    chnl=0 
-char id=126     x=429  y=0    width=5    height=3    xoffset=-1   yoffset=2    xadvance=2    page=0    chnl=0 
+char id=126     x=424  y=0    width=5    height=3    xoffset=-1   yoffset=2    xadvance=2    page=0    chnl=0 
 kernings count=3
 kerning first=80 second=44 amount=-1
 kerning first=80 second=46 amount=-1

@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import lombok.Getter;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		skin.addRegions(atlas);
 
 		VisUI.load(skin);
+		UIUtils.registerFonts(skin);
 		SharedResources.skin = skin;
 
 		TalosVFXUtils.init();
