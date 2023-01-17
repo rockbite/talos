@@ -6,13 +6,15 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedSet;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class InputHandling {
 
-	private ObjectSet<InputProcessor> permanentInputProcessors = new ObjectSet<>();
+	private OrderedSet<InputProcessor> permanentInputProcessors = new OrderedSet<>();
 
-	private ObjectSet<InputProcessor> temporaryInputProcessors = new ObjectSet<>();
-	private ObjectSet<InputProcessor> priorityInputProcessors = new ObjectSet<>();
+	private OrderedSet<InputProcessor> temporaryInputProcessors = new OrderedSet<>();
+	private OrderedSet<InputProcessor> priorityInputProcessors = new OrderedSet<>();
 
 	private InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
@@ -40,6 +42,8 @@ public class InputHandling {
 	}
 	public void setGDXMultiPlexer () {
 		inputMultiplexer.clear();
+
+		inputMultiplexer.addProcessor(SharedResources.appManager);
 
 		for (InputProcessor priorityInputProcessor : priorityInputProcessors) {
 			inputMultiplexer.addProcessor(priorityInputProcessor);

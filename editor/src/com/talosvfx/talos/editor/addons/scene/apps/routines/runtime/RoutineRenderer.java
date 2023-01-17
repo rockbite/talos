@@ -80,7 +80,7 @@ public class RoutineRenderer {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
             OrthographicCamera camera = (OrthographicCamera) mainRenderer.getCamera();
-            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom + cameraCull, camera.viewportHeight * camera.zoom + cameraCull).setCenter(camera.position.x, camera.position.y);
+            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom).setCenter(camera.position.x, camera.position.y);
 
             //todo: instead make a nice node to do it
             objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);

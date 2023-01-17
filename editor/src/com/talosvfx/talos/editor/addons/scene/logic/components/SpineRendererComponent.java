@@ -1,8 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
@@ -18,13 +16,13 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
+import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
 
-public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData> {
+public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
     private transient GameAsset<SkeletonData> defaultGameAsset;
     private GameAsset<SkeletonData> gameAsset;
@@ -33,6 +31,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public AnimationState animationState;
 
     public Color color = new Color(Color.WHITE);
+    public transient Color finalColor = new Color();
+    public boolean shouldInheritParentColor = true;
 
     private transient String currAnimation;
 
@@ -62,6 +62,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         PropertyWidget colorWidget = WidgetFactory.generate(this, "color", "Color");
         properties.add(colorWidget);
+
+        PropertyWidget inheritParentColorWidget = WidgetFactory.generate(this, "shouldInheritParentColor", "Inherit Parent Color");
+        properties.add(inheritParentColorWidget);
 
         SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
             @Override
@@ -133,6 +136,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             }
         }
 
+        json.writeValue("shouldInheritParentColor", shouldInheritParentColor);
         json.writeValue("scale", scale);
         json.writeValue("animation", currAnimation);
         super.write(json);
@@ -144,6 +148,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         scale = jsonData.getFloat("scale", 1/128f);
         currAnimation = jsonData.getString("animation", "");
+        shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);
 
         loadSkeletonFromIdentifier(gameResourceIdentifier);
 
@@ -234,4 +239,18 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         }
     }
 
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public Color getFinalColor() {
+        return finalColor;
+    }
+
+    @Override
+    public boolean shouldInheritParentColor() {
+        return shouldInheritParentColor;
+    }
 }

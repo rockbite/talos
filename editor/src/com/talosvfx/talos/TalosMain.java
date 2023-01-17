@@ -160,40 +160,6 @@ public class TalosMain extends ApplicationAdapter {
 		setInputProcessors();
 	}
 
-	private void loadFromProperties () {
-		FileHandle properties = Gdx.files.internal("talos-version.properties");
-		if (properties.exists()) {
-			Properties props = new Properties();
-			try {
-				props.load(properties.read());
-
-				String title = "Talos";
-				//buildHash=cac0e98
-				//buildTime=1660634881583
-				//version=1.4.2-SNAPSHOT
-
-				if (props.containsKey("version")) {
-					title = props.getProperty("version");
-				}
-				if (props.containsKey("buildTime")) {
-					String buildTime = props.getProperty("buildTime");
-					Date date = new Date(Long.parseLong(buildTime));
-
-					SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-
-					title += " " + sdf.format(date);
-				}
-				if (props.containsKey("buildHash")) {
-					title += " " + props.getProperty("buildHash");
-				}
-				Gdx.graphics.setTitle(title);
-
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
 	public void setPerFrameCursorTypeEnabled () {
 
 	}

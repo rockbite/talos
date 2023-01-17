@@ -48,7 +48,6 @@ public class TextValueWidget extends AbstractWidget<String> {
     public TextValueWidget() {
         editing = new Table();
         main = new Table();
-
     }
 
     @Override
@@ -203,6 +202,7 @@ public class TextValueWidget extends AbstractWidget<String> {
     }
 
     private void hideEditMode() {
+        isSelected = false;
         setValue(textField.getText());
 
         textField.clearSelection();
@@ -210,7 +210,6 @@ public class TextValueWidget extends AbstractWidget<String> {
         editing.setVisible(false);
         main.setVisible(true);
 
-        isSelected = false;
         setBackgrounds();
     }
 
@@ -241,6 +240,11 @@ public class TextValueWidget extends AbstractWidget<String> {
         }
 
         setBackground(ColorLibrary.obtainBackground(getSkin(), shape, color));
+    }
+
+    @Override
+    public boolean isFastChange() {
+        return isSelected;
     }
 
     public void setLabel(String text) {
