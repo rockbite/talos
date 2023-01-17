@@ -26,9 +26,12 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.CurveDataProvider;
 import com.talosvfx.talos.editor.widgets.CurveWidget;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.DynamicRangeModule;
+import com.talosvfx.talos.runtime.vfx.modules.InputModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule> implements CurveDataProvider {
 

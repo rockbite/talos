@@ -30,7 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.UIStage;
 import com.talosvfx.talos.editor.dialogs.TemporaryTextureSelectDialog;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 
 public class TextureDropWidget<F extends AbstractModule> extends Table {
 

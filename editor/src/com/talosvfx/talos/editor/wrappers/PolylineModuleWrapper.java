@@ -30,8 +30,14 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
 import com.talosvfx.talos.editor.widgets.IntegerInputWidget;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
+import com.talosvfx.talos.runtime.vfx.Slot;
+
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.CurveModule;
+import com.talosvfx.talos.runtime.vfx.modules.GradientColorModule;
+import com.talosvfx.talos.runtime.vfx.modules.NoiseModule;
+import com.talosvfx.talos.runtime.vfx.modules.PolylineModule;
+import com.talosvfx.talos.runtime.vfx.modules.Vector2Module;
 
 import java.io.File;
 

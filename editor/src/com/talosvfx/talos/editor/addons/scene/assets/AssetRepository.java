@@ -51,9 +51,9 @@ import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.assets.AssetProvider;
-import com.talosvfx.talos.runtime.serialization.ExportData;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
+import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

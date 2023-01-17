@@ -19,18 +19,15 @@ package com.talosvfx.talos.editor.wrappers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
 import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
-import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.FromToParticlePointDataGeneratorModule;
-import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
-import com.talosvfx.talos.runtime.modules.StaticValueModule;
-import com.talosvfx.talos.runtime.modules.Vector2Module;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.FromToParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
 
 public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper<FromToParticlePointDataGeneratorModule> implements IDragPointProvider{
 

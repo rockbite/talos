@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.wrappers;
 
-import com.talosvfx.talos.runtime.modules.CartToRadModule;
+import com.talosvfx.talos.runtime.vfx.modules.CartToRadModule;
 
 public class CartToRadModuleWrapper extends ModuleWrapper<CartToRadModule> {
 

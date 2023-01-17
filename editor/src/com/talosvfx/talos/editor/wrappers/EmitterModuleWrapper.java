@@ -22,8 +22,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.EmConfigModule;
+import com.talosvfx.talos.runtime.vfx.modules.EmitterModule;
+import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
 
 public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 

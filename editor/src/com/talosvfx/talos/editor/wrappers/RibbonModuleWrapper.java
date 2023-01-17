@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.FloatInputWidget;
 import com.talosvfx.talos.editor.widgets.IntegerInputWidget;
-import com.talosvfx.talos.runtime.modules.RibbonModule;
+import com.talosvfx.talos.runtime.vfx.modules.RibbonModule;
 
 public class RibbonModuleWrapper extends ModuleWrapper<RibbonModule> {
 

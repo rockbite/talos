@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class FloatRangeInputWidget extends Table {
 

@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.runtime.utils.SimplexNoise;
+import com.talosvfx.talos.runtime.vfx.utils.SimplexNoise;
 
 public class PerlinNoiseNode extends RoutineNode {
 

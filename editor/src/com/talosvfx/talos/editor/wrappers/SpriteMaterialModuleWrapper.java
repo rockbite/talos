@@ -26,8 +26,8 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
-import com.talosvfx.talos.runtime.modules.MaterialModule;
-import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 
 public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialModule> {
 

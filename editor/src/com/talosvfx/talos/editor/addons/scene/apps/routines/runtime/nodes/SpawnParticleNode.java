@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
@@ -8,11 +7,10 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.TickableNode
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ParticleComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpineRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 
 
 public class SpawnParticleNode extends RoutineNode implements TickableNode {

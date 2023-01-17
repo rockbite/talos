@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.bvb;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class AttachmentPoint implements Json.Serializable {
 

@@ -10,8 +10,8 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
-import com.talosvfx.talos.runtime.modules.VectorFieldModule;
-import com.talosvfx.talos.runtime.utils.VectorField;
+import com.talosvfx.talos.runtime.vfx.modules.VectorFieldModule;
+import com.talosvfx.talos.runtime.vfx.utils.VectorField;
 
 public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
 

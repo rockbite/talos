@@ -6,9 +6,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
-import com.talosvfx.talos.runtime.modules.ShadedSpriteModule;
-import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
-import com.talosvfx.talos.runtime.utils.VectorField;
+import com.talosvfx.talos.runtime.vfx.modules.ShadedSpriteModule;
+import com.talosvfx.talos.runtime.vfx.utils.ShaderDescriptor;
 
 public class ShadedSpriteModuleWrapper extends ModuleWrapper<ShadedSpriteModule> {
 

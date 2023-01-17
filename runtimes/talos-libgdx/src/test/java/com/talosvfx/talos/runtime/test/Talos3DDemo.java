@@ -17,11 +17,11 @@ import com.rockbite.bongo.engine.render.AutoReloadingShaderProgram;
 import com.rockbite.bongo.engine.render.ShaderFlags;
 import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
-import com.talosvfx.talos.runtime.render.Particle3DRenderer;
-import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
+import com.talosvfx.talos.runtime.vfx.render.Particle3DRenderer;
+import com.talosvfx.talos.runtime.vfx.render.p3d.Simple3DBatch;
 
 public class Talos3DDemo extends ApplicationAdapter {
 

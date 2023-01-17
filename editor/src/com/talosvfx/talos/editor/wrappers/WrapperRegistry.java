@@ -17,7 +17,7 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 
 public class WrapperRegistry<T extends AbstractModule, U extends ModuleWrapper<T>> {
 
