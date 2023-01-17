@@ -21,6 +21,8 @@ dependencies {
 
     implementation variantOf(libs.tiny.gizmo) { classifier("natives-desktop") }
 
+    implementation variantOf(libs.libgdx.freetype.platform) { classifier("natives-desktop")}
+
 }
 
 sourceSets.main.java.srcDirs = [ "src/" ]
