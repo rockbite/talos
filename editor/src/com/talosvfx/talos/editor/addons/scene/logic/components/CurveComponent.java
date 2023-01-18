@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
@@ -243,12 +242,12 @@ public class CurveComponent extends AComponent {
             @Override
             public void report(Boolean value) {
                 if(automaticControl != value) {
-                    SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
 
                     automaticControl = value;
                     if(automaticControl) {
                         autoSetAllControlPoints();
                     }
+                    SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
                 }
             }
         });
