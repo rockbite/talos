@@ -20,7 +20,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 
 public class AssetSelector<T> extends Table {
 
-    private Label nameLabel;
+    private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
 
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
@@ -54,7 +54,7 @@ public class AssetSelector<T> extends Table {
         Skin skin = SharedResources.skin;
         final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select asset");
 
-        nameLabel = new Label("", skin);
+        nameLabel = new LabelWithZoom("", skin);
         nameLabel.setEllipsis(true);
         nameLabel.setAlignment(Align.right);
 

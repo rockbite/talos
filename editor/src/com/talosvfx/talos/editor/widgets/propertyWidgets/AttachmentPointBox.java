@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentTypeToggle;
 import com.talosvfx.talos.editor.widgets.ui.BackgroundButton;
 import com.talosvfx.talos.editor.widgets.ui.NumericalValueField;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class AttachmentPointBox extends Table {
 
@@ -100,14 +101,14 @@ public class AttachmentPointBox extends Table {
 
     protected class SlotWidget extends Table {
 
-        Label label;
+        LabelWithZoom label;
 
         public SlotWidget(CharSequence text, Skin skin) {
             setSkin(skin);
 
             setBackground(skin.getDrawable("panel_button_bg"));
 
-            label = new Label(text, skin);
+            label = new LabelWithZoom(text, skin);
             label.setAlignment(Align.center);
             Label.LabelStyle style = new Label.LabelStyle();
             style.fontColor = label.getStyle().fontColor;

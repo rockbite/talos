@@ -145,7 +145,7 @@ public class NodeListPopup extends VisWindow {
     private void parseCategory(FilteredTree<String> tree, FilteredTree.Node parent, XmlReader.Element element) {
         Array<XmlReader.Element> categories = element.getChildrenByName("category");
         for(XmlReader.Element category: categories) {
-            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("title"), new Label(category.getAttribute("title"), getSkin()));
+            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("title"), new LabelWithZoom(category.getAttribute("title"), getSkin()));
 
             if(parent != null) parent.add(categoryNode);
             else tree.add(categoryNode);

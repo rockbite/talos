@@ -10,6 +10,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 import com.talosvfx.talos.runtime.modules.VectorFieldModule;
 import com.talosvfx.talos.runtime.utils.VectorField;
 
@@ -29,7 +30,7 @@ public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
         leftWrapper.add().expandY().row();
         rightWrapper.add().expandY().row();
 
-        vectorFieldLabel = new Label("drop .fga file here", getSkin());
+        vectorFieldLabel = new LabelWithZoom("drop .fga file here", getSkin());
         vectorFieldLabel.setAlignment(Align.center);
         vectorFieldLabel.setWrap(true);
         contentWrapper.add(vectorFieldLabel).padTop(60f).padBottom(10f).size(180, 50).center().expand();

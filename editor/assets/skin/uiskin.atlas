@@ -1,92 +1,22 @@
 
 uiskin.png
-size: 1024, 128
+size: 512, 64
 format: RGBA8888
 filter: MipMapLinearLinear, Linear
 repeat: none
-generated-font-10
-  rotate: false
-  xy: 2, 18
-  size: 508, 20
-  orig: 512, 512
-  offset: 1, 492
-  index: -1
-generated-font-11
-  rotate: false
-  xy: 513, 73
-  size: 509, 23
-  orig: 512, 512
-  offset: 1, 489
-  index: -1
 generated-font-12
   rotate: false
-  xy: 2, 40
+  xy: 2, 2
   size: 508, 25
   orig: 512, 512
   offset: 1, 487
   index: -1
-generated-font-13
-  rotate: false
-  xy: 2, 67
-  size: 509, 26
-  orig: 512, 512
-  offset: 1, 486
-  index: -1
-generated-font-14
-  rotate: false
-  xy: 511, 98
-  size: 509, 28
-  orig: 512, 512
-  offset: 1, 484
-  index: -1
 generated-font-15
   rotate: false
-  xy: 2, 95
+  xy: 2, 29
   size: 507, 31
   orig: 512, 512
   offset: 1, 481
-  index: -1
-generated-font-4
-  rotate: false
-  xy: 512, 3
-  size: 432, 5
-  orig: 512, 512
-  offset: 1, 506
-  index: -1
-generated-font-5
-  rotate: false
-  xy: 512, 10
-  size: 458, 6
-  orig: 512, 512
-  offset: 1, 505
-  index: -1
-generated-font-6
-  rotate: false
-  xy: 2, 2
-  size: 508, 14
-  orig: 512, 512
-  offset: 1, 497
-  index: -1
-generated-font-7
-  rotate: false
-  xy: 512, 18
-  size: 507, 15
-  orig: 512, 512
-  offset: 1, 496
-  index: -1
-generated-font-8
-  rotate: false
-  xy: 513, 54
-  size: 508, 17
-  orig: 512, 512
-  offset: 1, 494
-  index: -1
-generated-font-9
-  rotate: false
-  xy: 512, 35
-  size: 508, 17
-  orig: 512, 512
-  offset: 1, 494
   index: -1
 
 uiskin2.png

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 import java.util.function.Supplier;
 
@@ -49,7 +50,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
         valueWidget.setValue(0);
         valueWidget.setLabel("");
 
-        title = new Label(name, SharedResources.skin);
+        title = new LabelWithZoom(name, SharedResources.skin);
         title.setAlignment(Align.left);
 
         add(title).minWidth(70);

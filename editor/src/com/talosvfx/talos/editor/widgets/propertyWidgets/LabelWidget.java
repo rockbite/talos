@@ -5,12 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 import java.util.function.Supplier;
 
 public class LabelWidget extends PropertyWidget<String> {
 
-	private Label propertyValue;
+	private LabelWithZoom propertyValue;
 
 	public LabelWidget() {
 		super();
@@ -22,7 +23,7 @@ public class LabelWidget extends PropertyWidget<String> {
 
 	@Override
 	public Actor getSubWidget() {
-		propertyValue = new Label("", SharedResources.skin);
+		propertyValue = new LabelWithZoom("", SharedResources.skin);
 		propertyValue.setEllipsis(true);
 		propertyValue.setAlignment(Align.right);
 

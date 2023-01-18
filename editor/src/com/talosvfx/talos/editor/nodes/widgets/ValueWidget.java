@@ -15,6 +15,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
@@ -22,8 +23,8 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Table main;
     private Table progressContainer;
     private Table progress;
-    private Label label;
-    private Label valueLabel;
+    private LabelWithZoom label;
+    private LabelWithZoom valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
     private ColorLibrary.BackgroundColor mainBgColor = ColorLibrary.BackgroundColor.LIGHT_GRAY;
@@ -74,8 +75,8 @@ public class ValueWidget extends AbstractWidget<Float> {
         type = Type.NORMAL;
         isSelected = false;
 
-        label = new Label("", skin);
-        valueLabel = new Label("", skin);
+        label = new LabelWithZoom("", skin);
+        valueLabel = new LabelWithZoom("", skin);
         textField = new TextField("0", getSkin(), "no-bg");
         progressDrawable = ColorLibrary.createClippedPatch(skin, getShape(), ColorLibrary.BackgroundColor.LIGHT_BLUE);
 

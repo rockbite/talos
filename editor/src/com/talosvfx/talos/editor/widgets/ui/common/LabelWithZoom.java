@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.widgets.ui.common;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -63,11 +65,17 @@ public class LabelWithZoom extends Label {
     @Override
     public void act(float delta) {
         super.act(delta);
+
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
         Stage stage = getStage();
         if (stage != null) {
             float preferredFontSize = stageToScreen(registeredFont.defaultSize);
             if (preferredFontSize == 0) {
-                // not ready yet
+                //Not ready yet
                 return;
             }
             int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
@@ -75,12 +83,20 @@ public class LabelWithZoom extends Label {
                 setFontScale(1);
                 return;
             }
-            getStyle().font = UIUtils.orderedFontMap.get(fontSize);
-            setStyle(getStyle());
+
+            BitmapFont font = getStyle().font;
+            BitmapFont newFont = UIUtils.orderedFontMap.get(fontSize);
+            if (!(font == newFont)) {
+                getStyle().font = newFont;
+                setStyle(getStyle());
+            }
+
             float fontScale = preferredFontSize / fontSize;
-            setFontScale(fontScale);
-            float v = screenToStage(fontSize * fontScale);
-            System.out.println();
+            float finalScale = screenToStage(fontScale);
+            float fontScaleX = getFontScaleX();
+            if (finalScale != fontScaleX) {
+                setFontScale(finalScale);
+            }
         }
     }
 

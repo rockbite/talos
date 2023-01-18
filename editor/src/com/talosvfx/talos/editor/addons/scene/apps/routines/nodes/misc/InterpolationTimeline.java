@@ -120,7 +120,9 @@ public class InterpolationTimeline extends Table {
             lastY = y;
         }
 
-        Texture texture = new Texture(pixmap);
+        Texture texture = new Texture(pixmap, true);
+        texture.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+
         TextureRegion region = new TextureRegion(texture);
         region.flip(false, true);
         chartImage.setDrawable(new TextureRegionDrawable(region));

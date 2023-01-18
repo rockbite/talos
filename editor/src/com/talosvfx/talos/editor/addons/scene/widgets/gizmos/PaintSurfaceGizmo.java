@@ -167,6 +167,9 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     private void createFrameBuffer() {
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        if (surface.getGameResource().isBroken()) {
+            return;
+        }
         Texture resource = surface.getGameResource().getResource();
         resource.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, resource.getWidth(), resource.getHeight(), false);

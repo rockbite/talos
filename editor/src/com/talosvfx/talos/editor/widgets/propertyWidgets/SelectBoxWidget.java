@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 import java.util.function.Supplier;
 
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
 public class SelectBoxWidget extends PropertyWidget<String> {
 
     Stack stack;
-    Label noValueLabel;
+    LabelWithZoom noValueLabel;
     SelectBox<String> selectBox;
 
     Supplier<Array<String>> optionListSupplier;
@@ -41,7 +42,7 @@ public class SelectBoxWidget extends PropertyWidget<String> {
     @Override
     public Actor getSubWidget() {
         selectBox = new SelectBox<>(SharedResources.skin, "propertyValue");
-        noValueLabel = new Label("", SharedResources.skin);
+        noValueLabel = new LabelWithZoom("", SharedResources.skin);
         noValueLabel.setAlignment(Align.right);
         stack = new Stack();
         stack.add(noValueLabel);

@@ -20,7 +20,7 @@ public class ButtonLabel extends Table {
     public ButtonLabel(Drawable iconDrawable, String text) {
 
         Image icon = new Image(iconDrawable);
-        label = new Label(text, SharedResources.skin);
+        label = new LabelWithZoom(text, SharedResources.skin);
         label.setColor(Color.GRAY);
 
         add(icon).size(30).pad(3).padLeft(-5);

@@ -196,7 +196,7 @@ public class EditableLabel extends Table implements ActorCloneable {
 
     @Override
     public Actor copyActor (Actor copyFrom) {
-        Label label = new Label(this.label.getText(), getSkin());
+        Label label = new LabelWithZoom(this.label.getText(), getSkin());
         return label;
     }
     public Label getLabel() {

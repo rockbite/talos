@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 import com.talosvfx.talos.runtime.modules.ShadedSpriteModule;
 import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
 import com.talosvfx.talos.runtime.utils.VectorField;
@@ -19,7 +20,7 @@ public class ShadedSpriteModuleWrapper extends ModuleWrapper<ShadedSpriteModule>
     protected void configureSlots () {
         addOutputSlot("output", ShadedSpriteModule.OUTPUT);
 
-        dropLabel = new Label("drop .shdr file here", getSkin());
+        dropLabel = new LabelWithZoom("drop .shdr file here", getSkin());
         dropLabel.setAlignment(Align.center);
         dropLabel.setWrap(true);
         contentWrapper.add(dropLabel).padTop(10f).padBottom(10f).size(180, 50).left().expand();

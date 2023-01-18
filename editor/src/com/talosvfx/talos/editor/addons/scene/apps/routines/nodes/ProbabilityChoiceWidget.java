@@ -11,6 +11,7 @@ import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class ProbabilityChoiceWidget extends RoutineNodeWidget {
 
@@ -194,7 +195,7 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
         public void init(Skin skin) {
             super.init(skin);
 
-            Label label = new Label("weight", getSkin());
+            Label label = new LabelWithZoom("weight", getSkin());
             widget = new ValueWidget();
             widget.init(getSkin());
             widget.setRange(0, 100);

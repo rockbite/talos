@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.CollapsableWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.FileOpenField;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class PrefWidgetFactory {
 
@@ -116,7 +117,7 @@ public class PrefWidgetFactory {
         public BooleanWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
             if(xml.hasAttribute("label")) {
-                Label label = new Label(xml.getAttribute("label"), SharedResources.skin);
+                Label label = new LabelWithZoom(xml.getAttribute("label"), SharedResources.skin);
                 leftContent.add(label).right().expandX();
             }
             checkBoxWidget = new CheckBox(xml.getText(), SharedResources.skin, "rounded-checkbox");
@@ -140,7 +141,7 @@ public class PrefWidgetFactory {
 
         public NumberWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             valueWidget = new ValueWidget(SharedResources.skin);
@@ -180,7 +181,7 @@ public class PrefWidgetFactory {
 
         public StringWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             widget = new TextValueWidget(SharedResources.skin);
@@ -206,7 +207,7 @@ public class PrefWidgetFactory {
         public PathWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
 
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             fileOpener = new FileOpenField();

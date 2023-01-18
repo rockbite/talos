@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class FloatInputWidget extends Table {
@@ -36,7 +37,7 @@ public class FloatInputWidget extends Table {
     private TextField regularCarrier;
     private RotatorWidget angleCarrier;
 
-    private Label regularLabel;
+    private LabelWithZoom regularLabel;
 
     private float value;
 
@@ -68,7 +69,7 @@ public class FloatInputWidget extends Table {
     private void buildRegular(String text) {
         Table table = flavourContainers.get(NumericalValue.Flavour.REGULAR);
 
-        regularLabel = new Label(text, getSkin());
+        regularLabel = new LabelWithZoom(text, getSkin());
         regularCarrier = new TextField("", getSkin());
 
         table.add(regularLabel).left().row();

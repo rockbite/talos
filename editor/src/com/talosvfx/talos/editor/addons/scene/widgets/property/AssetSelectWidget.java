@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetSelectWidget.class);
 
-    private Label nameLabel;
+    private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
 
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
@@ -64,7 +65,7 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
         Skin skin = SharedResources.skin;
         final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select asset");
 
-        nameLabel = new Label("", skin);
+        nameLabel = new LabelWithZoom("", skin);
         nameLabel.setEllipsis(true);
         nameLabel.setAlignment(Align.right);
 

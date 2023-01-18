@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AsyncRoutineNodeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
 
 public class MicroNodeView extends Table {
 
@@ -44,7 +45,7 @@ public class MicroNodeView extends Table {
         shadow.setPosition(-shadow.getWidth()/2, -shadow.getHeight()/2);
         bg.setPosition(-bg.getWidth()/2, -bg.getHeight()/2);
 
-        label = new Label("1.0", SharedResources.skin);
+        label = new LabelWithZoom("1.0", SharedResources.skin);
         add(label).expand().center();
     }
 

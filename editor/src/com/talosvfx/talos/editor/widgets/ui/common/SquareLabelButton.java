@@ -20,7 +20,7 @@ public class SquareLabelButton extends Button {
         setStyle(skin.get("square", ButtonStyle.class));
 
         setSize(24, 24);
-        buttonTextLabel = new Label(buttonText, skin, "small");
+        buttonTextLabel = new LabelWithZoom(buttonText, skin, "small");
 
         add(buttonTextLabel).center().padBottom(2);
     }
