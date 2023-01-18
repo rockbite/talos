@@ -85,7 +85,6 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             }
         }
         isSelected = selected;
-        debugAll();
     }
 
     protected void wrapperSelected() {
@@ -238,7 +237,6 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
         LabelWithZoom label = new LabelWithZoom(title, VisUI.getSkin(), "small");
-        label.debugScale = true;
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 

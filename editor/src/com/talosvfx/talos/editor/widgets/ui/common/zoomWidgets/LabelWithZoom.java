@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 public class LabelWithZoom extends Label {
 
     private static final Logger logger = LoggerFactory.getLogger(LabelWithZoom.class);
-    public boolean debugScale;
 
     private LabelStyle providedStyle;
 
