@@ -70,7 +70,6 @@ public class TextFieldWithZoom extends TextField {
         }
         this.registeredFont = fontByName;
         this.setStyle(textFieldStyle);
-        setDebug(true);
     }
 
     @Override

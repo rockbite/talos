@@ -55,7 +55,6 @@ public class LabelWithZoom extends Label {
         }
         this.registeredFont = fontByName;
         this.setStyle(providedStyle);
-        setDebug(true);
     }
 
     @Override

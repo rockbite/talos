@@ -43,7 +43,6 @@ public class SelectBoxWithZoom<T> extends SelectBox<T> {
         }
         this.registeredFont = fontByName;
         this.setStyle(textFieldStyle);
-        setDebug(true);
     }
 
     @Override
