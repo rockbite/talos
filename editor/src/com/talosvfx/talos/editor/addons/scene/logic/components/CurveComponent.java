@@ -48,7 +48,7 @@ public class CurveComponent extends AComponent {
             autoSetAllAffectedControlPoints(points.size - 1);
         }
 
-        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
+        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void splitSegment(Vector2 point, int segmentIndex) {
@@ -63,7 +63,7 @@ public class CurveComponent extends AComponent {
             autoSetAnchorControlPoints(segmentIndex * 3 + 3);
         }
 
-        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
+        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void deleteSegment(int anchorIndex) {
@@ -81,7 +81,7 @@ public class CurveComponent extends AComponent {
             }
         }
 
-        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
+        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void setClosedState(boolean isClosed) {
