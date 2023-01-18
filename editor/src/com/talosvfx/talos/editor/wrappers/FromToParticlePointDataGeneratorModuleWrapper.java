@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.Regist
 import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.FromToParticlePointDataGeneratorModule;
@@ -37,7 +38,7 @@ public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper
     private DragPoint dragPointFrom;
     private DragPoint dragPointTo;
 
-    private VisTextField numPointsTextField;
+    private TextFieldWithZoom numPointsTextField;
 
     public FromToParticlePointDataGeneratorModuleWrapper () {
         super();

@@ -31,12 +31,17 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.FocusManager;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.ui.DynamicTable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.values.NumericalValue;
@@ -231,7 +236,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     protected Cell addInputSlot(String title, int key) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
+        LabelWithZoom label = new LabelWithZoom(title, VisUI.getSkin(), "small");
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
@@ -247,7 +252,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     protected Cell addOutputSlot(String title, int key) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
+        LabelWithZoom label = new LabelWithZoom(title, VisUI.getSkin(), "small");
         slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
         slotRow.add(icon).right();
 
@@ -272,10 +277,16 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return textField;
     }
 
-    protected VisSelectBox addSelectBox(Array<String> values) {
+    protected SelectBoxWithZoom addSelectBox(Array<String> values) {
         Table slotRow = new Table();
-        VisSelectBox selectBox = new VisSelectBox();
-
+        SelectBoxWithZoom selectBox = new SelectBoxWithZoom<>(VisUI.getSkin());
+        selectBox.addListener(new InputListener() {
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                FocusManager.resetFocus(getStage());
+                return false;
+            }
+        });
         selectBox.setItems(values);
 
         slotRow.add(selectBox).left().padBottom(4).padLeft(5).padRight(10);
@@ -286,7 +297,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return selectBox;
     }
 
-    protected VisSelectBox addSelectBox(IntMap.Values<String> values) {
+    protected SelectBoxWithZoom addSelectBox(IntMap.Values<String> values) {
         return addSelectBox(values.toArray());
     }
 
@@ -529,18 +540,18 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         }
     }
 
-    protected VisTextField addInputSlotWithTextField(String title, int key) {
+    protected TextFieldWithZoom addInputSlotWithTextField(String title, int key) {
         return addInputSlotWithTextField(title, key, 60, false);
     }
 
-    protected VisTextField addInputSlotWithTextField(String title, int key, float size) {
+    protected TextFieldWithZoom addInputSlotWithTextField(String title, int key, float size) {
         return addInputSlotWithTextField(title, key, size, false);
     }
 
     protected VisTextArea addInputSlotWithTextArea (String title, int key) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
+        LabelWithZoom label = new LabelWithZoom(title, VisUI.getSkin(), "small");
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
@@ -554,14 +565,14 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return textArea;
     }
 
-    protected VisTextField addInputSlotWithTextField(String title, int key, float size, boolean grow) {
+    protected TextFieldWithZoom addInputSlotWithTextField(String title, int key, float size, boolean grow) {
         Table slotRow = new Table();
         Image icon = new Image(getSkin().getDrawable("node-connector-off"));
-        VisLabel label = new VisLabel(title, "small");
+        LabelWithZoom label = new LabelWithZoom(title, VisUI.getSkin(), "small");
         slotRow.add(icon).left();
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
-        final VisTextField textField = new VisTextField();
+        final TextFieldWithZoom textField = new TextFieldWithZoom("", VisUI.getSkin().get(VisTextField.VisTextFieldStyle.class));
         slotRow.add().fillX().expandX().growX();
         slotRow.add(textField).right().width(size);
 
@@ -601,7 +612,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return value;
     }
 
-    protected float floatFromText(VisTextField textField) {
+    protected float floatFromText(TextField textField) {
         float value = 0;
         try {
             if (textField.getText().length() > 0) {

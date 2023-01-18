@@ -18,6 +18,7 @@ package com.talosvfx.talos.editor.wrappers;
 
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -27,9 +28,9 @@ import com.talosvfx.talos.runtime.modules.*;
 
 public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 
-    VisTextField delayField;
-    VisTextField durationField;
-    VisTextField emissionField;
+    TextField delayField;
+    TextField durationField;
+    TextField emissionField;
 
     @Override
     protected float reportPrefWidth() {

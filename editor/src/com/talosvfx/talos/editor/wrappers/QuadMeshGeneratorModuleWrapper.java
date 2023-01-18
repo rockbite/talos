@@ -20,7 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
 import com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule;
@@ -28,7 +30,7 @@ import com.talosvfx.talos.runtime.modules.Vector2Module;
 
 public class QuadMeshGeneratorModuleWrapper extends ModuleWrapper<QuadMeshGeneratorModule> {
 
-    private VisCheckBox billboard;
+    private CheckboxWithZoom billboard;
 
     public QuadMeshGeneratorModuleWrapper () {
         super();
@@ -49,7 +51,7 @@ public class QuadMeshGeneratorModuleWrapper extends ModuleWrapper<QuadMeshGenera
         addInputSlot("size", QuadMeshGeneratorModule.SIZE);
         addOutputSlot("quad", QuadMeshGeneratorModule.MODULE);
 
-        billboard = new VisCheckBox("billboard");
+        billboard = new CheckboxWithZoom("billboard", VisUI.getSkin());
         billboard.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {

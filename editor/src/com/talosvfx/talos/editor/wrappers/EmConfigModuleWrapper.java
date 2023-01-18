@@ -21,17 +21,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 import com.talosvfx.talos.runtime.modules.EmConfigModule;
 
 public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
-    VisCheckBox additiveBox;
-    VisCheckBox blendAddBox;
-    VisCheckBox attachedBox;
-    VisCheckBox continuousBox;
-    VisCheckBox alignedBox;
-    VisCheckBox immortalBox;
+    CheckboxWithZoom additiveBox;
+    CheckboxWithZoom blendAddBox;
+    CheckboxWithZoom attachedBox;
+    CheckboxWithZoom continuousBox;
+    CheckboxWithZoom alignedBox;
+    CheckboxWithZoom immortalBox;
 
     boolean lockListeners = false;
 
@@ -39,12 +41,12 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     protected void configureSlots() {
         addOutputSlot("config", EmConfigModule.OUTPUT);
 
-        additiveBox = new VisCheckBox("additive");
-        blendAddBox = new VisCheckBox("blendadd");
-        attachedBox = new VisCheckBox("attached");
-        continuousBox = new VisCheckBox("continuous");
-        alignedBox = new VisCheckBox("aligned");
-        immortalBox = new VisCheckBox("immortal");
+        additiveBox = new CheckboxWithZoom("additive", VisUI.getSkin());
+        blendAddBox = new CheckboxWithZoom("blendadd", VisUI.getSkin());
+        attachedBox = new CheckboxWithZoom("attached", VisUI.getSkin());
+        continuousBox = new CheckboxWithZoom("continuous", VisUI.getSkin());
+        alignedBox = new CheckboxWithZoom("aligned", VisUI.getSkin());
+        immortalBox = new CheckboxWithZoom("immortal", VisUI.getSkin());
 
         Table form = new Table();
 

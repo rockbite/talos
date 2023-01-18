@@ -17,21 +17,24 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 import com.talosvfx.talos.runtime.modules.GlobalScopeModule;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> implements IDragPointProvider {
 
-    VisSelectBox<String> selectBox;
+    SelectBox<String> selectBox;
 
     DragPoint dragPoint;
 
@@ -70,9 +73,9 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         previewWidget.unregisterDragPoints(this);
     }
 
-    protected VisSelectBox addSelectBox(Array<String> values) {
+    protected SelectBoxWithZoom addSelectBox(Array<String> values) {
         Table slotRow = new Table();
-        final VisSelectBox selectBox = new VisSelectBox();
+        SelectBoxWithZoom selectBox = new SelectBoxWithZoom<>(VisUI.getSkin());
 
         selectBox.setItems(values);
 
