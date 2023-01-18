@@ -1,10 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
-import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
 import com.talosvfx.talos.editor.addons.scene.utils.metadata.PrefabMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

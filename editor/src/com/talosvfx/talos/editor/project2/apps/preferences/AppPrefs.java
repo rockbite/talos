@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.project2.apps.preferences;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 
 /**
  * App preferences per asset

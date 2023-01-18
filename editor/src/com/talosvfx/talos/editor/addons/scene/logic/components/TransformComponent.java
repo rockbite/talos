@@ -2,8 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 public class TransformComponent extends AComponent {
     @ValueProperty(prefix = {"X", "Y"})

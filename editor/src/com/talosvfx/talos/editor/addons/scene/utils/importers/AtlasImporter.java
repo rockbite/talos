@@ -1,8 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;
 public class AtlasImporter extends AbstractImporter {
     @Override
     public GameObject makeInstance (GameAsset asset, GameObject parent) {

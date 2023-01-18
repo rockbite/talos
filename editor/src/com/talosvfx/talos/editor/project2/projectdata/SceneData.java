@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.project2.projectdata;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import lombok.Data;
 
 @Data

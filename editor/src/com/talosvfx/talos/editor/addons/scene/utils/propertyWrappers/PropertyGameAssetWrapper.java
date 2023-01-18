@@ -3,10 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameResourceOwner;
 
 
 public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> implements GameResourceOwner {

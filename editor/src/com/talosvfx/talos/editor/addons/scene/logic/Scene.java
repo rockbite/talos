@@ -3,10 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdated;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
@@ -150,13 +148,6 @@ public class Scene extends SavableContainer implements IPropertyProvider {
 
         return properties;
     }
-
-    @Override
-    protected void writeData (Json json) {
-        json.writeValue("name", getName());
-        super.writeData(json);
-    }
-
     @Override
     public String getPropertyBoxTitle () {
         return "Scene Properties";
@@ -166,4 +157,11 @@ public class Scene extends SavableContainer implements IPropertyProvider {
     public int getPriority () {
         return 0;
     }
+    @Override
+    protected void writeData (Json json) {
+        json.writeValue("name", getName());
+        super.writeData(json);
+    }
+
+
 }

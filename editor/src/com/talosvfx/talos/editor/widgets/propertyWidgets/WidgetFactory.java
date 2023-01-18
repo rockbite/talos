@@ -4,12 +4,20 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.*;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyBooleanWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyColorWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyFloatWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameObjectWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyIntegerWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyStringWrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyVec2Wrapper;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -48,14 +56,8 @@ public class WidgetFactory {
         return null;
     }
 
-    public static PropertyWidget generate(Object parent, String fieldName, String title) {
+    public static PropertyWidget generate (Object parent, Field field, String title) {
         try {
-            Field field;
-            try {
-                field = parent.getClass().getField(fieldName);
-            } catch (Exception e) {
-                field = parent.getClass().getDeclaredField(fieldName);
-            }
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
@@ -90,12 +92,24 @@ public class WidgetFactory {
 
             generatedWidget.setParent(parent);
             return generatedWidget;
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
 
+        return null;
+    }
+    public static PropertyWidget generate(Object parent, String fieldName, String title) {
+        try {
+            Field field;
+            try {
+                field = parent.getClass().getField(fieldName);
+            } catch (Exception e) {
+                field = parent.getClass().getDeclaredField(fieldName);
+            }
+            return generate(parent, field, title);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

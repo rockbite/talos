@@ -8,14 +8,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.RendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 

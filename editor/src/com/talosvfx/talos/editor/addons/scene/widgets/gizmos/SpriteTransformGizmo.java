@@ -1,20 +1,14 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntArray;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
-import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

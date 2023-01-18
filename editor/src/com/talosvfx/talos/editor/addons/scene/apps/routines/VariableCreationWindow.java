@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;

@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 
 

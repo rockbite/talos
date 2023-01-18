@@ -2,9 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

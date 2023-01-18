@@ -12,9 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.FocusManager;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.logic.components.CurveComponent;
-import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CurveComponentWrapper;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +51,8 @@ public class CurveGizmo extends Gizmo {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        if(gameObject.hasComponent(CurveComponent.class)) {
-            CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+        if(gameObject.hasComponent(CurveComponentWrapper.class)) {
+            CurveComponentWrapper curve = gameObject.getComponent(CurveComponentWrapper.class);
             Array<Vector2> points = curve.points;
 
             if(selected) {
@@ -149,7 +147,7 @@ public class CurveGizmo extends Gizmo {
     }
 
     private int getTouchedPoint(float x, float y) {
-        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+        CurveComponentWrapper curve = gameObject.getComponent(CurveComponentWrapper.class);
         if(curve != null) {
             Array<Vector2> points = curve.points;
             for (int i = 0; i < points.size; i++) {
@@ -177,11 +175,11 @@ public class CurveGizmo extends Gizmo {
 
     @Override
     public void touchDown(float x, float y, int button) {
-        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+        CurveComponentWrapper curve = gameObject.getComponent(CurveComponentWrapper.class);
         int touchedPoint = getTouchedPoint(x, y);
         if(button == 0) {
             if (touchedPoint >= 0) {
-                touchedPointRef = gameObject.getComponent(CurveComponent.class).points.get(touchedPoint);
+                touchedPointRef = gameObject.getComponent(CurveComponentWrapper.class).points.get(touchedPoint);
                 touchedPointIndex = touchedPoint;
             } else {
                 if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -232,7 +230,7 @@ public class CurveGizmo extends Gizmo {
         selectedSegmentIndex = -1;
 
         Vector2 local = toLocal(tmp, x, y);
-        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+        CurveComponentWrapper curve = gameObject.getComponent(CurveComponentWrapper.class);
         for(int i = 0; i < curve.getNumSegments(); i++) {
             Vector2[] pointsInSegment = curve.getPointsInSegment(i);
             bezier.set(pointsInSegment);
@@ -250,7 +248,7 @@ public class CurveGizmo extends Gizmo {
     @Override
     public void touchDragged(float x, float y) {
         if(touchedPointRef != null) {
-            CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+            CurveComponentWrapper curve = gameObject.getComponent(CurveComponentWrapper.class);
             Vector2 pos = toLocal(tmp3.set(x, y));
             curve.movePoint(touchedPointIndex, pos.x, pos.y);
         }

@@ -33,8 +33,6 @@ dependencies {
 
     implementation libs.string.similarity
 
-    implementation libs.spine.libgdx
-
     implementation libs.snakeyaml
 
     implementation libs.tiny.gizmo

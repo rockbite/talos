@@ -2,15 +2,10 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CameraComponentWrapper;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.CameraPane;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class CameraTransformGizmo extends SmartTransformGizmo {
@@ -54,7 +49,7 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 		getWorldLocAround(tmp, 0, 0); // this is center position of camera
 
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-		CameraComponent cameraComponent = gameObject.getComponent(CameraComponent.class);
+		CameraComponentWrapper cameraComponent = gameObject.getComponent(CameraComponentWrapper.class);
 
 		points[LB].set(tmp.x - cameraComponent.size.x / 2f, tmp.y - cameraComponent.size.y / 2f);
 		points[LT].set(tmp.x - cameraComponent.size.x / 2f, tmp.y + cameraComponent.size.y / 2f);
@@ -73,7 +68,7 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 	@Override
 	protected void transformOldToNew () {
 		TransformComponent transform = gameObject.getComponent(TransformComponent.class);
-		CameraComponent cameraComponent = gameObject.getComponent(CameraComponent.class);
+		CameraComponentWrapper cameraComponent = gameObject.getComponent(CameraComponentWrapper.class);
 
 		// bring old next points to local space
 		for (int i = 0; i < 4; i++) {
@@ -91,7 +86,7 @@ public class CameraTransformGizmo extends SmartTransformGizmo {
 		TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transform, isRapid);
 
-		CameraComponent camera = gameObject.getComponent(CameraComponent.class);
+		CameraComponentWrapper camera = gameObject.getComponent(CameraComponentWrapper.class);
 		SceneUtils.componentUpdated(gameObjectContainer, gameObject, camera, isRapid);
 	}
 

@@ -1,12 +1,10 @@
 package com.talosvfx.talos.editor.addons.scene.utils.metadata;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.FilePropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 public class PrefabMetadata extends AMetadata {
 

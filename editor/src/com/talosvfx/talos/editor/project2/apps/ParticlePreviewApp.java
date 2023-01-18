@@ -2,8 +2,7 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXPreviewActivated;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.EventHandler;

@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.widgets.VerticalIconMenu;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 

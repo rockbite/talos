@@ -1,11 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.logic;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import lombok.Getter;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.AComponent;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

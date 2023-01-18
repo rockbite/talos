@@ -35,7 +35,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;

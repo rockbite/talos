@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 
-public class ExportData {
+public class ExportData extends BaseVFXProjectData {
 
     public Array<EmitterExportData> emitters = new Array<>();
 

@@ -11,8 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-
+import com.talosvfx.talos.runtime.scene.GameObject;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 

@@ -6,11 +6,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 
 import java.util.function.Supplier;

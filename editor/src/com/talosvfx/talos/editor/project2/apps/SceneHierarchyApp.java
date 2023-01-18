@@ -3,9 +3,9 @@ package com.talosvfx.talos.editor.project2.apps;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
@@ -14,8 +14,6 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.HierarchyPreference;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-
-import java.util.UUID;
 
 @SingletonApp
 public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference> {

@@ -1,14 +1,10 @@
 package com.talosvfx.talos.editor.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;

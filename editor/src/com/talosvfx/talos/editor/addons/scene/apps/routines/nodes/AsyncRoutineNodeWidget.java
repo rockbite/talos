@@ -18,8 +18,7 @@ import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.misc.MicroNode
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.AsyncRoutineNodeState;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.misc.InterpolationLibrary;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.AsyncRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.nodes.widgets.SelectWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import lombok.Getter;
 

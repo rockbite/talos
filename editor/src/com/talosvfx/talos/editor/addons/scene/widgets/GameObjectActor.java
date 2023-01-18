@@ -5,13 +5,9 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 
 public class GameObjectActor extends Table {
 

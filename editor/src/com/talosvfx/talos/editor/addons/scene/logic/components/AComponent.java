@@ -1,8 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic.components;
 
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 public abstract class AComponent implements IPropertyProvider {
     private transient GameObject gameObject;

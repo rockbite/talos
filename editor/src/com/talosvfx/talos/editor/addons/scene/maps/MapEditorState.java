@@ -1,23 +1,21 @@
 package com.talosvfx.talos.editor.addons.scene.maps;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
-import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditor;
-import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.PaletteEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.tiledpalette.TileGameObjectProxy;
+import com.talosvfx.talos.runtime.maps.TileGameObjectProxy;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.TalosLayerSelectEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TileDataComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.runtime.maps.GridPosition;
+import com.talosvfx.talos.runtime.maps.TalosLayer;
+import com.talosvfx.talos.runtime.scene.components.MapComponent;
+import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,7 +183,8 @@ public class MapEditorState implements Observer {
 		mapComponent = mapObject.getComponent(MapComponent.class);
 		mapFocused = true;
 
-		mapComponent.setLayerSelectedByEmulating(mapComponent.getLayers().first());
+		logger.warn("Bad method doing ui shit commented");
+//		mapComponent.setLayerSelectedByEmulating(mapComponent.getLayers().first());
 
 		// rty to show palette
 		if(mapComponent.selectedLayer.getGameResource() != null) {

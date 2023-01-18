@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 
 public class Prefab extends SavableContainer {
@@ -16,7 +16,6 @@ public class Prefab extends SavableContainer {
         path = fileHandle.path();
         name = fileHandle.nameWithoutExtension();
         loadFromHandle(fileHandle);
-        root.addComponent(new TransformComponent());
     }
 
     public Prefab(GameObject root) {

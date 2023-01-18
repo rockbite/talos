@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;

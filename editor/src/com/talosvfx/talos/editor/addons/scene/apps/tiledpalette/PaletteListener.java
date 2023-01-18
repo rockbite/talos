@@ -2,9 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.tiledpalette;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.maps.StaticTile;
 
 public class PaletteListener implements EventListener {
 
