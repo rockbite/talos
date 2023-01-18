@@ -72,6 +72,10 @@ public class RoutineControlWindow extends Table {
                         updatePlayState();
                     }
                 }
+                if (routineStage.isPaused()) {
+                    routineStage.resume();
+                    updatePauseState();
+                }
             }
         });
 
