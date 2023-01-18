@@ -64,12 +64,6 @@ public class UIUtils {
         }
     }
 
-
-    public static void registerFonts (Skin skin) {
-
-    }
-
-
     public static void invalidateForDepth(Group group, int depth) {
         if (depth <= 0) return;
         if(group.getParent() == null || !(group.getParent() instanceof Layout)) return;

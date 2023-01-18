@@ -59,12 +59,6 @@ public class LabelWithZoom extends Label {
     }
 
     @Override
-    public void act(float delta) {
-        super.act(delta);
-
-    }
-
-    @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         Stage stage = getStage();
