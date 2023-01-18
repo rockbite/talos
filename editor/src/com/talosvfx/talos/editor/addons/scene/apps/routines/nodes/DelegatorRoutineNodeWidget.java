@@ -76,18 +76,61 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
     private void buildContainer(Table container, GameAsset<RoutineStageData> routineAsset) {
         if(asset != routineAsset) {
             asset = routineAsset;
-            RoutineStageData resource = routineAsset.getResource();
-            RoutineInstance instance = resource.createInstance(true);
+
+            Array<String> titles = new Array<>();
+            if (!routineAsset.isBroken()) {
+                RoutineStageData resource = routineAsset.getResource();
+                RoutineInstance instance = resource.createInstance(true);
+                Array<RoutineExecutorNode> executors = instance.getNodesByClass(RoutineExecutorNode.class);
+                for (RoutineExecutorNode executor : executors) {
+                    String title = executor.getTitle();
+                    titles.add(title);
+                }
+
+                Array<PropertyWrapper<?>> parentPropertyWrappers = instance.getParentPropertyWrappers();
+                for (PropertyWrapper<?> wrapper : parentPropertyWrappers) {
+                    PropertyType type = wrapper.getType();
+                    Class<? extends AbstractWidget> clazz = customTypeMap.get(type);
+                    if (clazz != null) {
+                        try {
+                            AbstractWidget widget = ClassReflection.newInstance(clazz);
+
+                            // todo: this needs to be done better
+                            if(widget instanceof GameAssetWidget) {
+                                ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString(), wrapper.propertyName);
+                            }
+
+                            widget.init(SharedResources.skin);
+
+
+                            if(widget instanceof ValueWidget) {
+                                ((ValueWidget) widget).setLabel(wrapper.propertyName);
+                            }
+
+                            widgetMap.put(wrapper.propertyName, widget);
+                            typeMap.put(wrapper.propertyName, type.toString().toLowerCase(Locale.ROOT));
+                            defaultsMap.put(wrapper.propertyName, "");
+                            addConnection(widget, wrapper.propertyName, true);
+                            container.add(widget).growX().padTop(10).row();
+
+                            widget.addListener(new ChangeListener() {
+                                @Override
+                                public void changed (ChangeEvent changeEvent, Actor actor) {
+                                    reportNodeDataModified();
+                                }
+                            });
+
+                        } catch (Exception e) {
+
+                        }
+                    }
+                }
+            }
 
             container.clear();
 
             // let's find all executors and expose them here
-            Array<RoutineExecutorNode> executors = instance.getNodesByClass(RoutineExecutorNode.class);
-            Array<String> titles = new Array<>();
-            for (RoutineExecutorNode executor : executors) {
-                String title = executor.getTitle();
-                titles.add(title);
-            }
+
             SelectWidget executorSelector = new SelectWidget();
             executorSelector.init(SharedResources.skin);
             executorSelector.setOptions(titles);
@@ -105,45 +148,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
             });
 
 
-            Array<PropertyWrapper<?>> parentPropertyWrappers = instance.getParentPropertyWrappers();
 
-            for (PropertyWrapper<?> wrapper : parentPropertyWrappers) {
-                PropertyType type = wrapper.getType();
-                Class<? extends AbstractWidget> clazz = customTypeMap.get(type);
-                if (clazz != null) {
-                    try {
-                        AbstractWidget widget = ClassReflection.newInstance(clazz);
-
-                        // todo: this needs to be done better
-                        if(widget instanceof GameAssetWidget) {
-                            ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString(), wrapper.propertyName);
-                        }
-
-                        widget.init(SharedResources.skin);
-
-
-                        if(widget instanceof ValueWidget) {
-                            ((ValueWidget) widget).setLabel(wrapper.propertyName);
-                        }
-
-                        widgetMap.put(wrapper.propertyName, widget);
-                        typeMap.put(wrapper.propertyName, type.toString().toLowerCase(Locale.ROOT));
-                        defaultsMap.put(wrapper.propertyName, "");
-                        addConnection(widget, wrapper.propertyName, true);
-                        container.add(widget).growX().padTop(10).row();
-
-                        widget.addListener(new ChangeListener() {
-                            @Override
-                            public void changed (ChangeEvent changeEvent, Actor actor) {
-                                reportNodeDataModified();
-                            }
-                        });
-
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
 
             Notifications.fireEvent(Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), this));
         }
