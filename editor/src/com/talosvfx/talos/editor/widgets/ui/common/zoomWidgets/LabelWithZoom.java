@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Null;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.utils.UIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,36 +61,50 @@ public class LabelWithZoom extends Label {
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+    public void act(float delta) {
         Stage stage = getStage();
         if (stage != null) {
-            float preferredFontSize = stageToScreen(registeredFont.defaultSize);
-            if (preferredFontSize == 0 || Float.isNaN(preferredFontSize)) {
+            BitmapFont defaultSizedFont = UIUtils.getFontForSize(registeredFont.defaultSize);
+            GlyphLayout glyphForFont = UIUtils.getGlyphForFont(defaultSizedFont);
+            float height = glyphForFont.height;
+
+            float preferredHeight = stageToScreen(height);
+            if (preferredHeight == 0 || Float.isNaN(preferredHeight)) {
                 //Not ready yet
                 return;
             }
-
-            int fontToGenerate = MathUtils.ceil(preferredFontSize);
-            fontToGenerate = MathUtils.clamp(fontToGenerate, 4, 90);
+            BitmapFont testFont = UIUtils.getFontForSize(4);
+            for (int i = 5; i <= 90; i++) {
+                testFont = UIUtils.getFontForSize(i);
+                GlyphLayout glyphForTest = UIUtils.getGlyphForFont(testFont);
+                if (glyphForTest.height > preferredHeight) {
+                    break;
+                }
+            }
 
             BitmapFont font = getStyle().font;
-            BitmapFont newFont = UIUtils.getFontForSize(fontToGenerate);
+            BitmapFont newFont = testFont;
             if (!(font == newFont)) {
                 getStyle().font = newFont;
                 setStyle(getStyle());
                 invalidateHierarchy();
             }
 
-            float fontScale = preferredFontSize / fontToGenerate;
+            float fontScale = preferredHeight / UIUtils.getGlyphForFont(testFont).height;
             float finalScale = screenToStage(fontScale);
             float fontScaleX = getFontScaleX();
             if (finalScale != fontScaleX) {
                 setFontScale(finalScale);
                 invalidateHierarchy();
             }
-
         }
+        super.act(delta);
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+
     }
 
     private Vector2 tmp = new Vector2();

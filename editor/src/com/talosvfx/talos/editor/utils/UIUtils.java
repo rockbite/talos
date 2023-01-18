@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -20,7 +21,12 @@ public class UIUtils {
     static private FreeTypeFontGenerator freeTypeFontGenerator;
 
     private static OrderedMap<Integer, BitmapFont> orderedFontMap = new OrderedMap<>();
+    private static OrderedMap<BitmapFont, GlyphLayout> fontTestHeight = new OrderedMap<>();
 
+
+    public static GlyphLayout getGlyphForFont (BitmapFont bitmapFont) {
+        return fontTestHeight.get(bitmapFont);
+    }
     public static BitmapFont getFontForSize (int fontSize) {
         if (orderedFontMap.containsKey(fontSize)) {
             return orderedFontMap.get(fontSize);
@@ -37,7 +43,12 @@ public class UIUtils {
         freeTypeFontParameter.genMipMaps = true;
         BitmapFont bitmapFont = freeTypeFontGenerator.generateFont(freeTypeFontParameter);
         bitmapFont.setUseIntegerPositions(false);
+
+        GlyphLayout glyphLayout = new GlyphLayout();
+        glyphLayout.setText(bitmapFont, "Aa");
+
         orderedFontMap.put(fontSize, bitmapFont);
+        fontTestHeight.put(bitmapFont, glyphLayout);
 
         return bitmapFont;
     }
