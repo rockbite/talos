@@ -303,7 +303,6 @@ public class CurveComponent extends AComponent {
 
         }
 
-        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
 
         Pools.free(tmp);
     }
