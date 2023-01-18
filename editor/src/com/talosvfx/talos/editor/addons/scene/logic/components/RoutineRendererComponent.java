@@ -8,9 +8,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -18,12 +20,14 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.ValueProperty;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.scene.ISizableComponent;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData>, ISizableComponent {
+public class RoutineRendererComponent<T extends BaseRoutineData> extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData>, ISizableComponent {
 
     GameAsset<RoutineStageData> routineResource;
 
@@ -180,7 +184,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             public void report(GameAsset<RoutineStageData> value) {
                 setGameAsset(value);
                 final GameObject gameObject = RoutineRendererComponent.this.getGameObject();
-                SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, RoutineRendererComponent.this);
+//                SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, this);
             }
         });
 

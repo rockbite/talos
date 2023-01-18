@@ -4,8 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.runtime.routine.AsyncRoutineNodeState;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
-import com.talosvfx.talos.runtime.scene.components.RoutineRenderComponent;
 
 public class ScaleToNode extends AsyncRoutineNode<GameObject, ScaleToNode.ScaleState> {
 

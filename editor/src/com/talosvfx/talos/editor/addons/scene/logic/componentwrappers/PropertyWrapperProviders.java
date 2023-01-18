@@ -41,6 +41,7 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.maps.GridPosition;
 import com.talosvfx.talos.runtime.maps.TalosLayer;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
@@ -569,14 +570,14 @@ public class PropertyWrapperProviders {
 		@Override
 		public Array<PropertyWidget> getListOfProperties() {
 			properties.clear();
-			AssetSelectWidget<RoutineStageData> widget = new AssetSelectWidget<RoutineStageData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<RoutineStageData>>() {
+			AssetSelectWidget<BaseRoutineData> widget = new AssetSelectWidget<BaseRoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<BaseRoutineData>>() {
 				@Override
-				public GameAsset<RoutineStageData> get() {
+				public GameAsset<BaseRoutineData> get() {
 					return component.getGameResource();
 				}
-			}, new PropertyWidget.ValueChanged<GameAsset<RoutineStageData>>() {
+			}, new PropertyWidget.ValueChanged<GameAsset<BaseRoutineData>>() {
 				@Override
-				public void report(GameAsset<RoutineStageData> value) {
+				public void report(GameAsset<BaseRoutineData> value) {
 					component.setGameAsset(value);
 					GameObject gameObject = component.getGameObject();
 					SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, component);

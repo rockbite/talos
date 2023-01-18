@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.runtime.routine.AsyncRoutineNodeState;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ISizableComponent;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 
 public class SizeToNode extends AsyncRoutineNode<GameObject, SizeToNode.SizeState> {
 

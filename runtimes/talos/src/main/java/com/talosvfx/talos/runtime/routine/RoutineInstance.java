@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
@@ -155,7 +156,7 @@ public class RoutineInstance {
     }
 
 
-    public void loadFrom (RoutineStageData routineStageData, RoutineConfigMap config) {
+    public void loadFrom (BaseRoutineData routineStageData, RoutineConfigMap config) {
         this.config = config;
         this.isDirty = true;
 

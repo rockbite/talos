@@ -8,16 +8,15 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.draw.DrawableQuad;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RenderRoutineNode;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.RoutineRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
+import com.talosvfx.talos.runtime.routine.nodes.RenderRoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 import java.util.Comparator;
 

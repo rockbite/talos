@@ -9,6 +9,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.routine.TickableNode;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
@@ -27,7 +28,7 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
     protected void configureNode(JsonValue properties) {
         // pre construct the custom part before configuring from values?
         // todo: IMPORTANT ASSET IS NOT LOADED YET, we do Runnable hack :/
-        GameAsset<RoutineStageData> asset = null;
+        GameAsset<BaseRoutineData> asset = null;
         for(JsonValue item: properties) {
             if(item.has("type") && item.getString("type").equals("ROUTINE")) {
                 String name = item.name;
@@ -47,9 +48,9 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
         }
     }
 
-    public void customConstruction(GameAsset<RoutineStageData> asset) {
+    public void customConstruction(GameAsset<BaseRoutineData> asset) {
         //todo: ths should be done in a runtime friendly way
-        RoutineStageData resource = asset.getResource();
+        BaseRoutineData resource = asset.getResource();
         if(resource == null) {
             configured = false;
             return;

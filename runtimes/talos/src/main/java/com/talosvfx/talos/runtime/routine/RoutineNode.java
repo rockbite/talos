@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import lombok.Getter;
@@ -213,7 +213,7 @@ public abstract class RoutineNode {
                 try {
                     GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
                     String identifier = jsonValue.getString("id");
-                    GameAsset gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
+                    GameAsset gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
                     port.setValue(gameAsset);
 
                     if(gameAsset.isBroken()) {

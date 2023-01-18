@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ISizableComponent;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class SetTransformNode extends RoutineNode {

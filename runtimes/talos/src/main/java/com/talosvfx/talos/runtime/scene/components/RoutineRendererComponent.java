@@ -2,16 +2,16 @@ package com.talosvfx.talos.runtime.scene.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ISizableComponent;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
@@ -19,15 +19,12 @@ import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.function.Supplier;
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<RoutineStageData>, ISizableComponent {
+public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<BaseRoutineData>, ISizableComponent {
 
-    GameAsset<RoutineStageData> routineResource;
+    GameAsset<BaseRoutineData> routineResource;
 
     GameAsset.GameAssetUpdateListener updateListener;
-
-    Array<PropertyWidget> properties = new Array<>();
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
@@ -77,7 +74,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             }
         }
 
-        GameAsset<RoutineStageData> assetForIdentifier = AssetRepository.getInstance().getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
+        GameAsset<BaseRoutineData> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
@@ -171,12 +168,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     }
 
     @Override
-    public GameAsset<RoutineStageData> getGameResource() {
+    public GameAsset<BaseRoutineData> getGameResource() {
         return routineResource;
     }
 
     @Override
-    public void setGameAsset(GameAsset<RoutineStageData> gameAsset) {
+    public void setGameAsset(GameAsset<BaseRoutineData> gameAsset) {
         if (routineResource != null) {
             routineResource.listeners.removeValue(updateListener, true);
         }
