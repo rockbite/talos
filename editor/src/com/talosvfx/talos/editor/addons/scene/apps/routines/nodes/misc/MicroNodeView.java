@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.AsyncRoutineNodeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class MicroNodeView extends Table {
 

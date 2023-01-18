@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
@@ -14,7 +13,7 @@ import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class NodeListPopup extends VisWindow {
 

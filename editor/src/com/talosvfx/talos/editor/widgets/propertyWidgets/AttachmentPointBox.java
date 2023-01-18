@@ -8,13 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.Bone;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentTypeToggle;
 import com.talosvfx.talos.editor.widgets.ui.BackgroundButton;
 import com.talosvfx.talos.editor.widgets.ui.NumericalValueField;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 
 public class AttachmentPointBox extends Table {
 
@@ -39,7 +38,7 @@ public class AttachmentPointBox extends Table {
 
         public BoneWidget(Skin skin) {
             setSkin(skin);
-            boneList = new SelectBox<>(getSkin(), "propertyValue");
+            boneList = new SelectBoxWithZoom<>(getSkin(), "propertyValue");
             attachmentTypeToggle = new AttachmentTypeToggle(getSkin());
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52).padRight(6f);
@@ -49,7 +48,7 @@ public class AttachmentPointBox extends Table {
 
         public BoneWidget(Skin skin, AttachmentPoint.AttachmentType attachmentType) {
             setSkin(skin);
-            boneList = new SelectBox<>(getSkin(), "propertyValue");
+            boneList = new SelectBoxWithZoom<>(getSkin(), "propertyValue");
             attachmentTypeToggle = new AttachmentTypeToggle(getSkin());
 
             add(boneList).height(25f).growX().minWidth(10).prefWidth(52);

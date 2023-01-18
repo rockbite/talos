@@ -1,19 +1,16 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 import java.util.function.Supplier;
 

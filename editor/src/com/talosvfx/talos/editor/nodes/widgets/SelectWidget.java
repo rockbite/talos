@@ -6,11 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 
 
 public class SelectWidget extends AbstractWidget<String> {
 
-    private SelectBox<String> selectBox;
+    private SelectBoxWithZoom<String> selectBox;
 
     private ObjectMap<String, String> titleMap = new ObjectMap<>();
     private ObjectMap<String, String> keyMap = new ObjectMap<>();
@@ -21,7 +22,7 @@ public class SelectWidget extends AbstractWidget<String> {
     public void init(Skin skin) {
         super.init(skin);
 
-        selectBox = new SelectBox<String>(skin, "rounded" );
+        selectBox = new SelectBoxWithZoom<String>(skin, "rounded" );
 
         content.add(selectBox).expandX().height(32).left().padLeft(-2).growX();
 

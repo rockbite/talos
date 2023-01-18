@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class ProbabilityChoiceWidget extends RoutineNodeWidget {
 

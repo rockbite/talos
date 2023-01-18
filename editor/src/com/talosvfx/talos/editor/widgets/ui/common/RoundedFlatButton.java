@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class RoundedFlatButton extends Button {
 

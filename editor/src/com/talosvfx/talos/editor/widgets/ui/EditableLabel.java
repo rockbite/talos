@@ -25,9 +25,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
@@ -77,7 +77,7 @@ public class EditableLabel extends Table implements ActorCloneable {
 
 		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
 		TextField.TextFieldStyle style = new TextField.TextFieldStyle(textFieldStyle);
-		textField = new TextField(text, style);
+		textField = new TextFieldWithZoom(text, style);
         inputTable.add(textField).width(0).growX();
 
         addListener(new ClickListener() {

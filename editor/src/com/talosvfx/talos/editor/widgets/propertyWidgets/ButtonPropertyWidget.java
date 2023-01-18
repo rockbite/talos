@@ -6,9 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.function.Supplier;

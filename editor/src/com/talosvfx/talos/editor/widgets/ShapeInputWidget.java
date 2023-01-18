@@ -21,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 import static com.talosvfx.talos.runtime.modules.OffsetModule.*;
 
@@ -48,11 +50,11 @@ public class ShapeInputWidget extends Table {
         shapeTypes.add("ELLIPSE");
         shapeTypes.add("LINE");
 
-        scaleField = new TextField("7", skin);
+        scaleField = new TextFieldWithZoom("7", skin);
         prevScale = 7;
         shapeWidget = new ShapeWidget(skin);
-        shapeType = new SelectBox<>(skin);
-        sideBox = new SelectBox<>(skin);
+        shapeType = new SelectBoxWithZoom<>(skin);
+        sideBox = new SelectBoxWithZoom<>(skin);
 
         sideTypes.addAll("ALL", "TOP", "BOTTOM", "LEFT", "RIGHT");
 

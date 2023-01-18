@@ -17,51 +17,30 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class UIUtils {
 
-    public static OrderedMap<Integer, BitmapFont> orderedFontMap = new OrderedMap<>();
+    static private FreeTypeFontGenerator freeTypeFontGenerator;
 
-    public static int getClosestFontSize(float preferredFontSize) {
-        int maxSize = 15;
-        int minSize = 4;
-        int round = MathUtils.round(preferredFontSize);
-        if (orderedFontMap.containsKey(round)) {
-            return round;
+    private static OrderedMap<Integer, BitmapFont> orderedFontMap = new OrderedMap<>();
+
+    public static BitmapFont getFontForSize (int fontSize) {
+        if (orderedFontMap.containsKey(fontSize)) {
+            return orderedFontMap.get(fontSize);
         }
 
-        int foundBiggerSize = -1;
-        for (int i = round; i <= maxSize; i++) {
-            if (orderedFontMap.containsKey(i)) {
-                foundBiggerSize = i;
-                break;
-            }
+        if (freeTypeFontGenerator == null) {
+            freeTypeFontGenerator = new FreeTypeFontGenerator(Gdx.files.local("skin/VisOpenSans.ttf"));
         }
 
-        int foundSmallerSize = -1;
-        for (int i = round; i >= minSize; i--) {
-            if (orderedFontMap.containsKey(i)) {
-                foundSmallerSize = i;
-                break;
-            }
-        }
+        FreeTypeFontGenerator.FreeTypeFontParameter freeTypeFontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        freeTypeFontParameter.size = fontSize;
+        freeTypeFontParameter.minFilter = Texture.TextureFilter.MipMapLinearLinear;
+        freeTypeFontParameter.magFilter = Texture.TextureFilter.Linear;
+        freeTypeFontParameter.genMipMaps = true;
+        BitmapFont bitmapFont = freeTypeFontGenerator.generateFont(freeTypeFontParameter);
+        orderedFontMap.put(fontSize, bitmapFont);
 
-        if (foundSmallerSize == -1 && foundBiggerSize == -1) {
-            // THIS MUST NEVER HAPPEN
-            return -1;
-        }
-
-        if (foundSmallerSize == -1) {
-            return foundBiggerSize;
-        }
-
-        if (foundBiggerSize == -1) {
-            return foundSmallerSize;
-        }
-
-        if (round - foundSmallerSize < foundBiggerSize - round) {
-            return foundSmallerSize;
-        } else {
-            return foundBiggerSize;
-        }
+        return bitmapFont;
     }
+
 
     public enum RegisteredFont {
         DEFAULT("generated-font-15", 15), SMALL("generated-font-12", 12);
@@ -87,20 +66,7 @@ public class UIUtils {
 
 
     public static void registerFonts (Skin skin) {
-        FreeTypeFontGenerator freeTypeFontGenerator = new FreeTypeFontGenerator(Gdx.files.local("skin/VisOpenSans.ttf"));
-        for (int i = 4; i < 50; i++) {
-            FreeTypeFontGenerator.FreeTypeFontParameter freeTypeFontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-            freeTypeFontParameter.size = i;
-            freeTypeFontParameter.minFilter = Texture.TextureFilter.MipMapLinearLinear;
-            freeTypeFontParameter.magFilter = Texture.TextureFilter.Linear;
-            freeTypeFontParameter.genMipMaps = true;
-            BitmapFont bitmapFont = freeTypeFontGenerator.generateFont(freeTypeFontParameter);
-            orderedFontMap.put(i, bitmapFont);
-        }
 
-        for (BitmapFont value : orderedFontMap.values()) {
-            value.setUseIntegerPositions(true);
-        }
     }
 
 

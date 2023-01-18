@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -11,9 +10,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 public class TextValueWidget extends AbstractWidget<String> {
 
@@ -64,7 +63,7 @@ public class TextValueWidget extends AbstractWidget<String> {
 
         label = new LabelWithZoom("", skin);
         valueLabel = new LabelWithZoom("", skin);
-        textField = new TextField("0", getSkin(), "no-bg");
+        textField = new TextFieldWithZoom("0", getSkin(), "no-bg");
 
         Stack mainStack = new Stack();
 

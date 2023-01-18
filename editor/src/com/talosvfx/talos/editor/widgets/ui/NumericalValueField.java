@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatFieldFilter;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class NumericalValueField extends Table {
@@ -17,11 +18,11 @@ public class NumericalValueField extends Table {
 
     public NumericalValueField(Skin skin) {
         setSkin(skin);
-        x = new TextField("0.0", getSkin(), "panel");
+        x = new TextFieldWithZoom("0.0", getSkin(), "panel");
         x.setTextFieldFilter(new FloatFieldFilter());
-        y = new TextField("0.0", getSkin(), "panel");
+        y = new TextFieldWithZoom("0.0", getSkin(), "panel");
         y.setTextFieldFilter(new FloatFieldFilter());
-        z = new TextField("0.0", getSkin(), "panel");
+        z = new TextFieldWithZoom("0.0", getSkin(), "panel");
         z.setTextFieldFilter(new FloatFieldFilter());
 
         x.addListener(new ChangeListener() {

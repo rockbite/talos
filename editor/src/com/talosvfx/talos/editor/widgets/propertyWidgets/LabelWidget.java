@@ -1,11 +1,9 @@
 package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 import java.util.function.Supplier;
 

@@ -1,8 +1,9 @@
-package com.talosvfx.talos.editor.widgets.ui.common;
+package com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -46,12 +47,7 @@ public class LabelWithZoom extends Label {
 
     private void cloneStyle () {
         LabelStyle style = getStyle();
-        LabelStyle labelStyle = new LabelStyle();
-        labelStyle.font = style.font;
-        if (labelStyle.fontColor != null) {
-            labelStyle.fontColor = new Color(labelStyle.fontColor);
-        }
-        labelStyle.background = style.background;
+        LabelStyle labelStyle = new LabelStyle(style);
         this.providedStyle = labelStyle;
         UIUtils.RegisteredFont fontByName = UIUtils.RegisteredFont.getFontByName(labelStyle.font.toString());
         if (fontByName == null) {
@@ -74,29 +70,28 @@ public class LabelWithZoom extends Label {
         Stage stage = getStage();
         if (stage != null) {
             float preferredFontSize = stageToScreen(registeredFont.defaultSize);
-            if (preferredFontSize == 0) {
+            if (preferredFontSize == 0 || Float.isNaN(preferredFontSize)) {
                 //Not ready yet
                 return;
             }
-            int fontSize = UIUtils.getClosestFontSize(preferredFontSize);
-            if (fontSize == registeredFont.defaultSize) {
-                setFontScale(1);
-                return;
-            }
+
+            int fontToGenerate = MathUtils.ceil(preferredFontSize);
+            fontToGenerate = MathUtils.clamp(fontToGenerate, 4, 90);
 
             BitmapFont font = getStyle().font;
-            BitmapFont newFont = UIUtils.orderedFontMap.get(fontSize);
+            BitmapFont newFont = UIUtils.getFontForSize(fontToGenerate);
             if (!(font == newFont)) {
                 getStyle().font = newFont;
                 setStyle(getStyle());
             }
 
-            float fontScale = preferredFontSize / fontSize;
+            float fontScale = preferredFontSize / fontToGenerate;
             float finalScale = screenToStage(fontScale);
             float fontScaleX = getFontScaleX();
             if (finalScale != fontScaleX) {
                 setFontScale(finalScale);
             }
+
         }
     }
 

@@ -6,10 +6,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.notifications.FileActorBinder;
-import com.talosvfx.talos.editor.widgets.ui.common.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import com.talosvfx.talos.runtime.modules.ShadedSpriteModule;
 import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
-import com.talosvfx.talos.runtime.utils.VectorField;
 
 public class ShadedSpriteModuleWrapper extends ModuleWrapper<ShadedSpriteModule> {
 
