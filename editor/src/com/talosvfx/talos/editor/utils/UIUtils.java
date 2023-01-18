@@ -36,6 +36,7 @@ public class UIUtils {
         freeTypeFontParameter.magFilter = Texture.TextureFilter.Linear;
         freeTypeFontParameter.genMipMaps = true;
         BitmapFont bitmapFont = freeTypeFontGenerator.generateFont(freeTypeFontParameter);
+        bitmapFont.setUseIntegerPositions(false);
         orderedFontMap.put(fontSize, bitmapFont);
 
         return bitmapFont;

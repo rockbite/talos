@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 public class LabelWithZoom extends Label {
 
     private static final Logger logger = LoggerFactory.getLogger(LabelWithZoom.class);
+    public boolean debugScale;
 
     private LabelStyle providedStyle;
 
@@ -76,6 +78,7 @@ public class LabelWithZoom extends Label {
             if (!(font == newFont)) {
                 getStyle().font = newFont;
                 setStyle(getStyle());
+                invalidateHierarchy();
             }
 
             float fontScale = preferredFontSize / fontToGenerate;
@@ -83,6 +86,7 @@ public class LabelWithZoom extends Label {
             float fontScaleX = getFontScaleX();
             if (finalScale != fontScaleX) {
                 setFontScale(finalScale);
+                invalidateHierarchy();
             }
 
         }
