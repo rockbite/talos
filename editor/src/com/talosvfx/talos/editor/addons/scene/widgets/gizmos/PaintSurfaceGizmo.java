@@ -14,10 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.PaintSurfaceComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class PaintSurfaceGizmo extends Gizmo {
 

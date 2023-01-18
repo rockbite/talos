@@ -10,13 +10,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.MapComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TileDataComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.maps.LayerType;
 import com.talosvfx.talos.runtime.maps.MapType;
 import com.talosvfx.talos.runtime.maps.StaticTile;
 import com.talosvfx.talos.runtime.maps.TalosLayer;
+import com.talosvfx.talos.runtime.scene.components.MapComponent;
+import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 import java.util.Comparator;
 

@@ -9,11 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.RendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class TransformGizmo extends Gizmo {
 

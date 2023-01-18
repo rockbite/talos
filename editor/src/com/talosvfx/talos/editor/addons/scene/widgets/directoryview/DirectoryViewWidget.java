@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.PropertyWrapperProviders;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -170,7 +171,9 @@ public class DirectoryViewWidget extends Table {
 				Item item = selected.first();
 				if (item.gameAsset != null) {
 					if (!item.gameAsset.isBroken()) {
-						holder = item.gameAsset.getRootRawAsset().metaData;
+						AMetadata metaData = item.gameAsset.getRootRawAsset().metaData;
+						IPropertyHolder holderForMeta = PropertyWrapperProviders.getOrCreateHolder(metaData);
+						holder = holderForMeta;
 					}
 				} else {
 					if (item.fileHandle != null) {

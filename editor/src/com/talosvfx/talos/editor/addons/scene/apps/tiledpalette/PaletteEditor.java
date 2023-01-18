@@ -13,12 +13,13 @@ import com.talosvfx.talos.editor.addons.scene.apps.AEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TileDataComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.maps.GridPosition;
 import com.talosvfx.talos.editor.utils.grid.RulerRenderer;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -8,16 +8,16 @@ import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.scene.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CameraComponentWrapper;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.components.CameraComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -93,7 +93,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 			return;
 
 		if(cameraGO != null) {
-			CameraComponentWrapper component = cameraGO.getComponent(CameraComponentWrapper.class);
+			CameraComponent component = cameraGO.getComponent(CameraComponent.class);
 			TransformComponent transform = cameraGO.getComponent(TransformComponent.class);
 			Camera camera = renderer.getCamera();
 			if(camera instanceof OrthographicCamera && lockCamera) {

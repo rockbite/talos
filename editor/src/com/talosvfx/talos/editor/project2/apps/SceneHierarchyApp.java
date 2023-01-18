@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Queue;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
@@ -14,6 +13,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.HierarchyPreference;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import com.talosvfx.talos.runtime.scene.Scene;
 
 @SingletonApp
 public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference> {

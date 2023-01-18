@@ -17,9 +17,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CameraComponentWrapper;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.CameraComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class CameraPreview extends Actor {
 
@@ -33,7 +33,7 @@ public class CameraPreview extends Actor {
 
     private Vector2 pixelSize = new Vector2();
     private Vector2 worldSize = new Vector2();
-    private CameraComponentWrapper component;
+    private CameraComponent component;
     private GameObject cameraObject;
 
     private float presumedRotation = 0;
@@ -130,6 +130,6 @@ public class CameraPreview extends Actor {
     public void setCamera (GameObjectContainer gameObjectContainer, GameObject cameraObject) {
         this.gameObjectContainer = gameObjectContainer;
         this.cameraObject = cameraObject;
-        this.component = cameraObject.getComponent(CameraComponentWrapper.class);
+        this.component = cameraObject.getComponent(CameraComponent.class);
     }
 }

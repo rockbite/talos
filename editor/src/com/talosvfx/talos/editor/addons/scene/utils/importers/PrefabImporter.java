@@ -1,8 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.talosvfx.talos.runtime.assets.GameAsset;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.PrefabMetadata;
+import com.talosvfx.talos.runtime.assets.meta.PrefabMetadata;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.Prefab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

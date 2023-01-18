@@ -25,7 +25,6 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClear
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -35,6 +34,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

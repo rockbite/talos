@@ -2,7 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.talosvfx.talos.runtime.assets.GameAsset;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

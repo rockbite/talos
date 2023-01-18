@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 
 public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
 

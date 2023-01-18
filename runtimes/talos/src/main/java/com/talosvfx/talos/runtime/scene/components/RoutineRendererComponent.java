@@ -20,9 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-public class RoutineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<BaseRoutineData>, ISizableComponent {
+public class RoutineRendererComponent<T extends BaseRoutineData> extends RendererComponent implements Json.Serializable, GameResourceOwner<T>, ISizableComponent {
 
-    GameAsset<BaseRoutineData> routineResource;
+    GameAsset<T> routineResource;
 
     GameAsset.GameAssetUpdateListener updateListener;
 
@@ -74,7 +74,7 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             }
         }
 
-        GameAsset<BaseRoutineData> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
+        GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
         setGameAsset(assetForIdentifier);
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
@@ -168,12 +168,12 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
     }
 
     @Override
-    public GameAsset<BaseRoutineData> getGameResource() {
+    public GameAsset<T> getGameResource() {
         return routineResource;
     }
 
     @Override
-    public void setGameAsset(GameAsset<BaseRoutineData> gameAsset) {
+    public void setGameAsset(GameAsset<T> gameAsset) {
         if (routineResource != null) {
             routineResource.listeners.removeValue(updateListener, true);
         }

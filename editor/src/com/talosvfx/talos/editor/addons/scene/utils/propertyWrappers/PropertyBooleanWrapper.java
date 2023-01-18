@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 public class PropertyBooleanWrapper extends PropertyWrapper<Boolean> {
     @Override

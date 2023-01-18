@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.routine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
 import com.talosvfx.talos.runtime.routine.nodes.RenderRoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -51,7 +53,7 @@ public class RoutineRenderer {
     private final Vector2 sizeTemp = new Vector2();
 
 
-    public void render(MainRenderer mainRenderer, Batch batch, GameObject gameObject, RoutineRendererComponent routineRendererComponent) {
+    public void render(Batch batch, Camera camera, GameObject gameObject, RoutineRendererComponent<?> routineRendererComponent) {
         RoutineInstance routineInstance = routineRendererComponent.routineInstance;
         boolean configured = routineInstance.checkConfigured();
 
@@ -74,8 +76,11 @@ public class RoutineRenderer {
         if (main instanceof RenderRoutineNode) {
             RenderRoutineNode renderRoutineNode = (RenderRoutineNode) main;
 
-            OrthographicCamera camera = (OrthographicCamera) mainRenderer.getCamera();
-            cameraViewportRect.setSize(camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom).setCenter(camera.position.x, camera.position.y);
+            float zoom = 1f;
+            if (camera instanceof OrthographicCamera) {
+                zoom = ((OrthographicCamera)camera).zoom;
+            }
+            cameraViewportRect.setSize(camera.viewportWidth * zoom, camera.viewportHeight * zoom).setCenter(camera.position.x, camera.position.y);
 
             //todo: instead make a nice node to do it
             objectViewportRect.setSize(viewportSize.x, viewportSize.y).setCenter(transform.position);
@@ -124,7 +129,7 @@ public class RoutineRenderer {
 
             for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
                 if(drawableQuad.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    drawSliced(batch, mainRenderer, drawableQuad);
+                    drawSliced(batch, drawableQuad);
                 } else {
                     boolean aspect = drawableQuad.aspect;
                     float scl = (float) drawableQuad.gameAsset.getResource().getWidth() / drawableQuad.gameAsset.getResource().getHeight();
@@ -166,8 +171,8 @@ public class RoutineRenderer {
 
     }
 
-    private void drawSliced(Batch batch, MainRenderer mainRenderer, DrawableQuad drawableQuad) {
-        final NinePatch patch = mainRenderer.obtainNinePatch(drawableQuad.gameAsset);// todo: this has to be done better
+    private void drawSliced (Batch batch, DrawableQuad drawableQuad) {
+        final NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(drawableQuad.gameAsset);// todo: this has to be done better
 
         float width = drawableQuad.size.x;
         float height = drawableQuad.size.y;

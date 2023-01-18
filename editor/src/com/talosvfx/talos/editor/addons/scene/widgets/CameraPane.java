@@ -7,10 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CameraComponentWrapper;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.CameraComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +71,7 @@ public class CameraPane extends Actor implements Observer {
         this.gameObjectContainer = gameObjectContainer;
         this.cameraObject = cameraObject;
 
-        CameraComponentWrapper component = cameraObject.getComponent(CameraComponentWrapper.class);
+        CameraComponent component = cameraObject.getComponent(CameraComponent.class);
         Vector2 size = component.size; // viewport size
         float aspect = size.x / size.y;
         float width = 200;

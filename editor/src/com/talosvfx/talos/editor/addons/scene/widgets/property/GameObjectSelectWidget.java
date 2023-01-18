@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Predicate;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.widgets.GameObjectListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -18,6 +17,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

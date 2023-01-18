@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
@@ -433,5 +434,23 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
         }
 
         return result;
+    }
+
+    public GameResourceOwner<?> getRenderResourceComponent () {
+        for (AComponent component : components) {
+            if (component instanceof GameResourceOwner && component instanceof RendererComponent) {
+                return (GameResourceOwner<?>)component;
+            }
+        }
+        return null;
+    }
+
+    public GameResourceOwner<?> getResourceComponent () {
+        for (AComponent component : components) {
+            if (component instanceof GameResourceOwner) {
+                return (GameResourceOwner<?>)component;
+            }
+        }
+        return null;
     }
 }

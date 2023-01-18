@@ -7,7 +7,8 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class GameObjectActor extends Table {
 

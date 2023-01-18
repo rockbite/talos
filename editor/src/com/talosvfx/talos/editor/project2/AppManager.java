@@ -15,7 +15,6 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.RawAsset;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
@@ -28,6 +27,7 @@ import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
+import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import lombok.Getter;
 
 import java.util.UUID;

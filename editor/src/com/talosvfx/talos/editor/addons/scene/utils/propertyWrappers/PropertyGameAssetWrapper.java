@@ -5,8 +5,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameResourceOwner;
-
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> implements GameResourceOwner {
 

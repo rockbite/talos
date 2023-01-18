@@ -7,9 +7,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponent;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
