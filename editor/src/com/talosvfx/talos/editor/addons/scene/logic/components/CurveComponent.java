@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.logic.components;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 import java.util.function.Supplier;
@@ -45,6 +47,8 @@ public class CurveComponent extends AComponent {
         if(automaticControl) {
             autoSetAllAffectedControlPoints(points.size - 1);
         }
+
+        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
     }
 
     public void splitSegment(Vector2 point, int segmentIndex) {
@@ -58,6 +62,8 @@ public class CurveComponent extends AComponent {
         } else {
             autoSetAnchorControlPoints(segmentIndex * 3 + 3);
         }
+
+        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
     }
 
     public void deleteSegment(int anchorIndex) {
@@ -74,6 +80,8 @@ public class CurveComponent extends AComponent {
                 points.removeRange(anchorIndex - 1, anchorIndex + 1);
             }
         }
+
+        SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
     }
 
     public void setClosedState(boolean isClosed) {
@@ -218,6 +226,7 @@ public class CurveComponent extends AComponent {
             public void report(Boolean value) {
                 if(isClosed != value) {
                     setClosedState(value);
+                    SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
                 }
             }
         });
@@ -234,6 +243,8 @@ public class CurveComponent extends AComponent {
             @Override
             public void report(Boolean value) {
                 if(automaticControl != value) {
+                    SceneUtils.componentUpdated(CurveComponent.this.getGameObject().getGameObjectContainerRoot(), CurveComponent.this.getGameObject(), CurveComponent.this);
+
                     automaticControl = value;
                     if(automaticControl) {
                         autoSetAllControlPoints();
@@ -289,7 +300,11 @@ public class CurveComponent extends AComponent {
                     }
                 }
             }
+
         }
+
+        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
+
         Pools.free(tmp);
     }
 
