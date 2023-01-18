@@ -171,7 +171,7 @@ public class RoutineInstance {
 
         IntMap<RoutineNode> idMap = new IntMap<>();
 
-        String nodePackageName = "com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.";
+        String nodePackageName = "com.talosvfx.talos.runtime.routine.nodes.";
         for(JsonValue nodeData: list) {
             String nodeName = nodeData.getString("name");
             int id = nodeData.getInt("id");

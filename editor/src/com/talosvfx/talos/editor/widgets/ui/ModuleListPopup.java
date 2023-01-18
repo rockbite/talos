@@ -142,7 +142,7 @@ public class ModuleListPopup extends VisWindow {
 
     private void registerModule(XmlReader.Element module) {
         try {
-            Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + module.getText());
+            Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.vfx.modules." + module.getText());
             Class wrapperClazz = ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
             TalosVFXUtils.moduleNames.put(wrapperClazz, module.getAttribute("name"));

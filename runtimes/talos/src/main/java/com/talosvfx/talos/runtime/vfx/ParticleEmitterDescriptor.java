@@ -42,12 +42,15 @@ import com.talosvfx.talos.runtime.vfx.modules.NoiseModule;
 import com.talosvfx.talos.runtime.vfx.modules.OffsetModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
 import com.talosvfx.talos.runtime.vfx.modules.PolylineModule;
+import com.talosvfx.talos.runtime.vfx.modules.QuadMeshGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.RadToCartModule;
 import com.talosvfx.talos.runtime.vfx.modules.RandomInputModule;
 import com.talosvfx.talos.runtime.vfx.modules.RandomRangeModule;
 import com.talosvfx.talos.runtime.vfx.modules.RibbonModule;
 import com.talosvfx.talos.runtime.vfx.modules.ScriptModule;
 import com.talosvfx.talos.runtime.vfx.modules.ShadedSpriteModule;
+import com.talosvfx.talos.runtime.vfx.modules.SingleParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
 import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
 import com.talosvfx.talos.runtime.vfx.modules.Vector2Module;
@@ -114,6 +117,10 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(AttractorModule.class);
             registeredModules.add(ForceApplierModule.class);
             registeredModules.add(NinePatchModule.class);
+            registeredModules.add(DrawableModule.class);
+            registeredModules.add(SingleParticlePointDataGeneratorModule.class);
+            registeredModules.add(QuadMeshGeneratorModule.class);
+            registeredModules.add(SpriteMaterialModule.class);
         }
     }
 
