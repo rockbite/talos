@@ -21,13 +21,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
 import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
-import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
-import com.talosvfx.talos.runtime.modules.Vector2Module;
+import com.talosvfx.talos.runtime.vfx.modules.Vector2Module;
 
 public class Vector2ModuleWrapper extends ModuleWrapper<Vector2Module> implements IDragPointProvider {
 

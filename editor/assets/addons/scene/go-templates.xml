@@ -1,4 +1,4 @@
-<entityTemplates componentClassPath="com.talosvfx.talos.editor.addons.scene.logic.components" gizmoClassPath="com.talosvfx.talos.editor.addons.scene.widgets.gizmos">
+<entityTemplates componentClassPath="com.talosvfx.talos.runtime.scene.components" gizmoClassPath="com.talosvfx.talos.editor.addons.scene.widgets.gizmos">
     <templates>
         <template name = "empty" title = "Empty Game Object" nameTemplate = "gameObject" keywords = "">
             <components>

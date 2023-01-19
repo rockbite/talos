@@ -26,8 +26,8 @@ import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
-import com.talosvfx.talos.runtime.modules.GlobalScopeModule;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.modules.GlobalScopeModule;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> implements IDragPointProvider {
 

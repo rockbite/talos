@@ -26,11 +26,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
-import com.talosvfx.talos.runtime.modules.EmitterModule;
+import com.talosvfx.talos.runtime.vfx.modules.EmitterModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +142,7 @@ public class ModuleListPopup extends VisWindow {
 
     private void registerModule(XmlReader.Element module) {
         try {
-            Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + module.getText());
+            Class moduleClazz = ClassReflection.forName("com.talosvfx.talos.runtime.vfx.modules." + module.getText());
             Class wrapperClazz = ClassReflection.forName("com.talosvfx.talos.editor.wrappers." + module.getAttribute("wrapper"));
             WrapperRegistry.reg(moduleClazz, wrapperClazz);
             TalosVFXUtils.moduleNames.put(wrapperClazz, module.getAttribute("name"));

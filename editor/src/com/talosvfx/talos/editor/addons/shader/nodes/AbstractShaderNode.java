@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;

@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,16 +11,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.components.PaintSurfaceComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class PaintSurfaceGizmo extends Gizmo {
 

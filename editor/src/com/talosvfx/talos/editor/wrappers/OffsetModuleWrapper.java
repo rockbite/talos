@@ -27,8 +27,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.CurveDataProvider;
 import com.talosvfx.talos.editor.widgets.CurveWidget;
 import com.talosvfx.talos.editor.widgets.ShapeInputWidget;
-import com.talosvfx.talos.runtime.modules.InterpolationModule;
-import com.talosvfx.talos.runtime.modules.OffsetModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
+import com.talosvfx.talos.runtime.vfx.modules.OffsetModule;
 
 public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements CurveDataProvider {
 

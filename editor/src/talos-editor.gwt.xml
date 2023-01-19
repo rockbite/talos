@@ -23,7 +23,7 @@
 
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.modules" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.serialization" />
-	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.Expression" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.runtime.vfx.Expression" />
 
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.project" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.project.ProjectController" />

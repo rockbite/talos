@@ -24,8 +24,11 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
@@ -34,11 +37,15 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExt
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.*;
-import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.Prefab;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.components.*;
+import com.talosvfx.talos.runtime.maps.LayerType;
 import com.talosvfx.talos.editor.addons.scene.maps.MapEditorState;
-import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
+import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
 import com.talosvfx.talos.editor.addons.scene.utils.FileWatching;
 import com.talosvfx.talos.editor.addons.scene.widgets.*;
@@ -52,9 +59,9 @@ import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
-import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
-import com.talosvfx.talos.editor.utils.NamingUtils;
+import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project.FileTracker;
@@ -62,6 +69,9 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -645,7 +655,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (gameObjectWeArePainting != null) {
 					if (type == LayerType.DYNAMIC_ENTITY) {
 						GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
-						Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+						TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
 						TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 						tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
 						layerSelected.getRootEntities().add(gameObject);
@@ -720,7 +730,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 							transformComponent.position.set((float) x + origin.x, (float) y + origin.y);
 
 							GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
-							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+							TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
 							TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 							tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
 							layerSelected.getRootEntities().add(gameObject);
@@ -736,7 +746,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 							transformComponent.position.set((float) x + origin.x, (float) y + origin.y);
 
 							GameObject gameObject = AssetRepository.getInstance().copyGameObject(gameObjectWeArePainting);
-							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+							TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
 							TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
 							tileDataComponent.getVisualOffset().set(transformSettings.transformOffsetX, transformSettings.transformOffsetY);
 							layerSelected.getRootEntities().add(gameObject);
@@ -822,7 +832,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 								gridSizeY = mapEditorState.getLayerSelected().getTileSizeY();
 							}
 
-							Gizmo.TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
+							TransformSettings transformSettings = gameObjectWeArePainting.getTransformSettings();
 
 							float transformOffsetModX = transformSettings.transformOffsetX % gridSizeX;
 							float transformOffsetModY = transformSettings.transformOffsetY % gridSizeY;
@@ -930,36 +940,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 
-	public void cleanWorkspace () {
-
-	}
-
-	public String writeExport () {
-		exporting = true;
-		AssetRepository.getInstance().exportToFile();
-
-		// write rest of files
-		String exportType = TalosMain.Instance().Prefs().getString("exportType", "Default");
-		if (exportType.equals("Default")) {
-			// default behaviour
-		} else if (exportType.equals("Custom Script")) {
-
-		}
-		exporting = false;
-
-		return "";
-	}
-
-	public void setProjectPath (String path) {
-		projectPath = path;
-	}
-
-	// if asset is updated externally, do something about it maybe
-	public void updateAsset (FileHandle handle) {
-
-	}
-
-
 	public void openSavableContainer (SavableContainer mainScene) {
 		if (mainScene == null)
 			return;
@@ -974,7 +954,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		clearSelection();
 
-		selectPropertyHolder(mainScene);
+		selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(mainScene));
 
 		if (mainScene instanceof Scene) {
 			gridPropertyProvider.getBackgroundColor().set(Color.valueOf("#272727"));
@@ -1129,16 +1109,20 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			// we select the main container then
 			if (currentContainer instanceof Scene) {
 				Scene scene = (Scene) currentContainer;
-				selectPropertyHolder(scene);
+				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(scene));
 			} else if (currentContainer instanceof Prefab) {
 				Prefab prefab = (Prefab) currentContainer;
-				selectPropertyHolder(prefab);
+				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(prefab));
 			}
 		} else {
 			if (gameObjects.size == 1) {
-				selectPropertyHolder(gameObjects.first());
+				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(gameObjects.first()));
 			} else {
-				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
+				ObjectSet<IPropertyHolder> tempList = new ObjectSet<>();
+				for (GameObject gameObject : gameObjects) {
+					tempList.add(PropertyWrapperProviders.getOrCreateHolder(gameObject));
+				}
+				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(new MultiPropertyHolder<>(tempList)));
 			}
 		}
 

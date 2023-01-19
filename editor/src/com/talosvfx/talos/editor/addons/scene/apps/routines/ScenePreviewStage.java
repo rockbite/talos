@@ -6,19 +6,19 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 
-import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.components.CameraComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -125,7 +125,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if(gameAsset != null) {
 			SavableContainer currentContainer = gameAsset.getResource();
 			Scene scene = new Scene();
-			scene.load(currentContainer.getAsString());
+			scene.load(TempHackUtil.hackIt(currentContainer.getAsString()));
 
 			currentScene = scene;
 		}

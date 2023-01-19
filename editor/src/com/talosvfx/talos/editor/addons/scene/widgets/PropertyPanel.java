@@ -9,13 +9,14 @@ import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -56,8 +57,8 @@ public class PropertyPanel extends Table implements Observer {
     }
 
     @EventHandler
-    public void onGameObjectNameChanged(GameObjectNameChanged event) {
-        PropertiesPanel propertiesPanel = providerPanelMap.get(event.target);
+    public void onGameObjectNameChanged (GameObjectNameChanged event) {
+        PropertiesPanel propertiesPanel = providerPanelMap.get(PropertyWrapperProviders.getOrCreateProvider(event.target));
         if(propertiesPanel != null) {
             propertiesPanel.updateValues();
         }
@@ -162,7 +163,7 @@ public class PropertyPanel extends Table implements Observer {
     @EventHandler
     public void onComponentUpdate (ComponentUpdated componentUpdated) {
         if (!ignoringEvents) {
-            propertyProviderUpdated(componentUpdated.getComponent());
+            propertyProviderUpdated(PropertyWrapperProviders.getOrCreateProvider(componentUpdated.getComponent()));
         }
     }
     @EventHandler

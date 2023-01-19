@@ -17,8 +17,8 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.utils.IntMap;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.RandomInputModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.RandomInputModule;
 
 public class RandomInputModuleWrapper extends ModuleWrapper<RandomInputModule> {
 

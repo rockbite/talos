@@ -22,8 +22,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
-import com.talosvfx.talos.runtime.modules.InputModule;
-import com.talosvfx.talos.runtime.ScopePayload;
+import com.talosvfx.talos.runtime.vfx.modules.InputModule;
+import com.talosvfx.talos.runtime.vfx.ScopePayload;
 
 public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 

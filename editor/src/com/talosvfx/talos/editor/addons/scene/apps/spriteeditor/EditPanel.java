@@ -14,9 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 
 public class EditPanel extends Table {
     public static final float WIDTH = 300f;

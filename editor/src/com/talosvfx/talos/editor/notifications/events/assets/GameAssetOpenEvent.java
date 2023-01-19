@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.notifications.events.assets;
 
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;

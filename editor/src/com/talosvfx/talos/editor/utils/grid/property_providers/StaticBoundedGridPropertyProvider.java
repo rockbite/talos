@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

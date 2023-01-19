@@ -1,10 +1,10 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
 import com.badlogic.gdx.utils.Json;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.runtime.scene.components.AComponent;
 import lombok.Data;
 
 @Data

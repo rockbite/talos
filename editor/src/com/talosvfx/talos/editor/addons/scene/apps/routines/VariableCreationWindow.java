@@ -14,13 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeMappers;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.NodeListPopup;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
@@ -28,6 +25,10 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
+import com.talosvfx.talos.runtime.routine.RoutineNode;
+import com.talosvfx.talos.runtime.routine.nodes.ExposedVariableNode;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,7 +153,7 @@ public class VariableCreationWindow extends Table {
 
             try {
                 PropertyType type = propertyWrapper.getType();
-                ATypeWidget innerWidget = ClassReflection.newInstance(type.getWidgetClass());
+                ATypeWidget innerWidget = ClassReflection.newInstance(PropertyTypeMappers.getWidgetForPropertyTYpe(type));
                 CustomVarWidget widget = new CustomVarWidget(routineStage, innerWidget, propertyWrapper.index);
                 widget.setValue(propertyWrapper.propertyName);
                 inner.add(widget).padTop(2).growX();

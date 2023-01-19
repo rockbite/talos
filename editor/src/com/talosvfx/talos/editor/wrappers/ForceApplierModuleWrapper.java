@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.wrappers;
 
-import com.talosvfx.talos.runtime.modules.ForceApplierModule;
+import com.talosvfx.talos.runtime.vfx.modules.ForceApplierModule;
 
 public class ForceApplierModuleWrapper extends ModuleWrapper<ForceApplierModule> {
 

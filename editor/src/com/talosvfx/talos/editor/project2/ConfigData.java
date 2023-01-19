@@ -5,7 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
+import com.talosvfx.talos.runtime.routine.RoutineConfigMap;
 import lombok.Getter;
 
 public class ConfigData {

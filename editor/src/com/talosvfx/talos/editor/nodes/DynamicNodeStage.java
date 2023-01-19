@@ -13,13 +13,12 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.data.DynamicNodeStageData;
 import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

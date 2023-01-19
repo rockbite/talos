@@ -12,11 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.FocusManager;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.logic.components.CurveComponent;
-import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.CurveComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

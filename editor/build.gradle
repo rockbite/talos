@@ -33,14 +33,14 @@ dependencies {
 
     implementation libs.string.similarity
 
-    implementation libs.spine.libgdx
-
     implementation libs.snakeyaml
 
     implementation libs.tiny.gizmo
     implementation libs.spark
 
     implementation libs.javapoet
+
+    implementation libs.classpathscanner
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok

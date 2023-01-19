@@ -18,10 +18,8 @@ package com.talosvfx.talos.editor;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineItemDataProvider;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 
 public class ParticleEmitterWrapper implements TimelineItemDataProvider<ParticleEmitterWrapper> {
 

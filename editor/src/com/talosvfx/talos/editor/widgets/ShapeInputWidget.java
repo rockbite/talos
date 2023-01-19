@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
-import static com.talosvfx.talos.runtime.modules.OffsetModule.*;
+import static com.talosvfx.talos.runtime.vfx.modules.OffsetModule.*;
 
 public class ShapeInputWidget extends Table {
 

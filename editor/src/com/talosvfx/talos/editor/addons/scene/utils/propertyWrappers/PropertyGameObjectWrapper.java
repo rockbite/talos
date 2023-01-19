@@ -3,7 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
-import com.talosvfx.talos.runtime.modules.VectorSplitModule;
+import com.talosvfx.talos.runtime.vfx.modules.VectorSplitModule;
 
 public class VectorSplitModuleWrapper extends ModuleWrapper<VectorSplitModule> implements IDragPointProvider {
 

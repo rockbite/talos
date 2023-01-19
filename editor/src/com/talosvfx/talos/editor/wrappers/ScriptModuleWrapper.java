@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisTextArea;
-import com.talosvfx.talos.runtime.modules.ScriptModule;
+import com.talosvfx.talos.runtime.vfx.modules.ScriptModule;
 
 public class ScriptModuleWrapper extends ModuleWrapper<ScriptModule> {
 
