@@ -20,6 +20,9 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
     public transient Vector2[] tmpArr;
     private boolean reverse = false;
 
+    private final Vector2 offset = new Vector2();
+    private boolean useLocalCoords = true;
+
     public MoveOnPath() {
         tmpArr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
     }
@@ -49,6 +52,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
         gameObjects.clear();
 
         reverse = fetchBooleanValue("reverse");
+        useLocalCoords = fetchBooleanValue("useLocalCoords");
 
         SavableContainer container = routineInstanceRef.getContainer();
 
@@ -61,13 +65,22 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
             gameObjects = container.findGameObjects(target);
         }
 
-        if(gameObjects.size > 0) {
+        if (gameObjects.size > 0) {
             GameObject go = gameObjects.first();
-            if(go.hasComponent(CurveComponent.class)) {
+            // make sure offset is always set back to zero
+            // so world transforms won't accumulate
+            // or old state would not persist
+            offset.setZero();
+            if (go.hasComponent(TransformComponent.class)) {
+                // store world offset
+                TransformComponent.localToWorld(go, offset);
+            }
+
+            if (go.hasComponent(CurveComponent.class)) {
                 copyPoints(go.getComponent(CurveComponent.class), state.points);
 
                 float jitter = fetchFloatValue("jitter");
-                if(jitter > 0) {
+                if (jitter > 0) {
                     randomizeCurve(state.points, jitter);
                 }
 
@@ -114,7 +127,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
 
         float currLen = 0;
 
-        for(int i = 0; i < getNumSegments(state.points); i++) {
+        for (int i = 0; i < getNumSegments(state.points); i++) {
             Vector2[] pointsInSegment = getPointsInSegment(i, state.points);
             bezier.set(pointsInSegment);
             float length = state.lengthData.get(i);
@@ -127,6 +140,10 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
                 Vector2 point = bezier.valueAt(tmp, localAlpha);
                 TransformComponent transform = state.getTarget().getComponent(TransformComponent.class);
                 transform.position.set(point);
+                if (!useLocalCoords) {
+                    // offset with transform of curve's gizmo
+                    transform.position.add(offset);
+                }
                 break;
             }
         }
