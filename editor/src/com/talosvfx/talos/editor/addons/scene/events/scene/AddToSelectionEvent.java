@@ -4,9 +4,10 @@ import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 import lombok.Data;
 
-public class AddToSelectionEvent extends ContextRequiredEvent<GameObjectContainer> {
+public class AddToSelectionEvent extends AbstractContextRequiredEvent<GameObjectContainer> {
 
 	private GameObject gameObject;
 
@@ -23,6 +24,7 @@ public class AddToSelectionEvent extends ContextRequiredEvent<GameObjectContaine
 
 	@Override
 	public void reset () {
+		super.reset();
 		gameObject = null;
 	}
 }

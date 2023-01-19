@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
