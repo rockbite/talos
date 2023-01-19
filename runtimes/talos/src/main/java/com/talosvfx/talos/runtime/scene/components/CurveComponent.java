@@ -3,7 +3,6 @@ package com.talosvfx.talos.runtime.scene.components;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

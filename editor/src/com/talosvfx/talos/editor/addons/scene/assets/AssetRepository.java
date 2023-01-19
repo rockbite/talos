@@ -474,7 +474,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
 		if (settings.isForceExportAll()) {
-			do the export for force
+			logger.info("todo export force");
 		} else {
 			logger.info("todo check all  other cases");
 
