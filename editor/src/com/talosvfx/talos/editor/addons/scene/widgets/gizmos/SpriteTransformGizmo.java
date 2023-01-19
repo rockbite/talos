@@ -93,17 +93,13 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 
 
-        // bring old next points to local space
-        for(int i = 0; i < 4; i++) {
-            TransformComponent.worldToLocal(gameObject.parent, nextPoints[i]);
-        }
-
         int howMany90Rots = MathUtils.floor(transform.worldRotation / 90);
         int howMany180Rots = MathUtils.floor(transform.worldRotation / 180f);
         int sig = (int) Math.pow(-1, howMany90Rots + howMany180Rots);
 
         spriteRendererComponent.size.set(nextPoints[RB].dst(nextPoints[LB]) * Math.signum(nextPoints[RB].x - nextPoints[LB].x) * sig, nextPoints[LB].dst(nextPoints[LT]) * Math.signum(nextPoints[LT].y - nextPoints[LB].y) * sig);
         spriteRendererComponent.size = lowerPrecision(spriteRendererComponent.size);
+
 
         // if aspect ratio is fixed set height by width
         if (spriteRendererComponent.fixAspectRatio) {
@@ -115,36 +111,30 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
             }
         }
 
-        if (spriteRendererComponent.fixAspectRatio) {
 
-
-
-            if (touchedPoint == RT) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
-
-                transform.position.set(nextPoints[LB]).add(tempVec2.x, tempVec2.y);
-            } else if (touchedPoint == LT) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
-
-                transform.position.set(nextPoints[RB]).add(-tempVec2.x, tempVec2.y);
-            } else if (touchedPoint == LB) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
-
-                transform.position.set(nextPoints[RT]).add(-tempVec2.x, -tempVec2.y);
-            } else if (touchedPoint == RB) {
-                tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
-
-                transform.position.set(nextPoints[LT]).add(tempVec2.x, -tempVec2.y);
-            }
-
-            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
-
-        } else {
+        if (touchedPoint == RT) {
             tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
-            transform.position.set(nextPoints[LB]).add(tempVec2);
-            transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+            transform.position.set(nextPoints[LB]).add(tempVec2.x, tempVec2.y);
+        } else if (touchedPoint == LT) {
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
+
+            transform.position.set(nextPoints[RB]).add(-tempVec2.x, tempVec2.y);
+        } else if (touchedPoint == LB) {
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+
+            transform.position.set(nextPoints[RT]).add(-tempVec2.x, -tempVec2.y);
+        } else if (touchedPoint == RB) {
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
+
+            transform.position.set(nextPoints[LT]).add(tempVec2.x, -tempVec2.y);
         }
 
+        transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+
+        TransformComponent.worldToLocal(gameObject.parent, transform.position);
+        transform.position.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
         transform.position = lowerPrecision(transform.position);
     }
 
