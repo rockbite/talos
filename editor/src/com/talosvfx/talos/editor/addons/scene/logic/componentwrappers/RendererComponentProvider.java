@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;

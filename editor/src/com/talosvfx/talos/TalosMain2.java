@@ -125,6 +125,8 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		//todo: move this somewhere else
 		SocketServer.getInstance();
+
+		RuntimeContext.getInstance().setSceneData(projectData.getSceneData());
 	}
 
 

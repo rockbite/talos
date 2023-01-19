@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.project2.projectdata;
+package com.talosvfx.talos.runtime.scene;
 
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.scene.SceneLayer;

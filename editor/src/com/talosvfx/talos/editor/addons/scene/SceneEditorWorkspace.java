@@ -59,7 +59,7 @@ import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
-import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;

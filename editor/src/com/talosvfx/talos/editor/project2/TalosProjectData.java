@@ -10,7 +10,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.utils.Toasts;
 import lombok.Getter;
 import lombok.Setter;

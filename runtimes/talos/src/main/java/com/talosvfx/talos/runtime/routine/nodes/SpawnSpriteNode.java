@@ -2,9 +2,13 @@ package com.talosvfx.talos.runtime.routine.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
@@ -36,10 +40,9 @@ public class SpawnSpriteNode extends RoutineNode {
             spriteRendererComponent.setGameAsset(asset);
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
 
-            logger.error("REDO THIS");
-//            SceneData sceneData = SharedResources.currentProject.getSceneData();
-//            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
-//            spriteRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
+            SceneData sceneData = RuntimeContext.getInstance().sceneData;
+            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+            spriteRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
 
             target.addGameObject(go);
 

@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
-import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ItemData;

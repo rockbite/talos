@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime;
 
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +17,8 @@ public class RuntimeContext {
 
 	@Getter@Setter
 	public BaseAssetRepository AssetRepository;
+
+	@Getter@Setter
+	public SceneData sceneData;
 
 }
