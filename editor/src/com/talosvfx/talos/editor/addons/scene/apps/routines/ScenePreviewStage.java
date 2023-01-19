@@ -18,6 +18,7 @@ import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.CameraComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		if(gameAsset != null) {
 			SavableContainer currentContainer = gameAsset.getResource();
 			Scene scene = new Scene();
-			scene.load(currentContainer.getAsString());
+			scene.load(TempHackUtil.hackIt(currentContainer.getAsString()));
 
 			currentScene = scene;
 		}

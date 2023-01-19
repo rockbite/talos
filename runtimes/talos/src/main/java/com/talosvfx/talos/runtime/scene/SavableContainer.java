@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,7 +186,7 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 	}
 
 	public void loadFromHandle (FileHandle handle) {
-		load(handle.readString());
+		load(TempHackUtil.hackIt(handle.readString()));
 	}
 
 	public Array<GameObject> findGameObjects(String targetString) {
