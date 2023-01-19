@@ -40,6 +40,8 @@ dependencies {
 
     implementation libs.javapoet
 
+    implementation libs.classpathscanner
+
     compileOnly libs.lombok
     annotationProcessor libs.lombok
 }

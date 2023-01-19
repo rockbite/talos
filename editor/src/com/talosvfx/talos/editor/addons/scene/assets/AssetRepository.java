@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -42,6 +43,7 @@ import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
@@ -78,7 +80,7 @@ import java.util.regex.Pattern;
 
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
-public class AssetRepository implements Observer {
+public class AssetRepository extends BaseAssetRepository implements Observer {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(AssetRepository.class);
@@ -111,6 +113,11 @@ public class AssetRepository implements Observer {
 		brokenAsset.setBroken(new Exception("No asset found"));
 		brokenAsset.setNonFound(true);
 		return brokenAsset;
+	}
+
+	@Override
+	public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+		return null;
 	}
 
 	private <T> void putAssetForIdentifier (String identifier, GameAssetType type, GameAsset<T> asset) {

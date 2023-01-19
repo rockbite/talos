@@ -26,6 +26,7 @@ import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -58,6 +59,10 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
 		SharedResources.configData = new ConfigData();
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
+
+		RuntimeContext instance = RuntimeContext.getInstance();
+		instance.AssetRepository = AssetRepository.getInstance();
+
 		SaveSystem saveSystem = new SaveSystem();
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));

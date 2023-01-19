@@ -27,6 +27,7 @@ dependencyResolutionManagement {
             version("javapoet", "1.13.0")
             version("lombokPlugin", "6.4.1")
             version("grgit", "3.1.1")
+            version("classpathscanner", "4.8.154")
 
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
@@ -60,6 +61,7 @@ dependencyResolutionManagement {
             library("javapoet", "com.squareup", "javapoet").versionRef("javapoet")
 
             library("grgit", "org.ajoberstar.grgit", "grgit-gradle").versionRef("grgit")
+            library("classpathscanner", "io.github.classgraph", "classgraph").versionRef("classpathscanner")
 
             plugin("grgit", "org.ajoberstar.grgit").versionRef("grgit")
             plugin("lombok", "io.freefair.lombok").versionRef("lombokPlugin")

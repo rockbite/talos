@@ -26,7 +26,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -937,36 +937,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		renderer.setLayers(getLayerList());
 		renderer.update(currentContainer.getSelfObject());
 		renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
-	}
-
-
-	public void cleanWorkspace () {
-
-	}
-
-	public String writeExport () {
-		exporting = true;
-		AssetRepository.getInstance().exportToFile();
-
-		// write rest of files
-		String exportType = TalosMain.Instance().Prefs().getString("exportType", "Default");
-		if (exportType.equals("Default")) {
-			// default behaviour
-		} else if (exportType.equals("Custom Script")) {
-
-		}
-		exporting = false;
-
-		return "";
-	}
-
-	public void setProjectPath (String path) {
-		projectPath = path;
-	}
-
-	// if asset is updated externally, do something about it maybe
-	public void updateAsset (FileHandle handle) {
-
 	}
 
 

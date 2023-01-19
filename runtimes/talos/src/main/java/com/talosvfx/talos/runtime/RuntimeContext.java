@@ -14,8 +14,6 @@ public class RuntimeContext {
 		return context;
 	}
 
-	private boolean isEditor = true;
-
 	@Getter@Setter
 	public BaseAssetRepository AssetRepository;
 
