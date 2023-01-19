@@ -13,10 +13,6 @@ public class CheckboxWithZoom extends CheckBox {
         super(text, skin, styleName);
     }
 
-    public CheckboxWithZoom(String text, CheckBoxStyle style) {
-        super(text, style);
-    }
-
     @Override
     protected Label newLabel(String text, Label.LabelStyle style) {
         return new LabelWithZoom(text, style);

@@ -55,7 +55,7 @@ public class SelectBoxWithZoom<T> extends SelectBox<T> {
             GlyphLayout glyphForFont = UIUtils.getGlyphForFont(defaultSizedFont);
             float height = glyphForFont.height;
 
-            float preferredHeight = stageToScreen(height);
+            float preferredHeight = UIUtils.stageToScreen(getStage(), height);
             if (preferredHeight == 0 || Float.isNaN(preferredHeight)) {
                 //Not ready yet
                 return;
@@ -64,7 +64,7 @@ public class SelectBoxWithZoom<T> extends SelectBox<T> {
             for (int i = 5; i <= 90; i++) {
                 testFont = UIUtils.getFontForSize(i);
                 GlyphLayout glyphForTest = UIUtils.getGlyphForFont(testFont);
-                if (glyphForTest.height > preferredHeight) {
+                if (glyphForTest.height >= preferredHeight) {
                     break;
                 }
             }
@@ -78,35 +78,10 @@ public class SelectBoxWithZoom<T> extends SelectBox<T> {
             }
 
             float fontScale = preferredHeight / UIUtils.getGlyphForFont(testFont).height;
-            float finalScale = screenToStage(fontScale);
+            float finalScale = UIUtils.screenToStage(getStage(), fontScale);
             newFont.getData().setScale(finalScale);
             invalidateHierarchy();
         }
     }
 
-    Vector2 tmp = new Vector2();
-
-    private float screenToStage (float screenSize) {
-        tmp.set(0, 0);
-        getStage().screenToStageCoordinates(tmp);
-        float baseline = tmp.x;
-
-        tmp.set(screenSize, 0);
-        getStage().screenToStageCoordinates(tmp);
-        float pos = tmp.x;
-
-        return Math.abs(pos - baseline);
-    }
-
-    private float stageToScreen(float stageSize) {
-        tmp.set(0, 0);
-        getStage().stageToScreenCoordinates(tmp);
-        float baseline = tmp.x;
-
-        tmp.set(stageSize, 0);
-        getStage().stageToScreenCoordinates(tmp);
-        float pos = tmp.x;
-
-        return Math.abs(pos - baseline);
-    }
 }

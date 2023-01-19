@@ -2,12 +2,15 @@ package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
@@ -93,5 +96,41 @@ public class UIUtils {
         table.setColor(Color.valueOf("444444ff"));
 
         return table;
+    }
+
+    private static Vector2 tmp = new Vector2();
+
+    public static float stageToScreen(Stage stage, float stageSize) {
+        if (stage.getCamera() instanceof OrthographicCamera) {
+            if (((OrthographicCamera) stage.getCamera()).zoom == 1) {
+                return stageSize;
+            }
+        }
+        tmp.set(0, 0);
+        stage.stageToScreenCoordinates(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(stageSize, 0);
+        stage.stageToScreenCoordinates(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline);
+    }
+
+    public static float screenToStage (Stage stage, float screenSize) {
+        if (stage.getCamera() instanceof OrthographicCamera) {
+            if (((OrthographicCamera) stage.getCamera()).zoom == 1) {
+                return screenSize;
+            }
+        }
+        tmp.set(0, 0);
+        stage.screenToStageCoordinates(tmp);
+        float baseline = tmp.x;
+
+        tmp.set(screenSize, 0);
+        stage.screenToStageCoordinates(tmp);
+        float pos = tmp.x;
+
+        return Math.abs(pos - baseline);
     }
 }

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -67,7 +68,7 @@ public class LabelWithZoom extends Label {
             GlyphLayout glyphForFont = UIUtils.getGlyphForFont(defaultSizedFont);
             float height = glyphForFont.height;
 
-            float preferredHeight = stageToScreen(height);
+            float preferredHeight = UIUtils.stageToScreen(getStage(), height);
             if (preferredHeight == 0 || Float.isNaN(preferredHeight)) {
                 //Not ready yet
                 return;
@@ -76,7 +77,7 @@ public class LabelWithZoom extends Label {
             for (int i = 5; i <= 90; i++) {
                 testFont = UIUtils.getFontForSize(i);
                 GlyphLayout glyphForTest = UIUtils.getGlyphForFont(testFont);
-                if (glyphForTest.height > preferredHeight) {
+                if (glyphForTest.height >= preferredHeight) {
                     break;
                 }
             }
@@ -90,7 +91,7 @@ public class LabelWithZoom extends Label {
             }
 
             float fontScale = preferredHeight / UIUtils.getGlyphForFont(testFont).height;
-            float finalScale = screenToStage(fontScale);
+            float finalScale = UIUtils.screenToStage(getStage(), fontScale);
             float fontScaleX = getFontScaleX();
             if (finalScale != fontScaleX) {
                 setFontScale(finalScale);
@@ -98,37 +99,5 @@ public class LabelWithZoom extends Label {
             }
         }
         super.act(delta);
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
-
-    }
-
-    private Vector2 tmp = new Vector2();
-
-    private float stageToScreen(float stageSize) {
-        tmp.set(0, 0);
-        getStage().stageToScreenCoordinates(tmp);
-        float baseline = tmp.x;
-
-        tmp.set(stageSize, 0);
-        getStage().stageToScreenCoordinates(tmp);
-        float pos = tmp.x;
-
-        return Math.abs(pos - baseline);
-    }
-
-    private float screenToStage (float screenSize) {
-        tmp.set(0, 0);
-        getStage().screenToStageCoordinates(tmp);
-        float baseline = tmp.x;
-
-        tmp.set(screenSize, 0);
-        getStage().screenToStageCoordinates(tmp);
-        float pos = tmp.x;
-
-        return Math.abs(pos - baseline);
     }
 }
