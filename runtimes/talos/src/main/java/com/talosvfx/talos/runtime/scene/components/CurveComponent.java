@@ -3,10 +3,15 @@ package com.talosvfx.talos.runtime.scene.components;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 public class CurveComponent extends AComponent {
+
+    private static final Logger logger = LoggerFactory.getLogger(CurveComponent.class);
 
     public Array<Vector2> points = new Array<>();
 
@@ -44,6 +49,9 @@ public class CurveComponent extends AComponent {
         if(automaticControl) {
             autoSetAllAffectedControlPoints(points.size - 1);
         }
+
+        logger.error("REDO THIS");
+//        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void splitSegment(Vector2 point, int segmentIndex) {
@@ -57,6 +65,9 @@ public class CurveComponent extends AComponent {
         } else {
             autoSetAnchorControlPoints(segmentIndex * 3 + 3);
         }
+
+        logger.error("REDO THIS");
+//        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void deleteSegment(int anchorIndex) {
@@ -73,6 +84,9 @@ public class CurveComponent extends AComponent {
                 points.removeRange(anchorIndex - 1, anchorIndex + 1);
             }
         }
+
+        logger.error("REDO THIS");
+//        SceneUtils.componentUpdated(this.getGameObject().getGameObjectContainerRoot(), this.getGameObject(), this);
     }
 
     public void setClosedState(boolean isClosed) {
@@ -213,7 +227,10 @@ public class CurveComponent extends AComponent {
                     }
                 }
             }
+
         }
+
+
         Pools.free(tmp);
     }
 

@@ -8,8 +8,12 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpawnSpineNode extends RoutineNode {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpawnSpineNode.class);
 
     private Vector2 tmp = new Vector2();
 
@@ -33,6 +37,12 @@ public class SpawnSpineNode extends RoutineNode {
             go.addComponent(spineRendererComponent);
             spineRendererComponent.setGameAsset(asset);
             spineRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
+
+            logger.error("REDO THIS");
+//            SceneData sceneData = SharedResources.currentProject.getSceneData();
+//            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+//            spineRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
+
             target.addGameObject(go);
 
             Color color = fetchColorValue("color");

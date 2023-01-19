@@ -14,8 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
@@ -145,8 +147,12 @@ public class PaintSurfaceGizmo extends Gizmo {
             }
         }
 
-        if(frameBuffer == null || sizeIsDifferent) {
-            createFrameBuffer();
+        if (frameBuffer == null || sizeIsDifferent) {
+           FrameBuffer fbo = createFrameBuffer();
+           if (fbo == null) {
+               // framebuffer creation was unsuccessful, skip
+               return;
+           }
         }
 
         drawBrushToBuffer();
@@ -154,7 +160,9 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void touchDragged(float x, float y) {
-        drawBrushToBuffer();
+        if (frameBuffer != null) {
+            drawBrushToBuffer();
+        }
     }
 
     @Override
@@ -162,9 +170,18 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     }
 
-    private void createFrameBuffer() {
+    private FrameBuffer createFrameBuffer() {
+        if (frameBuffer != null) {
+            frameBuffer.dispose();
+        }
+
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        Texture resource = surface.getGameResource().getResource();
+        GameAsset<Texture> gameResource = surface.getGameResource();
+        if (gameResource.isBroken()) {
+            // no texture is assigned to the surface,skip
+            return null;
+        }
+        Texture resource = gameResource.getResource();
         resource.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, resource.getWidth(), resource.getHeight(), false);
 
@@ -188,6 +205,8 @@ public class PaintSurfaceGizmo extends Gizmo {
         frameBuffer.end();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         innerBatch.enableBlending();
+
+        return frameBuffer;
     }
 
     private void createBrushTexture() {

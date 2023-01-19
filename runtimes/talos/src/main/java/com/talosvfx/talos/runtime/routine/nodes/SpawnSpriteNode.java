@@ -8,8 +8,12 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpawnSpriteNode extends RoutineNode {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpawnSpriteNode.class);
 
     private Vector2 tmp = new Vector2();
 
@@ -31,6 +35,12 @@ public class SpawnSpriteNode extends RoutineNode {
             go.addComponent(spriteRendererComponent);
             spriteRendererComponent.setGameAsset(asset);
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
+
+            logger.error("REDO THIS");
+//            SceneData sceneData = SharedResources.currentProject.getSceneData();
+//            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+//            spriteRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
+
             target.addGameObject(go);
 
             spriteRendererComponent.size.x = fetchFloatValue("width");

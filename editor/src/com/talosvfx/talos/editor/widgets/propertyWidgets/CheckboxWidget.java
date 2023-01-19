@@ -44,8 +44,7 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 	@Override
 	public void updateWidget(Boolean value) {
 		if(value == null) return;
-		checkBox.removeListener(listener);
+		checkBox.setProgrammaticChangeEvents(false);
 		checkBox.setChecked(value);
-		checkBox.addListener(listener);
 	}
 }

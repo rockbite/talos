@@ -95,7 +95,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
                 AddToSelectionEvent addToSelectionEvent = Notifications.obtainEvent(AddToSelectionEvent.class);
-                addToSelectionEvent.setGameObject(gameObject);
+                addToSelectionEvent.set(currentContainer, gameObject);
                 Notifications.fireEvent(addToSelectionEvent);
 
             }

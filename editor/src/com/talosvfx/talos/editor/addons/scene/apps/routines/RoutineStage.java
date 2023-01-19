@@ -47,6 +47,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private boolean playing;
     private ScenePreviewApp scenePreviewApp;
 
+    private boolean cameraLocked = false;
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
@@ -318,6 +319,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
             if(result) {
                 playing = true;
+                lockCamera(cameraLocked);
             }
         }
     }
@@ -356,6 +358,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void lockCamera(boolean checked) {
+        cameraLocked = checked;
         if(scenePreviewApp != null) {
             scenePreviewApp.setLockCamera(checked);
         }

@@ -4,20 +4,21 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.routine.TickableNode;
-import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
-public class CallRoutineNode extends RoutineNode implements TickableNode {
-
+public class CallRoutineNode extends RoutineNode implements TickableNode, GameAsset.GameAssetUpdateListener {
 
     RoutineInstance targetInstance;
     private RoutineInstance.RoutineListenerAdapter listener;
+
+    GameAsset<BaseRoutineData> currentSelectedAsset;
 
     @Override
     protected void constructNode(XmlReader.Element config) {
@@ -50,6 +51,10 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
     public void customConstruction(GameAsset<BaseRoutineData> asset) {
         //todo: ths should be done in a runtime friendly way
+
+        if (currentSelectedAsset != null) {
+            currentSelectedAsset.listeners.removeValue(this, true);
+        }
         BaseRoutineData resource = asset.getResource();
         if(resource == null) {
             configured = false;
@@ -79,6 +84,8 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
 
         // now create that routine
         targetInstance = asset.getResource().createInstance(false);
+        currentSelectedAsset = asset;
+        currentSelectedAsset.listeners.add(this);
     }
 
     private DataType makeDataType(PropertyType type) {
@@ -145,6 +152,13 @@ public class CallRoutineNode extends RoutineNode implements TickableNode {
             targetInstance.removeListener();
 
             targetInstance.reset();
+        }
+    }
+
+    @Override
+    public void onUpdate() {
+        if (!currentSelectedAsset.isBroken()) {
+            targetInstance = currentSelectedAsset.getResource().createInstance(false);
         }
     }
 }
