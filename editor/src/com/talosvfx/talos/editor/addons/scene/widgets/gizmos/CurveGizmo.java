@@ -254,9 +254,12 @@ public class CurveGizmo extends Gizmo {
         if(touchedPointRef != null) {
             touchDragged = true;
 
-            CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+            final CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+
             Vector2 pos = toLocal(tmp3.set(x, y));
             curve.movePoint(touchedPointIndex, pos.x, pos.y);
+
+            SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve, true);
         }
     }
 
@@ -268,7 +271,7 @@ public class CurveGizmo extends Gizmo {
         if (touchDragged) {
             touchDragged = false;
             final CurveComponent curve = gameObject.getComponent(CurveComponent.class);
-            SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve);
+            SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve, false);
         }
     }
 
