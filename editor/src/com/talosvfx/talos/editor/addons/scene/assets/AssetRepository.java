@@ -473,6 +473,15 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	public void exportToFile (AssetRepositoryCatalogueExportOptions settings) { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
+		if (settings.isForceExportAll()) {
+			do the export for force
+		} else {
+			logger.info("todo check all  other cases");
+
+
+
+		}
+
 		String projectPath = SharedResources.currentProject.getProjectDir().path();
 
 		FileHandle scenes = Gdx.files.absolute(projectPath).child("scenes");

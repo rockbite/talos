@@ -13,6 +13,9 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.utils.InputUtils;
+import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.editor.utils.WindowUtils;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +45,17 @@ public class Shortcuts extends InputAdapter {
 			Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
 			String exportScript = projectPrefs.getString("project.general.exportScript", "");
 			String projectFilePath = projectPrefs.getString("project.general.exportPath", "");
+
+			if (projectFilePath.isEmpty()) {
+				Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
+				SharedResources.ui.showPreferencesWindow();
+				return true;
+			} else {
+				BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
+				settings.loadFromPrefs(projectPrefs);
+				AssetRepository.getInstance().exportToFile(settings);
+			}
+
 			if(!exportScript.isEmpty()) {
 				String projectPath = currentProject.rootProjectDir().path();
 
