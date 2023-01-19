@@ -78,10 +78,10 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         points[RT].set(tmp.x + spriteRendererComponent.size.x/2f, tmp.y + spriteRendererComponent.size.y/2f);
         points[RB].set(tmp.x + spriteRendererComponent.size.x/2f, tmp.y - spriteRendererComponent.size.y/2f);
 
-        points[LB].rotateAroundDeg(tmp, transformComponent.rotation);
-        points[LT].rotateAroundDeg(tmp, transformComponent.rotation);
-        points[RT].rotateAroundDeg(tmp, transformComponent.rotation);
-        points[RB].rotateAroundDeg(tmp, transformComponent.rotation);
+        points[LB].rotateAroundDeg(tmp, transformComponent.worldRotation);
+        points[LT].rotateAroundDeg(tmp, transformComponent.worldRotation);
+        points[RT].rotateAroundDeg(tmp, transformComponent.worldRotation);
+        points[RB].rotateAroundDeg(tmp, transformComponent.worldRotation);
 
         tmp.set(points[RT]).sub(points[LB]).scl(0.5f).add(points[LB]); // midpoint
         updateRotationAreas(tmp.x, tmp.y);
@@ -113,19 +113,19 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
 
         if (touchedPoint == RT) {
-            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.worldRotation);
 
             transform.position.set(nextPoints[LB]).add(tempVec2.x, tempVec2.y);
         } else if (touchedPoint == LT) {
-            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.worldRotation);
 
             transform.position.set(nextPoints[RB]).add(-tempVec2.x, tempVec2.y);
         } else if (touchedPoint == LB) {
-            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.rotation);
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(transform.worldRotation);
 
             transform.position.set(nextPoints[RT]).add(-tempVec2.x, -tempVec2.y);
         } else if (touchedPoint == RB) {
-            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.rotation);
+            tempVec2.set(spriteRendererComponent.size).scl(0.5f).rotateDeg(-transform.worldRotation);
 
             transform.position.set(nextPoints[LT]).add(tempVec2.x, -tempVec2.y);
         }
