@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -78,25 +79,36 @@ public class TextFieldWithZoom extends TextField {
         Stage stage = getStage();
 
         if (stage != null) {
-            float preferredFontSize = stageToScreen(registeredFont.defaultSize);
-            if (preferredFontSize == 0 || Float.isNaN(preferredFontSize)) {
+            BitmapFont defaultSizedFont = UIUtils.getFontForSize(registeredFont.defaultSize);
+            GlyphLayout glyphForFont = UIUtils.getGlyphForFont(defaultSizedFont);
+            float height = glyphForFont.height;
+
+            float preferredHeight = stageToScreen(height);
+            if (preferredHeight == 0 || Float.isNaN(preferredHeight)) {
                 //Not ready yet
                 return;
             }
-
-            int fontToGenerate = MathUtils.ceil(preferredFontSize);
-            fontToGenerate = MathUtils.clamp(fontToGenerate, 4, 90);
+            BitmapFont testFont = UIUtils.getFontForSize(4);
+            for (int i = 5; i <= 90; i++) {
+                testFont = UIUtils.getFontForSize(i);
+                GlyphLayout glyphForTest = UIUtils.getGlyphForFont(testFont);
+                if (glyphForTest.height > preferredHeight) {
+                    break;
+                }
+            }
 
             BitmapFont font = getStyle().font;
-            BitmapFont newFont = UIUtils.getFontForSize(fontToGenerate);
+            BitmapFont newFont = testFont;
             if (!(font == newFont)) {
                 getStyle().font = newFont;
                 setStyle(getStyle());
+                invalidateHierarchy();
             }
 
-            float fontScale = preferredFontSize / fontToGenerate;
+            float fontScale = preferredHeight / UIUtils.getGlyphForFont(testFont).height;
             float finalScale = screenToStage(fontScale);
             newFont.getData().setScale(finalScale);
+            invalidateHierarchy();
         }
     }
 }
