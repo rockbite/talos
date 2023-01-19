@@ -167,6 +167,7 @@ public class ModuleListPopup extends VisWindow {
         getStage().setScrollFocus(searchFilteredTree.scrollPane);
         tree.collapseAll();
 
+        stage.stageToScreenCoordinates(location);
         createLocation.set(location);
     }
 
