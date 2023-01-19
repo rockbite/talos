@@ -36,7 +36,7 @@ public class Shortcuts extends InputAdapter {
 
 		if (keycode == Input.Keys.E && (InputUtils.ctrlPressed() || InputUtils.macCmdPressed())) {
 			//todo: delegate this to export action
-			AssetRepository.getInstance().exportToFile();
+//			AssetRepository.getInstance().exportToFile();
 
 			TalosProjectData currentProject = SharedResources.currentProject;
 			Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();

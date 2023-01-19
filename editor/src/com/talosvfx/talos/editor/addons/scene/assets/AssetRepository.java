@@ -470,7 +470,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	//Export formats
-	public void exportToFile () { //todo
+	public void exportToFile (AssetRepositoryCatalogueExportOptions settings) { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
 		String projectPath = SharedResources.currentProject.getProjectDir().path();
