@@ -21,7 +21,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
     private boolean reverse = false;
 
     private final Vector2 offset = new Vector2();
-    private boolean useLocalCoords = true;
+    private boolean useWorldOffset = true;
 
     public MoveOnPath() {
         tmpArr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
@@ -52,7 +52,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
         gameObjects.clear();
 
         reverse = fetchBooleanValue("reverse");
-        useLocalCoords = fetchBooleanValue("useLocalCoords");
+        useWorldOffset = fetchBooleanValue("useWorldOffset");
 
         SavableContainer container = routineInstanceRef.getContainer();
 
@@ -121,7 +121,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
         createEvenlySpacedPoints(state);
 
         float alpha = state.alpha;
-        if(reverse) {
+        if (reverse) {
             alpha = 1f - alpha;
         }
 
@@ -140,7 +140,7 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
                 Vector2 point = bezier.valueAt(tmp, localAlpha);
                 TransformComponent transform = state.getTarget().getComponent(TransformComponent.class);
                 transform.position.set(point);
-                if (!useLocalCoords) {
+                if (useWorldOffset) {
                     // offset with transform of curve's gizmo
                     transform.position.add(offset);
                 }
