@@ -990,4 +990,8 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return nodeMap.get(nodeId);
 	}
 
+	public NodeWidget findNode(int uniqueId) {
+		return nodeMap.get(uniqueId);
+	}
+
 }

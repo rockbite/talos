@@ -6,10 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.bvb.PropertiesPanel;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentAdded;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
-import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.RoutineRendererComponent;
@@ -166,6 +163,12 @@ public class PropertyPanel extends Table implements Observer {
     public void onComponentUpdate (ComponentUpdated componentUpdated) {
         if (!ignoringEvents) {
             propertyProviderUpdated(componentUpdated.getComponent());
+        }
+    }
+    @EventHandler
+    public void onAssetResolutionChanged (AssetResolutionChanged resolutionChanged) {
+        if (!ignoringEvents) {
+            updateValues();
         }
     }
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
@@ -108,19 +109,23 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
                             if (copyWrapper.isValueOverridden) {
                                 propertyWrappers.add(copyWrapper.clone());
                             } else {
-                                PropertyWrapper<?> cloneWrapper = propertyWrapper.clone();
-                                cloneWrapper.setDefault();
-                                propertyWrappers.add(cloneWrapper);
+                                final PropertyWrapper<?> clone = propertyWrapper.clone();
+                                clone.setDefault();
+                                propertyWrappers.add(clone);
                             }
                             break;
                         }
                     }
 
                     if (!foundCopy) {
-                        propertyWrappers.add(propertyWrapper.clone());
+                        final PropertyWrapper<?> clone = propertyWrapper.clone();
+                        clone.setDefault();
+                        propertyWrappers.add(clone);
                     }
                 } else {
-                    propertyWrappers.add(propertyWrapper.clone());
+                    final PropertyWrapper<?> clone = propertyWrapper.clone();
+                    clone.setDefault();
+                    propertyWrappers.add(clone);
                 }
             }
         }
@@ -175,6 +180,8 @@ public class RoutineRendererComponent extends RendererComponent implements Json.
             @Override
             public void report(GameAsset<RoutineStageData> value) {
                 setGameAsset(value);
+                final GameObject gameObject = RoutineRendererComponent.this.getGameObject();
+                SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, RoutineRendererComponent.this);
             }
         });
 

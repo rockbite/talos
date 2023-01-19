@@ -2,11 +2,15 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.SceneLayer;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.components.SpriteRendererComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.TransformComponent;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.projectdata.SceneData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 
 public class SpawnSpriteNode extends RoutineNode {
@@ -31,6 +35,11 @@ public class SpawnSpriteNode extends RoutineNode {
             go.addComponent(spriteRendererComponent);
             spriteRendererComponent.setGameAsset(asset);
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
+
+            SceneData sceneData = SharedResources.currentProject.getSceneData();
+            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+            spriteRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
+
             target.addGameObject(go);
 
             spriteRendererComponent.size.x = fetchFloatValue("width");

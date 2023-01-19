@@ -20,11 +20,17 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     public ColorPropertyWidget () {
         super();
+
+        setupPicker();
     }
 
     public ColorPropertyWidget(String name, Supplier<Color> supplier, ValueChanged<Color> valueChanged) {
         super(name, supplier, valueChanged);
 
+       setupPicker();
+    }
+
+    private void setupPicker() {
         colorPicker = new ColorPicker("Color Picker");
         colorPicker.setListener(new ColorPickerAdapter() {
             @Override
@@ -47,8 +53,13 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
             public void changed(Color newColor) {
                 super.changed(newColor);
                 box.setColor(newColor);
-                callValueChanged(newColor);
+                callValueChanged(newColor, true);
+            }
 
+            @Override
+            public void finished (Color newColor) {
+                super.finished(newColor);
+                callValueChanged(newColor, false);
             }
         });
 
@@ -88,4 +99,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
             box.setColor(value);
         }
     }
+
+
+
 }

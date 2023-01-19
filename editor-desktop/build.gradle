@@ -9,6 +9,8 @@ dependencies {
 
     implementation variantOf(libs.tiny.gizmo) { classifier("natives-desktop") }
 
+    implementation variantOf(libs.libgdx.freetype.platform) { classifier("natives-desktop")}
+
 }
 
 sourceSets.main.java.srcDirs = [ "src/" ]
@@ -43,7 +45,7 @@ task debug(dependsOn: classes, type: JavaExec) {
     }
 }
 
-task dist(type: Jar) {
+task dist(dependsOn: ':editor:generateBuildConfig', type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }

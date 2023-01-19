@@ -32,6 +32,7 @@ import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolygonSpriteBatchMultiTexture;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -48,7 +49,7 @@ import java.util.function.Supplier;
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 
-public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
+public class PaletteEditorWorkspace extends ViewportWidget implements Observer, EventContextProvider<PaletteEditorWorkspace> {
 
     private static final Logger logger = LoggerFactory.getLogger(PaletteEditorWorkspace.class);
     private PaletteEditor paletteEditor;
@@ -357,7 +358,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
                     if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                         // deselect all others, if they are selected
                         // if (deselectOthers(selectedGameObject)) { // TODO
-                        // Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(selection));
+                        // Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
                         // }
                     }
                 }
@@ -1211,5 +1212,15 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer {
     public GameObject getSelectedGameObject() {
         if (selection.size == 0) return null;
         return selection.orderedItems().first();
+    }
+
+    @Override
+    public TilePaletteData getEventContext() {
+        return paletteData.getResource();
+    }
+
+    @Override
+    public PaletteEditorWorkspace getContext() {
+        return this;
     }
 }

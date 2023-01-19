@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
+import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.scene.AddToSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
@@ -45,12 +46,14 @@ import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.project2.projectdata.SceneData;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -69,7 +72,7 @@ import java.util.function.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer {
+public class SceneEditorWorkspace extends ViewportWidget implements Json.Serializable, Observer, EventContextProvider<SavableContainer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorWorkspace.class);
 	public final TemplateListPopup templateListPopup;
@@ -189,7 +192,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			public void chosen (XmlReader.Element template, float x, float y) {
 				Vector2 pos = new Vector2(x, y);
 				String templateName = template.getAttribute("name");
-				SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
+				final GameObject newObjectInstance = SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
+				Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(newObjectInstance));
 			}
 		});
 
@@ -265,6 +269,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						vec.set(touchToWorld.x, touchToWorld.y);
 
 						SceneUtils.createSpineObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+
+						//forcefully make active if we aren't active
+						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.VFX) {
+						GameAsset<VFXProjectData> gameAsset = (GameAsset<VFXProjectData>)gameAssetPayload.getGameAsset();
+
+						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
+						vec.set(touchToWorld.x, touchToWorld.y);
+
+						SceneUtils.createParticle(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
@@ -417,6 +434,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				// set focus to scene
+				SharedResources.stage.setKeyboardFocus(SceneEditorWorkspace.this);
+
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
 				Gizmo gizmo = hitGizmo(hitCords.x, hitCords.y);
@@ -518,9 +538,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				SceneUtils.repositionGameObject(rootGO, dummyParent, gameObject);
 			}
 
-			GameObjectsRestructured gameObjectsRestructured = Notifications.obtainEvent(GameObjectsRestructured.class);
-			gameObjectsRestructured.targets.addAll(selectedObjects);
-			Notifications.fireEvent(gameObjectsRestructured);
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), selectedObjects));
 
 			selectGameObjectExternally(dummyParent);
 		});
@@ -721,6 +739,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		//TalosMain.Instance().UIStage().saveProjectAction();
 	}
 
+	@Override
+	public SavableContainer getContext() {
+		return currentContainer;
+	}
+
 	public static class ClipboardPayload {
 		public Array<GameObject> objects = new Array<>();
 		public Array<Vector2> objectWorldPositions = new Array<>();
@@ -728,74 +751,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void copySelected () {
-		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
-		Camera camera = currentCameraSupplier.get();
-
-		ClipboardPayload payload = new ClipboardPayload();
-		Array<GameObject> gameObjects = selection.orderedItems();
-		for (int i = 0; i < selection.size; i++) {
-			GameObject value = gameObjects.get(i);
-			payload.objects.add(value);
-			if (value.hasComponentType(TransformComponent.class)) {
-				payload.objectWorldPositions.add(value.getComponent(TransformComponent.class).worldPosition);
-			} else {
-				payload.objectWorldPositions.add(new Vector2());
-			}
-		}
-		Vector3 camPos = camera.position;
-		payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
-
-		Json json = new Json();
-		String clipboard = json.toJson(payload);
-		Gdx.app.getClipboard().setContents(clipboard);
+		SceneUtils.copy(gameAsset, selection);
 	}
 
 	public void pasteFromClipboard () {
-		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
-		Camera camera = currentCameraSupplier.get();
-
-		String clipboard = Gdx.app.getClipboard().getContents();
-
-		Json json = new Json();
-
-		try {
-			ClipboardPayload payload = json.fromJson(ClipboardPayload.class, clipboard);
-			Vector3 camPosAtPaste = camera.position;
-			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
-			offset.sub(payload.cameraPositionAtCopy);
-			GameObject parent = currentContainer.root;
-			if (selection.size == 1 && selection.first() != currentContainer.root) {
-				parent = selection.first().parent;
-			}
-
-			clearSelection();
-			for (int i = 0; i < payload.objects.size; i++) {
-				GameObject gameObject = payload.objects.get(i);
-
-				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
-
-				gameObject.setName(name);
-				SceneUtils.randomizeChildrenUUID(gameObject);
-				parent.addGameObject(gameObject);
-				if (gameObject.hasComponentType(TransformComponent.class)) {
-					TransformComponent component = gameObject.getComponent(TransformComponent.class);
-					component.worldPosition.set(payload.objectWorldPositions.get(i));
-					GameObject.projectInParentSpace(parent, gameObject);
-					component.position.add(offset);
-				}
-				initGizmos(gameObject, this);
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).setTarget(gameObject));
-				addToSelection(gameObject);
-			}
-
-			//todo: mm, why? i don't think it should trigger save
-			logger.info("Paste shuld trigger a save too, pasted event that goes through SceneUtils is the way to do this");
-
-//			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset, true);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		SceneUtils.paste(gameAsset);
 	}
 
 	@Override
@@ -957,41 +917,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (exportType.equals("Default")) {
 			// default behaviour
 		} else if (exportType.equals("Custom Script")) {
-			String sceneEditorExportScriptPath = TalosMain.Instance().Prefs().getString("sceneEditorExportScriptPath", null);
-			if (sceneEditorExportScriptPath != null) {
-				FileHandle handle = Gdx.files.absolute(sceneEditorExportScriptPath);
 
-				if (!handle.exists()) {
-					handle = Gdx.files.absolute(projectPath + File.separator + sceneEditorExportScriptPath);
-				}
-
-				if (handle.exists() && !handle.isDirectory()) {
-					Runtime rt = Runtime.getRuntime();
-
-					try {
-						String nodeCommand = "node";
-						String buildScriptPath = handle.path();
-						String projectDirectoryPath = "\"" + projectPath  + "\"";
-						String projectFilePath = "\"" + TalosMain.Instance().ProjectController().getExportPath() + "\"";
-
-						if (TalosMain.Instance().isOsX()) {
-							File nodeBinary = new File(nodeCommand);
-							if(!nodeBinary.exists()) {
-								nodeCommand = "/opt/homebrew/bin/node";
-							}
-							ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePath);
-							pb.inheritIO();
-							pb.start();
-						} else {
-							ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePath);
-							pb.inheritIO();
-							pb.start();
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
 		}
 		exporting = false;
 
@@ -1085,16 +1011,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
-		makeGizmosFor(getRootSceneObject(), gameObject, this);
-
-
-		// call set dirty method on the next frame so that the game asset is already set
-		// TODO: refactor the order of the event and setting data
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-			}
-		});
+		initGizmos(getRootSceneObject(), gameObject, this);
 	}
 
 	@EventHandler
@@ -1171,39 +1088,40 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectSelectionChanged (GameObjectSelectionChanged event) {
-		//If this didn't come from scene editor ignore it
-		if (event.getContext() == this) {
+		ObjectSet<GameObject> gameObjects = event.get();
 
-			ObjectSet<GameObject> gameObjects = event.get();
+		if (event.get().size == 1) { //Only select gizmos if one is selected
+			selectGizmos(gameObjects);
+		} else {
+			unselectGizmos();
+			groupSelectionGizmo.setSelected(true);
+		}
 
-			if (event.get().size == 1) { //Only select gizmos if one is selected
-				selectGizmos(gameObjects);
-			} else {
-				unselectGizmos();
-				groupSelectionGizmo.setSelected(true);
+		// now for properties
+
+		if (gameObjects.size == 0) {
+			// we select the main container then
+			if (currentContainer instanceof Scene) {
+				Scene scene = (Scene) currentContainer;
+				selectPropertyHolder(scene);
+			} else if (currentContainer instanceof Prefab) {
+				Prefab prefab = (Prefab) currentContainer;
+				selectPropertyHolder(prefab);
 			}
-
-			// now for properties
-
-			if (gameObjects.size == 0) {
-				// we select the main container then
-				if (currentContainer instanceof Scene) {
-					Scene scene = (Scene) currentContainer;
-					selectPropertyHolder(scene);
-				} else if (currentContainer instanceof Prefab) {
-					Prefab prefab = (Prefab) currentContainer;
-					selectPropertyHolder(prefab);
-				}
+		} else {
+			if (gameObjects.size == 1) {
+				selectPropertyHolder(gameObjects.first());
 			} else {
-				if (gameObjects.size == 1) {
-					selectPropertyHolder(gameObjects.first());
-				} else {
-					selectPropertyHolder(new MultiPropertyHolder(gameObjects));
-				}
+				selectPropertyHolder(new MultiPropertyHolder(gameObjects));
 			}
 		}
 
 		mapEditorState.update(event);
+	}
+
+	@EventHandler
+	public void GONameChangeCommand(GONameChangeCommand command) {
+		changeGOName(command.getGo(), command.getSuggestedName());
 	}
 
 	public void changeGOName (GameObject gameObject, String suggestedName) {
@@ -1340,7 +1258,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 
 
-	public Array<String> getLayerList () {
+	public Array<SceneLayer> getLayerList () {
 		SceneData sceneData = SharedResources.currentProject.getSceneData();
 
 		return sceneData.getRenderLayers();
@@ -1354,16 +1272,25 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onLayerListUpdated (LayerListUpdated event) {
-		Array<String> layerList = getLayerList();
+		Array<SceneLayer> layerList = getLayerList();
 		// find all game objects and if any of them is on layer that does not exist, change its layer to default
 		Array<GameObject> list = new Array<>();
 		list = currentContainer.getSelfObject().getChildrenByComponent(RendererComponent.class, list);
 
 		for (GameObject gameObject : list) {
 			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
-			String sortingLayer = component.getSortingLayer();
-			if (!layerList.contains(sortingLayer, false)) {
-				component.setSortingLayer("Default");
+
+			boolean foundLayer = false;
+			for (SceneLayer sceneLayer : layerList) {
+				if (sceneLayer.getIndex() == component.sortingLayer.getIndex()) {
+					component.setSortingLayer(sceneLayer);
+					foundLayer = true;
+					break;
+				}
+			}
+
+			if (!foundLayer) {
+				component.setSortingLayer(MainRenderer.DEFAULT_SCENE_LAYER);
 			}
 		}
 	}
@@ -1418,21 +1345,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				//reloadScheduled = 0.5f;
 			}
 		}
-	}
-
-	@EventHandler
-	public void onAssetPathChanged (AssetPathChanged event) {
-		Array<AComponent> list = new Array<>();
-
-		Gdx.app.postRunnable(new Runnable() {
-			@Override
-			public void run () {
-				for (AComponent component : list) {
-					//Dont think we need this
-//					Notifications.fireEvent(Notifications.obtainEvent(ComponentUpdated.class).set(component, false));
-				}
-			}
-		});
 	}
 
 
@@ -1504,6 +1416,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		performSelectionClear();
 	}
 
+	@Override
+	protected GameObjectContainer getEventContext() {
+		return currentContainer;
+	}
+
 	public void performSelectionClear() {
 		for (GameObject gameObject : selection) {
 			if (gizmos.gizmoMap.containsKey(gameObject)) {
@@ -1514,14 +1431,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 		clearSelection();
-		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(this, selection));
+		GameObjectSelectionChanged<GameObjectContainer> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
+		gameObjectSelectionChanged.set(getEventContext(), selection);
+		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
 	@EventHandler
 	public void onGameAssetOpened (GameAssetOpenEvent gameAssetOpenEvent) {
 		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
 		if (gameAsset.type == GameAssetType.SCENE) {
-
+			this.gameAsset = (GameAsset<Scene>) gameAsset;
 		}
 	}
 }

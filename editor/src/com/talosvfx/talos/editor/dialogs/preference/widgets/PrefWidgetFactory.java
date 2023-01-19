@@ -253,6 +253,7 @@ public class PrefWidgetFactory {
                 leftContent.add(label).right().expandX();
             }
             checkBoxWidget = new CheckBox(xml.getText(), SharedResources.skin, "rounded-checkbox");
+            checkBoxWidget.setProgrammaticChangeEvents(false);
             rightContent.add(checkBoxWidget).left().expandX();
         }
 
@@ -292,7 +293,7 @@ public class PrefWidgetFactory {
             }
             if(xml.hasAttribute("min") || xml.hasAttribute("max")) {
                 valueWidget.setRange(min, max);
-                valueWidget.setShowProgress(true);
+                valueWidget.setShowProgress(xml.getBooleanAttribute("progress", true));
             }
         }
 
@@ -321,7 +322,7 @@ public class PrefWidgetFactory {
 
         @Override
         protected void fromString(String str) {
-            widget.setValue(str);
+            widget.setValue(str, false);
         }
 
         @Override
@@ -343,7 +344,7 @@ public class PrefWidgetFactory {
 
             fileOpener = new FileOpenField();
             fileOpener.getInputContainer().setBackground(ColorLibrary.obtainBackground(SharedResources.skin, ColorLibrary.SHAPE_SQUIRCLE_LEFT, ColorLibrary.BackgroundColor.SUPER_DARK_GRAY));
-            rightContent.add(fileOpener).left().expand().growX().padLeft(5).padRight(5);
+            rightContent.add(fileOpener).left().expand().growX().padLeft(5).padRight(5).padBottom(5);
         }
 
         @Override

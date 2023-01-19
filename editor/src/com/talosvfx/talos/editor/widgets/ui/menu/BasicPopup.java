@@ -124,9 +124,16 @@ public class BasicPopup<T> extends Table {
         return this;
     }
 
+
+    /**
+     * @param actor actor
+     * @param x in screen space
+     * @param y in screen space
+     * @return
+     */
     public BasicPopup<T> show(Actor actor, float x, float y) {
         Vector2 tmp = new Vector2(x, y);
-        actor.localToStageCoordinates(tmp);
+        SharedResources.stage.screenToStageCoordinates(tmp);
         return show(tmp.x, tmp.y);
     }
 

@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import lombok.Getter;
@@ -18,7 +19,6 @@ import lombok.Getter;
 import java.util.function.Supplier;
 
 public class GenericStageWrappedViewportWidget extends ViewportWidget {
-
 
 	@Getter
 	private final Stage stage;
@@ -29,7 +29,13 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
 		Camera camera = currentCameraSupplier.get();
 
-		stage = new Stage(new ScreenViewport(camera));
+		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
+
+		camera.position.set(0, 0, 0);
+		if (camera instanceof OrthographicCamera) {
+			((OrthographicCamera) camera).zoom = 2f;
+		}
+		camera.update();
 
 		stage.addActor(actor);
 		stage.setKeyboardFocus(actor);
@@ -62,6 +68,11 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		stage.getViewport().setScreenBounds((int)x1, (int)y1, screenWidth, screenHeight);
  		stage.act();
 
+	}
+
+	@Override
+	protected Stage getEventContext() {
+		return stage;
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
+import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 
 import java.util.Collection;
 import java.util.function.Supplier;

@@ -4,14 +4,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
+import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.widgets.ui.timeline.ActionRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.BasicRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
+import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
@@ -120,6 +124,7 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                     // we need to create default one
                     editorApp.resetToNew();
                 }
+                AssetRepository.getInstance().assetChanged(editorApp.getGameAsset());
             }
         });
     }
@@ -151,6 +156,8 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         activeWrappers.reverse();
         setData(activeWrappers);
         setSelected(emitter);
+
+        editorApp.getModuleBoardWidget().loadEmitterToBoard(emitter, new EmitterData());
     }
 
     @Override
@@ -227,6 +234,9 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
     private ParticleEmitterWrapper createNewEmitter (String emitterName, float sortPosition) {
         ParticleEmitterWrapper emitterWrapper = editorApp.initEmitter(emitterName);
+        Supplier<ParticleEffectDescriptor> descriptorSupplier = editorApp.getGameAsset().getResource().getDescriptorSupplier();
+        ParticleEffectDescriptor particleEffectDescriptor = descriptorSupplier.get();
+        particleEffectDescriptor.addEmitter(emitterWrapper.getEmitter());
 
         editorApp.getEditorState().activeWrappers.add(emitterWrapper);
 
@@ -238,6 +248,8 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         //todo: mark as modified to save
 
         editorApp.getModuleBoardWidget().setCurrentEmitter(emitterWrapper);
+
+        AssetRepository.getInstance().assetChanged(editorApp.getGameAsset());
 
         return emitterWrapper;
     }

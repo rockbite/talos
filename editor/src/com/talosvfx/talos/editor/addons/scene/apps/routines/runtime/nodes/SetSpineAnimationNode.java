@@ -33,6 +33,8 @@ public class SetSpineAnimationNode extends RoutineNode {
     public void receiveSignal(String portName) {
         String animationName = fetchStringValue("animation");
         boolean loop = fetchBooleanValue("repeat");
+        boolean add = fetchBooleanValue("add");
+        int track = fetchIntValue("track");
 
         GameObject go = (GameObject) routineInstanceRef.getSignalPayload();
 
@@ -41,11 +43,11 @@ public class SetSpineAnimationNode extends RoutineNode {
 
             if(component != null) {
                 Animation animation = component.skeleton.getData().findAnimation(animationName);
-                if(animation != null) {
-                    component.animationState.setAnimation(0, animation, loop);
-                } else {
-                    component.animationState.setAnimation(0, component.skeleton.getData().getAnimations().first(), loop);
+                if(animation == null) {
+                    animation = component.skeleton.getData().getAnimations().first();
                 }
+
+                component.animationState.setAnimation(track, animation, loop);
             }
         }
 

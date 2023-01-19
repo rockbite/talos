@@ -33,6 +33,7 @@ import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
+import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
@@ -365,23 +366,16 @@ public class SEPropertyPanel extends PropertyPanel {
                                 public void accept (String newFileName) {
                                     //Create the script, and then add it to the game component after registering etc etc
 
-                                    logger.info("Reimplement create script and register");
-
-
                                     //Sugggest to put it in scripts
                                     FileHandle suggestedScriptsFolder = SceneUtils.getContextualFolderToCreateFile();
 
-//
-                                    FileHandle newScriptDestination = AssetImporter.suggestNewNameForFileHandle(suggestedScriptsFolder.path(), newFileName, "ts");
                                     FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
-//
-                                    String templateString = templateScript.readString();
-                                    templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
-                                    newScriptDestination.writeString(templateString, false);
+                                    FileHandle newScript = AssetRepository.getInstance().copyRawAsset(templateScript, suggestedScriptsFolder.child(newFileName + ".ts"), false);
 
-                                    AssetRepository.getInstance().rawAssetCreated(newScriptDestination, true);
+                                    String processed = newScript.readString().replaceAll("%TEMPLATE_NAME%", newFileName);
+                                    newScript.writeString(processed, false);
 
-                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScriptDestination, false);
+                                    GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(newScript, false);
 
                                     if (assetForPath != null) {
 

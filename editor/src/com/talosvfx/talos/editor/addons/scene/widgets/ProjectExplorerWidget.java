@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -277,14 +278,35 @@ public class ProjectExplorerWidget extends Table implements Observer {
     }
 
     public void showContextMenu (Array<FileHandle> files, boolean directory) {
+        // protect editable=false nodes from rename operation
+        // protect canDelete=false nodes from cut, delete operation
+        boolean canRename = true;
+        boolean canDelete = true;
+        for (FileHandle file : files) {
+            FilteredTree.Node<String> node = nodes.get(file.path());
+            if (node == null) {
+                // not interested
+                continue;
+            }
+            if (!node.canDelete) {
+                canDelete = false;
+            }
+            RowWidget widget = (RowWidget) node.getActor();
+            if (!widget.editable) {
+                canRename = false;
+            }
+        }
+
         contextualMenu.clearItems();
 
-        contextualMenu.addItem("Cut", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                invokeCut(files);
-            }
-        });
+        if (canDelete) {
+            contextualMenu.addItem("Cut", new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    invokeCut(files);
+                }
+            });
+        }
         contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
@@ -298,38 +320,45 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 invokePaste(destination);
             }
         });
-        contextualMenu.addSeparator();
-        contextualMenu.addItem("Rename", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                String path = files.first().path();
-                if(path != null) {
-                    FileHandle handle = Gdx.files.absolute(path);
-                    if (directory) {
-                        directoryViewWidget.rename();
-                    } else {
-                        if (handle.isDirectory()) {
-                            if (nodes.get(path) != null) {
-                                RowWidget widget = (RowWidget) nodes.get(path).getActor();
-                                widget.label.setEditMode();
+
+        if (canDelete || canRename) {
+            contextualMenu.addSeparator();
+        }
+
+        if (canRename) {
+            contextualMenu.addItem("Rename", new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    String path = files.first().path();
+                    if (path != null) {
+                        FileHandle handle = Gdx.files.absolute(path);
+                        if (directory) {
+                            directoryViewWidget.rename();
+                        } else {
+                            if (handle.isDirectory()) {
+                                if (nodes.get(path) != null) {
+                                    RowWidget widget = (RowWidget) nodes.get(path).getActor();
+                                    widget.label.setEditMode();
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-        contextualMenu.addItem("Delete", new ClickListener() {
-            @Override
-            public void clicked (InputEvent event, float x, float y) {
-                String path = files.first().path();
-                Array<String> paths = new Array<>();
-                for(FileHandle file: files) {
-                    paths.add(file.path());
-                }
-                deletePath(paths);
-            }
-        });
+            });
+        }
 
+        if (canDelete) {
+            contextualMenu.addItem("Delete", new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Array<String> paths = new Array<>();
+                    for (FileHandle file : files) {
+                        paths.add(file.path());
+                    }
+                    deletePath(paths);
+                }
+            });
+        }
 
         if(files.size == 1 && files.first().isDirectory()) {
             contextualMenu.addSeparator();
@@ -581,8 +610,11 @@ public class ProjectExplorerWidget extends Table implements Observer {
         directoryTree.clearChildren();
         FileHandle root = Gdx.files.absolute(path);
 
-        rootNode = new FilteredTree.Node("project",  new Label("Project", SharedResources.skin));
+        RowWidget widget = new RowWidget(root, false);
+        widget.getLabel().setText("Project");
+        rootNode = new FilteredTree.Node("project",  widget);
         rootNode.setObject(path); // project path
+        nodes.put(root.path(), rootNode);
         traversePath(root, 0, 10, rootNode);
         directoryTree.add(rootNode);
 
@@ -607,12 +639,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 EditableLabel label = widget.getLabel();
                 label.getTextField().setTextFieldFilter(AssetRepository.ASSET_NAME_FIELD_FILTER);
                 final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
-
-                if (listItemHandle.isDirectory()) {
-                    if (listItemHandle.name().equals("assets") || listItemHandle.name().equals("scenes")) {
-                        newNode.canDelete = false;
-                    }
-                }
 
                 newNode.setObject(listItemHandle.path());
                 newNode.draggable = true;
@@ -765,6 +791,11 @@ public class ProjectExplorerWidget extends Table implements Observer {
     @EventHandler
     public void onDirectoryChange (AssetChangeDirectoryEvent assetChangeDirectoryEvent) {
         select(assetChangeDirectoryEvent.getPath().path());
+    }
+
+    @EventHandler
+    public void onAssetColorFillEvent (AssetColorFillEvent event) {
+        directoryViewWidget.changeAssetPreview(event.getFileHandle());
     }
 
     public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {

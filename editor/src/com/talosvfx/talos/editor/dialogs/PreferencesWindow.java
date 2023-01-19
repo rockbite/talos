@@ -15,6 +15,7 @@ import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
+import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
@@ -258,6 +259,15 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
     public void onFinishInitializingEvent(FinishInitializingEvent event) {
         for(APrefWidget widget: widgetArray) {
             widget.read();
+        }
+    }
+
+    @EventHandler
+    public void onProjectLoadedEvent(ProjectLoadedEvent event) {
+        for(APrefWidget widget: widgetArray) {
+            if(widget.isProject()) {
+                widget.readLocal();
+            }
         }
     }
  }

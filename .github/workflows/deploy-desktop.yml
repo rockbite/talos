@@ -27,7 +27,6 @@ jobs:
           ./gradlew runtimes:talos:publishAllPublicationsToSnapshotRepository
           ./gradlew runtimes:talos-libgdx:publishAllPublicationsToSnapshotRepository
           ./gradlew runtimes:talos-bongo:publishAllPublicationsToSnapshotRepository
-          ./gradlew clean editor:genBuildFile
           ./gradlew editor-desktop:dist
 
       - name: Install SSH Key

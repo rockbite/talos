@@ -2,7 +2,11 @@
 package com.talosvfx.talos.editor.addons.scene.assets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -21,13 +25,12 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
 import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.addons.scene.events.AssetResolutionChanged;
 import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.Prefab;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
-import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
+import com.talosvfx.talos.editor.addons.scene.logic.*;
 import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
 import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
@@ -42,15 +45,14 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
-import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.editor.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.assets.AssetProvider;
-import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +163,8 @@ public class AssetRepository implements Observer {
 		gameAsset.setDummy(true);
 		return gameAsset;
 	}
+
+
 
 
 	static class DataMaps {
@@ -364,6 +368,29 @@ public class AssetRepository implements Observer {
 
 	}
 
+	public void reloadGameAssetFromString (GameAsset gameAssetReference, String asSTring) {
+		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
+		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
+
+		FileHandle temp = Gdx.files.local("temp");
+		temp.writeString(asSTring, false);
+
+		RawAsset rawAsset = new RawAsset(temp);
+
+		try {
+			GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(rootRawAsset.handle.extension());
+
+			GameAsset gameAsset = createOrUpdateGameAssetForType(assetTypeFromExtension, gameAssetIdentifier, rawAsset, false, gameAssetReference);
+			gameAssetReference.setResourcePayload(gameAsset.getResource());
+			gameAssetReference.setUpdated();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		temp.delete();
+	}
+
 	static class TypeIdentifierPair {
 		GameAssetType type;
 		String identifier;
@@ -433,60 +460,58 @@ public class AssetRepository implements Observer {
 	public void exportToFile () { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
-		logger.info("redo exporting");
+		String projectPath = SharedResources.currentProject.getProjectDir().path();
 
-//		FileHandle scenes = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("scenes");
-//		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
-//		if (scenes.exists()) {
-//			for (FileHandle handle : scenes.list()) {
-//				JsonValue scene = new JsonReader().parse(handle);
-//
-//				JsonValue gameObjects = scene.get("gameObjects");
-//				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
-//			}
-//		}
-//
-//		//Find all prefabs
-//		FileHandle assets = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assets");
-//		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
-//		findAllPrefabs(assets, identifiersBeingUsedByComponents);
-//
-//
-//		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
-//		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
-//
-//			//we need to get the identifier and type pairs
-//
-//			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
-//			if (gameAsset == null) {
-//				System.out.println("Game asset is null, not exporting");
-//				continue;
-//			}
-//			if (gameAsset.isBroken()) {
-//				System.out.println("Game asset is broken, not exporting");
-//				continue;
-//			}
-//
-//			gameAssetsToExport.add(gameAsset);
-//			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
-//		}
-//
-//		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
-//
-//		for (GameAsset<?> gameAsset : gameAssetsToExport) {
-//			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
-//			assetExportStructure.identifier = gameAsset.nameIdentifier;
-//			assetExportStructure.type = gameAsset.type;
-//			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-//				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
-//			}
-//			gameAssetExportStructure.gameAssets.add(assetExportStructure);
-//		}
-//
-//		FileHandle assetRepoExportFile = Gdx.files.absolute(SceneEditorWorkspace.getInstance().getProjectPath()).child("assetExport.json");
-//		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+		FileHandle scenes = Gdx.files.absolute(projectPath).child("scenes");
+		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
+		if (scenes.exists()) {
+			for (FileHandle handle : scenes.list()) {
+				JsonValue scene = new JsonReader().parse(handle);
+
+				JsonValue gameObjects = scene.get("gameObjects");
+				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
+			}
+		}
+
+		//Find all prefabs
+		FileHandle assets = Gdx.files.absolute(projectPath).child("assets");
+		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
+		findAllPrefabs(assets, identifiersBeingUsedByComponents);
 
 
+		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
+		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
+
+			//we need to get the identifier and type pairs
+
+			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
+			if (gameAsset == null) {
+				System.out.println("Game asset is null, not exporting");
+				continue;
+			}
+			if (gameAsset.isBroken()) {
+				System.out.println("Game asset is broken, not exporting");
+				continue;
+			}
+
+			gameAssetsToExport.add(gameAsset);
+			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
+		}
+
+		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+
+		for (GameAsset<?> gameAsset : gameAssetsToExport) {
+			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
+			assetExportStructure.identifier = gameAsset.nameIdentifier;
+			assetExportStructure.type = gameAsset.type;
+			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
+			}
+			gameAssetExportStructure.gameAssets.add(assetExportStructure);
+		}
+
+		FileHandle assetRepoExportFile = Gdx.files.absolute(projectPath).child("assetExport.json");
+		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
 	}
 
 	private void findAllPrefabs (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {
@@ -699,6 +724,21 @@ public class AssetRepository implements Observer {
 
 				break;
 			case SOUND:
+
+				if (gameAssetOut == null) {
+					GameAsset<Music> musicGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					gameAssetOut = musicGameAsset;
+
+					if (createLinks) {
+						value.gameAssetReferences.add(musicGameAsset);
+						musicGameAsset.dependentRawAssets.add(value);
+					}
+				}
+
+				Music music = Gdx.audio.newMusic(value.handle);
+
+				((GameAsset<Music>)gameAssetOut).setResourcePayload(music);
+
 				break;
 			case VFX_OUTPUT:
 
@@ -810,6 +850,10 @@ public class AssetRepository implements Observer {
 
 				VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
 				((GameAsset<VFXProjectData>)gameAssetOut).setResourcePayload(projectData);
+
+				//This is mega hack. Only because we will be making it into DynamicNodeStage later
+				ParticleNodeEditorApp app = new ParticleNodeEditorApp();
+				app.loadProject(projectData);
 
 
 				break;
@@ -960,6 +1004,8 @@ public class AssetRepository implements Observer {
 	}
 
 	public void assetChanged (GameAsset<?> gameAsset) {
+		Toasts.getInstance().showInfoToast("Marked changes " + gameAsset.nameIdentifier);
+
 		GlobalSaveStateSystem.GameAssetUpdateStateObject gameAssetUpdateStateObject = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset);
 		SharedResources.globalSaveStateSystem.pushItem(gameAssetUpdateStateObject);
 	}
@@ -1011,24 +1057,41 @@ public class AssetRepository implements Observer {
 		return asString;
 	}
 
-	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
-		Toasts.getInstance().showInfoToast("Saved " + gameAsset.nameIdentifier);
+	public <T> String saveGameAssetCurrentStateToJsonString (GameAsset<T> gameAsset) {
 		GameResourceSaveStrategy<T> gameResourceSaveStrategy = saveStrategyObjectMap.get(gameAsset.type);
 		if (gameResourceSaveStrategy != null) {
-			RawAsset rootRawAsset = gameAsset.getRootRawAsset();
 
 			String jsonString = gameResourceSaveStrategy.serializeToJson(gameAsset, json);
+
 			if (jsonString == null) {
 				Toasts.getInstance().showErrorToast("Error saving asset " + gameAsset);
 				logger.error("Error saving asset");
-				return;
+				return null;
 			}
-			rootRawAsset.handle.writeString(jsonString, false);
-			SharedResources.globalSaveStateSystem.markSaved(gameAsset);
+
+			return jsonString;
 
 		} else {
+			Toasts.getInstance().showErrorToast("Trying to save an asset that doesn't have a save strategy " + gameAsset);
 			logger.error("Trying to save an asset that doesn't have a save strategy");
 		}
+
+		return null;
+	}
+
+	public <T> void saveGameAssetResourceJsonToFile (GameAsset<T> gameAsset) {
+		Toasts.getInstance().showInfoToast("Saved to file " + gameAsset.nameIdentifier);
+		RawAsset rootRawAsset = gameAsset.getRootRawAsset();
+
+		String jsonString = saveGameAssetCurrentStateToJsonString(gameAsset);
+
+		if (jsonString == null) {
+			logger.error("Error saving to file");
+			return;
+		}
+
+		rootRawAsset.handle.writeString(jsonString, false);
+		SharedResources.globalSaveStateSystem.markSaved(gameAsset);
 
 	}
 
@@ -1299,16 +1362,28 @@ public class AssetRepository implements Observer {
 		return copyRawAsset(file, directory, false);
 	}
 
+	/**
+	 * In the first synopsis form, the copyRawAsset utility copies the contents of the file to the directory.
+	 * In the second synopsis form, the contents of each named file is copied to the directory target_directory.
+	 * The names of the files themselves are changed in case of collision, while replace flag is false.
+	 * @param file
+	 * @param directory
+	 * @param replace
+	 * @return FileHandle of newly copied file.
+	 */
 	public FileHandle copyRawAsset (FileHandle file, FileHandle directory, boolean replace) {
-		String fileName = file.name();
-		if (directory.child(fileName).exists() && !replace) {
-			String baseName = file.nameWithoutExtension();
+		// TODO: 11.01.23 rename arguments
+		String fileName = directory.isDirectory() ? file.name() : directory.name();
+		final FileHandle destinationDirectory = directory.isDirectory() ? directory : directory.parent();
+
+		if (destinationDirectory.child(fileName).exists() && !replace) {
+			String baseName = directory.isDirectory() ? file.nameWithoutExtension() : directory.nameWithoutExtension();
 
 			fileName = NamingUtils.getNewName(baseName, new Supplier<Collection<String>>() {
 				@Override
 				public Collection<String> get () {
 					ArrayList<String> fileNames = new ArrayList<>();
-					for (FileHandle fileHandle : directory.list()) {
+					for (FileHandle fileHandle : destinationDirectory.list()) {
 						fileNames.add(fileHandle.nameWithoutExtension());
 					}
 					return fileNames;
@@ -1320,7 +1395,7 @@ public class AssetRepository implements Observer {
 		Pattern pattern = Pattern.compile("[/?<>\\\\:*|\"]");
 		Matcher matcher = pattern.matcher(fileName);
 		fileName = matcher.replaceAll("_");
-		FileHandle dest = directory.child(fileName);
+		FileHandle dest = destinationDirectory.child(fileName);
 		if (file.isDirectory()) { // recursively copy directory and its contents
 			FileHandle[] list = file.list();
 			//Change the destination and copy all its children into the new destination
@@ -1409,7 +1484,6 @@ public class AssetRepository implements Observer {
 	}
 	public void moveFile (FileHandle file, FileHandle destination, boolean checkGameAssets, boolean rename) {
 
-
 		if (file.isDirectory()) {
 			//Moving a folder
 			if (destination.exists() && !destination.isDirectory()) {
@@ -1464,11 +1538,6 @@ public class AssetRepository implements Observer {
 
 
 				FileHandle newHandle = destination.child(file.name());
-
-				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-				assetPathChanged.oldRelativePath = relative(file);
-				assetPathChanged.newRelativePath = relative(newHandle);
-				Notifications.fireEvent(assetPathChanged);
 
 				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
@@ -1553,6 +1622,44 @@ public class AssetRepository implements Observer {
 		if (checkGameAssets) {
 			checkAllGameAssetCreation();
 		}
+	}
+
+	public void resizeAsset (GameAsset<Texture> gameAsset, int width, int height)  {
+		final FileHandle fileHandle = gameAsset.getRootRawAsset().handle;
+		final Pixmap oldPixmap = new Pixmap(fileHandle);
+		final Pixmap newPixmap = new Pixmap(width, height, oldPixmap.getFormat());
+		newPixmap.drawPixmap(oldPixmap, 0, 0);
+
+		PixmapIO.writePNG(fileHandle, newPixmap);
+
+		gameAsset.setResourcePayload(new Texture(newPixmap));
+		gameAsset.setUpdated();
+
+		oldPixmap.dispose();
+		newPixmap.dispose();
+
+		// fire asset resolution changed event
+		Notifications.fireEvent(Notifications.obtainEvent(AssetResolutionChanged.class));
+	}
+
+	public void fillAssetColor (GameAsset<Texture> gameAsset, Color color)  {
+		final FileHandle fileHandle = gameAsset.getRootRawAsset().handle;
+		final Pixmap pixmap = new Pixmap(fileHandle);
+
+		pixmap.setColor(color);
+		pixmap.fill();
+
+		PixmapIO.writePNG(fileHandle, pixmap);
+
+		gameAsset.setResourcePayload(new Texture(pixmap));
+		gameAsset.setUpdated();
+
+		pixmap.dispose();
+
+		// fire asset color fill event
+		final AssetColorFillEvent event = Notifications.obtainEvent(AssetColorFillEvent.class);
+		event.setFileHandle(fileHandle);
+		Notifications.fireEvent(event);
 	}
 
 	public static String relative(String fullPath) {

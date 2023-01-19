@@ -20,7 +20,9 @@ import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
+import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
+import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.components.*;
 import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
 import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
@@ -42,7 +44,11 @@ import java.util.Comparator;
 
 public class MainRenderer implements Observer {
 
+    public static SceneLayer DEFAULT_SCENE_LAYER = new SceneLayer("Default", 0);
+
     public final Comparator<GameObject> layerAndDrawOrderComparator;
+
+    public float timeScale = 1f;
 
     private  Comparator<GameObject> activeSorter;
 
@@ -52,14 +58,12 @@ public class MainRenderer implements Observer {
 
     private Vector2[] points = new Vector2[4];
 
-    private ObjectMap<String, Integer> layerOrderLookup = new ObjectMap<>();
-
     private static final int LB = 0;
     private static final int LT = 1;
     private static final int RT = 2;
     private static final int RB = 3;
 
-    private ObjectMap<Texture, NinePatch> patchCache = new ObjectMap<>();
+    private ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
@@ -79,9 +83,9 @@ public class MainRenderer implements Observer {
     public boolean skipUpdates = false;
 
     private Texture white;
-    private Array<String> layerList;
+    private Array<SceneLayer> layerList;
 
-    public void setLayers (Array<String> layerList) {
+    public void setLayers (Array<SceneLayer> layerList) {
         this.layerList = layerList;
     }
 
@@ -105,16 +109,29 @@ public class MainRenderer implements Observer {
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
             public int compare (GameObject o1, GameObject o2) {
+                SceneLayer o1Layer = MainRenderer.getLayerSafe(o1);
+                SceneLayer o2Layer = MainRenderer.getLayerSafe(o2);
 
-                float aSort = MainRenderer.getDrawOrderSafe(o1);
-                float bSort = MainRenderer.getDrawOrderSafe(o2);
-
-                return Float.compare(aSort, bSort);
+                if (o1Layer.equals(o2Layer)) {
+                    float aSort = MainRenderer.getDrawOrderSafe(o1);
+                    float bSort = MainRenderer.getDrawOrderSafe(o2);
+                    return Float.compare(aSort, bSort);
+                } else {
+                    return Integer.compare(o1Layer.getIndex(), o2Layer.getIndex());
+                }
             }
         };
 
         activeSorter = layerAndDrawOrderComparator;
         white = new Texture(Gdx.files.internal("white.png"));
+    }
+
+    private static SceneLayer getLayerSafe(GameObject gameObject) {
+        if (gameObject.hasComponentType(RendererComponent.class)) {
+            RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+            return rendererComponent.sortingLayer;
+        }
+        return DEFAULT_SCENE_LAYER;
     }
 
     public static float getDrawOrderSafe (GameObject gameObject) {
@@ -150,6 +167,36 @@ public class MainRenderer implements Observer {
 
                     transform.worldRotation += parentTransform.worldRotation;
                     transform.worldScale.scl(parentTransform.worldScale);
+                }
+            }
+        }
+
+        // if root has render component try mixing colors if they exist
+        if (root.hasComponentType(RendererComponent.class)) {
+            final RendererComponent rendererComponent = root.getComponentAssignableFrom(RendererComponent.class);
+
+            // check if render component has color value
+            if (rendererComponent instanceof IColorHolder) {
+                final IColorHolder colorHolder = (IColorHolder) rendererComponent;
+
+                // update final color by Renderer color
+                final Color finalColor = (colorHolder.getFinalColor());
+                finalColor.set(colorHolder.getColor());
+
+                // should inherit parent color update final color by parent color
+                if (colorHolder.shouldInheritParentColor()) {
+                    if (root.parent != null) {
+                        // check if parent contains render component
+                        if (root.parent.hasComponentType(RendererComponent.class)) {
+                            final RendererComponent parentRendererComponent = root.parent.getComponentAssignableFrom(RendererComponent.class);
+
+                            // check if parent render component has color value
+                            if (parentRendererComponent instanceof IColorHolder) {
+                                // combine colors
+                                finalColor.mul(((IColorHolder) parentRendererComponent).getFinalColor());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -192,8 +239,6 @@ public class MainRenderer implements Observer {
     }
     public void render (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
         mapRenderer.setCamera(this.camera);
-
-        updateLayerOrderLookup();
 
         //fill entities
         state.list.clear();
@@ -355,14 +400,15 @@ public class MainRenderer implements Observer {
 
         spineRendererComponent.skeleton.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
         spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
+        spineRendererComponent.skeleton.getRootBone().setRotation(transformComponent.rotation);
 
         if (!skipUpdates) {
-            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime() * timeScale);
             spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
-        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.color);
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
         spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -381,7 +427,7 @@ public class MainRenderer implements Observer {
         instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 
         if (!skipUpdates) {
-            instance.update(Gdx.graphics.getDeltaTime());
+            instance.update(Gdx.graphics.getDeltaTime() * timeScale);
         }
         talosRenderer.setBatch(batch);
         talosRenderer.render(instance);
@@ -404,14 +450,13 @@ public class MainRenderer implements Observer {
             }
             textureRegion.setRegion(resource);
             if(textureRegion != null) {
-                batch.setColor(spriteRenderer.color);
+                batch.setColor(spriteRenderer.finalColor);
 
                 final float width = spriteRenderer.size.x;
                 final float height = spriteRenderer.size.y;
 
                 if(metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    Texture texture = textureRegion.getTexture(); // todo: pelase fix me, i am such a shit
-                    NinePatch patch = obtainNinePatch(texture, metadata);// todo: this has to be done better
+                    NinePatch patch = obtainNinePatch(gameResource);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
                     float xSign = width < 0 ? -1 : 1;
                     float ySign = height < 0 ? -1 : 1;
@@ -449,7 +494,7 @@ public class MainRenderer implements Observer {
                     float endY = startY + totalHeight;
 
                     xCoord = startX;
-                    yCoord = startX;
+                    yCoord = startY;
 
                     for (xCoord = startX; xCoord < endX - tileWidth; xCoord += tileWidth){
                         for (yCoord = startY; yCoord < endY - tileHeight; yCoord += tileHeight) {
@@ -466,9 +511,12 @@ public class MainRenderer implements Observer {
                         }
                     }
 
-                    float remainderX = endX - xCoord;
-                    float remainderY = endY - yCoord;
-
+                    // clip remainder if a tile is bigger than the sprite
+                    final float remainderX, remainderY;
+                    if (totalWidth < tileWidth) remainderX = totalWidth;
+                    else remainderX = endX - xCoord;
+                    if (totalHeight < tileHeight) remainderY = totalHeight;
+                    else remainderY = endY - yCoord;
 
                     //Draw the remainders in x
                     for (float yCoordRemainder = startY; yCoordRemainder < endY - tileHeight; yCoordRemainder += tileHeight) {
@@ -587,13 +635,14 @@ public class MainRenderer implements Observer {
         }
     }
 
-    private NinePatch obtainNinePatch (Texture texture, SpriteMetadata metadata) {
-        if(patchCache.containsKey(texture)) { //something better, maybe hash on pixel size + texture for this
-            return patchCache.get(texture);
+    public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+        if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
+            return patchCache.get(gameAsset);
         } else {
-            NinePatch patch = new NinePatch(texture, metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
-            patch.scale(1/metadata.pixelsPerUnit, 1/metadata.pixelsPerUnit); // fix this later
-            patchCache.put(texture, patch);
+            final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
+            final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+            patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
+            patchCache.put(gameAsset, patch);
             return patch;
         }
     }
@@ -602,19 +651,14 @@ public class MainRenderer implements Observer {
         ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
 
         if(particleCache.containsKey(component)) {
-            return particleCache.get(component);
+            ParticleEffectInstance particleEffectInstance = particleCache.get(component);
+            component.setEffectRef(particleEffectInstance);
+            return particleEffectInstance;
         } else {
             ParticleEffectInstance instance = descriptor.createEffectInstance();
+            component.setEffectRef(instance);
             particleCache.put(component, instance);
             return instance;
-        }
-    }
-
-    private void updateLayerOrderLookup () {
-        layerOrderLookup.clear();
-        int i = 0;
-        for(String layer: layerList) {
-            layerOrderLookup.put(layer, i++);
         }
     }
 
@@ -692,5 +736,20 @@ public class MainRenderer implements Observer {
 
     public Camera getCamera() {
         return camera;
+    }
+
+
+    @EventHandler
+    public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
+        final SpriteMetadata metadata = event.getSpriteMetadata();
+        for (ObjectMap.Entry<GameAsset<Texture>, NinePatch> gameAssetNinePatchEntry : patchCache) {
+            if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
+                final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+                final float scale = 1 / metadata.pixelsPerUnit;
+                patch.scale(scale, scale);
+                patchCache.put(gameAssetNinePatchEntry.key, patch);
+                break;
+            }
+        }
     }
 }

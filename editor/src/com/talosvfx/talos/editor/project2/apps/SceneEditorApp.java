@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
@@ -20,11 +19,13 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.Getter;
 
 
 @SingletonApp
-public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
+public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<ViewportPreferences> {
 
+	@Getter
 	private final SceneEditorWorkspace workspaceWidget;
 
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorApp.class);
@@ -74,7 +75,6 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 
 
 		workspaceWidget.loadFromScene(gameAsset);
-		Notifications.registerObserver(this);
 	}
 
 	@Override
@@ -89,8 +89,6 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@Override
 	public void onRemove () {
 		gameAsset.listeners.removeValue(this, true);
-
-		Notifications.unregisterObserver(this);
 	}
 
 	@Override

@@ -3,7 +3,9 @@ package com.talosvfx.talos.editor.project2;
 import com.artemis.utils.reflect.ClassReflection;
 import com.artemis.utils.reflect.ReflectionException;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -32,7 +34,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-public class AppManager implements Observer {
+public class AppManager extends InputAdapter implements Observer {
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
@@ -153,7 +155,7 @@ public class AppManager implements Observer {
 		return null;
 	}
 
-	public <T extends BaseApp> T  getAppForAsset(Class<T> appClass, GameAsset<VFXProjectData> gameAsset) {
+	public <T extends BaseApp> T  getAppForAsset(Class<T> appClass, GameAsset<?> gameAsset) {
 		Array<BaseApp> appInstances = getAppInstances();
 		for(BaseApp app: appInstances) {
 			if(appClass.isAssignableFrom(app.getClass()) && app.gameAsset != null && app.gameAsset == gameAsset) {
@@ -566,5 +568,27 @@ public class AppManager implements Observer {
 		if (itemChangedAndUnsaved) {
 			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
 		}
+	}
+
+	private Vector2 vector2 = new Vector2();
+	private Array<LayoutContent> out = new Array<>();
+	@Override
+	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+		vector2 = new Vector2(screenX, screenY);
+
+		if (SharedResources.currentProject != null) {
+			LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
+			out.clear();
+			layoutGrid.getAllLayoutContentsFlat(out);
+
+			for (LayoutContent layoutContent : out) {
+				layoutContent.screenToLocalCoordinates(vector2.set(screenX, screenY));
+				if (layoutContent.hit(vector2.x, vector2.y, false) != null) {
+					layoutGrid.setLayoutActive(layoutContent);
+				}
+			}
+		}
+
+		return false; //Never do anything with touches, its just passive detection
 	}
 }

@@ -41,6 +41,9 @@ import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -58,6 +61,10 @@ public class TalosLauncher implements ILauncher {
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
+		DateFormat simple =  new SimpleDateFormat("dd MMM yy HH:mm Z");
+		String buildDate = simple.format(TALOS_BUILD.getBuildDate());
+		String misc = "Branch: [" + TALOS_BUILD.getBranch() + "] Commit: [" + TALOS_BUILD.getCommit() + "] Date: ["+ buildDate +"]";
+
 		TalosLauncher launcher = new TalosLauncher();
 
 		TalosMain2 talos = new TalosMain2(launcher) {
@@ -65,7 +72,8 @@ public class TalosLauncher implements ILauncher {
 			public void create () {
 				super.create();
 				afterCreated();
-				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TalosVersion.getVersion());
+				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TALOS_BUILD.getVersion() + " " + misc);
+				TALOS_BUILD.printAll();
 			}
 		};
 
@@ -77,7 +85,7 @@ public class TalosLauncher implements ILauncher {
 			ShaderProgram.prependVertexCode = "#version 330 core\n";
 			ShaderProgram.prependFragmentCode = "#version 330 core\n";
 		}
-		
+
 
 
 

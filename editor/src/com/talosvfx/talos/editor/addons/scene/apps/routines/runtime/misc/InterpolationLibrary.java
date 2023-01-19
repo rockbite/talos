@@ -21,7 +21,7 @@ public class InterpolationLibrary {
             }
         }
 
-        if(!map.containsKey(name)) {
+        if(name == null || !map.containsKey(name)) {
             return Interpolation.linear;
         }
 

@@ -9,6 +9,12 @@
         <tab name="addons" title="Addons">
             <injectable name = "addons"></injectable>
         </tab>
+        <tab name="project" title="Project">
+            <block name="general" title="General">
+                <path name = "exportPath" default=""  project="true">Export Path</path>
+                <string name="exportScript" project="true" default="">Export Script Relative</string>
+            </block>
+        </tab>
         <tab name="keymap" title="Keymap">
             <injectable name = "keymap">KeymapBlock</injectable>
         </tab>
@@ -18,7 +24,7 @@
             <block name = "realtimeSync" title="Realtime Sync">
                 <boolean name = "enable" default = "false">Enable</boolean>
                 <string name = "host" default="127.0.0.1">Host</string>
-                <number name = "port" default="3001">Port</number>
+                <number name = "port" default="42069" step="1" min = "0" max="99999" progress="false">Port</number>
             </block>
         </tab>
         <tab name="saveLoad" title="Save &amp; Load">

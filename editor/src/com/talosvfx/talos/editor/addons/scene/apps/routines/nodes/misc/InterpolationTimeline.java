@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -19,6 +18,9 @@ public class InterpolationTimeline extends Table {
     private Group container = new Group();
     private ObjectMap<Object, Image> progressMap = new ObjectMap<>();
     private Interpolation interpolation = Interpolation.linear;
+
+    private static final Color bgColor = Color.valueOf("#37574a");
+    private static final Color lineColor = Color.valueOf("18db66ff");
 
     private Image chartImage;
 
@@ -36,6 +38,8 @@ public class InterpolationTimeline extends Table {
 
         addActor(chartImage);
         addActor(container);
+
+        setInterpolation(interpolation);
     }
 
     public void clearMap() {
@@ -97,27 +101,95 @@ public class InterpolationTimeline extends Table {
     }
 
     private void buildChart() {
-        float width = 200;
-        float height = 58;
-        int res = 50;
-        Pixmap pixmap = new Pixmap((int)width, 58, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.valueOf("18db66ff"));
+        float width = 720;
+        float height = 480;
+        float margin = height * 0.2f;
+        float bottomLeftX = 0;
+        float bottomLeftY = margin;
+        float steps = width * 0.5f;
 
-        float margin = 0.5f;
+        Pixmap pixmap = new Pixmap((int) width, (int) height, Pixmap.Format.RGBA8888);
 
-        Vector2 prev = new Vector2(0, height);
-        float result = interpolation.apply(0);
-        prev.set(0, (int) (height - (result*height*(1f-margin))- height * margin/2f));
-        for(int i = 1; i < res; i++) {
-            int posX = (int) (i * (width/res));
-            float a = (float)i/res;
-            result = interpolation.apply(a);
-            pixmap.drawLine((int) prev.x, (int) prev.y, posX, (int) (height - (result*height*(1f-margin))- height * margin/2f));
-            prev.set(posX, (int) (height - (result*height*(1f-margin))- height * margin/2f));
+        float lastX = bottomLeftX, lastY = bottomLeftY;
+        for (float step = 0; step < steps - 3; step++) {
+            float percent = step / steps;
+            float x = bottomLeftX + width * percent;
+            float y = bottomLeftY + (height - 2.0f * margin) * interpolation.apply(percent);
+            plotLineWidth(pixmap, (int)lastX, (int)lastY, (int)x, (int)y, (long) (6 * 256.0));
+            lastX = x;
+            lastY = y;
         }
 
         Texture texture = new Texture(pixmap);
         TextureRegion region = new TextureRegion(texture);
+        region.flip(false, true);
         chartImage.setDrawable(new TextureRegionDrawable(region));
+    }
+
+    void plotLineWidth(Pixmap pixmap, int x0, int y0, int x1, int y1, long th) { /* plot an anti-aliased line of thickness th := 256 == 1 pixel */
+        int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+        long dx = Math.abs(x1-x0), dy = Math.abs(y1-y0);
+        long err = dx < dy ? dx : dy, e2 = dx < dy ? dy : dx; /* min / max */
+        final long BKGD = (255L<<16); /* max pixel value = background */
+        if (th <= 256 || e2 == 0) {
+            plotLineAA(pixmap, x0, y0, x1, y1);
+            return; /* assert */
+        }
+        e2 = BKGD/(e2+2*err*err*e2/(4*e2*e2+err*err)); /* sqrt approximation */
+        th = (th-256)<<16; dx *= e2; dy *= e2; /* scale values */
+        if (dx < dy) { /* steep line */
+            x1 = (int) ((BKGD+th/2)/dy); /* start offset */
+            err = x1*dy-th/2; /* shift error value to offset width */
+            for (x0 -= x1*sx; ; y0 += sy) {
+                pixmap.drawPixel(x1 = x0, y0, color((int) (err>>16))); /* aliasing pre-pixel */
+                for (e2 = dy-err-th; e2+dy < BKGD; e2 += dy)
+                    pixmap.drawPixel(x1 += sx, y0, Color.rgba8888(lineColor)); /* pixel on thick line */
+                pixmap.drawPixel(x1+sx, y0, color((int) (e2>>16))); /* aliasing post-pixel */
+                if (y0 == y1) break;
+                err += dx; /* y-step */
+                if (err > BKGD) { err -= dy; x0 += sx; } /* x-step */
+            }
+        } else { /* flat line */
+            y1 = (int) ((BKGD+th/2)/dx); /* start offset */
+            err = y1*dx-th/2; /* shift error value to offset width */
+            for (y0 -= y1*sy; ; x0 += sx) {
+                pixmap.drawPixel(x0, y1 = y0, color((int) (err>>16))); /* aliasing pre-pixel */
+                for (e2 = dx-err-th; e2+dx < BKGD; e2 += dx)
+                    pixmap.drawPixel(x0, y1 += sy, Color.rgba8888(lineColor)); /* pixel on thick line */
+                pixmap.drawPixel(x0, y1+sy, color((int) (e2>>16))); /* aliasing post-pixel */
+                if (x0 == x1) break;
+                err += dy; /* x-step */
+                if (err > BKGD) { err -= dx; y0 += sy; } /* y-step */
+            }
+        }
+    }
+
+    void plotLineAA(Pixmap pixmap, int x0, int y0, int x1, int y1) {
+        int dx = Math.abs(x1-x0), sx = x0 < x1 ? 1 : -1;
+        int dy = Math.abs(y1-y0), sy = y0 < y1 ? 1 : -1;
+        int x2, e2, err = dx-dy; /* error value e_xy */
+        int ed = dx+dy == 0 ? 1 : (int) Math.sqrt((float) dx * dx + (float) dy * dy);
+        for ( ; ; ){ /* pixel loop */
+            pixmap.drawPixel(x0,y0,color(255 * Math.abs(err-dx+dy)/ed));
+            e2 = err; x2 = x0;
+            if (2*e2 >= -dx) { /* x step */
+                if (x0 == x1) break;
+                if (e2+dy < ed) pixmap.drawPixel(x0,y0+sy,color(255*(e2+dy)/ed));
+                err -= dy; x0 += sx;
+            }
+            if (2*e2 <= dy) { /* y step */
+                if (y0 == y1) break;
+                if (dx-e2 < ed) pixmap.drawPixel(x2+sx,y0,color(255*(dx-e2)/ed));
+                err += dx; y0 += sy;
+            }
+        }
+    }
+
+    private static int color (int intensity) {
+        float r = (intensity*bgColor.r + (255-intensity)*lineColor.r)/255.0f;
+        float g = (intensity*bgColor.g + (255-intensity)*lineColor.g)/255.0f;
+        float b = (intensity*bgColor.b + (255-intensity)*lineColor.b)/255.0f;
+        float a = (intensity*bgColor.a + (255-intensity)*lineColor.a)/255.0f;
+        return Color.rgba8888(r, g, b, a);
     }
 }

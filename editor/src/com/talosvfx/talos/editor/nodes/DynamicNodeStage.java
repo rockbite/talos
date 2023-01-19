@@ -19,8 +19,11 @@ import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>>, GameAsset.GameAssetUpdateListener {
 
@@ -36,7 +39,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
     public GameAsset<T> gameAsset;
     public T data;
-    private GameAsset.GameAssetUpdateListener gameAssetUpdateListener;
 
     public DynamicNodeStage (Skin skin) {
         super();

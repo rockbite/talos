@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
@@ -24,6 +25,9 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
+import com.talosvfx.talos.editor.utils.Toasts;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +39,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     private Vector2 tmp = new Vector2();
 
+    @Getter
     private float timeScale = 1f;
     private boolean loading = false;
+
+    @Getter
+    private boolean paused = false;
+    @Getter
+    private boolean playing;
+    private ScenePreviewApp scenePreviewApp;
 
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
@@ -49,13 +60,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     protected void initActors () {
         super.initActors();
         nodeBoard.setTouchable(Touchable.enabled);
-    }
-
-    public void writeData (FileHandle target) {
-        Json json = new Json();
-        json.setOutputType(JsonWriter.OutputType.json);
-        String data = json.prettyPrint(this);
-        target.writeString(data, false);
     }
 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
@@ -154,11 +158,20 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
     }
 
-    public void routineUpdated () {
+    public void routineUpdated() {
+        routineUpdated(false);
+    }
+
+    public void routineUpdated (boolean isFastChange) {
         if(!loading) {
             //todo: this isn't right
-            markAssetChanged();
+            if (!isFastChange) {
+                markAssetChanged();
+            }
+            // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
+            gameAsset.listeners.removeValue(this, true);
             gameAsset.setUpdated();
+            gameAsset.listeners.add(this);
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
@@ -169,11 +182,13 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     @EventHandler
     public void onNodeCreatedEvent (NodeCreatedEvent event) {
         routineUpdated();
+        routineEditorApp.controlWindow.update();
     }
 
     @EventHandler
     public void onNodeRemovedEvent (NodeRemovedEvent event) {
         routineUpdated();
+        routineEditorApp.controlWindow.update();
     }
 
     @EventHandler
@@ -189,10 +204,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     @EventHandler
     public void onNodeDataModifiedEvent (NodeDataModifiedEvent event) {
         NodeWidget node = event.getNode();
-        updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node);
+        updateRoutineInstanceDataFromWidget(data.getRoutineInstance(), node, event.isFastChange);
+        routineEditorApp.controlWindow.update();
     }
 
-    private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget) {
+    private void updateRoutineInstanceDataFromWidget (RoutineInstance routineInstance, NodeWidget nodeWidget, boolean isFastChange) {
         RoutineNode logicNode = routineInstance.getNodeById(nodeWidget.getUniqueId());
 
         if (logicNode == null) return;
@@ -212,7 +228,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
         if (setRoutineDirty) {
             routineInstance.setDirty();
-            routineUpdated();
+            routineUpdated(isFastChange);
         }
     }
 
@@ -276,15 +292,74 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void act() {
         if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
+        if(scenePreviewApp != null) {
+            if (data.getRoutineInstance() != null) {
+                scenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
+            } else {
+                scenePreviewApp.setSpeed(timeScale);
+            }
+        }
     }
 
     public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
-        ScenePreviewApp scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+        scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
 
         return scenePreviewApp;
     }
 
     public void resetNodes() {
         nodeBoard.resetNodes();
+    }
+
+    public void play(String executorName) {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        RoutineExecutorNode node = (RoutineExecutorNode) routineInstance.getCustomLookup().get(executorName);
+        if(node != null) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(node.uniqueId);
+            boolean result = executorWidget.startPlay();
+
+            if(result) {
+                playing = true;
+            }
+        }
+    }
+
+    public void stop() {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        routineInstance.stop();
+        if (scenePreviewApp != null) {
+            scenePreviewApp.reload();
+        }
+        playing = false;
+        //timeScale = 1f;
+    }
+
+    public void resume() {
+        paused = false;
+        data.getRoutineInstance().setPaused(paused);
+        if (scenePreviewApp != null) {
+            scenePreviewApp.setPaused(paused);
+        }
+    }
+
+    public void pause() {
+        paused = true;
+        data.getRoutineInstance().setPaused(paused);
+        if (scenePreviewApp != null) {
+            scenePreviewApp.setPaused(paused);
+        }
+    }
+
+    public void setTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setSpeed(timeScale);
+        }
+    }
+
+    public void lockCamera(boolean checked) {
+        if(scenePreviewApp != null) {
+            scenePreviewApp.setLockCamera(checked);
+        }
     }
 }

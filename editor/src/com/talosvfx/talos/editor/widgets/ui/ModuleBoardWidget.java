@@ -277,15 +277,28 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         stage.addListener(new InputListener() {
 
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                super.touchDown(event, x, y, pointer, button);
 
                 if (button == 1 && !event.isCancelled()) {
                     showPopup();
+                } else {
+                    TalosVFXUtils.getModuleListPopup().remove();
                 }
 
-                return super.touchDown(event, x, y, pointer, button);
+                super.touchDown(event, x, y, pointer, button);
+
+                if (!event.isHandled()) {
+                    clearSelection();
+                    stage.unfocusAll();
+                    return false;
+                }
+
+                return false;
             }
+
 
         });
     }
@@ -460,7 +473,7 @@ public class ModuleBoardWidget extends WidgetGroup {
                 deleteWrapper(wrapper);
             }
         } catch (Exception e) {
-            //TalosMain.Instance().reportException(e);
+            e.printStackTrace();
         }
 
         clearSelection();
@@ -479,7 +492,6 @@ public class ModuleBoardWidget extends WidgetGroup {
             group.removeWrapper(wrapper);
         }
 
-        logger.error("Should be saving and using undo system");
 
         app.dataModified();
         // TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
@@ -908,7 +920,6 @@ public class ModuleBoardWidget extends WidgetGroup {
             other.removeWrappers(wrappers);
         }
 
-        logger.error("Should be saving and using undo system");
 
         app.dataModified();
     }
@@ -944,8 +955,6 @@ public class ModuleBoardWidget extends WidgetGroup {
             tmp.add(moduleContainer.getX(), moduleContainer.getY());
             localToStageCoordinates(tmp);
 
-            logger.info("Set position in reset");
-//            TalosMain.Instance().NodeStage().getCamera().position.set(tmp.x, tmp.y, 0);
         }
     }
 

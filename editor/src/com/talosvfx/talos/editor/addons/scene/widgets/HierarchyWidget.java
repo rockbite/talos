@@ -1,19 +1,17 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Select;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
@@ -27,7 +25,9 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClear
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
 import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.Scene;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -36,12 +36,13 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HierarchyWidget extends Table implements Observer {
+import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
+
+public class HierarchyWidget extends Table implements Observer, EventContextProvider<GameObjectContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
 
@@ -56,6 +57,7 @@ public class HierarchyWidget extends Table implements Observer {
 
     private ContextualMenu contextualMenu;
 
+    private GameAsset<Scene> gameAsset;
 
     public HierarchyWidget() {
         tree = new FilteredTree<>(SharedResources.skin, "modern");
@@ -94,7 +96,7 @@ public class HierarchyWidget extends Table implements Observer {
                 GameObject gameObject = objectMap.get(node.getObject().uuid.toString());
 
                 AddToSelectionEvent addToSelectionEvent = Notifications.obtainEvent(AddToSelectionEvent.class);
-                addToSelectionEvent.setGameObject(gameObject);
+                addToSelectionEvent.set(currentContainer, gameObject);
                 Notifications.fireEvent(addToSelectionEvent);
 
             }
@@ -164,7 +166,54 @@ public class HierarchyWidget extends Table implements Observer {
 
         Notifications.registerObserver(this);
 
+        addListeners();
+    }
 
+    private void addListeners () {
+        addListener(new InputListener() {
+            @Override
+            public boolean keyDown (InputEvent event, int keycode) {
+
+                // TODO: 13.01.23 later change this into new shortcut system
+
+                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) deleteSelected();
+
+                if (keycode == Input.Keys.C && ctrlPressed()) copySelected();
+
+                if (keycode == Input.Keys.V && ctrlPressed()) pasteFromClipboard();
+
+                return super.keyDown(event, keycode);
+            }
+        });
+    }
+
+    private void copySelected () {
+        final Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
+        final OrderedSet<GameObject> arraySelection = new OrderedSet<>();
+        for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
+            arraySelection.add(gameObjectNode.getObject());
+        }
+
+        SceneUtils.copy(gameAsset, arraySelection);
+    }
+
+    private void deleteSelected () {
+        ObjectSet<GameObject> selection = new ObjectSet<>();
+        for(FilteredTree.Node<GameObject> nodeObject: tree.getSelection()) {
+            if(objectMap.containsKey(nodeObject.getObject().uuid.toString())) {
+                GameObject gameObject = objectMap.get(nodeObject.getObject().uuid.toString());
+                selection.add(gameObject);
+            }
+        }
+
+        for (GameObject object : selection) {
+            SceneUtils.deleteGameObject(currentContainer, object);
+        }
+    }
+
+    private void pasteFromClipboard () {
+        tree.clearSelection(true);
+        SceneUtils.paste(gameAsset);
     }
 
     private Actor createToolsForNode (FilteredTree.Node<GameObject> node) {
@@ -233,8 +282,8 @@ public class HierarchyWidget extends Table implements Observer {
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                event.stop();
                 gameObject.setEditorVisible(!gameObject.isEditorVisible());
+                SceneUtils.visibilityUpdated(currentContainer, gameObject);
 
                 return true;
             }
@@ -245,8 +294,8 @@ public class HierarchyWidget extends Table implements Observer {
         handButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                event.stop();
                 gameObject.setEditorTransformLocked(!gameObject.isEditorTransformLocked());
+                SceneUtils.lockUpdated(currentContainer, gameObject);
 
                 Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
                 for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
@@ -268,14 +317,20 @@ public class HierarchyWidget extends Table implements Observer {
 
     private void showContextMenu (GameObject gameObject) {
         contextualMenu.clearItems();
-        contextualMenu.addItem("Convert to Prefab", new ClickListener() {
+
+        // if multiple objects are selected disable convert to prefab functionality
+        final boolean multipleObjectSelected = tree.getSelection().size() != 1;
+        final MenuItem convertToPrefab = contextualMenu.addItem("Convert to Prefab", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
+                if (multipleObjectSelected) return;
                 FilteredTree.Node<GameObject> item = tree.getSelection().first();
                 GameObject gameObject = objectMap.get(item.getObject().uuid.toString());
                 SceneUtils.convertToPrefab(gameObject);
             }
         });
+        convertToPrefab.setDisabled(multipleObjectSelected);
+
         contextualMenu.addSeparator();
         contextualMenu.addItem("Cut", new ClickListener() {
             @Override
@@ -286,19 +341,13 @@ public class HierarchyWidget extends Table implements Observer {
         contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
-                Array<GameObject> arraySelection = new Array<>();
-                for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
-                    arraySelection.add(gameObjectNode.getObject());
-                }
-
-                SceneUtils.copy(currentContainer, arraySelection);
+                copySelected();
             }
         });
         contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                SceneUtils.paste(currentContainer);
+                pasteFromClipboard();
             }
         });
         contextualMenu.addSeparator();
@@ -327,18 +376,7 @@ public class HierarchyWidget extends Table implements Observer {
         contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-                ObjectSet<GameObject> gameObjects= new ObjectSet<>();
-                for(FilteredTree.Node<GameObject> nodeObject: tree.getSelection()) {
-                    if(objectMap.containsKey(nodeObject.getObject().uuid.toString())) {
-                        GameObject gameObject = objectMap.get(nodeObject.getObject().uuid.toString());
-                        gameObjects.add(gameObject);
-                    }
-                }
-
-                for (GameObject object : gameObjects) {
-                    SceneUtils.deleteGameObject(currentContainer, object);
-                }
-
+                deleteSelected();
             }
         });
         contextualMenu.addSeparator();
@@ -354,8 +392,8 @@ public class HierarchyWidget extends Table implements Observer {
             item.addListener(new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
-                    SceneUtils.createObjectByTypeName(currentContainer, name, new Vector2(), gameObject, name);
-
+                    final GameObject newObjectInstance = SceneUtils.createObjectByTypeName(currentContainer, name, new Vector2(), gameObject, name);
+                    Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(newObjectInstance));
                 }
             });
             popupMenu.addItem(item);
@@ -525,23 +563,25 @@ public class HierarchyWidget extends Table implements Observer {
         }
     }
 
-    public void loadEntityContainer (GameObjectContainer entityContainer) {
+    public void loadEntityContainer (GameAsset<Scene> gameAsset) {
+        this.gameAsset = gameAsset;
+
+        currentContainer = gameAsset.getResource();
+
         tree.clearChildren();
         objectMap.clear();
         nodeMap.clear();
 
-        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(entityContainer.getName(), SharedResources.skin), entityContainer.getSelfObject()));
+        FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(currentContainer.getName(), SharedResources.skin), currentContainer.getSelfObject()));
         parent.setObject(new GameObject());
         parent.setCompanionActor(createToolsForNode(parent));
         parent.setSelectable(false);
 
-        traverseEntityContainer(entityContainer, parent);
+        traverseEntityContainer(currentContainer, parent);
 
         tree.add(parent);
 
         tree.expandAll();
-
-        currentContainer = entityContainer;
     }
 
     private FilteredTree.Node<GameObject> createNodeForGameObject (GameObject gameObject) {
@@ -628,6 +668,11 @@ public class HierarchyWidget extends Table implements Observer {
         return scrollPane;
     }
 
+    @Override
+    public GameObjectContainer getContext() {
+        return currentContainer;
+    }
+
     private static class HierarchyWrapper extends Table {
 
         private final Actor label;
@@ -664,8 +709,7 @@ public class HierarchyWidget extends Table implements Observer {
     public void onGameAssetOpen (GameAssetOpenEvent gameAssetOpenEvent) {
         GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
         if (gameAsset.type == GameAssetType.SCENE) {
-            Scene resource = (Scene)gameAsset.getResource();
-            loadEntityContainer(resource);
+            loadEntityContainer((GameAsset<Scene>) gameAsset);
         }
     }
 }

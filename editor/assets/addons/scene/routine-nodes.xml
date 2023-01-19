@@ -35,10 +35,42 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "RotateBy" title = "Rotate By" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue port="input" name="angle" type="float" min="-360" max="360">angle: </dynamicValue>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "PlayMusicNode" title = "Play Sound" keywords = "movement" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <asset port="input" name="asset" type="SOUND">asset</asset>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "MoveTowardsNode" title = "Move Towards" keywords = "movement" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <value port="input" name="x" type="float" min="-1000" max="1000">X: </value>
+                <value port="input" name="y" type="float" min="-1000" max="1000">Y: </value>
+            </group>
+            <dynamicValue port="input" name="speed" type="float" default="1">speed</dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "MoveOnPath" title = "Path Move" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue name="jitter" type="float" default="0" min = "0" max = "2" progress="true">Jitter</dynamicValue>
+            <inputText name="target" type="string">path</inputText>
+            <checkbox name="reverse" default = "false">reverse</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "ColorToNode" title = "Color To" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <color port="input" name="color" type="color">Color: </color>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <checkbox name="alphaOnly" default = "true">Transparency Only</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
@@ -54,12 +86,29 @@
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "PlaybackSpeedToNode" title = "Playback Speed" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue port="input" name="timeScale" type="float" min="0" max="10" progress="true">Time Scale: </dynamicValue>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name = "SizeToNode" title = "Size To" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>
                 <dynamicValue port="input" name="height" type="float" min="-1000" max="1000">Height: </dynamicValue>
             </group>
+            <checkbox name="additive" default = "false">Additive</checkbox>
+            <checkbox name="yoyo" default = "false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "ZoomToNode" title = "Zoom To" keywords = "movement" class = "AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <dynamicValue port="input" name="zoom" type="float" min="0.1" max="10" progress="true">Zoom: </dynamicValue>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
@@ -87,7 +136,8 @@
                 <value port="input" name="stopSignal" type="signal">stop</value>
                 <value port="input" name="flag" type="boolean">flag</value>
             </group>
-            <dynamicValue name="interval" type="float" default="1">interval</dynamicValue>
+            <dynamicValue name="count" type="float" default="10" step="1" min="0" max="1000">count</dynamicValue>
+            <dynamicValue name="interval" type="float" default="1" step="0.0001">interval</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
     </category>
@@ -95,6 +145,11 @@
         <module name = "RemoveEntityNode" title = "Remove Entity" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name="GetTransformNode" title="Get Transform" keywords="" class="RoutineNodeWidget">
+            <inputText name="target" type="string">target</inputText>
+            <value port="output" name="x" type="float">x</value>
+            <value port="output" name="y" type="float">y</value>
         </module>
         <module name = "TargetAccumulator" title = "Accumulator" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="addSignal" type="signal">add</value>
@@ -115,14 +170,26 @@
                 <option value = "sliced">Sliced</option>
                 <option value = "tiled">Tiled</option>
             </select>
-            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SpawnSpineNode" title = "Spawn Spine" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
             <asset port="input" name="spine" type="SKELETON">spine</asset>
             <color port="input" name="color" type="color">Color: </color>
-            <value port="input" name="layerOrder" type="int">Layer order</value>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name = "SpawnParticleNode" title = "Spawn Particle" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="parent" type="string">parent</inputText>
+            <asset port="input" name="particle" type="VFX">spine</asset>
+            <group>
+                <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">x: </dynamicValue>
+                <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">y: </dynamicValue>
+            </group>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetSpineAnimationNode" title = "Set Spine Animation" keywords = "" class = "SetSpineAnimationNodeWidget">
@@ -130,6 +197,8 @@
             <asset port="input" name="reference" type="SKELETON">reference</asset>
             <container name="animation_list"></container>
             <checkbox name="repeat" default = "true">repeat</checkbox>
+            <checkbox name="add" default = "false">add it</checkbox>
+            <dynamicValue port="input" name="track" type="int" min="0" max="10" step="1" progress="true">track</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name = "SetTransformNode" title = "Set Transform" keywords = "" class = "RoutineNodeWidget">
@@ -147,8 +216,8 @@
                 <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
             </group>
             <group>
-                <dynamicValue port="input" name="width" type="float" step="0.1">Width: </dynamicValue>
-                <dynamicValue port="input" name="height" type="float" step="0.1">Height: </dynamicValue>
+                <dynamicValue port="input" name="width" type="float" step="0.01">Width: </dynamicValue>
+                <dynamicValue port="input" name="height" type="float" step="0.01">Height: </dynamicValue>
             </group>
             <dynamicValue port="input" name="rotation" type="float" min="-360" max="360" step = "1" progress="true">Rotation: </dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
@@ -210,11 +279,11 @@
                 <option value = "DIV">Divide</option>
                 <option value = "POW">Power</option>
                 <option value = "SIN">Sinus</option>
-                <option value = "COS">Cosinus</option>
+                <option value = "COS">Cosines</option>
             </select>
             <group>
-                <dynamicValue port="input" name="valueA" type="fluid" max = "999" step="0.01">Value A</dynamicValue>
-                <dynamicValue port="input" name="valueB" type="fluid" max = "999" step="0.01">Value B</dynamicValue>
+                <dynamicValue port="input" name="valueA" type="fluid" max = "999" min = "-999" step="0.01">Value A</dynamicValue>
+                <dynamicValue port="input" name="valueB" type="fluid" max = "999" min = "-999" step="0.01">Value B</dynamicValue>
             </group>
         </module>
         <module name = "LoopNode" title = "Loop" keywords = "" class = "RoutineNodeWidget">
@@ -301,6 +370,7 @@
                 <dynamicValue port="input" name="min" type="float" default="0" min = "-1000" max = "1000" step="0.01">min: </dynamicValue>
                 <dynamicValue port="input" name="max" type="float" default="1" min = "-1000" max = "1000" step="0.01">max: </dynamicValue>
             </group>
+            <checkbox name="random" default = "false">New Everytime</checkbox>
             <value port="output" name="output" type="float">output</value>
         </module>
         <module name = "AssetSelectNode" title = "Asset Select" keywords = "" class = "RoutineNodeWidget">

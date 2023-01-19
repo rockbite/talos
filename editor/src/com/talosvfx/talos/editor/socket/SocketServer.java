@@ -1,12 +1,14 @@
 package com.talosvfx.talos.editor.socket;
 
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import org.eclipse.jetty.websocket.api.Session;
 import spark.Spark;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 
 /**
  * SocketServer is class which handles initialization, message broadcasting and basic configuration of Talos editor server.
@@ -24,7 +26,7 @@ public class SocketServer {
     public static ArrayList<Session> currentConnectedUsers = new ArrayList<>();
 
     private SocketServer() {
-        SERVER_PORT = TalosMain.Instance().Prefs().getInteger("serverPort", DEFAULT_PORT);
+        SERVER_PORT = TalosLocalPrefs.Instance().getGlobalInteger("system.realtimeSync.port", DEFAULT_PORT);
         Spark.initExceptionHandler(new Consumer<Exception>() {
             @Override
             public void accept(Exception e) {

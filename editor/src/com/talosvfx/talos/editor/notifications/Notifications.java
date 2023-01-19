@@ -155,7 +155,9 @@ public class Notifications {
 
 	public void fireEventInner (TalosEvent event) {
 		if (invocationMap.containsKey(event.getClass())) {
-			for (EventRunner eventRunner : invocationMap.get(event.getClass())) {
+			Array<EventRunner> eventRunners = invocationMap.get(event.getClass());
+			for (int i = 0; i < eventRunners.size; i++) {
+				EventRunner eventRunner = eventRunners.get(i);
 				testAndFireEvent(eventRunner, event);
 			}
 		}
@@ -186,9 +188,14 @@ public class Notifications {
 						"owner class implement ContextProvider");
 			}
 
+			EventContextProvider<?> eventContextProvider  = (EventContextProvider<?>) eventRunner.getObserver();
+
 			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
 
-			if (!(eventContextObject == eventRunner.getObserver())) {
+			if (eventContextObject == null) {
+				throw new GdxRuntimeException("Invalid event, context must be provided");
+			}
+			if (!(eventContextObject == eventContextProvider.getContext())) {
 				return;
 			}
 
