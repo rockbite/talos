@@ -20,10 +20,10 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyHolder;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.scene.GameObject;
-import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import org.slf4j.Logger;
@@ -57,7 +58,8 @@ public class SEPropertyPanel extends PropertyPanel {
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
         super.showPanel(target, propertyProviders);
 
-        if(target instanceof GameObject) {
+        if (target instanceof GameObjectPropertyHolder) {
+            final GameObjectPropertyHolder gameObjectPropertyHolder = (GameObjectPropertyHolder) target;
             // add part with custom components
 
             container.row();
@@ -70,7 +72,7 @@ public class SEPropertyPanel extends PropertyPanel {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
                     CreateComponentPopup createComponentPopup = new CreateComponentPopup();
-                    createComponentPopup.show(button, (GameObject)target);
+                    createComponentPopup.show(button, gameObjectPropertyHolder.getGameObject());
                 }
             });
 
@@ -334,12 +336,7 @@ public class SEPropertyPanel extends PropertyPanel {
                             scriptComponent.setGameAsset((GameAsset<String>)gameAsset);
                             gameObject.addComponent(scriptComponent);
 
-                            if (getCurrentHolder() instanceof GameObjectContainer) {
-                                SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, scriptComponent);
-
-                                IPropertyHolder holder = PropertyWrapperProviders.getOrCreateHolder(gameObject);
-                                showPanel(holder, holder.getPropertyProviders());
-                            }
+                            showComponent(scriptComponent);
 
                             remove();
                             return;
@@ -349,12 +346,7 @@ public class SEPropertyPanel extends PropertyPanel {
                             routineRendererComponent.setGameAsset(gameAsset);
                             gameObject.addComponent(routineRendererComponent);
 
-                            if (getCurrentHolder() instanceof GameObjectContainer) {
-                                SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
-
-                                IPropertyHolder holder = PropertyWrapperProviders.getOrCreateHolder(gameObject);
-                                showPanel(holder, holder.getPropertyProviders());
-                            }
+                            showComponent(routineRendererComponent);
 
                             remove();
                             return;
@@ -387,12 +379,7 @@ public class SEPropertyPanel extends PropertyPanel {
                                         scriptComponent.setGameAsset((GameAsset<String>)assetForPath);
                                         gameObject.addComponent(scriptComponent);
 
-                                        if (getCurrentHolder() instanceof GameObjectContainer) {
-                                            SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, scriptComponent);
-
-                                            IPropertyHolder holder = PropertyWrapperProviders.getOrCreateHolder(gameObject);
-                                            showPanel(holder, holder.getPropertyProviders());
-                                        }
+                                        showComponent(scriptComponent);
                                     }
                                     remove();
                                 }
@@ -425,11 +412,7 @@ public class SEPropertyPanel extends PropertyPanel {
 
                                         Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(assetDir.path()));
 
-                                        if (getCurrentHolder() instanceof GameObjectContainer) {
-                                            SceneUtils.componentAdded((GameObjectContainer)getCurrentHolder(), gameObject, routineRendererComponent);
-                                            IPropertyHolder holder = PropertyWrapperProviders.getOrCreateHolder(gameObject);
-                                            showPanel(holder, holder.getPropertyProviders());
-                                        }
+                                        showComponent(routineRendererComponent);
                                     }
 
                                     remove();
@@ -442,6 +425,16 @@ public class SEPropertyPanel extends PropertyPanel {
                     remove();
                 }
             });
+        }
+
+        private void showComponent(AComponent component) {
+            if (!(getCurrentHolder() instanceof GameObjectPropertyHolder)) return;
+
+            final GameObjectPropertyHolder gameObjectPropertyHolder = (GameObjectPropertyHolder) getCurrentHolder();
+            SceneUtils.componentAdded(gameObjectPropertyHolder.getGameObject(), gameObject, component);
+
+            final IPropertyHolder holder = PropertyWrapperProviders.getOrCreateHolder(gameObject);
+            showPanel(holder, holder.getPropertyProviders());
         }
     }
 }
