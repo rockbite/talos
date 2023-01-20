@@ -322,7 +322,7 @@ public class AppManager extends InputAdapter implements Observer {
 
 		LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
 
-		Array<U> appsToUpdate = getAppsToUpdate(gameAsset);
+		Array<U> appsToUpdate = new Array<>(getAppsToUpdate(gameAsset));
 		Array<U> appsToCreate = getAppsToCreateAndOpen(gameAsset, appsToUpdate);
 
 		for (U baseApp : appsToCreate) {
