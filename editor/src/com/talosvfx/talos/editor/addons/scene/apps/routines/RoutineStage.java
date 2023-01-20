@@ -76,11 +76,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     @Override
-    public void onUpdate () {
-        loadFrom(gameAsset);
-    }
-
-    @Override
     public void markAssetChanged () {
         if(!loading) {
             super.markAssetChanged();
@@ -170,9 +165,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
                 markAssetChanged();
             }
             // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
-            gameAsset.listeners.removeValue(this, true);
             gameAsset.setUpdated();
-            gameAsset.listeners.add(this);
             data.setRoutineInstance(data.createInstance(true));
             Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
