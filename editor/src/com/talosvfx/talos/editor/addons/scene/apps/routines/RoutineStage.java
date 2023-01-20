@@ -64,9 +64,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
         loading = true;
         if (asset == null || asset.getResource() == null) return;
-        reset();
 
         setFromData(asset);
+
+        reset();
+        
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
