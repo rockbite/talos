@@ -5,9 +5,10 @@ import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import lombok.Getter;
 
 public class GameObjectPropertyHolder extends PropertyWrapperProviders.ObjectPropertyHolder<GameObject> {
-
+	@Getter
 	private final GameObject gameObject;
 	private final GameObjectPropertyProvider gameObjectPropertyProvider;
 
