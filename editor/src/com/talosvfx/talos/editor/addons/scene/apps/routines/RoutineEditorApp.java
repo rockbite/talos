@@ -1,8 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -100,16 +98,7 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
             @Override
             protected void onTouchFocused () {
-                // if mouse hit coordinates are in uni focus on ui else on stage
-                final Vector2 coords = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-                uiContent.screenToLocalCoordinates(coords);
-                if (uiContent.hit(coords.x, coords.y, true) != null) {
-                    routineStageWrapper.getStage().unfocusAll();
-                    SharedResources.stage.setKeyboardFocus(routineUIStageWrapper);
-                } else {
-                    routineUIStageWrapper.getStage().unfocusAll();
-                    SharedResources.stage.setKeyboardFocus(routineStageWrapper);
-                }
+                SharedResources.stage.setKeyboardFocus(routineStageWrapper);
             }
         };
 
