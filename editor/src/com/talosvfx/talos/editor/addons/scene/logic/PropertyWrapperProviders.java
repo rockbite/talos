@@ -5,23 +5,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CameraComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.ComponentPropertyProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.CurveComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.MapComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.PaintSurfaceComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.ParticleComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.RendererComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.RoutineRenderComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.ScenePropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.ScenePropertyProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.ScriptComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpineComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TileDataComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponentProvider;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.*;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.AMetaDataHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.AMetaDataProvider;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.PrefabMetaDataHolder;
@@ -72,6 +56,7 @@ public class PropertyWrapperProviders {
 	static {
 		//objects
 		propertyHoldersForClass.put(Scene.class, ScenePropertyHolder.class);
+		propertyHoldersForClass.put(Prefab.class, PrefabPropertyHolder.class);
 		propertyHoldersForClass.put(GameObject.class, GameObjectPropertyHolder.class);
 
 		//metas
