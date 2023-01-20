@@ -318,7 +318,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 			int counter = nodeCounter.getAndIncrement(clazz, 0, 1);
 			node.setId(counter);
 			node.setUniqueId(globalNodeCounter++);
-
+			System.out.println("NodeBoard.java\t added node " + node.hashCode() + " with id: " + node.getId());
 		} catch (ReflectionException e) {
 			e.printStackTrace();
 		}
@@ -339,6 +339,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void deleteNode (NodeWidget node) {
+		System.out.println("NodeBoard.java\t removed node " + node.hashCode() + " with id: " + node.getId());
 		nodeStage.data.nodes.removeValue(node, true);
 
 		for (int i = nodeStage.data.nodeConnections.size - 1; i >= 0; i--) {
@@ -413,6 +414,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	public void removeConnection (NodeConnection connection) {
 		//Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionPreRemovedEvent.class).set(connection));
+		System.out.println("NodeBoard.java\t nodeConnections removed connection\t " + connection.fromNode.hashCode() + " with id: " + connection.fromNode.getId() + " " + connection.toNode.hashCode() + " with id " + connection.toNode.getId());
 		nodeStage.data.nodeConnections.removeValue(connection, true);
 
 		connection.fromNode.setSlotConnectionInactive(connection, false);
@@ -453,6 +455,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		connection.fromId = slotForm;
 		connection.toId = slotTo;
 
+		System.out.println("DynamicNodeStageData.java\t nodeConnections added node\t " + connection.fromNode.hashCode() + " with id: " + connection.fromNode.getId() + " " + connection.toNode.hashCode() + " with id " + connection.toNode.getId());
 		nodeStage.data.nodeConnections.add(connection);
 
 		from.setSlotActive(slotForm, false);
@@ -897,6 +900,8 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		NodeGroup group = new NodeGroup(this, skin);
 		group.setNodes(nodes);
+
+		System.out.println("NodeBoard.java\t groups added group\t" + group.hashCode() + " with text: " + group.getText());
 		nodeStage.data.groups.add(group);
 
 		groupContainer.addActor(group);

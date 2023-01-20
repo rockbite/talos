@@ -135,9 +135,12 @@ public class DynamicNodeStageData implements Json.Serializable {
 	}
 
 	public void clear () {
+		System.out.println("DynamicNodeStageData.java\t nodeConnections cleared\t");
 		nodeConnections.clear();
+		System.out.println("DynamicNodeStageData.java\t nodes cleared\t");
 		nodes.clear();
 
+		System.out.println("DynamicNodeStageData.java\t groups cleared\t");
 		groups.clear();
 	}
 }
