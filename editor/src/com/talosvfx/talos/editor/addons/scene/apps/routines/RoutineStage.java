@@ -165,14 +165,17 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
                 markAssetChanged();
             }
 
-            data.setRoutineInstance(data.createInstance(true));
+            if (!isFastChange) {
+                data.setRoutineInstance(data.createInstance(true));
 
-            gameAsset.setUpdated();
+                gameAsset.setUpdated();
 
-            Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
-            // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
+                Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+                // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
 
-            setInstanceListeners();
+                setInstanceListeners();
+            }
+
         }
     }
 
