@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
@@ -474,6 +475,27 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
 		if (settings.isForceExportAll()) {
+
+			//Gather all assets and export
+
+			Predicate<GameAsset<?>> forceAllPredicate = new Predicate<GameAsset<?>>() {
+				@Override
+				public boolean evaluate (GameAsset<?> gameAsset) {
+					return true;
+				}
+			};
+
+			exportGameAsset(settings, GameAssetType.SPRITE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SCRIPT, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.ROUTINE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SOUND, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SKELETON, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.VFX, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.PREFAB, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SCENE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.TILE_PALETTE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.LAYOUT_DATA, forceAllPredicate);
+
 			logger.info("todo export force");
 		} else {
 			logger.info("todo check all  other cases");
@@ -534,6 +556,16 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		FileHandle assetRepoExportFile = Gdx.files.absolute(projectPath).child("assetExport.json");
 		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+	}
+
+	private void exportGameAsset (AssetRepositoryCatalogueExportOptions settings, GameAssetType gameAssetType, Predicate<GameAsset<?>> forceAllPredicate) {
+		Array<GameAsset<Object>> assetsForType = getAssetsForType(gameAssetType);
+		Array<GameAsset<Object>> markedForExport = new Array<>();
+		for (GameAsset<Object> objectGameAsset : assetsForType) {
+			if (forceAllPredicate.evaluate(objectGameAsset)) {
+				markedForExport.add(objectGameAsset);
+			}
+		}
 	}
 
 	private void findAllPrefabs (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {
