@@ -105,10 +105,10 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
                 uiContent.screenToLocalCoordinates(coords);
                 if (uiContent.hit(coords.x, coords.y, true) != null) {
                     routineStageWrapper.getStage().unfocusAll();
-                    SharedResources.stage.setScrollFocus(routineUIStageWrapper);
+                    SharedResources.stage.setKeyboardFocus(routineUIStageWrapper);
                 } else {
                     routineUIStageWrapper.getStage().unfocusAll();
-                    SharedResources.stage.setScrollFocus(routineStageWrapper);
+                    SharedResources.stage.setKeyboardFocus(routineStageWrapper);
                 }
             }
         };
