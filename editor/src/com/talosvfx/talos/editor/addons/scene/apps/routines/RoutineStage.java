@@ -68,7 +68,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         setFromData(asset);
 
         reset();
-        
+
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
