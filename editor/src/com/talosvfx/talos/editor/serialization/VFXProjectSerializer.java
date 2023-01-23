@@ -22,12 +22,13 @@ import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
-import com.talosvfx.talos.runtime.ParticleEmitterDescriptor;
-import com.talosvfx.talos.runtime.modules.PolylineModule;
-import com.talosvfx.talos.runtime.modules.TextureModule;
-import com.talosvfx.talos.runtime.modules.VectorFieldModule;
-import com.talosvfx.talos.runtime.serialization.ConnectionData;
-import com.talosvfx.talos.runtime.serialization.ExportData;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
+import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
+import com.talosvfx.talos.runtime.vfx.modules.PolylineModule;
+import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
+import com.talosvfx.talos.runtime.vfx.modules.VectorFieldModule;
+import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
+import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 
 public class VFXProjectSerializer {
 
@@ -55,7 +56,7 @@ public class VFXProjectSerializer {
 
     public static VFXProjectData readTalosTLSProject (FileHandle fileHandle) {
         if(!fileHandle.exists()) return null;
-        return readTalosTLSProject(fileHandle.readString());
+        return readTalosTLSProject(TempHackUtil.hackIt(fileHandle.readString()));
     }
 
     public static VFXProjectData readTalosTLSProject (String data) {

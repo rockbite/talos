@@ -11,14 +11,16 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyProvider;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.components.AComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import lombok.Getter;
 import lombok.Setter;
@@ -159,9 +161,9 @@ public abstract class PropertyWidget<T> extends Table {
 			//WE need the context of what scene this shit belongs to
 			IPropertyHolder currentHolder = topLevelPropertiesPanel.getCurrentHolder();
 
-			if (currentHolder instanceof GameObjectContainer) {
+			if (currentHolder instanceof GameObjectPropertyHolder) {
 				GameObject gameObject = ((AComponent)parent).getGameObject();
-				SceneUtils.componentUpdated((GameObjectContainer)currentHolder, gameObject, (AComponent)parent, isFastChange);
+				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, (AComponent)parent, isFastChange);
 			} else {
 				logger.error("this should be a game object container");
 			}

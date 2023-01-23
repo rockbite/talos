@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
 import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXPreviewActivated;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
@@ -15,7 +15,6 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.EmitterList;
-import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 
 public class EmitterTimelineApp extends AppManager.BaseApp<VFXProjectData> implements Observer {

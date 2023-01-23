@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,24 +22,15 @@ import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
-import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
-import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
-import com.talosvfx.talos.editor.addons.scene.events.AssetResolutionChanged;
-import com.talosvfx.talos.editor.addons.scene.events.ScriptFileChangedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.*;
-import com.talosvfx.talos.editor.addons.scene.logic.components.GameResourceOwner;
-import com.talosvfx.talos.editor.addons.scene.logic.components.MapComponent;
-import com.talosvfx.talos.editor.addons.scene.logic.components.ScriptComponent;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.DirectoryMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.ScriptMetadata;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpineMetadata;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -49,11 +41,26 @@ import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
-import com.talosvfx.talos.editor.utils.NamingUtils;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
+import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
+import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.assets.AssetProvider;
-import com.talosvfx.talos.runtime.serialization.ExportData;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.assets.RawAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.Prefab;
+import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.components.MapComponent;
+import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
+import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,14 +79,14 @@ import java.util.regex.Pattern;
 
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
-public class AssetRepository implements Observer {
+public class AssetRepository extends BaseAssetRepository implements Observer {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(AssetRepository.class);
 	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
-
+	private ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
 	public <T> GameAsset<T> getAssetForUniqueIdentifier (String uuid, GameAssetType type) {
@@ -105,6 +112,33 @@ public class AssetRepository implements Observer {
 		brokenAsset.setBroken(new Exception("No asset found"));
 		brokenAsset.setNonFound(true);
 		return brokenAsset;
+	}
+
+	@Override
+	public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+		if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
+			return patchCache.get(gameAsset);
+		} else {
+			final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
+			final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+			patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
+			patchCache.put(gameAsset, patch);
+			return patch;
+		}
+	}
+
+	@EventHandler
+	public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
+		final SpriteMetadata metadata = event.getSpriteMetadata();
+		for (ObjectMap.Entry<GameAsset<Texture>, NinePatch> gameAssetNinePatchEntry : patchCache) {
+			if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
+				final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+				final float scale = 1 / metadata.pixelsPerUnit;
+				patch.scale(scale, scale);
+				patchCache.put(gameAssetNinePatchEntry.key, patch);
+				break;
+			}
+		}
 	}
 
 	private <T> void putAssetForIdentifier (String identifier, GameAssetType type, GameAsset<T> asset) {
@@ -457,8 +491,38 @@ public class AssetRepository implements Observer {
 	}
 
 	//Export formats
-	public void exportToFile () { //todo
+	public void exportToFile (AssetRepositoryCatalogueExportOptions settings) { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
+
+		if (settings.isForceExportAll()) {
+
+			//Gather all assets and export
+
+			Predicate<GameAsset<?>> forceAllPredicate = new Predicate<GameAsset<?>>() {
+				@Override
+				public boolean evaluate (GameAsset<?> gameAsset) {
+					return true;
+				}
+			};
+
+			exportGameAsset(settings, GameAssetType.SPRITE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SCRIPT, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.ROUTINE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SOUND, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SKELETON, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.VFX, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.PREFAB, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.SCENE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.TILE_PALETTE, forceAllPredicate);
+			exportGameAsset(settings, GameAssetType.LAYOUT_DATA, forceAllPredicate);
+
+			logger.info("todo export force");
+		} else {
+			logger.info("todo check all  other cases");
+
+
+
+		}
 
 		String projectPath = SharedResources.currentProject.getProjectDir().path();
 
@@ -512,6 +576,16 @@ public class AssetRepository implements Observer {
 
 		FileHandle assetRepoExportFile = Gdx.files.absolute(projectPath).child("assetExport.json");
 		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+	}
+
+	private void exportGameAsset (AssetRepositoryCatalogueExportOptions settings, GameAssetType gameAssetType, Predicate<GameAsset<?>> forceAllPredicate) {
+		Array<GameAsset<Object>> assetsForType = getAssetsForType(gameAssetType);
+		Array<GameAsset<Object>> markedForExport = new Array<>();
+		for (GameAsset<Object> objectGameAsset : assetsForType) {
+			if (forceAllPredicate.evaluate(objectGameAsset)) {
+				markedForExport.add(objectGameAsset);
+			}
+		}
 	}
 
 	private void findAllPrefabs (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {

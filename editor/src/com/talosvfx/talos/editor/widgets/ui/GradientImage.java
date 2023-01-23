@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.rockbite.bongo.engine.render.ShaderFlags;
 import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
-import com.talosvfx.talos.runtime.values.ColorPoint;
+import com.talosvfx.talos.runtime.vfx.values.ColorPoint;
 
 public class GradientImage extends Actor {
 

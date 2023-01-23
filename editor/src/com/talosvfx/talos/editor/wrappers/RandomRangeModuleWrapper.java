@@ -25,9 +25,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
+import com.talosvfx.talos.runtime.vfx.modules.RandomRangeModule;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
-import com.talosvfx.talos.runtime.modules.RandomRangeModule;
-import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 

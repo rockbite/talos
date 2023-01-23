@@ -7,13 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.TweenFinishedEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
@@ -25,9 +22,10 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
-import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.runtime.routine.RoutineNode;
+import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +47,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private boolean playing;
     private ScenePreviewApp scenePreviewApp;
 
+    private boolean cameraLocked = false;
 
     public RoutineStage (RoutineEditorApp routineEditorApp, Skin skin) {
         super(skin);
@@ -65,18 +64,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
         loading = true;
         if (asset == null || asset.getResource() == null) return;
-        reset();
 
         setFromData(asset);
+
+        reset();
+
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
         loading = false;
-    }
-
-    @Override
-    public void onUpdate () {
-        loadFrom(gameAsset);
     }
 
     @Override
@@ -168,14 +164,18 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             if (!isFastChange) {
                 markAssetChanged();
             }
-            // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
-            gameAsset.listeners.removeValue(this, true);
-            gameAsset.setUpdated();
-            gameAsset.listeners.add(this);
-            data.setRoutineInstance(data.createInstance(true));
-            Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
-            setInstanceListeners();
+            if (!isFastChange) {
+                data.setRoutineInstance(data.createInstance(true));
+
+                gameAsset.setUpdated();
+
+                Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+                // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
+
+                setInstanceListeners();
+            }
+
         }
     }
 
@@ -320,6 +320,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
             if(result) {
                 playing = true;
+                lockCamera(cameraLocked);
             }
         }
     }
@@ -358,6 +359,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     }
 
     public void lockCamera(boolean checked) {
+        cameraLocked = checked;
         if(scenePreviewApp != null) {
             scenePreviewApp.setLockCamera(checked);
         }

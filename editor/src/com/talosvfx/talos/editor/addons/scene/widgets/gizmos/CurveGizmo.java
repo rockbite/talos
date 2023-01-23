@@ -12,10 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.FocusManager;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.logic.components.CurveComponent;
-import com.talosvfx.talos.editor.project.IProject;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.components.CurveComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -247,12 +246,18 @@ public class CurveGizmo extends Gizmo {
         }
     }
 
+    private boolean touchDragged;
     @Override
     public void touchDragged(float x, float y) {
         if(touchedPointRef != null) {
-            CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+            touchDragged = true;
+
+            final CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+
             Vector2 pos = toLocal(tmp3.set(x, y));
             curve.movePoint(touchedPointIndex, pos.x, pos.y);
+
+            SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve, true);
         }
     }
 
@@ -260,6 +265,12 @@ public class CurveGizmo extends Gizmo {
     public void touchUp(float x, float y) {
         touchedPointRef = null;
         touchedPointIndex = -1;
+
+        if (touchDragged) {
+            touchDragged = false;
+            final CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+            SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve, false);
+        }
     }
 
     private Vector2 toWorld(Vector2 local) {

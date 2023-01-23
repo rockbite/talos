@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 
 public class ShaderBox extends Actor {
 

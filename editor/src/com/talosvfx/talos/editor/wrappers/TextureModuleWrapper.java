@@ -24,9 +24,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.TextureModule;
 
 public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule> {
 

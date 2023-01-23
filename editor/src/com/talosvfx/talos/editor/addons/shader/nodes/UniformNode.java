@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
-import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 
 public class UniformNode extends AbstractShaderNode implements ShaderBuilder.IValueProvider<Object> {
 

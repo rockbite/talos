@@ -23,13 +23,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.utils.ScreenshotService;
-import com.talosvfx.talos.runtime.values.ColorPoint;
+import com.talosvfx.talos.runtime.vfx.values.ColorPoint;
 import com.talosvfx.talos.editor.widgets.GradientWidget;
-import com.talosvfx.talos.runtime.modules.GradientColorModule;
-import com.talosvfx.talos.runtime.modules.InterpolationModule;
+import com.talosvfx.talos.runtime.vfx.modules.GradientColorModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
 
 public class GradientColorModuleWrapper extends ModuleWrapper<GradientColorModule> {
 

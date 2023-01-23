@@ -14,31 +14,42 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.components.*;
-import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.routine.RoutineRenderer;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.IColorHolder;
+import com.talosvfx.talos.runtime.maps.GridPosition;
+import com.talosvfx.talos.runtime.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolyBatchWithEncodingOverride;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.components.MapComponent;
+import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.render.SpriteBatchParticleRenderer;
 
 import java.util.Comparator;
 
@@ -63,7 +74,6 @@ public class MainRenderer implements Observer {
     private static final int RT = 2;
     private static final int RB = 3;
 
-    private ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
@@ -262,7 +272,8 @@ public class MainRenderer implements Observer {
 
                     TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
-                    Gizmo.TransformSettings transformSettings = gameObject.getTransformSettings();
+                    TransformSettings transformSettings = gameObject.getTransformSettings();
+
 
                     TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
                     GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
@@ -416,7 +427,7 @@ public class MainRenderer implements Observer {
 
     private void renderParticle (PolygonBatch batch, GameObject gameObject) {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-        ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
+        ParticleComponent<VFXProjectData> particleComponent = gameObject.getComponent(ParticleComponent.class);
 
         VFXProjectData resource = particleComponent.gameAsset.getResource();
         ParticleEffectDescriptor descriptor = resource.getDescriptorSupplier().get();
@@ -456,7 +467,7 @@ public class MainRenderer implements Observer {
                 final float height = spriteRenderer.size.y;
 
                 if(metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    NinePatch patch = obtainNinePatch(gameResource);// todo: this has to be done better
+                    NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(gameResource);// todo: this has to be done better
                     //todo: and this renders wrong so this needs fixing too
                     float xSign = width < 0 ? -1 : 1;
                     float ySign = height < 0 ? -1 : 1;
@@ -614,7 +625,7 @@ public class MainRenderer implements Observer {
     private void renderWithRoutine (Batch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         RoutineRendererComponent routineRendererComponent = gameObject.getComponent(RoutineRendererComponent.class);
-        routineRenderer.render(this, batch, gameObject, routineRendererComponent);
+        routineRenderer.render(batch, camera, gameObject, routineRendererComponent);
     }
 
     private void renderMap (PolygonBatch batch, GameObject gameObject) {
@@ -632,18 +643,6 @@ public class MainRenderer implements Observer {
             Texture resource = texGameAsset.getResource();
 
             batch.draw(resource, gridPosition.getIntX(), gridPosition.getIntY(), tileSizeX, tileSizeY);
-        }
-    }
-
-    public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
-        if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
-            return patchCache.get(gameAsset);
-        } else {
-            final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
-            final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
-            patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
-            patchCache.put(gameAsset, patch);
-            return patch;
         }
     }
 
@@ -736,20 +735,5 @@ public class MainRenderer implements Observer {
 
     public Camera getCamera() {
         return camera;
-    }
-
-
-    @EventHandler
-    public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
-        final SpriteMetadata metadata = event.getSpriteMetadata();
-        for (ObjectMap.Entry<GameAsset<Texture>, NinePatch> gameAssetNinePatchEntry : patchCache) {
-            if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
-                final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
-                final float scale = 1 / metadata.pixelsPerUnit;
-                patch.scale(scale, scale);
-                patchCache.put(gameAssetNinePatchEntry.key, patch);
-                break;
-            }
-        }
     }
 }

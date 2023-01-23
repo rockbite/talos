@@ -26,7 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.rockbite.bongo.engine.render.ShaderFlags;
 import com.rockbite.bongo.engine.render.SpriteShaderCompiler;
-import com.talosvfx.talos.runtime.utils.SimplexNoise;
+import com.talosvfx.talos.runtime.vfx.utils.SimplexNoise;
 
 public class NoiseImage extends Actor {
 

@@ -22,11 +22,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.QuadMeshGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.Vector2Module;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule;
-import com.talosvfx.talos.runtime.modules.Vector2Module;
 
 public class QuadMeshGeneratorModuleWrapper extends ModuleWrapper<QuadMeshGeneratorModule> {
 

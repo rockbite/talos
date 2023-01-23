@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -68,10 +68,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         return root;
     }
 
-    @Override
-    public void onUpdate () {
 
-    }
 
     @Override
     public NodeWidget createNode (String nodeName, float screenX, float y) {

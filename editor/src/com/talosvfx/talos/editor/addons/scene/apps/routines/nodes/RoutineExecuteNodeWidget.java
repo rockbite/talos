@@ -4,23 +4,19 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.SavableContainer;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
-import com.talosvfx.talos.editor.addons.scene.logic.components.CameraComponent;
-import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
 import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.components.CameraComponent;
 
 public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
 

@@ -1,21 +1,16 @@
 package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.Bone;
-import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.logic.TilePaletteData;
-import com.talosvfx.talos.editor.addons.scene.maps.LayerType;
-import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.maps.LayerType;
+import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
 
 import java.util.function.Supplier;
 

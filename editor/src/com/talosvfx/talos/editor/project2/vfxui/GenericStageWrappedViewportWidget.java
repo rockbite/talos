@@ -38,7 +38,6 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		camera.update();
 
 		stage.addActor(actor);
-		stage.setKeyboardFocus(actor);
 
 		setWorldSize(1000);
 	}

@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
+import com.talosvfx.talos.runtime.vfx.assets.BaseAssetProvider;
+import com.talosvfx.talos.runtime.vfx.utils.ShaderDescriptor;
 
 public class AtlasAssetProvider extends BaseAssetProvider {
     private final TextureAtlas atlas;

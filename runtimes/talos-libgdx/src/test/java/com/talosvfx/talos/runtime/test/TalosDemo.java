@@ -5,18 +5,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
-import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.vfx.render.SpriteBatchParticleRenderer;
 
 public class TalosDemo extends ApplicationAdapter {
 

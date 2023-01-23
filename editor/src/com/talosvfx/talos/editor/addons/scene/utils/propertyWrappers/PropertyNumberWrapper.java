@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 public abstract class PropertyNumberWrapper<T extends Number> extends PropertyWrapper<T> {
 

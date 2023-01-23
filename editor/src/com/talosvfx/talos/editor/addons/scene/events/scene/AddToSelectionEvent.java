@@ -1,9 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.events.scene;
 
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import lombok.Data;
 
 public class AddToSelectionEvent extends ContextRequiredEvent<GameObjectContainer> {

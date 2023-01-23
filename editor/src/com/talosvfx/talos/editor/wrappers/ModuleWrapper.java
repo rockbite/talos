@@ -34,17 +34,16 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.FocusManager;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.ui.DynamicTable;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.values.NumericalValue;
 
 public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow implements Json.Serializable {
 

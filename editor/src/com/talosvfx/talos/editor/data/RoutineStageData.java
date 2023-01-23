@@ -1,23 +1,21 @@
 package com.talosvfx.talos.editor.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineConfigMap;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineNode;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.ExposedVariableNode;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyType;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeMappers;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Data;
 
 @Data
-public class RoutineStageData extends DynamicNodeStageData {
+public class RoutineStageData extends DynamicNodeStageData implements BaseRoutineData {
 
 	private transient RoutineInstance routineInstance;
 
@@ -92,7 +90,7 @@ public class RoutineStageData extends DynamicNodeStageData {
 
 	private PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
 		try {
-			PropertyWrapper<?> propertyWrapper = type.getWrapperClass().getConstructor().newInstance();
+			PropertyWrapper<?> propertyWrapper = PropertyTypeMappers.getWrapperForPropertyType(type).getConstructor().newInstance();
 			return propertyWrapper;
 		} catch (Exception e) {
 			e.printStackTrace();

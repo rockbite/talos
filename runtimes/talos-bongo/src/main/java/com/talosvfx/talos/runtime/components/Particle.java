@@ -2,7 +2,7 @@ package com.talosvfx.talos.runtime.components;
 
 import com.artemis.Component;
 import com.badlogic.gdx.math.Matrix4;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 import lombok.Data;
 
 @Data

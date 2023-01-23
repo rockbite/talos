@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import lombok.Getter;
 
 public class SpritePixelPerUnitUpdateEvent implements TalosEvent {

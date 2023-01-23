@@ -5,9 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.editor.widgets.FloatInputWidget;
 import com.talosvfx.talos.editor.widgets.IntegerInputWidget;
-import com.talosvfx.talos.runtime.modules.NinePatchModule;
+import com.talosvfx.talos.runtime.vfx.modules.NinePatchModule;
 
 public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
 

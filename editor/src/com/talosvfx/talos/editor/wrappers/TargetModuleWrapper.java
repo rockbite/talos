@@ -7,9 +7,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.TargetModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.TargetModule;
 
 public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements IDragPointProvider {
 

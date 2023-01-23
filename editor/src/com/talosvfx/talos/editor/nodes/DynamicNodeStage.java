@@ -13,19 +13,18 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.WorkplaceStage;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.data.DynamicNodeStageData;
 import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeCreatedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.utils.Toasts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>>, GameAsset.GameAssetUpdateListener {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
 
@@ -51,11 +50,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     public void setFromData (GameAsset<T> data) {
         this.gameAsset = data;
         this.data = data.getResource();
-
-
-        if (!gameAsset.listeners.contains(this, true)) {
-            gameAsset.listeners.add(this);
-        }
     }
 
     public void markAssetChanged () {

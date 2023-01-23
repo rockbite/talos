@@ -23,8 +23,7 @@ public class SelectWidget extends AbstractWidget<String> {
         super.init(skin);
 
         selectBox = new SelectBoxWithZoom<String>(skin, "rounded" );
-
-        content.add(selectBox).expandX().height(32).left().padLeft(-2).growX();
+        selectBox.setMaxListCount(5);
 
         selectBox.getStyle().background.setLeftWidth(8);
         selectBox.getStyle().backgroundOpen.setLeftWidth(8);
@@ -41,6 +40,8 @@ public class SelectWidget extends AbstractWidget<String> {
                 }
             }
         });
+
+        content.add(selectBox).expandX().height(32).left().padLeft(-2).growX();
     }
 
     @Override

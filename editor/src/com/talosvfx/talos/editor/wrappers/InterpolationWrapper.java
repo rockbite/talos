@@ -24,9 +24,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
-import com.talosvfx.talos.runtime.utils.InterpolationMappings;
+import com.talosvfx.talos.runtime.vfx.Slot;
+
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.InputModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
+import com.talosvfx.talos.runtime.vfx.utils.InterpolationMappings;
 
 public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
 

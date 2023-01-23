@@ -20,10 +20,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.HistoryParticlePointDataGeneratorModule;
-import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.HistoryParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 
 public class HistoryParticlePointDataGeneratorModuleWrapper extends ModuleWrapper<HistoryParticlePointDataGeneratorModule> {
 

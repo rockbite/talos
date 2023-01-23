@@ -24,8 +24,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.FloatInputWidget;
 import com.talosvfx.talos.editor.widgets.IntegerInputWidget;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
-import com.talosvfx.talos.runtime.modules.FlipbookModule;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.FlipbookModule;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 
 public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModule> {
 

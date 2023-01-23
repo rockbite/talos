@@ -3,11 +3,10 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.RoutineControlWindow;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -144,11 +143,16 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
         Notifications.unregisterObserver(routineStage);
 
+        if (this.gameAsset != null) {
+            this.gameAsset.listeners.removeValue(this, true);
+        }
+
     }
 
     @Override
     public void onUpdate() {
         variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
+        routineStage.loadFrom(gameAsset);
     }
 
     public void applyFromPreferences(ViewportPreferences prefs) {

@@ -21,9 +21,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.widgets.CurveDataProvider;
 import com.talosvfx.talos.editor.widgets.CurveWidget;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.CurveModule;
+import com.talosvfx.talos.runtime.vfx.modules.InputModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
 
 public class CurveModuleWrapper extends ModuleWrapper<CurveModule> implements CurveDataProvider {
 

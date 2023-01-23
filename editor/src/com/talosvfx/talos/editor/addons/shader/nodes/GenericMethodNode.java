@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor.addons.shader.nodes;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.runtime.shaders.ShaderBuilder;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 
 public class GenericMethodNode extends AbstractShaderNode {
 

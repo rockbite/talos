@@ -1,6 +1,6 @@
 package com.talosvfx.talos.editor.addons.scene.events.meta;
 
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import lombok.Data;
 

@@ -24,10 +24,10 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTextField;
-import com.talosvfx.talos.runtime.Expression;
-import com.talosvfx.talos.runtime.modules.MathModule;
-import com.talosvfx.talos.runtime.utils.MathExpressionMappings;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.Expression;
+import com.talosvfx.talos.runtime.vfx.modules.MathModule;
+import com.talosvfx.talos.runtime.vfx.utils.MathExpressionMappings;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 

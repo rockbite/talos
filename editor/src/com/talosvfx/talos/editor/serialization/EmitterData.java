@@ -18,7 +18,7 @@ package com.talosvfx.talos.editor.serialization;
 
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
-import com.talosvfx.talos.runtime.serialization.ConnectionData;
+import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 
 public class EmitterData {
 

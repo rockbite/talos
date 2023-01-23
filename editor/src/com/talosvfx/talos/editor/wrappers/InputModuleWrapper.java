@@ -22,9 +22,9 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
+import com.talosvfx.talos.runtime.vfx.modules.InputModule;
+import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
-import com.talosvfx.talos.runtime.modules.InputModule;
-import com.talosvfx.talos.runtime.ScopePayload;
 
 public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 

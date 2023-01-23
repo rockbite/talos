@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
@@ -37,7 +39,15 @@ public class GenericStageWrappedWidget extends Table {
         camera.update();
 
         stage.addActor(actor);
-        stage.setKeyboardFocus(actor);
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (actor.hit(x, y, true) == null) {
+                    stage.unfocus(actor);
+                }
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
     }
 
     @Override
