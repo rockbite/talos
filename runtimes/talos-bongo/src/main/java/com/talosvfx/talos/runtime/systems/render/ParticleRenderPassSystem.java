@@ -19,18 +19,18 @@ import com.rockbite.bongo.engine.gltf.scene.shader.bundled.ShadedShader;
 import com.rockbite.bongo.engine.render.AutoReloadingShaderProgram;
 import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
-import com.talosvfx.talos.runtime.IEmitter;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.ScopePayload;
+import com.talosvfx.talos.runtime.vfx.IEmitter;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.runtime.components.Particle;
-import com.talosvfx.talos.runtime.modules.DrawableModule;
-import com.talosvfx.talos.runtime.modules.MaterialModule;
-import com.talosvfx.talos.runtime.modules.MeshGeneratorModule;
-import com.talosvfx.talos.runtime.modules.ParticlePointDataGeneratorModule;
-import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
-import com.talosvfx.talos.runtime.render.ParticleRenderer;
-import com.talosvfx.talos.runtime.render.p3d.Simple3DBatch;
-import com.talosvfx.talos.runtime.values.DrawableValue;
+import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
+import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.MeshGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
+import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
+import com.talosvfx.talos.runtime.vfx.render.p3d.Simple3DBatch;
+import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 
 public class ParticleRenderPassSystem extends RenderPassSystem implements ParticleRenderer {
 

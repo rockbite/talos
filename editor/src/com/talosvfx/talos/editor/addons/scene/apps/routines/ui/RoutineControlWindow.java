@@ -11,13 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineInstance;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.RoundedFlatButton;
+import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
 
 public class RoutineControlWindow extends Table {
 
@@ -71,6 +71,10 @@ public class RoutineControlWindow extends Table {
                         routineStage.play(selected.toString());
                         updatePlayState();
                     }
+                }
+                if (routineStage.isPaused()) {
+                    routineStage.resume();
+                    updatePauseState();
                 }
             }
         });

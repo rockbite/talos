@@ -23,11 +23,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
-import com.talosvfx.talos.runtime.modules.MaterialModule;
-import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 
 public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialModule> {
 

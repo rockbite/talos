@@ -26,11 +26,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.runtime.assets.BaseAssetProvider;
-import com.talosvfx.talos.runtime.utils.ShaderDescriptor;
-import com.talosvfx.talos.runtime.utils.VectorField;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.vfx.assets.BaseAssetProvider;
+import com.talosvfx.talos.runtime.vfx.utils.ShaderDescriptor;
+import com.talosvfx.talos.runtime.vfx.utils.VectorField;
 
 import java.io.File;
 

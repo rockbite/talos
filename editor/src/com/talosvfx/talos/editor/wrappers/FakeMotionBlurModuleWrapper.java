@@ -5,10 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
-import com.talosvfx.talos.runtime.modules.FakeMotionBlurModule;
+import com.talosvfx.talos.runtime.vfx.modules.FakeMotionBlurModule;
 
 public class FakeMotionBlurModuleWrapper extends ModuleWrapper<FakeMotionBlurModule> {
 

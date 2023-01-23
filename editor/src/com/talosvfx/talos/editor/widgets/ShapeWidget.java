@@ -30,7 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.render.Render;
 
-import static com.talosvfx.talos.runtime.modules.OffsetModule.*;
+import static com.talosvfx.talos.runtime.vfx.modules.OffsetModule.*;
 
 public class ShapeWidget extends Actor {
 

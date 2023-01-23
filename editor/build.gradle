@@ -44,8 +44,6 @@ dependencies {
 
     implementation libs.string.similarity
 
-    implementation libs.spine.libgdx
-
     implementation libs.snakeyaml
 
     implementation libs.tiny.gizmo
@@ -53,6 +51,8 @@ dependencies {
     implementation libs.javapoet
 
     implementation libs.javapoet
+
+    implementation libs.classpathscanner
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok

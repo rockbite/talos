@@ -12,10 +12,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.EmptyMetadata;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
@@ -28,8 +27,8 @@ import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.project2.apps.*;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
+import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -328,7 +327,7 @@ public class AppManager extends InputAdapter implements Observer {
 
 		LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
 
-		Array<U> appsToUpdate = getAppsToUpdate(gameAsset);
+		Array<U> appsToUpdate = new Array<>(getAppsToUpdate(gameAsset));
 		Array<U> appsToCreate = getAppsToCreateAndOpen(gameAsset, appsToUpdate);
 
 		for (U baseApp : appsToCreate) {

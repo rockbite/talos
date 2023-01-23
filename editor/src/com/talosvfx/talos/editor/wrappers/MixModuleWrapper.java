@@ -16,7 +16,7 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
-import com.talosvfx.talos.runtime.modules.MixModule;
+import com.talosvfx.talos.runtime.vfx.modules.MixModule;
 
 public class MixModuleWrapper extends ModuleWrapper<MixModule> {
 

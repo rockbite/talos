@@ -1,8 +1,11 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.AttractorModule;
+import com.talosvfx.talos.runtime.vfx.modules.InterpolationModule;
+import com.talosvfx.talos.runtime.vfx.modules.RandomRangeModule;
 
 public class AttractorModuleWrapper extends ModuleWrapper<AttractorModule> {
 

@@ -9,12 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.FilePropertyProvider;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
@@ -156,7 +157,9 @@ public class DirectoryViewWidget extends Table {
 				Item item = selected.first();
 				if (item.gameAsset != null) {
 					if (!item.gameAsset.isBroken()) {
-						holder = item.gameAsset.getRootRawAsset().metaData;
+						AMetadata metaData = item.gameAsset.getRootRawAsset().metaData;
+						IPropertyHolder holderForMeta = PropertyWrapperProviders.getOrCreateHolder(metaData);
+						holder = holderForMeta;
 					}
 				} else {
 					if (item.fileHandle != null) {

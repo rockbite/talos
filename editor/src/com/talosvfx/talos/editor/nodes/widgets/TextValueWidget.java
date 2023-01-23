@@ -166,7 +166,9 @@ public class TextValueWidget extends AbstractWidget<String> {
                 TextValueWidget.this.stageToLocalCoordinates(tmpVec);
                 Actor touchTarget = TextValueWidget.this.hit(tmpVec.x, tmpVec.y, false);
                 if (touchTarget == null) {
-                    getStage().setKeyboardFocus(null);
+                    if (getStage() != null) {
+                        getStage().setKeyboardFocus(null);
+                    }
                 }
 
                 return false;

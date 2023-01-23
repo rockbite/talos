@@ -14,31 +14,41 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.runtime.RoutineRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.assets.RawAsset;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.SpritePixelPerUnitUpdateEvent;
-import com.talosvfx.talos.editor.addons.scene.logic.GameObject;
-import com.talosvfx.talos.editor.addons.scene.logic.IColorHolder;
-import com.talosvfx.talos.editor.addons.scene.logic.components.*;
-import com.talosvfx.talos.editor.addons.scene.maps.GridPosition;
-import com.talosvfx.talos.editor.addons.scene.maps.StaticTile;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.routine.RoutineRenderer;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.IColorHolder;
+import com.talosvfx.talos.runtime.maps.GridPosition;
+import com.talosvfx.talos.runtime.maps.StaticTile;
 import com.talosvfx.talos.editor.addons.scene.maps.TalosMapRenderer;
-import com.talosvfx.talos.editor.addons.scene.utils.AMetadata;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.utils.PolyBatchWithEncodingOverride;
-import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.components.MapComponent;
+import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
+import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.render.SpriteBatchParticleRenderer;
 
 import java.util.Comparator;
 
@@ -262,7 +272,8 @@ public class MainRenderer implements Observer {
 
                     TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
-                    Gizmo.TransformSettings transformSettings = gameObject.getTransformSettings();
+                    TransformSettings transformSettings = gameObject.getTransformSettings();
+
 
                     TileDataComponent tileDataComponent = gameObject.getComponent(TileDataComponent.class);
                     GridPosition bottomLeftParentTile = tileDataComponent.getBottomLeftParentTile();
@@ -416,7 +427,7 @@ public class MainRenderer implements Observer {
 
     private void renderParticle (PolygonBatch batch, GameObject gameObject) {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-        ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
+        ParticleComponent<VFXProjectData> particleComponent = gameObject.getComponent(ParticleComponent.class);
 
         VFXProjectData resource = particleComponent.gameAsset.getResource();
         ParticleEffectDescriptor descriptor = resource.getDescriptorSupplier().get();
@@ -614,7 +625,7 @@ public class MainRenderer implements Observer {
     private void renderWithRoutine (Batch batch, GameObject gameObject) {
         //We render the map with its own main renderer, its own sorter
         RoutineRendererComponent routineRendererComponent = gameObject.getComponent(RoutineRendererComponent.class);
-        routineRenderer.render(this, batch, gameObject, routineRendererComponent);
+        routineRenderer.render(batch, camera, gameObject, routineRendererComponent);
     }
 
     private void renderMap (PolygonBatch batch, GameObject gameObject) {

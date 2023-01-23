@@ -1,6 +1,7 @@
 package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -24,12 +25,13 @@ public class DialogAppAdapter extends ApplicationAdapter {
     @Override
     public void create() {
         stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
-        SharedResources.inputHandling.addPriorityInputProcessor(stage);
-        SharedResources.inputHandling.setGDXMultiPlexer();
 
         Table content = dialog.getContent();
         stage.addActor(content);
         content.setFillParent(true);
+
+        //We have our own input, so this is fine
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -47,8 +49,6 @@ public class DialogAppAdapter extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        SharedResources.inputHandling.removePriorityInputProcessor(stage);
-        SharedResources.inputHandling.setGDXMultiPlexer();
         stage.dispose();
 
         if(disposeRunnable != null) {

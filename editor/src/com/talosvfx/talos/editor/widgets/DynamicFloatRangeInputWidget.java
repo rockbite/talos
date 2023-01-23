@@ -18,7 +18,7 @@ package com.talosvfx.talos.editor.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class DynamicFloatRangeInputWidget extends Table {
 

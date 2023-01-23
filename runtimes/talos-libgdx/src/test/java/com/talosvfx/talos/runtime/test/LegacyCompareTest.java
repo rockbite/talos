@@ -36,11 +36,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
-import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.ScopePayload;
-import com.talosvfx.talos.runtime.render.ParticleRenderer;
-import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ScopePayload;
+import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
+import com.talosvfx.talos.runtime.vfx.render.SpriteBatchParticleRenderer;
 
 import java.io.File;
 import java.net.URISyntaxException;

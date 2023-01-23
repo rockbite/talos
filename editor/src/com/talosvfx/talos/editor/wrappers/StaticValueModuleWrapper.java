@@ -21,8 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.FloatInputWidget;
-import com.talosvfx.talos.runtime.modules.StaticValueModule;
-import com.talosvfx.talos.runtime.values.NumericalValue;
+import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
+import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 

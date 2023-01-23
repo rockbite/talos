@@ -16,12 +16,12 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.ColorModule;
-import com.talosvfx.talos.runtime.modules.StaticValueModule;
-import com.talosvfx.talos.runtime.modules.StripMeshGeneratorModule;
-import com.talosvfx.talos.runtime.modules.Vector2Module;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.ColorModule;
+import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
+import com.talosvfx.talos.runtime.vfx.modules.StripMeshGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.Vector2Module;
 
 public class StripMeshGeneratorModuleWrapper extends ModuleWrapper<StripMeshGeneratorModule> {
 

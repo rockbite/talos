@@ -16,19 +16,13 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
-import com.talosvfx.talos.runtime.modules.CurveModule;
-import com.talosvfx.talos.runtime.modules.DrawableModule;
-import com.talosvfx.talos.runtime.modules.DynamicRangeModule;
-import com.talosvfx.talos.runtime.modules.GradientColorModule;
-import com.talosvfx.talos.runtime.modules.MaterialModule;
-import com.talosvfx.talos.runtime.modules.ParticleModule;
-import com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule;
-import com.talosvfx.talos.runtime.modules.SingleParticlePointDataGeneratorModule;
-import com.talosvfx.talos.runtime.modules.SpriteMaterialModule;
-import com.talosvfx.talos.runtime.modules.StaticValueModule;
-import com.talosvfx.talos.runtime.modules.Vector2Module;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
+import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.QuadMeshGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.SingleParticlePointDataGeneratorModule;
+import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 
 public class DrawableModuleWrapper extends ModuleWrapper<DrawableModule> {
 

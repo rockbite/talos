@@ -17,9 +17,13 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.*;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.CurveModule;
+import com.talosvfx.talos.runtime.vfx.modules.GradientColorModule;
+import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
+import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 

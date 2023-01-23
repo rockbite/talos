@@ -1,7 +1,8 @@
 package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectNameChanged;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
@@ -14,7 +15,7 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 @SingletonApp
-public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> implements Observer {
+public class PropertiesPanelApp extends AppManager.BaseApp<Object> implements Observer {
 
 	private final SEPropertyPanel propertyPanel;
 
@@ -22,7 +23,7 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> impl
 		this.singleton = true;
 
 		propertyPanel = new SEPropertyPanel();
-		DummyLayoutApp<IPropertyHolder> propertyPanelApp = new DummyLayoutApp<IPropertyHolder>(SharedResources.skin, this, getAppName()) {
+		DummyLayoutApp<Object> propertyPanelApp = new DummyLayoutApp<Object>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return propertyPanel;
@@ -45,10 +46,11 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> impl
 	}
 
 	@Override
-	public void updateForGameAsset (GameAsset<IPropertyHolder> gameAsset) {
+	public void updateForGameAsset (GameAsset<Object> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 		if (gameAsset.getResource() != null) {
-			propertyPanel.showPanel(gameAsset.getResource(), gameAsset.getResource().getPropertyProviders());
+			IPropertyHolder propertyHolderOrShouldBe = PropertyWrapperProviders.getOrCreateHolder(gameAsset.getResource());
+			propertyPanel.showPanel(propertyHolderOrShouldBe, propertyHolderOrShouldBe.getPropertyProviders());
 		}
 	}
 
@@ -74,7 +76,7 @@ public class PropertiesPanelApp extends AppManager.BaseApp<IPropertyHolder> impl
 
 	@EventHandler
 	public void onPropertyHolderSelected(PropertyHolderSelected event) {
-		getGridAppReference().updateTabName("properties - " + event.getTarget().getName());
+		getGridAppReference().updateTabName("Properties - " + event.getTarget().getName());
 	}
 }
 

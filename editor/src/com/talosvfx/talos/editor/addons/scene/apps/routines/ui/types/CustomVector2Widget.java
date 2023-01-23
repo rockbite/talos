@@ -1,10 +1,10 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
 import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 public class CustomVector2Widget extends ATypeWidget<Vector2> {
 

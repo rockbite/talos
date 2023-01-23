@@ -27,8 +27,8 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataM
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
-import com.talosvfx.talos.runtime.Slot;
-import com.talosvfx.talos.runtime.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.Slot;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;

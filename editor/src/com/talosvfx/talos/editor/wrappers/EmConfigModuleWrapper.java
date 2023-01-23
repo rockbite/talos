@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
-import com.talosvfx.talos.runtime.modules.EmConfigModule;
+import com.talosvfx.talos.runtime.vfx.modules.EmConfigModule;
 
 public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
