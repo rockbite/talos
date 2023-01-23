@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.notifications.commands;
 
 
 import com.badlogic.gdx.Input;
+import lombok.Getter;
 
 public class MouseCombination extends AbstractCombinationWithModifier {
+    @Getter
     private MouseCommand mouseCommand;
     private boolean isMouseCommandDone = false;
 

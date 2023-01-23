@@ -44,11 +44,12 @@ dependencies {
 
     implementation libs.string.similarity
 
+    implementation libs.spine.libgdx
+
     implementation libs.snakeyaml
 
     implementation libs.tiny.gizmo
     implementation libs.spark
-    implementation libs.javapoet
 
     implementation libs.javapoet
 
@@ -130,10 +131,6 @@ task generateCommandsEnum () {
     }
 }
 
-classes {
-    dependsOn createProperties
-}
-
 task packageSources(type: Jar, dependsOn: classes) {
     from delombok
     from sourceSets.main.resources.srcDirs
@@ -175,10 +172,6 @@ def getBuildInfo () {
     return buildInfo
 }
 
-import com.squareup.javapoet.FieldSpec
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeSpec
 import javax.lang.model.element.Modifier
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx

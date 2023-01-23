@@ -2,16 +2,11 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
-import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
-import com.talosvfx.talos.editor.addons.scene.logic.Scene;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
-import com.talosvfx.talos.editor.notifications.Notifications;
-import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;

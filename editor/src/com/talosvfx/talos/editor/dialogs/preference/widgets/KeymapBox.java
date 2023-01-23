@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.dialogs.preference.widgets;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -52,9 +53,7 @@ public class KeymapBox extends Button {
                     String key = Character.toString(character);
 
                     if (isOnlyUppercase) key = key.toUpperCase();
-
-                    setKey(key);
-
+                    setKey(Input.Keys.valueOf(key));
                     inWaitingMode = false;
                 }
                 return super.keyTyped(event, character);
@@ -62,9 +61,9 @@ public class KeymapBox extends Button {
         });
     }
 
-    public void setKey (String keyName) {
+    public void setKey (int key) {
         setChecked(false);
-        this.keyName = keyName;
+        this.keyName = Input.Keys.toString(key);
         keyLabel.setText(keyName);
     }
 

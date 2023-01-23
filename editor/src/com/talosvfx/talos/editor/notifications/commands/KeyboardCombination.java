@@ -1,7 +1,13 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
+import lombok.Getter;
+
 public class KeyboardCombination extends AbstractCombinationWithModifier {
+
+    @Getter
     private int regularKey;
+
+    @Getter
     private boolean repeat;
 
     private float repeatStartTime = 0.5f;

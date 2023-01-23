@@ -499,9 +499,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			logger.info("todo export force");
 		} else {
 			logger.info("todo check all  other cases");
-
-
-
 		}
 
 		String projectPath = SharedResources.currentProject.getProjectDir().path();

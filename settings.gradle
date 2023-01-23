@@ -57,8 +57,6 @@ dependencyResolutionManagement {
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
 
             library("spark", "com.sparkjava", "spark-core").versionRef("spark")
-            library("javapoet", "com.squareup", "javapoet").version("1.13.0")
-
             library("javapoet", "com.squareup", "javapoet").versionRef("javapoet")
 
             library("grgit", "org.ajoberstar.grgit", "grgit-gradle").versionRef("grgit")
