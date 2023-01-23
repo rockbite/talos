@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.utils;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 
 public class TempHackUtil {
@@ -8,6 +9,7 @@ public class TempHackUtil {
 
 	static {
 		replacementMaps.put("com.talosvfx.talos.editor.addons.scene.logic.components", "com.talosvfx.talos.runtime.scene.components");
+		replacementMaps.put("com.talosvfx.talos.runtime.modules", "com.talosvfx.talos.runtime.vfx.modules");
 	}
 	public static String hackIt (String asString) {
 		for (ObjectMap.Entry<String, String> replacementMap : replacementMaps) {

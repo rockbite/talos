@@ -22,6 +22,7 @@ import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.modules.PolylineModule;
 import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
@@ -55,7 +56,7 @@ public class VFXProjectSerializer {
 
     public static VFXProjectData readTalosTLSProject (FileHandle fileHandle) {
         if(!fileHandle.exists()) return null;
-        return readTalosTLSProject(fileHandle.readString());
+        return readTalosTLSProject(TempHackUtil.hackIt(fileHandle.readString()));
     }
 
     public static VFXProjectData readTalosTLSProject (String data) {
