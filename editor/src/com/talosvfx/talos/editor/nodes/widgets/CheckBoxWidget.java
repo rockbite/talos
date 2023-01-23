@@ -5,16 +5,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 
 public class CheckBoxWidget extends AbstractWidget<Boolean> {
 
-    private CheckBox checkBox;
+    private CheckboxWithZoom checkBox;
 
     @Override
     public void init(Skin skin) {
         super.init(skin);
 
-        checkBox = new CheckBox("checkbox", skin, "rounded-checkbox");
+        checkBox = new CheckboxWithZoom("checkbox", skin, "rounded-checkbox");
         content.add(checkBox).left().expandX().height(32).padLeft(-5);
     }
 

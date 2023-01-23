@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -22,6 +21,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public abstract class PropertyWidget<T> extends Table {
 	private static final Logger logger = LoggerFactory.getLogger(PropertyWidget.class);
 
 	@Getter
-	protected Label propertyName;
+	protected LabelWithZoom propertyName;
 	protected Table valueContainer;
 	protected T value;
 
@@ -99,7 +99,7 @@ public abstract class PropertyWidget<T> extends Table {
 	protected void build(String name) {
 		if(name != null) {
 			hasName = true;
-			propertyName = new Label(name + ":", SharedResources.skin);
+			propertyName = new LabelWithZoom(name + ":", SharedResources.skin);
 			propertyName.setAlignment(Align.left);
 			valueContainer = new Table();
 

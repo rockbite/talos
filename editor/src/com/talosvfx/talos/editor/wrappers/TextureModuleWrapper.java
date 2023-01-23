@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.widgets.TextureDropWidget;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule> {
 
@@ -60,7 +61,7 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
 
         addOutputSlot("output", TextureModule.OUTPUT);
 
-        assetNameLabel = new Label("fire", getSkin());
+        assetNameLabel = new LabelWithZoom("fire", getSkin());
 
         contentWrapper.add(assetNameLabel).padLeft(10).colspan(2).expand().fill().row();
 

@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+    dependencies {
+        classpath libs.libgdx.tools
+    }
+}
+
 dependencies {
 
     implementation project(":editor")
@@ -66,6 +78,14 @@ task distLegacyTest(type: Jar) {
         configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     with jar
+}
+
+
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
+task packTextures () {
+    doFirst {
+        TexturePacker.processIfModified("editor/rawAssetsToPack", "editor/assets/skin", "uiskin")
+    }
 }
 
 dist.dependsOn classes

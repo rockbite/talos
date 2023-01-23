@@ -541,7 +541,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 }
 
             } catch (ReflectionException exception) {
-
+                exception.printStackTrace();
             }
         } else {
             if (tagName.equals("group")) {

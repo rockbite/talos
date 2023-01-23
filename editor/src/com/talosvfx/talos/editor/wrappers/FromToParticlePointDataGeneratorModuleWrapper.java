@@ -28,13 +28,15 @@ import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.FromToParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
+
 
 public class FromToParticlePointDataGeneratorModuleWrapper extends ModuleWrapper<FromToParticlePointDataGeneratorModule> implements IDragPointProvider{
 
     private DragPoint dragPointFrom;
     private DragPoint dragPointTo;
 
-    private VisTextField numPointsTextField;
+    private TextFieldWithZoom numPointsTextField;
 
     public FromToParticlePointDataGeneratorModuleWrapper () {
         super();

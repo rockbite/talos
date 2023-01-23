@@ -22,15 +22,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.talosvfx.talos.editor.widgets.FloatRangeInputWidget;
 import com.talosvfx.talos.runtime.vfx.modules.RandomRangeModule;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 
 public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
     FloatRangeInputWidget inputRange;
-    private VisCheckBox distribution;
+    private CheckboxWithZoom distribution;
 
     @Override
     public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
@@ -61,7 +63,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
         addOutputSlot("result", 0);
 
-        distribution = new VisCheckBox("distributed");
+        distribution = new CheckboxWithZoom("distributed", VisUI.getSkin());
         rightWrapper.add(distribution).right().expandX().padRight(3).row();
 
         inputRange = new FloatRangeInputWidget("Min", "Max", getSkin());

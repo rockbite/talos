@@ -3,7 +3,6 @@ package com.talosvfx.talos.editor.widgets.ui.common;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -16,11 +15,12 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 
 public class AssetSelector<T> extends Table {
 
-    private Label nameLabel;
+    private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
 
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
@@ -54,7 +54,7 @@ public class AssetSelector<T> extends Table {
         Skin skin = SharedResources.skin;
         final SquareButton button = new SquareButton(skin, skin.getDrawable("ic-file-edit"), "Select asset");
 
-        nameLabel = new Label("", skin);
+        nameLabel = new LabelWithZoom("", skin);
         nameLabel.setEllipsis(true);
         nameLabel.setAlignment(Align.right);
 
