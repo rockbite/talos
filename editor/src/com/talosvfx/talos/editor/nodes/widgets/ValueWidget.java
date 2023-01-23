@@ -344,7 +344,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public boolean isFastChange () {
-        return isDragging;
+        return isDragging || isSelected;
     }
 
     @Override
