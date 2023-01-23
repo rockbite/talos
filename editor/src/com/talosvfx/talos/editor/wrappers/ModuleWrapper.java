@@ -691,17 +691,6 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
         setModule(module);
     }
-
-    @Override
-    public void invalidate () {
-        super.invalidate();
-    }
-
-    @Override
-    public void layout () {
-        super.layout();
-        pack();
-    }
 }
 
 
