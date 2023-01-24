@@ -14,12 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.dialogs.preference.widgets.blocks.InputCombinationTypeWidget;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.blocks.KeyboardCombinationTypeWidget;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.blocks.MouseCombinationTypeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
-import com.talosvfx.talos.editor.notifications.commands.CombinationType;
-import com.talosvfx.talos.editor.notifications.commands.ModifierKey;
+import com.talosvfx.talos.editor.notifications.commands.*;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
@@ -75,8 +75,14 @@ public class PrefWidgetFactory {
         private CollapsableWidget collapsableWidget;
         private Cell combinationTypeCell;
         private Label configurationNameLabel;
-        private SelectBox inputCombinationTypeSelectionBox;
+        private SelectBox<CombinationType> inputCombinationTypeSelectionBox;
         private Label finalCombination;
+
+        private InputCombinationTypeWidget inputCombinationTypeWidget;
+
+        private ICommand command;
+
+        private ImageButton resetToDefaultsButton;
 
         public KeyInputWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
@@ -113,8 +119,6 @@ public class PrefWidgetFactory {
 
                     widgetLabel = new Label("", SharedResources.skin, "small");
 
-            this.selectBox = new SelectBoxWithZoom<>(keyInputWidgetSelectBoxStyle);
-            this.keymapBox = new KeymapBox();
                     configurationNameLabel = new Label("", SharedResources.skin, "small");
 
                     inputCombinationTypeSelectionBox = new SelectBox<>(Styles.keyInputWidgetSelectBoxStyle);
@@ -127,24 +131,24 @@ public class PrefWidgetFactory {
                     // only showing visual combination (cant be changed directly)
                     finalCombination.setTouchable(Touchable.disabled);
 
-                    final ImageButton resetToDefaultsButton = new ImageButton(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2,  ColorLibrary.BackgroundColor.LIGHT_GRAY), SharedResources.skin.getDrawable("icon-arrow-left"));
+                    resetToDefaultsButton = new ImageButton(ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2,  ColorLibrary.BackgroundColor.LIGHT_GRAY), SharedResources.skin.getDrawable("icon-arrow-left"));
                     resetToDefaultsButton.getIconCell().pad(1);
                     resetToDefaultsButton.addListener(new ClickListener(){
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
                             super.clicked(event, x, y);
-                            // TODO: 05.01.23 reset default settings
+                            resetToDefault();
                         }
                     });
 
                     // assemble top segment
                     final Table topSegment = new Table();
                     topSegment.defaults().space(6);
-                    topSegment.add(arrowButton).expandY().top();
+//                    topSegment.add(arrowButton).expandY().top();
                     topSegment.add(configurationNameLabel).expand().left().top();
-                    topSegment.add(inputCombinationTypeSelectionBox).minWidth(90);
+//                    topSegment.add(inputCombinationTypeSelectionBox).minWidth(90);
                     topSegment.add(finalCombination).width(90);
-                    topSegment.add(resetToDefaultsButton).size(inputCombinationTypeSelectionBox.getHeight());
+//                    topSegment.add(resetToDefaultsButton).size(inputCombinationTypeSelectionBox.getHeight());
                     return topSegment;
                 }
 
@@ -173,15 +177,24 @@ public class PrefWidgetFactory {
             inputCombinationTypeSelectionBox.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    setInputCombinationType((CombinationType) inputCombinationTypeSelectionBox.getSelection().first());
+                    setInputCombinationType(inputCombinationTypeSelectionBox.getSelection().first());
                 }
             });
-            setInputCombinationType((CombinationType) inputCombinationTypeSelectionBox.getSelection().first());
         }
 
         private void setInputCombinationType (CombinationType combinationType) {
-            if (combinationType == CombinationType.MOUSE) combinationTypeCell.setActor(new MouseCombinationTypeWidget());
-            if (combinationType == CombinationType.KEYBOARD) combinationTypeCell.setActor(new KeyboardCombinationTypeWidget());
+            if (combinationType == CombinationType.MOUSE) inputCombinationTypeWidget = new MouseCombinationTypeWidget();
+            if (combinationType == CombinationType.KEYBOARD) inputCombinationTypeWidget = new KeyboardCombinationTypeWidget();
+            combinationTypeCell.setActor(inputCombinationTypeWidget);
+            configurationChanged();
+        }
+
+        private void configurationChanged() {
+            Combination activeCombination = command.getActiveCombination();
+            if (command.getDefaultCombination().equals(command.getActiveCombination())) {
+                resetToDefault();
+            }
+            finalCombination.setText(activeCombination.toString());
         }
 
         private Table constructModifierButtonsRow () {
@@ -211,7 +224,7 @@ public class PrefWidgetFactory {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         super.clicked(event, x, y);
-                        buttonPressed(modifierKey);
+                        buttonPressed(modifierKey, button.isChecked());
                     }
                 });
                 buttonLabelsMap.put(modifierKey, button);
@@ -226,12 +239,33 @@ public class PrefWidgetFactory {
         private void anyPressed () {
             for (ObjectMap.Entry<ModifierKey, Button> modifierKeySquareButtonEntry : buttonLabelsMap) {
                 modifierKeySquareButtonEntry.value.setChecked(anyButton.isChecked());
-                buttonPressed(modifierKeySquareButtonEntry.key);
+                buttonPressed(modifierKeySquareButtonEntry.key, modifierKeySquareButtonEntry.value.isChecked());
             }
         }
 
-        private void buttonPressed (ModifierKey modifierKey) {
+        private void buttonPressed(ModifierKey modifierKey, boolean add) {
+            if (!command.isDefaultOverridden()) {
+                createCopyOfCurrent();
+            }
 
+            Combination activeCombination = command.getActiveCombination();
+            if (activeCombination instanceof AbstractCombinationWithModifier) {
+                AbstractCombinationWithModifier abstractCombinationWithModifier = (AbstractCombinationWithModifier) activeCombination;
+                if (add) {
+                    abstractCombinationWithModifier.addModifierKey(modifierKey);
+                } else {
+                    abstractCombinationWithModifier.removeModifierKey(modifierKey);
+                }
+            }
+
+            configurationChanged();
+        }
+
+        private void createCopyOfCurrent () {
+            Combination activeCombination = command.getActiveCombination();
+            Combination copy = activeCombination.copy();
+            command.overrideCombination(copy);
+            configurationChanged();
         }
 
         @Override
@@ -244,10 +278,44 @@ public class PrefWidgetFactory {
             return null;
         }
 
-        public void configure(Commands.CommandType commandType) {
-            configurationNameLabel.setText(commandType.name);
-            // TODO: 05.01.23 get command combination
-            finalCombination.setText(commandType.toString());
+        public void configure(ICommand command) {
+            this.command = command;
+            Combination activeCombination = command.getActiveCombination();
+            configurationNameLabel.setText(command.getCommandType().name);
+            finalCombination.setText(activeCombination.toString());
+            inputCombinationTypeSelectionBox.setSelected(activeCombination.getCombinationType());
+            setInputCombinationType(activeCombination.getCombinationType());
+            updateInsideWidget();
+            resetToDefaultsButton.setVisible(command.isDefaultOverridden());
+            if (activeCombination instanceof AbstractCombinationWithModifier) {
+                AbstractCombinationWithModifier abstractCombinationWithModifier = (AbstractCombinationWithModifier) activeCombination;
+                for (ObjectMap.Entry<ModifierKey, Button> modifierKeySquareButtonEntry : buttonLabelsMap) {
+                    modifierKeySquareButtonEntry.value.setChecked(abstractCombinationWithModifier.hasModifier(modifierKeySquareButtonEntry.key));
+                }
+            }
+        }
+
+        private void updateInsideWidget() {
+            Combination activeCombination = command.getActiveCombination();
+            CombinationType combinationType = activeCombination.getCombinationType();
+
+            switch (combinationType) {
+                case MOUSE:
+                    MouseCombinationTypeWidget mouseWidget = (MouseCombinationTypeWidget) inputCombinationTypeWidget;
+                    mouseWidget.getSelectBox().setSelected(((MouseCombination) activeCombination).getMouseCommand());
+                    break;
+                case KEYBOARD:
+                    KeyboardCombinationTypeWidget keyboardWidget = (KeyboardCombinationTypeWidget) inputCombinationTypeWidget;
+                    KeyboardCombination keyboardCombination = (KeyboardCombination) activeCombination;
+                    keyboardWidget.getMainKeyButton().setKey(keyboardCombination.getRegularKey());
+                    keyboardWidget.getRepeatCheckBox().setChecked(keyboardCombination.isRepeat());
+                    break;
+            }
+        }
+
+        private void resetToDefault() {
+            command.resetToDefault();
+            resetToDefaultsButton.setVisible(command.isDefaultOverridden());
         }
     }
 

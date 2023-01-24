@@ -22,4 +22,6 @@ public interface Combination {
     void commandIsRun();
 
     CombinationType getCombinationType();
+
+    Combination copy();
 }

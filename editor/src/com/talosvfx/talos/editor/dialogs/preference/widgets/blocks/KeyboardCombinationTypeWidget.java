@@ -5,10 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.KeymapBox;
 import com.talosvfx.talos.editor.notifications.commands.KeyboardCombination;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Getter;
 
 public class KeyboardCombinationTypeWidget extends InputCombinationTypeWidget<KeyboardCombination> {
+    @Getter
     private KeymapBox mainKeyButton;
 
+    @Getter
     private CheckBox repeatCheckBox;
 
     public KeyboardCombinationTypeWidget(KeyboardCombination combination) {

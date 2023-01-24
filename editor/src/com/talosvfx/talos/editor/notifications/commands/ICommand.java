@@ -16,4 +16,10 @@ public interface ICommand {
     CommandContextType getContextType();
 
     Commands.CommandType getCommandType();
+
+    boolean isDefaultOverridden();
+
+    void overrideCombination(Combination combination);
+
+    void resetToDefault();
 }

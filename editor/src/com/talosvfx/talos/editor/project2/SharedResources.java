@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.talosvfx.talos.editor.notifications.commands.CommandsSystem;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.utils.WindowUtils;
@@ -33,4 +34,6 @@ public class SharedResources {
 
 
 	public static UIController ui;
+
+	public static CommandsSystem commandsSystem;
 }

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
+import com.badlogic.gdx.Input;
 import lombok.Getter;
 
 public class KeyboardCombination extends AbstractCombinationWithModifier {
@@ -22,6 +23,15 @@ public class KeyboardCombination extends AbstractCombinationWithModifier {
         super(modifierKeys);
         this.regularKey = regularKey;
         this.repeat = repeat;
+    }
+
+    @Override
+    public KeyboardCombination copy() {
+        KeyboardCombination keyboardCombination = new KeyboardCombination(regularKey, repeat);
+        for (ModifierKey item : modifierKeys) {
+            keyboardCombination.modifierKeys.add(item);
+        }
+        return keyboardCombination;
     }
 
     @Override
@@ -97,5 +107,33 @@ public class KeyboardCombination extends AbstractCombinationWithModifier {
             timerCooledDown = false;
             repeatCooldown = repeatStartTime;
         }
+    }
+
+    @Override
+    public String toString() {
+        String superString = super.toString();
+        return superString + Input.Keys.toString(regularKey);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KeyboardCombination that = (KeyboardCombination) o;
+
+        if (super.equals(that)) {
+            return false;
+        }
+
+        if (regularKey != that.regularKey) return false;
+        return repeat == that.repeat;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = regularKey;
+        result = 31 * result + (repeat ? 1 : 0);
+        return result;
     }
 }

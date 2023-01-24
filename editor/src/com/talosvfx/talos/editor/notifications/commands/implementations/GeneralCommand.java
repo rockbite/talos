@@ -29,9 +29,17 @@ public class GeneralCommand implements ICommand {
         this.activeCombination = defaultCombination;
     }
 
+
+    @Override
     public void overrideCombination (Combination combination) {
         this.isDefaultCombinationOverridden = true;
         this.activeCombination = combination;
+    }
+
+    @Override
+    public void resetToDefault () {
+        this.isDefaultCombinationOverridden = false;
+        this.activeCombination = defaultCombination;
     }
 
     @Override
@@ -52,5 +60,10 @@ public class GeneralCommand implements ICommand {
     @Override
     public void clearAfterRunning() {
         activeCombination.resetState();
+    }
+
+    @Override
+    public boolean isDefaultOverridden() {
+        return isDefaultCombinationOverridden;
     }
 }

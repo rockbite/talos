@@ -16,6 +16,19 @@ public abstract class AbstractCombinationWithModifier implements Combination {
             this.modifierKeys.add(modifierKey);
         }
 
+        checkForAllModifiers();
+    }
+
+    public boolean hasModifier(ModifierKey modifierKey) {
+        return modifierKeys.contains(modifierKey, false);
+    }
+
+    public void addModifierKey(ModifierKey modifierKey) {
+        this.modifierKeys.add(modifierKey);
+        checkForAllModifiers();
+    }
+
+    private void checkForAllModifiers() {
         isAnyModifier = true;
         for (ModifierKey value : ModifierKey.values()) {
             if (!this.modifierKeys.contains(value, false)) {
@@ -23,6 +36,11 @@ public abstract class AbstractCombinationWithModifier implements Combination {
                 break;
             }
         }
+    }
+
+    public void removeModifierKey(ModifierKey modifierKey) {
+        this.modifierKeys.removeValue(modifierKey, false);
+        isAnyModifier = false;
     }
 
     public void act(float delta) {
@@ -89,5 +107,46 @@ public abstract class AbstractCombinationWithModifier implements Combination {
     @Override
     public void scrolled(float amountY) {
 
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder modifiersString = new StringBuilder();
+        for (ModifierKey modifierKey : modifierKeys) {
+            modifiersString.append(modifierKey).append(" ");
+        }
+
+        return modifiersString.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractCombinationWithModifier)) return false;
+
+        AbstractCombinationWithModifier that = (AbstractCombinationWithModifier) o;
+
+        if (modifierKeys.size != that.modifierKeys.size) {
+            return false;
+        }
+
+        for (ModifierKey modifierKey : modifierKeys) {
+            if (!that.modifierKeys.contains(modifierKey, false)) {
+                return false;
+            }
+        }
+
+        for (ModifierKey modifierKey : that.modifierKeys) {
+            if (!(modifierKeys.contains(modifierKey, false))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return modifierKeys.hashCode();
     }
 }

@@ -4,8 +4,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.talosvfx.talos.editor.notifications.commands.MouseCombination;
 import com.talosvfx.talos.editor.notifications.commands.MouseCommand;
 import com.talosvfx.talos.editor.widgets.ui.Styles;
+import lombok.Getter;
 
 public class MouseCombinationTypeWidget extends InputCombinationTypeWidget<MouseCombination> {
+    @Getter
     private SelectBox<MouseCommand> selectBox;
     public MouseCombinationTypeWidget(MouseCombination currentCombination) {
         super(currentCombination);

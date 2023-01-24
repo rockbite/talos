@@ -12,6 +12,7 @@ import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ public class CommandsSystem extends InputAdapter {
 
     private CommandParser commandParser;
 
+    @Getter
     private Array<ICommand> allCommands = new Array<>();
 
     public CommandsSystem() {

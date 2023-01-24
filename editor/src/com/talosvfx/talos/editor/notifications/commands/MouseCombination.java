@@ -14,6 +14,16 @@ public class MouseCombination extends AbstractCombinationWithModifier {
         this.mouseCommand = mouseCommand;
     }
 
+
+    @Override
+    public MouseCombination copy() {
+        MouseCombination mouseCombination = new MouseCombination(mouseCommand);
+        for (ModifierKey modifierKey : modifierKeys) {
+            mouseCombination.modifierKeys.add(modifierKey);
+        }
+        return mouseCombination;
+    }
+
     @Override
     public boolean shouldExecute() {
         return isMouseCommandDone && super.shouldExecute();
@@ -74,5 +84,30 @@ public class MouseCombination extends AbstractCombinationWithModifier {
     @Override
     public CombinationType getCombinationType() {
         return CombinationType.MOUSE;
+    }
+
+    @Override
+    public String toString() {
+        String superText = super.toString();
+        return superText + mouseCommand;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MouseCombination that = (MouseCombination) o;
+
+        if (super.equals(that)) {
+            return false;
+        }
+
+        return mouseCommand == that.mouseCommand;
+    }
+
+    @Override
+    public int hashCode() {
+        return mouseCommand != null ? mouseCommand.hashCode() : 0;
     }
 }

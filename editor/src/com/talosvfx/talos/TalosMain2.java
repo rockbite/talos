@@ -51,6 +51,7 @@ public class TalosMain2 extends ApplicationAdapter {
 	@Override
 	public void create () {
 		super.create();
+		commandsSystem = new CommandsSystem();
 
 		AssetRepository.init();
 		SharedResources.projectLoader = this::projectLoader;
@@ -59,6 +60,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
 		SharedResources.configData = new ConfigData();
+		SharedResources.commandsSystem = this.commandsSystem;
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 
 		RuntimeContext instance = RuntimeContext.getInstance();
@@ -98,7 +100,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
-		commandsSystem = new CommandsSystem();
 		SharedResources.inputHandling.addPermanentInputProcessor(commandsSystem);
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
