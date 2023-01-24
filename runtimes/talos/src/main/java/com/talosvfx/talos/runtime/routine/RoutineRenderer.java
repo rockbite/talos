@@ -4,14 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.runtime.RuntimeContext;
-import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
 import com.talosvfx.talos.runtime.routine.nodes.RenderRoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -174,16 +172,7 @@ public class RoutineRenderer {
     }
 
     private void drawSliced (Batch batch, DrawableQuad drawableQuad) {
-        GameAsset<Texture> gameAsset = drawableQuad.gameAsset;
-        if (gameAsset.isBroken()) {
-            return;
-        }
-
-        final NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(gameAsset);// todo: this has to be done better
-
-        if (true) {
-            return;
-        }
+        final NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(drawableQuad.gameAsset);// todo: this has to be done better
 
         float width = drawableQuad.size.x;
         float height = drawableQuad.size.y;

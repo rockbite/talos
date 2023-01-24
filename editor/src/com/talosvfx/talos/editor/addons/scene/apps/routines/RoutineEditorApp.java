@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener, Observer {
-
     public final RoutineControlWindow controlWindow;
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;

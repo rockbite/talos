@@ -20,6 +20,7 @@ public class Commands {
     PASTE("paste_command", "Paste", "", "GENERAL"),
 
     SAVE("save_command", "Save", "", "GENERAL"),
+
     EXPORT("export_command", "Export", "", "GENERAL"),
 
     OPEN("open_command", "Open", "", "GENERAL"),

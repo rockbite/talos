@@ -2,8 +2,11 @@ package com.talosvfx.talos.editor.notifications.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.kotcrab.vis.ui.FocusManager;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
@@ -12,6 +15,7 @@ import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +61,15 @@ public class CommandsSystem extends InputAdapter {
     }
 
     public void runCommand(ICommand command) {
+        Actor keyboardFocus = SharedResources.stage.getKeyboardFocus();
+        if (keyboardFocus instanceof TextField) {
+            Toasts.getInstance().showErrorToast("NOT RUN BECAUSE OF FOCUS");
+            return;
+        }
+
         Notifications.fireEvent(getEventForCommand(command));
         command.commandIsRun();
-        logger.info("COMMAND IS RUN - " + command.getCommandType().name);
+        Toasts.getInstance().showInfoToast("Command - " + command.getCommandType().name);
     }
 
     public void clearAfterRunning() {

@@ -44,6 +44,7 @@ public class InputHandling {
 		inputMultiplexer.clear();
 
 		inputMultiplexer.addProcessor(SharedResources.appManager);
+		inputMultiplexer.addProcessor(SharedResources.commandsSystem);
 
 		for (InputProcessor priorityInputProcessor : priorityInputProcessors) {
 			inputMultiplexer.addProcessor(priorityInputProcessor);

@@ -100,7 +100,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
-		SharedResources.inputHandling.addPermanentInputProcessor(commandsSystem);
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
