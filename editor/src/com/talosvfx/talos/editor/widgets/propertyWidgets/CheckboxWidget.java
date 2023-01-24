@@ -5,12 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 
 import java.util.function.Supplier;
 
 public class CheckboxWidget extends PropertyWidget<Boolean> {
 
-	private CheckBox checkBox;
+	private CheckboxWithZoom checkBox;
 
 	public CheckboxWidget() {
 		super();
@@ -28,7 +29,7 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	@Override
 	public Actor getSubWidget() {
-		checkBox = new CheckBox("", SharedResources.skin, "panel-checkbox");
+		checkBox = new CheckboxWithZoom("", SharedResources.skin, "panel-checkbox");
 
 		listener = new ChangeListener() {
 			@Override

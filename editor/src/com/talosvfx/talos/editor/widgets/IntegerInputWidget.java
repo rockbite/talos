@@ -22,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 public class IntegerInputWidget extends Table {
 
@@ -29,7 +31,7 @@ public class IntegerInputWidget extends Table {
     private ChangeListener listener;
 
     private TextField regularCarrier;
-    private Label regularLabel;
+    private LabelWithZoom regularLabel;
     private int value;
 
     public IntegerInputWidget(String text, Skin skin) {
@@ -45,8 +47,8 @@ public class IntegerInputWidget extends Table {
 
         Table table = new Table();
 
-        regularLabel = new Label(text, getSkin());
-        regularCarrier = new TextField("", getSkin());
+        regularLabel = new LabelWithZoom(text, getSkin());
+        regularCarrier = new TextFieldWithZoom("", getSkin());
         regularCarrier.setTextFieldFilter(new TextField.TextFieldFilter.DigitsOnlyFilter());
 
         Cell labelCell = table.add(regularLabel);

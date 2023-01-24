@@ -10,6 +10,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 import java.util.function.Supplier;
 
@@ -73,7 +74,7 @@ public class CustomAssetWidget extends ATypeWidget<GameAsset> {
 
         Table content = new Table();
 
-        Label label = new Label("asset", SharedResources.skin);
+        Label label = new LabelWithZoom("asset", SharedResources.skin);
         content.add(label).left().expandX();
         content.add(assetWidget).growX().expandX().right();
 

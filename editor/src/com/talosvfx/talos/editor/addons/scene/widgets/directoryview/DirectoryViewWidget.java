@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
@@ -323,15 +325,32 @@ public class DirectoryViewWidget extends Table {
 
 				@Override
 				public void changed (String newText) {
-					if (newText.isEmpty()) {
-						newText = item.fileHandle.nameWithoutExtension();
+					final FileHandle oldHandle = item.fileHandle;
+
+					if (!oldHandle.isDirectory() && newText.isEmpty()) {
+						newText = oldHandle.nameWithoutExtension();
 					}
-					FileHandle newHandle = AssetImporter.renameFile(item.fileHandle, newText);
+					if (!oldHandle.isDirectory() && !newText.endsWith(oldHandle.extension())) {
+						newText += "." + oldHandle.extension();
+					}
+
+					FileHandle newHandle = item.fileHandle.parent().child(newText);
+					if (newHandle.exists()) {
+						if (!newHandle.name().equals(oldHandle.name())) {
+							Toasts.getInstance().showErrorToast(
+								"Cannot move asset from " + AssetRepository.relative(oldHandle) + " to " + AssetRepository.relative(newHandle)
+									+ ".\n Destination path name does already exist.", Align.center
+							);
+						}
+						item.setFile(oldHandle);
+						return;
+					}
+
+					newHandle = AssetImporter.renameFile(oldHandle, newText);
 					if (newHandle.isDirectory()) {
-						projectExplorerWidget.notifyRename(item.fileHandle, newHandle);
+						projectExplorerWidget.notifyRename(oldHandle, newHandle);
 					}
-					item.fileHandle = newHandle;
-					item.setFile(item.fileHandle);
+					item.setFile(newHandle);
 				}
 			});
 

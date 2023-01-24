@@ -28,8 +28,9 @@ public class Toasts {
 
 		private final VisLabel messageLabel;
 
-		Toast (String message, Color color) {
+		Toast (String message, Color color, int alignment) {
 			messageLabel = new VisLabel(message, color);
+			messageLabel.setAlignment(alignment);
 			add(messageLabel);
 
 			setTransform(true);
@@ -58,12 +59,20 @@ public class Toasts {
 		showToast(message, ColorLibrary.ORANGE);
 	}
 
+	public void showErrorToast (String message, int alignment) {
+		showToast(message, ColorLibrary.ORANGE, alignment);
+	}
+
 	public void showInfoToast (String message) {
 		showToast(message, ColorLibrary.BLUE);
 	}
 
-	private void showToast (String message, Color color) {
-		Toast toast = new Toast(message, color);
+	public void showToast (String message, Color color) {
+		showToast(message, color, Align.left);
+	}
+
+	private void showToast (String message, Color color, int alignment) {
+		Toast toast = new Toast(message, color, alignment);
 		toastTarget.addActor(toast);
 		toastTarget.setFillParent(true);
 		toastTarget.setPosition(0, 0);

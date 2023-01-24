@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class RoundedFlatButton extends Button {
 
@@ -25,7 +25,7 @@ public class RoundedFlatButton extends Button {
         style.disabled = ColorLibrary.createClippedPatch(getSkin(), ColorLibrary.SHAPE_SQUIRCLE, ColorLibrary.BackgroundColor.BRIGHT_GRAY);
         setStyle(style);
 
-        label = new Label(text, getSkin());
+        label = new LabelWithZoom(text, getSkin());
         label.setAlignment(Align.center);
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
     }
@@ -39,7 +39,7 @@ public class RoundedFlatButton extends Button {
         style.disabled = ColorLibrary.createClippedPatch(getSkin(), ColorLibrary.SHAPE_SQUIRCLE_RIGHT, ColorLibrary.BackgroundColor.BRIGHT_GRAY);
         setStyle(style);
 
-        Label label = new Label(text, getSkin());
+        Label label = new LabelWithZoom(text, getSkin());
         label.setAlignment(Align.center);
         iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
     }

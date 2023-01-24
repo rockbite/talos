@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 import java.util.function.Supplier;
 
@@ -22,7 +23,7 @@ public class IntPropertyWidget extends PropertyWidget<Integer> {
 
     @Override
     public Actor getSubWidget() {
-        textField = new TextField("", SharedResources.skin, "panel");
+        textField = new TextFieldWithZoom("", SharedResources.skin, "panel");
         textField.setTextFieldFilter(new IntFieldFilter());
 
         listener = new ChangeListener() {

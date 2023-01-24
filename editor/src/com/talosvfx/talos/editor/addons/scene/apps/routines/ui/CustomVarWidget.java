@@ -18,8 +18,9 @@ import com.talosvfx.talos.editor.utils.UIUtils;
 import com.talosvfx.talos.editor.widgets.ui.common.ArrowButton;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 import lombok.Getter;
-import lombok.Setter;
 
 public class CustomVarWidget extends Table {
 
@@ -73,11 +74,11 @@ public class CustomVarWidget extends Table {
         bottom = new Table();
         fieldContainer = new Table();
 
-        label = new Label("", skin);
-        valueLabel = new Label("", skin);
-        textField = new TextField("0", getSkin(), "no-bg");
+        label = new LabelWithZoom("", skin);
+        valueLabel = new LabelWithZoom("", skin);
+        textField = new TextFieldWithZoom("0", getSkin(), "no-bg");
 
-        typeLabel = new Label(innerWidget.getTypeName(), skin);
+        typeLabel = new LabelWithZoom(innerWidget.getTypeName(), skin);
         typeLabel.setColor(Color.GRAY);
 
         Stack mainStack = new Stack();
