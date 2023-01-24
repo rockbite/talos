@@ -538,8 +538,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void addNodeToSelection (NodeWidget node) {
-		SharedResources.stage.setKeyboardFocus(node);
-
 		selectedNodes.add(node);
 		updateSelectionBackgrounds();
 	}

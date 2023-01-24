@@ -2,6 +2,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.dialogs.IWindowDialog;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.SharedStage;
 import lombok.Setter;
 
 public class DialogAppAdapter extends ApplicationAdapter {
@@ -24,7 +26,7 @@ public class DialogAppAdapter extends ApplicationAdapter {
 
     @Override
     public void create() {
-        stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+        stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 
         Table content = dialog.getContent();
         stage.addActor(content);

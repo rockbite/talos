@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.SharedStage;
 import lombok.Getter;
 
 
@@ -35,7 +37,7 @@ public class GenericStageWrappedWidget extends Table {
 
     public GenericStageWrappedWidget(Actor actor) {
         camera = new OrthographicCamera();
-        stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND());
+        stage = new SharedStage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND());
         camera.update();
 
         stage.addActor(actor);

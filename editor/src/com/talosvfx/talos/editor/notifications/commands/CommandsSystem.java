@@ -61,7 +61,7 @@ public class CommandsSystem extends InputAdapter {
     }
 
     public void runCommand(ICommand command) {
-        Actor keyboardFocus = SharedResources.stage.getKeyboardFocus();
+        Actor keyboardFocus = SharedResources.inputHandling.keyboardFocus;
         if (keyboardFocus instanceof TextField) {
             Toasts.getInstance().showErrorToast("NOT RUN BECAUSE OF FOCUS");
             return;

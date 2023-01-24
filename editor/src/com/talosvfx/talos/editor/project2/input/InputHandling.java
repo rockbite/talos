@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.project2.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -10,8 +11,8 @@ import com.badlogic.gdx.utils.OrderedSet;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class InputHandling {
-
-	private OrderedSet<InputProcessor> permanentInputProcessors = new OrderedSet<>();
+	public Actor keyboardFocus;
+    private OrderedSet<InputProcessor> permanentInputProcessors = new OrderedSet<>();
 
 	private OrderedSet<InputProcessor> temporaryInputProcessors = new OrderedSet<>();
 	private OrderedSet<InputProcessor> priorityInputProcessors = new OrderedSet<>();
