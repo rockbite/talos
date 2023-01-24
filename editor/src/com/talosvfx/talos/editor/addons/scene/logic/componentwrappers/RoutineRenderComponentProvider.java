@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 public class RoutineRenderComponentProvider extends RendererComponentProvider<RoutineRendererComponent> {
 
 	Array<PropertyWidget> properties = new Array<>();
-	public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
 	public RoutineRenderComponentProvider (RoutineRendererComponent component) {
 		super(component);
@@ -53,8 +52,9 @@ public class RoutineRenderComponentProvider extends RendererComponentProvider<Ro
 		Array<PropertyWidget> superList = super.getListOfProperties();
 		properties.addAll(superList);
 
+		final Array<PropertyWrapper<?>> propertyWrappers = component.propertyWrappers;
 		for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-			PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
+			PropertyWidget<?> generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
 			generate.setInjectedChangeListener(new ChangeListener() {
 				@Override
 				public void changed (ChangeEvent event, Actor actor) {
