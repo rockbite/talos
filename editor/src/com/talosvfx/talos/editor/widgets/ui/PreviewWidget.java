@@ -196,11 +196,6 @@ public abstract class PreviewWidget extends ViewportWidget {
 				super.touchUp(event, x, y, pointer, button);
 				currentlyDragging = null;
 			}
-
-			@Override
-			public boolean keyUp (InputEvent event, int keycode) {
-				return super.keyUp(event, keycode);
-			}
 		};
 
 		addListener(inputListener);

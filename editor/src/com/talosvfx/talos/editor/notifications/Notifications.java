@@ -193,14 +193,10 @@ public class Notifications {
 			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
 
 			if (eventContextObject == null) {
-				throw new GdxRuntimeException("Invalid event, context must be provided");
+				logger.warn("firing event with no context provided");
 			}
 			if (!(eventContextObject == eventContextProvider.getContext())) {
 				return;
-			}
-
-			if (eventContextObject == null) {
-				logger.warn("firing event with no context provided");
 			}
 		}
 		eventRunner.runEvent(event);

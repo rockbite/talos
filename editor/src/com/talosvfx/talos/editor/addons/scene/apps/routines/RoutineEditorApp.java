@@ -144,6 +144,11 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         routineStage.getNodeBoard().ungroupSelectedNodes();
     }
 
+    @CommandEventHandler(commandType = Commands.CommandType.DELETE)
+    public void onDeleteCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().deleteSelectedNodes();
+    }
+
     @Override
     public void updateForGameAsset (GameAsset<RoutineStageData> gameAsset) {
         if (this.gameAsset != null) {
