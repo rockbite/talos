@@ -188,6 +188,7 @@ public class ValueWidget extends AbstractWidget<Float> {
             public boolean keyDown(InputEvent event, int keycode) {
                 if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
+                    getStage().setKeyboardFocus(null);
                 }
 
                 return super.keyDown(event, keycode);
