@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentRemoved;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.AComponentProvider;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponentProvider;
 import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -46,13 +48,11 @@ public class PropertiesPanel extends Table {
         titleLabel.setEllipsis(true);
         Table titleContainer = new Table();
         titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left();
-
-        if (propertyProvider instanceof AComponent && !(propertyProvider instanceof TransformComponent)) {
-            AComponent component = ((AComponent) propertyProvider);
+        if (propertyProvider instanceof AComponentProvider && !(propertyProvider instanceof TransformComponentProvider)) {
+            AComponent component = ((AComponentProvider<?>) propertyProvider).getComponent();
 
             ImageButton settingButton = new ImageButton(SharedResources.skin.getDrawable("ic-vertical-dots"));
-            titleContainer.add(settingButton).padTop(-titleLabel.getPrefHeight() - 3).right().width(20).padRight(2)
-                    .row();
+            titleContainer.add(settingButton).padTop(-titleLabel.getPrefHeight() - 3).right().width(20).padRight(2).row();
 
             settingButton.addListener( new ClickListener(){
 
