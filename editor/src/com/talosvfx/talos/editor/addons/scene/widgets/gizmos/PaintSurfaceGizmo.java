@@ -47,34 +47,36 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if(gameObject.hasComponent(PaintSurfaceComponent.class) && selected) {
-            PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        if (!gameObject.hasComponent(PaintSurfaceComponent.class)) return;
 
-            Texture resource = surface.getGameResource().getResource();
-            if(resource != null) {
-                float overlay = surface.overlay;
-                Vector2 size = surface.size;
-                color.a = overlay;
-                batch.setColor(color);
-                batch.draw(resource, getX() - size.x / 2f, getY() - size.y / 2f, size.x, size.y);
-                batch.setColor(Color.WHITE);
+        if (!gameObject.isEditorVisible()) return;
 
-                // time to draw the bush
-                if(!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
+        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
-                    batch.end();
-                    color.set(Color.WHITE);
-                    color.a = 0.1f;
-                    shapeRenderer.setColor(color);
-                    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                    Gdx.gl.glEnable(GL20.GL_BLEND);
-                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
-                    shapeRenderer.end();
-                    Gdx.gl.glDisable(GL20.GL_BLEND);
-                    batch.begin();
-                }
+        Texture resource = surface.getGameResource().getResource();
+        if (resource != null) {
+            float overlay = surface.overlay;
+            Vector2 size = surface.size;
+            color.a = overlay;
+            batch.setColor(color);
+            batch.draw(resource, getX() - size.x / 2f, getY() - size.y / 2f, size.x, size.y);
+            batch.setColor(Color.WHITE);
+
+            // time to draw the bush
+            if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
+
+                batch.end();
+                color.set(Color.WHITE);
+                color.a = 0.1f;
+                shapeRenderer.setColor(color);
+                shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
+                shapeRenderer.end();
+                Gdx.gl.glDisable(GL20.GL_BLEND);
+                batch.begin();
             }
         }
     }
