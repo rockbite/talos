@@ -24,8 +24,6 @@ import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
-import com.talosvfx.talos.runtime.vfx.modules.PolylineModule;
-import com.talosvfx.talos.runtime.vfx.modules.TextureModule;
 import com.talosvfx.talos.runtime.vfx.modules.VectorFieldModule;
 import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
@@ -115,26 +113,6 @@ public class VFXProjectSerializer {
             for (ModuleWrapper wrapper : emitter.modules) {
                 emitterData.modules.add(wrapper.getModule());
 
-                if (wrapper.getModule() instanceof TextureModule) {
-                    TextureModule textureModule = (TextureModule)wrapper.getModule();
-                    String name = textureModule.regionName;
-                    if (name == null)
-                        name = "fire";
-
-                    if (!data.metadata.resources.contains(name, false)) {
-                        data.metadata.resources.add(name);
-                    }
-                }
-                if (wrapper.getModule() instanceof PolylineModule) {
-                    PolylineModule module = (PolylineModule)wrapper.getModule();
-                    String name = module.regionName;
-                    if (name == null)
-                        name = "fire";
-
-                    if (!data.metadata.resources.contains(name, false)) {
-                        data.metadata.resources.add(name);
-                    }
-                }
                 if (wrapper.getModule() instanceof VectorFieldModule) {
                     VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
                     String fgaFileName = vectorFieldModule.fgaFileName;
