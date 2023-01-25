@@ -121,7 +121,7 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
 
         innerBatch.draw(brushTexture,
-                tmp.x - brushTexture.getWidth()/2f, surface.size.y - (tmp.y-brushTexture.getHeight()/2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
+                tmp.x - brushTexture.getWidth() / 2f, surface.size.y - (tmp.y - brushTexture.getHeight() / 2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
 
         innerBatch.end();
 
