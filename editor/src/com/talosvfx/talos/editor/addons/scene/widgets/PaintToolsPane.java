@@ -57,7 +57,7 @@ public class PaintToolsPane extends Table implements Observer {
         erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
         ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
         buttonButtonGroup.setMaxCheckCount(1);
-        buttonButtonGroup.setMinCheckCount(0);
+        buttonButtonGroup.setMinCheckCount(1);
         buttonButtonGroup.add(paint, erase);
         paint.setChecked(true);
 
