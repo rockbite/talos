@@ -82,19 +82,19 @@ public class PaintToolsPane extends Table implements Observer {
         sizeWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
         hardnessWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
         colorWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 fullColor.set(colorWidget.getValue());
                 applyChannelFilterToColor();
             }
@@ -102,14 +102,14 @@ public class PaintToolsPane extends Table implements Observer {
         opacityWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
 
         paint.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 currentTool = Tool.BRUSH;
             }
         });
@@ -117,7 +117,7 @@ public class PaintToolsPane extends Table implements Observer {
         erase.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 currentTool = Tool.ERASER;
             }
         });

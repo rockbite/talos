@@ -7,9 +7,11 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -28,12 +30,14 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     private Color color = new Color(Color.WHITE);
 
-    public Texture brushTexture;
+    private Texture brushTexture;
 
     private FrameBuffer frameBuffer;
     private Batch innerBatch;
 
     private Vector2 mouseCordsOnScene = new Vector2();
+
+    private Actor previousKeyboardFocus;
 
     public PaintSurfaceGizmo() {
         if (paintToolsPane == null) {
@@ -47,11 +51,11 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if(gameObject.hasComponent(PaintSurfaceComponent.class) && selected) {
+        if (gameObject.hasComponent(PaintSurfaceComponent.class) && selected) {
             PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
             Texture resource = surface.getGameResource().getResource();
-            if(resource != null) {
+            if (resource != null) {
                 float overlay = surface.overlay;
                 Vector2 size = surface.size;
                 color.a = overlay;
@@ -60,7 +64,7 @@ public class PaintSurfaceGizmo extends Gizmo {
                 batch.setColor(Color.WHITE);
 
                 // time to draw the bush
-                if(!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
                     batch.end();
@@ -81,16 +85,17 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void keyDown(InputEvent event, int keycode) {
-        if(keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
+        if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
             paintToolsPane.bracketDown(keycode);
-            brushTexture = null;
+            destroyBrushTexture();
         }
     }
 
     @Override
     public void keyUp(InputEvent event, int keycode) {
-        if(keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
+        if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
             paintToolsPane.bracketUp(keycode);
+            destroyBrushTexture();
         }
     }
 
@@ -102,12 +107,12 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
-        tmp.set(transformComponent.position).sub(surface.size.x/2f, surface.size.y/2f).sub(mouseCordsOnScene).scl(-1);
+        tmp.set(transformComponent.position).sub(surface.size.x / 2f, surface.size.y / 2f).sub(mouseCordsOnScene).scl(-1);
 
         frameBuffer.begin();
         innerBatch.begin();
 
-        if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+        if (paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
             Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_REVERSE_SUBTRACT);
             innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
@@ -123,6 +128,17 @@ public class PaintSurfaceGizmo extends Gizmo {
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
 
         frameBuffer.end();
+
+        GameAsset<Texture> gameAsset = surface.gameAsset;
+        if (!gameAsset.isBroken()) {
+            Texture resource = gameAsset.getResource();
+            TextureData textureData = resource.getTextureData();
+            if (textureData instanceof PixmapTextureData) {
+                textureData.consumePixmap().dispose();
+            }
+            resource.dispose();
+        }
+
         Texture texture = new Texture(pixmap);
 
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -132,27 +148,28 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void touchDown(float x, float y, int button) {
+        previousKeyboardFocus = SharedResources.stage.getKeyboardFocus();
         SharedResources.stage.setKeyboardFocus(this);
 
-        if(brushTexture == null) {
+        if (brushTexture == null) {
             createBrushTexture();
         }
         boolean sizeIsDifferent = false;
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
         Texture resource = surface.getGameResource().getResource();
-        if(frameBuffer != null) {
-            if(frameBuffer.getWidth() != resource.getWidth() || frameBuffer.getHeight() != resource.getHeight()) {
+        if (frameBuffer != null) {
+            if (frameBuffer.getWidth() != resource.getWidth() || frameBuffer.getHeight() != resource.getHeight()) {
                 sizeIsDifferent = true;
             }
         }
 
         if (frameBuffer == null || sizeIsDifferent) {
-           FrameBuffer fbo = createFrameBuffer();
-           if (fbo == null) {
-               // framebuffer creation was unsuccessful, skip
-               return;
-           }
+            FrameBuffer fbo = createFrameBuffer();
+            if (fbo == null) {
+                // framebuffer creation was unsuccessful, skip
+                return;
+            }
         }
 
         drawBrushToBuffer();
@@ -167,7 +184,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void touchUp(float x, float y) {
-
+        SharedResources.stage.setKeyboardFocus(previousKeyboardFocus);
     }
 
     private FrameBuffer createFrameBuffer() {
@@ -209,24 +226,37 @@ public class PaintSurfaceGizmo extends Gizmo {
         return frameBuffer;
     }
 
+    public void destroyBrushTexture() {
+        if (brushTexture != null) {
+            TextureData textureData = brushTexture.getTextureData();
+            if (textureData instanceof PixmapTextureData) {
+                textureData.consumePixmap().dispose();
+            }
+
+            brushTexture.dispose();
+        }
+
+        brushTexture = null;
+    }
+
     private void createBrushTexture() {
         int size = paintToolsPane.getSize();
         float opacity = paintToolsPane.getOpacity();
         float hardness = paintToolsPane.getHardness();
         float maxShift = 0.25f;
         float shift = (1f - hardness) * maxShift;
-        int boxSize = (int) (size * (1f+shift));
+        int boxSize = (int) (size * (1f + shift));
 
         Pixmap pixmap = new Pixmap(boxSize, boxSize, Pixmap.Format.RGBA8888);
-        for(int x = 0; x < pixmap.getWidth(); x++) {
-            for(int y = 0; y < pixmap.getHeight(); y++) {
+        for (int x = 0; x < pixmap.getWidth(); x++) {
+            for (int y = 0; y < pixmap.getHeight(); y++) {
                 color.set(paintToolsPane.getColor());
-                float dstFromCenter = (tmp.set(boxSize/2f, boxSize/2f).dst(x+0.5f, y+0.5f))/(boxSize/2f);
+                float dstFromCenter = (tmp.set(boxSize / 2f, boxSize / 2f).dst(x + 0.5f, y + 0.5f)) / (boxSize / 2f);
                 float point = 1f - shift * 2f;
                 float fadeOff;
-                if(dstFromCenter < point) {
+                if (dstFromCenter < point) {
                     fadeOff = 1;
-                } else if(dstFromCenter > 1f) {
+                } else if (dstFromCenter > 1f) {
                     fadeOff = 0;
                 } else {
                     fadeOff = 1f - (MathUtils.clamp(dstFromCenter, point, 1f) - point) * 2f;
@@ -234,7 +264,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
                 color.a = fadeOff * opacity;
 
-                if(paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
+                if (paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
                     color.a = fadeOff * opacity;
                 }
 
@@ -243,25 +273,25 @@ public class PaintSurfaceGizmo extends Gizmo {
             }
         }
 
-       brushTexture = new Texture(pixmap);
-       brushTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        brushTexture = new Texture(pixmap);
+        brushTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
     }
 
     private void drawBrushPoint(float x, float y, int sizePixels, float hardness) {
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
         Texture resource = surface.getGameResource().getResource();
-        float xMul = surface.size.x  / resource.getWidth();
-        float yMul = surface.size.y  / resource.getHeight();
+        float xMul = surface.size.x / resource.getWidth();
+        float yMul = surface.size.y / resource.getHeight();
 
         float maxShift = 0.25f;
         float shift = (1f - hardness) * maxShift;
 
         float xRadius = sizePixels * xMul * (1f + shift);
         float yRadius = sizePixels * yMul * (1f + shift);
-        shapeRenderer.ellipse(x - xRadius/2f, y - yRadius/2f, xRadius, yRadius, 60);
+        shapeRenderer.ellipse(x - xRadius / 2f, y - yRadius / 2f, xRadius, yRadius, 60);
         xRadius = sizePixels * xMul * (1f - shift);
         yRadius = sizePixels * yMul * (1f - shift);
-        shapeRenderer.ellipse(x - xRadius/2f, y - yRadius/2f, xRadius, yRadius, 60);
+        shapeRenderer.ellipse(x - xRadius / 2f, y - yRadius / 2f, xRadius, yRadius, 60);
     }
 
     @Override
@@ -272,12 +302,7 @@ public class PaintSurfaceGizmo extends Gizmo {
     }
 
     @Override
-    public void mouseMoved(float x, float y) {
-        super.mouseMoved(x, y);
-    }
-
-    @Override
-    public void setSelected (boolean selected) {
+    public void setSelected(boolean selected) {
         super.setSelected(selected);
 
         if (selected) {
@@ -292,7 +317,7 @@ public class PaintSurfaceGizmo extends Gizmo {
     }
 
     @Override
-    public void notifyRemove () {
+    public void notifyRemove() {
         viewport.panRequiresSpace(false);
         paintToolsPane.remove();
     }
