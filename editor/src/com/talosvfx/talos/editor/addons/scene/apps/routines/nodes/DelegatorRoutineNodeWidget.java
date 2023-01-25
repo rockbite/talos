@@ -10,13 +10,13 @@ import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
