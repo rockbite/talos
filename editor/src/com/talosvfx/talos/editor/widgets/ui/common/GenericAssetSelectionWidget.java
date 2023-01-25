@@ -18,7 +18,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 
-public class AssetSelector<T> extends Table {
+public class GenericAssetSelectionWidget<T> extends Table {
 
     private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
@@ -27,11 +27,11 @@ public class AssetSelector<T> extends Table {
 
     private AssetListPopup<T> assetListPopup;
 
-    public AssetSelector() {
+    public GenericAssetSelectionWidget() {
         super();
     }
 
-    public AssetSelector (String name, GameAssetType type) {
+    public GenericAssetSelectionWidget(GameAssetType type) {
 
         assetListPopup = new AssetListPopup<>();
         this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {

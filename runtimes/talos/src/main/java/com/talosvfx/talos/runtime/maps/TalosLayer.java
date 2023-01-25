@@ -142,9 +142,13 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
-		String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
-		loadPaletteFromIdentifier(gameResourceIdentifier);
+		String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+		if (gameResourceUUID.equals("broken")) {
+			String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+			loadPaletteFromIdentifier(gameResourceIdentifier);
+		} else {
+			loadPaletteFromUniqueIdentifier(gameResourceUUID);
+		}
 
 		this.type = json.readValue(LayerType.class, jsonData.get("type"));
 		this.name = jsonData.getString("name");
@@ -235,6 +239,11 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 	private void loadPaletteFromIdentifier (String identifier) {
 		GameAsset<TilePaletteData> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, GameAssetType.TILE_PALETTE);
 		setGameAsset(assetForIdentifier);
+	}
+
+	private void loadPaletteFromUniqueIdentifier (String uniqueIdentifier) {
+		GameAsset<TilePaletteData> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uniqueIdentifier, GameAssetType.TILE_PALETTE);
+		setGameAsset(assetForUniqueIdentifier);
 	}
 
 	public void setStaticTile (StaticTile staticTile) {

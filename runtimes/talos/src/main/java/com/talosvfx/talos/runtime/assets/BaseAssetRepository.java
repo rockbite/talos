@@ -26,6 +26,8 @@ public abstract class BaseAssetRepository {
 
 	public abstract <U> GameAsset<U> getAssetForIdentifier (String identifier, GameAssetType type);
 
+	public abstract <U> GameAsset<U> getAssetForUniqueIdentifier (String uuid, GameAssetType type);
+
 	public abstract NinePatch obtainNinePatch (GameAsset<Texture> gameAsset);
 
 

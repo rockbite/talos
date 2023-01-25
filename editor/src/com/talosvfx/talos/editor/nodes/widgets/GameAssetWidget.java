@@ -13,7 +13,7 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
-import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
+import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 
 import java.util.function.Supplier;
 
@@ -23,7 +23,7 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
     private Cell<SelectBoxWidget> typeSelectorCell;
     private GameAsset gameAsset;
     private GameAssetType type;
-    private AssetSelector<Object> widget;
+    private GenericAssetSelectionWidget<Object> widget;
 
     private Table bottomContainer;
 
@@ -44,7 +44,7 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
             @Override
             public void report(String value) {
                 type = GameAssetType.valueOf(value);
-                build(type.toString(), "");
+                build(type.toString());
                 fireChangedEvent();
             }
         }, new Supplier<Array<String>>() {
@@ -63,12 +63,12 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
         content.add(bottomContainer).growX();
     }
 
-    public void build(String typeString, String text) {
+    public void build(String typeString) {
         bottomContainer.clear();
 
         type = GameAssetType.valueOf(typeString);
 
-        widget = new AssetSelector<>(text, type);
+        widget = new GenericAssetSelectionWidget<>(type);
         widget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -85,9 +85,9 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
         String typeString = element.getAttribute("type", "");
         if(typeString.equals("")) {
             // widget is generic
-            build("SPRITE", "");
+            build("SPRITE");
         } else {
-            build(typeString, "");
+            build(typeString);
             typeSelectorCell.setActor(null).pad(0);
         }
 
@@ -103,14 +103,27 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
     public void read(Json json, JsonValue jsonValue) {
         try {
             GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-            String identifier = jsonValue.getString("id");
+            String uuid = readGameAssetUniqueIdentifier(jsonValue);
+            if (uuid.equals("broken")) {
+                String id = readGameAssetIdentifier(jsonValue);
+                gameAsset = AssetRepository.getInstance().getAssetForIdentifier(id, type);
+            } else {
+                gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(uuid, type);
+            }
 
-            gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
             this.type = type;
             typeSelector.updateWidget(type.name());
 
             widget.updateWidget(gameAsset);
         } catch (Exception e) {}
+    }
+
+    static String readGameAssetIdentifier (JsonValue jsonValue) {
+        return jsonValue.getString("id", "broken");
+    }
+
+    static String readGameAssetUniqueIdentifier (JsonValue jsonValue) {
+        return jsonValue.getString("uuid", "broken");
     }
 
     @Override
@@ -119,6 +132,7 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
         if(gameAsset != null) {
             json.writeValue("type", type);
             json.writeValue("id", gameAsset.nameIdentifier);
+            json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
         }
         json.writeObjectEnd();
     }

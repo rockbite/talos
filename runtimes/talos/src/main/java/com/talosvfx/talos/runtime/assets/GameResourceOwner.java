@@ -18,6 +18,7 @@ public interface GameResourceOwner<U> {
             if (!gameResource.isBroken()) {
                 json.writeValue("gameResourceExtension", gameResource.getRootRawAsset().handle.extension());
                 json.writeValue("type", gameResource.type);
+                json.writeValue("gameResourceUUID", gameResource.getRootRawAsset().metaData.uuid.toString());
             }
         }
     }
@@ -33,10 +34,13 @@ public interface GameResourceOwner<U> {
     static <U> GameAsset<U> readAsset (Json json, JsonValue jsonValue) {
         String identifier = readGameResourceFromComponent(jsonValue);
         GameAssetType type = readAssetType(json, jsonValue);
+        String uuid = readGameResourceUUIDFromComponent(jsonValue);
 
-        GameAsset<U> asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
-
-        return asset;
+        if (uuid.equals("broken")) {
+            return RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
+        } else {
+            return RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uuid, type);
+        }
     }
 
     static GameAssetType readAssetType(Json json, JsonValue jsonValue) {
@@ -49,4 +53,7 @@ public interface GameResourceOwner<U> {
         return component.getString("gameResource", "broken");
     }
 
+    static String readGameResourceUUIDFromComponent (JsonValue component) {
+        return component.getString("gameResourceUUID", "broken");
+    }
 }

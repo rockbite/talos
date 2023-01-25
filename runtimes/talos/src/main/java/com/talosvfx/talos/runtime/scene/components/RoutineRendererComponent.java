@@ -61,10 +61,19 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         requiresWrite = false;
     }
 
+    private void loadRoutineFromIdentifier (String gameResourceIdentifier) {
+        GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
+        setGameAsset(assetForIdentifier);
+    }
+
+    private void loadRoutineFromUniqueIdentifier (String gameResourceUUID) {
+        GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.ROUTINE);
+        setGameAsset(assetForUniqueIdentifier);
+    }
+
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 
         propertyWrappers.clear();
         JsonValue propertiesJson = jsonData.get("properties");
@@ -74,8 +83,14 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
             }
         }
 
-        GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
-        setGameAsset(assetForIdentifier);
+        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID.equals("broken")) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadRoutineFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadRoutineFromUniqueIdentifier(gameResourceUUID);
+        }
+
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
         if (viewportSize == null) viewportSize = new Vector2(6, 4);

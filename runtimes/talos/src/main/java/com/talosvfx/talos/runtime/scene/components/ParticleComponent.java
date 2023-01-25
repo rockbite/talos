@@ -27,10 +27,13 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
-        loadDescriptorFromIdentifier(gameResourceIdentifier);
+        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID.equals("broken")) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadDescriptorFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadDescriptorFromUniqueIdentifier(gameResourceUUID);
+        }
 
         super.read(json, jsonData);
     }
@@ -55,6 +58,11 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
     private void loadDescriptorFromIdentifier (String gameResourceIdentifier) {
         GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
         setGameAsset(assetForIdentifier);
+    }
+
+    private void loadDescriptorFromUniqueIdentifier (String gameResourceUUID) {
+        GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.VFX);
+        setGameAsset(assetForUniqueIdentifier);
     }
 
     @Override

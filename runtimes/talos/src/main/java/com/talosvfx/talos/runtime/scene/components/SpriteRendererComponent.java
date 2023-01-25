@@ -90,6 +90,11 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         setGameAsset(assetForIdentifier);
     }
 
+    private void loadTextureFromUniqueIdentifier (String gameResourceIdentifier) {
+        GameAsset<Texture> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        setGameAsset(assetForUniqueIdentifier);
+    }
+
     @Override
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
@@ -109,9 +114,13 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
-        loadTextureFromIdentifier(gameResourceIdentifier);
+        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID.equals("broken")) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadTextureFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadTextureFromUniqueIdentifier(gameResourceUUID);
+        }
 
         color = json.readValue(Color.class, jsonData.get("color"));
         shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);

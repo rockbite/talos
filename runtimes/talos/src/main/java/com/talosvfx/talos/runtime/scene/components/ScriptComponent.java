@@ -45,9 +45,13 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
-        loadScriptFromIdentifier(gameResourceIdentifier);
+        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID.equals("broken")) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadScriptFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadScriptFromUniqueIdentifier(gameResourceUUID);
+        }
 
         scriptProperties.clear();
         JsonValue propertiesJson = jsonData.get("properties");
@@ -61,6 +65,11 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     private void loadScriptFromIdentifier (String gameResourceIdentifier) {
         GameAsset<String> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SCRIPT);
         setGameAsset(assetForIdentifier);
+    }
+
+    private void loadScriptFromUniqueIdentifier (String gameResourceUUID) {
+        GameAsset<String> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SCRIPT);
+        setGameAsset(assetForUniqueIdentifier);
     }
 
     public void importScriptPropertiesFromMeta (boolean tryToMerge) {

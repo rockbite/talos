@@ -212,8 +212,14 @@ public abstract class RoutineNode {
                 Json json = new Json();
                 try {
                     GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-                    String identifier = jsonValue.getString("id");
-                    GameAsset gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
+                    GameAsset gameAsset;
+                    String uuid = jsonValue.getString("uuid", "broken");
+                    if (uuid.equals("broken")) {
+                        String id = jsonValue.getString("id", "broken");
+                        gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(id, type);
+                    } else {
+                        gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uuid, type);
+                    }
                     port.setValue(gameAsset);
 
                     if(gameAsset.isBroken()) {

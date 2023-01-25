@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyBooleanWrapper;
@@ -141,7 +141,7 @@ public class WidgetFactory {
     }
 
     private static <T> PropertyWidget generateForGameAsset (Object parent, Field field, Object object, String title, GameAssetType assetType) {
-        AssetSelectWidget<T> textureWidget = new AssetSelectWidget<>(title, assetType, new Supplier<GameAsset<T>>() {
+        PropertyPanelAssetSelectionWidget<T> textureWidget = new PropertyPanelAssetSelectionWidget<>(title, assetType, new Supplier<GameAsset<T>>() {
             @Override
             public GameAsset<T> get() {
                 try {
