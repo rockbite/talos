@@ -14,16 +14,18 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
+import lombok.Getter;
 
 import java.util.function.Supplier;
 
-public class GameAssetWidget extends AbstractWidget<GameAsset> {
+public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
 
     private final SelectBoxWidget typeSelector;
     private Cell<SelectBoxWidget> typeSelectorCell;
-    private GameAsset gameAsset;
+    private GameAsset<T> gameAsset;
     private GameAssetType type;
-    private GenericAssetSelectionWidget<Object> widget;
+    @Getter
+    private GenericAssetSelectionWidget<T> widget;
 
     private Table bottomContainer;
 
@@ -95,7 +97,7 @@ public class GameAssetWidget extends AbstractWidget<GameAsset> {
     }
 
     @Override
-    public GameAsset getValue() {
+    public GameAsset<T> getValue() {
         return gameAsset;
     }
 

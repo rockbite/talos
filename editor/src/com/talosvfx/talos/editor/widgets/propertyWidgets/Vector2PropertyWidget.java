@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.ValueProperty;
 
 import java.util.function.Supplier;
 

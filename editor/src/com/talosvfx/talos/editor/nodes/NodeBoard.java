@@ -339,14 +339,13 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void deleteNode (NodeWidget node) {
-		nodeStage.data.nodes.removeValue(node, true);
-
 		for (int i = nodeStage.data.nodeConnections.size - 1; i >= 0; i--) {
 			if (nodeStage.data.nodeConnections.get(i).toNode == node || nodeStage.data.nodeConnections.get(i).fromNode == node) {
-				removeConnection(nodeStage.data.nodeConnections.get(i));
+				removeConnection(nodeStage.data.nodeConnections.get(i), false);
 			}
 		}
 
+		nodeStage.data.nodes.removeValue(node, true);
 		Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(getNodeStage(), node));
 
 		mainContainer.removeActor(node);
@@ -411,14 +410,16 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return nodeToFind;
 	}
 
-	public void removeConnection (NodeConnection connection) {
+	public void removeConnection (NodeConnection connection, boolean fireEvent) {
 		//Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionPreRemovedEvent.class).set(connection));
 		nodeStage.data.nodeConnections.removeValue(connection, true);
 
 		connection.fromNode.setSlotConnectionInactive(connection, false);
 		connection.toNode.setSlotConnectionInactive(connection, true);
 
-		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(getNodeStage(), connection));
+		if (fireEvent) {
+			Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionRemovedEvent.class).set(getNodeStage(), connection));
+		}
 
 		updateSaveState();
 

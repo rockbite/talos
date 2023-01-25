@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.runtime.scene.ValueProperty;
 
 import java.util.function.Supplier;
 

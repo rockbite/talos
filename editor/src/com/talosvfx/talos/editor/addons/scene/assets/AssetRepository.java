@@ -4,14 +4,12 @@ package com.talosvfx.talos.editor.addons.scene.assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -1739,10 +1737,17 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		PixmapIO.writePNG(fileHandle, pixmap);
 
+		if (!gameAsset.isBroken()) {
+			Texture resource = gameAsset.getResource();
+			TextureData textureData = resource.getTextureData();
+			if (textureData instanceof PixmapTextureData) {
+				textureData.consumePixmap().dispose();
+			}
+			resource.dispose();
+		}
+
 		gameAsset.setResourcePayload(new Texture(pixmap));
 		gameAsset.setUpdated();
-
-		pixmap.dispose();
 
 		// fire asset color fill event
 		final AssetColorFillEvent event = Notifications.obtainEvent(AssetColorFillEvent.class);

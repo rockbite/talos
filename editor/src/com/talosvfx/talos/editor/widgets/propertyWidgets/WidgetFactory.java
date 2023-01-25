@@ -9,6 +9,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.GameObjectSelectWidget;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.ValueProperty;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyBooleanWrapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyColorWrapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyFloatWrapper;
