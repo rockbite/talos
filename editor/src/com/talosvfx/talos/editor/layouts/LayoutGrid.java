@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class LayoutGrid extends WidgetGroup implements Json.Serializable {
 
@@ -982,7 +983,7 @@ public class LayoutGrid extends WidgetGroup implements Json.Serializable {
                     //We need to make the app
 
                     try {
-                        AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier, gameAssetUniqueIdentifier);
+                        AppManager.BaseApp baseApp = SharedResources.appManager.createAndRegisterAppExternal(appID, baseAppClazz, gameAssetType, gameAssetIdentifier, UUID.fromString(gameAssetUniqueIdentifier));
 
                         //We skip and just add it to the parent
                         if (!(parent instanceof LayoutContent)) {

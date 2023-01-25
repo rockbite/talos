@@ -1,8 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
-import com.talosvfx.talos.editor.serialization.VFXProjectData;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -28,7 +27,7 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 		//			this.effectInstance = this.descriptor.createEffectInstance();
 		//		}
 
-		AssetSelectWidget<T> descriptorWidget = new AssetSelectWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<T>>() {
+		PropertyPanelAssetSelectionWidget<T> descriptorWidget = new PropertyPanelAssetSelectionWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<T>>() {
 			@Override
 			public GameAsset<T> get() {
 				return component.gameAsset;

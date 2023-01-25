@@ -108,7 +108,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
 
                             // todo: this needs to be done better
                             if(widget instanceof GameAssetWidget) {
-                                ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString(), wrapper.propertyName);
+                                ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString());
                             }
 
                             widget.init(SharedResources.skin);
@@ -132,7 +132,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
                             });
 
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
                     }
                 }

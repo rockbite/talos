@@ -25,14 +25,14 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
+import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 
 public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialModule> {
 
     private Label assetNameLabel;
-    private AssetSelector<Texture> selector;
+    private GenericAssetSelectionWidget<Texture> selector;
 
     private GameAsset<Texture> asset;
 
@@ -57,7 +57,7 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
 
         asset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
 
-        selector = new AssetSelector<>("sprite", GameAssetType.SPRITE);
+        selector = new GenericAssetSelectionWidget<>(GameAssetType.SPRITE);
         selector.setValue(asset);
         contentWrapper.add(selector).growX().right().expandX();
 
