@@ -15,6 +15,8 @@ import com.talosvfx.talos.runtime.scene.IColorHolder;
 import com.talosvfx.talos.runtime.scene.ISizableComponent;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
+import java.util.UUID;
+
 public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<Texture>, ISizableComponent, IColorHolder {
 
     public transient GameAsset<Texture> defaultGameAsset;
@@ -90,7 +92,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         setGameAsset(assetForIdentifier);
     }
 
-    private void loadTextureFromUniqueIdentifier (String gameResourceIdentifier) {
+    private void loadTextureFromUniqueIdentifier (UUID gameResourceIdentifier) {
         GameAsset<Texture> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForUniqueIdentifier);
     }
@@ -114,8 +116,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID.equals("broken")) {
+        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID == null) {
             String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
             loadTextureFromIdentifier(gameResourceIdentifier);
         } else {

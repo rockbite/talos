@@ -87,7 +87,7 @@ public class GenericAssetSelectionWidget<T> extends Table {
                         fireChangedEvent();
                         assetListPopup.remove();
                     }
-                });
+                }, gameAsset);
             }
         });
         return table;

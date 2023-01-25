@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 import lombok.Getter;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
@@ -105,8 +106,8 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
     public void read(Json json, JsonValue jsonValue) {
         try {
             GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-            String uuid = readGameAssetUniqueIdentifier(jsonValue);
-            if (uuid.equals("broken")) {
+            UUID uuid = readGameAssetUniqueIdentifier(jsonValue);
+            if (uuid == null) {
                 String id = readGameAssetIdentifier(jsonValue);
                 gameAsset = AssetRepository.getInstance().getAssetForIdentifier(id, type);
             } else {
@@ -124,8 +125,13 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
         return jsonValue.getString("id", "broken");
     }
 
-    static String readGameAssetUniqueIdentifier (JsonValue jsonValue) {
-        return jsonValue.getString("uuid", "broken");
+    static UUID readGameAssetUniqueIdentifier (JsonValue jsonValue) {
+        String uuid = jsonValue.getString("uuid", null);
+        if (uuid == null) {
+            return null;
+        } else {
+            return UUID.fromString(uuid);
+        }
     }
 
     @Override

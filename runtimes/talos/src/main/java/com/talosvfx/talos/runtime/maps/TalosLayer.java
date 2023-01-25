@@ -13,6 +13,8 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
+import java.util.UUID;
+
 public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Serializable {
 
 
@@ -142,8 +144,8 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
-		String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-		if (gameResourceUUID.equals("broken")) {
+		UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+		if (gameResourceUUID == null) {
 			String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
 			loadPaletteFromIdentifier(gameResourceIdentifier);
 		} else {
@@ -241,7 +243,7 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		setGameAsset(assetForIdentifier);
 	}
 
-	private void loadPaletteFromUniqueIdentifier (String uniqueIdentifier) {
+	private void loadPaletteFromUniqueIdentifier (UUID uniqueIdentifier) {
 		GameAsset<TilePaletteData> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uniqueIdentifier, GameAssetType.TILE_PALETTE);
 		setGameAsset(assetForUniqueIdentifier);
 	}

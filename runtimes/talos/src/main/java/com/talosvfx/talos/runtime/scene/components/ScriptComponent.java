@@ -11,6 +11,8 @@ import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 
+import java.util.UUID;
+
 public class ScriptComponent extends AComponent implements Json.Serializable, GameResourceOwner<String> {
 
     @Getter
@@ -45,8 +47,8 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID.equals("broken")) {
+        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID == null) {
             String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
             loadScriptFromIdentifier(gameResourceIdentifier);
         } else {
@@ -67,7 +69,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         setGameAsset(assetForIdentifier);
     }
 
-    private void loadScriptFromUniqueIdentifier (String gameResourceUUID) {
+    private void loadScriptFromUniqueIdentifier (UUID gameResourceUUID) {
         GameAsset<String> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SCRIPT);
         setGameAsset(assetForUniqueIdentifier);
     }

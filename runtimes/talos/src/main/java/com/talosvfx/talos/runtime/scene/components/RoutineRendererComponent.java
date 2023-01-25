@@ -19,6 +19,8 @@ import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 
 public class RoutineRendererComponent<T extends BaseRoutineData> extends RendererComponent implements Json.Serializable, GameResourceOwner<T>, ISizableComponent {
 
@@ -66,7 +68,7 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         setGameAsset(assetForIdentifier);
     }
 
-    private void loadRoutineFromUniqueIdentifier (String gameResourceUUID) {
+    private void loadRoutineFromUniqueIdentifier (UUID gameResourceUUID) {
         GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.ROUTINE);
         setGameAsset(assetForUniqueIdentifier);
     }
@@ -83,8 +85,8 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
             }
         }
 
-        String gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID.equals("broken")) {
+        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID == null) {
             String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
             loadRoutineFromIdentifier(gameResourceIdentifier);
         } else {

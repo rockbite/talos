@@ -84,17 +84,17 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	public static final AssetNameFieldFilter ASSET_NAME_FIELD_FILTER = new AssetNameFieldFilter();
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
-	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> uniqueIdentifierGameAssetMap = new ObjectMap<>();
+	private ObjectMap<GameAssetType, ObjectMap<UUID, GameAsset<?>>> uniqueIdentifierGameAssetMap = new ObjectMap<>();
 	private ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
-	public <T> GameAsset<T> getAssetForUniqueIdentifier (String uuid, GameAssetType type) {
+	public <T> GameAsset<T> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
 		if (uniqueIdentifierGameAssetMap.containsKey(type)) {
 			if (uniqueIdentifierGameAssetMap.get(type).containsKey(uuid)) {
 				return (GameAsset<T>)uniqueIdentifierGameAssetMap.get(type).get(uuid);
 			}
 		}
-		GameAsset<T> brokenAsset = new GameAsset<>(uuid, type);
+		GameAsset<T> brokenAsset = new GameAsset<>(uuid.toString(), type);
 		brokenAsset.setBroken(new Exception("No asset found"));
 		brokenAsset.setNonFound(true);
 		return brokenAsset;
@@ -146,7 +146,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		identifierGameAssetMap.get(type).put(identifier, asset);
 	}
 
-	private <T> void putAssetForUniqueIdentifier (String uuid, GameAssetType type, GameAsset<T> asset) {
+	private <T> void putAssetForUniqueIdentifier (UUID uuid, GameAssetType type, GameAsset<T> asset) {
 		if (!uniqueIdentifierGameAssetMap.containsKey(type)) {
 			uniqueIdentifierGameAssetMap.put(type, new ObjectMap<>());
 		}
@@ -164,15 +164,15 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	public <T> GameAsset<T> getAssetForResource (T resource) {
-		ObjectMap.Entries<GameAssetType, ObjectMap<String, GameAsset<?>>> iterator = uniqueIdentifierGameAssetMap.iterator();
+		ObjectMap.Entries<GameAssetType, ObjectMap<UUID, GameAsset<?>>> iterator = uniqueIdentifierGameAssetMap.iterator();
 		while (iterator.hasNext()) {
-			ObjectMap.Entry<GameAssetType, ObjectMap<String, GameAsset<?>>> next = iterator.next();
+			ObjectMap.Entry<GameAssetType, ObjectMap<UUID, GameAsset<?>>> next = iterator.next();
 
-			ObjectMap<String, GameAsset<?>> mapForUniqueIdentifier = next.value;
-			ObjectMap.Entries<String, GameAsset<?>> assetsForUniqueIdentifier = mapForUniqueIdentifier.iterator();
+			ObjectMap<UUID, GameAsset<?>> mapForUniqueIdentifier = next.value;
+			ObjectMap.Entries<UUID, GameAsset<?>> assetsForUniqueIdentifier = mapForUniqueIdentifier.iterator();
 
-			for (ObjectMap.Entry<String, GameAsset<?>> stringGameAssetEntry : assetsForUniqueIdentifier) {
-				GameAsset<?> asset = stringGameAssetEntry.value;
+			for (ObjectMap.Entry<UUID, GameAsset<?>> gameAssetEntry : assetsForUniqueIdentifier) {
+				GameAsset<?> asset = gameAssetEntry.value;
 				if (asset.getResource() == resource) {
 					return (GameAsset<T>)asset;
 				}
@@ -188,9 +188,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	public <T> GameAsset<T> findFirstOfType (GameAssetType gameAssetType) {
-		ObjectMap<String, GameAsset<?>> entries = uniqueIdentifierGameAssetMap.get(gameAssetType);
+		ObjectMap<UUID, GameAsset<?>> entries = uniqueIdentifierGameAssetMap.get(gameAssetType);
 		if (entries != null && entries.size > 0) {
-			for (ObjectMap.Entry<String, GameAsset<?>> entry : entries) {
+			for (ObjectMap.Entry<UUID, GameAsset<?>> entry : entries) {
 				return (GameAsset<T>) entry.value;
 			}
 		}
@@ -650,13 +650,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		return asset.handle.nameWithoutExtension();
 	}
 
-	private String getGameAssetUniqueIdentifierFromRawAsset (RawAsset asset) {
-		return asset.metaData.uuid.toString();
+	private UUID getGameAssetUniqueIdentifierFromRawAsset (RawAsset asset) {
+		return asset.metaData.uuid;
 	}
 
 	private void createGameAsset (FileHandle key, RawAsset value) {
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(value);
-		String gameAssetUniqueIdentifier = getGameAssetUniqueIdentifierFromRawAsset(value);
+		UUID gameAssetUniqueIdentifier = getGameAssetUniqueIdentifierFromRawAsset(value);
 
 		GameAssetType assetTypeFromExtension = null;
 		try {
@@ -1425,7 +1425,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					gameAsset.setUpdated();
 					dataMaps.removeFileHandleGameAssetObjectMap(rawAsset.handle);
 					identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
-					uniqueIdentifierGameAssetMap.get(gameAsset.type).remove(rawAsset.metaData.uuid.toString());
+					uniqueIdentifierGameAssetMap.get(gameAsset.type).remove(rawAsset.metaData.uuid);
 				}
 
 			}

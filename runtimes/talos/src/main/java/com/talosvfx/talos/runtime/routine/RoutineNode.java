@@ -13,6 +13,8 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import lombok.Getter;
 
+import java.util.UUID;
+
 public abstract class RoutineNode {
 
     private GameAsset.GameAssetUpdateListener updateListener;
@@ -213,8 +215,8 @@ public abstract class RoutineNode {
                 try {
                     GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
                     GameAsset gameAsset;
-                    String uuid = jsonValue.getString("uuid", "broken");
-                    if (uuid.equals("broken")) {
+                    UUID uuid = readUUIDFromData(jsonValue);
+                    if (uuid == null) {
                         String id = jsonValue.getString("id", "broken");
                         gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(id, type);
                     } else {
@@ -456,6 +458,15 @@ public abstract class RoutineNode {
 
     public void reset() {
 
+    }
+
+    static UUID readUUIDFromData (JsonValue jsonValue) {
+        String uuidString = jsonValue.getString("uuid", null);
+        if (uuidString == null) {
+            return null;
+        } else {
+            return UUID.fromString(uuidString);
+        }
     }
 
 }
