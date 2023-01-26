@@ -52,43 +52,47 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if (gameObject.hasComponent(PaintSurfaceComponent.class) && selected) {
-            PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        if (!gameObject.hasComponent(PaintSurfaceComponent.class)) return;
+        if (!gameObject.isEditorVisible()) return;
 
-            Texture resource = surface.getGameResource().getResource();
-            if (resource != null && !surface.getGameResource().isBroken()) {
+        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
-                boolean sizeIsDifferent = false;
+        Texture resource = surface.getGameResource().getResource();
+        if (resource != null && !surface.getGameResource().isBroken()) {
 
-                Vector2 size = surface.size;
-                int worldWidth = ((int) size.x);
-                int worldHeight = ((int) size.y);
-                if (frameBuffer != null) {
-                    if (frameBuffer.getWidth() != worldWidth || frameBuffer.getHeight() != worldHeight) {
-                        sizeIsDifferent = true;
-                    }
+            boolean sizeIsDifferent = false;
+
+            Vector2 size = surface.size;
+            int worldWidth = ((int) size.x);
+            int worldHeight = ((int) size.y);
+            if (frameBuffer != null) {
+                if (frameBuffer.getWidth() != worldWidth || frameBuffer.getHeight() != worldHeight) {
+                    sizeIsDifferent = true;
                 }
+            }
 
-                if (brushTexture == null) {
-                    createBrushTexture();
+            if (brushTexture == null) {
+                createBrushTexture();
+            }
+
+            if (frameBuffer == null || sizeIsDifferent) {
+                FrameBuffer fbo = createFrameBuffer();
+                if (fbo == null) {
+                    // framebuffer creation was unsuccessful, skip
+                    return;
                 }
+            }
 
-                if (frameBuffer == null || sizeIsDifferent) {
-                    FrameBuffer fbo = createFrameBuffer();
-                    if (fbo == null) {
-                        // framebuffer creation was unsuccessful, skip
-                        return;
-                    }
-                }
+            color.a = surface.overlay;
+            batch.setColor(color);
+            batch.draw(resource, getX() - size.x / 2f, getY() - size.y / 2f, size.x, size.y);
+            batch.setColor(Color.WHITE);
 
-                color.a = surface.overlay;
-                batch.setColor(color);
-                batch.draw(resource, getX() - size.x / 2f, getY() - size.y / 2f, size.x, size.y);
-                batch.setColor(Color.WHITE);
 
-                // time to draw the bush
-                if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
+            if (!selected) return;
+            // time to draw the bush
+            if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
                 batch.end();
                 color.set(Color.WHITE);
@@ -234,7 +238,7 @@ public class PaintSurfaceGizmo extends Gizmo {
                 0, 0, resource.getWidth(), resource.getHeight(),
                 false, true);
 
-        gameResource.setResourcePayload(frameBuffer.getColorBufferTexture());
+        Pixmap fromFrameBuffer = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
 
         innerBatch.end();
         frameBuffer.end();
