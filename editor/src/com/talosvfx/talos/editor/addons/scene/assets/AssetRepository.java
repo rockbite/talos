@@ -40,6 +40,8 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.assets.GameAssetExportStructure;
+import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
@@ -502,6 +504,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		ObjectSet<GameAsset<?>> gameAssetsToExport = new ObjectSet<>();
 		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
 
+		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
+			Toasts.getInstance().showInfoToast("Cleaning export directory");
+			settings.getExportPathHandle().deleteDirectory();
+			settings.getExportPathHandle().mkdirs();
+		}
+
 		if (settings.isForceExportAll()) {
 
 			//Gather all assets and export
@@ -533,18 +541,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 
 		FileHandle assetRepoExportFile = settings.getExportPathHandle().child("assetExport.json");
-
-		for (GameAsset<?> gameAsset : gameAssetsToExport) {
-			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
-			assetExportStructure.identifier = gameAsset.nameIdentifier;
-			assetExportStructure.uuid = gameAsset.getRootRawAsset().metaData.uuid.toString();
-			assetExportStructure.type = gameAsset.type;
-			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-				assetExportStructure.absolutePathsOfRawFiles.add(getRelativePathToProjectRepoFile(assetRepoExportFile, dependentRawAsset));
-			}
-			gameAssetExportStructure.gameAssets.add(assetExportStructure);
-		}
-
 		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
 
 //
@@ -601,15 +597,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 //		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
 	}
 
-	private String getRelativePathToProjectRepoFile (FileHandle assetRepoExportFile, RawAsset dependentRawAsset) {
-		FileHandle handle = dependentRawAsset.handle;
 
-		FileHandle rootExportDir = assetRepoExportFile.parent();
-
-
-		throw new GdxRuntimeException("todo");
-
-	}
 
 	private void exportToTargetDir (ObjectSet<GameAsset<?>> gameAssetsToExport, AssetRepositoryCatalogueExportOptions settings, GameAssetsExportStructure gameAssetExportStructure) {
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
@@ -633,14 +621,45 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 
 			for (RawAsset dependentRawAsset : dependentRawAssets) {
-				dependentRawAsset.handle.copyTo(destinationForChildDirectory);
-//				assetExportStructure.absolutePathsOfRawFiles.add(getRelativePathToProjectRepoFile(assetRepoExportFile, dependentRawAsset));
+
+				//We need folder structure
+				FileHandle projectDir = SharedResources.currentProject.getProjectDir();
+				String relativeFromRootDir = getRelativePathFromRoot(projectDir, dependentRawAsset.handle);
+				FileHandle dirToCopyInto = destinationForChildDirectory.child(relativeFromRootDir);
+				if (!dirToCopyInto.exists()) {
+					dirToCopyInto.mkdirs();
+				}
+				dependentRawAsset.handle.copyTo(dirToCopyInto);
+				copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto);
+
+				assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
 			}
 
 
 			gameAssetExportStructure.gameAssets.add(assetExportStructure);
 
 		}
+	}
+
+	private void copyMetaIfExists (FileHandle handle, FileHandle dirToCopyInto) {
+		FileHandle meta = handle.parent().child(handle.name() + ".meta");
+		if (meta.exists()) {
+			meta.copyTo(dirToCopyInto);
+		}
+	}
+
+	private String getRelativePathFromRoot (FileHandle projectDir, FileHandle pathInsideProjectDir) {
+		String path = projectDir.path();
+		String childPath = pathInsideProjectDir.parent().path();
+		String[] splits = childPath.split(path);
+		if (splits.length != 2) {
+			return "/";
+		}
+		String relativePath = splits[1];
+		if (!relativePath.endsWith("/")) {
+			relativePath += "/";
+		}
+		return relativePath;
 	}
 
 	private void exportGameAsset (AssetRepositoryCatalogueExportOptions settings, GameAssetType gameAssetType, Predicate<GameAsset<?>> acceptancePredicate, ObjectSet<GameAsset<?>> assetsToExportSet) {
@@ -688,16 +707,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 	}
 
-	public static class GameAssetExportStructure {
-		String identifier;
-		String uuid;
-		GameAssetType type;
-		Array<String> absolutePathsOfRawFiles = new Array<>();
-	}
 
-	public static class GameAssetsExportStructure {
-		Array<GameAssetExportStructure> gameAssets = new Array<>();
-	}
 
 	private boolean componentIsResourceOwner (String componentClazz) {
 		try {

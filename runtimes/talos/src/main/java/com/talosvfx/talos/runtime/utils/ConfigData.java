@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.project2;
+package com.talosvfx.talos.runtime.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -27,18 +27,17 @@ public class ConfigData {
 	}
 
 	private void loadTemplateConfigData () {
-		FileHandle list = Gdx.files.internal("addons/scene/go-templates.xml");
+		FileHandle list = Gdx.files.classpath("scene/go-templates.xml");
 
 		XmlReader xmlReader = new XmlReader();
 		gameObjectConfigurationXMLRoot = xmlReader.parse(list);
 
 		componentClassPath = gameObjectConfigurationXMLRoot.getAttribute("componentClassPath");
 
-
 		traverseTree(gameObjectConfigurationXMLRoot.getChildByName("templates"));
 
 		routineConfigMap = new RoutineConfigMap();
-		routineConfigMap.loadFrom(Gdx.files.internal("addons/scene/routine-nodes.xml"));
+		routineConfigMap.loadFrom(Gdx.files.classpath("routine/routine-nodes.xml"));
 	}
 	private void traverseTree (XmlReader.Element root) {
 		Array<XmlReader.Element> templates = root.getChildrenByName("template");

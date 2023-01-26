@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -382,7 +383,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         PopupMenu popupMenu = new PopupMenu();
 
-        ObjectMap<String, XmlReader.Element> confMap = SharedResources.configData.getGameObjectConfigurationMap();
+        ObjectMap<String, XmlReader.Element> confMap = RuntimeContext.getInstance().configData.getGameObjectConfigurationMap();
         for(String key: confMap.keys()) {
             XmlReader.Element element = confMap.get(key);
 

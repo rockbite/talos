@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.render.RenderState;
 
 public class GameObjectActor extends Table {
 
@@ -61,7 +62,7 @@ public class GameObjectActor extends Table {
 
 		uiRenderer.update(gameObject);
 		if (batch instanceof PolygonBatch) {
-			uiRenderer.render((PolygonBatch)batch, new MainRenderer.RenderState(), gameObject);
+			uiRenderer.render((PolygonBatch)batch, new RenderState(), gameObject);
 		}
 
 	}

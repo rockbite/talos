@@ -1,21 +1,17 @@
-package com.talosvfx.talos.editor.data;
+package com.talosvfx.talos.runtime.routine.serialization;
 
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeWidgetMapper;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
-import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
-import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
+import com.talosvfx.talos.runtime.routine.misc.PropertyTypeWrapperMapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Data;
 
 @Data
-public class RoutineStageData extends DynamicNodeStageData implements BaseRoutineData {
+public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 	private transient RoutineInstance routineInstance;
 
@@ -26,8 +22,12 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 	private transient boolean canWrite;
 
 	@Override
+	public void write (Json json) {
+
+	}
+
+	@Override
 	public void read (Json json, JsonValue root) {
-		super.read(json, root);
 		propertyWrappers.clear();
 		JsonValue propertiesJson = root.get("propertyWrappers");
 		if (propertiesJson != null) {
@@ -52,33 +52,7 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 		routineInstance = createInstance(false);
 	}
 
-	@Override
-	public <T extends DynamicNodeStageData> void constructForUI (DynamicNodeStage<T> dynamicNodeStage) {
-		super.constructForUI(dynamicNodeStage);
 
-		canWrite = true;
-		for (NodeWidget node : nodes) {
-			if (node instanceof RoutineExposedVariableNodeWidget) {
-				((RoutineExposedVariableNodeWidget) node).update(getPropertyWrapperWithIndex(((RoutineExposedVariableNodeWidget) node).index));
-			}
-		}
-	}
-
-	@Override
-	public void write (Json json) {
-		super.write(json);
-		json.writeValue("propertyWrapperIndex", exposedPropertyIndex);
-
-		json.writeObjectStart("propertyWrappers");
-		for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-			json.writeObjectStart("property");
-			json.writeValue("className", propertyWrapper.getClass().getName());
-			json.writeValue("property", propertyWrapper);
-			json.writeObjectEnd();
-		}
-		json.writeObjectEnd();
-
-	}
 
 	public PropertyWrapper<?> createNewPropertyWrapper (PropertyType propertyType) {
 		PropertyWrapper<?> propertyWrapper = createPropertyInstanceOfType(propertyType);
@@ -90,7 +64,7 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 
 	private PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
 		try {
-			PropertyWrapper<?> propertyWrapper = PropertyTypeWidgetMapper.getWrapperForPropertyType(type).getConstructor().newInstance();
+			PropertyWrapper<?> propertyWrapper = PropertyTypeWrapperMapper.getWrapperForPropertyType(type).getConstructor().newInstance();
 			return propertyWrapper;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -108,31 +82,14 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 		return null;
 	}
 
-	public void removeExposedVariablesWithIndex (int index) {
-		PropertyWrapper<?> propertyWrapperWithIndex = getPropertyWrapperWithIndex(index);
-		propertyWrappers.removeValue(propertyWrapperWithIndex, true);
-
-		for (NodeWidget node : nodes) {
-			if (node instanceof RoutineExposedVariableNodeWidget) {
-				RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
-				if (widget.index == index) {
-					widget.update(null);
-				}
-			}
-		}
+	@Override
+	public JsonValue getJsonNodes () {
+		return null;
 	}
 
-	public void changeExposedVariableKey (int index, String newKey) {
-		PropertyWrapper<?> propertyWrapper = getPropertyWrapperWithIndex(index);
-		propertyWrapper.propertyName = newKey;
-		for (NodeWidget node : nodes) {
-			if (node instanceof RoutineExposedVariableNodeWidget) {
-				RoutineExposedVariableNodeWidget widget = ((RoutineExposedVariableNodeWidget) node);
-				if (widget.index == index) {
-					widget.update(routineInstance.getPropertyWrapperWithIndex(index));
-				}
-			}
-		}
+	@Override
+	public JsonValue getJsonConnections () {
+		return null;
 	}
 
 	public RoutineInstance createInstance (boolean external) {
