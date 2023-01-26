@@ -13,9 +13,10 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
-import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
+import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 import lombok.Getter;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
@@ -24,9 +25,8 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
     private Cell<SelectBoxWidget> typeSelectorCell;
     private GameAsset<T> gameAsset;
     private GameAssetType type;
-
     @Getter
-    private AssetSelector<T> widget;
+    private GenericAssetSelectionWidget<T> widget;
 
     private Table bottomContainer;
 
@@ -47,7 +47,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
             @Override
             public void report(String value) {
                 type = GameAssetType.valueOf(value);
-                build(type.toString(), "");
+                build(type.toString());
                 fireChangedEvent();
             }
         }, new Supplier<Array<String>>() {
@@ -66,12 +66,12 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
         content.add(bottomContainer).growX();
     }
 
-    public void build(String typeString, String text) {
+    public void build(String typeString) {
         bottomContainer.clear();
 
         type = GameAssetType.valueOf(typeString);
 
-        widget = new AssetSelector<>(text, type);
+        widget = new GenericAssetSelectionWidget<>(type);
         widget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -88,9 +88,9 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
         String typeString = element.getAttribute("type", "");
         if(typeString.equals("")) {
             // widget is generic
-            build("SPRITE", "");
+            build("SPRITE");
         } else {
-            build(typeString, "");
+            build(typeString);
             typeSelectorCell.setActor(null).pad(0);
         }
 
@@ -106,14 +106,32 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
     public void read(Json json, JsonValue jsonValue) {
         try {
             GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-            String identifier = jsonValue.getString("id");
+            UUID uuid = readGameAssetUniqueIdentifier(jsonValue);
+            if (uuid == null) {
+                String id = readGameAssetIdentifier(jsonValue);
+                gameAsset = AssetRepository.getInstance().getAssetForIdentifier(id, type);
+            } else {
+                gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(uuid, type);
+            }
 
-            gameAsset = AssetRepository.getInstance().getAssetForIdentifier(identifier, type);
             this.type = type;
             typeSelector.updateWidget(type.name());
 
             widget.updateWidget(gameAsset);
         } catch (Exception e) {}
+    }
+
+    static String readGameAssetIdentifier (JsonValue jsonValue) {
+        return jsonValue.getString("id", "broken");
+    }
+
+    static UUID readGameAssetUniqueIdentifier (JsonValue jsonValue) {
+        String uuid = jsonValue.getString("uuid", null);
+        if (uuid == null) {
+            return null;
+        } else {
+            return UUID.fromString(uuid);
+        }
     }
 
     @Override
@@ -122,6 +140,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
         if(gameAsset != null) {
             json.writeValue("type", type);
             json.writeValue("id", gameAsset.nameIdentifier);
+            json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
         }
         json.writeObjectEnd();
     }

@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * GameAsset is a potentially complex resource. It links 1+ {@link RawAsset} together to reference
  * all assets required for this GameAsset to load
@@ -67,11 +69,17 @@ public class GameAsset<T> {
 	}
 
 	@Override
-	public boolean equals (Object obj) {
-		if (obj instanceof GameAsset) {
-			GameAsset<?> other = (GameAsset<?>)obj;
-			return other.type == this.type && other.nameIdentifier.equals(nameIdentifier);
-		}
-		return false;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof GameAsset)) return false;
+		GameAsset<?> other = (GameAsset<?>) o;
+		return other.type == this.type
+				&& Objects.equals(nameIdentifier, other.nameIdentifier)
+				&& Objects.equals(getRootRawAsset().metaData.uuid, other.getRootRawAsset().metaData.uuid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nameIdentifier, type, getRootRawAsset().metaData.uuid);
 	}
 }

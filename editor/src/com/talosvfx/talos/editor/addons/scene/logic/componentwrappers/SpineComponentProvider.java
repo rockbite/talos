@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
@@ -23,7 +23,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		AssetSelectWidget<SkeletonData> atlasWidget = new AssetSelectWidget<>("Skeleton", GameAssetType.SKELETON, new Supplier<GameAsset<SkeletonData>>() {
+		PropertyPanelAssetSelectionWidget<SkeletonData> atlasWidget = new PropertyPanelAssetSelectionWidget<>("Skeleton", GameAssetType.SKELETON, new Supplier<GameAsset<SkeletonData>>() {
 			@Override
 			public GameAsset<SkeletonData> get () {
 				return component.getGameResource();

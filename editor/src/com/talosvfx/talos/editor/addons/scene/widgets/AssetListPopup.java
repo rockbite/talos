@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.XmlReader;
@@ -137,6 +138,20 @@ public class AssetListPopup<T> extends VisWindow {
         tree.expandAll();
 
         tree.addItemListener(listener);
+    }
+
+    public void showPopup(Stage stage, Vector2 location, Predicate<FilteredTree.Node<GameAsset<T>>> filter, FilteredTree.ItemListener<GameAsset<T>> listener, @Null GameAsset<T> defaultSelection) {
+        this.showPopup(stage, location, filter, listener);
+
+        if (defaultSelection == null) {
+            // skip
+            return;
+        }
+        FilteredTree.Node<GameAsset<T>> selectedNode = tree.findNode(defaultSelection);
+        if (selectedNode != null) {
+            tree.clearSelection(false);
+            tree.addNodeToSelection(selectedNode);
+        }
     }
 
     @Override

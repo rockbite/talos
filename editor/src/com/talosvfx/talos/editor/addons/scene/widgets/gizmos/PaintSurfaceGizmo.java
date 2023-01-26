@@ -90,18 +90,17 @@ public class PaintSurfaceGizmo extends Gizmo {
                 if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
-                    batch.end();
-                    color.set(Color.WHITE);
-                    color.a = 0.1f;
-                    shapeRenderer.setColor(color);
-                    shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                    Gdx.gl.glEnable(GL20.GL_BLEND);
-                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
-                    shapeRenderer.end();
-                    Gdx.gl.glDisable(GL20.GL_BLEND);
-                    batch.begin();
-                }
+                batch.end();
+                color.set(Color.WHITE);
+                color.a = 0.1f;
+                shapeRenderer.setColor(color);
+                shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                drawBrushPoint(mouseCordsOnScene.x, mouseCordsOnScene.y, paintToolsPane.getSize(), paintToolsPane.getHardness());
+                shapeRenderer.end();
+                Gdx.gl.glDisable(GL20.GL_BLEND);
+                batch.begin();
             }
         }
     }

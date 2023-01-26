@@ -9,7 +9,7 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.maps.LayerType;
 import com.talosvfx.talos.runtime.maps.TalosLayer;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
 
 import java.util.function.Supplier;
@@ -46,7 +46,7 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
                 }
             });
 
-            AssetSelectWidget<TilePaletteData> paletteWidget = new AssetSelectWidget<>("Palette", GameAssetType.TILE_PALETTE, new Supplier<GameAsset<TilePaletteData>>() {
+            PropertyPanelAssetSelectionWidget<TilePaletteData> paletteWidget = new PropertyPanelAssetSelectionWidget<>("Palette", GameAssetType.TILE_PALETTE, new Supplier<GameAsset<TilePaletteData>>() {
                 @Override
                 public GameAsset<TilePaletteData> get() {
                     return layer.getGameResource();
