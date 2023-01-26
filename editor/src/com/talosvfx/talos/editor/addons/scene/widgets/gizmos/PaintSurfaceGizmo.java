@@ -23,6 +23,8 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
+import java.nio.ByteBuffer;
+
 public class PaintSurfaceGizmo extends Gizmo {
 
     private PaintToolsPane paintToolsPane;
@@ -45,7 +47,6 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
 
         shapeRenderer = new ShapeRenderer();
-
         innerBatch = new SpriteBatch();
     }
 
@@ -55,10 +56,32 @@ public class PaintSurfaceGizmo extends Gizmo {
             PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
             Texture resource = surface.getGameResource().getResource();
-            if (resource != null) {
-                float overlay = surface.overlay;
+            if (resource != null && !surface.getGameResource().isBroken()) {
+
+                boolean sizeIsDifferent = false;
+
                 Vector2 size = surface.size;
-                color.a = overlay;
+                int worldWidth = ((int) size.x);
+                int worldHeight = ((int) size.y);
+                if (frameBuffer != null) {
+                    if (frameBuffer.getWidth() != worldWidth || frameBuffer.getHeight() != worldHeight) {
+                        sizeIsDifferent = true;
+                    }
+                }
+
+                if (brushTexture == null) {
+                    createBrushTexture();
+                }
+
+                if (frameBuffer == null || sizeIsDifferent) {
+                    FrameBuffer fbo = createFrameBuffer();
+                    if (fbo == null) {
+                        // framebuffer creation was unsuccessful, skip
+                        return;
+                    }
+                }
+
+                color.a = surface.overlay;
                 batch.setColor(color);
                 batch.draw(resource, getX() - size.x / 2f, getY() - size.y / 2f, size.x, size.y);
                 batch.setColor(Color.WHITE);
@@ -107,7 +130,10 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
-        tmp.set(transformComponent.position).sub(surface.size.x / 2f, surface.size.y / 2f).sub(mouseCordsOnScene).scl(-1);
+        Vector2 surfaceSize = surface.size;
+        int worldWidth = ((int) surfaceSize.x);
+        int worldHeight = ((int) surfaceSize.y);
+        tmp.set(transformComponent.position).sub(worldWidth / 2f, worldHeight / 2f).sub(mouseCordsOnScene).scl(-1);
 
         frameBuffer.begin();
         innerBatch.begin();
@@ -121,25 +147,36 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
 
         innerBatch.draw(brushTexture,
-                tmp.x - brushTexture.getWidth() / 2f, surface.size.y - (tmp.y - brushTexture.getHeight() / 2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
+                tmp.x - brushTexture.getWidth() / 2f, worldHeight - (tmp.y - brushTexture.getHeight() / 2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
 
         innerBatch.end();
 
-        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
+
+        Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
 
         frameBuffer.end();
 
+        int width = worldWidth;
+        int height = worldHeight;
         GameAsset<Texture> gameAsset = surface.gameAsset;
         if (!gameAsset.isBroken()) {
             Texture resource = gameAsset.getResource();
             TextureData textureData = resource.getTextureData();
+            width = textureData.getWidth();
+            height = textureData.getHeight();
             if (textureData instanceof PixmapTextureData) {
                 textureData.consumePixmap().dispose();
             }
             resource.dispose();
         }
 
-        Texture texture = new Texture(pixmap);
+        Pixmap newPixmap = new Pixmap(width, height, pixmap.getFormat());
+        newPixmap.drawPixmap(pixmap,
+                0, 0, pixmap.getWidth(), pixmap.getHeight(),
+                0, 0, newPixmap.getWidth(), newPixmap.getHeight()
+        );
+        pixmap.dispose();
+        Texture texture = new Texture(newPixmap);
 
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         surface.gameAsset.setResourcePayload(texture);
@@ -150,27 +187,6 @@ public class PaintSurfaceGizmo extends Gizmo {
     public void touchDown(float x, float y, int button) {
         previousKeyboardFocus = SharedResources.stage.getKeyboardFocus();
         SharedResources.stage.setKeyboardFocus(this);
-
-        if (brushTexture == null) {
-            createBrushTexture();
-        }
-        boolean sizeIsDifferent = false;
-
-        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        Texture resource = surface.getGameResource().getResource();
-        if (frameBuffer != null) {
-            if (frameBuffer.getWidth() != resource.getWidth() || frameBuffer.getHeight() != resource.getHeight()) {
-                sizeIsDifferent = true;
-            }
-        }
-
-        if (frameBuffer == null || sizeIsDifferent) {
-            FrameBuffer fbo = createFrameBuffer();
-            if (fbo == null) {
-                // framebuffer creation was unsuccessful, skip
-                return;
-            }
-        }
 
         drawBrushToBuffer();
     }
@@ -200,28 +216,29 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
         Texture resource = gameResource.getResource();
         resource.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, resource.getWidth(), resource.getHeight(), false);
+        Vector2 bufferSize = surface.size;
+        int worldWidth = ((int) bufferSize.x);
+        int worldHeight = ((int) bufferSize.y);
+        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, worldWidth, worldHeight, false);
 
-        Viewport viewport = new FitViewport(resource.getWidth(), resource.getHeight());
-        viewport.setWorldSize(resource.getWidth(), resource.getHeight());
+        Viewport viewport = new FitViewport(worldWidth, worldHeight);
+        viewport.setWorldSize(worldWidth, worldHeight);
         viewport.apply(true);
 
-
         frameBuffer.begin();
-        innerBatch.disableBlending();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        Gdx.gl.glClearColor(1, 1, 1, 0f);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        innerBatch.setProjectionMatrix(viewport.getCamera().combined);
+
         innerBatch.begin();
-        innerBatch.draw(resource, 0, 0f, resource.getWidth(), resource.getHeight(),
+        innerBatch.setProjectionMatrix(viewport.getCamera().combined);
+        innerBatch.draw(resource, 0, 0f, worldWidth, worldHeight,
                 0, 0, resource.getWidth(), resource.getHeight(),
                 false, true);
+
+        gameResource.setResourcePayload(frameBuffer.getColorBufferTexture());
+
         innerBatch.end();
         frameBuffer.end();
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        innerBatch.enableBlending();
 
         return frameBuffer;
     }
@@ -296,9 +313,7 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public boolean hit(float x, float y) {
-        if (!selected) return false;
-
-        return true;
+        return selected;
     }
 
     @Override
