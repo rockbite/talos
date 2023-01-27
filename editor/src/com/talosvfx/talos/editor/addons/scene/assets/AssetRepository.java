@@ -76,6 +76,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.Deflater;
 
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
@@ -1798,12 +1799,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		if (!oldPixmap.isDisposed()) {
 			oldPixmap.dispose();
 		}
-		if (!newPixmap.isDisposed()) {
-			newPixmap.dispose();
-		}
 
 		// fire asset resolution changed event
-		Notifications.fireEvent(Notifications.obtainEvent(AssetResolutionChanged.class));
+		final AssetResolutionChanged event = Notifications.obtainEvent(AssetResolutionChanged.class);
+		event.setFileHandle(fileHandle);
+		Notifications.fireEvent(event);
 	}
 
 	public void fillAssetColor (GameAsset<Texture> gameAsset, Color color)  {
