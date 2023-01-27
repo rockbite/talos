@@ -27,6 +27,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -1661,6 +1662,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			populateChildren(file, rootNode);
 
 			file.moveTo(destination);
+			Notifications.fireEvent(Notifications.obtainEvent(DirectoryMovedEvent.class).set(file, destination));
 
 			updateChildReferences(rootNode);
 
