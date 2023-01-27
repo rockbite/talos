@@ -359,6 +359,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		nodeStage.data.nodes.removeValue(node, true);
 		mainContainer.removeActor(node);
+		if (ccFromNode == node) {
+			ccFromNode = null;
+		}
 
 		node.notifyRemoved();
 		unRegisterNode(node);
