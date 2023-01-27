@@ -71,7 +71,6 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
-import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
@@ -953,7 +952,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		gizmos.gizmoList.clear();
 		gizmos.gizmoMap.clear();
 		gizmos.gizmoList.add(groupSelectionGizmo);
-		initGizmos(mainScene, this);
+
+		boolean shouldRegisterRoot = mainScene instanceof Prefab;
+
+		createAndInitGizmos(mainScene, mainScene.getSelfObject(), this, shouldRegisterRoot);
 
 		clearSelection();
 
@@ -1020,13 +1022,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
-		initGizmos(getRootSceneObject(), gameObject, this);
+		createAndInitGizmos(getRootSceneObject(), gameObject, this, true);
 	}
 
 	@EventHandler
 	public void onComponentRemove (ComponentRemoved event) {
 		removeGizmos(event.getGameObject());
-		initGizmos(event.getGameObject(), this);
+		createAndInitGizmos(getRootSceneObject(), event.getGameObject(), this, true);
 	}
 
 	@EventHandler

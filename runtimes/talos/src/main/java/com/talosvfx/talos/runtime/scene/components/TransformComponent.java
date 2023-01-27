@@ -24,6 +24,9 @@ public class TransformComponent extends AComponent {
     public static Array<GameObject> tmp = new Array<>();
     public static Vector2 vec = new Vector2();
     public static Vector2 localToWorld(GameObject gameObject, Vector2 vector) {
+        //gameObject is null so we dont do anything
+        if (gameObject == null) return vector;
+
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 
@@ -43,7 +46,20 @@ public class TransformComponent extends AComponent {
     }
 
     public static Vector2 worldToLocal(GameObject gameObject, Vector2 vector) {
-        if(gameObject.parent == null) return vector;
+        if(gameObject == null) {
+            return vector;
+        }
+        if(gameObject.parent == null) {
+
+            //Check if root has transform component
+            if (gameObject.hasComponent(TransformComponent.class)) {
+                TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+
+                untransformVectorByTransform(vector, transform);
+            }
+
+            return vector;
+        }
 
         tmp.clear();
         tmp = getRootChain(gameObject, tmp);
@@ -53,14 +69,17 @@ public class TransformComponent extends AComponent {
             if(item.hasComponent(TransformComponent.class)) {
                 TransformComponent transform = item.getComponent(TransformComponent.class);
 
-
-                vector.sub(transform.position);
-                vector.rotateDeg(-transform.rotation);
-                vector.scl(1f/transform.scale.x, 1f/transform.scale.y);
+                untransformVectorByTransform(vector, transform);
             }
         }
 
         return vector;
+    }
+
+    private static void untransformVectorByTransform (Vector2 vector, TransformComponent transform) {
+        vector.sub(transform.position);
+        vector.rotateDeg(-transform.rotation);
+        vector.scl(1f/ transform.scale.x, 1f/ transform.scale.y);
     }
 
     private static Array<GameObject> getRootChain(GameObject currObject, Array<GameObject> chain) {

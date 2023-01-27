@@ -645,24 +645,20 @@ public abstract class ViewportWidget extends Table {
 		gizmos.gizmoMap.remove(gameObject);
 	}
 
-	public void initGizmos (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
-		makeGizmosFor(gameObjectContainer, gameObject, parent);
+	protected void createAndInitGizmos (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent, boolean makeGizmoForRoot) {
+		if (makeGizmoForRoot) {
+			makeGizmosFor(gameObjectContainer, gameObject, parent);
+		}
 		Array<GameObject> childObjects = gameObject.getGameObjects();
 		if (childObjects != null) {
 			for (GameObject childObject : childObjects) {
-				makeGizmosFor(gameObjectContainer, childObject, parent);
-				initGizmos(gameObjectContainer,childObject, parent);
+				createAndInitGizmos(gameObjectContainer,childObject, parent, true);
 			}
 		}
 	}
 
-	public void initGizmos (GameObjectContainer gameObjectContainer, ViewportWidget parent) {
-		Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
-		if (childObjects != null) {
-			for (GameObject childObject : childObjects) {
-				initGizmos(gameObjectContainer, childObject, parent);
-			}
-		}
+	public void initGizmos (GameObjectContainer gameObjectContainer, ViewportWidget parent, boolean makeGizmoForRoot) {
+		createAndInitGizmos(gameObjectContainer, gameObjectContainer.getSelfObject(), parent, makeGizmoForRoot);
 	}
 
 	public void makeGizmosFor (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
