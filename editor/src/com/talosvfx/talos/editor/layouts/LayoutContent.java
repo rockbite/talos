@@ -134,17 +134,19 @@ public class LayoutContent extends LayoutItem {
 		addContent(layoutApp, copy, true);
 	}
 	public void addContent (LayoutApp layoutApp, boolean copy, boolean swapToActive) {
-		layoutApp.setDestroyCallback(new DestroyCallback() {
-			@Override
-			public void onDestroyRequest () {
-				grid.removeApp(LayoutContent.this, layoutApp);
-				layoutApp.setDestroyCallback(null);
-			}
-		});
+		if (!copy) {
+			layoutApp.setDestroyCallback(new DestroyCallback() {
+				@Override
+				public void onDestroyRequest () {
+					grid.removeApp(LayoutContent.this, layoutApp);
+					layoutApp.setDestroyCallback(null);
+				}
+			});
 
-		layoutApp.setLayoutContent(this);
+			layoutApp.setLayoutContent(this);
 
-		apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
+			apps.put(layoutApp.getUniqueIdentifier(), layoutApp);
+		}
 
 		if (copy) {
 			tabBar.add(layoutApp.copyTabWidget()).growY();

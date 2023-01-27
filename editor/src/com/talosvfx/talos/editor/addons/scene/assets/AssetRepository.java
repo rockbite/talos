@@ -40,6 +40,8 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.assets.GameAssetExportStructure;
+import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
@@ -499,9 +501,19 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	public void exportToFile (AssetRepositoryCatalogueExportOptions settings) { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
 
+		ObjectSet<GameAsset<?>> gameAssetsToExport = new ObjectSet<>();
+		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+
+		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
+			Toasts.getInstance().showInfoToast("Cleaning export directory");
+			settings.getExportPathHandle().deleteDirectory();
+			settings.getExportPathHandle().mkdirs();
+		}
+
 		if (settings.isForceExportAll()) {
 
 			//Gather all assets and export
+			Toasts.getInstance().showInfoToast("Exporting all");
 
 			Predicate<GameAsset<?>> forceAllPredicate = new Predicate<GameAsset<?>>() {
 				@Override
@@ -510,87 +522,157 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				}
 			};
 
-			exportGameAsset(settings, GameAssetType.SPRITE, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.SCRIPT, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.ROUTINE, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.SOUND, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.SKELETON, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.VFX, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.PREFAB, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.SCENE, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.TILE_PALETTE, forceAllPredicate);
-			exportGameAsset(settings, GameAssetType.LAYOUT_DATA, forceAllPredicate);
 
-			logger.info("todo export force");
+			exportGameAsset(settings, GameAssetType.SPRITE, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.SCRIPT, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.ROUTINE, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.SOUND, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.SKELETON, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.VFX, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.PREFAB, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.SCENE, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.TILE_PALETTE, forceAllPredicate, gameAssetsToExport);
+			exportGameAsset(settings, GameAssetType.LAYOUT_DATA, forceAllPredicate, gameAssetsToExport);
+
+			exportToTargetDir(gameAssetsToExport, settings, gameAssetExportStructure);
 		} else {
 			logger.info("todo check all  other cases");
 
-
-
 		}
 
-		String projectPath = SharedResources.currentProject.getProjectDir().path();
-
-		FileHandle scenes = Gdx.files.absolute(projectPath).child("scenes");
-		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
-		if (scenes.exists()) {
-			for (FileHandle handle : scenes.list()) {
-				JsonValue scene = new JsonReader().parse(handle);
-
-				JsonValue gameObjects = scene.get("gameObjects");
-				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
-			}
-		}
-
-		//Find all prefabs
-		FileHandle assets = Gdx.files.absolute(projectPath).child("assets");
-		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
-		findAllPrefabs(assets, identifiersBeingUsedByComponents);
-
-
-		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
-		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
-
-			//we need to get the identifier and type pairs
-
-			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
-			if (gameAsset == null) {
-				System.out.println("Game asset is null, not exporting");
-				continue;
-			}
-			if (gameAsset.isBroken()) {
-				System.out.println("Game asset is broken, not exporting");
-				continue;
-			}
-
-			gameAssetsToExport.add(gameAsset);
-			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
-		}
-
-		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
-
-		for (GameAsset<?> gameAsset : gameAssetsToExport) {
-			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
-			assetExportStructure.identifier = gameAsset.nameIdentifier;
-			assetExportStructure.type = gameAsset.type;
-			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
-			}
-			gameAssetExportStructure.gameAssets.add(assetExportStructure);
-		}
-
-		FileHandle assetRepoExportFile = Gdx.files.absolute(projectPath).child("assetExport.json");
+		FileHandle assetRepoExportFile = settings.getExportPathHandle().child("assetExport.json");
 		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+
+//
+//		String projectPath = SharedResources.currentProject.getProjectDir().path();
+//
+//		FileHandle scenes = Gdx.files.absolute(projectPath).child("scenes");
+//		ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents = new ObjectSet<>();
+//		if (scenes.exists()) {
+//			for (FileHandle handle : scenes.list()) {
+//				JsonValue scene = new JsonReader().parse(handle);
+//
+//				JsonValue gameObjects = scene.get("gameObjects");
+//				collectExportedAssetsArrayGameObjects(gameObjects, identifiersBeingUsedByComponents);
+//			}
+//		}
+//
+//		//Find all prefabs
+//		FileHandle assets = Gdx.files.absolute(projectPath).child("assets");
+//		//Find all prefabs and do same shit as above, export the prefab GameAsset as well as the .prefabs
+//		findAllPrefabs(assets, identifiersBeingUsedByComponents);
+//
+//
+//		Array<GameAsset<?>> gameAssetsToExport = new Array<>();
+//		for (TypeIdentifierPair identPair : identifiersBeingUsedByComponents) {
+//
+//			//we need to get the identifier and type pairs
+//
+//			GameAsset<?> gameAsset = getAssetForIdentifier(identPair.identifier, identPair.type);
+//			if (gameAsset == null) {
+//				System.out.println("Game asset is null, not exporting");
+//				continue;
+//			}
+//			if (gameAsset.isBroken()) {
+//				System.out.println("Game asset is broken, not exporting");
+//				continue;
+//			}
+//
+//			gameAssetsToExport.add(gameAsset);
+//			gameAssetsToExport.addAll(gameAsset.dependentGameAssets); //Add any dependnet game assets
+//		}
+//
+//
+//		for (GameAsset<?> gameAsset : gameAssetsToExport) {
+//			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
+//			assetExportStructure.identifier = gameAsset.nameIdentifier;
+//			assetExportStructure.type = gameAsset.type;
+//			for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
+//				assetExportStructure.absolutePathsOfRawFiles.add(dependentRawAsset.handle.path());
+//			}
+//			gameAssetExportStructure.gameAssets.add(assetExportStructure);
+//		}
+//
+//		FileHandle assetRepoExportFile = Gdx.files.absolute(projectPath).child("assetExport.json");
+//		assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
 	}
 
-	private void exportGameAsset (AssetRepositoryCatalogueExportOptions settings, GameAssetType gameAssetType, Predicate<GameAsset<?>> forceAllPredicate) {
+
+
+	private void exportToTargetDir (ObjectSet<GameAsset<?>> gameAssetsToExport, AssetRepositoryCatalogueExportOptions settings, GameAssetsExportStructure gameAssetExportStructure) {
+		for (GameAsset<?> gameAsset : gameAssetsToExport) {
+
+			Array<RawAsset> dependentRawAssets = gameAsset.dependentRawAssets;
+
+			GameAssetType type = gameAsset.type;
+
+			FileHandle exportPathHandle = settings.getExportPathHandle();
+			FileHandle destinationForChildDirectory = exportPathHandle.child(type.name());
+
+			if (!destinationForChildDirectory.exists()) {
+				destinationForChildDirectory.mkdirs();
+			}
+
+
+			GameAssetExportStructure assetExportStructure = new GameAssetExportStructure();
+			assetExportStructure.identifier = gameAsset.nameIdentifier;
+			assetExportStructure.uuid = gameAsset.getRootRawAsset().metaData.uuid.toString();
+			assetExportStructure.type = gameAsset.type;
+
+
+			for (RawAsset dependentRawAsset : dependentRawAssets) {
+
+				//We need folder structure
+				FileHandle projectDir = SharedResources.currentProject.getProjectDir();
+				String relativeFromRootDir = getRelativePathFromRoot(projectDir, dependentRawAsset.handle);
+				FileHandle dirToCopyInto = destinationForChildDirectory.child(relativeFromRootDir);
+				if (!dirToCopyInto.exists()) {
+					dirToCopyInto.mkdirs();
+				}
+				dependentRawAsset.handle.copyTo(dirToCopyInto);
+				copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto);
+
+				assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
+			}
+
+
+			gameAssetExportStructure.gameAssets.add(assetExportStructure);
+
+		}
+	}
+
+	private void copyMetaIfExists (FileHandle handle, FileHandle dirToCopyInto) {
+		FileHandle meta = handle.parent().child(handle.name() + ".meta");
+		if (meta.exists()) {
+			meta.copyTo(dirToCopyInto);
+		}
+	}
+
+	private String getRelativePathFromRoot (FileHandle projectDir, FileHandle pathInsideProjectDir) {
+		String path = projectDir.path();
+		String childPath = pathInsideProjectDir.parent().path();
+		String[] splits = childPath.split(path);
+		if (splits.length != 2) {
+			return "/";
+		}
+		String relativePath = splits[1];
+		if (!relativePath.endsWith("/")) {
+			relativePath += "/";
+		}
+		return relativePath;
+	}
+
+	private void exportGameAsset (AssetRepositoryCatalogueExportOptions settings, GameAssetType gameAssetType, Predicate<GameAsset<?>> acceptancePredicate, ObjectSet<GameAsset<?>> assetsToExportSet) {
 		Array<GameAsset<Object>> assetsForType = getAssetsForType(gameAssetType);
-		Array<GameAsset<Object>> markedForExport = new Array<>();
 		for (GameAsset<Object> objectGameAsset : assetsForType) {
-			if (forceAllPredicate.evaluate(objectGameAsset)) {
-				markedForExport.add(objectGameAsset);
+			if (acceptancePredicate.evaluate(objectGameAsset)) {
+				assetsToExportSet.add(objectGameAsset);
+				assetsToExportSet.addAll(objectGameAsset.dependentGameAssets);
 			}
 		}
+
+
+
 	}
 
 	private void findAllPrefabs (FileHandle assets, ObjectSet<TypeIdentifierPair> identifiersBeingUsedByComponents) {
@@ -625,15 +707,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 	}
 
-	public static class GameAssetExportStructure {
-		String identifier;
-		GameAssetType type;
-		Array<String> absolutePathsOfRawFiles = new Array<>();
-	}
 
-	public static class GameAssetsExportStructure {
-		Array<GameAssetExportStructure> gameAssets = new Array<>();
-	}
 
 	private boolean componentIsResourceOwner (String componentClazz) {
 		try {
