@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -43,7 +44,9 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 			@Override
 			public void clicked(ButtonPropertyWidget<String> widget) {
 				//Edit this tls
-				RawAsset rootRawAsset = component.getGameResource().getRootRawAsset();
+				if (component.gameAsset != null) {
+					SharedResources.appManager.openNewAsset(component.gameAsset);
+				}
 			}
 		}, new Supplier<String>() {
 			@Override
