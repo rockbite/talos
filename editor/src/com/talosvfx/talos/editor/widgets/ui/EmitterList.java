@@ -262,17 +262,14 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
         preview.getDescriptor().removeEmitter(wrapper.getEmitter());
         Array<ParticleEmitterWrapper> activeWrappers = editorApp.getEditorState().activeWrappers;
 
-
         activeWrappers.removeValue(wrapper, true);
-        if (activeWrappers.size > 0) {
-            editorApp.getModuleBoardWidget().currentEmitterWrapper = activeWrappers.peek();
-        } else {
-            editorApp.getModuleBoardWidget().currentEmitterWrapper = null;
+        if (activeWrappers.size  <= 0) {
+            createNewEmitterClicked();
         }
+        editorApp.getModuleBoardWidget().setCurrentEmitter(activeWrappers.peek());
 
         //todo : node stage onEmitterRemoved call needed?
 
         setEmitters(activeWrappers);
-
     }
 }
