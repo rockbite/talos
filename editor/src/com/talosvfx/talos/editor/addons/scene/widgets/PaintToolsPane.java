@@ -57,7 +57,7 @@ public class PaintToolsPane extends Table implements Observer {
         erase = new SquareButton(getSkin(), getSkin().getDrawable("eraser_icon"), true, "Eraser");
         ButtonGroup<SquareButton> buttonButtonGroup = new ButtonGroup<>();
         buttonButtonGroup.setMaxCheckCount(1);
-        buttonButtonGroup.setMinCheckCount(0);
+        buttonButtonGroup.setMinCheckCount(1);
         buttonButtonGroup.add(paint, erase);
         paint.setChecked(true);
 
@@ -82,19 +82,19 @@ public class PaintToolsPane extends Table implements Observer {
         sizeWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
         hardnessWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
         colorWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 fullColor.set(colorWidget.getValue());
                 applyChannelFilterToColor();
             }
@@ -102,14 +102,14 @@ public class PaintToolsPane extends Table implements Observer {
         opacityWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
             }
         });
 
         paint.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 currentTool = Tool.BRUSH;
             }
         });
@@ -117,7 +117,7 @@ public class PaintToolsPane extends Table implements Observer {
         erase.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                paintSurfaceGizmo.brushTexture = null;
+                paintSurfaceGizmo.destroyBrushTexture();
                 currentTool = Tool.ERASER;
             }
         });
@@ -126,17 +126,17 @@ public class PaintToolsPane extends Table implements Observer {
 
     private void applyChannelFilterToColor() {
         PaintSurfaceComponent surface = paintSurfaceGizmo.getGameObject().getComponent(PaintSurfaceComponent.class);
-        if(!surface.redChannel) {
+        if (!surface.redChannel) {
             colorWidget.getValue().r = 0;
         } else {
             colorWidget.getValue().r = fullColor.r;
         }
-        if(!surface.greenChannel) {
+        if (!surface.greenChannel) {
             colorWidget.getValue().g = 0;
         } else {
             colorWidget.getValue().g = fullColor.g;
         }
-        if(!surface.blueChannel) {
+        if (!surface.blueChannel) {
             colorWidget.getValue().b = 0;
         } else {
             colorWidget.getValue().b = fullColor.b;
@@ -176,14 +176,14 @@ public class PaintToolsPane extends Table implements Observer {
 
         Pools.get(Vector2.class).free(vec);
 
-        if(bracketDown > 0) {
+        if (bracketDown > 0) {
             bracketStartCoolDown -= Gdx.graphics.getDeltaTime();
 
-            if(bracketStartCoolDown <= 0) {
+            if (bracketStartCoolDown <= 0) {
                 bracketStartCoolDown = 0f;
 
                 bracketCoolDown -= Gdx.graphics.getDeltaTime();
-                if(bracketCoolDown <= 0) {
+                if (bracketCoolDown <= 0) {
                     bracketCoolDown = 0.1f;
                     if (bracketDown == Input.Keys.LEFT_BRACKET) {
                         decreaseSize();
@@ -200,11 +200,11 @@ public class PaintToolsPane extends Table implements Observer {
     }
 
     public int getSize() {
-        return (int)sizeWidget.getValue().floatValue();
+        return (int) sizeWidget.getValue().floatValue();
     }
 
     public float getHardness() {
-        return hardnessWidget.getValue()/100f;
+        return hardnessWidget.getValue() / 100f;
     }
 
     public Color getColor() {
@@ -214,8 +214,8 @@ public class PaintToolsPane extends Table implements Observer {
     private float getSizeDiff() {
         float size = getSize();
         float diff = 1;
-        if(size >= 10) diff = 5;
-        if(size >= 50) diff = 10;
+        if (size >= 10) diff = 5;
+        if (size >= 50) diff = 10;
 
         return diff;
     }
@@ -224,7 +224,8 @@ public class PaintToolsPane extends Table implements Observer {
         float size = getSize();
         float diff = getSizeDiff();
         float newSize = (float) (Math.floor(size / diff) * diff);
-        if(size == newSize) size -= diff; else size = newSize;
+        if (size == newSize) size -= diff;
+        else size = newSize;
         sizeWidget.setValue(size);
     }
 
@@ -232,7 +233,8 @@ public class PaintToolsPane extends Table implements Observer {
         float size = getSize();
         float diff = getSizeDiff();
         float newSize = (float) (Math.ceil(size / diff) * diff);
-        if(size == newSize) size += diff; else size = newSize;
+        if (size == newSize) size += diff;
+        else size = newSize;
         sizeWidget.setValue(size);
     }
 
@@ -255,7 +257,7 @@ public class PaintToolsPane extends Table implements Observer {
     }
 
     public float getOpacity() {
-        return opacityWidget.getValue()/100;
+        return opacityWidget.getValue() / 100;
     }
 
     public Tool getCurrentTool() {

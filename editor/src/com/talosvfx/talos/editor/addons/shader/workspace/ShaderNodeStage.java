@@ -68,10 +68,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         return root;
     }
 
-    @Override
-    public void onUpdate () {
 
-    }
 
     @Override
     public NodeWidget createNode (String nodeName, float screenX, float y) {

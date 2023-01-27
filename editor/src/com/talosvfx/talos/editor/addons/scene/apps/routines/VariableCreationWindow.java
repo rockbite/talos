@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeMappers;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeWidgetMapper;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.CustomVarWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
@@ -153,7 +153,7 @@ public class VariableCreationWindow extends Table {
 
             try {
                 PropertyType type = propertyWrapper.getType();
-                ATypeWidget innerWidget = ClassReflection.newInstance(PropertyTypeMappers.getWidgetForPropertyTYpe(type));
+                ATypeWidget innerWidget = ClassReflection.newInstance(PropertyTypeWidgetMapper.getWidgetForPropertyTYpe(type));
                 CustomVarWidget widget = new CustomVarWidget(routineStage, innerWidget, propertyWrapper.index);
                 widget.setValue(propertyWrapper.propertyName);
                 inner.add(widget).padTop(2).growX();

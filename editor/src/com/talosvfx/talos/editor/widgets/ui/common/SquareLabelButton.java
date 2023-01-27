@@ -1,10 +1,9 @@
 package com.talosvfx.talos.editor.widgets.ui.common;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class SquareLabelButton extends Button {
 
@@ -20,7 +19,7 @@ public class SquareLabelButton extends Button {
         setStyle(skin.get("square", ButtonStyle.class));
 
         setSize(24, 24);
-        buttonTextLabel = new Label(buttonText, skin, "small");
+        buttonTextLabel = new LabelWithZoom(buttonText, skin, "small");
 
         add(buttonTextLabel).center().padBottom(2);
     }

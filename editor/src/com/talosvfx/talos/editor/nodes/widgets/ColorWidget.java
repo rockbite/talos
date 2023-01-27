@@ -11,9 +11,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class ColorWidget extends AbstractWidget<Color> {
 
@@ -27,7 +27,7 @@ public class ColorWidget extends AbstractWidget<Color> {
 
         Label label = null;
         if(text != null) {
-            label = new Label(text, skin);
+            label = new LabelWithZoom(text, skin);
         }
 
 

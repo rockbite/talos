@@ -27,7 +27,7 @@ public class RenderQuadNode extends RoutineNode {
         drawableQuad.z = z;
         drawableQuad.size.set(width, height);
 
-        GameAsset<Texture> asset = fetchAssetValue("sprite");
+        GameAsset<Texture> asset = (GameAsset<Texture>) fetchAssetValue("sprite");
 
         if (asset == null || asset.getRootRawAsset() == null) {
             return;

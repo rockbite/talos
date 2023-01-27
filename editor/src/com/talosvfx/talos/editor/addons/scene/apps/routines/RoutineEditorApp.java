@@ -143,11 +143,16 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
         Notifications.unregisterObserver(routineStage);
 
+        if (this.gameAsset != null) {
+            this.gameAsset.listeners.removeValue(this, true);
+        }
+
     }
 
     @Override
     public void onUpdate() {
         variableCreationWindow.setRoutineName(gameAsset.nameIdentifier);
+        routineStage.loadFrom(gameAsset);
     }
 
     public void applyFromPreferences(ViewportPreferences prefs) {

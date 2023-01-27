@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -29,9 +30,9 @@ import com.talosvfx.talos.runtime.vfx.modules.Vector3Module;
 
 public class Vector3ModuleWrapper extends ModuleWrapper<Vector3Module> implements IDragPointProvider {
 
-	private VisTextField xField;
-	private VisTextField yField;
-	private VisTextField zField;
+	private TextField xField;
+	private TextField yField;
+	private TextField zField;
 
 	private DragPoint dragPoint;
 

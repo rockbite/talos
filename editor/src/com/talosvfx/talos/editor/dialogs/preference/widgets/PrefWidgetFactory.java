@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.XmlReader;
@@ -12,9 +11,10 @@ import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.notifications.GlobalActions;
 import com.talosvfx.talos.editor.project2.SharedResources;
-import com.talosvfx.talos.editor.widgets.ui.common.CollapsableWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.FileOpenField;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 
 public class PrefWidgetFactory {
 
@@ -82,7 +82,7 @@ public class PrefWidgetFactory {
             keyInputWidgetSelectBoxStyle.listStyle.background = ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
             keyInputWidgetSelectBoxStyle.scrollStyle.background =ColorLibrary.obtainBackground(ColorLibrary.SHAPE_SQUIRCLE_BOTTOM_2, ColorLibrary.BackgroundColor.ULTRA_DARK_GRAY);
 
-            this.selectBox = new SelectBox<>(keyInputWidgetSelectBoxStyle);
+            this.selectBox = new SelectBoxWithZoom<>(keyInputWidgetSelectBoxStyle);
             this.keymapBox = new KeymapBox();
 
             // NOTE: pads are added to top segment not the entire panel so the click listener also registered paddings
@@ -116,7 +116,7 @@ public class PrefWidgetFactory {
         public BooleanWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
             if(xml.hasAttribute("label")) {
-                Label label = new Label(xml.getAttribute("label"), SharedResources.skin);
+                Label label = new LabelWithZoom(xml.getAttribute("label"), SharedResources.skin);
                 leftContent.add(label).right().expandX();
             }
             checkBoxWidget = new CheckBox(xml.getText(), SharedResources.skin, "rounded-checkbox");
@@ -140,7 +140,7 @@ public class PrefWidgetFactory {
 
         public NumberWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             valueWidget = new ValueWidget(SharedResources.skin);
@@ -180,7 +180,7 @@ public class PrefWidgetFactory {
 
         public StringWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             widget = new TextValueWidget(SharedResources.skin);
@@ -206,7 +206,7 @@ public class PrefWidgetFactory {
         public PathWidget(String parentPath, XmlReader.Element xml) {
             super(parentPath, xml);
 
-            Label label = new Label(xml.getText(), SharedResources.skin);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
             fileOpener = new FileOpenField();

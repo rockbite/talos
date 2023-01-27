@@ -263,7 +263,9 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void onRemove () {
-
+		if (this.gameAsset != null) {
+			this.gameAsset.listeners.removeValue(this, true);
+		}
 	}
 
 	@Override

@@ -17,6 +17,7 @@
 package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -30,8 +31,8 @@ import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
-    private VisTextField aField;
-    private VisTextField bField;
+    private TextField aField;
+    private TextField bField;
 
     VisSelectBox<String> selectBox;
 

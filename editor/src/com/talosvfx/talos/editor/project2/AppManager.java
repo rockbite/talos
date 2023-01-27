@@ -70,7 +70,7 @@ public class AppManager extends InputAdapter implements Observer {
 		return null;
 	}
 
-	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, String gameAssetUniqueIdentifier) {
+	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, UUID gameAssetUniqueIdentifier) {
 
 		Class<U> appForSimpleName = (Class<U>)appRegistry.getAppForSimpleName(baseAppClazz);
 
@@ -322,7 +322,7 @@ public class AppManager extends InputAdapter implements Observer {
 
 		LayoutGrid layoutGrid = SharedResources.currentProject.getLayoutGrid();
 
-		Array<U> appsToUpdate = getAppsToUpdate(gameAsset);
+		Array<U> appsToUpdate = new Array<>(getAppsToUpdate(gameAsset));
 		Array<U> appsToCreate = getAppsToCreateAndOpen(gameAsset, appsToUpdate);
 
 		for (U baseApp : appsToCreate) {

@@ -3,15 +3,13 @@ package com.talosvfx.talos.editor.widgets.ui.common;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class ButtonLabel extends Table {
 
@@ -20,7 +18,7 @@ public class ButtonLabel extends Table {
     public ButtonLabel(Drawable iconDrawable, String text) {
 
         Image icon = new Image(iconDrawable);
-        label = new Label(text, SharedResources.skin);
+        label = new LabelWithZoom(text, SharedResources.skin);
         label.setColor(Color.GRAY);
 
         add(icon).size(30).pad(3).padLeft(-5);

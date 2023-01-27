@@ -188,21 +188,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         groups.clear();
     }
 
-    public void fileDrop (String[] paths, float x, float y) {
-        tmp.set(x, y);
-        (getStage().getViewport()).unproject(tmp);
-
-        for (ModuleWrapper wrapper : getModuleWrappers()) {
-            tmp2.set(tmp);
-            wrapper.stageToLocalCoordinates(tmp2);
-
-            if (wrapper.hit(tmp2.x, tmp2.y, false) != null) {
-                wrapper.fileDrop(paths, tmp2.x, tmp2.y);
-            }
-        }
-    }
-
-
     public void loadEmitterToBoard (ParticleEmitterWrapper emitterWrapper, EmitterData emitterData) {
         IntMap<ModuleWrapper> map = new IntMap<>();
         if (!moduleWrappers.containsKey(emitterWrapper)) {
@@ -283,13 +268,9 @@ public class ModuleBoardWidget extends WidgetGroup {
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchDown(event, x, y, pointer, button);
 
-                if (button == 1 && !event.isCancelled()) {
+                if (button == 1) {
                     showPopup();
-                } else {
-                    TalosVFXUtils.getModuleListPopup().remove();
                 }
-
-                super.touchDown(event, x, y, pointer, button);
 
                 if (!event.isHandled()) {
                     clearSelection();
@@ -462,7 +443,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
-        Stage uiStage = SharedResources.stage;
+        Stage uiStage = getStage();
         uiStage.screenToStageCoordinates(vec);
 
         TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
@@ -521,6 +502,15 @@ public class ModuleBoardWidget extends WidgetGroup {
         }
     }
 
+
+    /**
+     * @param module
+     * @param x in screen coordinate space
+     * @param y in screen coordinate space
+     * @param <T>
+     * @param <U>
+     * @return
+     */
     public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float x, float y) {
         ModuleWrapper<T> moduleWrapper = null;
 

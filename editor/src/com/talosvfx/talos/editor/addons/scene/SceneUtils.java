@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -137,7 +138,7 @@ public class SceneUtils {
 	public static GameObject createObjectByTypeName (GameObjectContainer gameObjectContainer, String idName, Vector2 position, GameObject parent, String nameHint) {
 		GameObject gameObject = new GameObject();
 
-		XmlReader.Element template = SharedResources.configData.getGameObjectConfigurationMap().get(idName);
+		XmlReader.Element template = RuntimeContext.getInstance().configData.getGameObjectConfigurationMap().get(idName);
 
 		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
 
@@ -162,7 +163,7 @@ public class SceneUtils {
 		Array<XmlReader.Element> componentsXMLArray = container.getChildrenByName("component");
 		for (XmlReader.Element componentXML : componentsXMLArray) {
 			String className = componentXML.getAttribute("className");
-			String classPath = SharedResources.configData.getComponentClassPath();
+			String classPath = RuntimeContext.getInstance().configData.getComponentClassPath();
 
 			try {
 				Class clazz = ClassReflection.forName(classPath + "." + className);

@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.routine.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -22,7 +23,7 @@ public class SpawnSpineNode extends RoutineNode {
 
         GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
 
-        GameAsset asset = fetchAssetValue("spine");
+        GameAsset<SkeletonData> asset = (GameAsset<SkeletonData>) fetchAssetValue("spine");
 
         if(asset != null) {
             tmp.setZero();

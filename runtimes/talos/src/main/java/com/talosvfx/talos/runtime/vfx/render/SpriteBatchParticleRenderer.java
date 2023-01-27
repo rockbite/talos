@@ -44,9 +44,13 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	private ShaderProgram blendAddShader;
 	private Camera camera;
 
-	public SpriteBatchParticleRenderer (Camera camera) {
-		this.camera = camera;
+	public SpriteBatchParticleRenderer () {
 		initShaders();
+	}
+
+	public SpriteBatchParticleRenderer (Camera camera) {
+		this();
+		this.camera = camera;
 	}
 
 	public SpriteBatchParticleRenderer (Camera camera, PolygonBatch batch) {

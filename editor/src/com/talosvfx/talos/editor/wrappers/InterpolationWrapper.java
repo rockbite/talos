@@ -18,6 +18,7 @@ package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -33,7 +34,7 @@ import com.talosvfx.talos.runtime.vfx.utils.InterpolationMappings;
 public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
 
 
-    VisSelectBox<String> selectBox;
+    SelectBox<String> selectBox;
 
     public InterpolationWrapper() {
         super();

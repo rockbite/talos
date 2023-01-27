@@ -5,17 +5,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
@@ -25,7 +26,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
 
     private final ObjectMap<PropertyType, Class<? extends AbstractWidget>> customTypeMap = new ObjectMap<>();
 
-    private GameAsset asset;
+    private GameAsset<RoutineStageData> asset;
 
     public DelegatorRoutineNodeWidget() {
         customTypeMap.put(PropertyType.FLOAT, ValueWidget.class);
@@ -41,14 +42,24 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
 
         Table container = getCustomContainer("customParams");
 
-        GameAssetWidget assetSelector = (GameAssetWidget)widgetMap.get("asset");
+        GameAssetWidget<RoutineStageData> assetSelector = (GameAssetWidget<RoutineStageData>)widgetMap.get("asset");
         assetSelector.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                buildContainer(container, assetSelector.getValue());
+                GameAsset<RoutineStageData> newRoutineAsset = assetSelector.getValue();
+                buildContainer(container, newRoutineAsset);
             }
         });
-        GameAsset value = assetSelector.getValue();
+
+        Predicate<FilteredTree.Node<GameAsset<RoutineStageData>>> filter = node -> {
+            GameAsset<RoutineStageData> routineAsset = node.getObject();
+            if (routineAsset == null) return false;
+            if (routineAsset.type != GameAssetType.ROUTINE) return false;
+            return !routineAsset.equals(DelegatorRoutineNodeWidget.this.nodeBoard.getNodeStage().gameAsset);
+        };
+
+        assetSelector.getWidget().setFilter(filter);
+        GameAsset<RoutineStageData> value = assetSelector.getValue();
 
         if(value != null) {
             buildContainer(container, value);
@@ -62,7 +73,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
             JsonValue props = jsonValue.get("properties");
             if(props.has("asset") && props.get("asset").has("id")) {
                 String id = props.get("asset").getString("id");
-                GameAsset value = AssetRepository.getInstance().getAssetForIdentifier(id, GameAssetType.ROUTINE);
+                GameAsset<RoutineStageData> value = AssetRepository.getInstance().getAssetForIdentifier(id, GameAssetType.ROUTINE);
                 if (value != null) {
                     buildContainer(container, value);
                 }
@@ -97,7 +108,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
 
                             // todo: this needs to be done better
                             if(widget instanceof GameAssetWidget) {
-                                ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString(), wrapper.propertyName);
+                                ((GameAssetWidget) widget).build(((PropertyGameAssetWrapper)wrapper).getGameAssetType().toString());
                             }
 
                             widget.init(SharedResources.skin);
@@ -121,7 +132,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
                             });
 
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
                     }
                 }

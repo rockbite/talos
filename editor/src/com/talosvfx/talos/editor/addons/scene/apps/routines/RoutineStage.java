@@ -64,18 +64,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void loadFrom (GameAsset<RoutineStageData> asset) {
         loading = true;
         if (asset == null || asset.getResource() == null) return;
-        reset();
 
         setFromData(asset);
+
+        reset();
+
         asset.getResource().constructForUI(this);
 
         setInstanceListeners();
         loading = false;
-    }
-
-    @Override
-    public void onUpdate () {
-        loadFrom(gameAsset);
     }
 
     @Override
@@ -109,7 +106,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     protected XmlReader.Element loadData () {
-        FileHandle list = Gdx.files.internal("addons/scene/routine-nodes.xml");
+        FileHandle list = Gdx.files.internal("routine/routine-nodes.xml");
         XmlReader xmlReader = new XmlReader();
         XmlReader.Element root = xmlReader.parse(list);
 
@@ -167,14 +164,18 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             if (!isFastChange) {
                 markAssetChanged();
             }
-            // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
-            gameAsset.listeners.removeValue(this, true);
-            gameAsset.setUpdated();
-            gameAsset.listeners.add(this);
-            data.setRoutineInstance(data.createInstance(true));
-            Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
 
-            setInstanceListeners();
+            if (!isFastChange) {
+                data.setRoutineInstance(data.createInstance(true));
+
+                gameAsset.setUpdated();
+
+                Notifications.fireEvent(Notifications.obtainEvent(RoutineUpdated.class).set(gameAsset));
+                // we need to remove this listener to avoid reloading, but we need this to be listener for undo/redo functionality
+
+                setInstanceListeners();
+            }
+
         }
     }
 

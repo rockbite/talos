@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Json;
@@ -35,9 +36,9 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
     private Image colorBtn;
 
-    VisTextField rField;
-    VisTextField gField;
-    VisTextField bField;
+    TextField rField;
+    TextField gField;
+    TextField bField;
 
     Color tmpClr = new Color();
     Vector2 vec = new Vector2();

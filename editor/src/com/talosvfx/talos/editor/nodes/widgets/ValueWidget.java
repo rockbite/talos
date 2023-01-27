@@ -1,7 +1,5 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
@@ -11,10 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.TextFieldWithZoom;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
@@ -22,8 +21,8 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Table main;
     private Table progressContainer;
     private Table progress;
-    private Label label;
-    private Label valueLabel;
+    private LabelWithZoom label;
+    private LabelWithZoom valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
     private ColorLibrary.BackgroundColor mainBgColor = ColorLibrary.BackgroundColor.LIGHT_GRAY;
@@ -74,9 +73,9 @@ public class ValueWidget extends AbstractWidget<Float> {
         type = Type.NORMAL;
         isSelected = false;
 
-        label = new Label("", skin);
-        valueLabel = new Label("", skin);
-        textField = new TextField("0", getSkin(), "no-bg");
+        label = new LabelWithZoom("", skin);
+        valueLabel = new LabelWithZoom("", skin);
+        textField = new TextFieldWithZoom("0", getSkin(), "no-bg");
         progressDrawable = ColorLibrary.createClippedPatch(skin, getShape(), ColorLibrary.BackgroundColor.LIGHT_BLUE);
 
         Stack mainStack = new Stack();
@@ -189,6 +188,7 @@ public class ValueWidget extends AbstractWidget<Float> {
             public boolean keyDown(InputEvent event, int keycode) {
                 if (SceneEditorWorkspace.isEnterPressed(keycode)) {
                     hideEditMode();
+                    getStage().setKeyboardFocus(null);
                 }
 
                 return super.keyDown(event, keycode);
@@ -344,7 +344,7 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     public boolean isFastChange () {
-        return isDragging;
+        return isDragging || isSelected;
     }
 
     @Override

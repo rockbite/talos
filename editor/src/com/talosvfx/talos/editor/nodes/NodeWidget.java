@@ -291,7 +291,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 NodeBoard.NodeConnection connection = nodeBoard.findConnection(NodeWidget.this, isInput, key);
 
                 if(isInput && connection!= null) {
-                    nodeBoard.removeConnection(connection);
+                    nodeBoard.removeConnection(connection, true);
                     nodeBoard.ccCurrentlyRemoving = true;
 
                     connection.fromNode.getOutputSlotPos(connection.fromId, tmp2);
@@ -541,7 +541,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                 }
 
             } catch (ReflectionException exception) {
-
+                exception.printStackTrace();
             }
         } else {
             if (tagName.equals("group")) {

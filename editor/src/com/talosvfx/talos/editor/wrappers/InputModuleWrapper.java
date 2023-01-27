@@ -24,12 +24,13 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.talosvfx.talos.runtime.vfx.modules.InputModule;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
+import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
 
 public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 
     IntMap<String> map;
 
-    VisSelectBox<String> selectBox;
+    SelectBoxWithZoom<String> selectBox;
 
     public InputModuleWrapper() {
         super();

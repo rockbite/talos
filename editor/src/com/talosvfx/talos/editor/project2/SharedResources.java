@@ -24,8 +24,6 @@ public class SharedResources {
 
 	public static WindowUtils windowUtils;
 
-	public static ConfigData configData;
-
 	public static GlobalSaveStateSystem globalSaveStateSystem;
 	public static MainMenu mainMenu;
 

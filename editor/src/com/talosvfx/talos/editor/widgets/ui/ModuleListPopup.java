@@ -29,6 +29,7 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.EmitterModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.modules.EmitterModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,12 +100,13 @@ public class ModuleListPopup extends VisWindow {
             public void selected(FilteredTree.Node node) {
                 if(node.children.size == 0) {
                     try {
-                        Class clazz = ClassReflection.forName("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name));
+                        Class clazz = ClassReflection.forName(TempHackUtil.hackIt("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name)));
                         if(WrapperRegistry.map.containsKey(clazz)) {
                             moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -166,6 +168,7 @@ public class ModuleListPopup extends VisWindow {
         getStage().setScrollFocus(searchFilteredTree.scrollPane);
         tree.collapseAll();
 
+        stage.stageToScreenCoordinates(location);
         createLocation.set(location);
     }
 

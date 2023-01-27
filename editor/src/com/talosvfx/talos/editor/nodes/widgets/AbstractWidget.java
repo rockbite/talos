@@ -62,6 +62,7 @@ public abstract class AbstractWidget<T> extends Table {
 
     @Override
     public void act(float delta) {
+        super.act(delta);
         if(portBody != null) {
             if (isInput) {
                 portBody.setX(-24);

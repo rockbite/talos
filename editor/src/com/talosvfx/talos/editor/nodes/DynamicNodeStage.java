@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
-public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>>, GameAsset.GameAssetUpdateListener {
+public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
 
@@ -50,11 +50,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     public void setFromData (GameAsset<T> data) {
         this.gameAsset = data;
         this.data = data.getResource();
-
-
-        if (!gameAsset.listeners.contains(this, true)) {
-            gameAsset.listeners.add(this);
-        }
     }
 
     public void markAssetChanged () {
