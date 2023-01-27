@@ -17,9 +17,11 @@ import java.util.UUID;
 
 public abstract class RoutineNode {
 
-    private GameAsset.GameAssetUpdateListener updateListener;
-
     protected RoutineInstance routineInstanceRef;
+
+    GameAsset.GameAssetUpdateListener updateListener;
+
+    private GameAsset<?> cachedGameAsset;
     public int uniqueId;
 
     protected boolean nodeDirty = false;
@@ -303,38 +305,39 @@ public abstract class RoutineNode {
         routineInstanceRef.onSignalSent(uniqueId, portName);
     }
 
-    protected GameAsset fetchAssetValue(String key) {
+    protected GameAsset<?> fetchAssetValue(String key) {
+        GameAsset<?> gameAsset = null;
         Port port = inputs.get(key);
 
-        if(port.connections.isEmpty()) {
-            if (port.valueOverride == null) {
-                return null;
-            }
+        if (port.connections.isEmpty()) {
             if (port.valueOverride instanceof GameAsset) {
-                return (GameAsset) (port.valueOverride);
-            } else {
-                GameAsset asset = (GameAsset) port.valueOverride;
-                if (!asset.listeners.contains(updateListener, true)) {
-                    asset.listeners.add(updateListener);
-                }
-                return asset;
+                gameAsset = (GameAsset<?>) (port.valueOverride);
             }
         } else {
             Connection connection = port.connections.first();
             RoutineNode targetNode = connection.toPort.nodeRef;
             String targetPortName = connection.toPort.name;
 
-            if(targetNode.queryValue(targetPortName) instanceof GameAsset) {
-                GameAsset gameAsset = (GameAsset) targetNode.queryValue(targetPortName);
-                if (!gameAsset.listeners.contains(updateListener, true)) {
-                    gameAsset.listeners.add(updateListener);
-                }
-
-                return gameAsset;
+            if (targetNode.queryValue(targetPortName) instanceof GameAsset) {
+                gameAsset = (GameAsset<?>) targetNode.queryValue(targetPortName);
             }
         }
 
-        return null;
+        if (cachedGameAsset == gameAsset) {
+            return gameAsset;
+        } else {
+            if (cachedGameAsset != null) {
+                cachedGameAsset.listeners.removeValue(updateListener, true);
+            }
+            cachedGameAsset = gameAsset;
+            if (gameAsset != null) {
+                if (!gameAsset.listeners.contains(updateListener, true)) {
+                    gameAsset.listeners.add(updateListener);
+                }
+            }
+        }
+
+        return cachedGameAsset;
     }
 
     protected String fetchStringValue(String key) {
