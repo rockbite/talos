@@ -2,8 +2,10 @@ package com.talosvfx.talos.editor.nodes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
@@ -233,18 +235,27 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		bezier.set(curvePoints, 0, curvePoints.length);
 
-		float resolution = 1f / 20f;
+		final float baseSamplesPerLine = 20f;
+		final float baseThickness = 2f;
+		float samplesPerLine = baseSamplesPerLine;
+		float thickness = baseThickness;
 
-		for (float i = 0; i < 1f; i += resolution) {
+		Camera camera = getStage().getCamera();
+		if (camera instanceof OrthographicCamera) {
+			OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+			final float zoom = orthographicCamera.zoom;
+			samplesPerLine = baseSamplesPerLine * (1f / MathUtils.clamp(zoom, 0.4f, 1.0f));
+			thickness = baseThickness * MathUtils.clamp(zoom, 1.0f, 10.0f);
+		}
 
-			float thickness = 2f;
+		Color mainColor = NodeBoard.curveColor;
+		if (hoveredConnectionRef == nodeConnection && nodeConnection != null) {
+			thickness *= 1.25f;
+			mainColor = curveColorSelected;
+		}
 
-			Color mainColor = NodeBoard.curveColor;
-
-			if (hoveredConnectionRef == nodeConnection && nodeConnection != null) {
-				thickness = 2.5f;
-				mainColor = curveColorSelected;
-			}
+		final float step = 1f / samplesPerLine;
+		for (float i = 0; i < 1f; i += step) {
 
 			if (highlight >= 0) {
 				float highlightDist = Math.abs(i - highlight);
