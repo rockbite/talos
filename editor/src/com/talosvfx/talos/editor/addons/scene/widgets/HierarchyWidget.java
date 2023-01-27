@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -279,16 +280,14 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
 
         eyeButton.addListener(new ClickListener() {
-
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 gameObject.setEditorVisible(!gameObject.isEditorVisible());
                 SceneUtils.visibilityUpdated(currentContainer, gameObject);
-
+                // stop proceeding to parent touch down
+                event.cancel();
                 return true;
             }
-
-
         });
 
         handButton.addListener(new ClickListener() {
@@ -306,6 +305,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                         tree.removeNodeFromSelection(gameObjectNode);
                     }
                 }
+                // stop proceeding to parent touch down
+                event.cancel();
                 return true;
             }
         });
