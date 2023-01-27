@@ -1800,9 +1800,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		if (!oldPixmap.isDisposed()) {
 			oldPixmap.dispose();
 		}
-		if (!newPixmap.isDisposed()) {
-			newPixmap.dispose();
-		}
 
 		// fire asset resolution changed event
 		Notifications.fireEvent(Notifications.obtainEvent(AssetResolutionChanged.class));
