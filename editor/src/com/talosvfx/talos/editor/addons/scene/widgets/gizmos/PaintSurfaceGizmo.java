@@ -13,19 +13,22 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.events.PaintSurfaceResize;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
-import java.nio.ByteBuffer;
-
-public class PaintSurfaceGizmo extends Gizmo {
+public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.GameAssetUpdateListener {
 
     private PaintToolsPane paintToolsPane;
     private final ShapeRenderer shapeRenderer;
@@ -48,6 +51,29 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         shapeRenderer = new ShapeRenderer();
         innerBatch = new SpriteBatch();
+        Notifications.registerObserver(this);
+        addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
+                    paintToolsPane.bracketDown(keycode);
+                    destroyBrushTexture();
+                    return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
+                    paintToolsPane.bracketUp(keycode);
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     @Override
@@ -59,28 +85,10 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         Texture resource = surface.getGameResource().getResource();
         if (resource != null && !surface.getGameResource().isBroken()) {
-
-            boolean sizeIsDifferent = false;
-
             Vector2 size = surface.size;
-            int worldWidth = ((int) size.x);
-            int worldHeight = ((int) size.y);
-            if (frameBuffer != null) {
-                if (frameBuffer.getWidth() != worldWidth || frameBuffer.getHeight() != worldHeight) {
-                    sizeIsDifferent = true;
-                }
-            }
 
             if (brushTexture == null) {
                 createBrushTexture();
-            }
-
-            if (frameBuffer == null || sizeIsDifferent) {
-                FrameBuffer fbo = createFrameBuffer();
-                if (fbo == null) {
-                    // framebuffer creation was unsuccessful, skip
-                    return;
-                }
             }
 
             color.a = surface.overlay;
@@ -109,20 +117,10 @@ public class PaintSurfaceGizmo extends Gizmo {
         }
     }
 
-    @Override
-    public void keyDown(InputEvent event, int keycode) {
-        if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
-            paintToolsPane.bracketDown(keycode);
-            destroyBrushTexture();
-        }
-    }
-
-    @Override
-    public void keyUp(InputEvent event, int keycode) {
-        if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
-            paintToolsPane.bracketUp(keycode);
-            destroyBrushTexture();
-        }
+    @EventHandler
+    public void onSurfaceSizeChangedEvent(PaintSurfaceResize event) {
+        if (event.component != gameObject.getComponent(PaintSurfaceComponent.class)) return;
+        createFrameBuffer(true);
     }
 
     private void drawBrushToBuffer() {
@@ -159,6 +157,15 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         frameBuffer.end();
 
+        updateAssetFromPixmap(pixmap, true);
+    }
+
+    private void updateAssetFromPixmap (Pixmap pixmap, boolean updateListeners) {
+        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        Vector2 surfaceSize = surface.size;
+        int worldWidth = ((int) surfaceSize.x);
+        int worldHeight = ((int) surfaceSize.y);
+
         int width = worldWidth;
         int height = worldHeight;
         GameAsset<Texture> gameAsset = surface.gameAsset;
@@ -178,17 +185,19 @@ public class PaintSurfaceGizmo extends Gizmo {
                 0, 0, pixmap.getWidth(), pixmap.getHeight(),
                 0, 0, newPixmap.getWidth(), newPixmap.getHeight()
         );
-        pixmap.dispose();
         Texture texture = new Texture(newPixmap);
 
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         surface.gameAsset.setResourcePayload(texture);
-        surface.gameAsset.setUpdated();
+        if (updateListeners) {
+            surface.gameAsset.listeners.removeValue(this, true);
+            surface.gameAsset.setUpdated();
+            surface.gameAsset.listeners.add(this);
+        }
     }
 
     @Override
     public void touchDown(float x, float y, int button) {
-        previousKeyboardFocus = SharedResources.stage.getKeyboardFocus();
         SharedResources.stage.setKeyboardFocus(this);
 
         drawBrushToBuffer();
@@ -203,10 +212,21 @@ public class PaintSurfaceGizmo extends Gizmo {
 
     @Override
     public void touchUp(float x, float y) {
-        SharedResources.stage.setKeyboardFocus(previousKeyboardFocus);
+
     }
 
-    private FrameBuffer createFrameBuffer() {
+    @Override
+    public void setGameObject(GameObjectContainer gameObjectContainer, GameObject gameObject) {
+        super.setGameObject(gameObjectContainer, gameObject);
+        if (gameObject.hasComponent(PaintSurfaceComponent.class)) {
+            PaintSurfaceComponent surfaceComponent = gameObject.getComponent(PaintSurfaceComponent.class);
+            surfaceComponent.gameAsset.listeners.add(this);
+        }
+        createFrameBuffer(false);
+    }
+
+    private FrameBuffer createFrameBuffer(boolean updateListeners) {
+        destroyBrushTexture();
         if (frameBuffer != null) {
             frameBuffer.dispose();
         }
@@ -234,15 +254,15 @@ public class PaintSurfaceGizmo extends Gizmo {
 
         innerBatch.begin();
         innerBatch.setProjectionMatrix(viewport.getCamera().combined);
+        Gdx.gl20.glDisable(GL20.GL_SCISSOR_TEST);
         innerBatch.draw(resource, 0, 0f, worldWidth, worldHeight,
                 0, 0, resource.getWidth(), resource.getHeight(),
                 false, true);
-
-        Pixmap fromFrameBuffer = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
-
         innerBatch.end();
+        Pixmap fromFrameBuffer = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
         frameBuffer.end();
 
+        updateAssetFromPixmap(fromFrameBuffer, updateListeners);
         return frameBuffer;
     }
 
@@ -254,9 +274,8 @@ public class PaintSurfaceGizmo extends Gizmo {
             }
 
             brushTexture.dispose();
+            brushTexture = null;
         }
-
-        brushTexture = null;
     }
 
     private void createBrushTexture() {
@@ -266,11 +285,12 @@ public class PaintSurfaceGizmo extends Gizmo {
         float maxShift = 0.25f;
         float shift = (1f - hardness) * maxShift;
         int boxSize = (int) (size * (1f + shift));
+        Color tempColor = new Color();
 
         Pixmap pixmap = new Pixmap(boxSize, boxSize, Pixmap.Format.RGBA8888);
         for (int x = 0; x < pixmap.getWidth(); x++) {
             for (int y = 0; y < pixmap.getHeight(); y++) {
-                color.set(paintToolsPane.getColor());
+                tempColor.set(paintToolsPane.getColor());
                 float dstFromCenter = (tmp.set(boxSize / 2f, boxSize / 2f).dst(x + 0.5f, y + 0.5f)) / (boxSize / 2f);
                 float point = 1f - shift * 2f;
                 float fadeOff;
@@ -282,13 +302,13 @@ public class PaintSurfaceGizmo extends Gizmo {
                     fadeOff = 1f - (MathUtils.clamp(dstFromCenter, point, 1f) - point) * 2f;
                 }
 
-                color.a = fadeOff * opacity;
+                tempColor.a = fadeOff * opacity;
 
                 if (paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
-                    color.a = fadeOff * opacity;
+                    tempColor.a = fadeOff * opacity;
                 }
 
-                pixmap.setColor(color);
+                pixmap.setColor(tempColor);
                 pixmap.drawPixel(x, y);
             }
         }
@@ -328,9 +348,12 @@ public class PaintSurfaceGizmo extends Gizmo {
             paintToolsPane.setFrom(gameObject);
 
             viewport.panRequiresSpace(true);
+            previousKeyboardFocus = SharedResources.stage.getKeyboardFocus();
+            SharedResources.stage.setKeyboardFocus(this);
         } else {
             paintToolsPane.remove();
             viewport.panRequiresSpace(false);
+            SharedResources.stage.setKeyboardFocus(previousKeyboardFocus);
         }
     }
 
@@ -338,5 +361,15 @@ public class PaintSurfaceGizmo extends Gizmo {
     public void notifyRemove() {
         viewport.panRequiresSpace(false);
         paintToolsPane.remove();
+        if (gameObject.hasComponent(PaintSurfaceComponent.class)) {
+            PaintSurfaceComponent surfaceComponent = gameObject.getComponent(PaintSurfaceComponent.class);
+            surfaceComponent.gameAsset.listeners.removeValue(this, true);
+        }
+        Notifications.unregisterObserver(this);
+    }
+
+    @Override
+    public void onUpdate() {
+        createFrameBuffer(false);
     }
 }

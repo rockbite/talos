@@ -59,7 +59,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
     }
 
     @Override
-    protected boolean isFastChange (PropertyWidget<?> propertyWidget) {
+    public boolean isFastChange () {
         return valueWidget.isFastChange();
     }
 
