@@ -29,10 +29,22 @@ public class ExportData extends BaseVFXProjectData {
     public Array<EmitterExportData> emitters = new Array<>();
 
     public ExportMetadata metadata = new ExportMetadata();
+    private transient ParticleEffectDescriptor particleEffectDescriptorLoaded;
+
+    private transient Supplier<ParticleEffectDescriptor> descriptorSupplier = new Supplier<ParticleEffectDescriptor>() {
+        @Override
+        public ParticleEffectDescriptor get () {
+           return particleEffectDescriptorLoaded;
+        }
+    };
 
     @Override
     public Supplier<ParticleEffectDescriptor> getDescriptorSupplier () {
-        throw new GdxRuntimeException("Todo");
+        return descriptorSupplier;
+    }
+
+    public void setDescriptorLoaded (ParticleEffectDescriptor particleEffectDescriptor) {
+        this.particleEffectDescriptorLoaded = particleEffectDescriptor;
     }
 
     public static class ExportMetadata {

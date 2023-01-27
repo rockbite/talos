@@ -621,6 +621,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			assetExportStructure.type = gameAsset.type;
 
 
+			boolean primaryFile = true;
 			for (RawAsset dependentRawAsset : dependentRawAssets) {
 
 				//We need folder structure
@@ -630,10 +631,33 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				if (!dirToCopyInto.exists()) {
 					dirToCopyInto.mkdirs();
 				}
-				dependentRawAsset.handle.copyTo(dirToCopyInto);
+
+				//Conversions
+				boolean converted = false;
+				if (primaryFile) {
+					if (type == GameAssetType.VFX) {
+						//Lets convert vfx file handle if this is the one
+						GameAsset<VFXProjectData> castedVfxGameAsset = (GameAsset<VFXProjectData>)gameAsset;
+						ExportData exportData = VFXProjectSerializer.exportTLSDataToP(castedVfxGameAsset.getResource());
+						String fileToWrite = VFXProjectSerializer.writeTalosPExport(exportData);
+						String newFileName = dependentRawAsset.handle.nameWithoutExtension() + ".p";
+						dirToCopyInto.child(newFileName).writeString(fileToWrite, false);
+						converted = true;
+
+						assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + newFileName);
+					}
+				}
+
+				if (!converted) {
+					dependentRawAsset.handle.copyTo(dirToCopyInto);
+					assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
+				}
+
+
 				copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto);
 
-				assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
+
+				primaryFile = false;
 			}
 
 
@@ -999,12 +1023,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					}
 
 
-					RawAsset rawAssetTLSFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
-
-
 					if (createLinks) {
 						value.gameAssetReferences.add(vfxProjectDataGameAsset);
-						vfxProjectDataGameAsset.dependentRawAssets.add(rawAssetTLSFile);
 					}
 				}
 
