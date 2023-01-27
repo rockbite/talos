@@ -31,6 +31,11 @@ public class CustomAssetWidget extends ATypeWidget<GameAsset<?>> {
     }
 
     @Override
+    public boolean isFastChange() {
+        return false;
+    }
+
+    @Override
     public void applyValueToWrapper(PropertyWrapper<GameAsset<?>> propertyWrapper) {
         propertyWrapper.defaultValue = assetWidget.getValue();
     }

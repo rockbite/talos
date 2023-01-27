@@ -150,6 +150,12 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
     }
 
     @Override
+    public boolean isFastChange() {
+        boolean valueFastChange = valueWidget.isFastChange();
+        return isRanged() ? stepWidget.isFastChange() || maxWidget.isFastChange() || minWidget.isFastChange() || valueFastChange : valueFastChange;
+    }
+
+    @Override
     public void updateFromPropertyWrapper(PropertyWrapper<Float> propertyWrapper) {
         PropertyFloatWrapper floatWrapper = (PropertyFloatWrapper) propertyWrapper;
         if (floatWrapper.isRanged) {
