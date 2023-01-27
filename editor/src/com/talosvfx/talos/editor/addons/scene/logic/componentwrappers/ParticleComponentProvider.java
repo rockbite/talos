@@ -44,7 +44,7 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 			@Override
 			public void clicked(ButtonPropertyWidget<String> widget) {
 				//Edit this tls
-				if (component.gameAsset != null) {
+				if (component.gameAsset != null && !component.gameAsset.isBroken()) {
 					SharedResources.appManager.openNewAsset(component.gameAsset);
 				}
 			}
