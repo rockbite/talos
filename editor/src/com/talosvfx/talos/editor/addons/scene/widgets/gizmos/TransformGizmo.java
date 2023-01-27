@@ -25,6 +25,9 @@ public class TransformGizmo extends Gizmo {
     private BoundingBox selectionBounds = new BoundingBox();
     private boolean haveBounds = false;
 
+    private final Vector2 centerPoint = new Vector2();
+    private final float pointHitError = 25;
+
     @Override
     public void draw (Batch batch, float parentAlpha) {
         if(gameObject.hasComponent(TransformComponent.class)) {
@@ -119,13 +122,35 @@ public class TransformGizmo extends Gizmo {
         prevTouch.set(x, y);
         deltaXCache = x;
         deltaYCache = y;
+
+        grabbedFromCenter = isPointHit(centerPoint, x, y);
     }
 
     private float deltaXCache;
     private float deltaYCache;
 
+    private boolean isPointHit (Vector2 point, float x, float y) {
+        float dst = point.dst(x, y) / worldPerPixel;
+        // check distance in some error range
+        return dst < pointHitError;
+    }
+
+    @Override
+    protected void positionChanged() {
+        super.positionChanged();
+        // update central point when position changed
+        centerPoint.set(getX(), getY());
+    }
+
+    private boolean grabbedFromCenter;
+
+
     @Override
     public void touchDragged (float x, float y) {
+        // when transform is locked move only when is dragged from center point
+        // NOTE: when fast dragged the mouse position can move faster than the transformation, hence we discard checks if the gizmo was already dragged
+        if (!grabbedFromCenter && gameObject.isEditorTransformLocked())
+            return;
 
         tmp.set(x, y).sub(prevTouch);
         // render position
