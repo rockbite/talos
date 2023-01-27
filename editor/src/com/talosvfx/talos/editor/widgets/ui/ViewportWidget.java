@@ -454,14 +454,14 @@ public abstract class ViewportWidget extends Table {
 							countOfSameTouchDown = 0;
 
 							if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-								if (entityUnderMouse != null) {
+								if (entityUnderMouse != null && !entityUnderMouse.isEditorTransformLocked()) {
 									addToSelection(entityUnderMouse);
 								}
 
 							} else {
 								//We aren't over the pixel or the gizmo, unselect
 								requestSelectionClear();
-								if (entityUnderMouse != null) {
+								if (hasEntityUnderMouse && !entityUnderMouse.isEditorTransformLocked()) {
 									hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, entityUnderMouse);
 									selectGameObject(entityUnderMouse);
 
@@ -499,8 +499,6 @@ public abstract class ViewportWidget extends Table {
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
 						if (canTouchGizmo(hitGizmo)) {
-							selectGameObject(hitGizmo.getGameObject());
-
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
@@ -615,7 +613,6 @@ public abstract class ViewportWidget extends Table {
 		if (testGizmo instanceof GroupSelectionGizmo) return true;
 
 		if (!testGizmo.getGameObject().isEditorVisible()) return false;
-		if (testGizmo.getGameObject().isEditorTransformLocked()) return false;
 
 		return true;
 	}
@@ -739,8 +736,6 @@ public abstract class ViewportWidget extends Table {
 		});
 
 		for (Gizmo gizmo : gizmos.gizmoList) {
-
-			if(!(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) continue;
 			if (gizmo.hit(x, y)) {
 				return gizmo;
 			}
@@ -1250,17 +1245,12 @@ public abstract class ViewportWidget extends Table {
 	protected void setSelection (Array<GameObject> gameObjects) {
 		selection.clear();
 
-		// do not select locked GO's here
 		for (GameObject gameObject : gameObjects) {
-			if(!gameObject.isEditorTransformLocked()) {
-				selection.add(gameObject);
-			}
+			selection.add(gameObject);
 		}
 
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
-
-
 
 	protected void selectGameObjectAndChildren (GameObject gameObject) {
 		selection.add(gameObject);
