@@ -246,13 +246,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 	public void act (float delta) {
 		super.act(delta);
 
-		ParticleEffectDescriptor dataDescriptor = vfxProjectData.getDescriptorSupplier().get();
-
-		if (this.descriptor != dataDescriptor || vfxNeedsUpdate()) {
-			this.descriptor = dataDescriptor;
-			this.effectInstance = this.descriptor.createEffectInstance();
-			effectInstance.loopable = true;
-		}
+		checkForChanges();
 
 		long timeBefore = TimeUtils.nanoTime();
 		cpuTime.put(TimeUtils.timeSinceNanos(timeBefore));
@@ -287,6 +281,21 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 		}
 
+	}
+
+	public ParticleEffectInstance getEffectInstance() {
+		checkForChanges();
+		return effectInstance;
+	}
+
+	public void checkForChanges() {
+		ParticleEffectDescriptor dataDescriptor = vfxProjectData.getDescriptorSupplier().get();
+
+		if (this.descriptor != dataDescriptor || vfxNeedsUpdate()) {
+			this.descriptor = dataDescriptor;
+			this.effectInstance = this.descriptor.createEffectInstance();
+			effectInstance.loopable = true;
+		}
 	}
 
 	private boolean vfxNeedsUpdate () {
