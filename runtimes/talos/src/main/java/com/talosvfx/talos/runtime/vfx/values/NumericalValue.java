@@ -17,10 +17,14 @@
 package com.talosvfx.talos.runtime.vfx.values;
 
 import com.badlogic.gdx.math.MathUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 public class NumericalValue extends Value {
+
+	private static final Logger logger = LoggerFactory.getLogger(NumericalValue.class);
 
 	private float[] elements = new float[4];
 
@@ -118,7 +122,11 @@ public class NumericalValue extends Value {
 
 	@Override
 	public void set(Value value) {
-		set((NumericalValue) value);
+		if (!(value instanceof NumericalValue)) {
+			logger.debug("Invalid type of input for value - " + value);
+		} else {
+			set((NumericalValue) value);
+		}
 	}
 
 	public void set (NumericalValue other) {
