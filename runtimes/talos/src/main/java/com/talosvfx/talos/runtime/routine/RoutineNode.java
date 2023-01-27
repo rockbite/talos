@@ -177,7 +177,7 @@ public abstract class RoutineNode {
                 port.dataType = DataType.ASSET;
             }
 
-            if(name.equals("checkbox")) {
+            if(row.getName().equals("checkbox")) {
                 port.valueOverride = row.getBooleanAttribute("default", false);
             }
         }
