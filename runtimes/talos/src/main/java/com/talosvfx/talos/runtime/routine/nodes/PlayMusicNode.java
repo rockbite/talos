@@ -10,7 +10,7 @@ public class PlayMusicNode extends RoutineNode {
 
     @Override
     public void receiveSignal(String portName) {
-        asset = fetchAssetValue("asset");
+        asset = (GameAsset<Music>) fetchAssetValue("asset");
         asset.getResource().play();
     }
 

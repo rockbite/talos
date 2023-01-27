@@ -32,7 +32,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
     }
 
     @Override
-    protected boolean isFastChange (PropertyWidget<?> propertyWidget) {
+    public boolean isFastChange () {
         return xValue.isFastChange() || yValue.isFastChange();
     }
 
