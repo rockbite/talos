@@ -20,6 +20,7 @@ import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.scene.components.CameraComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.render.RenderState;
 
 public class CameraPreview extends Actor {
 
@@ -118,7 +119,7 @@ public class CameraPreview extends Actor {
         mainRenderer.skipUpdates = true;
         mainRenderer.setCamera(viewport.getCamera());
         mainRenderer.update(rootGO);
-        mainRenderer.render(polygonSpriteBatch, new MainRenderer.RenderState(), rootGO);
+        mainRenderer.render(polygonSpriteBatch, new RenderState(), rootGO);
 
     }
 

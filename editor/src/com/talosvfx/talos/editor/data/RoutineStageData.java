@@ -4,11 +4,11 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeMappers;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeWidgetMapper;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
@@ -90,7 +90,7 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 
 	private PropertyWrapper<?> createPropertyInstanceOfType (PropertyType type) {
 		try {
-			PropertyWrapper<?> propertyWrapper = PropertyTypeMappers.getWrapperForPropertyType(type).getConstructor().newInstance();
+			PropertyWrapper<?> propertyWrapper = PropertyTypeWidgetMapper.getWrapperForPropertyType(type).getConstructor().newInstance();
 			return propertyWrapper;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -144,7 +144,7 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 			JsonValue parse = jsonReader.parse(jsonData);
 			read(json, parse);
 		}
-		routine.loadFrom(this, SharedResources.configData.getRoutineConfigMap());
+		routine.loadFrom(this, RuntimeContext.getInstance().configData.getRoutineConfigMap());
 		return routine;
 	}
 }

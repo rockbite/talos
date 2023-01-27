@@ -14,6 +14,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class PaintSurfaceComponent extends AComponent implements GameResourceOwner<Texture>, Json.Serializable {
@@ -93,8 +94,13 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-        loadTextureFromIdentifier(gameResourceIdentifier);
+        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID == null) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadTextureFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadTextureFromUniqueIdentifier(gameResourceUUID);
+        }
 
         overlay = jsonData.getFloat("overlay", 0.5f);
         size = json.readValue( "size", Vector2.class, jsonData);
@@ -103,5 +109,10 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
     private void loadTextureFromIdentifier (String gameResourceIdentifier) {
         GameAsset<Texture> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForIdentifier);
+    }
+
+    private void loadTextureFromUniqueIdentifier (UUID gameResourceUUID) {
+        GameAsset<Texture> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SPRITE);
+        setGameAsset(assetForUniqueIdentifier);
     }
 }

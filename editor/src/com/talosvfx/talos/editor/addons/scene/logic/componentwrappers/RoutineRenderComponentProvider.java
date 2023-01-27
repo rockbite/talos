@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 public class RoutineRenderComponentProvider extends RendererComponentProvider<RoutineRendererComponent> {
 
 	Array<PropertyWidget> properties = new Array<>();
-	public Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
 	public RoutineRenderComponentProvider (RoutineRendererComponent component) {
 		super(component);
@@ -28,7 +27,7 @@ public class RoutineRenderComponentProvider extends RendererComponentProvider<Ro
 	@Override
 	public Array<PropertyWidget> getListOfProperties () {
 		properties.clear();
-		AssetSelectWidget<BaseRoutineData> widget = new AssetSelectWidget<BaseRoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<BaseRoutineData>>() {
+		PropertyPanelAssetSelectionWidget<BaseRoutineData> widget = new PropertyPanelAssetSelectionWidget<BaseRoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<BaseRoutineData>>() {
 			@Override
 			public GameAsset<BaseRoutineData> get () {
 				return component.getGameResource();
@@ -53,8 +52,9 @@ public class RoutineRenderComponentProvider extends RendererComponentProvider<Ro
 		Array<PropertyWidget> superList = super.getListOfProperties();
 		properties.addAll(superList);
 
+		final Array<PropertyWrapper<?>> propertyWrappers = component.propertyWrappers;
 		for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
-			PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
+			PropertyWidget<?> generate = WidgetFactory.generateForPropertyWrapper(propertyWrapper);
 			generate.setInjectedChangeListener(new ChangeListener() {
 				@Override
 				public void changed (ChangeEvent event, Actor actor) {

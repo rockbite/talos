@@ -140,7 +140,7 @@ public abstract class PropertyWidget<T> extends Table {
 
 
 	protected void callValueChanged (T value) {
-		boolean isFastChange = isFastChange(this);
+		boolean isFastChange = isFastChange();
 		callValueChanged(value, isFastChange);
 	}
 
@@ -178,7 +178,7 @@ public abstract class PropertyWidget<T> extends Table {
 		}
 	}
 
-	protected boolean isFastChange (PropertyWidget<?> propertyWidget) {
+	public boolean isFastChange () {
 		return false;
 	}
 

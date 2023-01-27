@@ -17,14 +17,23 @@
 package com.talosvfx.talos.runtime.vfx.serialization;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+
+import java.util.function.Supplier;
 
 public class ExportData extends BaseVFXProjectData {
 
     public Array<EmitterExportData> emitters = new Array<>();
 
     public ExportMetadata metadata = new ExportMetadata();
+
+    @Override
+    public Supplier<ParticleEffectDescriptor> getDescriptorSupplier () {
+        throw new GdxRuntimeException("Todo");
+    }
 
     public static class ExportMetadata {
         public Array<String> resources = new Array<>();

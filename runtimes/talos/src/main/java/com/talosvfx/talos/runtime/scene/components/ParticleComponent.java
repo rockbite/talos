@@ -15,7 +15,7 @@ import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.function.Supplier;
+import java.util.UUID;
 
 public class ParticleComponent<T extends BaseVFXProjectData> extends RendererComponent implements GameResourceOwner<T> {
     private transient GameAsset<T> defaultGameAsset;
@@ -27,10 +27,13 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
-        loadDescriptorFromIdentifier(gameResourceIdentifier);
+        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
+        if (gameResourceUUID == null) {
+            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+            loadDescriptorFromIdentifier(gameResourceIdentifier);
+        } else {
+            loadDescriptorFromUniqueIdentifier(gameResourceUUID);
+        }
 
         super.read(json, jsonData);
     }
@@ -55,6 +58,11 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
     private void loadDescriptorFromIdentifier (String gameResourceIdentifier) {
         GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
         setGameAsset(assetForIdentifier);
+    }
+
+    private void loadDescriptorFromUniqueIdentifier (UUID gameResourceUUID) {
+        GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.VFX);
+        setGameAsset(assetForUniqueIdentifier);
     }
 
     @Override

@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
+public class PropertyPanelAssetSelectionWidget<T> extends PropertyWidget<GameAsset<T>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AssetSelectWidget.class);
+    private static final Logger logger = LoggerFactory.getLogger(PropertyPanelAssetSelectionWidget.class);
 
     private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
@@ -31,10 +31,10 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
     private AssetListPopup<T> assetListPopup;
-    public AssetSelectWidget() {
+    public PropertyPanelAssetSelectionWidget() {
         super();
     }
-    public AssetSelectWidget (String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
+    public PropertyPanelAssetSelectionWidget(String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
         super(name, supplier, valueChanged);
         assetListPopup = new AssetListPopup<>();
         this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {
@@ -48,7 +48,7 @@ public class AssetSelectWidget<T> extends PropertyWidget<GameAsset<T>> {
 
     @Override
     public PropertyWidget clone() {
-        AssetSelectWidget clone = (AssetSelectWidget) super.clone();
+        PropertyPanelAssetSelectionWidget clone = (PropertyPanelAssetSelectionWidget) super.clone();
         clone.filter = filter;
         return clone;
     }

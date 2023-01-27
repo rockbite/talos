@@ -1,7 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -21,7 +21,7 @@ public class ScriptComponentProvider extends AComponentProvider<ScriptComponent>
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		AssetSelectWidget<String> widget = new AssetSelectWidget<String>("Script", GameAssetType.SCRIPT, new Supplier<GameAsset<String>>() {
+		PropertyPanelAssetSelectionWidget<String> widget = new PropertyPanelAssetSelectionWidget<>("Script", GameAssetType.SCRIPT, new Supplier<GameAsset<String>>() {
 			@Override
 			public GameAsset<String> get () {
 				return component.getScriptResource();

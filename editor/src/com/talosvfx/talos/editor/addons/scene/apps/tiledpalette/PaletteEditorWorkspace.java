@@ -34,9 +34,11 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.render.RenderState;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -92,8 +94,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer, 
 
                 return -Float.compare(AworldPosY, BworldPosY);
             } else {
-                float aSort = MainRenderer.getDrawOrderSafe(a);
-                float bSort = MainRenderer.getDrawOrderSafe(b);
+                float aSort = GameObjectRenderer.getDrawOrderSafe(a);
+                float bSort = GameObjectRenderer.getDrawOrderSafe(b);
 
                 return Float.compare(aSort, bSort);
             }
@@ -1176,7 +1178,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Observer, 
             //Set the transform to the temporary position which is bottom left parent tile + transform
 
             mainRenderer.update(gameObject);
-            mainRenderer.render(batch, new MainRenderer.RenderState(), gameObject);
+            mainRenderer.render(batch, new RenderState(), gameObject);
 
             position.set(storedX, storedY);
         }

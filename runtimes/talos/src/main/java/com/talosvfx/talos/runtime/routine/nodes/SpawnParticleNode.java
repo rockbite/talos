@@ -35,7 +35,7 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
             }
         }
 
-        GameAsset<BaseVFXProjectData> asset = fetchAssetValue("particle");
+        GameAsset<BaseVFXProjectData> asset = (GameAsset<BaseVFXProjectData>) fetchAssetValue("particle");
 
         if (asset != null) {
             tmp.setZero();

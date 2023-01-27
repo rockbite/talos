@@ -176,21 +176,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         groups.clear();
     }
 
-    public void fileDrop (String[] paths, float x, float y) {
-        tmp.set(x, y);
-        (getStage().getViewport()).unproject(tmp);
-
-        for (ModuleWrapper wrapper : getModuleWrappers()) {
-            tmp2.set(tmp);
-            wrapper.stageToLocalCoordinates(tmp2);
-
-            if (wrapper.hit(tmp2.x, tmp2.y, false) != null) {
-                wrapper.fileDrop(paths, tmp2.x, tmp2.y);
-            }
-        }
-    }
-
-
     public void loadEmitterToBoard (ParticleEmitterWrapper emitterWrapper, EmitterData emitterData) {
         IntMap<ModuleWrapper> map = new IntMap<>();
         if (!moduleWrappers.containsKey(emitterWrapper)) {

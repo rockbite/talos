@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -39,6 +40,7 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClear
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
@@ -61,6 +63,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
+import com.talosvfx.talos.runtime.scene.render.RenderState;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -194,9 +197,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Notifications.registerObserver(this);
 
 
-		GizmoRegister.init(SharedResources.configData.getGameObjectConfigurationXMLRoot());
+		GizmoRegister.init(RuntimeContext.getInstance().configData.getGameObjectConfigurationXMLRoot());
 
-		templateListPopup = new TemplateListPopup(SharedResources.configData.getGameObjectConfigurationXMLRoot());
+		templateListPopup = new TemplateListPopup(RuntimeContext.getInstance().configData.getGameObjectConfigurationXMLRoot());
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
 			public void chosen (XmlReader.Element template, float x, float y) {
@@ -910,7 +913,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		renderer.setLayers(getLayerList());
 		renderer.update(currentContainer.getSelfObject());
-		renderer.render(batch, new MainRenderer.RenderState(), currentContainer.getSelfObject());
+		renderer.render(batch, new RenderState(), currentContainer.getSelfObject());
 	}
 
 
@@ -1274,7 +1277,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 
 			if (!foundLayer) {
-				component.setSortingLayer(MainRenderer.DEFAULT_SCENE_LAYER);
+				component.setSortingLayer(GameObjectRenderer.DEFAULT_SCENE_LAYER);
 			}
 		}
 	}

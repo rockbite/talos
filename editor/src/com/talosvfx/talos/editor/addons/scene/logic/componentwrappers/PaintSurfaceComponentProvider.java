@@ -1,8 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.widgets.property.AssetSelectWidget;
+import com.talosvfx.talos.editor.addons.scene.events.PaintSurfaceResize;
+import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -22,7 +26,7 @@ public class PaintSurfaceComponentProvider extends AComponentProvider<PaintSurfa
 
 		Array<PropertyWidget> properties = new Array<>();
 
-		AssetSelectWidget<Texture> textureWidget = new AssetSelectWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
+		PropertyPanelAssetSelectionWidget<Texture> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
 			@Override
 			public GameAsset<Texture> get () {
 				return component.gameAsset;
@@ -35,6 +39,14 @@ public class PaintSurfaceComponentProvider extends AComponentProvider<PaintSurfa
 		});
 
 		PropertyWidget sizeWidget = WidgetFactory.generate(component, "size", "Size");
+		sizeWidget.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (!sizeWidget.isFastChange()) {
+					Notifications.fireEvent(Notifications.obtainEvent(PaintSurfaceResize.class).set(component));
+				}
+			}
+		});
 
 		PropertyWidget overlayWidget = WidgetFactory.generate(component, "overlay", "Overlay");
 

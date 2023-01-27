@@ -16,22 +16,25 @@ import com.talosvfx.talos.editor.addons.scene.widgets.AssetListPopup;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import lombok.Setter;
 
 
-public class AssetSelector<T> extends Table {
+public class GenericAssetSelectionWidget<T> extends Table {
 
     private LabelWithZoom nameLabel;
     private GameAsset<T> gameAsset;
 
+
+    @Setter
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
     private AssetListPopup<T> assetListPopup;
 
-    public AssetSelector() {
+    public GenericAssetSelectionWidget() {
         super();
     }
 
-    public AssetSelector (String name, GameAssetType type) {
+    public GenericAssetSelectionWidget(GameAssetType type) {
 
         assetListPopup = new AssetListPopup<>();
         this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {
@@ -84,7 +87,7 @@ public class AssetSelector<T> extends Table {
                         fireChangedEvent();
                         assetListPopup.remove();
                     }
-                });
+                }, gameAsset);
             }
         });
         return table;

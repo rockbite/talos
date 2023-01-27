@@ -8,14 +8,14 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
-import com.talosvfx.talos.editor.widgets.ui.common.AssetSelector;
+import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 import java.util.function.Supplier;
 
-public class CustomAssetWidget extends ATypeWidget<GameAsset> {
-    private AssetSelector assetWidget;
+public class CustomAssetWidget extends ATypeWidget<GameAsset<?>> {
+    private GenericAssetSelectionWidget<?> assetWidget;
     private final SelectBoxWidget typeSelector;
 
     private GameAssetType currentType = GameAssetType.SPRITE;
@@ -26,12 +26,12 @@ public class CustomAssetWidget extends ATypeWidget<GameAsset> {
     }
 
     @Override
-    public void updateFromPropertyWrapper(PropertyWrapper<GameAsset> propertyWrapper) {
-        assetWidget.updateWidget(propertyWrapper.defaultValue);
+    public void updateFromPropertyWrapper(PropertyWrapper<GameAsset<?>> propertyWrapper) {
+        assetWidget.updateWidget(((GameAsset) propertyWrapper.defaultValue));
     }
 
     @Override
-    public void applyValueToWrapper(PropertyWrapper<GameAsset> propertyWrapper) {
+    public void applyValueToWrapper(PropertyWrapper<GameAsset<?>> propertyWrapper) {
         propertyWrapper.defaultValue = assetWidget.getValue();
     }
 
@@ -70,7 +70,7 @@ public class CustomAssetWidget extends ATypeWidget<GameAsset> {
     private void reBuild() {
         clearChildren();
 
-        assetWidget = new AssetSelector<>("asset", currentType);
+        assetWidget = new GenericAssetSelectionWidget<>(currentType);
 
         Table content = new Table();
 

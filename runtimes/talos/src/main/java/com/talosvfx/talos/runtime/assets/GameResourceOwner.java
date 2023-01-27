@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.RuntimeContext;
 
+import java.util.UUID;
+
 public interface GameResourceOwner<U> {
 
     GameAssetType getGameAssetType ();
@@ -18,6 +20,7 @@ public interface GameResourceOwner<U> {
             if (!gameResource.isBroken()) {
                 json.writeValue("gameResourceExtension", gameResource.getRootRawAsset().handle.extension());
                 json.writeValue("type", gameResource.type);
+                json.writeValue("gameResourceUUID", gameResource.getRootRawAsset().metaData.uuid.toString());
             }
         }
     }
@@ -33,10 +36,13 @@ public interface GameResourceOwner<U> {
     static <U> GameAsset<U> readAsset (Json json, JsonValue jsonValue) {
         String identifier = readGameResourceFromComponent(jsonValue);
         GameAssetType type = readAssetType(json, jsonValue);
+        UUID uuid = readGameResourceUUIDFromComponent(jsonValue);
 
-        GameAsset<U> asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
-
-        return asset;
+        if (uuid == null) {
+            return RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
+        } else {
+            return RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uuid, type);
+        }
     }
 
     static GameAssetType readAssetType(Json json, JsonValue jsonValue) {
@@ -49,4 +55,12 @@ public interface GameResourceOwner<U> {
         return component.getString("gameResource", "broken");
     }
 
+    static UUID readGameResourceUUIDFromComponent (JsonValue jsonValue) {
+        String uuid = jsonValue.getString("gameResourceUUID", null);
+        if (uuid == null) {
+            return null;
+        } else {
+            return UUID.fromString(uuid);
+        }
+    }
 }

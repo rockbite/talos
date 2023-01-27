@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
@@ -278,16 +280,14 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
 
         eyeButton.addListener(new ClickListener() {
-
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 gameObject.setEditorVisible(!gameObject.isEditorVisible());
                 SceneUtils.visibilityUpdated(currentContainer, gameObject);
-
+                // stop proceeding to parent touch down
+                event.cancel();
                 return true;
             }
-
-
         });
 
         handButton.addListener(new ClickListener() {
@@ -305,6 +305,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                         tree.removeNodeFromSelection(gameObjectNode);
                     }
                 }
+                // stop proceeding to parent touch down
+                event.cancel();
                 return true;
             }
         });
@@ -382,7 +384,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         PopupMenu popupMenu = new PopupMenu();
 
-        ObjectMap<String, XmlReader.Element> confMap = SharedResources.configData.getGameObjectConfigurationMap();
+        ObjectMap<String, XmlReader.Element> confMap = RuntimeContext.getInstance().configData.getGameObjectConfigurationMap();
         for(String key: confMap.keys()) {
             XmlReader.Element element = confMap.get(key);
 

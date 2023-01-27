@@ -71,7 +71,7 @@ public class AppManager extends InputAdapter implements Observer {
 		return null;
 	}
 
-	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, String gameAssetUniqueIdentifier) {
+	public <T, U extends BaseApp<T>> U createAndRegisterAppExternal (String appID, String baseAppClazz, GameAssetType gameAssetType, String gameAssetIdentifier, UUID gameAssetUniqueIdentifier) {
 
 		Class<U> appForSimpleName = (Class<U>)appRegistry.getAppForSimpleName(baseAppClazz);
 

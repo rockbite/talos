@@ -106,7 +106,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     protected XmlReader.Element loadData () {
-        FileHandle list = Gdx.files.internal("addons/scene/routine-nodes.xml");
+        FileHandle list = Gdx.files.internal("routine/routine-nodes.xml");
         XmlReader xmlReader = new XmlReader();
         XmlReader.Element root = xmlReader.parse(list);
 

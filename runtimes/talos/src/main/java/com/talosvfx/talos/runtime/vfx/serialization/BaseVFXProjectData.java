@@ -1,4 +1,10 @@
 package com.talosvfx.talos.runtime.vfx.serialization;
 
-public class BaseVFXProjectData {
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.ScopePayload;
+
+import java.util.function.Supplier;
+
+public abstract class BaseVFXProjectData {
+	public abstract Supplier<ParticleEffectDescriptor> getDescriptorSupplier ();
 }
