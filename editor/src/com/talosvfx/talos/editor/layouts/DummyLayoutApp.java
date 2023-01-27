@@ -1,10 +1,13 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -159,6 +162,16 @@ public class DummyLayoutApp<T> implements LayoutApp {
         actor.getStyle().up = null;
         actor.getImage().setScaling(Scaling.fill);
         tab.add(actor).size(16).padLeft(5).padRight(-10);
+
+        tab.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == Input.Buttons.MIDDLE && destroyCallback != null) {
+                    destroyCallback.onDestroyRequest();
+                }
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
 
         return tab;
     }
