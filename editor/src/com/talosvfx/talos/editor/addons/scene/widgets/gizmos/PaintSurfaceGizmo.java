@@ -200,14 +200,20 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     public void touchDown(float x, float y, int button) {
         SharedResources.stage.setKeyboardFocus(this);
 
-        drawBrushToBuffer();
+        if (canDraw()) {
+            drawBrushToBuffer();
+        }
     }
 
     @Override
     public void touchDragged(float x, float y) {
-        if (frameBuffer != null) {
+        if (canDraw()) {
             drawBrushToBuffer();
         }
+    }
+
+    private boolean canDraw () {
+        return frameBuffer != null;
     }
 
     @Override
