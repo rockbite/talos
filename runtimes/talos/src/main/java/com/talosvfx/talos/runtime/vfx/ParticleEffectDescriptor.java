@@ -61,7 +61,12 @@ public class ParticleEffectDescriptor {
 		return new ParticleEmitterDescriptor(this);
 	}
 
-	public void load(FileHandle fileHandle) {
+	public void load (FileHandle fileHandle) {
+		final ExportData exportData = getExportData(fileHandle);
+		load(exportData);
+	}
+
+	public static ExportData getExportData (FileHandle fileHandle) {
 		Json json = new Json();
 		ParticleEmitterDescriptor.registerModules();
 		for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
@@ -69,6 +74,10 @@ public class ParticleEffectDescriptor {
 		}
 
 		final ExportData exportData = json.fromJson(ExportData.class, fileHandle.readString());
+		return exportData;
+	}
+
+	public void load (ExportData exportData) {
 
 		if (exportData.metadata.versionString == null) {
 			exportData.metadata.versionString = "1.4.0"; //Default for unknown versions

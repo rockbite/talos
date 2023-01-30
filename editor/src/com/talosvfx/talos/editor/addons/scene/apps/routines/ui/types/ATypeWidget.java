@@ -9,6 +9,7 @@ public abstract class ATypeWidget<T> extends Table {
 
     public abstract String getTypeName();
 
+    public abstract boolean isFastChange();
 
     protected boolean fireChangedEvent() {
         ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);

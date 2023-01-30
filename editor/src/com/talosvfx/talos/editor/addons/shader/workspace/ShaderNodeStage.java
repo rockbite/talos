@@ -94,9 +94,9 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
     @EventHandler
     public void onNodeRemoved(NodeRemovedEvent event) {
-       if (event.getNode() == colorOutput) {
+     /*  if (event.getNode() == colorOutput) {
            colorOutput = null;
-       }
+       }*/
     }
 
     public String getFragShader() {

@@ -217,12 +217,14 @@ public class GameObjectRenderer {
 			routineRenderer.render(batch, camera, gameObject, gameObject.getComponent(RoutineRendererComponent.class));
 		}
 	}
-	public void buildRenderStateAndRender (PolygonBatch batch, RenderState state, GameObject root) {
+	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, GameObject root) {
 		temp.clear();
 		temp.add(root);
-		buildRenderStateAndRender(batch, state, temp);
+		buildRenderStateAndRender(batch, camera, state, temp);
 	}
-	public void buildRenderStateAndRender (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
+	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, Array<GameObject> rootObjects) {
+		setCamera(camera);
+
 		buildRenderState(batch, state, rootObjects);
 		for (int i = 0; i < state.list.size; i++) {
 			GameObject gameObject = state.list.get(i);

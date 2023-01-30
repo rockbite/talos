@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
+import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.AssetResolutionChanged;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
@@ -160,14 +161,16 @@ public class ProjectExplorerWidget extends Table implements Observer {
                     String parentPath = parentToMoveTo.getObject();
                     String childPath = childThatHasMoved.getObject();
 
-                    System.out.println("Moving " + childPath + " " + " to " + parentPath);
-
                     FileHandle parentHandle = Gdx.files.absolute(parentPath);
                     FileHandle childHandle = Gdx.files.absolute(childPath);
+                    if (childHandle.parent().equals(parentHandle)) {
+                        // do not need to move, when rearranging in the same directory
+                        return;
+                    }
 
+                    System.out.println("Moving " + childPath + " " + " to " + parentPath);
 
                     //Its always folders
-
                     AssetRepository.getInstance().moveFile(childHandle, parentHandle, false);
 
                 }
@@ -799,6 +802,12 @@ public class ProjectExplorerWidget extends Table implements Observer {
     @EventHandler
     public void onAssetResolutionChange (AssetResolutionChanged event) {
         directoryViewWidget.changeAssetPreview(event.getFileHandle());
+    }
+
+    @EventHandler
+    public void onDirectoryMovedEvent (DirectoryMovedEvent event) {
+        loadDirectoryTree(rootNode.getObject());
+        select(event.getNewHandle().path());
     }
 
     public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {

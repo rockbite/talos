@@ -163,7 +163,7 @@ public class VariableCreationWindow extends Table {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
                         widget.applyValueToWrapper(routineInstance.getPropertyWrapperWithIndex(propertyWrapper.index));
-                        routineStage.routineUpdated();
+                        routineStage.routineUpdated(innerWidget.isFastChange());
                     }
                 });
                 innerWidget.updateFromPropertyWrapper(propertyWrapper);

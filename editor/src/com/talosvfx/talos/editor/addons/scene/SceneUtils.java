@@ -109,7 +109,7 @@ public class SceneUtils {
 
 		GameObject gameObject = prefab.root;
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-		transformComponent.position.set(position);
+		transformComponent.position.add(position);
 
 		String name = NamingUtils.getNewName(prefab.name, gameObjectContainer.getAllGONames());
 
@@ -450,9 +450,17 @@ public class SceneUtils {
 
 		gameObject.setName("Prefab_" + gameObject.getName());
 
-		Prefab prefab = new Prefab(gameObject);
+		Prefab tempPrefabForSerialization = new Prefab(gameObject);
+		String serializedPrefab = tempPrefabForSerialization.getAsString();
 
-		prefabHandle.writeString(prefab.getAsString(), false);
+		Prefab newPrefab = new Prefab(serializedPrefab, tempPrefabForSerialization.path, tempPrefabForSerialization.name);
+
+		if (newPrefab.getSelfObject().hasComponent(TransformComponent.class)) {
+			TransformComponent component = newPrefab.getSelfObject().getComponent(TransformComponent.class);
+			component.position.setZero();
+		}
+
+		prefabHandle.writeString(newPrefab.getAsString(), false);
 		AssetRepository.getInstance().rawAssetCreated(prefabHandle, true);
 
 		Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(prefabs.path()));

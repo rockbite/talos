@@ -36,6 +36,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -316,8 +317,10 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         return toolsWidget;
     }
 
-    private void showContextMenu (GameObject gameObject) {
+    private void showContextMenu (@Null GameObject gameObject) {
         contextualMenu.clearItems();
+
+        boolean areWeRootOfPrefab = areWeRootOfPrefab(gameObject);
 
         // if multiple objects are selected disable convert to prefab functionality
         final boolean multipleObjectSelected = tree.getSelection().size() != 1;
@@ -330,29 +333,29 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 SceneUtils.convertToPrefab(gameObject);
             }
         });
-        convertToPrefab.setDisabled(multipleObjectSelected);
 
         contextualMenu.addSeparator();
-        contextualMenu.addItem("Cut", new ClickListener() {
+        MenuItem cut = contextualMenu.addItem("Cut", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
 
             }
         });
-        contextualMenu.addItem("Copy", new ClickListener() {
+        MenuItem copy = contextualMenu.addItem("Copy", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 copySelected();
             }
         });
-        contextualMenu.addItem("Paste", new ClickListener() {
+        MenuItem paste = contextualMenu.addItem("Paste", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 pasteFromClipboard();
             }
         });
+
         contextualMenu.addSeparator();
-        contextualMenu.addItem("Rename", new ClickListener() {
+        MenuItem rename = contextualMenu.addItem("Rename", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 if (tree.getSelection().size() == 1) {
@@ -368,13 +371,13 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 }
             }
         });
-        contextualMenu.addItem("Duplicate", new ClickListener() {
+        MenuItem duplicate = contextualMenu.addItem("Duplicate", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
 
             }
         });
-        contextualMenu.addItem("Delete", new ClickListener() {
+        MenuItem delete = contextualMenu.addItem("Delete", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 deleteSelected();
@@ -409,7 +412,30 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         createMenu.setSubMenu(popupMenu);
 
+        //cut copy  duplicate delete
+        convertToPrefab.setDisabled(multipleObjectSelected || areWeRootOfPrefab);
+
+        cut.setDisabled(areWeRootOfPrefab);
+        copy.setDisabled(areWeRootOfPrefab);
+        duplicate.setDisabled(areWeRootOfPrefab);
+        delete.setDisabled(areWeRootOfPrefab);
+
+
         contextualMenu.show(getStage());
+    }
+
+    private boolean areWeRootOfPrefab (@Null GameObject gameObject) {
+        if (gameObject == null) {
+            //we are a dummy root that doesnt have real game object, this is for dummy root of scene, not required to be valid game object
+            return false;
+        }
+        if (gameObject.getGameObjectContainerRoot() instanceof Prefab) {
+            if (gameObject.parent == null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @EventHandler
@@ -574,9 +600,20 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         nodeMap.clear();
 
         FilteredTree.Node<GameObject> parent = new FilteredTree.Node<>("root", makeHierarchyWidgetActor( new Label(currentContainer.getName(), SharedResources.skin), currentContainer.getSelfObject()));
-        parent.setObject(new GameObject());
+
+        boolean shouldBeSelectable = currentContainer instanceof Prefab;
+
+        parent.setSelectable(shouldBeSelectable);
+        if (shouldBeSelectable) {
+            //set the root object
+            parent.setObject(currentContainer.getSelfObject());
+            objectMap.put(currentContainer.getSelfObject().uuid.toString(), currentContainer.getSelfObject());
+            nodeMap.put(currentContainer.getSelfObject(), parent);
+        } else {
+            parent.setObject(new GameObject());
+        }
+
         parent.setCompanionActor(createToolsForNode(parent));
-        parent.setSelectable(false);
 
         traverseEntityContainer(currentContainer, parent);
 

@@ -15,6 +15,12 @@ public class Prefab extends SavableContainer {
         loadFromHandle(fileHandle);
     }
 
+    public Prefab (String jsonContent, String path, String name) {
+        this.path = path;
+        this.name = name;
+        loadFromString(jsonContent);
+    }
+
     public Prefab(GameObject root) {
         this.root = root;
     }

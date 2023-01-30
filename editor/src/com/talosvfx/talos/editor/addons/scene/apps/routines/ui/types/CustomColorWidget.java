@@ -24,6 +24,11 @@ public class CustomColorWidget extends ATypeWidget<Color> {
         propertyWrapper.defaultValue.set(colorWidget.getValue());
     }
 
+    @Override
+    public boolean isFastChange() {
+        return colorWidget.isFastChange();
+    }
+
     public CustomColorWidget() {
         colorWidget = new ColorWidget();
         colorWidget.init(SharedResources.skin, "color");
