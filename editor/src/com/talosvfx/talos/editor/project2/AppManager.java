@@ -36,6 +36,7 @@ public class AppManager extends InputAdapter implements Observer {
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
+	public static final GameAsset<Object> dummyAsset = new GameAsset<>("dummy", GameAssetType.DIRECTORY);
 
 	static {
 		FileHandle singleton = Gdx.files.local("singleton");
@@ -43,6 +44,12 @@ public class AppManager extends InputAdapter implements Observer {
 		value.metaData = new EmptyMetadata();
 		value.metaData.uuid = new UUID(-1, -1);
 		singletonAsset.dependentRawAssets.add(value);
+
+		FileHandle dummy = Gdx.files.local("dummy");
+		RawAsset dummyValue = new RawAsset(dummy);
+		dummyValue.metaData = new EmptyMetadata();
+		dummyValue.metaData.uuid = new UUID(-1, -2);
+		dummyAsset.dependentRawAssets.add(dummyValue);
 	}
 	private static final String APP_LIST_MENU_PATH = "window/apps/list";
 	private static final String PANEL_LIST_MENU_PATH = "window/panels/panel_list";
