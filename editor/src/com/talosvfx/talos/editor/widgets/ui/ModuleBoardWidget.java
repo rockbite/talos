@@ -530,7 +530,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             module.setIndex(id);
             moduleWrapper.setBoard(this);
 
-            tmp.set(x, Gdx.graphics.getHeight() - y);
+            tmp.set(x, y);
             moduleContainer.screenToLocalCoordinates(tmp);
 
             moduleWrapper.setPosition(tmp.x - moduleWrapper.getWidth() / 2f, tmp.y - moduleWrapper.getHeight() / 2f);
