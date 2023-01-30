@@ -1,10 +1,13 @@
 package com.talosvfx.talos.editor.layouts;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -123,6 +126,7 @@ public class DummyLayoutApp<T> implements LayoutApp {
         tab.add(visLabel).pad(5).padLeft(0).left().maxWidth(300).minWidth(0);
         visLabel.setAlignment(Align.left);
         visLabel.setEllipsis(true);
+        visLabel.setTouchable(Touchable.disabled);
 
         ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
         actor.addListener(new ClickListener() {
@@ -159,6 +163,15 @@ public class DummyLayoutApp<T> implements LayoutApp {
         actor.getStyle().up = null;
         actor.getImage().setScaling(Scaling.fill);
         tab.add(actor).size(16).padLeft(5).padRight(-10);
+
+        tab.addListener(new ClickListener(Input.Buttons.MIDDLE) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (destroyCallback != null) {
+                    destroyCallback.onDestroyRequest();
+                }
+            }
+        });
 
         return tab;
     }
