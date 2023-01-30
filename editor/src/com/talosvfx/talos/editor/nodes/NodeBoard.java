@@ -916,8 +916,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		updateSaveState();
 
-//        TalosMain.Instance().ProjectController().setDirty();
-
 		clearSelection();
 
 		return group;

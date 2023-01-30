@@ -10,6 +10,7 @@ public class TempHackUtil {
 	static {
 		replacementMaps.put("com.talosvfx.talos.editor.addons.scene.logic.components", "com.talosvfx.talos.runtime.scene.components");
 		replacementMaps.put("com.talosvfx.talos.runtime.modules", "com.talosvfx.talos.runtime.vfx.modules");
+		replacementMaps.put("com.talosvfx.talos.editor.addons.scene.utils.propertyWrappers", "com.talosvfx.talos.runtime.scene.utils.propertyWrappers");
 	}
 	public static String hackIt (String asString) {
 		for (ObjectMap.Entry<String, String> replacementMap : replacementMaps) {

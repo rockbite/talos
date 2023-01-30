@@ -377,6 +377,10 @@ public abstract class RoutineNode {
 
     protected Color fetchColorValue(String key) {
         Object object = fetchValue(key);
+        if (!(object instanceof Color)) {
+            return Color.WHITE;
+        }
+
         return (Color)object;
     }
 
