@@ -126,6 +126,7 @@ public class DummyLayoutApp<T> implements LayoutApp {
         tab.add(visLabel).pad(5).padLeft(0).left().maxWidth(300).minWidth(0);
         visLabel.setAlignment(Align.left);
         visLabel.setEllipsis(true);
+        visLabel.setTouchable(Touchable.disabled);
 
         ImageButton actor = new ImageButton(skin.getDrawable("ic-vertical-dots"));
         actor.addListener(new ClickListener() {
@@ -163,13 +164,12 @@ public class DummyLayoutApp<T> implements LayoutApp {
         actor.getImage().setScaling(Scaling.fill);
         tab.add(actor).size(16).padLeft(5).padRight(-10);
 
-        tab.addListener(new ClickListener() {
+        tab.addListener(new ClickListener(Input.Buttons.MIDDLE) {
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (button == Input.Buttons.MIDDLE && destroyCallback != null) {
+            public void clicked(InputEvent event, float x, float y) {
+                if (destroyCallback != null) {
                     destroyCallback.onDestroyRequest();
                 }
-                return super.touchDown(event, x, y, pointer, button);
             }
         });
 
