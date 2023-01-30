@@ -59,6 +59,7 @@ import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.MapComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
@@ -1064,7 +1065,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 						asset.dependentRawAssets.add(value);
 					}
 				}
-				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
+
+				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, TempHackUtil.hackIt(value.handle.readString()));
 
 				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 
