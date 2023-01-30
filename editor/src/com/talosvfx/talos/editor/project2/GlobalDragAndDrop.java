@@ -23,6 +23,7 @@ public class GlobalDragAndDrop {
 
 	public GlobalDragAndDrop () {
 		dragAndDrop = new DragAndDrop();
+		dragAndDrop.setDragTime(10);
 	}
 
 	public void removeTarget (DragAndDrop.Target target) {
