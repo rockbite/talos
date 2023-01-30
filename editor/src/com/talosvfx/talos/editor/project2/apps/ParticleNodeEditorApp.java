@@ -108,17 +108,22 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		particleEffectDescriptor.setAssetProvider(new AssetProvider() {
 			@Override
-			public <T> T findAsset (String assetName, Class<T> clazz) {
-
+			public <T> GameAsset<T> findGameAsset(String assetName, Class<T> clazz) {
 				if (Sprite.class.isAssignableFrom(clazz)) {
-					GameAsset<Texture> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+					GameAsset<T> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 					if(gameAsset.getResource() == null) {
 						gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
 					}
-					return (T)new Sprite(gameAsset.getResource());
+					return gameAsset;
 				}
 
 				throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+			}
+
+			@Override
+			public <T> T findAsset(String assetName, Class<T> clazz) {
+				GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
+				return (T) new Sprite(((Texture) gameAsset.getResource()));
 			}
 		});
 

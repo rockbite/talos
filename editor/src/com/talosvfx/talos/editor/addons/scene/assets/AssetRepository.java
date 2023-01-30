@@ -915,10 +915,15 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
 						@Override
-						public <T> T findAsset (String assetName, Class<T> clazz) {
+						public <T> T findAsset(String assetName, Class<T> clazz) {
+							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
+							return (T) new Sprite(((Texture) gameAsset.getResource()));
+						}
 
+						@Override
+						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
 							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
 								if (gameAsset != null) {
 									if (createLinks) {
@@ -926,7 +931,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 											particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
 										}
 									}
-									return (T)new Sprite(gameAsset.getResource());
+									return gameAsset;
 								} else {
 									particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
 								}
@@ -957,19 +962,24 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
 						@Override
-						public <T> T findAsset (String assetName, Class<T> clazz) {
-
+						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
 							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
 								if (gameAsset != null) {
-									return (T)new Sprite(gameAsset.getResource());
+									return gameAsset;
 								} else {
 									assetToUpdate.setBroken(new Exception("Cannot find " + assetName));
 								}
 							}
 
 							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+						}
+
+						@Override
+						public <T> T findAsset (String assetName, Class<T> clazz) {
+							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
+							return (T) new Sprite(((Texture) gameAsset.getResource()));
 						}
 					});
 					try {

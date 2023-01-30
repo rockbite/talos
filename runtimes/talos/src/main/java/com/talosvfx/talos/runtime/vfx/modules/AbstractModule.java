@@ -258,4 +258,6 @@ public abstract class AbstractModule implements Json.Serializable {
         return outputSlots;
     }
 
+    public void remove(){}
+
 }
