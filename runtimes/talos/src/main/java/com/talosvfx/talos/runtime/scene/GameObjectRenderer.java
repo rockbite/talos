@@ -19,6 +19,7 @@ import com.talosvfx.talos.runtime.scene.render.RoutineComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SimpleParticleComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SkeletonComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SpriteComponentRenderer;
+import lombok.Getter;
 
 import java.util.Comparator;
 
@@ -36,6 +37,9 @@ public class GameObjectRenderer {
 	private Comparator<GameObject> activeSorter;
 
 	private Camera camera;
+
+	@Getter
+	private boolean skipUpdates;
 
 	public GameObjectRenderer () {
 		spriteRenderer = createSpriteRenderer();
@@ -234,5 +238,13 @@ public class GameObjectRenderer {
 
 	public void setCamera (Camera camera) {
 		this.camera = camera;
+	}
+
+	/**
+	 * Any renderers that may want to skip updates do it here
+	 * @param skipUpdates
+	 */
+	public void setSkipUpdates (boolean skipUpdates) {
+		this.skipUpdates = skipUpdates;
 	}
 }

@@ -38,7 +38,9 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 
 		ParticleEffectInstance instance = obtainParticle(gameObject, descriptor);
 		instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
-		instance.update(Gdx.graphics.getDeltaTime());
+		if (!gameObjectRenderer.isSkipUpdates()) {
+			instance.update(Gdx.graphics.getDeltaTime());
+		}
 
 		renderer.render(instance);
 	}

@@ -1390,6 +1390,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
 		customBatch.setUsingCustomColourEncoding(true);
 		customBatch.setProjectionMatrix(camera.combined);
+		customBatch.disableBlending();
 
 		customBatch.begin();
 		renderer.setCamera(camera);
@@ -1398,6 +1399,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		customBatch.end();
 		renderer.skipUpdates = false;
 		renderer.setRenderingEntitySelectionBuffer(false);
+		customBatch.enableBlending();
 	}
 
 	@Override
