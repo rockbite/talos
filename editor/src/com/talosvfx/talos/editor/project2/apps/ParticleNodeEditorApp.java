@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedWidget;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.vfx.VFXEditorActivated;
@@ -41,7 +43,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
-	private final GenericStageWrappedViewportWidget moduleGraphUIWrapper;
+
+	private final GenericStageWrappedViewportWidget moduleGraphStageWrapper;
+	private final GenericStageWrappedWidget moduleGraphUIWrapper;
+
+	public Table uiContent;
 
 	private Comparator<ParticleEmitterWrapper> emitterComparator = new Comparator<ParticleEmitterWrapper>() {
 		@Override
@@ -60,40 +66,46 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		moduleBoardWidget = new ModuleBoardWidget(this);
 
-		moduleGraphUIWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget) {
+		moduleGraphStageWrapper = new GenericStageWrappedViewportWidget(moduleBoardWidget) {
 			@Override
 			protected boolean canMoveAround() {
 				return true;
 			}
 		};
-		moduleGraphUIWrapper.disableListeners();
-		moduleGraphUIWrapper.panRequiresSpace(false);
+		moduleGraphStageWrapper.disableListeners();
+		moduleGraphStageWrapper.panRequiresSpace(false);
 
-		moduleBoardWidget.sendInStage(moduleGraphUIWrapper.getStage());
+		uiContent = new Table();
+		moduleGraphUIWrapper = new GenericStageWrappedWidget(uiContent);
+		moduleBoardWidget.sendInUIStage(moduleGraphUIWrapper.getStage());
+
+		final Table content = new Table();
+		Stack stack = new Stack(moduleGraphStageWrapper, moduleGraphUIWrapper);
+		content.add(stack).grow();
 
 		this.gridAppReference = new DummyLayoutApp<VFXProjectData>(SharedResources.skin, this, getAppName()) {
 			@Override
-			public Actor getMainContent () {
-				return moduleGraphUIWrapper;
+			public Actor getMainContent() {
+				return content;
 			}
 
 			@Override
 			public void onInputProcessorAdded () {
 				super.onInputProcessorAdded();
-				moduleGraphUIWrapper.restoreListeners();
-				SharedResources.stage.setScrollFocus(moduleGraphUIWrapper);
+				moduleGraphStageWrapper.restoreListeners();
+				SharedResources.stage.setScrollFocus(moduleGraphStageWrapper);
 				SharedResources.inputHandling.addPriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.addPriorityInputProcessor(moduleGraphStageWrapper.getStage());
 				SharedResources.inputHandling.setGDXMultiPlexer();
 			}
 
 			@Override
 			public void onInputProcessorRemoved () {
 				super.onInputProcessorRemoved();
-				moduleGraphUIWrapper.disableListeners();
+				moduleGraphStageWrapper.disableListeners();
 				SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphUIWrapper.getStage());
+				SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphStageWrapper.getStage());
 				SharedResources.inputHandling.setGDXMultiPlexer();
-
-				Stage stage = moduleGraphUIWrapper.getStage();
 			}
 		};
 	}
@@ -263,6 +275,12 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void onRemove () {
+		// remove listeners and stuff somehow
+		moduleGraphStageWrapper.disableListeners();
+		SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphUIWrapper.getStage());
+		SharedResources.inputHandling.removePriorityInputProcessor(moduleGraphStageWrapper.getStage());
+		SharedResources.inputHandling.setGDXMultiPlexer();
+
 		if (this.gameAsset != null) {
 			this.gameAsset.listeners.removeValue(this, true);
 		}
@@ -270,15 +288,15 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void applyFromPreferences(ViewportPreferences prefs) {
-		moduleGraphUIWrapper.setCameraPos(prefs.cameraPos);
-		moduleGraphUIWrapper.setCameraZoom(prefs.cameraZoom);
+		moduleGraphStageWrapper.setCameraPos(prefs.cameraPos);
+		moduleGraphStageWrapper.setCameraZoom(prefs.cameraZoom);
 	}
 
 	@Override
 	public ViewportPreferences getPrefs() {
 		ViewportPreferences prefs = new ViewportPreferences();
-		prefs.cameraPos = moduleGraphUIWrapper.getCameraPos();
-		prefs.cameraZoom = moduleGraphUIWrapper.getCameraZoom();
+		prefs.cameraPos = moduleGraphStageWrapper.getCameraPos();
+		prefs.cameraZoom = moduleGraphStageWrapper.getCameraZoom();
 		return prefs;
 	}
 

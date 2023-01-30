@@ -91,8 +91,6 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
                 SharedResources.inputHandling.removePriorityInputProcessor(routineUIStageWrapper.getStage());
                 SharedResources.inputHandling.removePriorityInputProcessor(routineStageWrapper.getStage());
                 SharedResources.inputHandling.setGDXMultiPlexer();
-
-                Stage stage = routineStageWrapper.getStage();
             }
 
 
