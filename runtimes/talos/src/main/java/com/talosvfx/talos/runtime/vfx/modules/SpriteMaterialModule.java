@@ -16,22 +16,26 @@
 
 package com.talosvfx.talos.runtime.vfx.modules;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.render.drawables.TextureRegionDrawable;
 import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
-public class SpriteMaterialModule extends MaterialModule {
+public class SpriteMaterialModule extends MaterialModule implements GameAsset.GameAssetUpdateListener {
 
 	private DrawableValue userDrawable;
 
 	public String assetIdentifier = "white";
 
 	private ModuleValue<SpriteMaterialModule> moduleOutput;
+
+	private GameAsset<Texture> gameAsset;
 
 	@Override
 	protected void defineSlots() {
@@ -55,8 +59,10 @@ public class SpriteMaterialModule extends MaterialModule {
 	public void setAsset (String identifier) {
 		this.assetIdentifier = identifier;
 		final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-		Sprite asset = assetProvider.findAsset(assetIdentifier, Sprite.class);
-		userDrawable.setDrawable(new TextureRegionDrawable(asset));
+		GameAsset<Texture> asset = assetProvider.findGameAsset(assetIdentifier, Sprite.class);
+		asset.listeners.add(this);
+		this.gameAsset = asset;
+		userDrawable.setDrawable(new TextureRegionDrawable(new Sprite(gameAsset.getResource())));
 	}
 
 	@Override
@@ -80,4 +86,18 @@ public class SpriteMaterialModule extends MaterialModule {
 	}
 
 
+	@Override
+	public void onUpdate() {
+		if (gameAsset != null && !gameAsset.isBroken()) {
+			userDrawable.getDrawable().getTextureRegion().setTexture(gameAsset.getResource());
+		}
+	}
+
+	@Override
+	public void remove() {
+		super.remove();
+		if(gameAsset!=null){
+			gameAsset.listeners.removeValue(this, true);
+		}
+	}
 }

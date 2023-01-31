@@ -19,6 +19,7 @@ import com.talosvfx.talos.runtime.scene.render.RoutineComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SimpleParticleComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SkeletonComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SpriteComponentRenderer;
+import lombok.Getter;
 
 import java.util.Comparator;
 
@@ -36,6 +37,9 @@ public class GameObjectRenderer {
 	private Comparator<GameObject> activeSorter;
 
 	private Camera camera;
+
+	@Getter
+	private boolean skipUpdates;
 
 	public GameObjectRenderer () {
 		spriteRenderer = createSpriteRenderer();
@@ -217,12 +221,14 @@ public class GameObjectRenderer {
 			routineRenderer.render(batch, camera, gameObject, gameObject.getComponent(RoutineRendererComponent.class));
 		}
 	}
-	public void buildRenderStateAndRender (PolygonBatch batch, RenderState state, GameObject root) {
+	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, GameObject root) {
 		temp.clear();
 		temp.add(root);
-		buildRenderStateAndRender(batch, state, temp);
+		buildRenderStateAndRender(batch, camera, state, temp);
 	}
-	public void buildRenderStateAndRender (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
+	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, Array<GameObject> rootObjects) {
+		setCamera(camera);
+
 		buildRenderState(batch, state, rootObjects);
 		for (int i = 0; i < state.list.size; i++) {
 			GameObject gameObject = state.list.get(i);
@@ -232,5 +238,13 @@ public class GameObjectRenderer {
 
 	public void setCamera (Camera camera) {
 		this.camera = camera;
+	}
+
+	/**
+	 * Any renderers that may want to skip updates do it here
+	 * @param skipUpdates
+	 */
+	public void setSkipUpdates (boolean skipUpdates) {
+		this.skipUpdates = skipUpdates;
 	}
 }

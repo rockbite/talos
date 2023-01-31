@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -21,10 +22,14 @@ import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
+import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
+import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 
 import java.util.UUID;
 
-public class RuntimeAssetRepository extends BaseAssetRepository {
+public class RuntimeAssetRepository extends BaseAssetRepository implements AssetProvider {
 	protected ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierToGameAssetMap = new ObjectMap<>();
 	protected ObjectMap<UUID, GameAsset<?>> uuidGameAssetObjectMap = new ObjectMap<>();
 
@@ -61,6 +66,20 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		loadType(GameAssetType.LAYOUT_DATA, sorted, baseDir);
 	}
 
+	@Override
+	public <T> T findAsset (String assetName, Class<T> clazz) {
+		if (Sprite.class.isAssignableFrom(clazz)) {
+			GameAsset<Texture> resource = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+			return (T)new Sprite(resource.getResource());
+		}
+		throw new GdxRuntimeException("No asset found " + assetName + " " + clazz.getSimpleName());
+	}
+
+	@Override
+	public <T> GameAsset findGameAsset(String assetName, Class<T> clazz) {
+		throw new UnsupportedOperationException("Not supported operation");
+	}
+
 	private interface GameAssetLoader<T> {
 		GameAsset<T> load (GameAssetExportStructure exportStructure, FileHandle baseFolder);
 	}
@@ -76,7 +95,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		case SOUND:
 			break;
 		case VFX:
-			break;
+			return this::particleLoader;
 		case VFX_OUTPUT:
 			break;
 		case SCRIPT:
@@ -149,6 +168,26 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		gameAsset.setResourcePayload("Script");
 		return (GameAsset<T>)gameAsset;
 	}
+
+	private <T> GameAsset<T> particleLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
+		GameAsset<BaseVFXProjectData> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
+
+		FileHandle vfxPFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
+
+		ExportData vfxExportData = ParticleEffectDescriptor.getExportData(vfxPFile);
+
+		ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
+		particleEffectDescriptor.setAssetProvider(this);
+
+		particleEffectDescriptor.load(vfxExportData);
+
+		vfxExportData.setDescriptorLoaded(particleEffectDescriptor);
+
+		gameAsset.setResourcePayload(vfxExportData);
+
+		return (GameAsset<T>)gameAsset;
+	}
+
 
 	private <T> GameAsset<T> routineLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
 		GameAsset<BaseRoutineData> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);

@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.scene.render;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
@@ -25,10 +26,10 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 		spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);
 		spineRendererComponent.skeleton.getRootBone().setRotation(transformComponent.rotation);
 
-//		if (!skipUpdates) {
-//			spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime() * timeScale);
-//			spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
-//		}
+		if (!gameObjectRenderer.isSkipUpdates()) {
+			spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+			spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+		}
 		spineRendererComponent.skeleton.updateWorldTransform();
 
 		spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);

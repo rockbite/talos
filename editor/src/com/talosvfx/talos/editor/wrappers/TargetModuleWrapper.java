@@ -5,6 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
 import com.talosvfx.talos.runtime.vfx.Slot;
@@ -45,14 +48,16 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
 
     @Override
     protected void wrapperSelected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.registerForDragPoints(this);
+        RegisterDragPoints registerDragPoints = Notifications.obtainEvent(RegisterDragPoints.class);
+        registerDragPoints.setRegisterForDragPoints(this);
+        Notifications.fireEvent(registerDragPoints);
     }
 
     @Override
     protected void wrapperDeselected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.unregisterDragPoints(this);
+        UnRegisterDragPoints unregisterDragPoints = Notifications.obtainEvent(UnRegisterDragPoints.class);
+        unregisterDragPoints.setUnRegisterForDragPoints(this);
+        Notifications.fireEvent(unregisterDragPoints);
     }
 
     @Override

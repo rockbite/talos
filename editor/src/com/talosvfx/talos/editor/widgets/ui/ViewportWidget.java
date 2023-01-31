@@ -21,6 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
@@ -454,14 +455,14 @@ public abstract class ViewportWidget extends Table {
 							countOfSameTouchDown = 0;
 
 							if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-								if (entityUnderMouse != null) {
+								if (entityUnderMouse != null && !entityUnderMouse.isEditorTransformLocked()) {
 									addToSelection(entityUnderMouse);
 								}
 
 							} else {
 								//We aren't over the pixel or the gizmo, unselect
 								requestSelectionClear();
-								if (entityUnderMouse != null) {
+								if (hasEntityUnderMouse && !entityUnderMouse.isEditorTransformLocked()) {
 									hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, entityUnderMouse);
 									selectGameObject(entityUnderMouse);
 
@@ -499,8 +500,6 @@ public abstract class ViewportWidget extends Table {
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
 						if (canTouchGizmo(hitGizmo)) {
-							selectGameObject(hitGizmo.getGameObject());
-
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
@@ -615,7 +614,6 @@ public abstract class ViewportWidget extends Table {
 		if (testGizmo instanceof GroupSelectionGizmo) return true;
 
 		if (!testGizmo.getGameObject().isEditorVisible()) return false;
-		if (testGizmo.getGameObject().isEditorTransformLocked()) return false;
 
 		return true;
 	}
@@ -648,24 +646,20 @@ public abstract class ViewportWidget extends Table {
 		gizmos.gizmoMap.remove(gameObject);
 	}
 
-	public void initGizmos (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
-		makeGizmosFor(gameObjectContainer, gameObject, parent);
+	protected void createAndInitGizmos (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent, boolean makeGizmoForRoot) {
+		if (makeGizmoForRoot) {
+			makeGizmosFor(gameObjectContainer, gameObject, parent);
+		}
 		Array<GameObject> childObjects = gameObject.getGameObjects();
 		if (childObjects != null) {
 			for (GameObject childObject : childObjects) {
-				makeGizmosFor(gameObjectContainer, childObject, parent);
-				initGizmos(gameObjectContainer,childObject, parent);
+				createAndInitGizmos(gameObjectContainer,childObject, parent, true);
 			}
 		}
 	}
 
-	public void initGizmos (GameObjectContainer gameObjectContainer, ViewportWidget parent) {
-		Array<GameObject> childObjects = gameObjectContainer.getGameObjects();
-		if (childObjects != null) {
-			for (GameObject childObject : childObjects) {
-				initGizmos(gameObjectContainer, childObject, parent);
-			}
-		}
+	public void initGizmos (GameObjectContainer gameObjectContainer, ViewportWidget parent, boolean makeGizmoForRoot) {
+		createAndInitGizmos(gameObjectContainer, gameObjectContainer.getSelfObject(), parent, makeGizmoForRoot);
 	}
 
 	public void makeGizmosFor (GameObjectContainer gameObjectContainer, GameObject gameObject, ViewportWidget parent) {
@@ -739,8 +733,6 @@ public abstract class ViewportWidget extends Table {
 		});
 
 		for (Gizmo gizmo : gizmos.gizmoList) {
-
-			if(!(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) continue;
 			if (gizmo.hit(x, y)) {
 				return gizmo;
 			}
@@ -1250,17 +1242,12 @@ public abstract class ViewportWidget extends Table {
 	protected void setSelection (Array<GameObject> gameObjects) {
 		selection.clear();
 
-		// do not select locked GO's here
 		for (GameObject gameObject : gameObjects) {
-			if(!gameObject.isEditorTransformLocked()) {
-				selection.add(gameObject);
-			}
+			selection.add(gameObject);
 		}
 
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(getEventContext(), selection));
 	}
-
-
 
 	protected void selectGameObjectAndChildren (GameObject gameObject) {
 		selection.add(gameObject);

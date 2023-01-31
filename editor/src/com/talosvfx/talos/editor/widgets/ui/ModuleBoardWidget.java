@@ -82,6 +82,8 @@ public class ModuleBoardWidget extends WidgetGroup {
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
 
+    private Stage uiStage;
+
     public ModuleBoardWidget (ParticleNodeEditorApp app) {
         super();
 
@@ -247,11 +249,10 @@ public class ModuleBoardWidget extends WidgetGroup {
         return arr;
     }
 
-    public void sendInStage (Stage stage) {
+    public void sendInUIStage (Stage stage) {
+        uiStage = stage;
 
-        stage.addListener(new InputListener() {
-
-
+        uiStage.addListener(new InputListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchDown(event, x, y, pointer, button);
@@ -262,7 +263,9 @@ public class ModuleBoardWidget extends WidgetGroup {
 
                 if (!event.isHandled()) {
                     clearSelection();
-                    stage.unfocusAll();
+                    if (uiStage != null) {
+                        uiStage.unfocusAll();
+                    }
                     return false;
                 }
 
@@ -431,10 +434,9 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
-        Stage uiStage = getStage();
-        uiStage.screenToStageCoordinates(vec);
-
-        TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
+        if (uiStage != null) {
+            TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
+        }
     }
 
     public void deleteSelectedWrappers () {
@@ -467,13 +469,13 @@ public class ModuleBoardWidget extends WidgetGroup {
         // TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
-    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float x, float y) {
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float screenX, float screenY) {
         final T module;
         try {
             module = ClassReflection.newInstance(clazz);
 
             if (currentEmitterGraph.addModule(module)) {
-                final U moduleWrapper = createModuleWrapper(module, x, y);
+                final U moduleWrapper = createModuleWrapper(module, screenX, screenY);
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(currentEmitterGraph);
 
@@ -493,13 +495,13 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     /**
      * @param module
-     * @param x in screen coordinate space
-     * @param y in screen coordinate space
+     * @param screenX in screen coordinate space
+     * @param screenY in screen coordinate space
      * @param <T>
      * @param <U>
      * @return
      */
-    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float x, float y) {
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float screenX, float screenY) {
         ModuleWrapper<T> moduleWrapper = null;
 
         if (module == null) return null;
@@ -518,7 +520,7 @@ public class ModuleBoardWidget extends WidgetGroup {
             module.setIndex(id);
             moduleWrapper.setBoard(this);
 
-            tmp.set(x, Gdx.graphics.getHeight() - y);
+            tmp.set(screenX, screenY);
             moduleContainer.screenToLocalCoordinates(tmp);
 
             moduleWrapper.setPosition(tmp.x - moduleWrapper.getWidth() / 2f, tmp.y - moduleWrapper.getHeight() / 2f);

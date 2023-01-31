@@ -32,6 +32,11 @@ public class CustomBooleanWidget extends ATypeWidget<Boolean>  {
     }
 
     @Override
+    public boolean isFastChange() {
+        return false;
+    }
+
+    @Override
     public void applyValueToWrapper(PropertyWrapper<Boolean> propertyWrapper) {
         propertyWrapper.defaultValue = checkBox.isChecked();
     }

@@ -197,6 +197,12 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     }
 
+    @Override
+    public void layout() {
+        super.layout();
+        pack();
+    }
+
     protected abstract void configureSlots();
 
     protected float reportPrefWidth() {

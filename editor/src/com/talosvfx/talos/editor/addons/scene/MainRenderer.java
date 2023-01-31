@@ -131,6 +131,7 @@ public class MainRenderer implements Observer {
     }
     public void render (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
         gameObjectRenderer.setCamera(this.camera);
+        gameObjectRenderer.setSkipUpdates(skipUpdates);
         //fill entities
         gameObjectRenderer.buildRenderState(batch, state, rootObjects);
 

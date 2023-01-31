@@ -186,8 +186,13 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 	}
 
 	public void loadFromHandle (FileHandle handle) {
-		load(TempHackUtil.hackIt(handle.readString()));
+		loadFromString(handle.readString());
 	}
+
+	void loadFromString (String jsonString) {
+		load(TempHackUtil.hackIt(jsonString));
+	}
+
 
 	public Array<GameObject> findGameObjects(String targetString) {
 		Array<GameObject> list = new Array<>();

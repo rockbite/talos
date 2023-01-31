@@ -182,20 +182,22 @@ public class DirectoryViewWidget extends Table {
 					}
 				}
 			} else if (selected.size > 1) {
-				ObjectSet<AMetadata> list = new ObjectSet<AMetadata>();
+				ObjectSet<IPropertyHolder> list = new ObjectSet<>();
 				for (int i = 0; i < selected.size; i++) {
 					Item item = selected.get(i);
 					if (item.gameAsset != null) {
 						if (!item.gameAsset.isBroken()) {
 							RawAsset rootRawAsset = item.gameAsset.getRootRawAsset();
-							list.add(rootRawAsset.metaData);
+							AMetadata metaData = rootRawAsset.metaData;
+							IPropertyHolder holderForMeta = PropertyWrapperProviders.getOrCreateHolder(metaData);
+							list.add(holderForMeta);
 						}
 					}
 				}
 				if (list.isEmpty()) {
 					holder = null;
 				} else {
-					holder = new MultiPropertyHolder(list);
+					holder = new MultiPropertyHolder<>(list);
 				}
 			}
 

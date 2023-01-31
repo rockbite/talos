@@ -177,7 +177,7 @@ public abstract class RoutineNode {
                 port.dataType = DataType.ASSET;
             }
 
-            if(name.equals("checkbox")) {
+            if(row.getName().equals("checkbox")) {
                 port.valueOverride = row.getBooleanAttribute("default", false);
             }
         }
@@ -377,6 +377,10 @@ public abstract class RoutineNode {
 
     protected Color fetchColorValue(String key) {
         Object object = fetchValue(key);
+        if (!(object instanceof Color)) {
+            return Color.WHITE;
+        }
+
         return (Color)object;
     }
 

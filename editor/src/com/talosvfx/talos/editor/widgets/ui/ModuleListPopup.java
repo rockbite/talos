@@ -43,7 +43,7 @@ public class ModuleListPopup extends VisWindow {
     FilteredTree<String> tree;
     SearchFilteredTree<String> searchFilteredTree;
 
-    Vector2 createLocation = new Vector2();
+    Vector2 createLocationScreen = new Vector2();
 
     private ObjectMap<String, String> nameToModuleClass = new ObjectMap<>();
     private ModuleBoardWidget moduleBoardWidget;
@@ -102,7 +102,7 @@ public class ModuleListPopup extends VisWindow {
                     try {
                         Class clazz = ClassReflection.forName(TempHackUtil.hackIt("com.talosvfx.talos.runtime.modules." + nameToModuleClass.get(node.name)));
                         if(WrapperRegistry.map.containsKey(clazz)) {
-                            moduleBoardWidget.createModule(clazz, createLocation.x, createLocation.y);
+                            moduleBoardWidget.createModule(clazz, createLocationScreen.x, createLocationScreen.y);
                             remove();
                         }
                     } catch (ReflectionException e) {
@@ -155,21 +155,23 @@ public class ModuleListPopup extends VisWindow {
         WrapperRegistry.reg(EmitterModule.class, EmitterModuleWrapper.class);
     }
 
-    public void showPopup(Stage stage, Vector2 location, ModuleBoardWidget moduleBoardWidget) {
+    public void showPopup(Stage uiStage, Vector2 screenTouch, ModuleBoardWidget moduleBoardWidget) {
         this.moduleBoardWidget = moduleBoardWidget;
 
-        setPosition(location.x, location.y - getHeight());
-        if (stage.getHeight() - getY() > stage.getHeight()) setY(getY() + getHeight());
-        ActorUtils.keepWithinStage(stage, this);
-        stage.addActor(this);
+        Vector2 popupSpawnLocation = new Vector2(screenTouch);
+        uiStage.screenToStageCoordinates(popupSpawnLocation);
+        setPosition(popupSpawnLocation.x, popupSpawnLocation.y - getHeight());
+        setPosition(popupSpawnLocation.x, popupSpawnLocation.y);
+        if (uiStage.getHeight() - getY() > uiStage.getHeight()) setY(getY() + getHeight());
+        ActorUtils.keepWithinStage(uiStage, this);
+        uiStage.addActor(this);
 
         searchFilteredTree.reset();
         getStage().setKeyboardFocus(searchFilteredTree.textField);
         getStage().setScrollFocus(searchFilteredTree.scrollPane);
         tree.collapseAll();
 
-        stage.stageToScreenCoordinates(location);
-        createLocation.set(location);
+        createLocationScreen.set(screenTouch);
     }
 
     @Override

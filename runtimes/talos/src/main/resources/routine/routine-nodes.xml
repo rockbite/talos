@@ -62,6 +62,7 @@
             <dynamicValue name="jitter" type="float" default="0" min = "0" max = "2" progress="true">Jitter</dynamicValue>
             <inputText name="target" type="string">path</inputText>
             <checkbox name="reverse" default = "false">reverse</checkbox>
+            <checkbox name="useWorldOffset" default="true">use world offset</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
             <value port="output" name="onComplete" type="signal">onComplete</value>

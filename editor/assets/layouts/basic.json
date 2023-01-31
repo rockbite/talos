@@ -15,6 +15,7 @@
               "tabActive": true,
               "baseAppClazz": "ProjectExplorerApp",
               "gameAssetIdentifier": "singleton",
+              "gameAssetUniqueIdentifier": "ffffffff-ffff-ffff-ffff-ffffffffffff",
               "gameAssetType": "DIRECTORY"
             }
           ]
@@ -34,6 +35,7 @@
                   "tabActive": true,
                   "baseAppClazz": "SceneHierarchyApp",
                   "gameAssetIdentifier": "dummy",
+                  "gameAssetUniqueIdentifier": "ffffffff-ffff-ffff-ffff-fffffffffffe",
                   "gameAssetType": "SCENE"
                 }
               ]
@@ -49,6 +51,7 @@
                   "tabActive": true,
                   "baseAppClazz": "SceneEditorApp",
                   "gameAssetIdentifier": "dummy",
+                  "gameAssetUniqueIdentifier": "ffffffff-ffff-ffff-ffff-fffffffffffe",
                   "gameAssetType": "SCENE"
                 }
               ]
@@ -67,6 +70,7 @@
           "tabActive": true,
           "baseAppClazz": "PropertiesPanelApp",
           "gameAssetIdentifier": "dummy",
+          "gameAssetUniqueIdentifier": "ffffffff-ffff-ffff-ffff-fffffffffffe",
           "gameAssetType": "SCENE"
         }
       ]

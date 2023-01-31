@@ -325,14 +325,15 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void deleteSelectedNodes () {
-		try {
-			for (NodeWidget node : selectedNodes) {
-				deleteNode(node);
-			}
-		} catch (Exception e) {
-			TalosMain.Instance().reportException(e);
+		NodeRemovedEvent nodeRemovedEvent = Notifications.obtainEvent(NodeRemovedEvent.class);
+
+		for (NodeWidget node : selectedNodes) {
+			deleteNode(node);
+			nodeRemovedEvent.getNodes().add(node);
 		}
 
+		nodeRemovedEvent.setContext(nodeStage);
+		Notifications.fireEvent(nodeRemovedEvent);
 		clearSelection();
 	}
 
@@ -344,15 +345,15 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		}
 
 		nodeStage.data.nodes.removeValue(node, true);
-		Notifications.fireEvent(Notifications.obtainEvent(NodeRemovedEvent.class).set(getNodeStage(), node));
-
 		mainContainer.removeActor(node);
+		if (ccFromNode == node) {
+			ccFromNode = null;
+		}
 
 		node.notifyRemoved();
 		unRegisterNode(node);
 
 		updateSaveState();
-//        TalosMain.Instance().ProjectController().setDirty();
 	}
 
 	public <T extends AbstractModule> void tryAndConnectLasCC (NodeWidget nodeWidget) {
@@ -899,8 +900,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		groupContainer.addActor(group);
 
 		updateSaveState();
-
-//        TalosMain.Instance().ProjectController().setDirty();
 
 		clearSelection();
 

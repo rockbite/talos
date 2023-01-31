@@ -13,6 +13,11 @@ public class CustomVector2Widget extends ATypeWidget<Vector2> {
 
     private Vector2 vec = new Vector2();
 
+    @Override
+    public boolean isFastChange() {
+        return xWidget.isFastChange() || yWidget.isFastChange();
+    }
+
     public CustomVector2Widget() {
         xWidget = new ValueWidget();
         xWidget.init(SharedResources.skin);

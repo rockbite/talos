@@ -71,7 +71,6 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.utils.grid.property_providers.StaticBoundedGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
-import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
@@ -927,7 +926,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		gizmos.gizmoList.clear();
 		gizmos.gizmoMap.clear();
 		gizmos.gizmoList.add(groupSelectionGizmo);
-		initGizmos(mainScene, this);
+
+		boolean shouldRegisterRoot = mainScene instanceof Prefab;
+
+		createAndInitGizmos(mainScene, mainScene.getSelfObject(), this, shouldRegisterRoot);
 
 		clearSelection();
 
@@ -994,13 +996,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
-		initGizmos(getRootSceneObject(), gameObject, this);
+		createAndInitGizmos(getRootSceneObject(), gameObject, this, true);
 	}
 
 	@EventHandler
 	public void onComponentRemove (ComponentRemoved event) {
 		removeGizmos(event.getGameObject());
-		initGizmos(event.getGameObject(), this);
+		createAndInitGizmos(getRootSceneObject(), event.getGameObject(), this, true);
 	}
 
 	@EventHandler
@@ -1157,15 +1159,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		//if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
 		if(gizmo != null) {
-			if(!(gizmo instanceof GroupSelectionGizmo)) {
-				if(gizmo.getGameObject().isEditorTransformLocked()) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
+			return false;
 		}
 
 		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
@@ -1370,6 +1364,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		PolygonSpriteBatchMultiTexture customBatch = entitySelectionBuffer.getCustomBatch();
 		customBatch.setUsingCustomColourEncoding(true);
 		customBatch.setProjectionMatrix(camera.combined);
+		customBatch.disableBlending();
 
 		customBatch.begin();
 		renderer.setCamera(camera);
@@ -1378,6 +1373,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		customBatch.end();
 		renderer.skipUpdates = false;
 		renderer.setRenderingEntitySelectionBuffer(false);
+		customBatch.enableBlending();
 	}
 
 	@Override

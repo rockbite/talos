@@ -55,7 +55,7 @@ public class AssetPipelineTest extends ApplicationAdapter {
 
 		Scene scene = this.scene.getResource();
 		gameObjectRenderer.update(scene.getSelfObject(), Gdx.graphics.getDeltaTime());
-		gameObjectRenderer.buildRenderStateAndRender(batch, renderState, scene.getSelfObject());
+		gameObjectRenderer.buildRenderStateAndRender(batch, camera, renderState, scene.getSelfObject());
 		batch.end();
 
 	}

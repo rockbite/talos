@@ -158,6 +158,7 @@ public class ParticleEmitterDescriptor {
             }
         }
 
+        module.remove();
         modules.removeValue(module, true);
 
         if(module instanceof ParticleModule) {

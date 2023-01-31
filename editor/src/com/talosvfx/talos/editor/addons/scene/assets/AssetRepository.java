@@ -27,6 +27,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
+import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -58,6 +59,7 @@ import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.MapComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
@@ -620,6 +622,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			assetExportStructure.type = gameAsset.type;
 
 
+			boolean primaryFile = true;
 			for (RawAsset dependentRawAsset : dependentRawAssets) {
 
 				//We need folder structure
@@ -629,10 +632,33 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				if (!dirToCopyInto.exists()) {
 					dirToCopyInto.mkdirs();
 				}
-				dependentRawAsset.handle.copyTo(dirToCopyInto);
+
+				//Conversions
+				boolean converted = false;
+				if (primaryFile) {
+					if (type == GameAssetType.VFX) {
+						//Lets convert vfx file handle if this is the one
+						GameAsset<VFXProjectData> castedVfxGameAsset = (GameAsset<VFXProjectData>)gameAsset;
+						ExportData exportData = VFXProjectSerializer.exportTLSDataToP(castedVfxGameAsset.getResource());
+						String fileToWrite = VFXProjectSerializer.writeTalosPExport(exportData);
+						String newFileName = dependentRawAsset.handle.nameWithoutExtension() + ".p";
+						dirToCopyInto.child(newFileName).writeString(fileToWrite, false);
+						converted = true;
+
+						assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + newFileName);
+					}
+				}
+
+				if (!converted) {
+					dependentRawAsset.handle.copyTo(dirToCopyInto);
+					assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
+				}
+
+
 				copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto);
 
-				assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
+
+				primaryFile = false;
 			}
 
 
@@ -914,10 +940,15 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
 						@Override
-						public <T> T findAsset (String assetName, Class<T> clazz) {
+						public <T> T findAsset(String assetName, Class<T> clazz) {
+							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
+							return (T) new Sprite(((Texture) gameAsset.getResource()));
+						}
 
+						@Override
+						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
 							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
 								if (gameAsset != null) {
 									if (createLinks) {
@@ -925,7 +956,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 											particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
 										}
 									}
-									return (T)new Sprite(gameAsset.getResource());
+									return gameAsset;
 								} else {
 									particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
 								}
@@ -956,19 +987,24 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
 						@Override
-						public <T> T findAsset (String assetName, Class<T> clazz) {
-
+						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
 							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<Texture> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
+								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
 
 								if (gameAsset != null) {
-									return (T)new Sprite(gameAsset.getResource());
+									return gameAsset;
 								} else {
 									assetToUpdate.setBroken(new Exception("Cannot find " + assetName));
 								}
 							}
 
 							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
+						}
+
+						@Override
+						public <T> T findAsset (String assetName, Class<T> clazz) {
+							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
+							return (T) new Sprite(((Texture) gameAsset.getResource()));
 						}
 					});
 					try {
@@ -998,12 +1034,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					}
 
 
-					RawAsset rawAssetTLSFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
-
-
 					if (createLinks) {
 						value.gameAssetReferences.add(vfxProjectDataGameAsset);
-						vfxProjectDataGameAsset.dependentRawAssets.add(rawAssetTLSFile);
 					}
 				}
 
@@ -1043,7 +1075,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 						asset.dependentRawAssets.add(value);
 					}
 				}
-				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, value.handle);
+
+				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, TempHackUtil.hackIt(value.handle.readString()));
 
 				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 
@@ -1661,6 +1694,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			populateChildren(file, rootNode);
 
 			file.moveTo(destination);
+			Notifications.fireEvent(Notifications.obtainEvent(DirectoryMovedEvent.class).set(file, destination));
 
 			updateChildReferences(rootNode);
 
@@ -1798,12 +1832,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		if (!oldPixmap.isDisposed()) {
 			oldPixmap.dispose();
 		}
-		if (!newPixmap.isDisposed()) {
-			newPixmap.dispose();
-		}
 
 		// fire asset resolution changed event
-		Notifications.fireEvent(Notifications.obtainEvent(AssetResolutionChanged.class));
+		final AssetResolutionChanged event = Notifications.obtainEvent(AssetResolutionChanged.class);
+		event.setFileHandle(fileHandle);
+		Notifications.fireEvent(event);
 	}
 
 	public void fillAssetColor (GameAsset<Texture> gameAsset, Color color)  {

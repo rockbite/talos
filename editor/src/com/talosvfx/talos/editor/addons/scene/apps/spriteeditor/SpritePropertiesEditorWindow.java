@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -66,6 +67,7 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         // init save button
         final Label buttonLabel = new Label("Save", SharedResources.skin);
         final SquareButton saveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
+        saveButton.setStyle(new Button.ButtonStyle(saveButton.getStyle()));
         saveButton.getStyle().checked = saveButton.getStyle().up;
         saveButton.addListener(new ClickListener() {
             @Override
@@ -93,6 +95,7 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         // init save button
         final Label buttonLabel = new Label("Save", SharedResources.skin);
         final SquareButton saveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
+        saveButton.setStyle(new Button.ButtonStyle(saveButton.getStyle()));
         saveButton.getStyle().checked = saveButton.getStyle().up;
         saveButton.addListener(new ClickListener() {
             @Override

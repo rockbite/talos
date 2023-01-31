@@ -291,11 +291,9 @@ public class AssetImporter {
     }
 
     public static void moveFile(FileHandle file, FileHandle directory, boolean checkGameAssets, boolean rename) {
+        //Are we moving the actual scene editing?
 
-        //Are we moving the actual scene editting?
-
-
-        logger.info("Rdo scene editing move");
+        logger.info("Redo scene editing move");
 //        String path = SceneEditorWorkspace.getInstance().getCurrentContainer().path;
 //        if (file.path().equals(path)) {
 //            //moving the scene that we are editing
@@ -309,13 +307,6 @@ public class AssetImporter {
 //        }
 
         AssetRepository.getInstance().moveFile(file, directory, checkGameAssets, rename);
-
-
-        logger.info("file moved, we should send events so project explorer etc can change if they want to");
-
-//        SceneEditorAddon.get().projectExplorer.loadDirectoryTree(projectPath);
-//
-//        SceneEditorAddon.get().projectExplorer.select(directory.path());
     }
 
     public static FileHandle renameFile(FileHandle file, String newName) {
