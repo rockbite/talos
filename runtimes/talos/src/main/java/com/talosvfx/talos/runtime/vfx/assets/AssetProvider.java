@@ -16,7 +16,11 @@
 
 package com.talosvfx.talos.runtime.vfx.assets;
 
+import com.talosvfx.talos.runtime.assets.GameAsset;
+
 public interface AssetProvider {
 
 	<T> T findAsset (String assetName, Class<T> clazz);
+
+	<T> GameAsset findGameAsset(String assetName, Class<T> clazz);
 }

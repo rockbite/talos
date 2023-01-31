@@ -51,4 +51,9 @@ public class AtlasAssetProvider extends BaseAssetProvider {
             }
         });
     }
+
+    @Override
+    public <T> GameAsset<T> findGameAsset(String assetName, Class<T> clazz) {
+        throw new UnsupportedOperationException("Not supported operation");
+    }
 }

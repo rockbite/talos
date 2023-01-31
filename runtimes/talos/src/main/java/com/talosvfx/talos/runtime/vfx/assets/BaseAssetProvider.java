@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime.vfx.assets;
 
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 
 public abstract class BaseAssetProvider implements AssetProvider {
 
@@ -44,6 +45,11 @@ public abstract class BaseAssetProvider implements AssetProvider {
 	@Override
 	public <T> T findAsset (String assetName, Class<T> clazz) {
 		return getAssetHandler(clazz).findAsset(assetName);
+	}
+
+	@Override
+	public <T> GameAsset<T> findGameAsset (String assetName, Class<T> clazz) {
+		throw new UnsupportedOperationException("Not supported operation");
 	}
 
 }
