@@ -36,10 +36,6 @@ public class SaveSystem implements Observer {
 		Notifications.fireEvent(Notifications.obtainEvent(SaveRequest.class));
 	}
 
-	@CommandEventHandler(commandType = Commands.CommandType.UNDO)
-	public void onUndoAction (CommandEvent actionEvent) {
-		SharedResources.globalSaveStateSystem.onUndoRequest();
-	}
 
 	@EventHandler
 	public void onSave (SaveRequest event) {

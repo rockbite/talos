@@ -4,6 +4,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.AMetadata;
@@ -144,6 +147,9 @@ public class GlobalSaveStateSystem implements Observer {
 		}
 	}
 
-
+	@CommandEventHandler(commandType = Commands.CommandType.UNDO)
+	public void onUndoAction (CommandEvent actionEvent) {
+		SharedResources.globalSaveStateSystem.onUndoRequest();
+	}
 
 }
